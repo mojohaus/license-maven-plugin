@@ -86,7 +86,7 @@ public class DownloadLicensesMojo
     /**
      * File contains a mapping between each dependency and it's license information.
      * 
-     * @parameter default-value="${project.build.directory}/licenses.xml"
+     * @parameter default-value="${project.basedir}/src/licenses.xml"
      * @since 2.0.0
      */
     private File licensesSummaryFile;
