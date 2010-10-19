@@ -1,0 +1,26 @@
+import java.io.*;
+import java.util.*;
+
+try
+{
+    File licenseFile = new File( basedir, "target/licenses/Common Public License Version 1.0 - cpl1.0.txt" );
+    if ( !licenseFile.exists() || licenseFile.isDirectory() )
+    {
+        System.err.println( "Could not find license file: " + licenseFile );
+        return false;
+    }
+    
+    File summaryFile = new File( basedir, "target/licenses.xml" );
+    if ( !summaryFile.exists() || summaryFile.isDirectory() )
+    {
+        System.err.println( "Could not find license file: " + summaryFile );
+        return false;
+    }
+}
+catch( Throwable t )
+{
+    t.printStackTrace();
+    return false;
+}
+
+return true;
