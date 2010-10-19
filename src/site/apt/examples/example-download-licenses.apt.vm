@@ -1,0 +1,41 @@
+ ------
+ License Examples
+ ------
+ ------
+ 2010-10-16
+ ------
+
+Donwload Licenses Examples
+
+  This page provides examples of how to use the <<<download-licenses>>> goal.
+
+* Basic Example
+
+  This example shows how to configure the <<<download-licenses>>> goal for basic usage.
+  
+-------------------
+<project>
+  ...
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>${project.version}</version>
+        <executions>
+          <execution>
+            <id>download-licenses</id>
+            <goals>
+              <goal>download-licenses</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+    ...
+  </build>
+  ...
+</project>
+-------------------
+
+

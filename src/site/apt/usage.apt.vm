@@ -1,0 +1,64 @@
+ ------
+ Usage
+ ------
+ ------
+ 2010-10-16
+ ------
+
+Usage
+
+  The License Maven Plugin can download dependency license files. The section below should help 
+  you to get started. If you have problems using the plugin, please feel free to post your
+  question to the {{{./mail-lists.html}user mailing list}}.
+
+  By default, the <<<{{{./download-licenses-mojo.html}download-licenses}}>>> goal will attempt to 
+  resolve the license of each project dependency.  These files will be downloaded to a local directory
+  to be included in the final packaging of the project if desired.  The licenses are downloaded
+  based on the url field of the dependency POM.  In addition to the license files available via the
+  POMs a license information file can be configured that will allow the plugin to locate license
+  files when the information is missing or incorrect in the dependency POM.
+  
+  After downloading the license files, the plugin will create a summary file in XML format which describes
+  the license(s) associated with each dependency.
+
+* {Basic Configuration}
+
+  By default the plugin attaches to the <<<generate-resources>>> phase of the build lifecycle.  An 
+  example configuration is supplied below.
+
+-------------------
+<project>
+  ...
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>${project.version}</version>
+        <executions>
+          <execution>
+            <id>download-licenses</id>
+            <goals>
+              <goal>download-licenses</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+    ...
+  </build>
+  ...
+</project>
+-------------------
+
+  Next run your build:
+  
++-----+
+mvn generate-resources
++-----+
+    
+  For the <<<download-licenses>>> goal, licenses will by default be downloaded into the directory 
+  <<<target/licenses>>>.  This can be configured using the <<<licensesOutputDirectory>>> parameter.
+  
+
+   
