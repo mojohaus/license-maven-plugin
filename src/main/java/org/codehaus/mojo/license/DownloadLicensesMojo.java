@@ -42,7 +42,7 @@ import org.codehaus.mojo.license.model.DependencyProject;
 /**
  * Maven goal for downloading the license files of all the current project's dependencies.
  * 
- * @phase generate-resources
+ * @phase package
  * @goal download-licenses
  * @requiresDependencyResolution test
  * @author Paul Gier
