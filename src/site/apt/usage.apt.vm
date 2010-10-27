@@ -19,7 +19,10 @@ Usage
   files when the information is missing or incorrect in the dependency POM.
   
   After downloading the license files, the plugin will create a summary file in XML format which describes
-  the license(s) associated with each dependency.
+  the license(s) associated with each dependency.  Note that subsequent runs of the plugin will attempt
+  to use the existing summary file if found instead of re-downloading the licenses every build.
+  If the license summary file is found, only the licenses of new dependencies not in the file will
+  be downloaded.
 
 * {Basic Configuration}
 

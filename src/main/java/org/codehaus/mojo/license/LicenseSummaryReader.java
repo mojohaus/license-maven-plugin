@@ -102,11 +102,15 @@ public class LicenseSummaryReader
             }
             else if ( node.getNodeName().equals( "licenses" ) )
             {
-                NodeList licensesNodes = node.getChildNodes();
-                for ( int j = 0; j < licensesNodes.getLength(); ++j )
+                NodeList licensesChildNodes = node.getChildNodes();
+                for ( int j = 0; j < licensesChildNodes.getLength(); ++j )
                 {
-                    License license = parseLicense( licensesNodes.item( j ) );
-                    dependency.addLicense( license );
+                    Node licensesChildNode = licensesChildNodes.item( j );
+                    if ( licensesChildNode.getNodeName().equals( "license" ) )
+                    {
+                        License license = parseLicense( licensesChildNode );
+                        dependency.addLicense( license );
+                    }
                 }
             }
         }

@@ -98,6 +98,7 @@
               <pomIncludes>
                 <pomInclude>*/pom.xml</pomInclude>
               </pomIncludes>
+              <!-- <goals>license:download-licenses</goals>-->
               <postBuildHookScript>verify.bsh</postBuildHookScript>
               <!-- <settingsFile>src/it/settings.xml</settingsFile> -->
               <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>

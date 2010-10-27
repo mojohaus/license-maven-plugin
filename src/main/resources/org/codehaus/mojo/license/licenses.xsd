@@ -20,7 +20,7 @@ under the License.
 -->
 
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-  targetNamespace="http://www.codehaus.org/" xmlns="http://www.codehaus.org"
+  targetNamespace="http://mojo.codehaus.org/" xmlns="http://mojo.codehaus.org/"
   elementFormDefault="qualified" >
 
 <xs:element name="licenseSummary">

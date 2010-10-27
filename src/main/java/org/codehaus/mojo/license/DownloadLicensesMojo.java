@@ -55,7 +55,8 @@ public class DownloadLicensesMojo
     /**
      * The Maven Project Object
      * 
-     * @parameter expression="${project}"
+     * @parameter default-value="${project}"
+     * @readonly
      */
     private MavenProject project;
 
@@ -70,7 +71,7 @@ public class DownloadLicensesMojo
     /**
      * Location of the local repository.
      * 
-     * @parameter expression="${localRepository}"
+     * @parameter default-value="${localRepository}"
      * @readonly
      */
     private org.apache.maven.artifact.repository.ArtifactRepository localRepository;
@@ -78,16 +79,16 @@ public class DownloadLicensesMojo
     /**
      * List of Remote Repositories used by the resolver
      * 
-     * @parameter expression="${project.remoteArtifactRepositories}"
+     * @parameter default-value="${project.remoteArtifactRepositories}"
      * @readonly
      */
     private java.util.List remoteRepositories;
 
     /**
-     * File contains a mapping between each dependency and it's license information.
+     * Input file containing a mapping between each dependency and it's 
+     * license information.
      * 
      * @parameter default-value="${project.basedir}/src/licenses.xml"
-     * @since 2.0.0
      */
     private File licensesSummaryFile;
 
@@ -99,7 +100,8 @@ public class DownloadLicensesMojo
     private File licensesOutputDirectory;
 
     /**
-     * File contains a mapping between each dependency and it's license information.
+     * The output file containing a mapping between each dependency 
+     * and it's license information.
      * 
      * @parameter default-value="${project.build.directory}/licenses.xml"
      */
@@ -126,6 +128,7 @@ public class DownloadLicensesMojo
     public void execute()
         throws MojoExecutionException
     {
+
         if ( !licensesOutputDirectory.exists() )
         {
             licensesOutputDirectory.mkdirs();
@@ -136,14 +139,14 @@ public class DownloadLicensesMojo
             licensesSummaryOutputFile.getParentFile().mkdirs();
         }
 
-        // Load pre-configured license information
+        // Load license information from previous build so it doesn't have to be located again
         HashMap<String, DependencyProject> configuredDepLicensesMap = new HashMap<String, DependencyProject>();
-        if ( licensesSummaryFile.exists() )
+        if ( licensesSummaryOutputFile.exists() )
         {
             FileInputStream fis = null;
             try
             {
-                fis = new FileInputStream( licensesSummaryFile );
+                fis = new FileInputStream( licensesSummaryOutputFile );
                 List<DependencyProject> licensesList = LicenseSummaryReader.parseLicenseSummary( fis );
                 for ( DependencyProject dep : licensesList )
                 {
@@ -159,19 +162,20 @@ public class DownloadLicensesMojo
                 FileUtil.tryClose( fis );
             }
         }
-
-        // Load license information from previous build so we don't have to download the licenses again
-        HashMap<String, DependencyProject> cachedDepLicensesMap = new HashMap<String, DependencyProject>();
-        if ( licensesSummaryOutputFile.exists() )
+        else if ( licensesSummaryFile.exists() )
         {
+            // Load manually configured license information
             FileInputStream fis = null;
             try
             {
-                fis = new FileInputStream( licensesSummaryOutputFile );
-                List<DependencyProject> licensesList = LicenseSummaryReader.parseLicenseSummary( fis );
-                for ( DependencyProject dep : licensesList )
+                fis = new FileInputStream( licensesSummaryFile );
+                List<DependencyProject> depLicensesList = LicenseSummaryReader.parseLicenseSummary( fis );
+                getLog().debug( "Loaded " +  depLicensesList.size() + " licenses" );
+                for ( DependencyProject depProject : depLicensesList )
                 {
-                    cachedDepLicensesMap.put( dep.toString(), dep );
+                    getLog().debug( "Downloading licenses for project " + depProject.getId() );
+                    this.downloadLicenses( depProject );
+                    configuredDepLicensesMap.put( depProject.getId(), depProject );
                 }
             }
             catch ( Exception e )
@@ -189,10 +193,12 @@ public class DownloadLicensesMojo
 
         if ( includeTransitiveDependencies )
         {
+            // All project dependencies
             depArtifacts = project.getArtifacts();
         }
         else
         {
+            // Only direct project dependencies
             depArtifacts = project.getDependencyArtifacts();
         }
 
@@ -201,33 +207,28 @@ public class DownloadLicensesMojo
 
         for ( Artifact artifact : depArtifacts )
         {
-            MavenProject depMavenProject = null;
-            try
+            getLog().debug( "Checking licenses for project " + artifact );
+            String artifactProjectId = this.getArtifactProjectId( artifact );
+            if ( configuredDepLicensesMap.containsKey( artifactProjectId ) )
             {
-                depMavenProject = projectBuilder.buildFromRepository( artifact, remoteRepositories, localRepository );
+                depProjectLicenses.add( configuredDepLicensesMap.get( artifactProjectId ) );
             }
-            catch ( ProjectBuildingException e )
+            else
             {
-                getLog().warn( "Unable to build project: " + artifact.getDependencyConflictId() );
-                getLog().warn( e );
+                DependencyProject depProject = null;
+                try
+                {
+                    depProject = createDependencyProject( artifact );
+                    getLog().debug( "Downloading licenses for project " + depProject );
+                    this.downloadLicenses( depProject );
+                    depProjectLicenses.add( depProject );
+                }
+                catch ( ProjectBuildingException e )
+                {
+                    getLog().warn( "Unable to build project: " + artifact.getDependencyConflictId() );
+                    getLog().warn( e );
+                }
             }
-
-            DependencyProject depProject = createDependencyProject( depMavenProject );
-
-            getLog().debug( "Downloading licenses..." );
-            if ( configuredDepLicensesMap.containsKey( depProject.getId() ) )
-            {
-                List<License> licenses = configuredDepLicensesMap.get( depProject.getId() ).getLicenses();
-                depProject.setLicenses( licenses );
-            }
-
-            // Don't try to download the license again if we don't need to
-            if ( !cachedDepLicensesMap.containsKey( depProject.getId() ) )
-            {
-                this.downloadLicenses( depProject );
-            }
-            depProjectLicenses.add( depProject );
-
         }
 
         try
@@ -240,6 +241,17 @@ public class DownloadLicensesMojo
         }
 
     }
+    
+    /**
+     * Returns the project ID for the artifact
+     * 
+     * @param artifact
+     * @return groupId:artifactId:version
+     */
+    public String getArtifactProjectId(Artifact artifact)
+    {
+        return artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getVersion();
+    }
 
     /**
      * Create a simple DependencyProject object containing the GAV and license info from the MavenProject
@@ -247,11 +259,15 @@ public class DownloadLicensesMojo
      * @param project
      * @return
      */
-    public DependencyProject createDependencyProject( MavenProject project )
+    public DependencyProject createDependencyProject( Artifact artifact )
+        throws ProjectBuildingException
     {
+        MavenProject depMavenProject = null;
+        depMavenProject = projectBuilder.buildFromRepository( artifact, remoteRepositories, localRepository );
+
         DependencyProject dependencyProject =
-            new DependencyProject( project.getGroupId(), project.getArtifactId(), project.getVersion() );
-        List<License> licenses = project.getLicenses();
+            new DependencyProject( depMavenProject.getGroupId(), depMavenProject.getArtifactId(), depMavenProject.getVersion() );
+        List<License> licenses = depMavenProject.getLicenses();
         for ( License license : licenses )
         {
             dependencyProject.addLicense( license );

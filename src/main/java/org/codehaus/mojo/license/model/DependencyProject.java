@@ -25,6 +25,12 @@ import java.util.List;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.License;
 
+/**
+ * Represents the license information for a given dependency project
+ * 
+ * @author pgier
+ *
+ */
 public class DependencyProject
 {
     private String groupId;
@@ -116,6 +122,10 @@ public class DependencyProject
         return getId();
     }
     
+    /**
+     * The unique ID for the project
+     * @return String containing "groupId:artifactId:version"
+     */
     public String getId()
     {
         return groupId + ":" + artifactId + ":" + version;
