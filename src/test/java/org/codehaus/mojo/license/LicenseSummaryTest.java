@@ -47,7 +47,9 @@ public class LicenseSummaryTest extends TestCase
       List<DependencyProject> list = LicenseSummaryReader.parseLicenseSummary( fis );
       fis.close();
       DependencyProject dep = list.get( 0 );
+      this.assertEquals( "org.codehaus.mojo", dep.getGroupId() );
       this.assertEquals( "junk", dep.getArtifactId() );
+      this.assertEquals( "1.1", dep.getVersion() );
 
    }
    
