@@ -124,11 +124,11 @@ public class DependencyProject
     
     /**
      * The unique ID for the project
-     * @return String containing "groupId:artifactId:version"
+     * @return String containing "groupId:artifactId"
      */
     public String getId()
     {
-        return groupId + ":" + artifactId + ":" + version;
+        return groupId + ":" + artifactId;
     }
 
     public boolean equals( Object compareTo )

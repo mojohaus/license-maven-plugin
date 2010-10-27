@@ -150,7 +150,7 @@ public class DownloadLicensesMojo
                 List<DependencyProject> licensesList = LicenseSummaryReader.parseLicenseSummary( fis );
                 for ( DependencyProject dep : licensesList )
                 {
-                    configuredDepLicensesMap.put( dep.toString(), dep );
+                    configuredDepLicensesMap.put( dep.getId(), dep );
                 }
             }
             catch ( Exception e )
@@ -211,7 +211,9 @@ public class DownloadLicensesMojo
             String artifactProjectId = this.getArtifactProjectId( artifact );
             if ( configuredDepLicensesMap.containsKey( artifactProjectId ) )
             {
-                depProjectLicenses.add( configuredDepLicensesMap.get( artifactProjectId ) );
+                DependencyProject depProject = configuredDepLicensesMap.get( artifactProjectId );
+                depProject.setVersion( artifact.getVersion() );
+                depProjectLicenses.add( depProject );
             }
             else
             {
@@ -225,7 +227,7 @@ public class DownloadLicensesMojo
                 }
                 catch ( ProjectBuildingException e )
                 {
-                    getLog().warn( "Unable to build project: " + artifact.getDependencyConflictId() );
+                    getLog().warn( "Unable to build project: " + artifact );
                     getLog().warn( e );
                 }
             }
@@ -246,11 +248,11 @@ public class DownloadLicensesMojo
      * Returns the project ID for the artifact
      * 
      * @param artifact
-     * @return groupId:artifactId:version
+     * @return groupId:artifactId
      */
     public String getArtifactProjectId(Artifact artifact)
     {
-        return artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getVersion();
+        return artifact.getGroupId() + ":" + artifact.getArtifactId();
     }
 
     /**
