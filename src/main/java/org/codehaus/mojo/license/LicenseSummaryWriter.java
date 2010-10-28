@@ -30,7 +30,6 @@ import javax.xml.transform.Result;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
@@ -48,7 +47,7 @@ import org.w3c.dom.Node;
 public class LicenseSummaryWriter
 {
     public static void writeLicenseSummary( List<DependencyProject> dependencies, File outputFile )
-        throws ParserConfigurationException, TransformerFactoryConfigurationError, TransformerException
+        throws ParserConfigurationException, TransformerException
     {
         DocumentBuilderFactory fact = DocumentBuilderFactory.newInstance();
         DocumentBuilder parser = fact.newDocumentBuilder();

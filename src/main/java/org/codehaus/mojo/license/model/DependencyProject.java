@@ -29,7 +29,6 @@ import org.apache.maven.model.License;
  * Represents the license information for a given dependency project
  * 
  * @author pgier
- *
  */
 public class DependencyProject
 {
@@ -121,9 +120,10 @@ public class DependencyProject
     {
         return getId();
     }
-    
+
     /**
      * The unique ID for the project
+     * 
      * @return String containing "groupId:artifactId"
      */
     public String getId()
@@ -135,22 +135,18 @@ public class DependencyProject
     {
         if ( compareTo instanceof Artifact )
         {
-            Artifact compareArtifact = (Artifact) compareTo;
-            if ( !groupId.equals( compareArtifact.getGroupId() ) )
+            Artifact compare = (Artifact) compareTo;
+            if ( groupId.equals( compare.getGroupId() ) && artifactId.equals( compare.getArtifactId() ) )
             {
-                return false;
+                return true;
             }
-            if ( !artifactId.equals( compareArtifact.getArtifactId() ) )
-            {
-                return false;
-            }
-            if ( !version.equals( compareArtifact.getVersion() ) )
-            {
-                return false;
-            }
-            return true;
         }
         return false;
+    }
+
+    public int hashCode()
+    {
+        return getId().hashCode();
     }
 
 }

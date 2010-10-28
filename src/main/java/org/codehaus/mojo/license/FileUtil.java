@@ -23,6 +23,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+/**
+ * Some basic file io utilities
+ * 
+ * @author pgier
+ */
 public class FileUtil
 {
 

@@ -48,8 +48,11 @@ public class LicenseSummaryReader
     /**
      * Read a component-info.xml from an input stream into a ComponentInfo object.
      * 
-     * @param compInfoFile
-     * @return
+     * @param licSummaryIS Input stream containing the license data
+     * @return List of DependencyProject objects
+     * @throws IOException if there is a problem reading the InputStream
+     * @throws ParserConfigurationException if there is a problem parsing the XML stream
+     * @throws SAXException if there is a problem parsing the XML stream
      */
     public static List<DependencyProject> parseLicenseSummary( InputStream licSummaryIS )
         throws IOException, ParserConfigurationException, SAXException

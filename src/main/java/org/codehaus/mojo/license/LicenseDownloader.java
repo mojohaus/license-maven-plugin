@@ -27,6 +27,11 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
+/**
+ * Utilities for downloading remote license files.
+ * 
+ * @author pgier
+ */
 public class LicenseDownloader
 {
 

@@ -85,8 +85,7 @@ public class DownloadLicensesMojo
     private java.util.List remoteRepositories;
 
     /**
-     * Input file containing a mapping between each dependency and it's 
-     * license information.
+     * Input file containing a mapping between each dependency and it's license information.
      * 
      * @parameter default-value="${project.basedir}/src/licenses.xml"
      */
@@ -100,8 +99,7 @@ public class DownloadLicensesMojo
     private File licensesOutputDirectory;
 
     /**
-     * The output file containing a mapping between each dependency 
-     * and it's license information.
+     * The output file containing a mapping between each dependency and it's license information.
      * 
      * @parameter default-value="${project.build.directory}/licenses.xml"
      */
@@ -118,7 +116,6 @@ public class DownloadLicensesMojo
      * Include transitive dependencies when downloading license files.
      * 
      * @parameter default-value="true"
-     * @since 2.0.0
      */
     private boolean includeTransitiveDependencies;
 
@@ -170,7 +167,7 @@ public class DownloadLicensesMojo
             {
                 fis = new FileInputStream( licensesSummaryFile );
                 List<DependencyProject> depLicensesList = LicenseSummaryReader.parseLicenseSummary( fis );
-                getLog().debug( "Loaded " +  depLicensesList.size() + " licenses" );
+                getLog().debug( "Loaded " + depLicensesList.size() + " licenses" );
                 for ( DependencyProject depProject : depLicensesList )
                 {
                     getLog().debug( "Downloading licenses for project " + depProject.getId() );
@@ -243,20 +240,20 @@ public class DownloadLicensesMojo
         }
 
     }
-    
+
     /**
      * Returns the project ID for the artifact
      * 
      * @param artifact
      * @return groupId:artifactId
      */
-    public String getArtifactProjectId(Artifact artifact)
+    public String getArtifactProjectId( Artifact artifact )
     {
         return artifact.getGroupId() + ":" + artifact.getArtifactId();
     }
 
     /**
-     * Create a simple DependencyProject object containing the GAV and license info from the MavenProject
+     * Create a simple DependencyProject object containing the GAV and license info from the Maven Artifact
      * 
      * @param project
      * @return
@@ -268,7 +265,8 @@ public class DownloadLicensesMojo
         depMavenProject = projectBuilder.buildFromRepository( artifact, remoteRepositories, localRepository );
 
         DependencyProject dependencyProject =
-            new DependencyProject( depMavenProject.getGroupId(), depMavenProject.getArtifactId(), depMavenProject.getVersion() );
+            new DependencyProject( depMavenProject.getGroupId(), depMavenProject.getArtifactId(),
+                                   depMavenProject.getVersion() );
         List<License> licenses = depMavenProject.getLicenses();
         for ( License license : licenses )
         {
@@ -282,7 +280,7 @@ public class DownloadLicensesMojo
      * object.
      * 
      * @param license
-     * @return
+     * @return A filename to be used for the downloaded license file
      */
     private String getLicenseFileName( License license )
         throws MalformedURLException
