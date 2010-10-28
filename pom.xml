@@ -40,6 +40,13 @@
   </issueManagement>
 
   <inceptionYear>2010</inceptionYear>
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
 
   <properties>
     <mojo.java.target>1.5</mojo.java.target>
@@ -98,7 +105,6 @@
               <pomIncludes>
                 <pomInclude>*/pom.xml</pomInclude>
               </pomIncludes>
-              <!-- <goals>license:download-licenses</goals>-->
               <postBuildHookScript>verify.bsh</postBuildHookScript>
               <!-- <settingsFile>src/it/settings.xml</settingsFile> -->
               <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
