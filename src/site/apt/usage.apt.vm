@@ -57,7 +57,7 @@ Usage
   Next run your build:
   
 +-----+
-mvn generate-resources
+mvn package
 +-----+
     
   For the <<<download-licenses>>> goal, licenses will by default be downloaded into the directory 
