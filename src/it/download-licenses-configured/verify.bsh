@@ -3,7 +3,7 @@ import java.util.*;
 
 try
 {
-    File licenseFile = new File( basedir, "target/licenses/Apache License 2.0 - LICENSE-2.0.txt" );
+    File licenseFile = new File( basedir, "target/licenses/apache license 2.0 - license-2.0.txt" );
     if ( !licenseFile.exists() || licenseFile.isDirectory() )
     {
         System.err.println( "Could not find license file: " + licenseFile );

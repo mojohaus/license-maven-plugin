@@ -3,7 +3,7 @@ import java.util.*;
 
 try
 {
-    File licenseFile = new File( basedir, "target/licenses/Common Public License Version 1.0 - cpl1.0.txt" );
+    File licenseFile = new File( basedir, "target/licenses/common public license version 1.0 - cpl1.0.txt" );
     if ( !licenseFile.exists() || licenseFile.isDirectory() )
     {
         System.err.println( "Could not find license file: " + licenseFile );
