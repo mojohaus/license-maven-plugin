@@ -87,7 +87,7 @@ public class DownloadLicensesMojo
      * 
      * @parameter default-value="${project.basedir}/src/licenses.xml"
      */
-    private File licensesSummaryFile;
+    private File licensesSummaryConfigFile;
 
     /**
      * The directory to which the dependency licenses should be written.
@@ -134,7 +134,6 @@ public class DownloadLicensesMojo
             licensesSummaryOutputFile.getParentFile().mkdirs();
         }
 
-        // Load license information from previous build so it doesn't have to be located again
         HashMap<String, DependencyProject> configuredDepLicensesMap = new HashMap<String, DependencyProject>();
         if ( licensesSummaryOutputFile.exists() )
         {
@@ -150,32 +149,36 @@ public class DownloadLicensesMojo
             }
             catch ( Exception e )
             {
-                throw new MojoExecutionException( "Unable to parse license summary file.", e );
+                throw new MojoExecutionException( "Unable to parse license summary output file.", e );
             }
             finally
             {
                 FileUtil.tryClose( fis );
             }
         }
-        else if ( licensesSummaryFile.exists() )
+        
+        // Load manually configured license information
+        if ( licensesSummaryConfigFile.exists() )
         {
-            // Load manually configured license information
             FileInputStream fis = null;
             try
             {
-                fis = new FileInputStream( licensesSummaryFile );
+                fis = new FileInputStream( licensesSummaryConfigFile );
                 List<DependencyProject> depLicensesList = LicenseSummaryReader.parseLicenseSummary( fis );
                 getLog().debug( "Loaded " + depLicensesList.size() + " licenses" );
                 for ( DependencyProject depProject : depLicensesList )
                 {
-                    getLog().debug( "Downloading licenses for project " + depProject.getId() );
-                    this.downloadLicenses( depProject );
-                    configuredDepLicensesMap.put( depProject.getId(), depProject );
+                    if ( !configuredDepLicensesMap.containsKey( depProject.getId() ) )
+                    {
+                        getLog().debug( "Downloading licenses for project " + depProject.getId() );
+                        this.downloadLicenses( depProject );
+                        configuredDepLicensesMap.put( depProject.getId(), depProject );
+                    }
                 }
             }
             catch ( Exception e )
             {
-                throw new MojoExecutionException( "Unable to parse license summary file.", e );
+                throw new MojoExecutionException( "Unable to parse license summary config file.", e );
             }
             finally
             {
@@ -274,8 +277,8 @@ public class DownloadLicensesMojo
     }
 
     /**
-     * Tries to determine what the name of the downloaded license file should be based on the information in the license
-     * object.
+     * Determine filename to use for downloaded license file. The file name is based on the configured name of the
+     * license (if available) and the remote filename of the license.
      * 
      * @param license
      * @return A filename to be used for the downloaded license file
