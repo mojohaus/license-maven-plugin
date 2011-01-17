@@ -303,6 +303,9 @@ public class DownloadLicensesMojo
             // This means it isn't a valid file extension, so append the default
             licenseFileName = licenseFileName + DEFAULT_EXTENSION;
         }
+        
+        // Force lower case so we don't end up with multiple copies of the same license
+        licenseFileName = licenseFileName.toLowerCase();
 
         return licenseFileName;
     }
