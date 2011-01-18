@@ -24,11 +24,11 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.License;
 
 /**
- * Represents the license information for a given dependency project
+ * Contains the license information for a single project/dependency
  * 
  * @author pgier
  */
-public class DependencyProject
+public class ProjectLicenseInfo
 {
     private String groupId;
 
@@ -53,12 +53,12 @@ public class DependencyProject
     /**
      * Default constructor
      */
-    public DependencyProject()
+    public ProjectLicenseInfo()
     {
 
     }
 
-    public DependencyProject( String groupId, String artifactId, String version )
+    public ProjectLicenseInfo( String groupId, String artifactId, String version )
     {
         this.groupId = groupId;
         this.artifactId = artifactId;
@@ -129,8 +129,20 @@ public class DependencyProject
         return groupId + ":" + artifactId;
     }
 
+    /**
+     * Compare this artifact to another ProjectLicenseInfo, or compare to an instance
+     * of org.apache.maven.artifact.Artifact 
+     */
     public boolean equals( Object compareTo )
     {
+        if ( compareTo instanceof ProjectLicenseInfo )
+        {
+            ProjectLicenseInfo compare = (ProjectLicenseInfo) compareTo;
+            if ( groupId.equals( compare.getGroupId() ) && artifactId.equals( compare.getArtifactId() ) )
+            {
+                return true;
+            }
+        }
         if ( compareTo instanceof Artifact )
         {
             Artifact compare = (Artifact) compareTo;

@@ -27,7 +27,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.maven.model.License;
-import org.codehaus.mojo.license.model.DependencyProject;
+import org.codehaus.mojo.license.model.ProjectLicenseInfo;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -52,10 +52,10 @@ public class LicenseSummaryReader
      * @throws ParserConfigurationException if there is a problem parsing the XML stream
      * @throws SAXException if there is a problem parsing the XML stream
      */
-    public static List<DependencyProject> parseLicenseSummary( InputStream licSummaryIS )
+    public static List<ProjectLicenseInfo> parseLicenseSummary( InputStream licSummaryIS )
         throws IOException, ParserConfigurationException, SAXException
     {
-        List<DependencyProject> dependencies = new ArrayList<DependencyProject>();
+        List<ProjectLicenseInfo> dependencies = new ArrayList<ProjectLicenseInfo>();
 
         DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
@@ -81,9 +81,9 @@ public class LicenseSummaryReader
 
     }
 
-    private static DependencyProject parseDependencyNode( Node dependencyNode )
+    private static ProjectLicenseInfo parseDependencyNode( Node dependencyNode )
     {
-        DependencyProject dependency = new DependencyProject();
+        ProjectLicenseInfo dependency = new ProjectLicenseInfo();
         NodeList depElements = dependencyNode.getChildNodes();
         for ( int i = 0; i < depElements.getLength(); ++i )
         {

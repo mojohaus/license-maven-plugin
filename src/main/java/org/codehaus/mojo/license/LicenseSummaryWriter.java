@@ -32,7 +32,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.maven.model.License;
-import org.codehaus.mojo.license.model.DependencyProject;
+import org.codehaus.mojo.license.model.ProjectLicenseInfo;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -44,7 +44,7 @@ import org.w3c.dom.Node;
  */
 public class LicenseSummaryWriter
 {
-    public static void writeLicenseSummary( List<DependencyProject> dependencies, File outputFile )
+    public static void writeLicenseSummary( List<ProjectLicenseInfo> dependencies, File outputFile )
         throws ParserConfigurationException, TransformerException
     {
         DocumentBuilderFactory fact = DocumentBuilderFactory.newInstance();
@@ -56,7 +56,7 @@ public class LicenseSummaryWriter
         Node dependenciesNode = doc.createElement( "dependencies" );
         root.appendChild( dependenciesNode );
 
-        for ( DependencyProject dep : dependencies )
+        for ( ProjectLicenseInfo dep : dependencies )
         {
             dependenciesNode.appendChild( createDependencyNode( doc, dep ) );
         }
@@ -71,7 +71,7 @@ public class LicenseSummaryWriter
         xformer.transform( new DOMSource( doc ), result );
     }
 
-    public static Node createDependencyNode( Document doc, DependencyProject dep )
+    public static Node createDependencyNode( Document doc, ProjectLicenseInfo dep )
     {
         Node depNode = doc.createElement( "dependency" );
 

@@ -32,7 +32,7 @@ import junit.framework.TestCase;
 import org.apache.maven.model.License;
 import org.codehaus.mojo.license.LicenseSummaryReader;
 import org.codehaus.mojo.license.LicenseSummaryWriter;
-import org.codehaus.mojo.license.model.DependencyProject;
+import org.codehaus.mojo.license.model.ProjectLicenseInfo;
 import org.xml.sax.SAXException;
 
 public class LicenseSummaryTest extends TestCase
@@ -42,9 +42,9 @@ public class LicenseSummaryTest extends TestCase
       File licenseSummaryFile = new File( "src/test/resources/license-summary-test.xml" );
       this.assertTrue( licenseSummaryFile.exists() );
       FileInputStream fis = new FileInputStream( licenseSummaryFile );
-      List<DependencyProject> list = LicenseSummaryReader.parseLicenseSummary( fis );
+      List<ProjectLicenseInfo> list = LicenseSummaryReader.parseLicenseSummary( fis );
       fis.close();
-      DependencyProject dep = list.get( 0 );
+      ProjectLicenseInfo dep = list.get( 0 );
       this.assertEquals( "org.codehaus.mojo", dep.getGroupId() );
       this.assertEquals( "junk", dep.getArtifactId() );
       this.assertEquals( "1.1", dep.getVersion() );
@@ -53,9 +53,9 @@ public class LicenseSummaryTest extends TestCase
    
    public void testWriteReadLicenseSummary() throws IOException, SAXException, ParserConfigurationException, TransformerFactoryConfigurationError, TransformerException
    {
-      List<DependencyProject> licSummary = new ArrayList<DependencyProject> ();
-      DependencyProject dep1 = new DependencyProject( "org.test", "test1", "1.0" );
-      DependencyProject dep2 = new DependencyProject( "org.test", "test2", "2.0" );
+      List<ProjectLicenseInfo> licSummary = new ArrayList<ProjectLicenseInfo> ();
+      ProjectLicenseInfo dep1 = new ProjectLicenseInfo( "org.test", "test1", "1.0" );
+      ProjectLicenseInfo dep2 = new ProjectLicenseInfo( "org.test", "test2", "2.0" );
       
       License lic = new License();
       lic.setName( "lgpl" );
@@ -73,9 +73,9 @@ public class LicenseSummaryTest extends TestCase
       
       this.assertTrue( licenseSummaryFile.exists() );
       FileInputStream fis = new FileInputStream( licenseSummaryFile );
-      List<DependencyProject> list = LicenseSummaryReader.parseLicenseSummary( fis );
+      List<ProjectLicenseInfo> list = LicenseSummaryReader.parseLicenseSummary( fis );
       fis.close();
-      DependencyProject dep = list.get( 0 );
+      ProjectLicenseInfo dep = list.get( 0 );
       this.assertEquals( "org.test", dep.getGroupId() );
       this.assertEquals( "test1", dep.getArtifactId() );
       this.assertEquals( "1.0", dep.getVersion() );
