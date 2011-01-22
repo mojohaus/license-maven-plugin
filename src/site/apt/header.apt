@@ -1,0 +1,155 @@
+~~~
+~~ #%L
+~~ License Maven Plugin
+~~ 
+~~ $Id$
+~~ $HeadURL$
+~~ %%
+~~ Copyright (C) 2008 - 2011 CodeLutin, Codehaus, Tony Chemit
+~~ %%
+~~ This program is free software: you can redistribute it and/or modify
+~~ it under the terms of the GNU Lesser General Public License as 
+~~ published by the Free Software Foundation, either version 3 of the 
+~~ License, or (at your option) any later version.
+~~ 
+~~ This program is distributed in the hope that it will be useful,
+~~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+~~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+~~ GNU General Lesser Public License for more details.
+~~ 
+~~ You should have received a copy of the GNU General Lesser Public 
+~~ License along with this program.  If not, see
+~~ <http://www.gnu.org/licenses/lgpl-3.0.html>.
+~~ #L%
+~~~
+----
+File Header
+----
+
+Abstract
+
+  This document describes the file header model introduced in version 2.1.
+
+  You will learn how to customize it and use it with the goal
+  {{{./update-file-header-mojo.html}update-file-header}}.
+
+Header model
+
+* Example
+
+  Here is an example of a file header (with NO comment box) :
+
+--------------------------------------------------------------------------------
+
+  (1) # % L
+  (2) Project description
+  (3) %%
+  (4) Copyright (C) 2010 your organization
+  (5) %%
+  (6) License content
+  (7) # L %
+--------------------------------------------------------------------------------
+
+  * (1) the start process tag used to detect begin of header (NEVER suppress it).
+
+  * (2) Project description section
+
+  * (3) Header section delimiter
+
+  * (4) Copyright section of the file (see next section for detail)
+
+  * (5) Header section delimiter
+
+  * (6) License section
+
+  * (7) the end process tag used to detect end of header (NEVER suppress it).
+
+* Configuration
+
+  You can configure those things :
+
+  * start process tag
+
+  * header section delimiter
+  
+  * end process tag
+
+* Copyright model
+
+  Copyright section must exactly be of this form :
+
+--------------------------------------------------------------------------------
+
+  Copyright (C) firstYear[ - lastYear] holder
+--------------------------------------------------------------------------------
+
+  If *firstYear* and *lastYear* are the same then lastYear is omitted.
+
+* Comment box
+
+  In a file, we must box the file header in a comment.  In the descriptor file
+  you can customize it by choosing a headerType.
+
+Available comment styles
+
+  Here is the available comment styles.
+
+  Using the goal {{{./comment-style-list-mojo.html}comment-style-list}}
+  you can find all of them.
+
+* java style
+
+--------------------------------------------------------------------------------
+
+  /*
+   * HEADER
+   */
+--------------------------------------------------------------------------------
+
+* xml style
+
+--------------------------------------------------------------------------------
+
+  <!--
+   HEADER
+  -->
+--------------------------------------------------------------------------------
+
+* properties style
+
+--------------------------------------------------------------------------------
+
+  ######
+  # HEADER
+  ######
+--------------------------------------------------------------------------------
+
+* apt style
+
+--------------------------------------------------------------------------------
+
+  ~~~~~~
+  ~~ HEADER
+  ~~~~~~
+--------------------------------------------------------------------------------
+
+* rst style
+
+--------------------------------------------------------------------------------
+  .. -
+  .. * HEADER
+  .. -
+--------------------------------------------------------------------------------
+
+Ignore a header
+
+  If you don't want {{{./update-file-header-mojo.html}update-file-header}}
+  goal to treate a specific file, you can use a specific tag in your class :
+
+--------------------------------------------------------------------------------
+
+  %%Ignore-License
+--------------------------------------------------------------------------------
+
+  Note : Don't use start (1) and end (7 in exemple) balise
+  You can change it with <<ignoreTag>> property.

@@ -261,7 +261,7 @@ public class DownloadLicensesMojo
     /**
      * Create a simple DependencyProject object containing the GAV and license info from the Maven Artifact
      * 
-     * @param project
+     * @param artifact
      * @return DependencyProject with artifact and license info
      */
     public ProjectLicenseInfo createDependencyProject( Artifact artifact )

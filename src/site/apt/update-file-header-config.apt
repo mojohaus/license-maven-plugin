@@ -1,0 +1,227 @@
+~~~
+~~ #%L
+~~ License Maven Plugin
+~~ 
+~~ $Id$
+~~ $HeadURL$
+~~ %%
+~~ Copyright (C) 2008 - 2011 CodeLutin, Codehaus, Tony Chemit
+~~ %%
+~~ This program is free software: you can redistribute it and/or modify
+~~ it under the terms of the GNU Lesser General Public License as 
+~~ published by the Free Software Foundation, either version 3 of the 
+~~ License, or (at your option) any later version.
+~~ 
+~~ This program is distributed in the hope that it will be useful,
+~~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+~~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+~~ GNU General Lesser Public License for more details.
+~~ 
+~~ You should have received a copy of the GNU General Lesser Public 
+~~ License along with this program.  If not, see
+~~ <http://www.gnu.org/licenses/lgpl-3.0.html>.
+~~ #L%
+~~~
+----
+Update File Header: Configuration
+----
+
+  <Since version 2.4>, without a descriptor file, we can configure the
+  update-file-header goal with four parameters:
+
+    * licenseName : it is the name of the license to add on file header. It is mandatory,
+
+    * roots : it is a list of the main directories from which we apply the
+    license on files. The default roots is <src>,
+
+    * includes : List of files to include, gived by a regexp (for example: <*Dao.java>).
+    The default include is **/*,
+
+    * excludes: List of files to exclude, gived by a regexp (for example: <*Test.java>).
+    The default excludes are i18n properties (**/i18n/*.properties).
+
+    * extraExtensions: Dictionnary of extensions to map to existing comment style.
+    
+  To see all extensions accepted run the <<comment-style-list>> goal.
+
+-------------------------------------------------------------------------------
+[INFO] --- license-maven-plugin:1.0:comment-style-list (default-cli) @ license-maven-plugin ---
+[INFO] List of available comment styles:
+
+  - apt        : header transformer with apt comment style            , extensions : [apt]
+  - java       : header transformer with java comment style           , extensions : [java, groovy, css, cs, as, aj, c, h, cpp]
+  - properties : header transformer with properties file comment style, extensions : [properties, sh, py, rb, pl, pm]
+  - rst        : header transformer with rst comment style            , extensions : [rst]
+  - xml        : header transformer with xml comment style            , extensions : [pom, xml, xhtml, mxlm, dtd, jspx, fml, xsl, html, htm, jaxx, kml, gsp, tml]
+-------------------------------------------------------------------------------
+
+Roots
+
+  By default, All the files in <src> are treated. This could be changed with the
+  property <roots>. The roots property is a list of based directory from which the
+  update-file-header will be applied.
+
+* Exemple
+
+    Given a pom with these plugin configuration
+
+-------------------------------------------------------------------------------
+
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>1.0</version>
+        <configuration>
+          <verbose>false</verbose>
+          <addSvnKeyWords>true</addSvnKeyWords>
+        </configuration>
+        <executions>
+          <execution>
+            <id>first</id>
+            <goals>
+              <goal>update-file-header</goal>
+            </goals>
+            <phase>process-sources</phase>
+            <configuration>
+              <licenseName>gpl_v3</licenseName>
+              <roots>
+                <root>src/main/java</root>
+                <root>src/test</root>
+              </roots>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+
+-------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------
+  Considering we have the following tree:
+  src/main/java
+  src/main/resources
+  src/test/java
+  src/test/resources
+-------------------------------------------------------------------------------
+  Only files from src/main/java, src/test/java and src/test/resources will be treated.
+
+Includes
+
+  By default, all the files from the roots and with the adequate extension are treated.
+  With the list parameters <includes>, we can specify with more precision which
+  files we want to deals.
+
+* Example
+
+    Soit un pom avec la configuration de plugin suivante:
+
+-------------------------------------------------------------------------------
+
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>1.0</version>
+        <configuration>
+          <verbose>false</verbose>
+          <addSvnKeyWords>true</addSvnKeyWords>
+        </configuration>
+        <executions>
+          <execution>
+            <id>first</id>
+            <goals>
+              <goal>update-file-header</goal>
+            </goals>
+            <phase>process-sources</phase>
+            <configuration>
+              <licenseName>gpl_v3</licenseName>
+              <includes>
+                <include>*Dao.java</include>
+                <include>*Bean.java</include>
+                <include>.*entities.*.xml</include>
+              </includes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+
+-------------------------------------------------------------------------------
+
+  The update-file-header will be done only on java files (from "src") ending with
+  <"Dao"> and <"Bean"> and on xml files containing <"entities"> in their file name.
+
+
+Excludes
+
+  The excludes parameter allows to ignore some file in the update-file-header process.
+
+* Example
+
+    Given a pom with these plugin configuration
+
+-------------------------------------------------------------------------------
+
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>1.0</version>
+        <configuration>
+          <verbose>false</verbose>
+          <addSvnKeyWords>true</addSvnKeyWords>
+        </configuration>
+        <executions>
+          <execution>
+            <id>first</id>
+            <goals>
+              <goal>update-file-header</goal>
+            </goals>
+            <phase>process-sources</phase>
+            <configuration>
+              <licenseName>gpl_v3</licenseName>
+              <excludes>
+                <exclude>*.png</exclude>
+                <exclude>*.txt</exclude>
+                <exclude>*Test.java</exclude>
+              </excludes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+
+-------------------------------------------------------------------------------
+
+  The java files ending with "Test", the png files and the txt files will be
+  ignored by the update-file-header goal.
+
+ExtraExtensions
+
+  To use more extensions, add a mapped parameter where keys are extensions and
+  values are the comment style type to use.
+
+* Exemple
+
+  Given a pom with these plugin configuration
+
+-------------------------------------------------------------------------------
+
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>1.0</version>
+        <configuration>
+          <extraExtensions>
+            <yo>java</yo>
+          </extraExtensions>
+        </configuration>
+      </plugin>
+    </plugins>
+
+-------------------------------------------------------------------------------
+
+  Files with extension <<yo>> will be treated as java files.
+

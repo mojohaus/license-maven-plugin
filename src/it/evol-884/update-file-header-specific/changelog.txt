@@ -1,0 +1,1 @@
+see the changelog of org.nuiton:i18n project.
