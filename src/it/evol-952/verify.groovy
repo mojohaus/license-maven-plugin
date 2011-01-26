@@ -22,13 +22,13 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
-file = new File(basedir, 'src/main/java/org/nuiton/license/plugin/test/MyBean.java');
+file = new File(basedir, 'src/main/java/org/codehaus/license/plugin/test/MyBean.java');
 assert file.exists();
 
 content = file.text;
 assert content.contains('Copyright (C) 2012 License Test');
 
-file = new File(basedir, 'src/main/java/org/nuiton/license/plugin/test/MyBean2.java');
+file = new File(basedir, 'src/main/java/org/codehaus/license/plugin/test/MyBean2.java');
 assert file.exists();
 
 content = file.text;
@@ -36,7 +36,7 @@ assert content.contains('Copyright (C) 2010 Tony');
 assert content.contains('do NOT update!');
 assert !content.contains('Fake to be removed!');
 
-file = new File(basedir, 'src/main/java/org/nuiton/license/plugin/test/MyBean3.java');
+file = new File(basedir, 'src/main/java/org/codehaus/license/plugin/test/MyBean3.java');
 assert file.exists();
 
 content = file.text;
@@ -133,13 +133,13 @@ assert content.contains('$Id');
 
 // test with extra mapping
 
-file = new File(basedir, 'src/main/java/org/nuiton/license/plugin/test/MyBean.java2');
+file = new File(basedir, 'src/main/java/org/codehaus/license/plugin/test/MyBean.java2');
 assert file.exists();
 
 content = file.text;
 assert content.contains('Copyright (C) 2012 License Test');
 
-file = new File(basedir, 'src/main/java/org/nuiton/license/plugin/test/MyBean2.java2');
+file = new File(basedir, 'src/main/java/org/codehaus/license/plugin/test/MyBean2.java2');
 assert file.exists();
 
 content = file.text;
@@ -147,7 +147,7 @@ assert content.contains('Copyright (C) 2010 Tony');
 assert content.contains('do NOT update!');
 assert !content.contains('Fake to be removed!');
 
-file = new File(basedir, 'src/main/java/org/nuiton/license/plugin/test/MyBean3.java2');
+file = new File(basedir, 'src/main/java/org/codehaus/license/plugin/test/MyBean3.java2');
 assert file.exists();
 
 content = file.text;

@@ -23,13 +23,13 @@
  * #L%
  */
 
-file = new File(basedir, 'child1/src/main/java/org/nuiton/license/plugin/test/MyBean.java');
+file = new File(basedir, 'child1/src/main/java/org/codehaus/license/plugin/test/MyBean.java');
 assert file.exists();
 
 content = file.text;
 assert content.contains('Copyright (C) 2012 License Test');
 
-file = new File(basedir, 'child1/src/main/java/org/nuiton/license/plugin/test/MyBean2.java');
+file = new File(basedir, 'child1/src/main/java/org/codehaus/license/plugin/test/MyBean2.java');
 assert file.exists();
 
 content = file.text;
@@ -37,7 +37,7 @@ assert content.contains('Copyright (C) 2010 Tony');
 assert content.contains('do NOT update!');
 assert !content.contains('Fake to be removed!');
 
-file = new File(basedir, 'child1/src/main/java/org/nuiton/license/plugin/test/MyBean3.java');
+file = new File(basedir, 'child1/src/main/java/org/codehaus/license/plugin/test/MyBean3.java');
 assert file.exists();
 
 content = file.text;
