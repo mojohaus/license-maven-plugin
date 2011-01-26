@@ -14,7 +14,7 @@
  * @author tchemit <chemit@codelutin.com>
  * @since 2.1
  */
-package org.nuiton.license.plugin.test;
+package org.codehaus.license.plugin.test;
 
 public class MyBean2
 {
