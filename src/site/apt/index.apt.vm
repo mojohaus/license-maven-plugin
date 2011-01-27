@@ -14,8 +14,26 @@ ${project.name}
   
   The following goals are meant to participate in the default build lifecycle:
   
+  * <<<{{{./add-third-party-mojo.html}license:add-third-party}}>>>\
+    Generates a file containing a list of all dependencies and their licenses for a single project build.
+  
+  * <<<{{{./aggregate-add-third-party-mojo.html}license:aggregate-add-third-party}}>>>\
+    Generates a file containing a list of all dependencies and their licenses for a multi-module build.
+  
   * <<<{{{./download-licenses-mojo.html}license:download-licenses}}>>>\
     Downloads the license files associated with each dependency.
+  
+  * <<<{{{./comment-style-list-mojo.html}license:comment-style-list}}>>>\
+    Displays all the available comment styles to box file headers.
+  
+  * <<<{{{./license-list-mojo.html}license:license-list}}>>>\
+    Display all available licenses.
+  
+  * <<<{{{./update-file-header-mojo.html}license:update-file-header}}>>>\
+    Update the license header of the current project source files.
+  
+  * <<<{{{./update-project-license-mojo.html}license:update-project-license}}>>>\
+    Updates (or creates) the main project license file according to the license defined in the licenseName parameter.
   
 * {Usage}
   

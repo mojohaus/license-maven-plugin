@@ -49,11 +49,13 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 /**
- * The gola to generate the third-party file.
+ * Goal to generate the third-party license file.
  * <p/>
- * This file contains for all dependencies of the project a line giving the
- * license used by the dependency.
- * <p/>
+ * This file contains a list of the dependencies and their licenses.  Each dependency and it's
+ * license is displayed on a single line in the format <br/>
+ * <pre>
+ *   (&lt;license-name&gt;) &lt;project-name&gt; &lt;groupId&gt;:&lt;artifactId&gt;:&lt;version&gt; - &lt;project-url&gt;
+ * </pre>
  * It will also copy it in the class-path (says add the generated directory as
  * a resource of the build).
  *

@@ -39,7 +39,8 @@ import org.apache.maven.project.ProjectBuildingException;
 import org.codehaus.mojo.license.model.ProjectLicenseInfo;
 
 /**
- * Maven goal for downloading the license files of all the current project's dependencies.
+ * Download the license files of all the current project's dependencies, and generate
+ * a summary file containing a list of all dependencies and their licenses.
  * 
  * @phase package
  * @goal download-licenses
