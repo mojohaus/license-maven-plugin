@@ -25,67 +25,52 @@
 
 package org.codehaus.mojo.license;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.nuiton.plugin.AbstractMojoTest;
-import org.nuiton.plugin.PluginHelper;
-
 import java.io.File;
-import java.io.IOException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.apache.maven.plugin.testing.AbstractMojoTestCase;
+import org.apache.maven.project.MavenProject;
+import org.junit.Assert;
 
 public class UpdateProjectLicenseMojoTest
-    extends AbstractMojoTest<UpdateProjectLicenseMojo>
+    extends AbstractMojoTestCase
 {
 
-    @Override
-    protected String getGoalName( String methodName )
-    {
-        return "update-project-license";
-    }
+    public static final String GOAL = "update-project-license";
 
-    @Override
-    protected void setUpMojo( UpdateProjectLicenseMojo mojo, File pomFile )
+    public static File testPomDir;
+
+    public void setUp()
         throws Exception
     {
-        super.setUpMojo( mojo, pomFile );
-        if ( mojo.isSkip() )
-        {
-            return;
-        }
-        // license is where the pom is
-        File outputDirectory = pomFile.getParentFile();
-        mojo.setOutputDirectory( outputDirectory );
-//        mojo.setDescriptor(new File(outputDirectory, mojo.getDescriptor().getName()));
-        if ( !outputDirectory.exists() )
-        {
-            if ( !outputDirectory.mkdirs() )
-            {
-                throw new IOException( "could not create directory : " + outputDirectory );
-            }
-        }
-        mojo.setLicenseFile( new File( pomFile.getParentFile(), mojo.getLicenseFile().toString() ) );
+        super.setUp();
 
-        log.info( "pom             : " + getRelativePathFromBasedir( mojo.getProject().getFile() ) );
-        log.info( "outputDirectory : " + getRelativePathFromBasedir( mojo.getOutputDirectory() ) );
-        log.info( "licenseFile     : " + getRelativePathFromBasedir( mojo.getLicenseFile() ) );
+        testPomDir =
+            new File( getBasedir(), "target/test-classes/org/codehaus/mojo/license/updateProjectLicenseMojoTest/" );
     }
 
-    @Test
+    /*
+     * @Override protected String getGoalName( String methodName ) { return "update-project-license"; }
+     */
+
     public void testOne()
         throws Exception
     {
+        // Mojo initialization
+        File pomFile = new File( testPomDir, "testOne.xml" );
+        UpdateProjectLicenseMojo mojo = (UpdateProjectLicenseMojo) this.lookupMojo( GOAL, pomFile );
 
-        UpdateProjectLicenseMojo mojo = getMojo();
-
+        File basedir = pomFile.getParentFile();
+        mojo.setOutputDirectory( basedir );
+        mojo.setLicenseFile( new File( basedir, mojo.getLicenseFile().toString() ) );
+        MavenProject project = LicensePluginTestHelper.buildProject( getContainer(), pomFile );
+        setVariableValueToObject( mojo, "project", project );
+        
         File licenseFile = mojo.getLicenseFile();
         long t0 = licenseFile.lastModified();
 
         // always assume pom is older than any file
         // since we can not ensure order of copy test resources
-        PluginHelper.setLastModified( mojo.getProject().getFile(), 0 );
+        LicensePluginTestHelper.setLastModified( project.getFile(), 0 );
 
         mojo.setVerbose( true );
         // then executing the mojo, will do NOT change the licence file
@@ -104,19 +89,26 @@ public class UpdateProjectLicenseMojoTest
         assertTrue( t1 > t0 );
     }
 
-    @Test
     public void testTwo()
         throws Exception
     {
 
-        UpdateProjectLicenseMojo mojo = getMojo();
+        // Mojo initialization
+        File pomFile = new File( testPomDir, "testTwo.xml" );
+        UpdateProjectLicenseMojo mojo = (UpdateProjectLicenseMojo) this.lookupMojo( GOAL, pomFile );
+
+        File basedir = pomFile.getParentFile();
+        mojo.setOutputDirectory( basedir );
+        mojo.setLicenseFile( new File( basedir, mojo.getLicenseFile().toString() ) );
+        MavenProject project = LicensePluginTestHelper.buildProject( getContainer(), pomFile );
+        setVariableValueToObject( mojo, "project", project );
 
         File licenseFile = mojo.getLicenseFile();
         long t0 = licenseFile.lastModified();
 
         // always assume pom is older than any file
         // since we can not ensure order of copy test resources
-        PluginHelper.setLastModified( mojo.getProject().getFile(), 0 );
+        LicensePluginTestHelper.setLastModified( mojo.getProject().getFile(), 0 );
 
         mojo.setVerbose( true );
 
@@ -137,15 +129,12 @@ public class UpdateProjectLicenseMojoTest
         assertTrue( t1 > t0 );
     }
 
-
-    @Test
-    public void skip()
+    public void testSkip()
         throws Exception
     {
-
-        UpdateProjectLicenseMojo mojo = getMojo();
+        File pom = new File( testPomDir, "skip.xml" );
+        UpdateProjectLicenseMojo mojo = (UpdateProjectLicenseMojo) this.lookupMojo( GOAL, pom );
         mojo.execute();
         Assert.assertTrue( mojo.isSkip() );
-
     }
 }

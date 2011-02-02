@@ -25,12 +25,18 @@
 
 package org.codehaus.mojo.license;
 
+import org.apache.maven.plugin.testing.AbstractMojoTestCase;
+import org.apache.maven.project.MavenProject;
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.nuiton.plugin.AbstractMojoTest;
-import org.nuiton.plugin.PluginHelper;
+import org.junit.rules.TestName;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Set;
 
 import static org.codehaus.mojo.license.UpdateFileHeaderMojo.FileState;
@@ -41,9 +47,16 @@ import static org.codehaus.mojo.license.UpdateFileHeaderMojo.FileState;
  * @author tchemit <chemit@codelutin.com>
  * @since 2.1
  */
+@RunWith(JUnit4.class)
 public class UpdateFileHeaderMojoTest
-        extends AbstractMojoTest<UpdateFileHeaderMojo> {
+        extends AbstractMojoTestCase {
 
+
+    public static final String GOAL = "update-file-header";
+    
+    @Rule public TestName name = new TestName();
+
+    public static File testPomDir;
 
     private Set<File> uptodates;
 
@@ -57,30 +70,37 @@ public class UpdateFileHeaderMojoTest
 
     private Set<File> process;
 
-    @Override
-    protected String getGoalName(String methodName) {
-        return "update-file-header";
-    }
+    @Before
+    public void setUp()
+        throws Exception
+    {
+        super.setUp();
 
-    @Override
-    protected void clearMojo(UpdateFileHeaderMojo mojo) {
-        mojo.clear();
+        testPomDir =
+            new File( getBasedir(), "target/test-classes/org/codehaus/mojo/license/updateFileHeaderMojoTest/" );
     }
+    
+    public UpdateFileHeaderMojo initMojo( String testName ) throws Exception
+    {
+        File pomFile = new File( testPomDir, testName + ".xml" );
+        UpdateFileHeaderMojo mojo = (UpdateFileHeaderMojo) this.lookupMojo( GOAL, pomFile );
+        
+        File basedir = pomFile.getParentFile();
+        MavenProject project = LicensePluginTestHelper.buildProject( getContainer(), pomFile );
+        project.setBasedir( new File(basedir, name.getMethodName()) );
+        setVariableValueToObject( mojo, "project", project );
 
-    @Override
-    protected void setUpMojo(UpdateFileHeaderMojo mojo, File pomFile)
-            throws Exception {
-        super.setUpMojo(mojo, pomFile);
-        mojo.getProject().setBasedir(new File(mojo.getProject().getBasedir(), getMethodName()));
+        return mojo;
     }
 
     @Test
     public void addLicense()
             throws Exception {
 
-        File f = getMyBeanFile(getMethodName());
+        UpdateFileHeaderMojo mojo = initMojo( name.getMethodName() );
 
-        UpdateFileHeaderMojo mojo = getMojo();
+        File beanFile = getMyBeanFile( name.getMethodName() );
+
         String content;
 
 //        content = PluginHelper.readAsString(f, mojo.getEncoding());
@@ -99,12 +119,12 @@ public class UpdateFileHeaderMojoTest
             Assert.assertEquals(1, uptodates.size());
             Assert.assertNull(adds);
         }
-        content = PluginHelper.readAsString(f, mojo.getEncoding());
+        content = LicensePluginTestHelper.readAsString(beanFile, mojo.getEncoding());
 
         // check header
-        checkPattern(f, content, "Copyright (C) 2010", true);
-        checkPattern(f, content, "Project name : maven-license-plugin-java", true);
-        checkPattern(f, content, "Organization is CodeLutin", true);
+        checkPattern(beanFile, content, "Copyright (C) 2010", true);
+        checkPattern(beanFile, content, "Project name : maven-license-plugin-java", true);
+        checkPattern(beanFile, content, "Organization is CodeLutin", true);
 
         // re execute mojo to make sure we are in uptodate
         execute(false, mojo);
@@ -113,7 +133,7 @@ public class UpdateFileHeaderMojoTest
         Assert.assertEquals(1, uptodates.size());
 
         int oldLength = content.length();
-        content = PluginHelper.readAsString(f, mojo.getEncoding());
+        content = LicensePluginTestHelper.readAsString(beanFile, mojo.getEncoding());
         int newLength = content.length();
 
         Assert.assertEquals(oldLength, newLength);
@@ -123,7 +143,7 @@ public class UpdateFileHeaderMojoTest
     public void all()
             throws Exception {
 
-        UpdateFileHeaderMojo mojo = getMojo();
+        UpdateFileHeaderMojo mojo = initMojo( name.getMethodName() );
 
         mojo.setClearAfterOperation(false);
         execute(true, mojo);
@@ -168,17 +188,17 @@ public class UpdateFileHeaderMojoTest
     public void updateLicense()
             throws Exception {
 
-        File f = getMyBeanFile(getMethodName());
+        UpdateFileHeaderMojo mojo = initMojo( name.getMethodName() );
 
-        UpdateFileHeaderMojo mojo = getMojo();
+        File beanFile = getMyBeanFile( name.getMethodName() );
 
         String content;
 
-        content = PluginHelper.readAsString(f, mojo.getEncoding());
+        content = LicensePluginTestHelper.readAsString(beanFile, mojo.getEncoding());
 
         // check header
-        checkPattern(f, content, "Copyright (C) 2000 Codelutin do NOT update!", true);
-        checkPattern(f, content, "License Test :: do NOT update!", true);
+        checkPattern(beanFile, content, "Copyright (C) 2000 Codelutin do NOT update!", true);
+        checkPattern(beanFile, content, "License Test :: do NOT update!", true);
 //        checkPattern(f, content, "Fake to be removed!", true);
 
         execute(true, mojo);
@@ -192,14 +212,14 @@ public class UpdateFileHeaderMojoTest
             Assert.assertNull(uptodates);
             Assert.assertEquals(1, updates.size());
         }
-        content = PluginHelper.readAsString(f, mojo.getEncoding());
+        content = LicensePluginTestHelper.readAsString(beanFile, mojo.getEncoding());
 
         // check header (description + copyright) does not changed
-        checkPattern(f, content, "Copyright (C) 2000 Codelutin do NOT update!", true);
-        checkPattern(f, content, "License Test :: do NOT update!", true);
+        checkPattern(beanFile, content, "Copyright (C) 2000 Codelutin do NOT update!", true);
+        checkPattern(beanFile, content, "License Test :: do NOT update!", true);
 
         // check license changed
-        checkPattern(f, content, "Fake to be removed!", false);
+        checkPattern(beanFile, content, "Fake to be removed!", false);
 
         execute(false, mojo);
 
@@ -211,7 +231,7 @@ public class UpdateFileHeaderMojoTest
 //        Assert.assertNull(updates);
 
         int oldLength = content.length();
-        content = PluginHelper.readAsString(f, mojo.getEncoding());
+        content = LicensePluginTestHelper.readAsString(beanFile, mojo.getEncoding());
         int newLength = content.length();
 
         Assert.assertEquals(oldLength, newLength);
@@ -221,54 +241,54 @@ public class UpdateFileHeaderMojoTest
     public void failLicense()
             throws Exception {
 
-        File f = getMyBeanFile(getMethodName());
+        UpdateFileHeaderMojo mojo = initMojo( name.getMethodName() );
 
-        UpdateFileHeaderMojo mojo = getMojo();
+        File beanFile = getMyBeanFile( name.getMethodName() );
 
         String content;
 
-        content = PluginHelper.readAsString(f, mojo.getEncoding());
+        content = LicensePluginTestHelper.readAsString(beanFile, mojo.getEncoding());
 
         // check header
-        checkPattern(f, content, "Copyright (C) 2000 Codelutin do NOT update!", true);
-        checkPattern(f, content, "License Test :: do NOT update!", true);
-        checkPattern(f, content, "License content do NOT update!", true);
+        checkPattern(beanFile, content, "Copyright (C) 2000 Codelutin do NOT update!", true);
+        checkPattern(beanFile, content, "License Test :: do NOT update!", true);
+        checkPattern(beanFile, content, "License content do NOT update!", true);
 //        checkPattern(f, content, "Fake to be removed!", true);
 
         execute(true, mojo);
         Assert.assertEquals(1, process.size());
         Assert.assertEquals(1, fails.size());
 
-        content = PluginHelper.readAsString(f, mojo.getEncoding());
+        content = LicensePluginTestHelper.readAsString(beanFile, mojo.getEncoding());
 
         // check header does not changed
-        checkPattern(f, content, "Copyright (C) 2000 Codelutin do NOT update!", true);
-        checkPattern(f, content, "License Test :: do NOT update!", true);
-        checkPattern(f, content, "License content do NOT update!", true);
+        checkPattern(beanFile, content, "Copyright (C) 2000 Codelutin do NOT update!", true);
+        checkPattern(beanFile, content, "License Test :: do NOT update!", true);
+        checkPattern(beanFile, content, "License content do NOT update!", true);
 
         execute(false, mojo);
         Assert.assertEquals(1, process.size());
         Assert.assertEquals(1, fails.size());
 
-        content = PluginHelper.readAsString(f, mojo.getEncoding());
+        content = LicensePluginTestHelper.readAsString(beanFile, mojo.getEncoding());
 
         // check header does not changed
-        checkPattern(f, content, "Copyright (C) 2000 Codelutin do NOT update!", true);
-        checkPattern(f, content, "License Test :: do NOT update!", true);
-        checkPattern(f, content, "License content do NOT update!", true);
+        checkPattern(beanFile, content, "Copyright (C) 2000 Codelutin do NOT update!", true);
+        checkPattern(beanFile, content, "License Test :: do NOT update!", true);
+        checkPattern(beanFile, content, "License content do NOT update!", true);
     }
 
     @Test
     public void ignoreLicense()
             throws Exception {
 
-        File f = getMyBeanFile(getMethodName());
+        UpdateFileHeaderMojo mojo = initMojo( name.getMethodName() );
 
-        UpdateFileHeaderMojo mojo = getMojo();
+        File f = getMyBeanFile( name.getMethodName() );
 
         String content;
 
-        content = PluginHelper.readAsString(f, mojo.getEncoding());
+        content = LicensePluginTestHelper.readAsString(f, mojo.getEncoding());
 
         // check header
         checkPattern(f, content, "Copyright (C) 2000 Codelutin Do not update!", true);
@@ -281,7 +301,7 @@ public class UpdateFileHeaderMojoTest
         Assert.assertEquals(1, process.size());
         Assert.assertEquals(1, ignores.size());
 
-        content = PluginHelper.readAsString(f, mojo.getEncoding());
+        content = LicensePluginTestHelper.readAsString(f, mojo.getEncoding());
 
         // check header (description + copyright) does not changed
         checkPattern(f, content, "Copyright (C) 2000 Codelutin Do not update!", true);
@@ -294,7 +314,7 @@ public class UpdateFileHeaderMojoTest
         Assert.assertEquals(1, process.size());
         Assert.assertEquals(1, ignores.size());
 
-        content = PluginHelper.readAsString(f, mojo.getEncoding());
+        content = LicensePluginTestHelper.readAsString(f, mojo.getEncoding());
 
         // check header (description + copyright) does not changed
         checkPattern(f, content, "Copyright (C) 2000 Codelutin Do not update!", true);
@@ -307,7 +327,7 @@ public class UpdateFileHeaderMojoTest
     public void skip()
             throws Exception {
 
-        UpdateFileHeaderMojo mojo = getMojo();
+        UpdateFileHeaderMojo mojo = initMojo( name.getMethodName() );
         mojo.execute();
         Assert.assertTrue(mojo.isSkip());
     }
@@ -325,11 +345,20 @@ public class UpdateFileHeaderMojoTest
         ignores = mojo.getFiles(FileState.ignore);
     }
 
-    protected File getMyBeanFile(String testName) {
-        File f = PluginHelper.getFile(getBasedir(), "target", "test-classes", "org", "codehaus", "mojo", "license",
-                                      "updateFileHeaderMojoTest", testName, "src", "MyBean.java");
-        return f;
+    protected File getMyBeanFile( String testName )
+    {
+        return new File( getBasedir(), "target/test-classes/org/codehaus/mojo/license/updateFileHeaderMojoTest/"
+            + testName + "/src/MyBean.java" );
     }
 
+    public void checkPattern( File file, String content, String pattern, boolean required )
+        throws IOException
+    {
+
+        String errorMessage = required ? "could not find the pattern : " : "should not have found pattern :";
+
+        // checks pattern found (or not) in file's content
+        assertEquals( errorMessage + pattern + " in '" + file + "'", required, content.contains( pattern ) );
+    }
 
 }
