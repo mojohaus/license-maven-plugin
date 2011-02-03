@@ -1097,13 +1097,11 @@ public class UpdateFileHeaderMojo
         return filter;
     }
 
-    @Override
     public FileHeader getFileHeader()
     {
         return header;
     }
 
-    @Override
     public FileHeaderTransformer getTransformer()
     {
         return transformer;

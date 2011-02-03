@@ -96,7 +96,6 @@ public class ArtifactHelper
         {
             projectComparator = new Comparator<MavenProject>()
             {
-                @Override
                 public int compare( MavenProject o1, MavenProject o2 )
                 {
 

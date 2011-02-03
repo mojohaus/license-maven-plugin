@@ -178,7 +178,6 @@ public class LicenseStore
         addRepository( repository );
     }
 
-    @Override
     public Iterator<LicenseRepository> iterator()
     {
         return getRepositories().iterator();

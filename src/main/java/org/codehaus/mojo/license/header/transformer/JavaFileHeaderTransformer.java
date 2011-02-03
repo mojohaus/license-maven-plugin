@@ -51,7 +51,6 @@ public class JavaFileHeaderTransformer
         super( NAME, DESCRIPTION, COMMENT_START_TAG, COMMENT_END_TAG, COMMENT_LINE_PREFIX );
     }
 
-    @Override
     public String[] getDefaultAcceptedExtensions()
     {
         return new String[]{ "java", "groovy", "css", "cs", "as", "aj", "c", "h", "cpp"

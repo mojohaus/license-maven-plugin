@@ -73,25 +73,21 @@ public abstract class AbstractLicenseMojo
      */
     private boolean verbose;
 
-    @Override
     public final MavenProject getProject()
     {
         return project;
     }
 
-    @Override
     public final void setProject( MavenProject project )
     {
         this.project = project;
     }
 
-    @Override
     public final boolean isVerbose()
     {
         return verbose;
     }
 
-    @Override
     public final void setVerbose( boolean verbose )
     {
         this.verbose = verbose;

@@ -416,13 +416,11 @@ public abstract class AbstractAddThirdPartyMojo
         }
     }
 
-    @Override
     public final String getEncoding()
     {
         return encoding;
     }
 
-    @Override
     public final void setEncoding( String encoding )
     {
         this.encoding = encoding;

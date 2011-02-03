@@ -142,13 +142,11 @@ public class LicenseListMojo
         getLog().info( buffer.toString() );
     }
 
-    @Override
     public final String getEncoding()
     {
         return encoding;
     }
 
-    @Override
     public final void setEncoding( String encoding )
     {
         this.encoding = encoding;

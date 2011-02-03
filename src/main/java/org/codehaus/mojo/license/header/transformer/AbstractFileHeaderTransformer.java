@@ -121,109 +121,91 @@ public abstract class AbstractFileHeaderTransformer
         this.commentLinePrefix = commentLinePrefix;
     }
 
-    @Override
     public String getName()
     {
         return name;
     }
 
-    @Override
     public void setName( String name )
     {
         this.name = name;
     }
 
-    @Override
     public String getDescription()
     {
         return description;
     }
 
-    @Override
     public void setDescription( String description )
     {
         this.description = description;
     }
 
-    @Override
     public String getSectionDelimiter()
     {
         return sectionDelimiter;
     }
 
-    @Override
     public void setSectionDelimiter( String sectionDelimiter )
     {
         this.sectionDelimiter = sectionDelimiter;
     }
 
-    @Override
     public String getProcessStartTag()
     {
         return processStartTag;
     }
 
-    @Override
     public void setProcessStartTag( String processStartTag )
     {
         this.processStartTag = processStartTag;
     }
 
-    @Override
     public String getProcessEndTag()
     {
         return processEndTag;
     }
 
-    @Override
     public void setProcessEndTag( String processEndTag )
     {
         this.processEndTag = processEndTag;
     }
 
-    @Override
     public String getCommentStartTag()
     {
         return commentStartTag;
     }
 
-    @Override
     public void setCommentStartTag( String commentStartTag )
     {
         this.commentStartTag = commentStartTag;
     }
 
-    @Override
     public String getCommentEndTag()
     {
         return commentEndTag;
     }
 
-    @Override
     public void setCommentEndTag( String commentEndTag )
     {
         this.commentEndTag = commentEndTag;
     }
 
-    @Override
     public String getCommentLinePrefix()
     {
         return commentLinePrefix;
     }
 
-    @Override
     public String addHeader( String header, String content )
     {
         return header + content;
     }
 
-    @Override
     public void setCommentLinePrefix( String commentLinePrefix )
     {
         this.commentLinePrefix = commentLinePrefix;
     }
 
-    @Override
     public FileHeader toFileHeader( String header )
     {
         FileHeader model = new FileHeader();
@@ -261,7 +243,6 @@ public abstract class AbstractFileHeaderTransformer
         return model;
     }
 
-    @Override
     public String toString( FileHeader model )
         throws NullPointerException
     {
@@ -286,7 +267,6 @@ public abstract class AbstractFileHeaderTransformer
         return buffer.toString();
     }
 
-    @Override
     public String toHeaderContent( FileHeader model )
         throws NullPointerException
     {
@@ -312,7 +292,6 @@ public abstract class AbstractFileHeaderTransformer
         return result;
     }
 
-    @Override
     public String boxComment( String header, boolean withTags )
     {
         StringBuilder buffer = new StringBuilder();
@@ -333,7 +312,6 @@ public abstract class AbstractFileHeaderTransformer
         return buffer.toString();
     }
 
-    @Override
     public String unboxComent( String header )
     {
         StringBuilder buffer = new StringBuilder();
@@ -373,7 +351,6 @@ public abstract class AbstractFileHeaderTransformer
         return buffer.toString();
     }
 
-    @Override
     public String boxProcessTag( String header )
     {
         StringBuilder buffer = new StringBuilder();
@@ -383,7 +360,6 @@ public abstract class AbstractFileHeaderTransformer
         return buffer.toString();
     }
 
-    @Override
     public String unboxProcessTag( String boxedHeader )
     {
         StringBuilder buffer = new StringBuilder();
@@ -400,19 +376,16 @@ public abstract class AbstractFileHeaderTransformer
         return buffer.toString();
     }
 
-    @Override
     public boolean isDescriptionEquals( FileHeader header1, FileHeader header2 )
     {
         return header1.getDescription().equals( header2.getDescription() );
     }
 
-    @Override
     public boolean isCopyrightEquals( FileHeader header1, FileHeader header2 )
     {
         return header1.getCopyright().equals( header2.getCopyright() );
     }
 
-    @Override
     public boolean isLicenseEquals( FileHeader header1, FileHeader header2 )
     {
         String license1 = removeSpaces( header1.getLicense() );

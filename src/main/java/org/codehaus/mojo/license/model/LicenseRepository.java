@@ -182,7 +182,6 @@ public class LicenseRepository
         return license;
     }
 
-    @Override
     public Iterator<License> iterator()
     {
         checkInit( "iterator" );
