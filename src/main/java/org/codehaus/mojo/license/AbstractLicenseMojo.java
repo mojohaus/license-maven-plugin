@@ -25,6 +25,7 @@
 
 package org.codehaus.mojo.license;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
@@ -120,7 +121,7 @@ public abstract class AbstractLicenseMojo
             {
                 for ( String s : extraResolver )
                 {
-                    if ( s != null && !s.trim().isEmpty() )
+                    if ( StringUtils.isNotEmpty(s) )
                     {
                         getLog().info( "adding extra resolver " + s );
                         store.addRepository( s );

@@ -495,7 +495,7 @@ public class UpdateFileHeaderMojo
 
                     // override existing extension mapping
                     getLog().warn( "The extension " + extension + " is already accepted for comment style " +
-                        extensionToCommentStyle.get( extension ) );
+                                       extensionToCommentStyle.get( extension ) );
                 }
                 String commentStyle = entry.getValue();
 
@@ -704,7 +704,7 @@ public class UpdateFileHeaderMojo
         catch ( Exception e )
         {
             getLog().warn( "skip failed file : " + e.getMessage() +
-                ( e.getCause() == null ? "" : " Cause : " + e.getCause().getMessage() ), e );
+                               ( e.getCause() == null ? "" : " Cause : " + e.getCause().getMessage() ), e );
             FileState.fail.addFile( file, getResult() );
             doFinalize = false;
         }
@@ -786,7 +786,8 @@ public class UpdateFileHeaderMojo
         catch ( IllegalStateException e )
         {
             // could not obtain existing header
-            throw new InvalideFileHeaderException( "Could not extract header on file " + file, e );
+            throw new InvalideFileHeaderException(
+                "Could not extract header on file " + file + " for reason " + e.getMessage() );
         }
         catch ( Exception e )
         {
@@ -794,7 +795,7 @@ public class UpdateFileHeaderMojo
             {
                 throw (InvalideFileHeaderException) e;
             }
-            throw new IOException( "Could not process file " + file, e );
+            throw new IOException( "Could not process file " + file + " for reason " + e.getMessage() );
         }
 
         if ( processor.isTouched() )

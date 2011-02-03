@@ -47,14 +47,4 @@ public class InvalideFileHeaderException
     {
         super( message );
     }
-
-    public InvalideFileHeaderException( String message, Throwable cause )
-    {
-        super( message, cause );
-    }
-
-    public InvalideFileHeaderException( Throwable cause )
-    {
-        super( cause );
-    }
 }

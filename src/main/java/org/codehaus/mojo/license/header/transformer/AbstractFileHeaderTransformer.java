@@ -26,6 +26,7 @@
 package org.codehaus.mojo.license.header.transformer;
 
 
+import org.apache.commons.lang.StringUtils;
 import org.codehaus.mojo.license.header.FileHeader;
 
 import java.util.regex.Matcher;
@@ -318,7 +319,8 @@ public abstract class AbstractFileHeaderTransformer
         int prefixLength = getCommentLinePrefix().length();
         for ( String line : header.split( LINE_SEPARATOR + "" ) )
         {
-            if ( line.isEmpty() || line.contains( getCommentStartTag() ) || line.contains( getCommentEndTag() ) )
+            if ( StringUtils.isEmpty( line ) || line.contains( getCommentStartTag() ) ||
+                line.contains( getCommentEndTag() ) )
             {
 
                 // not be unboxed, but just skipped
@@ -365,7 +367,8 @@ public abstract class AbstractFileHeaderTransformer
         StringBuilder buffer = new StringBuilder();
         for ( String line : boxedHeader.split( LINE_SEPARATOR + "" ) )
         {
-            if ( line.isEmpty() || line.contains( getProcessStartTag() ) || line.contains( getProcessEndTag() ) )
+            if ( StringUtils.isEmpty( line ) || line.contains( getProcessStartTag() ) ||
+                line.contains( getProcessEndTag() ) )
             {
 
                 // not be unboxed, but just skipped
@@ -390,8 +393,7 @@ public abstract class AbstractFileHeaderTransformer
     {
         String license1 = removeSpaces( header1.getLicense() );
         String license2 = removeSpaces( header2.getLicense() );
-        boolean result = license1.equals( license2 );
-        return result;
+        return license1.equals( license2 );
     }
 
     protected static final Pattern REMOVE_SPACE_PATTERN = Pattern.compile( "(\\s+)" );

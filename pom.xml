@@ -55,8 +55,8 @@
   <properties>
     <mojo.java.target>1.5</mojo.java.target>
     <mavenVersion>2.2.1</mavenVersion>
-    <processorVersion>1.1</processorVersion>
-    <helperPluginVersion>1.2.10</helperPluginVersion>
+    <processorVersion>1.2.1</processorVersion>
+    <helperPluginVersion>1.2.11</helperPluginVersion>
     <pluginPluginVersion>2.5.1</pluginPluginVersion>
     <javadocPluginVersion>2.7</javadocPluginVersion>
     

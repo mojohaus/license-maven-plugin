@@ -25,6 +25,7 @@
 
 package org.codehaus.mojo.license.model;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.nuiton.plugin.PluginHelper;
@@ -91,7 +92,7 @@ public class LicenseRepository
         checkNotInit( "load" );
         try
         {
-            if ( baseURL == null || baseURL.toString().trim().isEmpty() )
+            if ( baseURL == null || StringUtils.isEmpty( baseURL.toString() ) )
             {
                 throw new IllegalStateException( "no baseURL defined in " + this );
             }
@@ -164,7 +165,7 @@ public class LicenseRepository
     public License getLicense( String licenseName )
     {
         checkInit( "getLicense" );
-        if ( licenseName == null || licenseName.trim().isEmpty() )
+        if ( StringUtils.isEmpty( licenseName ) )
         {
             throw new IllegalArgumentException( "licenceName can not be null, nor empty" );
         }
@@ -215,102 +216,4 @@ public class LicenseRepository
         }
     }
 
-//    /** next repository (can be {@code null}). */
-//    @Deprecated
-//    protected LicenseRepository next;
-//
-//    @Deprecated
-//    protected List<LicenseDefinition> definitions;
-//
-//    @Deprecated
-//    protected final Map<LicenseDefinition, License> cache;
-//
-//    @Deprecated
-//    public void reload() throws IOException {
-//        init = false;
-//        load();
-//    }
-
-//    @Deprecated
-//    public static URL getUrl(URL baseUrl,
-//                             String suffix) throws IllegalArgumentException {
-//        return PluginHelper.getUrl(baseUrl, suffix);
-//    }
-//
-//    @Deprecated
-//    public LicenseRepository appendRepository(LicenseRepository next) {
-//        LicenseRepository lastRepository = getLastRepository();
-//        lastRepository.next = next;
-//        return next;
-//    }
-//
-//    @Deprecated
-//    public List<LicenseDefinition> getAllDefinitions() {
-//        LicenseRepository[] repos = getAllRepositories();
-//        List<LicenseDefinition> result =
-//                new ArrayList<LicenseDefinition>(repos.length);
-//        for (LicenseRepository repo : repos) {
-//            result.addAll(repo.definitions);
-//        }
-//        return result;
-//    }
-//
-//    public List<LicenseDefinition> getDefinitions() {
-//        return definitions;
-//    }
-//
-//    public LicenseDefinition getDefinition(String licenseName) {
-//        checkInit("getDefinition");
-//        if (licenseName == null || licenseName.trim().isEmpty()) {
-//            throw new IllegalArgumentException(
-//                    "licenceName can not be null, nor empty");
-//        }
-//        licenseName = licenseName.trim().toLowerCase();
-//        LicenseDefinition definition = null;
-//        for (LicenseDefinition d : definitions) {
-//            if (licenseName.equals(d.getName())) {
-//                definition = d;
-//                break;
-//            }
-//        }
-//        if (definition == null && next != null) {
-//            definition = next.getDefinition(licenseName);
-//        }
-//        return definition;
-//    }
-//
-//    @Deprecated
-//    protected LicenseRepository getLastRepository() {
-//        LicenseRepository last = next == null ? this : next.getLastRepository();
-//        return last;
-//    }
-//
-//    @Deprecated
-//    protected LicenseRepository[] getAllRepositories() {
-//        List<LicenseRepository> list = new ArrayList<LicenseRepository>();
-//        LicenseRepository repo = this;
-//        while (repo != null) {
-//            list.add(repo);
-//            repo = repo.next;
-//        }
-//        return list.toArray(new LicenseRepository[list.size()]);
-//    }
-//
-//    @Deprecated
-//    protected void checkNotInit() throws IllegalStateException {
-//        if (init) {
-//            throw new IllegalStateException(
-//                    "license repository " + this +
-//                            " was already initialize...");
-//        }
-//    }
-//
-//    @Deprecated
-//    protected void checkInit() throws IllegalStateException {
-//        if (!init) {
-//            throw new IllegalStateException(
-//                    "repository " + this + " is not init, use the load " +
-//                            "method before any license request");
-//        }
-//    }
 }
