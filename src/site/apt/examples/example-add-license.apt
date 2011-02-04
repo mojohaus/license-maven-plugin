@@ -23,10 +23,6 @@
 ~~ #L%
 ~~~
 
-----
-Add a license not present in license-maven-plugin
-----
-
 Add a license not present in license-maven-plugin
 
   You might want to add a new license that is not already managed by the plugin

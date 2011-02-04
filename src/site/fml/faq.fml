@@ -21,13 +21,24 @@
 
 <faqs id="FAQ" title="Frequently Asked Questions">
   <part id="General">
-    <faq id="license-headers">
-      <question>Can this plugin be used to verify license headers in source files?</question>
+    <faq id="google-code-maven-license-plugin">
+      <question>What is the difference between this plugin (the Codehaus license-maven-plugin) and the maven-license-plugin hosted at Google Code?</question>
       <answer>
         <p>
-          The plugin currently only downloads the complete license files of dependencies, and does
-          not have a feature to verify and/or fix license headers in source files.  This feature 
-          may be available in future versions of the plugin.
+          The Codehaus plugin and the <a href="">Google Code</a> plugin were developed separately but with similar goals.  
+          The two plugins have several overlapping features including verifying and updating license information in 
+          source files.  The Codehaus plugin also provides the ability to download the licenses of thirdparty dependencies 
+          and create and XML report listing each project dependency and its license.  If you are not sure which one to use
+          you should try both to see which one better fits your needs.
+        </p>
+      </answer>
+    </faq>
+    <faq id="code-lutin-maven-license-plugin">
+      <question>What is the difference between this plugin (the Codehaus license-maven-plugin) and the maven-license-plugin hosted at Code Lutin?</question>
+      <answer>
+        <p>
+          The <a href="http://maven-site.nuiton.org/maven-license-plugin/">Code Lutin maven-license-plugin</a> is an older version of the Codehaus license-maven-plugin.  The source code 
+          of the Code Lutin plugin was donated to Codehaus and merged with some existing license plugin code.
         </p>
       </answer>
     </faq>

@@ -60,4 +60,9 @@ ${project.name}
   To provide you with better understanding of some usages of the License Plugin, you can take a look at the following
   examples:
 
+  * {{{./examples/example-add-license.html}Add License}}
+  
   * {{{./examples/example-download-licenses.html}Basic License Download}}
+  
+  * {{{./examples/update-file-header-config.html}Update File Header}}
+  

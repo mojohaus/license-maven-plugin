@@ -28,7 +28,9 @@
       <item name="FAQ" href="faq.html"/>
     </menu>
     <menu name="Examples">
+      <item name="Add License" href="examples/example-add-license.html"/>
       <item name="Download Licenses" href="examples/example-download-licenses.html"/>
+      <item name="Update File Header" href="examples/update-file-header-config.html"/>
     </menu>
   </body>
 </project>

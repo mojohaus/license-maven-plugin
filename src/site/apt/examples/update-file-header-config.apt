@@ -22,11 +22,10 @@
 ~~ <http://www.gnu.org/licenses/lgpl-3.0.html>.
 ~~ #L%
 ~~~
-----
-Update File Header: Configuration
-----
 
-  <Since version 2.4>, without a descriptor file, we can configure the
+Update File Header: Configuration
+
+  Without a descriptor file, we can configure the
   update-file-header goal with four parameters:
 
     * licenseName : it is the name of the license to add on file header. It is mandatory,

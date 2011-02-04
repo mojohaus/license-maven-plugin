@@ -30,7 +30,12 @@ import java.io.File;
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
 import org.apache.maven.project.MavenProject;
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
+@RunWith( JUnit4.class )
 public class UpdateProjectLicenseMojoTest
     extends AbstractMojoTestCase
 {
@@ -39,6 +44,7 @@ public class UpdateProjectLicenseMojoTest
 
     public static File testPomDir;
 
+    @Before
     public void setUp()
         throws Exception
     {
@@ -48,10 +54,7 @@ public class UpdateProjectLicenseMojoTest
             new File( getBasedir(), "target/test-classes/org/codehaus/mojo/license/updateProjectLicenseMojoTest/" );
     }
 
-    /*
-     * @Override protected String getGoalName( String methodName ) { return "update-project-license"; }
-     */
-
+    @Test
     public void testOne()
         throws Exception
     {
@@ -64,7 +67,7 @@ public class UpdateProjectLicenseMojoTest
         mojo.setLicenseFile( new File( basedir, mojo.getLicenseFile().toString() ) );
         MavenProject project = LicensePluginTestHelper.buildProject( getContainer(), pomFile );
         setVariableValueToObject( mojo, "project", project );
-        
+
         File licenseFile = mojo.getLicenseFile();
         long t0 = licenseFile.lastModified();
 
@@ -89,6 +92,7 @@ public class UpdateProjectLicenseMojoTest
         assertTrue( t1 > t0 );
     }
 
+    @Test
     public void testTwo()
         throws Exception
     {
@@ -129,6 +133,7 @@ public class UpdateProjectLicenseMojoTest
         assertTrue( t1 > t0 );
     }
 
+    @Test
     public void testSkip()
         throws Exception
     {
