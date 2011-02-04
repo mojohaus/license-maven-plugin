@@ -89,7 +89,7 @@ public class DownloadLicensesMojo
      * 
      * @parameter default-value="${project.basedir}/src/licenses.xml"
      */
-    private File licensesSummaryConfigFile;
+    private File licensesConfigFile;
 
     /**
      * The directory to which the dependency licenses should be written.
@@ -103,7 +103,7 @@ public class DownloadLicensesMojo
      * 
      * @parameter default-value="${project.build.directory}/licenses.xml"
      */
-    private File licensesSummaryOutputFile;
+    private File licensesOutputFile;
 
     /**
      * Don't show warnings about bad or missing license files.
@@ -137,18 +137,18 @@ public class DownloadLicensesMojo
             licensesOutputDirectory.mkdirs();
         }
 
-        if ( !licensesSummaryOutputFile.getParentFile().exists() )
+        if ( !licensesOutputFile.getParentFile().exists() )
         {
-            licensesSummaryOutputFile.getParentFile().mkdirs();
+            licensesOutputFile.getParentFile().mkdirs();
         }
 
         HashMap<String, ProjectLicenseInfo> configuredDepLicensesMap = new HashMap<String, ProjectLicenseInfo>();
 
         // License info from previous build
-        loadLicenseInfo( configuredDepLicensesMap, licensesSummaryOutputFile, true );
+        loadLicenseInfo( configuredDepLicensesMap, licensesOutputFile, true );
 
         // Manually configured license info
-        loadLicenseInfo( configuredDepLicensesMap, licensesSummaryConfigFile, false );
+        loadLicenseInfo( configuredDepLicensesMap, licensesConfigFile, false );
 
         // Get the list of project dependencies
         Set<Artifact> depArtifacts = null;
@@ -195,7 +195,7 @@ public class DownloadLicensesMojo
 
         try
         {
-            LicenseSummaryWriter.writeLicenseSummary( depProjectLicenses, licensesSummaryOutputFile );
+            LicenseSummaryWriter.writeLicenseSummary( depProjectLicenses, licensesOutputFile );
         }
         catch ( Exception e )
         {

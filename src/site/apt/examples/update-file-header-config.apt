@@ -23,7 +23,7 @@
 ~~ #L%
 ~~~
 
-Update File Header: Configuration
+Update File Header Examples
 
   Without a descriptor file, we can configure the
   update-file-header goal with four parameters:
@@ -54,15 +54,15 @@ Update File Header: Configuration
   - xml        : header transformer with xml comment style            , extensions : [pom, xml, xhtml, mxlm, dtd, jspx, fml, xsl, html, htm, jaxx, kml, gsp, tml]
 -------------------------------------------------------------------------------
 
-Roots
+Root Directories
 
   By default, All the files in <src> are treated. This could be changed with the
-  property <roots>. The roots property is a list of based directory from which the
+  property <roots>. The roots property is a list of base directories from which the
   update-file-header will be applied.
 
-* Exemple
+* Example
 
-    Given a pom with these plugin configuration
+    Given a pom with this plugin configuration
 
 -------------------------------------------------------------------------------
 
@@ -158,7 +158,7 @@ Excludes
 
 * Example
 
-    Given a pom with these plugin configuration
+    Given a pom with this plugin configuration
 
 -------------------------------------------------------------------------------
 
@@ -201,9 +201,9 @@ ExtraExtensions
   To use more extensions, add a mapped parameter where keys are extensions and
   values are the comment style type to use.
 
-* Exemple
+* Example
 
-  Given a pom with these plugin configuration
+  Given a pom with this plugin configuration
 
 -------------------------------------------------------------------------------
 

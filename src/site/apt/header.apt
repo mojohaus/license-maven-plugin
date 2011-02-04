@@ -22,15 +22,11 @@
 ~~ <http://www.gnu.org/licenses/lgpl-3.0.html>.
 ~~ #L%
 ~~~
-----
-File Header
-----
 
-Abstract
+Overview
 
-  This document describes the file header model introduced in version 2.1.
-
-  You will learn how to customize it and use it with the goal
+  This page describes the file header model.  You will learn how to 
+  customize it and use it with the goal
   {{{./update-file-header-mojo.html}update-file-header}}.
 
 Header model

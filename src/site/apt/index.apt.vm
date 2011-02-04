@@ -20,11 +20,11 @@ ${project.name}
   * <<<{{{./aggregate-add-third-party-mojo.html}license:aggregate-add-third-party}}>>>\
     Generates a file containing a list of all dependencies and their licenses for a multi-module build.
   
-  * <<<{{{./download-licenses-mojo.html}license:download-licenses}}>>>\
-    Downloads the license files associated with each dependency.
-  
   * <<<{{{./comment-style-list-mojo.html}license:comment-style-list}}>>>\
     Displays all the available comment styles to box file headers.
+  
+  * <<<{{{./download-licenses-mojo.html}license:download-licenses}}>>>\
+    Downloads the license files associated with each dependency.
   
   * <<<{{{./license-list-mojo.html}license:license-list}}>>>\
     Display all available licenses.
@@ -60,9 +60,13 @@ ${project.name}
   To provide you with better understanding of some usages of the License Plugin, you can take a look at the following
   examples:
 
-  * {{{./examples/example-add-license.html}Add License}}
+  * {{{./examples/example-add-license.html}Add License to the plugin}}
   
-  * {{{./examples/example-download-licenses.html}Basic License Download}}
+  * {{{./examples/example-download-licenses.html}Download dependency licenses}}
   
-  * {{{./examples/update-file-header-config.html}Update File Header}}
+  * {{{./examples/example-license-list.html}List available licenses}}
+  
+  * {{{./examples/example-thirdparty.html}Check thirdparty licenses}}
+  
+  * {{{./examples/update-file-header-config.html}Update file header of source files}}
   

@@ -1,0 +1,75 @@
+ ------
+ License List Examples
+ ------
+ ------
+ 2011-02-04
+ ------
+
+License List Examples
+
+* license-list goal
+
+  This goal displays a list of available licenses.
+
+  Use it directly (and only) from commandline :
+
+-------------------------------------------------------------------------------
+  mvn license:license-list
+-------------------------------------------------------------------------------
+
+  To display the license header, use the <<detail>> parameter :
+
+-------------------------------------------------------------------------------
+  mvn license:license-list -Ddetail
+-------------------------------------------------------------------------------
+
+  for full detail see {{{./license-list-mojo.html}detail page}}.
+
+** Example output
+
+-------------------------------------------------------------------------------
+  [INFO] [license:license-list {execution: default-cli}]
+  [INFO] Available licenses :
+
+   * agpl_v3   : GNU Affero General Public License (AGPL) version 3.0
+   * apache_v2 : Apache License version 2.0
+   * cddl_v1   : COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0
+   * fdl_v1_3  : GNU Free Documentation License (FDL) version 1.3
+   * gpl_v1    : GNU General Public License (GPL) version 1.0
+   * gpl_v2    : GNU General Public License (GPL) version 2.0
+   * gpl_v3    : GNU General Public License (GPL) version 3.0
+   * lgpl_v2_1 : GNU General Lesser Public License (LGPL) version 2.1
+   * lgpl_v3   : GNU General Lesser Public License (LGPL) version 3.0
+   * mit       : MIT-License
+-------------------------------------------------------------------------------
+
+* comment-style-list goal
+
+  This goal displays the available comment styles to box file header.
+
+  Use it directly (and only) from commandline :
+
+-------------------------------------------------------------------------------
+  mvn license:comment-style-list
+-------------------------------------------------------------------------------
+
+  To display the example, use the <<detail>> parameter :
+
+-------------------------------------------------------------------------------
+  mvn license:comment-style-list -Ddetail
+-------------------------------------------------------------------------------
+
+  for full detail see {{{./comment-style-list-mojo.html}detail page}}.
+
+** Example output
+
+-------------------------------------------------------------------------------
+  [INFO] [license:comment-style-list {execution: default-cli}]
+  [INFO] List of available comment styles:
+
+    - apt        : header transformer with apt comment style
+    - java       : header transformer with java comment style
+    - properties : header transformer with properties file comment style
+    - rst        : header transformer with rst comment style
+    - xml        : header transformer with xml comment style
+-------------------------------------------------------------------------------

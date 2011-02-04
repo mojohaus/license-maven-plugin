@@ -7,24 +7,130 @@
 
 Usage
 
-  The License Maven Plugin can download dependency license files. The section below should help 
-  you to get started. If you have problems using the plugin, please feel free to post your
-  question to the {{{./mail-lists.html}user mailing list}}.
+  The License Maven Plugin provides several goals related to licenses in a project.
+  This includes validating/updating license header information in source files, 
+  updating the LICENSE.txt file, and retrieving license information from dependencies.
+  The information below should help you to get started. If you have problems using 
+  the plugin, please feel free to post your questions to the 
+  {{{./mail-lists.html}user mailing list}}.
 
-  By default, the <<<{{{./download-licenses-mojo.html}download-licenses}}>>> goal will attempt to 
-  resolve the license of each project dependency.  These files will be downloaded to a local directory
-  to be included in the final packaging of the project if desired.  The licenses are downloaded
-  based on the url field of the dependency POM.  In addition to the license files available via the
-  POMs a license information file can be configured that will allow the plugin to locate license
-  files when the information is missing or incorrect in the dependency POM.
-  
-  After downloading the license files, the plugin will create a summary file in XML format which describes
-  the license(s) associated with each dependency.  Note that subsequent runs of the plugin will attempt
-  to use the existing summary file if found instead of re-downloading the licenses every build.
-  If the license summary file is found, only the licenses of new dependencies not in the file will
-  be downloaded.
+* Getting Plugin Configuration Information
 
-* {Basic Configuration}
+** license-list goal
+
+  This goal displays a list of available licenses.
+
+  Use it directly (and only) from commandline :
+
+-------------------------------------------------------------------------------
+
+  mvn license:license-list
+-------------------------------------------------------------------------------
+
+  To display the license header, use the <<detail>> parameter :
+
+-------------------------------------------------------------------------------
+  mvn license:license-list -Ddetail
+-------------------------------------------------------------------------------
+
+  For more information, see the {{{./examples/example-license-list.html}examples}} and
+  for full detail see {{{./license-list-mojo.html}detail page}}.
+
+** comment-style-list goal
+
+  This goal displays the available comment styles to box file header.
+
+  Use it directly (and only) from commandline :
+
+-------------------------------------------------------------------------------
+  mvn license:comment-style-list
+-------------------------------------------------------------------------------
+
+  To display the example, use the <<detail>> parameter :
+
+-------------------------------------------------------------------------------
+  mvn license:comment-style-list -Ddetail
+-------------------------------------------------------------------------------
+
+  For more information, see the {{{./examples/example-license-list.html}examples}} and
+  for full detail see {{{./comment-style-list-mojo.html}detail page}}.
+
+** help goal
+
+  This goal display the help of the plugin (available goals).
+
+  Use it directly (and only) from commandline :
+
+-------------------------------------------------------------------------------
+  mvn license:help
+-------------------------------------------------------------------------------
+
+  To display verbose help  :
+
+-------------------------------------------------------------------------------
+  mvn license:help -Ddetail
+-------------------------------------------------------------------------------
+
+  for full detail see {{{./help-mojo.html}detail page}}.
+
+
+* Updating License Information
+
+** update-project-license goal
+
+  This goal creates or updates the LICENSE.txt file and add it in build.
+
+  It can also generate a bundle License file to avoid name collision in a final
+  application.
+
+  for full detail see {{{./update-project-license-mojo.html}detail page}}.
+
+** update-file-header goal
+
+  This goal adds or updates the license header on some files using a xml
+  descriptor file to describe all files to include in license process for a
+  whole module.
+
+  For more information, see the {{{./examples/update-file-header-config.html}examples}} and
+  for full detail see {{{./update-file-header-mojo.html}detail page}}.
+
+  In case of any descriptor file, all the <*.java *.rst *.xml et *.properties>
+  files from <"src/**/*"> are treated. However, it is necessary to give the license
+  to use, with the parameter <licenseName>.
+
+  for full detail see {{{./update-file-header-config.html}detail page}}.
+
+
+* Getting Dependency License Information
+
+** add-third-party goal
+
+  This goal build the THIRD-PARTY.txt file and add it in build.
+
+  <Since version 2.3>, we can consolidate the generated file by filling another
+  file (the <<missing file>>) for dependencies without license.
+
+  <Note:> This mojo has not effect on a <<pom>> project.
+
+  For more information, see the {{{./examples/example-thirdparty.html}examples}} and for
+  full detail see {{{./add-third-party-mojo.html}the add third party mojo page}}.
+
+** aggregate-add-third-party goal
+
+  This goal build the THIRD-PARTY.txt file on a multi-module project from
+  the dependencies of all his modules.
+
+  <Note:> This mojo has only effect on a <<pom>> project.
+
+  For more information, see the {{{./examples/example-thirdparty.html}examples}} and for
+  full detail see {{{./aggregate-add-third-party-mojo.html}the aggregate add third party mojo 
+  page}}.
+
+** download-licenses goal
+
+  The License Maven Plugin can download dependency license files and generate an XML report of the 
+  licenses.  Example configuration is listed below, and more information is available in the 
+  {{{./examples/example-download-licenses.html}examples page}}.
 
   By default the plugin attaches to the <<<generate-resources>>> phase of the build lifecycle.  An 
   example configuration is supplied below.

@@ -26,10 +26,13 @@
       <item name="Goals" href="plugin-info.html"/>
       <item name="Usage" href="usage.html"/>
       <item name="FAQ" href="faq.html"/>
+      <item name="File header model" href="header.html"/>
     </menu>
     <menu name="Examples">
       <item name="Add License" href="examples/example-add-license.html"/>
       <item name="Download Licenses" href="examples/example-download-licenses.html"/>
+      <item name="List Licenses" href="examples/example-license-list.html"/>
+      <item name="Thirdparty Licenses" href="examples/example-thirdparty.html"/>
       <item name="Update File Header" href="examples/update-file-header-config.html"/>
     </menu>
   </body>
