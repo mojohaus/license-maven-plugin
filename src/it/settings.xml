@@ -60,6 +60,6 @@
   </profiles>
 
   <pluginGroups>
-    <pluginGroup>org.nuiton</pluginGroup>
+    <pluginGroup>org.codehaus.mojo</pluginGroup>
   </pluginGroups>
 </settings>
