@@ -12,7 +12,7 @@
  * this class owns a header, only license will be updated.
  *
  * @author tchemit <chemit@codelutin.com>
- * @since 2.1
+ * @since 1.0
  */
 package org.codehaus.mojo.license.updateFileHeaderMojoTest.updateLicense.src;
 

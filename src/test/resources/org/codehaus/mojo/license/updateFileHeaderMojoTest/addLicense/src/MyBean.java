@@ -4,7 +4,7 @@ package org.codehaus.mojo.license.updateFileHeaderMojoTest.addLicense.src;
  * this class has no license, a new default one will be added.
  *
  * @author tchemit <chemit@codelutin.com>
- * @since 2.1
+ * @since 1.0
  */
 public class MyBean
 {

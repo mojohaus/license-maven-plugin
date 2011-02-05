@@ -17,14 +17,17 @@ package org.codehaus.mojo.license;
  * along with this program.  If not, see <http://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.IOUtil;
+
+import java.io.*;
 
 /**
  * Some basic file io utilities
- * 
+ *
  * @author pgier
+ * @author tchemit <chemit@codelutin.com>
+ * @since 1.0
  */
 public class FileUtil
 {
@@ -58,6 +61,139 @@ public class FileUtil
         catch ( IOException e )
         {
             // do nothing
+        }
+    }
+
+    /**
+     * Creates the directory (and his parents) if necessary.
+     *
+     * @param dir the directory to create if not exisiting
+     * @return {@code true} if directory was created, {@code false} if was no
+     *         need to create it
+     * @throws IOException if could not create directory
+     */
+    public static boolean createDirectoryIfNecessary( File dir )
+        throws IOException
+    {
+        if ( !dir.exists() )
+        {
+            boolean b = dir.mkdirs();
+            if ( !b )
+            {
+                throw new IOException( "Could not create directory " + dir );
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Delete the given file.
+     *
+     * @param file the file to delete
+     * @throws IOException if could not delete the file
+     */
+    public static void deleteFile( File file )
+        throws IOException
+    {
+        if ( !file.exists() )
+        {
+            // file does not exist, can not delete it
+            return;
+        }
+        boolean b = file.delete();
+        if ( !b )
+        {
+            throw new IOException( "could not delete file " + file );
+        }
+    }
+
+    /**
+     * Rename the given file to a new destination.
+     *
+     * @param file        the file to rename
+     * @param destination the destination file
+     * @throws IOException if could not rename the file
+     */
+    public static void renameFile( File file, File destination )
+        throws IOException
+    {
+        boolean b = file.renameTo( destination );
+        if ( !b )
+        {
+            throw new IOException( "could not rename " + file + " to " + destination );
+        }
+    }
+
+    /**
+     * Permet de copier le fichier source vers le fichier cible.
+     *
+     * @param source le fichier source
+     * @param target le fichier cible
+     * @throws IOException Erreur de copie
+     */
+    public static void copy( File source, File target )
+        throws IOException
+    {
+        createDirectoryIfNecessary( target.getParentFile() );
+        FileUtils.copyFile( source, target );
+    }
+
+    public static File getFile( File base, String... paths )
+    {
+        StringBuilder buffer = new StringBuilder();
+        for ( String path : paths )
+        {
+            buffer.append( File.separator ).append( path );
+        }
+        return new File( base, buffer.substring( 1 ) );
+    }
+
+    /**
+     * Permet de lire un fichier et de retourner sont contenu sous forme d'une
+     * chaine de carateres
+     *
+     * @param file     le fichier a lire
+     * @param encoding encoding to read file
+     * @return the content of the file
+     * @throws IOException if IO pb
+     */
+    static public String readAsString( File file, String encoding )
+        throws IOException
+    {
+        FileInputStream inf = new FileInputStream( file );
+        BufferedReader in = new BufferedReader( new InputStreamReader( inf, encoding ) );
+        try
+        {
+            return IOUtil.toString( in );
+        }
+        finally
+        {
+            in.close();
+        }
+    }
+
+    /**
+     * Sauvegarde un contenu dans un fichier.
+     *
+     * @param file     le fichier a ecrire
+     * @param content  le contenu du fichier
+     * @param encoding l'encoding d'ecriture
+     * @throws IOException if IO pb
+     */
+    public static void writeString( File file, String content, String encoding )
+        throws IOException
+    {
+        createDirectoryIfNecessary( file.getParentFile() );
+        BufferedWriter out;
+        out = new BufferedWriter( new OutputStreamWriter( new FileOutputStream( file ), encoding ) );
+        try
+        {
+            IOUtil.copy( content, out );
+        }
+        finally
+        {
+            out.close();
         }
     }
 }

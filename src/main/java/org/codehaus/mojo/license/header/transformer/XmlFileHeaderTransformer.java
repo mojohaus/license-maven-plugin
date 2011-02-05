@@ -30,7 +30,7 @@ package org.codehaus.mojo.license.header.transformer;
  *
  * @author tchemit <chemit@codelutin.com>
  * @plexus.component role-hint="xml"
- * @since 2.1
+ * @since 1.0
  */
 public class XmlFileHeaderTransformer
     extends AbstractFileHeaderTransformer

@@ -30,8 +30,6 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
-import org.nuiton.io.SortedProperties;
-import org.nuiton.plugin.Plugin;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,7 +48,7 @@ import java.util.SortedSet;
  * @requiresProject true
  * @aggregator
  * @execute goal="add-third-party"
- * @since 2.3
+ * @since 1.0
  */
 public class AggregatorAddThirdPartyMojo
     extends AbstractAddThirdPartyMojo
@@ -62,14 +60,14 @@ public class AggregatorAddThirdPartyMojo
      * @parameter expression="${reactorProjects}"
      * @readonly
      * @required
-     * @since 2.3
+     * @since 1.0
      */
     protected List<?> reactorProjects;
 
     @Override
     protected boolean checkPackaging()
     {
-        return acceptPackaging( Plugin.Packaging.pom );
+        return acceptPackaging( "pom" );
     }
 
     @Override

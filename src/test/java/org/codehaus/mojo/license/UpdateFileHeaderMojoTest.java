@@ -43,9 +43,9 @@ import static org.codehaus.mojo.license.UpdateFileHeaderMojo.FileState;
 
 /**
  * Tests the {@link UpdateFileHeaderMojo}.
- * 
+ *
  * @author tchemit <chemit@codelutin.com>
- * @since 2.1
+ * @since 1.0
  */
 @RunWith( JUnit4.class )
 public class UpdateFileHeaderMojoTest
@@ -77,7 +77,8 @@ public class UpdateFileHeaderMojoTest
     {
         super.setUp();
 
-        testPomDir = new File( getBasedir(), "target/test-classes/org/codehaus/mojo/license/updateFileHeaderMojoTest/" );
+        testPomDir =
+            new File( getBasedir(), "target/test-classes/org/codehaus/mojo/license/updateFileHeaderMojoTest/" );
     }
 
     public UpdateFileHeaderMojo initMojo( String testName )
@@ -365,8 +366,9 @@ public class UpdateFileHeaderMojoTest
 
     protected File getMyBeanFile( String testName )
     {
-        return new File( getBasedir(), "target/test-classes/org/codehaus/mojo/license/updateFileHeaderMojoTest/"
-            + testName + "/src/MyBean.java" );
+        return new File( getBasedir(),
+                         "target/test-classes/org/codehaus/mojo/license/updateFileHeaderMojoTest/" + testName +
+                             "/src/MyBean.java" );
     }
 
     public void checkPattern( File file, String content, String pattern, boolean required )

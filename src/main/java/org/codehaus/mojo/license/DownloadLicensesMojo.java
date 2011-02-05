@@ -17,18 +17,6 @@ package org.codehaus.mojo.license;
  * along with this program.  If not, see <http://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.License;
 import org.apache.maven.plugin.AbstractMojo;
@@ -38,15 +26,24 @@ import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.codehaus.mojo.license.model.ProjectLicenseInfo;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.*;
+
 /**
  * Download the license files of all the current project's dependencies, and generate
  * a summary file containing a list of all dependencies and their licenses.
- * 
+ *
+ * @author Paul Gier
+ * @version $Revision$
  * @phase package
  * @goal download-licenses
  * @requiresDependencyResolution test
- * @author Paul Gier
- * @version $Revision$
+ * @since 1.0
  */
 public class DownloadLicensesMojo
     extends AbstractMojo
@@ -54,68 +51,77 @@ public class DownloadLicensesMojo
 
     /**
      * The Maven Project Object
-     * 
+     *
      * @parameter default-value="${project}"
      * @readonly
+     * @since 1.0
      */
     private MavenProject project;
 
     /**
      * Used to build a maven projects from artifacts in the remote repository.
-     * 
+     *
      * @component role="org.apache.maven.project.MavenProjectBuilder"
      * @readonly
+     * @since 1.0
      */
     private MavenProjectBuilder projectBuilder;
 
     /**
      * Location of the local repository.
-     * 
+     *
      * @parameter default-value="${localRepository}"
      * @readonly
+     * @since 1.0
      */
     private org.apache.maven.artifact.repository.ArtifactRepository localRepository;
 
     /**
      * List of Remote Repositories used by the resolver
-     * 
+     *
      * @parameter default-value="${project.remoteArtifactRepositories}"
      * @readonly
+     * @since 1.0
      */
     private java.util.List remoteRepositories;
 
     /**
      * Input file containing a mapping between each dependency and it's license information.
-     * 
+     *
      * @parameter default-value="${project.basedir}/src/licenses.xml"
+     * @since 1.0
      */
     private File licensesConfigFile;
 
     /**
      * The directory to which the dependency licenses should be written.
-     * 
+     *
      * @parameter default-value="${project.build.directory}/licenses"
+     * @since 1.0
      */
     private File licensesOutputDirectory;
 
     /**
      * The output file containing a mapping between each dependency and it's license information.
-     * 
+     *
      * @parameter default-value="${project.build.directory}/licenses.xml"
+     * @since 1.0
      */
     private File licensesOutputFile;
 
     /**
      * Don't show warnings about bad or missing license files.
-     * 
+     *
      * @parameter default-value="false"
+     * @since 1.0
      */
     private boolean quiet;
 
     /**
      * Include transitive dependencies when downloading license files.
-     * 
+     *
      * @parameter default-value="true"
+     * @since 1.0
      */
     private boolean includeTransitiveDependencies;
 
@@ -207,10 +213,10 @@ public class DownloadLicensesMojo
     /**
      * Load the license information contained in a file if it exists. Will overwrite existing license information in the
      * map for dependencies with the same id. If the config file does not exist, the method does nothing.
-     * 
+     *
      * @param configuredDepLicensesMap A map between the dependencyId and the license info
-     * @param licenseConfigFile The license configuration file to load
-     * @param previouslyDownloaded Whether these licenses were already downloaded
+     * @param licenseConfigFile        The license configuration file to load
+     * @param previouslyDownloaded     Whether these licenses were already downloaded
      * @throws MojoExecutionException
      */
     private void loadLicenseInfo( HashMap<String, ProjectLicenseInfo> configuredDepLicensesMap, File licenseConfigFile,
@@ -250,7 +256,7 @@ public class DownloadLicensesMojo
 
     /**
      * Returns the project ID for the artifact
-     * 
+     *
      * @param artifact
      * @return groupId:artifactId
      */
@@ -261,7 +267,7 @@ public class DownloadLicensesMojo
 
     /**
      * Create a simple DependencyProject object containing the GAV and license info from the Maven Artifact
-     * 
+     *
      * @param artifact
      * @return DependencyProject with artifact and license info
      */
@@ -285,7 +291,7 @@ public class DownloadLicensesMojo
     /**
      * Determine filename to use for downloaded license file. The file name is based on the configured name of the
      * license (if available) and the remote filename of the license.
-     * 
+     *
      * @param license
      * @return A filename to be used for the downloaded license file
      */
@@ -318,7 +324,7 @@ public class DownloadLicensesMojo
 
     /**
      * Download the licenses associated with this project
-     * 
+     *
      * @param depProject The project which generated the dependency
      */
     private void downloadLicenses( ProjectLicenseInfo depProject )
@@ -358,16 +364,16 @@ public class DownloadLicensesMojo
             {
                 if ( !quiet )
                 {
-                    getLog().warn( "POM for dependency " + depProject.toString() + " has an invalid license URL: "
-                                       + license.getUrl() );
+                    getLog().warn( "POM for dependency " + depProject.toString() + " has an invalid license URL: " +
+                                       license.getUrl() );
                 }
             }
             catch ( FileNotFoundException e )
             {
                 if ( !quiet )
                 {
-                    getLog().warn( "POM for dependency " + depProject.toString()
-                                       + " has a license URL that returns file not found: " + license.getUrl() );
+                    getLog().warn( "POM for dependency " + depProject.toString() +
+                                       " has a license URL that returns file not found: " + license.getUrl() );
                 }
             }
             catch ( IOException e )

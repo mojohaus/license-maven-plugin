@@ -31,27 +31,16 @@ import org.apache.maven.model.License;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
-import org.nuiton.io.SortedProperties;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.SortedSet;
-import java.util.TreeMap;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * Map of artifacts (stub in mavenproject) group by their license.
  *
  * @author tchemit <chemit@codelutin.com>
- * @since 2.3
+ * @since 1.0
  */
 public class LicenseMap
     extends TreeMap<String, SortedSet<MavenProject>>

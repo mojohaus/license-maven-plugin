@@ -29,11 +29,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.codehaus.mojo.license.header.transformer.FileHeaderTransformer;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Displays all the available comment style to box file headers.
@@ -42,7 +38,7 @@ import java.util.Map;
  * @requiresProject false
  * @requiresDirectInvocation
  * @goal comment-style-list
- * @since 2.1
+ * @since 1.0
  */
 public class CommentStyleListMojo
     extends AbstractLicenseMojo
@@ -52,7 +48,7 @@ public class CommentStyleListMojo
      * A flag to display also the content of each license.
      *
      * @parameter expression="${detail}"
-     * @since 2.1
+     * @since 1.0
      */
     private boolean detail;
 
@@ -60,7 +56,7 @@ public class CommentStyleListMojo
      * All available header transformers.
      *
      * @component role="org.codehaus.mojo.license.header.transformer.FileHeaderTransformer"
-     * @since 2.1
+     * @since 1.0
      */
     private Map<String, FileHeaderTransformer> transformers;
 
@@ -80,7 +76,7 @@ public class CommentStyleListMojo
         if ( isVerbose() )
         {
             buffer.append( "\n\n-------------------------------------------------------------------------------\n" );
-            buffer.append( "                           maven-license-plugin\n" );
+            buffer.append( "                           license-maven-plugin\n" );
             buffer.append( "-------------------------------------------------------------------------------\n\n" );
         }
         List<String> names = new ArrayList<String>( transformers.keySet() );

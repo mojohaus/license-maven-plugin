@@ -33,7 +33,7 @@ import org.nuiton.processor.filters.DefaultFilter;
  * File Header filter.
  *
  * @author tchemit <chemit@codelutin.com>
- * @since 2.1
+ * @since 1.0
  */
 public abstract class FileHeaderFilter
     extends DefaultFilter
@@ -92,21 +92,9 @@ public abstract class FileHeaderFilter
      *
      * @param oldHeader the old header found in file.
      * @return {@code null} if header is still the same, otherwise the new header to apply
-     * @since 2.3.2
+     * @since 1.0
      */
     protected abstract FileHeader getNewHeader( FileHeader oldHeader );
-
-    /**
-     * The logic to implements when a header was touched.
-     *
-     * @param ch the actual header content
-     * @return the new header content (beginning by a
-     *         {@link FileHeaderTransformer#getProcessStartTag()} and ending
-     *         with a {@link FileHeaderTransformer#getProcessEndTag()}).
-     * @deprecated since 2.3.2, use now the method {@link #getNewHeader(FileHeader)}.
-     */
-    @Deprecated
-    protected abstract String treateHeader( String ch );
 
     public FileHeaderFilter()
     {
@@ -166,27 +154,7 @@ public abstract class FileHeaderFilter
                 header = newFileHeader;
             }
 
-            String result = transformer.toHeaderContent( header );
-            return result;
-
-//            // update header
-//            String newHeader = treateHeader(ch);
-//            if (log.isDebugEnabled()) {
-//                log.debug("old header =\n" + ch);
-//                log.debug("new header =\n" + newHeader);
-//            }
-//            if (!newHeader.contains(ch.trim())) {
-//                // this is a weak test, but should be more enough
-//                // if the new header contains the old one, it would be
-//                // bad luck to not have equality ?
-//                //TODO-TC-20100415 : use an exact test (must remove process tag on new header)
-////            if (!ch.equals(newHeader)) {
-//
-//                // header content was modified, mark it
-//                modified = true;
-//            }
-//
-//            return newHeader;
+            return transformer.toHeaderContent( header );
         }
         // Means we detects the process start tag but not the end one.
         // coming then here from the flush filter method... So changes nothing

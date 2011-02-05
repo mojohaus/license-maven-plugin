@@ -17,16 +17,17 @@ package org.codehaus.mojo.license.model;
  * along with this program.  If not, see <http://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.License;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Contains the license information for a single project/dependency
- * 
+ *
  * @author pgier
+ * @since 1.0
  */
 public class ProjectLicenseInfo
 {
@@ -121,7 +122,7 @@ public class ProjectLicenseInfo
 
     /**
      * The unique ID for the project
-     * 
+     *
      * @return String containing "groupId:artifactId"
      */
     public String getId()
@@ -131,7 +132,7 @@ public class ProjectLicenseInfo
 
     /**
      * Compare this artifact to another ProjectLicenseInfo, or compare to an instance
-     * of org.apache.maven.artifact.Artifact 
+     * of org.apache.maven.artifact.Artifact
      */
     public boolean equals( Object compareTo )
     {

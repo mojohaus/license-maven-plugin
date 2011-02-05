@@ -17,12 +17,6 @@ package org.codehaus.mojo.license;
  * along with this program.  If not, see <http://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-
 import org.apache.maven.project.DefaultProjectBuilderConfiguration;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
@@ -30,16 +24,20 @@ import org.apache.maven.project.ProjectBuilderConfiguration;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.util.IOUtil;
 
+import java.io.*;
+
 /**
- * Helper methods for the Maven plugin test harness
+ * Helper methods for the Maven plugin test harness.
+ *
+ * @since 1.0
  */
 public class LicensePluginTestHelper
 {
     /**
      * Initialize the project of the mojo.
-     * 
+     *
      * @param container the plexus container
-     * @param pomFile the pom file used to configure the mojo
+     * @param pomFile   the pom file used to configure the mojo
      * @throws Exception
      */
     public static MavenProject buildProject( PlexusContainer container, File pomFile )
@@ -52,7 +50,7 @@ public class LicensePluginTestHelper
 
     /**
      * Try to update the lastModified date of a file
-     * 
+     *
      * @param file
      * @param lastModified
      * @throws IOException If the lastModified date was not changed
@@ -69,8 +67,8 @@ public class LicensePluginTestHelper
 
     /**
      * Read a file as a string with the given encoding
-     * 
-     * @param file The file to read
+     *
+     * @param file     The file to read
      * @param encoding encoding to read file
      * @return the content of the file
      * @throws IOException if IO problem

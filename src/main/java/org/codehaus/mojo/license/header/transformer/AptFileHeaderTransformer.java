@@ -30,7 +30,7 @@ package org.codehaus.mojo.license.header.transformer;
  *
  * @author tchemit <chemit@codelutin.com>
  * @plexus.component role-hint="apt"
- * @since 2.1
+ * @since 1.0
  */
 public class AptFileHeaderTransformer
     extends AbstractFileHeaderTransformer

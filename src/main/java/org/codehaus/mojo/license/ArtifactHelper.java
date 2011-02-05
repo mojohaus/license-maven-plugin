@@ -34,7 +34,7 @@ import java.util.Comparator;
  * A helper for artifacts.
  *
  * @author tchemit <chemit@codelutin.com>
- * @since 2.4.2
+ * @since 1.0
  */
 public class ArtifactHelper
 {

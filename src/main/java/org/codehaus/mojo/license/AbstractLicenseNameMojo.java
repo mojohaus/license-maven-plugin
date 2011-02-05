@@ -29,7 +29,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.maven.plugin.MojoFailureException;
 import org.codehaus.mojo.license.model.License;
 import org.codehaus.mojo.license.model.LicenseStore;
-import org.nuiton.plugin.PluginWithEncoding;
 
 import java.util.Arrays;
 
@@ -38,31 +37,30 @@ import java.util.Arrays;
  * {@link #licenseStore}.
  *
  * @author tchemit <chemit@codelutin.com>
- * @since 2.1
+ * @since 1.0
  */
 public abstract class AbstractLicenseNameMojo
     extends AbstractLicenseMojo
-    implements PluginWithEncoding
 {
 
-    /**
-     * Encoding used to read and writes files.
-     * <p/>
-     * <b>Note:</b> If nothing is filled here, we will use the system
-     * property {@code file.encoding}.
-     *
-     * @parameter expression="${license.encoding}" default-value="${project.build.sourceEncoding}"
-     * @required
-     * @since 2.1
-     */
-    private String encoding;
+//    /**
+//     * Encoding used to read and writes files.
+//     * <p/>
+//     * <b>Note:</b> If nothing is filled here, we will use the system
+//     * property {@code file.encoding}.
+//     *
+//     * @parameter expression="${license.encoding}" default-value="${project.build.sourceEncoding}"
+//     * @required
+//     * @since 1.0
+//     */
+//    private String encoding;
 
     /**
      * To specify an external extra licenses repository resolver (says the base
      * url of the repository where the {@code license.properties} is present).
      *
      * @parameter expression="${license.licenseResolver}"
-     * @since 2.1
+     * @since 1.0
      */
     private String licenseResolver;
 
@@ -70,7 +68,7 @@ public abstract class AbstractLicenseNameMojo
      * A flag to keep a backup of every modified file.
      *
      * @parameter expression="${license.keepBackup}"  default-value="false"
-     * @since 2.1
+     * @since 1.0
      */
     private boolean keepBackup;
 
@@ -78,7 +76,7 @@ public abstract class AbstractLicenseNameMojo
      * Name of the license to use in the project.
      *
      * @parameter expression="${license.licenseName}"
-     * @since 2.4
+     * @since 1.0
      */
     private String licenseName;
 
@@ -169,7 +167,7 @@ public abstract class AbstractLicenseNameMojo
      * @throws IllegalArgumentException if license is not valid
      * @throws IllegalStateException    if license store is not initialized
      * @throws MojoFailureException     if license does not exist
-     * @since 2.4.1
+     * @since 1.0
      */
     protected void checkLicense( String licenseName )
         throws IllegalArgumentException, IllegalStateException, MojoFailureException
@@ -187,19 +185,19 @@ public abstract class AbstractLicenseNameMojo
         if ( mainLicense == null )
         {
             throw new MojoFailureException( "License named '" + mainLicense + "' is unknown, use one of " +
-                Arrays.toString( licenseStore.getLicenseNames() ) );
+                                                Arrays.toString( licenseStore.getLicenseNames() ) );
         }
     }
 
-    public final String getEncoding()
-    {
-        return encoding;
-    }
-
-    public final void setEncoding( String encoding )
-    {
-        this.encoding = encoding;
-    }
+//    public final String getEncoding()
+//    {
+//        return encoding;
+//    }
+//
+//    public final void setEncoding( String encoding )
+//    {
+//        this.encoding = encoding;
+//    }
 
     public boolean isKeepBackup()
     {

@@ -26,7 +26,6 @@
 package org.codehaus.mojo.license;
 
 import org.codehaus.mojo.license.model.License;
-import org.nuiton.plugin.PluginHelper;
 
 import java.io.File;
 
@@ -45,7 +44,7 @@ import java.io.File;
  * @goal update-project-license
  * @phase generate-resources
  * @requiresProject true
- * @since 2.1
+ * @since 1.0
  */
 public class UpdateProjectLicenseMojo
     extends AbstractLicenseNameMojo
@@ -57,7 +56,7 @@ public class UpdateProjectLicenseMojo
      *
      * @parameter expression="${license.licenceFile}" default-value="${basedir}/LICENSE.txt"
      * @required
-     * @since 2.1
+     * @since 1.0
      */
     protected File licenseFile;
 
@@ -67,7 +66,7 @@ public class UpdateProjectLicenseMojo
      * <b>Note:</b> This option is not available for {@code pom} module types.
      *
      * @parameter expression="${license.outputDirectory}"  default-value="target/generated-sources/license"
-     * @since 2.1
+     * @since 1.0
      */
     protected File outputDirectory;
 
@@ -83,7 +82,7 @@ public class UpdateProjectLicenseMojo
      * <b>Note:</b> This option is not available for {@code pom} module types.
      *
      * @parameter expression="${license.generateBundle}"  default-value="false"
-     * @since 2.1
+     * @since 1.0
      */
     protected boolean generateBundle;
 
@@ -94,7 +93,7 @@ public class UpdateProjectLicenseMojo
      * <b>Note:</b> This option is not available for {@code pom} module types.
      *
      * @parameter expression="${license.bundleLicensePath}"  default-value="META-INF/${project.artifactId}-LICENSE.txt"
-     * @since 2.1
+     * @since 1.0
      */
     protected String bundleLicensePath;
 
@@ -110,7 +109,7 @@ public class UpdateProjectLicenseMojo
      * A flag to skip the goal.
      *
      * @parameter expression="${license.skipUpdateProjectLicense}" default-value="false"
-     * @since 2.1
+     * @since 1.0
      */
     protected boolean skipUpdateProjectLicense;
 
@@ -191,7 +190,7 @@ public class UpdateProjectLicenseMojo
             {
 
                 // creates the bundled license file
-                File bundleTarget = PluginHelper.getFile( getOutputDirectory(), getBundleLicensePath() );
+                File bundleTarget = FileUtil.getFile( getOutputDirectory(), getBundleLicensePath() );
                 copyFile( target, bundleTarget );
             }
 

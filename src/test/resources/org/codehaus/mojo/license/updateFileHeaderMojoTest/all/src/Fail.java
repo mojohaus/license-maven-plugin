@@ -14,7 +14,7 @@ package org.codehaus.mojo.license.updateFileHeaderMojoTest.all.src;
  * modified.
  *
  * @author tchemit <chemit@codelutin.com>
- * @since 2.1
+ * @since 1.0
  */
 public class Fail
 {

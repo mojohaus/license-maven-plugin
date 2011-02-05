@@ -25,8 +25,6 @@
 
 package org.codehaus.mojo.license;
 
-import java.io.File;
-
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
 import org.apache.maven.project.MavenProject;
 import org.junit.Assert;
@@ -34,6 +32,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+
+import java.io.File;
 
 @RunWith( JUnit4.class )
 public class UpdateProjectLicenseMojoTest

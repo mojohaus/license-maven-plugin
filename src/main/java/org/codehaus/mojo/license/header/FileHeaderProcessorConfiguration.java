@@ -32,7 +32,7 @@ import org.codehaus.mojo.license.header.transformer.FileHeaderTransformer;
  * Contract of required configuration of the {@link FileHeaderProcessor}.
  *
  * @author tchemit <chemit@codelutin.com>
- * @since 2.1
+ * @since 1.0
  */
 public interface FileHeaderProcessorConfiguration
 {

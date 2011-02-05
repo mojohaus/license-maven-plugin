@@ -29,7 +29,6 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.codehaus.mojo.license.model.License;
 import org.codehaus.mojo.license.model.LicenseStore;
-import org.nuiton.plugin.PluginWithEncoding;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -43,18 +42,17 @@ import java.util.List;
  * @goal license-list
  * @requiresProject false
  * @requiresDirectInvocation
- * @since 1.0.1
+ * @since 1.0
  */
 public class LicenseListMojo
     extends AbstractLicenseMojo
-    implements PluginWithEncoding
 {
 
     /**
      * the url of an extra license repository.
      *
      * @parameter expression="${extraResolver}"
-     * @since 1.0.1
+     * @since 1.0
      */
     private String extraResolver;
 
@@ -62,21 +60,21 @@ public class LicenseListMojo
      * A flag to display also the content of each license.
      *
      * @parameter expression="${detail}"
-     * @since 1.0.1
+     * @since 1.0
      */
     private boolean detail;
 
-    /**
-     * Encoding used to read and writes files.
-     * <p/>
-     * <b>Note:</b> If nothing is filled here, we will use the system
-     * property {@code file.encoding}.
-     *
-     * @parameter expression="${license.encoding}" default-value="${project.build.sourceEncoding}"
-     * @required
-     * @since 2.1
-     */
-    private String encoding;
+//    /**
+//     * Encoding used to read and writes files.
+//     * <p/>
+//     * <b>Note:</b> If nothing is filled here, we will use the system
+//     * property {@code file.encoding}.
+//     *
+//     * @parameter expression="${license.encoding}" default-value="${project.build.sourceEncoding}"
+//     * @required
+//     * @since 1.0
+//     */
+//    private String encoding;
 
     /**
      * store of licenses
@@ -142,15 +140,15 @@ public class LicenseListMojo
         getLog().info( buffer.toString() );
     }
 
-    public final String getEncoding()
-    {
-        return encoding;
-    }
-
-    public final void setEncoding( String encoding )
-    {
-        this.encoding = encoding;
-    }
+//    public final String getEncoding()
+//    {
+//        return encoding;
+//    }
+//
+//    public final void setEncoding( String encoding )
+//    {
+//        this.encoding = encoding;
+//    }
 
     public String getExtraResolver()
     {

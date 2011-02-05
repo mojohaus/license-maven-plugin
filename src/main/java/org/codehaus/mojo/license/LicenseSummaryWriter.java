@@ -17,30 +17,26 @@ package org.codehaus.mojo.license;
  * along with this program.  If not, see <http://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 
-import java.io.File;
-import java.util.List;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Result;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
 import org.apache.maven.model.License;
 import org.codehaus.mojo.license.model.ProjectLicenseInfo;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.*;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.File;
+import java.util.List;
+
 /**
  * A LicenseSummaryWriter.
- * 
+ *
  * @author Paul Gier
  * @version $Revision$
+ * @since 1.0
  */
 public class LicenseSummaryWriter
 {
@@ -126,9 +122,9 @@ public class LicenseSummaryWriter
         {
             Node licDistNode = doc.createElement( "distribution" );
             licDistNode.appendChild( doc.createTextNode( lic.getDistribution() ) );
-            licenseNode.appendChild( licDistNode );            
+            licenseNode.appendChild( licDistNode );
         }
-        
+
         if ( lic.getComments() != null )
         {
             Node licCommentsNode = doc.createElement( "comments" );

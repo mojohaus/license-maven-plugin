@@ -29,29 +29,19 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
-import org.nuiton.io.SortedProperties;
-import org.nuiton.plugin.PluginHelper;
-import org.nuiton.plugin.PluginWithEncoding;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.SortedSet;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * Abstract mojo for all third-party mojos.
  *
  * @author tchemit <chemit@codelutin.com>
- * @since 2.3
+ * @since 1.0
  */
 public abstract class AbstractAddThirdPartyMojo
     extends AbstractLicenseMojo
-    implements PluginWithEncoding
 {
 
     /**
@@ -59,7 +49,7 @@ public abstract class AbstractAddThirdPartyMojo
      *
      * @parameter expression="${license.outputDirectory}" default-value="target/generated-sources/license"
      * @required
-     * @since 2.3
+     * @since 1.0
      */
     protected File outputDirectory;
 
@@ -68,7 +58,7 @@ public abstract class AbstractAddThirdPartyMojo
      *
      * @parameter expression="${license.thirdPartyFilename}" default-value="THIRD-PARTY.txt"
      * @required
-     * @since 2.3
+     * @since 1.0
      */
     protected String thirdPartyFilename;
 
@@ -76,7 +66,7 @@ public abstract class AbstractAddThirdPartyMojo
      * A flag to use the missing licenses file to consolidate the THID-PARTY file.
      *
      * @parameter expression="${license.useMissingFile}"  default-value="false"
-     * @since 2.3
+     * @since 1.0
      */
     protected boolean useMissingFile;
 
@@ -84,7 +74,7 @@ public abstract class AbstractAddThirdPartyMojo
      * The file where to fill the license for dependencies with unknwon license.
      *
      * @parameter expression="${license.missingFile}"  default-value="src/license/THIRD-PARTY.properties"
-     * @since 2.3
+     * @since 1.0
      */
     protected File missingFile;
 
@@ -102,7 +92,7 @@ public abstract class AbstractAddThirdPartyMojo
      * &lt;/pre&gt;
      *
      * @parameter
-     * @since 2.3
+     * @since 1.0
      */
     protected List<String> licenseMerges;
 
@@ -113,7 +103,7 @@ public abstract class AbstractAddThirdPartyMojo
      * <b>Note:</b> This option is not available for {@code pom} module types.
      *
      * @parameter expression="${license.bundleThirdPartyPath}"  default-value="META-INF/${project.artifactId}-THIRD-PARTY.txt"
-     * @since 2.3
+     * @since 1.0
      */
     protected String bundleThirdPartyPath;
 
@@ -124,7 +114,7 @@ public abstract class AbstractAddThirdPartyMojo
      * The file will be copied at the {@link #bundleThirdPartyPath} location.
      *
      * @parameter expression="${license.generateBundle}"  default-value="false"
-     * @since 2.3
+     * @since 1.0
      */
     protected boolean generateBundle;
 
@@ -132,7 +122,7 @@ public abstract class AbstractAddThirdPartyMojo
      * To force generation of the third-party file even if every thing is up to date.
      *
      * @parameter expression="${license.force}"  default-value="false"
-     * @since 2.3
+     * @since 1.0
      */
     protected boolean force;
 
@@ -140,7 +130,7 @@ public abstract class AbstractAddThirdPartyMojo
      * A flag to fail the build if at least one dependency was detected without a license.
      *
      * @parameter expression="${license.failIfWarning}"  default-value="false"
-     * @since 2.3
+     * @since 1.0
      */
     protected boolean failIfWarning;
 
@@ -152,7 +142,7 @@ public abstract class AbstractAddThirdPartyMojo
      * If sets to {@code true}, the it will group by license type.
      *
      * @parameter expression="${license.groupByLicense}"  default-value="false"
-     * @since 2.3
+     * @since 1.0
      */
     protected boolean groupByLicense;
 
@@ -160,7 +150,7 @@ public abstract class AbstractAddThirdPartyMojo
      * A filter to exclude some GroupIds
      *
      * @parameter expression="${license.excludedGroups}" default-value=""
-     * @since 2.3.2
+     * @since 1.0
      */
     protected String excludedGroups;
 
@@ -168,7 +158,7 @@ public abstract class AbstractAddThirdPartyMojo
      * A filter to include only some GroupIds
      *
      * @parameter expression="${license.includedGroups}" default-value=""
-     * @since 2.3.2
+     * @since 1.0
      */
     protected String includedGroups;
 
@@ -176,7 +166,7 @@ public abstract class AbstractAddThirdPartyMojo
      * A filter to exclude some ArtifactsIds
      *
      * @parameter expression="${license.excludedArtifacts}" default-value=""
-     * @since 2.3.2
+     * @since 1.0
      */
     protected String excludedArtifacts;
 
@@ -184,25 +174,25 @@ public abstract class AbstractAddThirdPartyMojo
      * A filter to include only some ArtifactsIds
      *
      * @parameter expression="${license.includedArtifacts}" default-value=""
-     * @since 2.3.2
+     * @since 1.0
      */
     protected String includedArtifacts;
 
-    /**
-     * Encoding used to read and writes files.
-     * <p/>
-     * <b>Note:</b> If nothing is filled here, we will use the system
-     * property {@code file.encoding}.
-     *
-     * @parameter expression="${license.encoding}" default-value="${project.build.sourceEncoding}"
-     * <p/>
-     * tchemit 2010-08-29 Ano #842
-     * In maven 3, it will not pass if nothing was filled in project.build.sourceEncoding,
-     * As we have a futher fallback for this case we do not need to be required here.
-     * //@required
-     * @since 2.1
-     */
-    private String encoding;
+//    /**
+//     * Encoding used to read and writes files.
+//     * <p/>
+//     * <b>Note:</b> If nothing is filled here, we will use the system
+//     * property {@code file.encoding}.
+//     *
+//     * @parameter expression="${license.encoding}" default-value="${project.build.sourceEncoding}"
+//     * <p/>
+//     * tchemit 2010-08-29 Ano #842
+//     * In maven 3, it will not pass if nothing was filled in project.build.sourceEncoding,
+//     * As we have a futher fallback for this case we do not need to be required here.
+//     * //@required
+//     * @since 1.0
+//     */
+//    private String encoding;
 
     private LicenseMap licenseMap;
 
@@ -266,7 +256,7 @@ public abstract class AbstractAddThirdPartyMojo
         if ( isGenerateBundle() )
         {
 
-            File bundleFile = PluginHelper.getFile( getOutputDirectory(), getBundleThirdPartyPath() );
+            File bundleFile = FileUtil.getFile( getOutputDirectory(), getBundleThirdPartyPath() );
 
             if ( isVerbose() )
             {
@@ -410,21 +400,21 @@ public abstract class AbstractAddThirdPartyMojo
         {
 
             // creates the bundled license file
-            File bundleTarget = PluginHelper.getFile( getOutputDirectory(), getBundleThirdPartyPath() );
+            File bundleTarget = FileUtil.getFile( getOutputDirectory(), getBundleThirdPartyPath() );
             log.info( "Writing bundled third-party file to " + bundleTarget );
             copyFile( target, bundleTarget );
         }
     }
 
-    public final String getEncoding()
-    {
-        return encoding;
-    }
-
-    public final void setEncoding( String encoding )
-    {
-        this.encoding = encoding;
-    }
+//    public final String getEncoding()
+//    {
+//        return encoding;
+//    }
+//
+//    public final void setEncoding( String encoding )
+//    {
+//        this.encoding = encoding;
+//    }
 
     public boolean isGroupByLicense()
     {

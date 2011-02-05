@@ -38,7 +38,7 @@ import java.util.regex.Pattern;
  * Concrete implementation should only have to give comment configuration.
  *
  * @author tchemit <chemit@codelutin.com>
- * @since 2.1
+ * @since 1.0
  */
 public abstract class AbstractFileHeaderTransformer
     implements FileHeaderTransformer

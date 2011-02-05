@@ -38,7 +38,7 @@ import java.io.IOException;
  *
  * @author tchemit <chemit@codelutin.com>
  * @plexus.component role="org.nuiton.processor.Processor" role-hint="file-header"
- * @since 2.1
+ * @since 1.0
  */
 public class FileHeaderProcessor
     extends Processor

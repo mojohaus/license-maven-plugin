@@ -32,7 +32,7 @@ import java.io.IOException;
  * back to a {@link FileHeader}
  *
  * @author tchemit <chemit@codelutin.com>
- * @since 2.1
+ * @since 1.0
  */
 public class InvalideFileHeaderException
     extends IOException

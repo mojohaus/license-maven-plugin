@@ -93,90 +93,11 @@
       <scope>provided</scope>
     </dependency>
 
-
     <dependency>
       <groupId>org.nuiton.processor</groupId>
       <artifactId>nuiton-processor</artifactId>
       <version>${processorVersion}</version>
       <scope>compile</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.nuiton</groupId>
-      <artifactId>maven-helper-plugin</artifactId>
-      <version>${helperPluginVersion}</version>
-      <scope>compile</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>org.apache.maven</groupId>
-          <artifactId>maven-artifact</artifactId>
-        </exclusion>
-
-        <exclusion>
-          <groupId>org.apache.maven</groupId>
-          <artifactId>maven-artifact-manager</artifactId>
-        </exclusion>
-
-        <exclusion>
-          <groupId>org.apache.maven</groupId>
-          <artifactId>maven-model</artifactId>
-        </exclusion>
-
-        <exclusion>
-          <groupId>org.apache.maven</groupId>
-          <artifactId>maven-profile</artifactId>
-        </exclusion>
-
-        <exclusion>
-          <groupId>org.apache.maven</groupId>
-          <artifactId>maven-settings</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>commons-httpclient</groupId>
-          <artifactId>commons-httpclient</artifactId>
-        </exclusion>
-
-        <exclusion>
-          <groupId>plexus</groupId>
-          <artifactId>plexus-mail-sender-simple</artifactId>
-        </exclusion>
-
-        <exclusion>
-          <groupId>plexus</groupId>
-          <artifactId>plexus-mail-sender-api</artifactId>
-        </exclusion>
-
-        <exclusion>
-          <groupId>plexus</groupId>
-          <artifactId>plexus-mail-sender-javamail</artifactId>
-        </exclusion>
-
-        <exclusion>
-          <groupId>javax.mail</groupId>
-          <artifactId>mail</artifactId>
-        </exclusion>
-
-        <exclusion>
-          <groupId>org.sonatype.plexus</groupId>
-          <artifactId>plexus-cipher</artifactId>
-        </exclusion>
-
-        <exclusion>
-          <groupId>org.sonatype.plexus</groupId>
-          <artifactId>plexus-sec-dispatcher</artifactId>
-        </exclusion>
-
-        <exclusion>
-          <groupId>org.codehaus.plexus</groupId>
-          <artifactId>plexus-velocity</artifactId>
-        </exclusion>
-
-        <exclusion>
-          <groupId>org.apache.velocity</groupId>
-          <artifactId>velocity</artifactId>
-        </exclusion>
-
-      </exclusions>
     </dependency>
 
     <dependency>

@@ -28,21 +28,17 @@ package org.codehaus.mojo.license.model;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.nuiton.plugin.PluginHelper;
+import org.codehaus.mojo.license.MojoHelper;
 
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Properties;
 
 /**
  * @author tchemit <chemit@codelutin.com>
- * @since 1.0.3
+ * @since 1.0
  */
 public class LicenseRepository
     implements Iterable<License>
@@ -97,7 +93,7 @@ public class LicenseRepository
                 throw new IllegalStateException( "no baseURL defined in " + this );
             }
 
-            URL definitionURL = PluginHelper.getUrl( getBaseURL(), REPOSITORY_DEFINITION_FILE );
+            URL definitionURL = MojoHelper.getUrl( getBaseURL(), REPOSITORY_DEFINITION_FILE );
             if ( licenses != null )
             {
                 licenses.clear();
@@ -120,7 +116,7 @@ public class LicenseRepository
                 String licenseName = (String) entry.getKey();
                 licenseName = licenseName.trim().toLowerCase();
                 String licenseDescription = (String) entry.getValue();
-                URL licenseURL = PluginHelper.getUrl( baseURL, licenseName );
+                URL licenseURL = MojoHelper.getUrl( baseURL, licenseName );
 
                 License license = new License();
                 license.setName( licenseName );

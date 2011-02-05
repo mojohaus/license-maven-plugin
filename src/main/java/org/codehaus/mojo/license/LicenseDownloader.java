@@ -17,18 +17,15 @@ package org.codehaus.mojo.license;
  * along with this program.  If not, see <http://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
 
 /**
  * Utilities for downloading remote license files.
- * 
+ *
  * @author pgier
+ * @since 1.0
  */
 public class LicenseDownloader
 {
@@ -66,7 +63,7 @@ public class LicenseDownloader
 
     /**
      * Copy data from one stream to another.
-     * 
+     *
      * @param inStream
      * @param outStream
      * @throws IOException

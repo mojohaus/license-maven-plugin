@@ -34,8 +34,6 @@ import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
-import org.nuiton.io.SortedProperties;
-import org.nuiton.plugin.Plugin;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -64,7 +62,7 @@ import java.util.regex.PatternSyntaxException;
  * @phase generate-resources
  * @requiresDependencyResolution test
  * @requiresProject true
- * @since 2.2 (was previously {@code AddThirdPartyFileMojo}).
+ * @since 1.0
  */
 public class AddThirdPartyMojo
     extends AbstractAddThirdPartyMojo
@@ -105,7 +103,7 @@ public class AddThirdPartyMojo
     @Override
     protected boolean checkPackaging()
     {
-        return rejectPackaging( Plugin.Packaging.pom );
+        return rejectPackaging( "pom" );
     }
 
     @Override

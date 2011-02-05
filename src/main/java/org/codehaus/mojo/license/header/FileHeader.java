@@ -39,7 +39,7 @@ package org.codehaus.mojo.license.header;
  * </pre>
  *
  * @author tchemit <chemit@codelutin.com>
- * @since 2.1
+ * @since 1.0
  */
 public class FileHeader
 {

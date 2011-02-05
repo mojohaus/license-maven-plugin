@@ -27,8 +27,8 @@ package org.codehaus.mojo.license.model;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
+import org.codehaus.mojo.license.MojoHelper;
 import org.codehaus.plexus.util.IOUtil;
-import org.nuiton.plugin.PluginHelper;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -40,6 +40,7 @@ import java.net.URL;
  * The model of a license.
  *
  * @author tchemit <chemit@codelutin.com>
+ * @since 1.0
  */
 public class License
 {
@@ -86,7 +87,7 @@ public class License
     {
         if ( licenseURL == null )
         {
-            licenseURL = PluginHelper.getUrl( getBaseURL(), LICENSE_CONTENT_FILE );
+            licenseURL = MojoHelper.getUrl( getBaseURL(), LICENSE_CONTENT_FILE );
         }
         return licenseURL;
     }
@@ -95,7 +96,7 @@ public class License
     {
         if ( headerURL == null )
         {
-            headerURL = PluginHelper.getUrl( getBaseURL(), LICENSE_HEADER_FILE );
+            headerURL = MojoHelper.getUrl( getBaseURL(), LICENSE_HEADER_FILE );
         }
         return headerURL;
     }
@@ -151,16 +152,6 @@ public class License
     {
         this.name = name;
     }
-
-//    @Deprecated
-//    public void setLicenseURL(URL licenseURL) {
-//        this.licenseURL = licenseURL;
-//    }
-//
-//    @Deprecated
-//    public void setHeaderURL(URL headerURL) {
-//        this.headerURL = headerURL;
-//    }
 
     public void setDescription( String description )
     {

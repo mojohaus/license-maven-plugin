@@ -38,15 +38,13 @@ import static org.codehaus.mojo.license.header.transformer.FileHeaderTransformer
 import static org.codehaus.mojo.license.header.transformer.FileHeaderTransformer.DEFAULT_PROCESS_START_TAG;
 import static org.codehaus.mojo.license.header.transformer.FileHeaderTransformer.DEFAULT_SECTION_DELIMITER;
 import static org.codehaus.mojo.license.header.transformer.FileHeaderTransformer.LINE_SEPARATOR;
-import static org.codehaus.mojo.license.header.transformer.JavaFileHeaderTransformer.COMMENT_END_TAG;
-import static org.codehaus.mojo.license.header.transformer.JavaFileHeaderTransformer.COMMENT_LINE_PREFIX;
-import static org.codehaus.mojo.license.header.transformer.JavaFileHeaderTransformer.COMMENT_START_TAG;
+import static org.codehaus.mojo.license.header.transformer.JavaFileHeaderTransformer.*;
 
 /**
  * Tests the {@link AbstractFileHeaderTransformer}.
  *
  * @author tchemit <chemit@codelutin.com>
- * @since 2.1
+ * @since 1.0
  */
 public class AbstractFileHeaderTransformerTest
 {
@@ -189,8 +187,8 @@ public class AbstractFileHeaderTransformerTest
 
         header = transformer.toString( model2 );
         Assert.assertEquals( "Description2" + LINE_SEPARATOR + DEFAULT_SECTION_DELIMITER + LINE_SEPARATOR +
-            "Copyright (C) 2010 - 2012 Tony2" + LINE_SEPARATOR + DEFAULT_SECTION_DELIMITER + LINE_SEPARATOR +
-            "License2" + LINE_SEPARATOR, header );
+                                 "Copyright (C) 2010 - 2012 Tony2" + LINE_SEPARATOR + DEFAULT_SECTION_DELIMITER +
+                                 LINE_SEPARATOR + "License2" + LINE_SEPARATOR, header );
     }
 
     @Test
@@ -248,9 +246,10 @@ public class AbstractFileHeaderTransformerTest
         boxedHeader = transformer.boxComment( header, true );
 
         Assert.assertEquals( COMMENT_START_TAG + LINE_SEPARATOR + COMMENT_LINE_PREFIX + "Description" + LINE_SEPARATOR +
-            COMMENT_LINE_PREFIX + DEFAULT_SECTION_DELIMITER + LINE_SEPARATOR + COMMENT_LINE_PREFIX +
-            "Copyright (C) 2010 Tony" + LINE_SEPARATOR + COMMENT_LINE_PREFIX + DEFAULT_SECTION_DELIMITER +
-            LINE_SEPARATOR + COMMENT_LINE_PREFIX + "License" + LINE_SEPARATOR + COMMENT_END_TAG + LINE_SEPARATOR,
+                                 COMMENT_LINE_PREFIX + DEFAULT_SECTION_DELIMITER + LINE_SEPARATOR +
+                                 COMMENT_LINE_PREFIX + "Copyright (C) 2010 Tony" + LINE_SEPARATOR +
+                                 COMMENT_LINE_PREFIX + DEFAULT_SECTION_DELIMITER + LINE_SEPARATOR +
+                                 COMMENT_LINE_PREFIX + "License" + LINE_SEPARATOR + COMMENT_END_TAG + LINE_SEPARATOR,
                              boxedHeader );
 
         boxedHeader = transformer.boxComment( header, false );

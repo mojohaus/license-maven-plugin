@@ -33,7 +33,7 @@ import org.codehaus.mojo.license.header.transformer.FileHeaderTransformer;
  *
  * @author tchemit <chemit@codelutin.com>
  * @plexus.component role="org.codehaus.mojo.license.header.FileHeaderFilter" role-hint="update-file-header"
- * @since 2.1
+ * @since 1.0
  */
 public class UpdateFileHeaderFilter
     extends FileHeaderFilter
@@ -41,22 +41,16 @@ public class UpdateFileHeaderFilter
 
     /**
      * Flag sets to {@code true} if description can be updated.
-     *
-     * @since 2.3.2
      */
     protected boolean updateDescription;
 
     /**
      * Flag set to {@code true} if license can be updated.
-     *
-     * @since 2.3.2
      */
     protected boolean updateLicense;
 
     /**
      * Flag sets to {@code true} if copyright can be updated.
-     *
-     * @since 2.1
      */
     protected boolean updateCopyright;
 
@@ -91,7 +85,7 @@ public class UpdateFileHeaderFilter
             if ( log.isDebugEnabled() )
             {
                 log.debug( "description has changed from [" + oldHeader.getDescription() + "] to [" +
-                    newHeader.getDescription() + "]" );
+                               newHeader.getDescription() + "]" );
             }
 
             // description has changed, mark header to be updated
@@ -147,66 +141,6 @@ public class UpdateFileHeaderFilter
             result = null;
         }
 
-        return result;
-    }
-
-    @Override
-    @Deprecated
-    protected String treateHeader( String ch )
-    {
-
-        if ( getLog().isDebugEnabled() )
-        {
-            getLog().debug( "header\n" + ch );
-        }
-
-        FileHeaderTransformer transformer = getTransformer();
-
-        // unbox comment
-        String unbox = transformer.unboxComent( ch );
-
-        if ( getLog().isDebugEnabled() )
-        {
-            getLog().info( "unboxed comment header\n" + unbox );
-        }
-
-        // obtain current license of file
-        FileHeader fileHeader = transformer.toFileHeader( unbox );
-
-        // updates license
-        fileHeader.setLicense( getFileHeader().getLicense() );
-
-        if ( isUpdateCopyright() )
-        {
-            // 1) obtain the svn last comit on this file
-
-            // 2) compute the last year of copyright
-
-            // 3) if necessary update last year
-            //fileHeader.setCopyrightLastYear(lastYear);
-        }
-        // build new brut header (with no boxing)
-        String newHeader = transformer.toString( fileHeader );
-
-        // box with process tag
-        newHeader = transformer.boxProcessTag( newHeader );
-
-        // box header with comment prefix
-        newHeader = transformer.boxComment( newHeader, false );
-
-        // remove all before process start tag
-        // remove all after process end tag
-        // this is a requirement for processor to respect involution.
-        int index = newHeader.indexOf( transformer.getProcessStartTag() );
-        int lastIndex =
-            newHeader.lastIndexOf( transformer.getProcessEndTag() ) + transformer.getProcessEndTag().length();
-
-        String result = newHeader.substring( index, lastIndex );
-
-        if ( getLog().isDebugEnabled() )
-        {
-            getLog().debug( "updated Header =\n" + result );
-        }
         return result;
     }
 

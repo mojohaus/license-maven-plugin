@@ -17,15 +17,6 @@ package org.codehaus.mojo.license;
  * along with this program.  If not, see <http://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.maven.model.License;
 import org.codehaus.mojo.license.model.ProjectLicenseInfo;
 import org.w3c.dom.Document;
@@ -34,23 +25,32 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * A LicenseSummaryReader.
- * 
+ *
  * @author Paul Gier
  * @version $Revision$
+ * @since 1.0
  */
 public class LicenseSummaryReader
 {
 
     /**
      * Read a component-info.xml from an input stream into a ComponentInfo object.
-     * 
+     *
      * @param licSummaryIS Input stream containing the license data
      * @return List of DependencyProject objects
-     * @throws IOException if there is a problem reading the InputStream
+     * @throws IOException                  if there is a problem reading the InputStream
      * @throws ParserConfigurationException if there is a problem parsing the XML stream
-     * @throws SAXException if there is a problem parsing the XML stream
+     * @throws SAXException                 if there is a problem parsing the XML stream
      */
     public static List<ProjectLicenseInfo> parseLicenseSummary( InputStream licSummaryIS )
         throws IOException, ParserConfigurationException, SAXException
