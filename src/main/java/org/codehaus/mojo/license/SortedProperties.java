@@ -2,8 +2,8 @@
  * #%L
  * Maven helper plugin
  * 
- * $Id: SortedProperties.java 790 2010-11-21 11:07:56Z tchemit $
- * $HeadURL: http://svn.nuiton.org/svn/maven-helper-plugin/tags/maven-helper-plugin-1.2.11/src/main/java/org/nuiton/io/SortedProperties.java $
+ * $Id$
+ * $HeadURL$
  * %%
  * Copyright (C) 2009 - 2010 Tony Chemit, CodeLutin
  * %%
