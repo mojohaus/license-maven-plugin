@@ -178,21 +178,13 @@ public abstract class AbstractAddThirdPartyMojo
      */
     protected String includedArtifacts;
 
-//    /**
-//     * Encoding used to read and writes files.
-//     * <p/>
-//     * <b>Note:</b> If nothing is filled here, we will use the system
-//     * property {@code file.encoding}.
-//     *
-//     * @parameter expression="${license.encoding}" default-value="${project.build.sourceEncoding}"
-//     * <p/>
-//     * tchemit 2010-08-29 Ano #842
-//     * In maven 3, it will not pass if nothing was filled in project.build.sourceEncoding,
-//     * As we have a futher fallback for this case we do not need to be required here.
-//     * //@required
-//     * @since 1.0
-//     */
-//    private String encoding;
+    /**
+     * Include transitive dependencies when downloading license files.
+     *
+     * @parameter default-value="true"
+     * @since 1.0
+     */
+    protected boolean includeTransitiveDependencies;
 
     private LicenseMap licenseMap;
 
@@ -219,8 +211,7 @@ public abstract class AbstractAddThirdPartyMojo
         return artifactCache;
     }
 
-    protected abstract LicenseMap createLicenseMap()
-        throws ProjectBuildingException;
+    protected abstract SortedMap<String, MavenProject> loadDependencies();
 
     protected abstract SortedProperties createUnsafeMapping()
         throws ProjectBuildingException, IOException;
@@ -271,7 +262,9 @@ public abstract class AbstractAddThirdPartyMojo
             setDoGenerateBundle( false );
         }
 
-        licenseMap = createLicenseMap();
+        SortedMap<String, MavenProject> projectDependencies = loadDependencies();
+
+        licenseMap = createLicenseMap( projectDependencies );
 
         unsafeDependencies = licenseMap.getUnsafeDependencies();
 
@@ -299,6 +292,19 @@ public abstract class AbstractAddThirdPartyMojo
                 licenseMap.mergeLicenses( split );
             }
         }
+    }
+
+    protected LicenseMap createLicenseMap( SortedMap<String, MavenProject> dependencies )
+    {
+
+        LicenseMap licenseMap = new LicenseMap();
+        licenseMap.setLog( getLog() );
+
+        for ( MavenProject project : dependencies.values() )
+        {
+            licenseMap.addLicense( project, project.getLicenses() );
+        }
+        return licenseMap;
     }
 
     protected boolean checkUnsafeDependencies()
@@ -405,16 +411,6 @@ public abstract class AbstractAddThirdPartyMojo
             copyFile( target, bundleTarget );
         }
     }
-
-//    public final String getEncoding()
-//    {
-//        return encoding;
-//    }
-//
-//    public final void setEncoding( String encoding )
-//    {
-//        this.encoding = encoding;
-//    }
 
     public boolean isGroupByLicense()
     {

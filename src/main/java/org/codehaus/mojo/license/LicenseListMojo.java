@@ -64,18 +64,6 @@ public class LicenseListMojo
      */
     private boolean detail;
 
-//    /**
-//     * Encoding used to read and writes files.
-//     * <p/>
-//     * <b>Note:</b> If nothing is filled here, we will use the system
-//     * property {@code file.encoding}.
-//     *
-//     * @parameter expression="${license.encoding}" default-value="${project.build.sourceEncoding}"
-//     * @required
-//     * @since 1.0
-//     */
-//    private String encoding;
-
     /**
      * store of licenses
      */
@@ -139,16 +127,6 @@ public class LicenseListMojo
         }
         getLog().info( buffer.toString() );
     }
-
-//    public final String getEncoding()
-//    {
-//        return encoding;
-//    }
-//
-//    public final void setEncoding( String encoding )
-//    {
-//        this.encoding = encoding;
-//    }
 
     public String getExtraResolver()
     {

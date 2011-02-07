@@ -1,23 +1,31 @@
-package org.codehaus.mojo.license;
-
-/* 
- * Codehaus License Maven Plugin
- *     
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+/*
+ * #%L
+ * License Maven Plugin
  *
+ * $Id$
+ * $HeadURL$
+ * %%
+ * Copyright (C) 2010 - 2011 CodeLutin, Codehaus, Tony Chemit
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as 
+ * published by the Free Software Foundation, either version 3 of the 
+ * License, or (at your option) any later version.
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/lgpl-3.0.html>.
+ * GNU General Lesser Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Lesser Public 
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/lgpl-3.0.html>.
+ * #L%
  */
+package org.codehaus.mojo.license;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.License;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -47,6 +55,7 @@ import java.util.*;
  */
 public class DownloadLicensesMojo
     extends AbstractMojo
+    implements MavenProjectDependenciesLoader
 {
 
     /**
@@ -74,7 +83,7 @@ public class DownloadLicensesMojo
      * @readonly
      * @since 1.0
      */
-    private org.apache.maven.artifact.repository.ArtifactRepository localRepository;
+    private ArtifactRepository localRepository;
 
     /**
      * List of Remote Repositories used by the resolver
@@ -83,7 +92,7 @@ public class DownloadLicensesMojo
      * @readonly
      * @since 1.0
      */
-    private java.util.List remoteRepositories;
+    private List remoteRepositories;
 
     /**
      * Input file containing a mapping between each dependency and it's license information.
@@ -129,7 +138,7 @@ public class DownloadLicensesMojo
      * Keeps a collection of the URLs of the licenses that have been downlaoded. This helps the plugin to avoid
      * downloading the same license multiple times.
      */
-    private HashSet<String> downloadedLicenseURLs = new HashSet<String>();
+    private Set<String> downloadedLicenseURLs = new HashSet<String>();
 
     /**
      * Main Maven plugin execution
@@ -148,7 +157,7 @@ public class DownloadLicensesMojo
             licensesOutputFile.getParentFile().mkdirs();
         }
 
-        HashMap<String, ProjectLicenseInfo> configuredDepLicensesMap = new HashMap<String, ProjectLicenseInfo>();
+        Map<String, ProjectLicenseInfo> configuredDepLicensesMap = new HashMap<String, ProjectLicenseInfo>();
 
         // License info from previous build
         loadLicenseInfo( configuredDepLicensesMap, licensesOutputFile, true );
@@ -156,28 +165,31 @@ public class DownloadLicensesMojo
         // Manually configured license info
         loadLicenseInfo( configuredDepLicensesMap, licensesConfigFile, false );
 
-        // Get the list of project dependencies
-        Set<Artifact> depArtifacts = null;
+        SortedMap<String, MavenProject> dependencies = ArtifactHelper.loadProjectDependencies( this, getLog(), null );
 
-        if ( includeTransitiveDependencies )
-        {
-            // All project dependencies
-            depArtifacts = project.getArtifacts();
-        }
-        else
-        {
-            // Only direct project dependencies
-            depArtifacts = project.getDependencyArtifacts();
-        }
+//        // Get the list of project dependencies
+//        Set<Artifact> depArtifacts;
+//
+//        if ( includeTransitiveDependencies )
+//        {
+//            // All project dependencies
+//            depArtifacts = project.getArtifacts();
+//        }
+//        else
+//        {
+//            // Only direct project dependencies
+//            depArtifacts = project.getDependencyArtifacts();
+//        }
 
         // The resulting list of licenses after dependency resolution
         List<ProjectLicenseInfo> depProjectLicenses = new ArrayList<ProjectLicenseInfo>();
 
-        for ( Artifact artifact : depArtifacts )
+         for ( MavenProject project : dependencies.values() )
         {
+            Artifact artifact = project.getArtifact();
             getLog().debug( "Checking licenses for project " + artifact );
-            String artifactProjectId = this.getArtifactProjectId( artifact );
-            ProjectLicenseInfo depProject = null;
+            String artifactProjectId = getArtifactProjectId( artifact );
+             ProjectLicenseInfo depProject = null;
             if ( configuredDepLicensesMap.containsKey( artifactProjectId ) )
             {
                 depProject = configuredDepLicensesMap.get( artifactProjectId );
@@ -187,7 +199,7 @@ public class DownloadLicensesMojo
             {
                 try
                 {
-                    depProject = createDependencyProject( artifact );
+                    depProject = createDependencyProject( project );
                 }
                 catch ( ProjectBuildingException e )
                 {
@@ -198,6 +210,32 @@ public class DownloadLicensesMojo
             downloadLicenses( depProject );
             depProjectLicenses.add( depProject );
         }
+
+//        for ( Artifact artifact : depArtifacts )
+//        {
+//            getLog().debug( "Checking licenses for project " + artifact );
+//            String artifactProjectId = getArtifactProjectId( artifact );
+//            ProjectLicenseInfo depProject = null;
+//            if ( configuredDepLicensesMap.containsKey( artifactProjectId ) )
+//            {
+//                depProject = configuredDepLicensesMap.get( artifactProjectId );
+//                depProject.setVersion( artifact.getVersion() );
+//            }
+//            else
+//            {
+//                try
+//                {
+//                    depProject = createDependencyProject( artifact );
+//                }
+//                catch ( ProjectBuildingException e )
+//                {
+//                    getLog().warn( "Unable to build project: " + artifact );
+//                    getLog().warn( e );
+//                }
+//            }
+//            downloadLicenses( depProject );
+//            depProjectLicenses.add( depProject );
+//        }
 
         try
         {
@@ -219,7 +257,7 @@ public class DownloadLicensesMojo
      * @param previouslyDownloaded     Whether these licenses were already downloaded
      * @throws MojoExecutionException
      */
-    private void loadLicenseInfo( HashMap<String, ProjectLicenseInfo> configuredDepLicensesMap, File licenseConfigFile,
+    private void loadLicenseInfo( Map<String, ProjectLicenseInfo> configuredDepLicensesMap, File licenseConfigFile,
                                   boolean previouslyDownloaded )
         throws MojoExecutionException
     {
@@ -265,18 +303,40 @@ public class DownloadLicensesMojo
         return artifact.getGroupId() + ":" + artifact.getArtifactId();
     }
 
+//    /**
+//     * Create a simple DependencyProject object containing the GAV and license info from the Maven Artifact
+//     *
+//     * @param artifact
+//     * @return DependencyProject with artifact and license info
+//     * @throws ProjectBuildingException
+//     */
+//    public ProjectLicenseInfo createDependencyProject( Artifact artifact )
+//        throws ProjectBuildingException
+//    {
+//        MavenProject depMavenProject =
+//            projectBuilder.buildFromRepository( artifact, remoteRepositories, localRepository );
+//
+//        ProjectLicenseInfo dependencyProject =
+//            new ProjectLicenseInfo( depMavenProject.getGroupId(), depMavenProject.getArtifactId(),
+//                                    depMavenProject.getVersion() );
+//        List<License> licenses = depMavenProject.getLicenses();
+//        for ( License license : licenses )
+//        {
+//            dependencyProject.addLicense( license );
+//        }
+//        return dependencyProject;
+//    }
+
     /**
      * Create a simple DependencyProject object containing the GAV and license info from the Maven Artifact
      *
-     * @param artifact
+     * @param depMavenProject
      * @return DependencyProject with artifact and license info
+     * @throws ProjectBuildingException
      */
-    public ProjectLicenseInfo createDependencyProject( Artifact artifact )
+    public ProjectLicenseInfo createDependencyProject( MavenProject depMavenProject )
         throws ProjectBuildingException
     {
-        MavenProject depMavenProject = null;
-        depMavenProject = projectBuilder.buildFromRepository( artifact, remoteRepositories, localRepository );
-
         ProjectLicenseInfo dependencyProject =
             new ProjectLicenseInfo( depMavenProject.getGroupId(), depMavenProject.getArtifactId(),
                                     depMavenProject.getVersion() );
@@ -294,6 +354,7 @@ public class DownloadLicensesMojo
      *
      * @param license
      * @return A filename to be used for the downloaded license file
+     * @throws MalformedURLException
      */
     private String getLicenseFileName( License license )
         throws MalformedURLException
@@ -346,7 +407,7 @@ public class DownloadLicensesMojo
         {
             try
             {
-                String licenseFileName = this.getLicenseFileName( license );
+                String licenseFileName = getLicenseFileName( license );
 
                 File licenseOutputFile = new File( licensesOutputDirectory, licenseFileName );
                 if ( licenseOutputFile.exists() )
@@ -357,7 +418,7 @@ public class DownloadLicensesMojo
                 if ( !downloadedLicenseURLs.contains( license.getUrl() ) )
                 {
                     LicenseDownloader.downloadLicense( license.getUrl(), licenseOutputFile );
-                    this.downloadedLicenseURLs.add( license.getUrl() );
+                    downloadedLicenseURLs.add( license.getUrl() );
                 }
             }
             catch ( MalformedURLException e )
@@ -387,4 +448,58 @@ public class DownloadLicensesMojo
 
     }
 
+    public MavenProject getProject()
+    {
+        return project;
+    }
+
+    public MavenProjectBuilder getMavenProjectBuilder()
+    {
+        return projectBuilder;
+    }
+
+    public ArtifactRepository getLocalRepository()
+    {
+        return localRepository;
+    }
+
+    public List getRemoteRepositories()
+    {
+        return remoteRepositories;
+    }
+
+    public boolean isIncludeTransitiveDependencies()
+    {
+        return includeTransitiveDependencies;
+    }
+
+    public List<String> getExcludeScopes()
+    {
+        return Collections.emptyList();
+    }
+
+    public String getIncludedArtifacts()
+    {
+        return null;
+    }
+
+    public String getIncludedGroups()
+    {
+        return null;
+    }
+
+    public String getExcludedGroups()
+    {
+        return null;
+    }
+
+    public String getExcludedArtifacts()
+    {
+        return null;
+    }
+
+    public boolean isVerbose()
+    {
+        return !quiet;
+    }
 }

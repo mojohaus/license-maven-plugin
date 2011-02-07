@@ -67,7 +67,6 @@ public class LicenseMap
     }
 
     public void addLicense( MavenProject project, List<?> licenses )
-        throws ProjectBuildingException
     {
 
         if ( Artifact.SCOPE_SYSTEM.equals( project.getArtifact().getScope() ) )
@@ -142,7 +141,8 @@ public class LicenseMap
         return unsafeDependencies;
     }
 
-    protected SortedProperties loadUnsafeMapping( String encoding, File missingFile )
+    protected SortedProperties loadUnsafeMapping( SortedMap<String, MavenProject> artifactCache, String encoding,
+                                                  File missingFile )
         throws IOException, ProjectBuildingException
     {
 
@@ -167,7 +167,7 @@ public class LicenseMap
         // dependency in the missing file, now we must deal with it, so check it
 
         List<String> migrateId = new ArrayList<String>();
-        SortedMap<String, MavenProject> artifactCache = AbstractAddThirdPartyMojo.getArtifactCache();
+//        SortedMap<String, MavenProject> artifactCache = AbstractAddThirdPartyMojo.getArtifactCache();
         for ( Object o : unsafeMappings.keySet() )
         {
             String id = (String) o;
@@ -181,7 +181,6 @@ public class LicenseMap
 
                     // now we are sure this is a unknown dependency
                     unknownDependenciesId.add( id );
-
                 }
                 else
                 {

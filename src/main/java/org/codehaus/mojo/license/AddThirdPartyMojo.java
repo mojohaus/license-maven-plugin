@@ -26,7 +26,6 @@
 package org.codehaus.mojo.license;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.MojoFailureException;
@@ -38,13 +37,7 @@ import org.apache.maven.project.ProjectBuildingException;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
+import java.util.*;
 
 /**
  * Goal to generate the third-party license file.
@@ -66,6 +59,7 @@ import java.util.regex.PatternSyntaxException;
  */
 public class AddThirdPartyMojo
     extends AbstractAddThirdPartyMojo
+    implements MavenProjectDependenciesLoader
 {
 
     /**
@@ -107,78 +101,9 @@ public class AddThirdPartyMojo
     }
 
     @Override
-    protected LicenseMap createLicenseMap()
-        throws ProjectBuildingException
+    protected SortedMap<String, MavenProject> loadDependencies()
     {
-        Log log = getLog();
-
-        LicenseMap licenseMap = new LicenseMap();
-        licenseMap.setLog( log );
-
-        boolean haveNoIncludedGroups = StringUtils.isEmpty( includedGroups );
-        boolean haveNoIncludedArtifacts = StringUtils.isEmpty( includedArtifacts );
-
-        boolean haveExcludedGroups = StringUtils.isNotEmpty( excludedGroups );
-        boolean haveExcludedArtifacts = StringUtils.isNotEmpty( excludedArtifacts );
-        boolean haveExclusions = haveExcludedGroups || haveExcludedArtifacts;
-
-        Pattern includedGroupPattern = null;
-        Pattern includedArtifactPattern = null;
-        Pattern excludedGroupPattern = null;
-        Pattern excludedArtifactPattern = null;
-
-        if ( !haveNoIncludedGroups )
-        {
-            includedGroupPattern = Pattern.compile( includedGroups );
-        }
-        if ( !haveNoIncludedArtifacts )
-        {
-            includedArtifactPattern = Pattern.compile( includedArtifacts );
-        }
-        if ( haveExcludedGroups )
-        {
-            excludedGroupPattern = Pattern.compile( excludedGroups );
-        }
-        if ( haveExcludedArtifacts )
-        {
-            excludedArtifactPattern = Pattern.compile( excludedArtifacts );
-        }
-
-        // build the license map for the dependencies of the project
-        for ( Object o : getProject().getArtifacts() )
-        {
-
-            Artifact artifact = (Artifact) o;
-            if ( Artifact.SCOPE_SYSTEM.equals( artifact.getScope() ) )
-            {
-
-                // never treate system artifacts (they are mysterious and
-                // no information can be retrive from anywhere)...
-                continue;
-            }
-            String id = ArtifactHelper.getArtifactId( artifact );
-            if ( isVerbose() )
-            {
-                getLog().info( "detected artifact " + id );
-            }
-
-            // Check if the project should be included
-            // If there is no specified artifacts and group to include, include all
-            boolean isToInclude = haveNoIncludedArtifacts && haveNoIncludedGroups ||
-                isIncludable( artifact, includedGroupPattern, includedArtifactPattern );
-
-            // Check if the project should be excluded
-            boolean isToExclude = isToInclude && haveExclusions &&
-                isExcludable( artifact, excludedGroupPattern, excludedArtifactPattern );
-
-            if ( isToInclude && !isToExclude )
-            {
-                MavenProject project = addArtifact( id, artifact );
-                licenseMap.addLicense( project, project.getLicenses() );
-            }
-        }
-
-        return licenseMap;
+        return ArtifactHelper.loadProjectDependencies( this, getLog(), getArtifactCache() );
     }
 
     @Override
@@ -186,7 +111,8 @@ public class AddThirdPartyMojo
         throws ProjectBuildingException, IOException
     {
 
-        SortedProperties unsafeMappings = getLicenseMap().loadUnsafeMapping( getEncoding(), getMissingFile() );
+        SortedProperties unsafeMappings =
+            getLicenseMap().loadUnsafeMapping( getArtifactCache(), getEncoding(), getMissingFile() );
 
         SortedSet<MavenProject> unsafeDependencies = getUnsafeDependencies();
 
@@ -229,7 +155,7 @@ public class AddThirdPartyMojo
      * @param unsafeDependencies the unsafe dependencies from the project
      * @return {@code true} if missing ifle should be (re-)generated, {@code false} otherwise
      * @throws IOException if any IO problem
-     * @since 3.0
+     * @since 1.0
      */
     protected boolean computeDoGenerateMissingFile( SortedProperties unsafeMappings,
                                                     SortedSet<MavenProject> unsafeDependencies )
@@ -339,33 +265,6 @@ public class AddThirdPartyMojo
         }
     }
 
-    protected MavenProject addArtifact( String id, Artifact artifact )
-        throws ProjectBuildingException
-    {
-
-        MavenProject project = getArtifactCache().get( id );
-
-        Log log = getLog();
-        if ( project != null )
-        {
-            if ( isVerbose() )
-            {
-                log.info( "add dependency [" + id + "] (from cache)" );
-            }
-        }
-        else
-        {
-            project = mavenProjectBuilder.buildFromRepository( artifact, remoteRepositories, localRepository, true );
-            if ( isVerbose() )
-            {
-                log.info( "add dependency [" + id + "]" );
-            }
-            getArtifactCache().put( id, project );
-        }
-
-        return project;
-    }
-
     public boolean isDoGenerateMissing()
     {
         return doGenerateMissing;
@@ -376,108 +275,28 @@ public class AddThirdPartyMojo
         this.doGenerateMissing = doGenerateMissing;
     }
 
-
-    protected boolean isIncludable( Artifact project, Pattern includedGroupPattern, Pattern includedArtifactPattern )
+    public ArtifactRepository getLocalRepository()
     {
-
-        Log log = getLog();
-
-        // check if the groupId of the project should be included
-        if ( includedGroupPattern != null )
-        {
-            // we have some defined license filters
-            try
-            {
-                Matcher matchGroupId = includedGroupPattern.matcher( project.getGroupId() );
-                if ( matchGroupId.find() )
-                {
-                    if ( log.isDebugEnabled() )
-                    {
-                        log.debug( "Include " + project.getGroupId() );
-                    }
-                    return true;
-                }
-            }
-            catch ( PatternSyntaxException e )
-            {
-                getLog().warn( "The pattern specified by expression <" + includedGroups + "> seems to be invalid." );
-            }
-        }
-
-        // check if the artifactId of the project should be included
-        if ( includedArtifactPattern != null )
-        {
-            // we have some defined license filters
-            try
-            {
-                Matcher matchGroupId = includedArtifactPattern.matcher( project.getArtifactId() );
-                if ( matchGroupId.find() )
-                {
-                    if ( log.isDebugEnabled() )
-                    {
-                        log.debug( "Include " + project.getArtifactId() );
-                    }
-                    return true;
-                }
-            }
-            catch ( PatternSyntaxException e )
-            {
-                getLog().warn( "The pattern specified by expression <" + includedArtifacts + "> seems to be invalid." );
-            }
-        }
-
-        return false;
+        return localRepository;
     }
 
-
-    protected boolean isExcludable( Artifact project, Pattern excludedGroupPattern, Pattern excludedArtifactPattern )
+    public List<?> getRemoteRepositories()
     {
+        return remoteRepositories;
+    }
 
-        Log log = getLog();
-        // check if the groupId of the project should be included
-        if ( excludedGroupPattern != null )
-        {
-            // we have some defined license filters
-            try
-            {
-                Matcher matchGroupId = excludedGroupPattern.matcher( project.getGroupId() );
-                if ( matchGroupId.find() )
-                {
-                    if ( log.isDebugEnabled() )
-                    {
-                        log.debug( "Exclude " + project.getGroupId() );
-                    }
-                    return true;
-                }
-            }
-            catch ( PatternSyntaxException e )
-            {
-                getLog().warn( "The pattern specified by expression <" + excludedGroups + "> seems to be invalid." );
-            }
-        }
+    public MavenProjectBuilder getMavenProjectBuilder()
+    {
+        return mavenProjectBuilder;
+    }
 
-        // check if the artifactId of the project should be included
-        if ( excludedArtifactPattern != null )
-        {
-            // we have some defined license filters
-            try
-            {
-                Matcher matchGroupId = excludedArtifactPattern.matcher( project.getArtifactId() );
-                if ( matchGroupId.find() )
-                {
-                    if ( log.isDebugEnabled() )
-                    {
-                        log.debug( "Exclude " + project.getArtifactId() );
-                    }
-                    return true;
-                }
-            }
-            catch ( PatternSyntaxException e )
-            {
-                getLog().warn( "The pattern specified by expression <" + excludedArtifacts + "> seems to be invalid." );
-            }
-        }
+    public boolean isIncludeTransitiveDependencies()
+    {
+        return includeTransitiveDependencies;
+    }
 
-        return false;
+    public List<String> getExcludeScopes()
+    {
+        return Arrays.asList( Artifact.SCOPE_SYSTEM );
     }
 }

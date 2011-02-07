@@ -83,20 +83,10 @@ public class AggregatorAddThirdPartyMojo
     }
 
     @Override
-    protected LicenseMap createLicenseMap()
-        throws ProjectBuildingException
+    protected SortedMap<String, MavenProject> loadDependencies()
     {
-        Log log = getLog();
-
-        LicenseMap licenseMap = new LicenseMap();
-        licenseMap.setLog( log );
-
-        SortedMap<String, MavenProject> artifacts = getArtifactCache();
-        for ( MavenProject project : artifacts.values() )
-        {
-            licenseMap.addLicense( project, project.getLicenses() );
-        }
-        return licenseMap;
+        // use the cache filled by modules in reactor
+        return getArtifactCache();
     }
 
     @Override
@@ -125,7 +115,7 @@ public class AggregatorAddThirdPartyMojo
             if ( file.exists() )
             {
 
-                SortedProperties tmp = licenseMap.loadUnsafeMapping( getEncoding(), file );
+                SortedProperties tmp = licenseMap.loadUnsafeMapping( getArtifactCache(), getEncoding(), file );
                 unsafeMappings.putAll( tmp );
             }
 
