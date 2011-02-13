@@ -63,6 +63,10 @@
     <!-- versions of javadoc tagglets -->
     <mavenPluginToolsJavadocVersion>2.5.1</mavenPluginToolsJavadocVersion>
     <plexusComponentJavadocVersion>1.3.0</plexusComponentJavadocVersion>
+
+    <!-- generate site in english and french -->
+    <locales>en,fr</locales>
+    
   </properties>
 
   <dependencies>

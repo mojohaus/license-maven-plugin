@@ -1,0 +1,104 @@
+ ------
+ Download Licenses Examples
+ ------
+ ------
+ 2010-10-16
+ ------
+
+Download Licenses Exemples
+
+  Cette page fournit des exemples d'utilisation du goal <<<download-licenses>>>.
+  Par défaut, le goal <<<{{{./download-licenses-mojo.html}download-licenses}}>>> essayera de résoudre la license de
+  chacune des dépendances du projet.  Ces fichiers seront téléchargés dans un répertoire local et seront incluses dans
+  les sources du projet (class-path) si nécessaire.
+  Les licenses sont téléchargés en utilisant l'url fourni dans le POM de la dépendance.
+  
+  Après avoir téléchargé les licenses, le plugin crée un résumé au format XML décrivant la license associée à
+  chaque dépendance.
+
+  A noter que la ré-exécution du fragment de build ne retéléchargera pas les licenses si le résumé est trouvé.
+  Si le résumé est trouvé, seules les licenses de nouvelles dépendances serton téléchargées.
+
+* Exemple simple
+
+  Cet exemple montre comment configurer le goal <<<download-licenses>>> pour un usage des plus simple.
+  
+-------------------
+<project>
+  ...
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>${project.version}</version>
+        <executions>
+          <execution>
+            <id>download-licenses</id>
+            <goals>
+              <goal>download-licenses</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+    ...
+  </build>
+  ...
+</project>
+-------------------
+
+  Ensuite lancer le build :
+  
++-----+
+mvn package
++-----+
+    
+  Pour le goal <<<download-licenses>>> , les licenses sont téléchargés par défaut dans le répertoire <<<target/licenses>>>.
+  Ceci peut-être configuré via le paramètre <<<licensesOutputDirectory>>>.
+  
+* Configuration avancée
+
+  Par défaut, le plugin recherche dans le POM de chaque dépendance pour obtenir les informations des licenses.
+  Malheuresement, tous les POMs n'ont pas cette information de correctement configurer. Dans ce cas, la license requises
+  peut-être configurée manuellement.
+  Par défaut le plugin va rechercher dans un fichier <<src/licenses.xml>> qui contient les informations de licenses
+  supplémentaires qui seront fusionnées avec celles du POM pour créer le résumé final.
+
+  La localisation de ce fichier est configurable via le paramètre <<licensesConfigFile>>.
+
+  L'exemple suivant en montre l'utilisation :
+  
+-------------------
+<?xml version="1.0"?>
+
+<licenseSummary xmlns="http://mojo.codehaus.org/"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://mojo.codehaus.org/ licenses.xsd">
+  <dependencies>
+    <dependency>
+      <groupId>com.wutka</groupId>
+      <artifactId>dtdparser</artifactId>
+      <licenses>
+        <license>
+          <name>GNU Lesser General Public License</name>
+          <url>http://www.gnu.org/licenses/lgpl.txt</url>
+          <distribution>repo</distribution>
+        </license>
+      </licenses>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jcl-over-slf4j</artifactId>
+      <licenses>
+        <license>
+          <name>MIT License</name>
+          <url>http://www.opensource.org/licenses/mit-license.php</url>
+        </license>
+      </licenses>
+    </dependency>
+  </dependencies>
+</licenseSummary>
+-------------------
+
+  Le résumé XML suit la même syntaxe XML que ce fichier de consolidation de licenses.

@@ -1,0 +1,150 @@
+~~~
+~~ #%L
+~~ License Maven Plugin
+~~ 
+~~ $Id$
+~~ $HeadURL$
+~~ %%
+~~ Copyright (C) 2008 - 2011 CodeLutin, Codehaus, Tony Chemit
+~~ %%
+~~ This program is free software: you can redistribute it and/or modify
+~~ it under the terms of the GNU Lesser General Public License as 
+~~ published by the Free Software Foundation, either version 3 of the 
+~~ License, or (at your option) any later version.
+~~ 
+~~ This program is distributed in the hope that it will be useful,
+~~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+~~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+~~ GNU General Lesser Public License for more details.
+~~ 
+~~ You should have received a copy of the GNU General Lesser Public 
+~~ License along with this program.  If not, see
+~~ <http://www.gnu.org/licenses/lgpl-3.0.html>.
+~~ #L%
+~~~
+
+Présentation
+
+  Cette page décrit le modèle des en-têtes de fichier générées. On décrit ici comment configurer et les utiliser
+  via le goal {{{./update-file-header-mojo.html}update-file-header}}.
+
+Modèle d'en-tête
+
+* Exemple
+
+  Voici un exemple d'en-tête de fichier (sans encapsulation de commentaire) :
+
+--------------------------------------------------------------------------------
+
+  (1) # % L
+  (2) Project description
+  (3) %%
+  (4) Copyright (C) 2010 your organization
+  (5) %%
+  (6) License content
+  (7) # L %
+--------------------------------------------------------------------------------
+
+  * (1) le tag de début d'en-tête (à ne JAMAIS supprimer)
+
+  * (2) Section de description du projet
+
+  * (3) Délimiteur de section
+
+  * (4) Section du Copyright du fichiers (voir plus loin pour plus de détail)
+
+  * (5) Délimiteur de section
+
+  * (6) Section de license
+
+  * (7) le tag de fin d'en-tête (à ne JAMAIS supprimer)
+
+* Configuration
+
+  Plusieurs choses peuvent être configurées :
+
+  * le tag de début d'en-tête
+
+  * le délimiteur de section
+  
+  * le tag de fin d'en-tête
+
+* Modèle de Copyright
+
+  La section de copyright doit avoir exactement cette forme :
+
+--------------------------------------------------------------------------------
+
+  Copyright (C) firstYear[ - lastYear] holder
+--------------------------------------------------------------------------------
+
+  Si <firstYear> et <lastYear> sont les mêmes, alors <lastYear> est omis.
+
+* Encapsulation par commentaire
+
+  Dans un fichier, l'en-tête doit être encapsulée dans un commentaire du type de fichier.
+
+Styles de commentaire disponibles
+
+  Voici la liste des styles de commentaires disponibles.
+
+  Utilisez le goal {{{./comment-style-list-mojo.html}comment-style-list}}
+  pour les obtenir tous en console.
+
+* java style
+
+--------------------------------------------------------------------------------
+
+  /*
+   * HEADER
+   */
+--------------------------------------------------------------------------------
+
+* xml style
+
+--------------------------------------------------------------------------------
+
+  <!--
+   HEADER
+  -->
+--------------------------------------------------------------------------------
+
+* properties style
+
+--------------------------------------------------------------------------------
+
+  ######
+  # HEADER
+  ######
+--------------------------------------------------------------------------------
+
+* apt style
+
+--------------------------------------------------------------------------------
+
+  ~~~~~~
+  ~~ HEADER
+  ~~~~~~
+--------------------------------------------------------------------------------
+
+* rst style
+
+--------------------------------------------------------------------------------
+  .. -
+  .. * HEADER
+  .. -
+--------------------------------------------------------------------------------
+
+Ignorer un fichier
+
+  Si vous ne vouluez pas que le goal {{{./update-file-header-mojo.html}update-file-header}}
+  ne traite un fichier particulier, vous pouvez ajouter un tag spécifique dans votre fichier :
+
+--------------------------------------------------------------------------------
+
+  %%Ignore-License
+--------------------------------------------------------------------------------
+
+  Note : Ne pas utiliser cette balise entre les balises d'une en-tête classique (1) et (7 dans l'exemple)...
+
+  Il est possible de changer le nom de la balise via la propriété <<ignoreTag>>.

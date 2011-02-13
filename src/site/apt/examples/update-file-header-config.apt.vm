@@ -25,19 +25,18 @@
 
 Update File Header Examples
 
-  Without a descriptor file, we can configure the
-  update-file-header goal with four parameters:
+  The <update-file-header> goal can be configured this way:
 
     * licenseName : it is the name of the license to add on file header. It is mandatory,
 
     * roots : it is a list of the main directories from which we apply the
-    license on files. The default roots is <src>,
+    license on files. The default roots is <src, target/generated-sources, target/processed-source>,
 
     * includes : List of files to include, gived by a regexp (for example: <*Dao.java>).
     The default include is **/*,
 
     * excludes: List of files to exclude, gived by a regexp (for example: <*Test.java>).
-    The default excludes are i18n properties (**/i18n/*.properties).
+    there is no default excludes files.
 
     * extraExtensions: Dictionnary of extensions to map to existing comment style.
     
@@ -56,13 +55,13 @@ Update File Header Examples
 
 Root Directories
 
-  By default, All the files in <src> are treated. This could be changed with the
-  property <roots>. The roots property is a list of base directories from which the
+  By default, All the files in <src, target/generated-sources, target/processed-source> are treated.
+  This could be changed with the property <roots>. The roots property is a list of base directories from which the
   update-file-header will be applied.
 
 * Example
 
-    Given a pom with this plugin configuration
+    Given a pom with this plugin configuration:
 
 -------------------------------------------------------------------------------
 
@@ -70,7 +69,7 @@ Root Directories
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>license-maven-plugin</artifactId>
-        <version>1.0</version>
+        <version>${project.version}</version>
         <configuration>
           <verbose>false</verbose>
           <addSvnKeyWords>true</addSvnKeyWords>
@@ -113,7 +112,7 @@ Includes
 
 * Example
 
-    Soit un pom avec la configuration de plugin suivante:
+    Given a pom with this plugin configuration:
 
 -------------------------------------------------------------------------------
 
@@ -121,7 +120,7 @@ Includes
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>license-maven-plugin</artifactId>
-        <version>1.0</version>
+        <version>${project.version}</version>
         <configuration>
           <verbose>false</verbose>
           <addSvnKeyWords>true</addSvnKeyWords>
@@ -158,7 +157,7 @@ Excludes
 
 * Example
 
-    Given a pom with this plugin configuration
+    Given a pom with this plugin configuration:
 
 -------------------------------------------------------------------------------
 
@@ -166,7 +165,7 @@ Excludes
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>license-maven-plugin</artifactId>
-        <version>1.0</version>
+        <version>${project.version}</version>
         <configuration>
           <verbose>false</verbose>
           <addSvnKeyWords>true</addSvnKeyWords>
@@ -203,7 +202,7 @@ ExtraExtensions
 
 * Example
 
-  Given a pom with this plugin configuration
+  Given a pom with this plugin configuration:
 
 -------------------------------------------------------------------------------
 
@@ -211,7 +210,7 @@ ExtraExtensions
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>license-maven-plugin</artifactId>
-        <version>1.0</version>
+        <version>${project.version}</version>
         <configuration>
           <extraExtensions>
             <yo>java</yo>
@@ -222,5 +221,5 @@ ExtraExtensions
 
 -------------------------------------------------------------------------------
 
-  Files with extension <<yo>> will be treated as java files.
+  Files with extension <<yo>> will be treated as java files (says using the comment style named java).
 

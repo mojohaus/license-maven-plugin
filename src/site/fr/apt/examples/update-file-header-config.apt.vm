@@ -1,0 +1,230 @@
+~~~
+~~ #%L
+~~ License Maven Plugin
+~~ 
+~~ $Id$
+~~ $HeadURL$
+~~ %%
+~~ Copyright (C) 2008 - 2011 CodeLutin, Codehaus, Tony Chemit
+~~ %%
+~~ This program is free software: you can redistribute it and/or modify
+~~ it under the terms of the GNU Lesser General Public License as 
+~~ published by the Free Software Foundation, either version 3 of the 
+~~ License, or (at your option) any later version.
+~~ 
+~~ This program is distributed in the hope that it will be useful,
+~~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+~~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+~~ GNU General Lesser Public License for more details.
+~~ 
+~~ You should have received a copy of the GNU General Lesser Public 
+~~ License along with this program.  If not, see
+~~ <http://www.gnu.org/licenses/lgpl-3.0.html>.
+~~ #L%
+~~~
+
+Update File Header Examples
+
+  Le goal <<update-file-header>> peut être configuré via les paramètres suivants :
+
+    * licenseName : l'identifiant de license à utiliser (obligatoire)
+
+    * roots : la liste des répertoires sources à scanner. Par défaut, on utiliser <src, target/generated-sources, target/processed-source>,
+
+    * includes : Liste des fichiers à inclure dans les <<roots>>, données par une regex (par exemple : <*Dao.java>).
+    Par défaut, on inclut tout (i.e <<**/*>>).
+
+    * excludes: Liste des fichiers à exlucrer donnés par une regex (par exemple : <*Test.java>).
+    Par défaut, on exclut rien.
+
+    * extraExtensions: Dictionnaire d'extensions de fichiers à utiliser en plus de celles déjà connues.
+
+  Pour voir toutes les extensions connues, utilisez le goal <<comment-style-list>>.
+
+-------------------------------------------------------------------------------
+[INFO] --- license-maven-plugin:1.0:comment-style-list (default-cli) @ license-maven-plugin ---
+[INFO] List of available comment styles:
+
+  - apt        : header transformer with apt comment style            , extensions : [apt]
+  - java       : header transformer with java comment style           , extensions : [java, groovy, css, cs, as, aj, c, h, cpp]
+  - properties : header transformer with properties file comment style, extensions : [properties, sh, py, rb, pl, pm]
+  - rst        : header transformer with rst comment style            , extensions : [rst]
+  - xml        : header transformer with xml comment style            , extensions : [pom, xml, xhtml, mxlm, dtd, jspx, fml, xsl, html, htm, jaxx, kml, gsp, tml]
+-------------------------------------------------------------------------------
+
+Root Directories
+
+  Par défaut, toutes les répertoires de sources dans la convention maven sont utilisés, à savoir :
+  <src, target/generated-sources, target/processed-source>.
+
+  Il est possible de changer ce comportement en configurant la propriété <<roots>. Cette propriété est une liste de
+  répertoires.
+
+* Example
+
+    Soit un pom avec la configuration de plugin suivante :
+
+-------------------------------------------------------------------------------
+
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>${project.version}</version>
+        <configuration>
+          <verbose>false</verbose>
+          <addSvnKeyWords>true</addSvnKeyWords>
+        </configuration>
+        <executions>
+          <execution>
+            <id>first</id>
+            <goals>
+              <goal>update-file-header</goal>
+            </goals>
+            <phase>process-sources</phase>
+            <configuration>
+              <licenseName>gpl_v3</licenseName>
+              <roots>
+                <root>src/main/java</root>
+                <root>src/test</root>
+              </roots>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+
+-------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------
+  Considering we have the following tree:
+  src/main/java
+  src/main/resources
+  src/test/java
+  src/test/resources
+-------------------------------------------------------------------------------
+  seluls les fichiers des répertoires src/main/java, src/test/java and src/test/resources seront traités.
+
+Includes
+
+  Par défaut, tous les fichiers des <roots> seront traités si leur extension est connu.
+  La propriété  de type liste <includes> permet to spécifier plus finnement la liste des fichiers à traiter.
+
+  Note: Même si des fichiers sont spécifiés explicitement via cette propriété et que leur extension n'est pas connue,
+   ils ne seront alors toujours pas traités.
+
+* Exemple
+
+    Soit un pom avec la configuration de plugin suivante :
+
+-------------------------------------------------------------------------------
+
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>${project.version}</version>
+        <configuration>
+          <verbose>false</verbose>
+          <addSvnKeyWords>true</addSvnKeyWords>
+        </configuration>
+        <executions>
+          <execution>
+            <id>first</id>
+            <goals>
+              <goal>update-file-header</goal>
+            </goals>
+            <phase>process-sources</phase>
+            <configuration>
+              <licenseName>gpl_v3</licenseName>
+              <includes>
+                <include>*Dao.java</include>
+                <include>*Bean.java</include>
+                <include>.*entities.*.xml</include>
+              </includes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+
+-------------------------------------------------------------------------------
+
+  Ici seuls les fichiers se terminant par <Dao.java>, <Bean.java> et les fichiers xml dont le nom contient <entities> seront
+  traités (dans les répertoires roots par défaut).
+
+
+Excludes
+
+  Le paramètre <excludes> permet de ne pas traiter les fichiers spécifiés.
+
+* Exemple
+
+    Soit un pom avec la configuration de plugin suivante :
+
+-------------------------------------------------------------------------------
+
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>${project.version}</version>
+        <configuration>
+          <verbose>false</verbose>
+          <addSvnKeyWords>true</addSvnKeyWords>
+        </configuration>
+        <executions>
+          <execution>
+            <id>first</id>
+            <goals>
+              <goal>update-file-header</goal>
+            </goals>
+            <phase>process-sources</phase>
+            <configuration>
+              <licenseName>gpl_v3</licenseName>
+              <excludes>
+                <exclude>*.png</exclude>
+                <exclude>*.txt</exclude>
+                <exclude>*Test.java</exclude>
+              </excludes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+
+-------------------------------------------------------------------------------
+
+  Ici tous les fichiers se terminant par <Test.java>, les fichiers txt et png ne seront pas traités par le goal.
+
+ExtraExtensions
+
+  Pour permettre de traiter des fichiers dont les extensiosn ne sont pas connus par le plugin, on peut renseigner le
+  paramètre <extraExtensions>.
+
+  Ce paramètre est de type Map, la clef étant l'extension à inclure et la valeur le style de commentaire à utiliser
+  pour cette extension.
+
+* Exemple
+
+  Soit un pom avec la configuration de plugin suivante :
+
+-------------------------------------------------------------------------------
+
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>${project.version}</version>
+        <configuration>
+          <extraExtensions>
+            <yo>java</yo>
+          </extraExtensions>
+        </configuration>
+      </plugin>
+    </plugins>
+
+-------------------------------------------------------------------------------
+
+  Les fichiers d'extension <<yo>> seront traités en utilisant le style de commentaire <<java>>.
+

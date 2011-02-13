@@ -1,0 +1,76 @@
+ ------
+ License List Examples
+ ------
+ ------
+ 2011-02-04
+ ------
+
+Obtenir les licenses connues
+
+* Goal license-list
+
+  Ce goal affiche en console la liste des licenses disponibles pour la mise à jour des en-têtes des fichiers sources.
+
+  Utilisez le directement (et uniquement) depuis la ligne de commande :
+
+-------------------------------------------------------------------------------
+  mvn license:license-list
+-------------------------------------------------------------------------------
+
+  Pour afficher les informations complêtes d'une license, utilisez le paramètre <<detail>> :
+
+-------------------------------------------------------------------------------
+  mvn license:license-list -Ddetail
+-------------------------------------------------------------------------------
+
+  Pour obtenir toutes les informations disponibles sur le goal consulter la {{{./license-list-mojo.html}page des détails du goal}}.
+
+** Sortie de l'exemple
+
+-------------------------------------------------------------------------------
+  [INFO] [license:license-list {execution: default-cli}]
+  [INFO] Available licenses :
+
+   * agpl_v3   : GNU Affero General Public License (AGPL) version 3.0
+   * apache_v2 : Apache License version 2.0
+   * cddl_v1   : COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0
+   * fdl_v1_3  : GNU Free Documentation License (FDL) version 1.3
+   * gpl_v1    : GNU General Public License (GPL) version 1.0
+   * gpl_v2    : GNU General Public License (GPL) version 2.0
+   * gpl_v3    : GNU General Public License (GPL) version 3.0
+   * lgpl_v2_1 : GNU General Lesser Public License (LGPL) version 2.1
+   * lgpl_v3   : GNU General Lesser Public License (LGPL) version 3.0
+   * mit       : MIT-License
+-------------------------------------------------------------------------------
+
+* Goal comment-style-list
+
+  Ce goal affiche en console la liste des styles de commentaires disponibles pour encapsuler les en-têtes des fichiers sources
+
+  Utilisez le directement (et uniquement) depuis la ligne de commande :
+
+-------------------------------------------------------------------------------
+  mvn license:comment-style-list
+-------------------------------------------------------------------------------
+
+  Pour afficher un exemple pour chaque style de commentaire, utilisez le paramètre <<detail>> :
+
+-------------------------------------------------------------------------------
+  mvn license:comment-style-list -Ddetail
+-------------------------------------------------------------------------------
+
+  Pour obtenir toutes les informations disponibles sur le goal consulter
+  la {{{./comment-style-list-mojo.html}page des détails du goal}}.
+
+** Sortie de l'exemple
+
+-------------------------------------------------------------------------------
+[INFO] --- license-maven-plugin:1.0:comment-style-list (default-cli) @ license-maven-plugin ---
+[INFO] List of available comment styles:
+
+  - apt        : header transformer with apt comment style            , extensions : [apt]
+  - java       : header transformer with java comment style           , extensions : [java, groovy, css, cs, as, aj, c, h, cpp]
+  - properties : header transformer with properties file comment style, extensions : [properties, sh, py, rb, pl, pm]
+  - rst        : header transformer with rst comment style            , extensions : [rst]
+  - xml        : header transformer with xml comment style            , extensions : [pom, xml, xhtml, mxlm, dtd, jspx, fml, xsl, html, htm, jaxx, kml, gsp, tml]
+-------------------------------------------------------------------------------

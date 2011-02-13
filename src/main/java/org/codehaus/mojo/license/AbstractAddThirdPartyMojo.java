@@ -47,7 +47,7 @@ public abstract class AbstractAddThirdPartyMojo
     /**
      * Directory where to generate files.
      *
-     * @parameter expression="${license.outputDirectory}" default-value="target/generated-sources/license"
+     * @parameter expression="${license.outputDirectory}" default-value="${project.build.directory}/generated-sources/license"
      * @required
      * @since 1.0
      */

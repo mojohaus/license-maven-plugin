@@ -1,0 +1,131 @@
+ ------
+ Usage
+ ------
+ ------
+ 2010-10-16
+ ------
+
+Usage
+
+  Le License Maven Plugin fournit un certain nombre de gola pour la gestion des licenses dans un projet.
+  Par exemple : valider/mettre à jour les en-têtes des fichiers sources,
+  mettre à jour le fichier pricnipal LICENSE.txt d'un projet, et télécharger des informations sur les licenses des
+  dépendances.
+
+  Les informations qui suivent devraient vous permettre de commencer à vous servir du plugin.
+
+  Si vous rencontrez des problèmes à l'utilisation, vous pouvez toujours envoyer un petit courriel à la
+  {{{./mail-lists.html}mailing list des utilisateurs}}.
+
+* Obtenir des informations sur la configuration des goals du plugin
+
+** Goal license-list
+
+  Ce goal affiche en console la liste des licenses disponibles pour la mise à jour des en-têtes des fichiers sources.
+
+  Utilisez le directement (et uniquement) depuis la ligne de commande :
+
+-------------------------------------------------------------------------------
+
+  mvn license:license-list
+-------------------------------------------------------------------------------
+
+  Pour afficher les informations complêtes d'une license, utilisez le paramètre <<detail>> :
+
+-------------------------------------------------------------------------------
+  mvn license:license-list -Ddetail
+-------------------------------------------------------------------------------
+
+  Pour plus d'information, voir la {{{./examples/example-license-list.html}page des exemples}} et pour obtenir
+  toutes les informations disponibles sur le goal consulter la {{{./license-list-mojo.html}page des détails du goal}}.
+
+** Goal comment-style-list
+
+  Ce goal affiche en console la liste des styles de commentaires disponibles pour encapsuler les en-têtes des fichiers sources
+  
+  Utilisez le directement (et uniquement) depuis la ligne de commande :
+
+-------------------------------------------------------------------------------
+  mvn license:comment-style-list
+-------------------------------------------------------------------------------
+
+  Pour afficher un exemple pour chaque style de commentaire, utilisez le paramètre <<detail>> :
+
+-------------------------------------------------------------------------------
+  mvn license:comment-style-list -Ddetail
+-------------------------------------------------------------------------------
+
+  Pour plus d'informations, voir la {{{./examples/example-license-list.html}page des exemples}} et pour obtenir
+  toutes les informations disponibles sur le goal consulter la {{{./comment-style-list-mojo.html}page des détails du goal}}.
+
+** Goal help
+
+  Goal pour afficher l'aide du plugin (goals disponibles).
+
+  Utilisez le directement (et uniquement) depuis la ligne de commande :
+
+-------------------------------------------------------------------------------
+  mvn license:help
+-------------------------------------------------------------------------------
+
+  Pour afficher l'aide verbeuse :
+
+-------------------------------------------------------------------------------
+  mvn license:help -Ddetail
+-------------------------------------------------------------------------------
+
+  Pour plus de détail, voir la {{{./help-mojo.html}page des détails du goal}}.
+
+
+* Mettre à jour les informations sur les licenses
+
+** Goal update-project-license
+
+  Ce goal créer ou mets à jour le fichier <<LICENSE.txt>> et l'ajoute aux sources du build (dans le class-path).
+
+  Le goal peut aussi générer une version bundle de ce fichier pour éviter les collision de noms du simple LICENSE.txt.
+
+  Pour plus de détail, voir la {{{./update-project-license-mojo.html}page des détails du goal}}.
+
+** Goal update-file-header
+
+  Ce goal ajoute ou met à jour les en-têtes sur les fichiers sources du projet.
+
+  Pour plus d'information, consulter la {{{./examples/update-file-header-config.html}page des exemples}} et pour
+  obtenir toutes les informations disponibles sur le goal consulter la {{{./update-file-header-mojo.html}page des détails du goal}}.
+
+  If no configuration is dones, all the <*.java *.rst *.xml et *.properties>
+  files depuis <"src/**/*"> seront traités. Il est cependant nécessaire de fournir la nom de license à utiliser
+  avec le paramètre <licenseName>.
+
+  Pour plus de détail, voir la page {{{./update-file-header-config.html}configuration des en-têtes des fichiers sources}}.
+
+
+* Obtenir des informations sur les licenses des dépendances
+
+** Goal add-third-party
+
+  Ce goal constuir un fichier THIRD-PARTY.txt file et l'ajoute aux sources du build (dans le class-path).
+
+  Un fichier auxiliaire peut-être utilisé (le <<fichier de consolidation>>) pour les dépendances sans license renseigné
+  dans leur POM.
+
+  <Note:> Ce goal n'a pas d'effet sur un projet de type <<pom>>.
+
+  Pour plus de détails, consulter la {{{./examples/example-thirdparty.html}page des exemples}}.
+
+** Goal aggregate-add-third-party
+
+  Ce gaol construir le fichier THIRD-PARTY.txt pour un projet multi-module pour tous ces modules fils.
+
+  <Note:> Ce gaol n'a d'effet que sur un porjet de type <<pom>>.
+
+  Pour plus d'informations, consultez la {{{./examples/example-thirdparty.html} page des examples}}.
+
+** Goal download-licenses
+
+  Ce gaol permet de télécharger et générer un rapport XML pour les licenses des dépendances d'un projet.
+
+  Pour plus d'informations vous pouvez consulter la {{{./examples/example-download-licenses.html}page des exemples}}.
+
+  Par défaut, le goal est attaché à la phase <<<generate-resources>>> du cycle de build par défaut.

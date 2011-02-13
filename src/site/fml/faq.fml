@@ -39,6 +39,7 @@
         <p>
           The <a href="http://maven-site.nuiton.org/maven-license-plugin/">Code Lutin maven-license-plugin</a> is an older version of the Codehaus license-maven-plugin.  The source code 
           of the Code Lutin plugin was donated to Codehaus and merged with some existing license plugin code.
+          His original creator joined then the Codehaus team to continue the project developement.
         </p>
       </answer>
     </faq>

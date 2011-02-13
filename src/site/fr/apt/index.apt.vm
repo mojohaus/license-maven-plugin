@@ -1,0 +1,73 @@
+ ------
+ Introduction 
+ ------
+ ------
+ 2010-10-16
+ ------
+
+${project.name}
+
+  Le plugin permet de gérer tout ce qui concerne les license sur un projet maven (téléchargement de licenses, génération
+  de fichier de third-parties, ajout d'en-tête sur les fichiers sources.
+   
+* {Goals} Présentation
+  
+  Les différentes goal sont conçus pour être intégrer dans le cycle de build par défaut :
+  
+  * <<<{{{./add-third-party-mojo.html}license:add-third-party}}>>>\
+    Générer un fichier qui contient l'ensemble des dépendances d'un module groupés par leur license.
+  
+  * <<<{{{./aggregate-add-third-party-mojo.html}license:aggregate-add-third-party}}>>>\
+    Générer un fichier qui contient l'ensemble des dépendances d'un projet multi-podule groupés par leur license.
+  
+  * <<<{{{./comment-style-list-mojo.html}license:comment-style-list}}>>>\
+    Affiche en console les styles de commentaire disponibles pour l'ajout d'en-tête sur les fichiers sources.
+  
+  * <<<{{{./download-licenses-mojo.html}license:download-licenses}}>>>\
+    Télécharge les licenses associées à chaque dépendance d'un projet.
+  
+  * <<<{{{./license-list-mojo.html}license:license-list}}>>>\
+    Affiche en console les licenses disponibles pour l'ajout d'en-tête sur les fichiers sources.
+  
+  * <<<{{{./update-file-header-mojo.html}license:update-file-header}}>>>\
+    Mettre à jour (ou créer) les en-têtes sur les fichiers sources.
+  
+  * <<<{{{./update-project-license-mojo.html}license:update-project-license}}>>>\
+    MEttre à jour (ou créer) le fichier principale de license du projet suivant le paramètre <<licenseName>>.
+  
+* {Utilisation}
+  
+  Des instructions sur l'utilisation du plugin peuvent être trouvés sur la {{{./usage.html}page d'utilisation}}.
+  Des cas concrêts d'utilisation sont décrit dans les exemples suivants.
+  Les utilisateurs contribuent parfois pour donner de nouveaux exemples, astuces ou errata :
+  {{{http://docs.codehaus.org/display/MAVENUSER/License+Maven+Plugin}page Wiki du plugin}}.
+
+  Dans le cas où vous avez encore des question concernant l'utilisation de ce plugin , jettez un coup d'oeil à {{{./faq.html}la foire aux questions}}
+  et vous pouvez toujours écrire à la {{{./mail-lists.html}mailing-list des utilisateurs}}. Les messages à cette liste
+  sont archivés et pourrait déjà contenir la réponse à votre question. Pensez avant de poster ici à naviguer / rechercher
+  dans {{{./mail-lists.html}les archives}}.
+
+  Si vous pensez qu'une fonctionnalité manque au plugin ou que vous avez trouvé un malfonctionnement de celui-ci, vous
+  pouvez remplir un rapport de nouvelle fonctionnalité ou d'anomalie sur  {{{./issue-tracking.html}gestionnaire de tâches du projet}}.
+  Lors de la création d'un nouveau rapport, merci de fournir une description complête et humainement compréhensible.
+  Surtout pour un rapport d'anomalie pour que les développeurs puissent facilement reproduire le problème.
+  Pour cette même raison, les logs de DEBUG complêts ainsi que les poms du projet (ou un petit projet tets) sont
+  fortement appréciés en pièces-jointes à la demande.
+  Bien entendu, les patches sont les bienvenues :) Les contributeurs peuvent télécharger les sources depuis le
+  {{{./source-repository.html}gestionnaire de sources}} et trouvereront des informations supplémentaires dans le
+  {{{http://mojo.codehaus.org/development/guidelines.html}guide de développement}}.
+
+* {Exemples}
+  
+  Pour mieux comprendre l'utilisation du License Plugin, vous pouvez jetter un coup d'oeil aux exemples suivants :
+
+  * {{{./examples/example-add-license.html}Ajouter une license au plugin}}
+  
+  * {{{./examples/example-download-licenses.html}Télécharger les licenses des dépendances}}
+  
+  * {{{./examples/example-license-list.html}Lister les licenses connues}}
+  
+  * {{{./examples/example-thirdparty.html}Vérifier les licenses des dépendances}}
+  
+  * {{{./examples/update-file-header-config.html}Mettre à jour les en-têtes des fichiers sources}}
+  
