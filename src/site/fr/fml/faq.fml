@@ -22,7 +22,7 @@
 <faqs id="FAQ" title="Foire aux questions">
   <part id="General">
     <faq id="google-code-maven-license-plugin">
-      <question>Quelle est la différence entre ce plugin (celui de Codehaus license-maven-plugin) and le maven-license-plugin hosted hébergé à Google Code?</question>
+      <question>Quelle est la différence entre ce plugin (celui de Codehaus license-maven-plugin) et le maven-license-plugin hosted hébergé à Google Code?</question>
       <answer>
         <p>
           Ces deux plugins ont été développés séparemment mais foncièrement remplissent le même rôle...

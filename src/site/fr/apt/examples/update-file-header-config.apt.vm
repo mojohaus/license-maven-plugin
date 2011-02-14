@@ -57,7 +57,7 @@ Root Directories
   Par défaut, toutes les répertoires de sources dans la convention maven sont utilisés, à savoir :
   <src, target/generated-sources, target/processed-source>.
 
-  Il est possible de changer ce comportement en configurant la propriété <<roots>. Cette propriété est une liste de
+  Il est possible de changer ce comportement en configurant la propriété <<roots>>. Cette propriété est une liste de
   répertoires.
 
 * Example
@@ -103,7 +103,7 @@ Root Directories
   src/test/java
   src/test/resources
 -------------------------------------------------------------------------------
-  seluls les fichiers des répertoires src/main/java, src/test/java and src/test/resources seront traités.
+  seuls les fichiers des répertoires src/main/java, src/test/java and src/test/resources seront traités.
 
 Includes
 

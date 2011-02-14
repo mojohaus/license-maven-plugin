@@ -27,6 +27,7 @@
       <item name="Usage" href="usage.html"/>
       <item name="FAQ" href="faq.html"/>
       <item name="File header model" href="header.html"/>
+      <!--<item name="Site français" href="http://mojo.codehaus.org/license-maven-plugin/fr/index.html"/>-->
     </menu>
     <menu name="Examples">
       <item name="Add License" href="examples/example-add-license.html"/>
