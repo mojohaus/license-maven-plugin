@@ -147,15 +147,16 @@ public class DownloadLicensesMojo
         throws MojoExecutionException
     {
 
-        if ( !licensesOutputDirectory.exists() )
-        {
-            licensesOutputDirectory.mkdirs();
-        }
-
-        if ( !licensesOutputFile.getParentFile().exists() )
-        {
-            licensesOutputFile.getParentFile().mkdirs();
-        }
+        initDirectories();
+//        if ( !licensesOutputDirectory.exists() )
+//        {
+//            licensesOutputDirectory.mkdirs();
+//        }
+//
+//        if ( !licensesOutputFile.getParentFile().exists() )
+//        {
+//            licensesOutputFile.getParentFile().mkdirs();
+//        }
 
         Map<String, ProjectLicenseInfo> configuredDepLicensesMap = new HashMap<String, ProjectLicenseInfo>();
 
@@ -184,12 +185,12 @@ public class DownloadLicensesMojo
         // The resulting list of licenses after dependency resolution
         List<ProjectLicenseInfo> depProjectLicenses = new ArrayList<ProjectLicenseInfo>();
 
-         for ( MavenProject project : dependencies.values() )
+        for ( MavenProject project : dependencies.values() )
         {
             Artifact artifact = project.getArtifact();
             getLog().debug( "Checking licenses for project " + artifact );
             String artifactProjectId = getArtifactProjectId( artifact );
-             ProjectLicenseInfo depProject = null;
+            ProjectLicenseInfo depProject = null;
             if ( configuredDepLicensesMap.containsKey( artifactProjectId ) )
             {
                 depProject = configuredDepLicensesMap.get( artifactProjectId );
@@ -246,6 +247,21 @@ public class DownloadLicensesMojo
             throw new MojoExecutionException( "Unable to write license summary file.", e );
         }
 
+    }
+
+    private void initDirectories()
+        throws MojoExecutionException
+    {
+        try
+        {
+            FileUtil.createDirectoryIfNecessary( licensesOutputDirectory );
+
+            FileUtil.createDirectoryIfNecessary( licensesOutputFile.getParentFile() );
+        }
+        catch ( IOException e )
+        {
+            throw new MojoExecutionException( "Unable to create a directory...", e );
+        }
     }
 
     /**
@@ -340,10 +356,10 @@ public class DownloadLicensesMojo
         ProjectLicenseInfo dependencyProject =
             new ProjectLicenseInfo( depMavenProject.getGroupId(), depMavenProject.getArtifactId(),
                                     depMavenProject.getVersion() );
-        List<License> licenses = depMavenProject.getLicenses();
-        for ( License license : licenses )
+        List<?> licenses = depMavenProject.getLicenses();
+        for ( Object license : licenses )
         {
-            dependencyProject.addLicense( license );
+            dependencyProject.addLicense( (License) license );
         }
         return dependencyProject;
     }
@@ -473,26 +489,31 @@ public class DownloadLicensesMojo
         return includeTransitiveDependencies;
     }
 
+    // not used at the moment
     public List<String> getExcludeScopes()
     {
         return Collections.emptyList();
     }
 
+    // not used at the moment
     public String getIncludedArtifacts()
     {
         return null;
     }
 
+    // not used at the moment
     public String getIncludedGroups()
     {
         return null;
     }
 
+    // not used at the moment
     public String getExcludedGroups()
     {
         return null;
     }
 
+    // not used at the moment
     public String getExcludedArtifacts()
     {
         return null;

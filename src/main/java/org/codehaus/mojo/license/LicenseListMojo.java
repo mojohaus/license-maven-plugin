@@ -75,7 +75,7 @@ public class LicenseListMojo
     {
 
         // obtain licenses store
-        licenseStore = createLicenseStore( extraResolver );
+        licenseStore = LicenseStore.createLicenseStore( getLog(), getExtraResolver() );
     }
 
     @Override
@@ -109,7 +109,7 @@ public class LicenseListMojo
         {
             License license = licenseStore.getLicense( licenseName );
             buffer.append( String.format( pattern, licenseName, license.getDescription() ) );
-            if ( detail )
+            if ( isDetail() )
             {
                 try
                 {
@@ -133,14 +133,14 @@ public class LicenseListMojo
         return extraResolver;
     }
 
-    public void setExtraResolver( String extraResolver )
-    {
-        this.extraResolver = extraResolver;
-    }
-
     public boolean isDetail()
     {
         return detail;
+    }
+
+    public void setExtraResolver( String extraResolver )
+    {
+        this.extraResolver = extraResolver;
     }
 
     public void setDetail( boolean detail )

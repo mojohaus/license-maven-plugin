@@ -293,7 +293,7 @@ public class UpdateFileHeaderMojo
     public static final String[] DEFAULT_EXCLUDES =
         new String[]{ "**/*.zargo", "**/*.uml", "**/*.umldi", "**/*.xmi", /* modelisation */
             "**/*.img", "**/*.png", "**/*.jpg", "**/*.jpeg", "**/*.gif", /* images */
-            "**/*.zip" };
+            "**/*.zip", "**/*.jar", "**/*.war", "**/*.ear", "**/*.tgz", "**/*.gz" };
 
     public static final String[] DEFAULT_ROOTS =
         new String[]{ "src", "target/generated-sources", "target/processed-sources" };
@@ -642,8 +642,7 @@ public class UpdateFileHeaderMojo
     {
 
         // obtain license from definition
-        String licenseName = getLicenseName();
-        License license = getLicense( licenseName );
+        License license = getLicense( getLicenseName(), true );
 
         getLog().info( "Process header '" + commentStyle + "'" );
         getLog().info( " - using " + license.getDescription() );
@@ -709,7 +708,7 @@ public class UpdateFileHeaderMojo
             }
             else
             {
-                deleteFile( processFile );
+                FileUtil.deleteFile( processFile );
             }
         }
 
@@ -825,7 +824,7 @@ public class UpdateFileHeaderMojo
 
         if ( !isDryRun() )
         {
-            writeFile( processFile, content, getEncoding() );
+            FileUtil.writeString( processFile, content, getEncoding() );
         }
 
         FileState.add.addFile( file, getResult() );
@@ -838,13 +837,13 @@ public class UpdateFileHeaderMojo
 
         if ( isKeepBackup() && !isDryRun() )
         {
-            File backupFile = getBackupFile( file );
+            File backupFile = FileUtil.getBackupFile( file );
 
             if ( backupFile.exists() )
             {
 
                 // always delete backup file, before the renaming
-                deleteFile( backupFile );
+                FileUtil.deleteFile( backupFile );
             }
 
             if ( isVerbose() )
@@ -852,14 +851,14 @@ public class UpdateFileHeaderMojo
                 getLog().debug( " - backup original file " + file );
             }
 
-            renameFile( file, backupFile );
+            FileUtil.renameFile( file, backupFile );
         }
 
         if ( isDryRun() )
         {
 
             // dry run, delete temporary file
-            deleteFile( processFile );
+            FileUtil.deleteFile( processFile );
         }
         else
         {
@@ -868,7 +867,7 @@ public class UpdateFileHeaderMojo
             {
 
                 // replace file with the updated one
-                renameFile( processFile, file );
+                FileUtil.renameFile( processFile, file );
             }
             catch ( IOException e )
             {
@@ -880,7 +879,7 @@ public class UpdateFileHeaderMojo
                 FileUtils.copyFile( processFile, file );
 
                 // then delete process file
-                deleteFile( processFile );
+                FileUtil.deleteFile( processFile );
             }
         }
     }

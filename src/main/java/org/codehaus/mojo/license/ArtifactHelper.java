@@ -48,6 +48,9 @@ public class ArtifactHelper
 
     protected static Comparator<MavenProject> projectComparator;
 
+    public static final String INVALIDE_PATTERN_MESSAGE =
+        "The pattern specified by expression <%s> seems to be invalid.";
+
     public static SortedMap<String, MavenProject> loadProjectDependencies( MavenProjectDependenciesLoader mojo, Log log,
                                                                            SortedMap<String, MavenProject> cache )
     {
@@ -171,7 +174,7 @@ public class ArtifactHelper
                 }
                 catch ( ProjectBuildingException e )
                 {
-                    log.warn( "Unable to obtain dependencies for artifact : " + artifact );
+                    log.warn( "Unable to obtain POM for artifact : " + artifact );
                     log.warn( e );
                     continue;
                 }
@@ -284,8 +287,7 @@ public class ArtifactHelper
             }
             catch ( PatternSyntaxException e )
             {
-                log.warn( "The pattern specified by expression <" + includedGroupPattern.pattern() +
-                              "> seems to be invalid." );
+                log.warn( String.format( INVALIDE_PATTERN_MESSAGE, includedGroupPattern.pattern() ) );
             }
         }
 
@@ -307,8 +309,7 @@ public class ArtifactHelper
             }
             catch ( PatternSyntaxException e )
             {
-                log.warn( "The pattern specified by expression <" + includedArtifactPattern.pattern() +
-                              "> seems to be invalid." );
+                log.warn( String.format( INVALIDE_PATTERN_MESSAGE, includedArtifactPattern.pattern() ) );
             }
         }
 
@@ -337,8 +338,7 @@ public class ArtifactHelper
             }
             catch ( PatternSyntaxException e )
             {
-                log.warn( "The pattern specified by expression <" + excludedGroupPattern.pattern() +
-                              "> seems to be invalid." );
+                log.warn( String.format( INVALIDE_PATTERN_MESSAGE, excludedGroupPattern.pattern() ) );
             }
         }
 
@@ -360,8 +360,7 @@ public class ArtifactHelper
             }
             catch ( PatternSyntaxException e )
             {
-                log.warn( "The pattern specified by expression <" + excludedArtifactPattern.pattern() +
-                              "> seems to be invalid." );
+                log.warn( String.format( INVALIDE_PATTERN_MESSAGE, excludedArtifactPattern.pattern() ) );
             }
         }
 

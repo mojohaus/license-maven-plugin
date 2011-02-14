@@ -36,9 +36,6 @@ import java.io.File;
  * Can also generate a bundled license file (to avoid collision names in
  * class-path). This file is by default generated in
  * {@code META-INF class-path directory}.
- * <p/>
- * <b>Note:</b> this goal replace {@code add-license} one (which does not
- * use license project descriptor).
  *
  * @author tchemit <chemit@codelutin.com>
  * @goal update-project-license
@@ -114,9 +111,9 @@ public class UpdateProjectLicenseMojo
     protected boolean skipUpdateProjectLicense;
 
     /**
-     * flag to known if
+     * Flag to known if generate is needed.
      */
-    protected boolean doGenerate;
+    private boolean doGenerate;
 
     @Override
     protected void init()
@@ -134,7 +131,9 @@ public class UpdateProjectLicenseMojo
         File licenseFile = getLicenseFile();
         if ( licenseFile != null )
         {
-            setDoGenerate( isForce() || !isFileNewerThanPomFile( licenseFile ) );
+            File pomFile = getProject().getFile();
+
+            setDoGenerate( isForce() || !licenseFile.exists() || licenseFile.lastModified() <= pomFile.lastModified() );
         }
     }
 
@@ -143,17 +142,17 @@ public class UpdateProjectLicenseMojo
         throws Exception
     {
 
-        License mainLicense = getMainLicense();
+        License license = getLicense();
 
         File target = getLicenseFile();
 
         if ( isDoGenerate() )
         {
 
-            getLog().info( "Will create or update license file [" + mainLicense.getName() + "] to " + target );
+            getLog().info( "Will create or update license file [" + license.getName() + "] to " + target );
             if ( isVerbose() )
             {
-                getLog().info( "detail of license :\n" + mainLicense );
+                getLog().info( "detail of license :\n" + license );
             }
 
             if ( target.exists() && isKeepBackup() )
@@ -163,18 +162,18 @@ public class UpdateProjectLicenseMojo
                     getLog().info( "backup " + target );
                 }
                 // copy it to backup file
-                backupFile( target );
+                FileUtil.backupFile( target );
             }
         }
 
         // obtain license content
-        String licenseContent = mainLicense.getLicenseContent( getEncoding() );
+        String licenseContent = license.getLicenseContent( getEncoding() );
 
         if ( isDoGenerate() )
         {
 
             // writes it root main license file
-            writeFile( target, licenseContent, getEncoding() );
+            FileUtil.writeString( target, licenseContent, getEncoding() );
         }
 
         if ( hasClassPath() )
@@ -183,15 +182,14 @@ public class UpdateProjectLicenseMojo
             // copy LICENSE.txt to the resource directory (to be include in
             // class-path)
             File resourceTarget = new File( getOutputDirectory(), target.getName() );
-
-            copyFile( getLicenseFile(), resourceTarget );
+            FileUtil.copyFile( getLicenseFile(), resourceTarget );
 
             if ( isGenerateBundle() )
             {
 
                 // creates the bundled license file
                 File bundleTarget = FileUtil.getFile( getOutputDirectory(), getBundleLicensePath() );
-                copyFile( target, bundleTarget );
+                FileUtil.copyFile( target, bundleTarget );
             }
 
             // add resources directory as project resources basedir

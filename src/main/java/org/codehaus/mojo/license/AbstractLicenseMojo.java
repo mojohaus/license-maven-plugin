@@ -31,11 +31,9 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.mojo.license.model.LicenseStore;
 import org.codehaus.plexus.util.ReaderFactory;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 
 /**
@@ -103,8 +101,6 @@ public abstract class AbstractLicenseMojo
      * Method to initialize the mojo before doing any concrete actions.
      * <p/>
      * <b>Note:</b> The method is invoked before the {@link #doAction()} method.
-     * <p/>
-     * <p/>
      *
      * @throws Exception if any
      */
@@ -354,46 +350,12 @@ public abstract class AbstractLicenseMojo
         return session.getStartTime().getTime();
     }
 
-    protected LicenseStore createLicenseStore( String... extraResolver )
-        throws MojoExecutionException
-    {
-        LicenseStore store;
-        try
-        {
-            store = new LicenseStore();
-            store.addJarRepository();
-            if ( extraResolver != null )
-            {
-                for ( String s : extraResolver )
-                {
-                    if ( StringUtils.isNotEmpty( s ) )
-                    {
-                        getLog().info( "adding extra resolver " + s );
-                        store.addRepository( s );
-                    }
-                }
-            }
-            store.init();
-        }
-        catch ( IllegalArgumentException ex )
-        {
-            throw new MojoExecutionException( "could not obtain the license repository", ex );
-        }
-        catch ( IOException ex )
-        {
-            throw new MojoExecutionException( "could not obtain the license repository", ex );
-        }
-        return store;
-    }
-
-
     /**
      * Add a new resource location to the maven project
      * (in not already present).
      *
      * @param dir      the new resource location to add
      * @param includes files to include
-     * @since 1.1.1
      */
     protected void addResourceDir( File dir, String... includes )
     {
@@ -405,123 +367,11 @@ public abstract class AbstractLicenseMojo
     }
 
     /**
-     * Create the directory if necessary.
-     *
-     * @param dir the directory to create if not already existing
-     * @throws IOException if could not create the directory
-     * @since 1.1.1
-     */
-    protected void createDirectoryIfNecessary( File dir )
-        throws IOException
-    {
-        boolean b = FileUtil.createDirectoryIfNecessary( dir );
-        if ( b && isVerbose() )
-        {
-            getLog().info( "mkdir " + dir );
-        }
-    }
-
-    /**
-     * Delete the given file.
-     *
-     * @param file the file to delete
-     * @throws IOException if could not delete the file
-     * @since 1.1.1
-     */
-    protected void deleteFile( File file )
-        throws IOException
-    {
-        FileUtil.deleteFile( file );
-    }
-
-    /**
-     * Rename the given file to the destination one.
-     *
-     * @param file        the file to rename
-     * @param destination the destination of the file
-     * @throws IOException if could not delete the file
-     * @since 1.2.0
-     */
-    protected void renameFile( File file, File destination )
-        throws IOException
-    {
-        FileUtil.renameFile( file, destination );
-    }
-
-
-    /**
-     * @param file the source file
-     * @return the backup file
-     */
-    public File getBackupFile( File file )
-    {
-        return new File( file.getAbsolutePath() + "~" );
-    }
-
-    /**
-     * Backups the given file using the {@link #getBackupFile(File)} as
-     * destination file.
-     *
-     * @param f the file to backup
-     * @throws IOException if any pb while copying the file
-     */
-    protected void backupFile( File f )
-        throws IOException
-    {
-        File dst = getBackupFile( f );
-        copyFile( f, dst );
-    }
-
-    /**
-     * Copy a file to a given locationand logging.
-     *
-     * @param srcFile  represents the file to copy.
-     * @param destFile file name of destination file.
-     * @throws IOException if could not copy file.
-     */
-    protected void copyFile( File srcFile, File destFile )
-        throws IOException
-    {
-        getLog().info( "Copying " + srcFile.getName() + " to " + destFile );
-
-        FileUtil.copy( srcFile, destFile );
-    }
-
-    /**
-     * Write a {@code content} into the given destination file for the given
-     * {@code encoding}.
-     *
-     * @param destFile location where to write the content
-     * @param content  content ot write in the file
-     * @param encoding the enconding of the file
-     * @throws IOException if any pb while writing the content into the file
-     */
-    public void writeFile( File destFile, String content, String encoding )
-        throws IOException
-    {
-        FileUtil.writeString( destFile, content, encoding );
-    }
-
-    /**
      * @return {@code true} if project is not a pom, {@code false} otherwise.
-     * @since 1.2.6
      */
     protected boolean hasClassPath()
     {
         return rejectPackaging( "pom" );
-    }
-
-    /**
-     * Test if a file exists and is newer than the pom file.
-     *
-     * @param f the file to test
-     * @return {@code true} if file exists and is newer than the pom file,
-     *         {@code false} otherwise.
-     */
-    protected boolean isFileNewerThanPomFile( File f )
-    {
-        File pomFile = getProject().getFile();
-        return f.exists() && f.lastModified() > pomFile.lastModified();
     }
 
 }

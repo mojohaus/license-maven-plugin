@@ -26,7 +26,6 @@
 package org.codehaus.mojo.license;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.maven.plugin.MojoFailureException;
 import org.codehaus.mojo.license.model.License;
 import org.codehaus.mojo.license.model.LicenseStore;
 
@@ -42,18 +41,6 @@ import java.util.Arrays;
 public abstract class AbstractLicenseNameMojo
     extends AbstractLicenseMojo
 {
-
-//    /**
-//     * Encoding used to read and writes files.
-//     * <p/>
-//     * <b>Note:</b> If nothing is filled here, we will use the system
-//     * property {@code file.encoding}.
-//     *
-//     * @parameter expression="${license.encoding}" default-value="${project.build.sourceEncoding}"
-//     * @required
-//     * @since 1.0
-//     */
-//    private String encoding;
 
     /**
      * To specify an external extra licenses repository resolver (says the base
@@ -81,7 +68,12 @@ public abstract class AbstractLicenseNameMojo
     private String licenseName;
 
     /**
-     * store of licenses
+     * License loaded from the {@link #licenseName}.
+     */
+    private License license;
+
+    /**
+     * Store of available licenses.
      */
     private LicenseStore licenseStore;
 
@@ -124,26 +116,13 @@ public abstract class AbstractLicenseNameMojo
         }
 
         // init licenses store
-        LicenseStore licenseStore = createLicenseStore( getLicenseResolver() );
-        setLicenseStore( licenseStore );
+        licenseStore = LicenseStore.createLicenseStore( getLog(), getLicenseResolver() );
 
         // check licenseName exists
-        checkLicense( licenseName );
+        license = getLicense( licenseName, true );
     }
 
-    public License getMainLicense()
-        throws IllegalArgumentException, IllegalStateException, MojoFailureException
-    {
-
-        // check license exists
-        checkLicense( licenseName );
-
-        // obtain license from his name
-        License mainLicense = getLicense( licenseName );
-        return mainLicense;
-    }
-
-    public License getLicense( String licenseName )
+    public License getLicense( String licenseName, boolean checkIfExists )
         throws IllegalArgumentException, IllegalStateException
     {
         if ( StringUtils.isEmpty( licenseName ) )
@@ -155,49 +134,14 @@ public abstract class AbstractLicenseNameMojo
         {
             throw new IllegalStateException( "No license store initialized!" );
         }
-        License mainLicense = licenseStore.getLicense( licenseName );
-        return mainLicense;
+        License license = licenseStore.getLicense( licenseName );
+        if ( checkIfExists && license == null )
+        {
+            throw new IllegalArgumentException( "License named '" + licenseName + "' is unknown, use one of " +
+                                                    Arrays.toString( licenseStore.getLicenseNames() ) );
+        }
+        return license;
     }
-
-    /**
-     * Check if the given license name is valid (not null, nor empty) and
-     * exists in the license store.
-     *
-     * @param licenseName the name of the license to check
-     * @throws IllegalArgumentException if license is not valid
-     * @throws IllegalStateException    if license store is not initialized
-     * @throws MojoFailureException     if license does not exist
-     * @since 1.0
-     */
-    protected void checkLicense( String licenseName )
-        throws IllegalArgumentException, IllegalStateException, MojoFailureException
-    {
-        if ( StringUtils.isEmpty( licenseName ) )
-        {
-            throw new IllegalArgumentException( "licenseName can not be null, nor empty" );
-        }
-        LicenseStore licenseStore = getLicenseStore();
-        if ( licenseStore == null )
-        {
-            throw new IllegalStateException( "No license store initialized!" );
-        }
-        License mainLicense = licenseStore.getLicense( licenseName );
-        if ( mainLicense == null )
-        {
-            throw new MojoFailureException( "License named '" + mainLicense + "' is unknown, use one of " +
-                                                Arrays.toString( licenseStore.getLicenseNames() ) );
-        }
-    }
-
-//    public final String getEncoding()
-//    {
-//        return encoding;
-//    }
-//
-//    public final void setEncoding( String encoding )
-//    {
-//        this.encoding = encoding;
-//    }
 
     public boolean isKeepBackup()
     {
@@ -217,6 +161,11 @@ public abstract class AbstractLicenseNameMojo
     public LicenseStore getLicenseStore()
     {
         return licenseStore;
+    }
+
+    public License getLicense()
+    {
+        return license;
     }
 
     public void setKeepBackup( boolean keepBackup )

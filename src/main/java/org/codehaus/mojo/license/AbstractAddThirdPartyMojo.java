@@ -399,7 +399,7 @@ public abstract class AbstractAddThirdPartyMojo
                 log.info( content );
             }
 
-            writeFile( target, content, getEncoding() );
+            FileUtil.writeString( target, content, getEncoding() );
         }
 
         if ( isDoGenerateBundle() )
@@ -408,7 +408,7 @@ public abstract class AbstractAddThirdPartyMojo
             // creates the bundled license file
             File bundleTarget = FileUtil.getFile( getOutputDirectory(), getBundleThirdPartyPath() );
             log.info( "Writing bundled third-party file to " + bundleTarget );
-            copyFile( target, bundleTarget );
+            FileUtil.copyFile( target, bundleTarget );
         }
     }
 

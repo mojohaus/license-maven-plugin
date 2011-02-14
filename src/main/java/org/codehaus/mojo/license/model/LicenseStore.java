@@ -25,8 +25,10 @@
 
 package org.codehaus.mojo.license.model;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.maven.plugin.MojoExecutionException;
 
 import java.io.IOException;
 import java.net.URL;
@@ -64,6 +66,38 @@ public class LicenseStore
      * flag to know if store was init
      */
     protected boolean init;
+
+    public static LicenseStore createLicenseStore( org.apache.maven.plugin.logging.Log log, String... extraResolver )
+        throws MojoExecutionException
+    {
+        LicenseStore store;
+        try
+        {
+            store = new LicenseStore();
+            store.addJarRepository();
+            if ( extraResolver != null )
+            {
+                for ( String s : extraResolver )
+                {
+                    if ( StringUtils.isNotEmpty( s ) )
+                    {
+                        log.info( "adding extra resolver " + s );
+                        store.addRepository( s );
+                    }
+                }
+            }
+            store.init();
+        }
+        catch ( IllegalArgumentException ex )
+        {
+            throw new MojoExecutionException( "could not obtain the license repository", ex );
+        }
+        catch ( IOException ex )
+        {
+            throw new MojoExecutionException( "could not obtain the license repository", ex );
+        }
+        return store;
+    }
 
     public void init()
         throws IOException

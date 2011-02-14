@@ -150,13 +150,13 @@ public class FileUtil
     }
 
     /**
-     * Permet de copier le fichier source vers le fichier cible.
+     * Copy a file to a given locationand logging.
      *
-     * @param source le fichier source
-     * @param target le fichier cible
-     * @throws IOException Erreur de copie
+     * @param source represents the file to copy.
+     * @param target file name of destination file.
+     * @throws IOException if could not copy file.
      */
-    public static void copy( File source, File target )
+    public static void copyFile( File source, File target )
         throws IOException
     {
         createDirectoryIfNecessary( target.getParentFile() );
@@ -171,6 +171,29 @@ public class FileUtil
             buffer.append( File.separator ).append( path );
         }
         return new File( base, buffer.substring( 1 ) );
+    }
+
+    /**
+     * @param file the source file
+     * @return the backup file
+     */
+    public static File getBackupFile( File file )
+    {
+        return new File( file.getAbsolutePath() + "~" );
+    }
+
+    /**
+     * Backups the given file using the {@link FileUtil#getBackupFile(File)} as
+     * destination file.
+     *
+     * @param f the file to backup
+     * @throws IOException if any pb while copying the file
+     */
+    public static void backupFile( File f )
+        throws IOException
+    {
+        File dst = FileUtil.getBackupFile( f );
+        copyFile( f, dst );
     }
 
     /**

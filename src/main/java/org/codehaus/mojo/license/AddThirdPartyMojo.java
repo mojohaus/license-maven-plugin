@@ -237,7 +237,7 @@ public class AddThirdPartyMojo
         LicenseMap licenseMap = getLicenseMap();
         File file = getMissingFile();
 
-        createDirectoryIfNecessary( file.getParentFile() );
+        FileUtil.createDirectoryIfNecessary( file.getParentFile() );
         log.info( "Regenerate missing license file " + file );
 
         FileOutputStream writer = new FileOutputStream( file );
