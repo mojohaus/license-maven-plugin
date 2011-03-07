@@ -51,6 +51,14 @@ public class ArtifactHelper
     public static final String INVALIDE_PATTERN_MESSAGE =
         "The pattern specified by expression <%s> seems to be invalid.";
 
+    /**
+     * Get the list of project dependencies after applying transitivity and filtering rules.
+     * 
+     * @param mojo
+     * @param log
+     * @param cache
+     * @return
+     */
     public static SortedMap<String, MavenProject> loadProjectDependencies( MavenProjectDependenciesLoader mojo, Log log,
                                                                            SortedMap<String, MavenProject> cache )
     {

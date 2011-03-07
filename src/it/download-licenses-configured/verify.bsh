@@ -3,15 +3,15 @@ import java.util.*;
 
 try
 {
-    File licenseFile = new File( basedir, "target/licenses/apache license 2.0 - license-2.0.txt" );
-    if ( !licenseFile.exists() || licenseFile.isDirectory() )
+    File licenseFile = new File( basedir, "target/generated-resources/licenses/apache license 2.0 - license-2.0.txt" );
+    if ( !licenseFile.isFile() )
     {
         System.err.println( "Could not find license file: " + licenseFile );
         return false;
     }
     
-    File summaryFile = new File( basedir, "target/licenses.xml" );
-    if ( !summaryFile.exists() || summaryFile.isDirectory() )
+    File summaryFile = new File( basedir, "target/generated-resources/licenses.xml" );
+    if ( !summaryFile.isFile() )
     {
         System.err.println( "Could not find license file: " + summaryFile );
         return false;

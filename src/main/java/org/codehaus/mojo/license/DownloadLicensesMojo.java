@@ -97,7 +97,7 @@ public class DownloadLicensesMojo
     /**
      * Input file containing a mapping between each dependency and it's license information.
      *
-     * @parameter default-value="${project.basedir}/src/licenses.xml"
+     * @parameter default-value="${project.basedir}/src/license/licenses.xml"
      * @since 1.0
      */
     private File licensesConfigFile;
@@ -105,7 +105,7 @@ public class DownloadLicensesMojo
     /**
      * The directory to which the dependency licenses should be written.
      *
-     * @parameter default-value="${project.build.directory}/licenses"
+     * @parameter default-value="${project.build.directory}/generated-resources/licenses"
      * @since 1.0
      */
     private File licensesOutputDirectory;
@@ -113,7 +113,7 @@ public class DownloadLicensesMojo
     /**
      * The output file containing a mapping between each dependency and it's license information.
      *
-     * @parameter default-value="${project.build.directory}/licenses.xml"
+     * @parameter default-value="${project.build.directory}/generated-resources/licenses.xml"
      * @since 1.0
      */
     private File licensesOutputFile;
@@ -148,39 +148,16 @@ public class DownloadLicensesMojo
     {
 
         initDirectories();
-//        if ( !licensesOutputDirectory.exists() )
-//        {
-//            licensesOutputDirectory.mkdirs();
-//        }
-//
-//        if ( !licensesOutputFile.getParentFile().exists() )
-//        {
-//            licensesOutputFile.getParentFile().mkdirs();
-//        }
 
         Map<String, ProjectLicenseInfo> configuredDepLicensesMap = new HashMap<String, ProjectLicenseInfo>();
 
         // License info from previous build
         loadLicenseInfo( configuredDepLicensesMap, licensesOutputFile, true );
 
-        // Manually configured license info
+        // Manually configured license info, loaded second to override previously loaded info
         loadLicenseInfo( configuredDepLicensesMap, licensesConfigFile, false );
 
         SortedMap<String, MavenProject> dependencies = ArtifactHelper.loadProjectDependencies( this, getLog(), null );
-
-//        // Get the list of project dependencies
-//        Set<Artifact> depArtifacts;
-//
-//        if ( includeTransitiveDependencies )
-//        {
-//            // All project dependencies
-//            depArtifacts = project.getArtifacts();
-//        }
-//        else
-//        {
-//            // Only direct project dependencies
-//            depArtifacts = project.getDependencyArtifacts();
-//        }
 
         // The resulting list of licenses after dependency resolution
         List<ProjectLicenseInfo> depProjectLicenses = new ArrayList<ProjectLicenseInfo>();
@@ -211,32 +188,6 @@ public class DownloadLicensesMojo
             downloadLicenses( depProject );
             depProjectLicenses.add( depProject );
         }
-
-//        for ( Artifact artifact : depArtifacts )
-//        {
-//            getLog().debug( "Checking licenses for project " + artifact );
-//            String artifactProjectId = getArtifactProjectId( artifact );
-//            ProjectLicenseInfo depProject = null;
-//            if ( configuredDepLicensesMap.containsKey( artifactProjectId ) )
-//            {
-//                depProject = configuredDepLicensesMap.get( artifactProjectId );
-//                depProject.setVersion( artifact.getVersion() );
-//            }
-//            else
-//            {
-//                try
-//                {
-//                    depProject = createDependencyProject( artifact );
-//                }
-//                catch ( ProjectBuildingException e )
-//                {
-//                    getLog().warn( "Unable to build project: " + artifact );
-//                    getLog().warn( e );
-//                }
-//            }
-//            downloadLicenses( depProject );
-//            depProjectLicenses.add( depProject );
-//        }
 
         try
         {
