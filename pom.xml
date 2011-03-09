@@ -284,14 +284,7 @@
     </pluginManagement>
   </build>
   
-  <profiles>
-    <profile>
-      <id>mojo-release</id>
-      <properties>
-        <gpg.keyname>Tony Chemit (codehaus)</gpg.keyname>
-      </properties>
-    </profile>
-    
+  <profiles>    
     <profile>
       <id>run-its</id>
       <activation>
