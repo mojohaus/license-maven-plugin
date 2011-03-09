@@ -28,13 +28,13 @@
   <artifactId>license-maven-plugin</artifactId>
   <packaging>maven-plugin</packaging>
   <name>License Maven Plugin</name>
-  <version>1.0-beta-1</version>
+  <version>1.0-SNAPSHOT</version>
   <description>Maven plugin to download and collect license files from project dependencies.</description>
 
   <scm>
-    <connection>scm:svn:http://svn.codehaus.org/mojo/tags/license-maven-plugin-1.0-beta-1</connection>
-    <developerConnection>scm:svn:https://svn.codehaus.org/mojo/tags/license-maven-plugin-1.0-beta-1</developerConnection>
-    <url>http://fisheye.codehaus.org/browse/mojo/tags/license-maven-plugin-1.0-beta-1</url>
+    <connection>scm:svn:http://svn.codehaus.org/mojo/trunk/mojo/license-maven-plugin</connection>
+    <developerConnection>scm:svn:https://svn.codehaus.org/mojo/trunk/mojo/license-maven-plugin</developerConnection>
+    <url>http://fisheye.codehaus.org/browse/mojo/trunk/mojo/license-maven-plugin</url>
   </scm>
 
   <issueManagement>
