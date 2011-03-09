@@ -286,13 +286,6 @@
   
   <profiles>
     <profile>
-      <id>mojo-release</id>
-      <properties>
-        <gpg.keyname>Tony Chemit (codehaus)</gpg.keyname>
-      </properties>
-    </profile>
-    
-    <profile>
       <id>run-its</id>
       <activation>
         <property>
