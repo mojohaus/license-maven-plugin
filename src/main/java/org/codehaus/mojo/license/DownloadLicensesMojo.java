@@ -127,6 +127,14 @@ public class DownloadLicensesMojo
     private boolean quiet;
 
     /**
+     * Show extra logging information.
+     * 
+     * @parameter default-value="false"
+     * @since 1.0
+     */
+    private boolean verbose;
+
+    /**
      * Include transitive dependencies when downloading license files.
      * 
      * @parameter default-value="true"
@@ -451,6 +459,6 @@ public class DownloadLicensesMojo
 
     public boolean isVerbose()
     {
-        return !quiet;
+        return verbose;
     }
 }
