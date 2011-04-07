@@ -44,7 +44,7 @@ public class ProjectLicenseInfo
 
     private String version;
 
-    private List<License> licenses;
+    private List<License> licenses = new ArrayList<License>();
 
     private String licenseResolutionResult;
 
@@ -115,10 +115,6 @@ public class ProjectLicenseInfo
 
     public void addLicense( License license )
     {
-        if ( licenses == null )
-        {
-            licenses = new ArrayList<License>();
-        }
         licenses.add( license );
     }
 

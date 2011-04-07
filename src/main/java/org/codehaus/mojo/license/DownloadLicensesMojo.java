@@ -152,10 +152,16 @@ public class DownloadLicensesMojo
         Map<String, ProjectLicenseInfo> configuredDepLicensesMap = new HashMap<String, ProjectLicenseInfo>();
 
         // License info from previous build
-        loadLicenseInfo( configuredDepLicensesMap, licensesOutputFile, true );
+        if ( licensesOutputFile.exists() )
+        {
+            loadLicenseInfo( configuredDepLicensesMap, licensesOutputFile, true );
+        }
 
         // Manually configured license info, loaded second to override previously loaded info
-        loadLicenseInfo( configuredDepLicensesMap, licensesConfigFile, false );
+        if ( licensesConfigFile.exists() )
+        {
+            loadLicenseInfo( configuredDepLicensesMap, licensesConfigFile, false );
+        }
 
         SortedMap<String, MavenProject> dependencies = ArtifactHelper.loadProjectDependencies( this, getLog(), null );
 
@@ -228,35 +234,31 @@ public class DownloadLicensesMojo
                                   boolean previouslyDownloaded )
         throws MojoExecutionException
     {
-        // Check if we have already downloaded the licenses in a previous build
-        if ( licenseConfigFile.exists() )
+        FileInputStream fis = null;
+        try
         {
-            FileInputStream fis = null;
-            try
+            fis = new FileInputStream( licenseConfigFile );
+            List<ProjectLicenseInfo> licensesList = LicenseSummaryReader.parseLicenseSummary( fis );
+            for ( ProjectLicenseInfo dep : licensesList )
             {
-                fis = new FileInputStream( licenseConfigFile );
-                List<ProjectLicenseInfo> licensesList = LicenseSummaryReader.parseLicenseSummary( fis );
-                for ( ProjectLicenseInfo dep : licensesList )
+                configuredDepLicensesMap.put( dep.getId(), dep );
+                if ( previouslyDownloaded )
                 {
-                    configuredDepLicensesMap.put( dep.getId(), dep );
-                    if ( previouslyDownloaded )
+                    for ( License license : dep.getLicenses() )
                     {
-                        for ( License license : dep.getLicenses() )
-                        {
-                            downloadedLicenseURLs.add( license.getUrl() );
-                        }
+                        // Save the URL so we don't download it again
+                        downloadedLicenseURLs.add( license.getUrl() );
                     }
                 }
             }
-            catch ( Exception e )
-            {
-                throw new MojoExecutionException( "Unable to parse license summary output file: " + licenseConfigFile,
-                                                  e );
-            }
-            finally
-            {
-                FileUtil.tryClose( fis );
-            }
+        }
+        catch ( Exception e )
+        {
+            throw new MojoExecutionException( "Unable to parse license summary output file: " + licenseConfigFile, e );
+        }
+        finally
+        {
+            FileUtil.tryClose( fis );
         }
     }
 
