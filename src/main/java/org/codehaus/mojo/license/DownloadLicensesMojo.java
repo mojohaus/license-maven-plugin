@@ -96,24 +96,24 @@ public class DownloadLicensesMojo
 
     /**
      * Input file containing a mapping between each dependency and it's license information.
-     * 
-     * @parameter default-value="${project.basedir}/src/license/licenses.xml"
+     *
+     * @parameter default-value="${project.basedir}/src/license/licenses.xml" expression="${licensesConfigFile}"
      * @since 1.0
      */
     private File licensesConfigFile;
 
     /**
      * The directory to which the dependency licenses should be written.
-     * 
-     * @parameter default-value="${project.build.directory}/generated-resources/licenses"
+     *
+     * @parameter default-value="${project.build.directory}/generated-resources/licenses" expression="${licensesOutputDirectory}
      * @since 1.0
      */
     private File licensesOutputDirectory;
 
     /**
      * The output file containing a mapping between each dependency and it's license information.
-     * 
-     * @parameter default-value="${project.build.directory}/generated-resources/licenses.xml"
+     *
+     * @parameter default-value="${project.build.directory}/generated-resources/licenses.xml" expression="${licensesOutputFile}
      * @since 1.0
      */
     private File licensesOutputFile;
