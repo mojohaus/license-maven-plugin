@@ -132,4 +132,27 @@ assert content.contains('# #%L');
 assert !content.contains('# # \n');
 assert content.contains('$Id');
 
+file = new File(basedir, 'child1/src/files/jsp/test.jsp');
+assert file.exists();
+
+content = file.text;
+assert content.contains('<%--');
+assert content.contains('--%>');
+assert content.contains('Copyright (C)');
+assert content.contains('#%L');
+assert content.contains('#L%');
+assert content.contains('$Id');
+
+
+file = new File(basedir, 'child1/src/files/jsp/test2.jsp');
+assert file.exists();
+
+content = file.text;
+assert content.contains('<%--');
+assert content.contains('--%>');
+assert content.contains('Copyright (C)');
+assert content.contains('#%L');
+assert content.contains('#L%');
+assert content.contains('$Id');
+
 return true;
