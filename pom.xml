@@ -80,10 +80,10 @@
       <version>${mavenVersion}</version>
       <exclusions>
 
-        <exclusion>
+        <!--exclusion>
           <groupId>org.codehaus.plexus</groupId>
           <artifactId>plexus-container-default</artifactId>
-        </exclusion>
+        </exclusion-->
          <exclusion>
           <groupId>org.apache.maven.wagon</groupId>
           <artifactId>wagon-provider-api</artifactId>
@@ -92,11 +92,11 @@
       </exclusions>
     </dependency>
 
-    <dependency>
+    <!--dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-inject-plexus</artifactId>
       <version>1.4.2</version>
-    </dependency>
+    </dependency-->
 
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -155,10 +155,10 @@
           <groupId>org.codehaus.plexus</groupId>
           <artifactId>plexus-interactivity-api</artifactId>
         </exclusion>
-        <exclusion>
+        <!--exclusion>
           <groupId>org.codehaus.plexus</groupId>
           <artifactId>plexus-container-default</artifactId>
-        </exclusion>
+        </exclusion-->
         <exclusion>
           <groupId>org.slf4j</groupId>
           <artifactId>slf4j-jdk14</artifactId>
@@ -233,6 +233,18 @@
           <execution>
             <goals>
               <goal>generate-metadata</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>create-component-descriptor</id>
+            <goals>
+              <goal>descriptor</goal>
             </goals>
           </execution>
         </executions>
