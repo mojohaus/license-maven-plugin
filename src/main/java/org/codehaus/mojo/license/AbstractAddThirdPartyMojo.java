@@ -186,6 +186,8 @@ public abstract class AbstractAddThirdPartyMojo
      */
     protected boolean includeTransitiveDependencies;
 
+    private SortedMap<String, MavenProject> projectDependencies;
+
     private LicenseMap licenseMap;
 
     private SortedSet<MavenProject> unsafeDependencies;
@@ -214,7 +216,7 @@ public abstract class AbstractAddThirdPartyMojo
     protected abstract SortedMap<String, MavenProject> loadDependencies();
 
     protected abstract SortedProperties createUnsafeMapping()
-        throws ProjectBuildingException, IOException;
+        throws ProjectBuildingException, IOException, ThirdPartyToolException;
 
     @Override
     protected void init()
@@ -262,11 +264,13 @@ public abstract class AbstractAddThirdPartyMojo
             setDoGenerateBundle( false );
         }
 
-        SortedMap<String, MavenProject> projectDependencies = loadDependencies();
+        projectDependencies = loadDependencies();
 
         licenseMap = createLicenseMap( projectDependencies );
 
-        unsafeDependencies = licenseMap.getUnsafeDependencies();
+        SortedSet<MavenProject> unsafeDependencies = licenseMap.getUnsafeDependencies();
+        
+        setUnsafeDependencies( unsafeDependencies );
 
         if ( !CollectionUtils.isEmpty( unsafeDependencies ) && isUseMissingFile() && isDoGenerate() )
         {
@@ -447,9 +451,19 @@ public abstract class AbstractAddThirdPartyMojo
         return failIfWarning;
     }
 
+    public SortedMap<String, MavenProject> getProjectDependencies()
+    {
+        return projectDependencies;
+    }
+
     public SortedSet<MavenProject> getUnsafeDependencies()
     {
         return unsafeDependencies;
+    }
+
+    public void setUnsafeDependencies( SortedSet<MavenProject> unsafeDependencies )
+    {
+        this.unsafeDependencies = unsafeDependencies;
     }
 
     public File getThirdPartyFile()

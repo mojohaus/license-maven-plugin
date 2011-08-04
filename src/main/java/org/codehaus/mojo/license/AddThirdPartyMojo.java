@@ -26,6 +26,7 @@
 package org.codehaus.mojo.license;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.MojoFailureException;
@@ -83,6 +84,22 @@ public class AddThirdPartyMojo
     protected List<?> remoteRepositories;
 
     /**
+     * Deploy the third party missing file in maven repository.
+     *
+     * @parameter expression="${license.deployMissingFile}"  default-value="true"
+     * @since 1.0
+     */
+    protected boolean deployMissingFile;
+
+    /**
+     * Load from repositories third party missing files.
+     *
+     * @parameter expression="${license.useRepositoryMissingFiles}"  default-value="true"
+     * @since 1.0
+     */
+    protected boolean useRepositoryMissingFiles;
+
+    /**
      * Maven Project Builder component.
      *
      * @component
@@ -92,7 +109,18 @@ public class AddThirdPartyMojo
      */
     protected MavenProjectBuilder mavenProjectBuilder;
 
+    /**
+     * third party tool.
+     *
+     * @component
+     * @readonly
+     * @since 1.0
+     */
+    private ThirdPartyTool thridPartyTool;
+
     private boolean doGenerateMissing;
+
+    private Properties oldMissingFileContent;
 
     @Override
     protected boolean checkPackaging()
@@ -108,7 +136,7 @@ public class AddThirdPartyMojo
 
     @Override
     protected SortedProperties createUnsafeMapping()
-        throws ProjectBuildingException, IOException
+        throws ProjectBuildingException, IOException, ThirdPartyToolException
     {
 
         SortedProperties unsafeMappings =
@@ -116,6 +144,31 @@ public class AddThirdPartyMojo
 
         SortedSet<MavenProject> unsafeDependencies = getUnsafeDependencies();
 
+        if ( CollectionUtils.isNotEmpty( unsafeDependencies ) )
+        {
+
+            // there is some unresolved license
+
+            if ( isUseRepositoryMissingFiles() )
+            {
+
+                // try to load missing third party files from dependencies
+
+                Collection<MavenProject> projects = new ArrayList<MavenProject>( getProjectDependencies().values() );
+                projects.remove( getProject() );
+                projects.removeAll( unsafeDependencies );
+
+                SortedProperties resolvedUnsafeMapping =
+                    thridPartyTool.loadThirdPartyDescriptorsForUnsafeMapping( getProject(), getEncoding(), projects,
+                                                                              unsafeDependencies, getLicenseMap(),
+                                                                              getLocalRepository(),
+                                                                              (List<ArtifactRepository>) getRemoteRepositories() );
+
+                // push back resolved unsafe mappings
+                unsafeMappings.putAll( resolvedUnsafeMapping );
+
+            }
+        }
         if ( isVerbose() )
         {
             getLog().info( "found " + unsafeMappings.size() + " unsafe mappings" );
@@ -172,7 +225,7 @@ public class AddThirdPartyMojo
         if ( isForce() )
         {
 
-            // the mapping fro missing file is not empty, regenerate it
+            // the mapping for missing file is not empty, regenerate it
             return !CollectionUtils.isEmpty( unsafeMappings.keySet() );
         }
         else
@@ -224,6 +277,16 @@ public class AddThirdPartyMojo
         {
             throw new MojoFailureException(
                 "There is some dependencies with no license, please fill the file " + getMissingFile() );
+        }
+
+        if ( !unsafe && isDeployMissingFile() && MapUtils.isNotEmpty( getUnsafeMappings() ) )
+        {
+
+            // can deploy missing file
+            File file = getMissingFile();
+
+            getLog().info( "Will deploy third party file from " + file );
+            thridPartyTool.deployThirdPartyDescriptor( getProject(), file );
         }
 
         addResourceDir( getOutputDirectory(), "**/*.txt" );
@@ -298,5 +361,20 @@ public class AddThirdPartyMojo
     public List<String> getExcludeScopes()
     {
         return Arrays.asList( Artifact.SCOPE_SYSTEM );
+    }
+
+    public boolean isDeployMissingFile()
+    {
+        return deployMissingFile;
+    }
+
+    public boolean isUseRepositoryMissingFiles()
+    {
+        return useRepositoryMissingFiles;
+    }
+
+    public ThirdPartyTool getThridPartyTool()
+    {
+        return thridPartyTool;
     }
 }

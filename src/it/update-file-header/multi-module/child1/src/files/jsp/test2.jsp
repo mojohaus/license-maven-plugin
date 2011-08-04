@@ -2,8 +2,8 @@
   #%L
   License Test :: update-file-header
 
-  $Id: test2.jsp 13519 2011-02-05 09:32:50Z tchemit $
-  $HeadURL: https://svn.codehaus.org/mojo/trunk/mojo/license-maven-plugin/src/it/update-file-header/multi-module/child1/src/files/jsp/test2.jsp $
+  $Id$
+  $HeadURL$
   %%
   Copyright (C) 2012 License Test
   %%
