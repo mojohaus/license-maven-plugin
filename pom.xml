@@ -78,25 +78,7 @@
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-project</artifactId>
       <version>${mavenVersion}</version>
-      <exclusions>
-
-        <!--exclusion>
-          <groupId>org.codehaus.plexus</groupId>
-          <artifactId>plexus-container-default</artifactId>
-        </exclusion-->
-         <exclusion>
-          <groupId>org.apache.maven.wagon</groupId>
-          <artifactId>wagon-provider-api</artifactId>
-        </exclusion>
-
-      </exclusions>
     </dependency>
-
-    <!--dependency>
-      <groupId>org.sonatype.sisu</groupId>
-      <artifactId>sisu-inject-plexus</artifactId>
-      <version>1.4.2</version>
-    </dependency-->
 
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -116,54 +98,6 @@
       <exclusions>
 
         <exclusion>
-          <groupId>org.apache.maven.reporting</groupId>
-          <artifactId>maven-reporting-api</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.maven</groupId>
-          <artifactId>maven-monitor</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.maven.wagon</groupId>
-          <artifactId>wagon-file</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.maven.wagon</groupId>
-          <artifactId>wagon-webdav-jackrabbit</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.maven.wagon</groupId>
-          <artifactId>wagon-http</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.maven.wagon</groupId>
-          <artifactId>wagon-http-lightweight</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.maven.wagon</groupId>
-          <artifactId>wagon-ssh</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.maven.wagon</groupId>
-          <artifactId>wagon-ssh-external</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.sonatype.plexus</groupId>
-          <artifactId>plexus-sec-dispatcher</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.codehaus.plexus</groupId>
-          <artifactId>plexus-interactivity-api</artifactId>
-        </exclusion>
-        <!--exclusion>
-          <groupId>org.codehaus.plexus</groupId>
-          <artifactId>plexus-container-default</artifactId>
-        </exclusion-->
-        <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-jdk14</artifactId>
-        </exclusion>
-        <exclusion>
           <groupId>org.slf4j</groupId>
           <artifactId>jcl-over-slf4j</artifactId>
         </exclusion>
@@ -180,6 +114,13 @@
       <artifactId>plexus-utils</artifactId>
       <version>1.5.15</version>
       <scope>compile</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-container-default</artifactId>
+      <version>1.0-alpha-9-stable-1</version>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
