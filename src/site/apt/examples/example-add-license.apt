@@ -31,7 +31,7 @@ Add a license not present in license-maven-plugin
 
 * Create the license files
 
-  * src/licence/my_licence/header.txt
+  * src/license/my_license/header.txt
 
     Example for GPLv3 :
 
@@ -53,7 +53,7 @@ License along with this program.  If not, see
 
 -------------------------------------------------------------------------------
 
-  * src/licence/my_licence/license.txt
+  * src/license/my_license/license.txt
 
   Example for GPLv3 :
 
@@ -86,11 +86,11 @@ Public License instead of this License.  But first, please read
 * Declare the new license
 
   The new license(s) must be declared in the file :
-  src/licence/licenses.properties. One license per line like :
+  src/license/licenses.properties. One license per line like :
 
 -------------------------------------------------------------------------------
 
-    my_licence=My license
+    my_license=My license
     
 -------------------------------------------------------------------------------
 
@@ -105,7 +105,7 @@ Public License instead of this License.  But first, please read
     <groupId>org.codehaus.mojo</groupId>
     <artifactId>license-maven-plugin</artifactId>
     <configuration>
-        <licenseName>my_licence</licenseName>
+        <licenseName>my_license</licenseName>
         <licenseResolver>file://${basedir}/src/license</licenseResolver>
     </configuration>
     <executions>
@@ -126,7 +126,7 @@ Public License instead of this License.  But first, please read
 -------------------------------------------------------------------------------
 
 <properties>
-    <license.licenseName>my_licence</license.licenseName>
+    <license.licenseName>my_license</license.licenseName>
     <license.licenseResolver>file://${basedir}/src/license</license.licenseResolver>
 </properties>
 
