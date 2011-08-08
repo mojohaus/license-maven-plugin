@@ -228,22 +228,28 @@ public class AddThirdPartyMojo
             // the mapping for missing file is not empty, regenerate it
             return !CollectionUtils.isEmpty( unsafeMappings.keySet() );
         }
-        else
+
+        if ( !CollectionUtils.isEmpty( unsafeDependencies ) )
         {
 
-            if ( !CollectionUtils.isEmpty( unsafeDependencies ) )
-            {
-
-                // there is some unsafe dependencies from the project, must
-                // regenerate missing file
-                return true;
-            }
-
-            // check if the missing file has changed
-            SortedProperties oldUnsafeMappings = new SortedProperties( getEncoding() );
-            oldUnsafeMappings.load( getMissingFile() );
-            return !unsafeMappings.equals( oldUnsafeMappings );
+            // there is some unsafe dependencies from the project, must
+            // regenerate missing file
+            return true;
         }
+
+        File missingFile = getMissingFile();
+        
+        if (!missingFile.exists()) {
+
+            // the missing file does not exists, this happens when
+            // using remote missing file from dependencies
+            return true;
+        }
+
+        // check if the missing file has changed
+        SortedProperties oldUnsafeMappings = new SortedProperties( getEncoding() );
+        oldUnsafeMappings.load( missingFile );
+        return !unsafeMappings.equals( oldUnsafeMappings );
     }
 
     @Override
