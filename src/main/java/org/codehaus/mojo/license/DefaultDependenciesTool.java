@@ -1,23 +1,23 @@
 /*
  * #%L
  * License Maven Plugin
- * 
+ *
  * $Id$
  * $HeadURL$
  * %%
- * Copyright (C) 2008 - 2010 CodeLutin, Codehaus, Tony Chemit
+ * Copyright (C) 2011 CodeLutin, Codehaus, Tony Chemit
  * %%
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as 
- * published by the Free Software Foundation, either version 3 of the 
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
- * You should have received a copy of the GNU General Lesser Public 
+ *
+ * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
@@ -27,47 +27,58 @@ package org.codehaus.mojo.license;
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
+import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.logging.Logger;
 
-import java.util.*;
+import java.util.List;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 /**
- * A helper for artifacts.
+ * Default implementation of the {@link DependenciesTool}.
  *
  * @author tchemit <chemit@codelutin.com>
+ * @version $Id$
+ * @plexus.component role="org.codehaus.mojo.license.DependenciesTool" role-hint="default"
  * @since 1.0
  */
-public class ArtifactHelper
+public class DefaultDependenciesTool
+    extends AbstractLogEnabled
+    implements DependenciesTool
 {
 
-    protected static Comparator<MavenProject> projectComparator;
-
-    public static final String INVALIDE_PATTERN_MESSAGE =
+    public static final String INVALID_PATTERN_MESSAGE =
         "The pattern specified by expression <%s> seems to be invalid.";
 
     /**
-     * Get the list of project dependencies after applying transitivity and filtering rules.
-     * 
-     * @param mojo
-     * @param log
-     * @param cache
-     * @return
+     * Project builder.
+     *
+     * @plexus.requirement
      */
-    public static SortedMap<String, MavenProject> loadProjectDependencies( MavenProjectDependenciesLoader mojo, Log log,
-                                                                           SortedMap<String, MavenProject> cache )
+    private MavenProjectBuilder mavenProjectBuilder;
+
+    /**
+     * {@inheritDoc}
+     */
+    public SortedMap<String, MavenProject> loadProjectDependencies( MavenProject project,
+                                                                    MavenProjectDependenciesConfigurator configuration,
+                                                                    ArtifactRepository localRepository,
+                                                                    List<ArtifactRepository> remoteRepositories,
+                                                                    SortedMap<String, MavenProject> cache )
     {
 
-        boolean haveNoIncludedGroups = StringUtils.isEmpty( mojo.getIncludedGroups() );
-        boolean haveNoIncludedArtifacts = StringUtils.isEmpty( mojo.getIncludedArtifacts() );
+        boolean haveNoIncludedGroups = StringUtils.isEmpty( configuration.getIncludedGroups() );
+        boolean haveNoIncludedArtifacts = StringUtils.isEmpty( configuration.getIncludedArtifacts() );
 
-        boolean haveExcludedGroups = StringUtils.isNotEmpty( mojo.getExcludedGroups() );
-        boolean haveExcludedArtifacts = StringUtils.isNotEmpty( mojo.getExcludedArtifacts() );
+        boolean haveExcludedGroups = StringUtils.isNotEmpty( configuration.getExcludedGroups() );
+        boolean haveExcludedArtifacts = StringUtils.isNotEmpty( configuration.getExcludedArtifacts() );
         boolean haveExclusions = haveExcludedGroups || haveExcludedArtifacts;
 
         Pattern includedGroupPattern = null;
@@ -77,26 +88,24 @@ public class ArtifactHelper
 
         if ( !haveNoIncludedGroups )
         {
-            includedGroupPattern = Pattern.compile( mojo.getIncludedGroups() );
+            includedGroupPattern = Pattern.compile( configuration.getIncludedGroups() );
         }
         if ( !haveNoIncludedArtifacts )
         {
-            includedArtifactPattern = Pattern.compile( mojo.getIncludedArtifacts() );
+            includedArtifactPattern = Pattern.compile( configuration.getIncludedArtifacts() );
         }
         if ( haveExcludedGroups )
         {
-            excludedGroupPattern = Pattern.compile( mojo.getExcludedGroups() );
+            excludedGroupPattern = Pattern.compile( configuration.getExcludedGroups() );
         }
         if ( haveExcludedArtifacts )
         {
-            excludedArtifactPattern = Pattern.compile( mojo.getExcludedArtifacts() );
+            excludedArtifactPattern = Pattern.compile( configuration.getExcludedArtifacts() );
         }
-
-        MavenProject project = mojo.getProject();
 
         Set<?> depArtifacts;
 
-        if ( mojo.isIncludeTransitiveDependencies() )
+        if ( configuration.isIncludeTransitiveDependencies() )
         {
             // All project dependencies
             depArtifacts = project.getArtifacts();
@@ -107,13 +116,9 @@ public class ArtifactHelper
             depArtifacts = project.getDependencyArtifacts();
         }
 
-        ArtifactRepository localRepository = mojo.getLocalRepository();
-        List remoteRepositories = mojo.getRemoteRepositories();
-        MavenProjectBuilder projectBuilder = mojo.getMavenProjectBuilder();
+        List<String> excludeScopes = configuration.getExcludeScopes();
 
-        List<String> excludeScopes = mojo.getExcludeScopes();
-
-        boolean verbose = mojo.isVerbose();
+        boolean verbose = configuration.isVerbose();
 
         SortedMap<String, MavenProject> result = new TreeMap<String, MavenProject>();
 
@@ -129,7 +134,9 @@ public class ArtifactHelper
                 continue;
             }
 
-            String id = getArtifactId( artifact );
+            Logger log = getLogger();
+
+            String id = MojoHelper.getArtifactId( artifact );
 
             if ( verbose )
             {
@@ -139,11 +146,11 @@ public class ArtifactHelper
             // Check if the project should be included
             // If there is no specified artifacts and group to include, include all
             boolean isToInclude = haveNoIncludedArtifacts && haveNoIncludedGroups ||
-                isIncludable( log, artifact, includedGroupPattern, includedArtifactPattern );
+                isIncludable( artifact, includedGroupPattern, includedArtifactPattern );
 
             // Check if the project should be excluded
             boolean isToExclude = isToInclude && haveExclusions &&
-                isExcludable( log, artifact, excludedGroupPattern, excludedArtifactPattern );
+                isExcludable( artifact, excludedGroupPattern, excludedArtifactPattern );
 
             if ( !isToInclude || isToExclude )
             {
@@ -178,13 +185,21 @@ public class ArtifactHelper
                 try
                 {
                     depMavenProject =
-                        projectBuilder.buildFromRepository( artifact, remoteRepositories, localRepository, true );
+                        mavenProjectBuilder.buildFromRepository( artifact, remoteRepositories, localRepository, true );
                 }
                 catch ( ProjectBuildingException e )
                 {
-                    log.warn( "Unable to obtain POM for artifact : " + artifact );
-                    log.warn( e );
+                    log.warn( "Unable to obtain POM for artifact : " + artifact, e );
                     continue;
+                }
+
+                String id2 = MojoHelper.getArtifactId( depMavenProject.getArtifact() );
+
+                if ( !id.equals( id2 ) )
+                {
+
+                    // once project loaded id has changed (probably packaging is no more jar)
+                    id = id2;
                 }
 
                 if ( verbose )
@@ -206,76 +221,10 @@ public class ArtifactHelper
         return result;
     }
 
-    public static String getArtifactId( Artifact artifact )
+    protected boolean isIncludable( Artifact project, Pattern includedGroupPattern, Pattern includedArtifactPattern )
     {
-        StringBuilder sb = new StringBuilder();
-        sb.append( artifact.getGroupId() );
-        sb.append( "--" );
-        sb.append( artifact.getArtifactId() );
-        sb.append( "--" );
-        sb.append( artifact.getVersion() );
-        String type = artifact.getType();
-        if ( !StringUtils.isEmpty( type ) && !"pom".equals( type ) )
-        {
-            sb.append( "--" );
-            sb.append( artifact.getType() );
-        }
-        if ( !StringUtils.isEmpty( artifact.getClassifier() ) )
-        {
-            sb.append( "--" );
-            sb.append( artifact.getClassifier() );
-        }
-        return sb.toString();
-    }
 
-    public static String getArtifactName( MavenProject project )
-    {
-        StringBuilder sb = new StringBuilder();
-        if ( project.getName().startsWith( "Unnamed -" ) )
-        {
-
-            // as in Maven 3, let's use the artifact id
-            sb.append( project.getArtifactId() );
-        }
-        else
-        {
-            sb.append( project.getName() );
-        }
-        sb.append( " (" );
-        sb.append( project.getGroupId() );
-        sb.append( ":" );
-        sb.append( project.getArtifactId() );
-        sb.append( ":" );
-        sb.append( project.getVersion() );
-        sb.append( " - " );
-        String url = project.getUrl();
-        sb.append( url == null ? "no url defined" : url );
-        sb.append( ")" );
-
-        return sb.toString();
-    }
-
-    public static Comparator<MavenProject> getProjectComparator()
-    {
-        if ( projectComparator == null )
-        {
-            projectComparator = new Comparator<MavenProject>()
-            {
-                public int compare( MavenProject o1, MavenProject o2 )
-                {
-
-                    String id1 = getArtifactId( o1.getArtifact() );
-                    String id2 = getArtifactId( o2.getArtifact() );
-                    return id1.compareTo( id2 );
-                }
-            };
-        }
-        return projectComparator;
-    }
-
-    protected static boolean isIncludable( Log log, Artifact project, Pattern includedGroupPattern,
-                                           Pattern includedArtifactPattern )
-    {
+        Logger log = getLogger();
 
         // check if the groupId of the project should be included
         if ( includedGroupPattern != null )
@@ -295,7 +244,7 @@ public class ArtifactHelper
             }
             catch ( PatternSyntaxException e )
             {
-                log.warn( String.format( INVALIDE_PATTERN_MESSAGE, includedGroupPattern.pattern() ) );
+                log.warn( String.format( INVALID_PATTERN_MESSAGE, includedGroupPattern.pattern() ) );
             }
         }
 
@@ -317,16 +266,17 @@ public class ArtifactHelper
             }
             catch ( PatternSyntaxException e )
             {
-                log.warn( String.format( INVALIDE_PATTERN_MESSAGE, includedArtifactPattern.pattern() ) );
+                log.warn( String.format( INVALID_PATTERN_MESSAGE, includedArtifactPattern.pattern() ) );
             }
         }
 
         return false;
     }
 
-    protected static boolean isExcludable( Log log, Artifact project, Pattern excludedGroupPattern,
-                                           Pattern excludedArtifactPattern )
+    protected boolean isExcludable( Artifact project, Pattern excludedGroupPattern, Pattern excludedArtifactPattern )
     {
+
+        Logger log = getLogger();
 
         // check if the groupId of the project should be included
         if ( excludedGroupPattern != null )
@@ -346,7 +296,7 @@ public class ArtifactHelper
             }
             catch ( PatternSyntaxException e )
             {
-                log.warn( String.format( INVALIDE_PATTERN_MESSAGE, excludedGroupPattern.pattern() ) );
+                log.warn( String.format( INVALID_PATTERN_MESSAGE, excludedGroupPattern.pattern() ) );
             }
         }
 
@@ -368,7 +318,7 @@ public class ArtifactHelper
             }
             catch ( PatternSyntaxException e )
             {
-                log.warn( String.format( INVALIDE_PATTERN_MESSAGE, excludedArtifactPattern.pattern() ) );
+                log.warn( String.format( INVALID_PATTERN_MESSAGE, excludedArtifactPattern.pattern() ) );
             }
         }
 

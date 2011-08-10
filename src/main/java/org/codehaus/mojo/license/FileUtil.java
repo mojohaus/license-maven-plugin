@@ -111,6 +111,22 @@ public class FileUtil
         return false;
     }
 
+    public static boolean createNewFile( File file )
+        throws IOException
+    {
+        createDirectoryIfNecessary( file.getParentFile() );
+        if ( !file.exists() )
+        {
+            boolean b = file.createNewFile();
+            if ( !b )
+            {
+                throw new IOException( "Could not create new file " + file );
+            }
+            return true;
+        }
+        return false;
+    }
+
     /**
      * Delete the given file.
      *

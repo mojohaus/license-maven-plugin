@@ -36,7 +36,9 @@ import org.apache.maven.model.License;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.MavenProjectHelper;
+import org.codehaus.mojo.license.model.LicenseMap;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -53,6 +55,9 @@ public class DefaultThirdPartyTool
     extends AbstractLogEnabled
     implements ThirdPartyTool
 {
+    public static final String DESCRIPTOR_CLASSIFIER = "third-party";
+
+    public static final String DESCRIPTOR_TYPE = "properties";
 
     // ----------------------------------------------------------------------
     // Components
@@ -77,7 +82,7 @@ public class DefaultThirdPartyTool
      *
      * @plexus.requirement
      */
-    protected MavenProjectBuilder mavenProjectBuilder;
+    private MavenProjectBuilder mavenProjectBuilder;
 
     /**
      * Maven ProjectHelper.
@@ -87,20 +92,60 @@ public class DefaultThirdPartyTool
     private MavenProjectHelper projectHelper;
 
     /**
+     * Maven project comparator.
+     */
+    private final Comparator<MavenProject> projectComparator = MojoHelper.newMavenProjectComparator();
+
+    /**
      * {@inheritDoc}
      */
-    public void deployThirdPartyDescriptor( MavenProject project, File file )
+    public void attachThirdPartyDescriptor( MavenProject project, File file )
     {
 
-        projectHelper.attachArtifact( project, "properties", "third-party", file );
+        projectHelper.attachArtifact( project, DESCRIPTOR_TYPE, DESCRIPTOR_CLASSIFIER, file );
     }
 
-    public SortedProperties loadThirdPartyDescriptorsForUnsafeMapping( MavenProject project, String encoding,
-                                                           Collection<MavenProject> projects,
-                                                           SortedSet<MavenProject> unsafeDependencies,
-                                                           LicenseMap licenseMap,
-                                                           ArtifactRepository localRepository,
-                                                           List<ArtifactRepository> repositories )
+    /**
+     * {@inheritDoc}
+     */
+    public SortedSet<MavenProject> getProjectsWithNoLicense( LicenseMap licenseMap, boolean doLog )
+    {
+
+        Logger log = getLogger();
+
+        // get unsafe dependencies (says with no license)
+        SortedSet<MavenProject> unsafeDependencies = licenseMap.get( LicenseMap.getUnknownLicenseMessage() );
+
+        if ( doLog )
+        {
+            if ( CollectionUtils.isEmpty( unsafeDependencies ) )
+            {
+                log.debug( "There is no dependency with no license from poms." );
+            }
+            else
+            {
+                log.debug( "There is " + unsafeDependencies.size() + " dependencies with no license from poms : " );
+                for ( MavenProject dep : unsafeDependencies )
+                {
+
+                    // no license found for the dependency
+                    log.debug( " - " + MojoHelper.getArtifactId( dep.getArtifact() ) );
+                }
+            }
+        }
+
+        return unsafeDependencies;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public SortedProperties loadThirdPartyDescriptorsForUnsafeMapping( String encoding,
+                                                                       Collection<MavenProject> projects,
+                                                                       SortedSet<MavenProject> unsafeDependencies,
+                                                                       LicenseMap licenseMap,
+                                                                       ArtifactRepository localRepository,
+                                                                       List<ArtifactRepository> remoteRepositories )
         throws ThirdPartyToolException, IOException
     {
 
@@ -108,7 +153,7 @@ public class DefaultThirdPartyTool
         Map<String, MavenProject> unsafeProjects = new HashMap<String, MavenProject>();
         for ( MavenProject unsafeDependency : unsafeDependencies )
         {
-            String id = ArtifactHelper.getArtifactId( unsafeDependency.getArtifact() );
+            String id = MojoHelper.getArtifactId( unsafeDependency.getArtifact() );
             unsafeProjects.put( id, unsafeDependency );
         }
 
@@ -122,7 +167,7 @@ public class DefaultThirdPartyTool
                 break;
             }
 
-            File thirdPartyDescriptor = getThirdPartyDescriptor( mavenProject, localRepository, repositories );
+            File thirdPartyDescriptor = resolvThirdPartyDescriptor( mavenProject, localRepository, remoteRepositories );
 
             if ( thirdPartyDescriptor != null && thirdPartyDescriptor.exists() && thirdPartyDescriptor.length() > 0 )
             {
@@ -131,8 +176,8 @@ public class DefaultThirdPartyTool
                 {
                     getLogger().info( "Detects third party descriptor " + thirdPartyDescriptor );
                 }
-                // there is a third party file detected form the given dependency
 
+                // there is a third party file detected form the given dependency
                 SortedProperties unsafeMappings = new SortedProperties( encoding );
 
                 if ( thirdPartyDescriptor.exists() )
@@ -164,11 +209,8 @@ public class DefaultThirdPartyTool
 
                         // push back to
                         result.put( id, license.trim() );
-                        
-                        License l = new License();
-                        l.setName( license.trim() );
-                        l.setUrl( license.trim() );
-                        licenseMap.addLicense( resolvedProject, Arrays.asList( l ) );
+
+                        addLicense( licenseMap, resolvedProject, license );
                     }
                 }
             }
@@ -179,8 +221,8 @@ public class DefaultThirdPartyTool
     /**
      * {@inheritDoc}
      */
-    public File getThirdPartyDescriptor( MavenProject project, ArtifactRepository localRepository,
-                                         List<ArtifactRepository> repositories )
+    public File resolvThirdPartyDescriptor( MavenProject project, ArtifactRepository localRepository,
+                                            List<ArtifactRepository> repositories )
         throws ThirdPartyToolException
     {
         if ( project == null )
@@ -217,6 +259,236 @@ public class DefaultThirdPartyTool
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public void addLicense( LicenseMap licenseMap, MavenProject project, String licenseName )
+    {
+        License license = new License();
+        license.setName( licenseName.trim() );
+        license.setUrl( licenseName.trim() );
+        addLicense( licenseMap, project, license );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void addLicense( LicenseMap licenseMap, MavenProject project, License license )
+    {
+        addLicense( licenseMap, project, Arrays.asList( license ) );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void addLicense( LicenseMap licenseMap, MavenProject project, List<?> licenses )
+    {
+
+        if ( Artifact.SCOPE_SYSTEM.equals( project.getArtifact().getScope() ) )
+        {
+
+            // do NOT treate system dependency
+            return;
+        }
+
+        if ( CollectionUtils.isEmpty( licenses ) )
+        {
+
+            // no license found for the dependency
+            licenseMap.put( LicenseMap.getUnknownLicenseMessage(), project );
+            return;
+        }
+
+        for ( Object o : licenses )
+        {
+            String id = MojoHelper.getArtifactId( project.getArtifact() );
+            if ( o == null )
+            {
+                getLogger().warn( "could not acquire the license for " + id );
+                continue;
+            }
+            License license = (License) o;
+            String licenseKey = license.getName();
+
+            // tchemit 2010-08-29 Ano #816 Check if the License object is well formed
+
+            if ( StringUtils.isEmpty( license.getName() ) )
+            {
+                getLogger().warn( "No license name defined for " + id );
+                licenseKey = license.getUrl();
+            }
+
+            if ( StringUtils.isEmpty( licenseKey ) )
+            {
+                getLogger().warn( "No license url defined for " + id );
+                licenseKey = LicenseMap.getUnknownLicenseMessage();
+            }
+            licenseMap.put( licenseKey, project );
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void mergeLicenses( LicenseMap licenseMap, String... licenses )
+    {
+        if ( licenses.length == 0 )
+        {
+            return;
+        }
+
+        String mainLicense = licenses[0].trim();
+        SortedSet<MavenProject> mainSet = licenseMap.get( mainLicense );
+        if ( mainSet == null )
+        {
+            getLogger().warn( "No license [" + mainLicense + "] found, will create it." );
+            mainSet = new TreeSet<MavenProject>( projectComparator );
+            licenseMap.put( mainLicense, mainSet );
+        }
+        int size = licenses.length;
+        for ( int i = 1; i < size; i++ )
+        {
+            String license = licenses[i].trim();
+            SortedSet<MavenProject> set = licenseMap.get( license );
+            if ( set == null )
+            {
+                getLogger().warn( "No license [" + license + "] found, skip this merge." );
+                continue;
+            }
+            getLogger().info( "Merge license [" + license + "] (" + set.size() + " depedencies)." );
+            mainSet.addAll( set );
+            set.clear();
+            licenseMap.remove( license );
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public SortedProperties loadUnsafeMapping( LicenseMap licenseMap, SortedMap<String, MavenProject> artifactCache,
+                                               String encoding, File missingFile )
+        throws IOException
+    {
+        SortedSet<MavenProject> unsafeDependencies = getProjectsWithNoLicense( licenseMap, false );
+
+        SortedProperties unsafeMappings = new SortedProperties( encoding );
+
+        // there is some unsafe dependencies
+        if ( missingFile.exists() )
+        {
+
+            getLogger().info( "Load missing file " + missingFile );
+
+            // load the missing file
+            unsafeMappings.load( missingFile );
+        }
+
+        // get from the missing file, all unknown dependencies
+        List<String> unknownDependenciesId = new ArrayList<String>();
+
+        // migrate unsafe mapping (before version 3.0 we do not have the type of
+        // dependency in the missing file, now we must deal with it, so check it
+
+        List<String> migrateId = new ArrayList<String>();
+        for ( Object o : unsafeMappings.keySet() )
+        {
+            String id = (String) o;
+            MavenProject project = artifactCache.get( id );
+            if ( project == null )
+            {
+                // try with the --jar type
+                project = artifactCache.get( id + "--jar" );
+                if ( project == null )
+                {
+
+                    // now we are sure this is a unknown dependency
+                    unknownDependenciesId.add( id );
+                }
+                else
+                {
+
+                    // this dependency must be migrated
+                    migrateId.add( id );
+                }
+            }
+        }
+
+        if ( !unknownDependenciesId.isEmpty() )
+        {
+
+            // there is some unknown dependencies in the missing file, remove them
+            for ( String id : unknownDependenciesId )
+            {
+                getLogger().warn(
+                    "dependency [" + id + "] does not exists in project, remove it from the missing file." );
+                unsafeMappings.remove( id );
+            }
+
+            unknownDependenciesId.clear();
+        }
+
+        if ( !migrateId.isEmpty() )
+        {
+
+            // there is some dependencies to migrate in the missing file
+            for ( String id : migrateId )
+            {
+                String newId = id + "--jar";
+                getLogger().info( "Migrate " + id + " to " + newId + " in the missing file." );
+                Object value = unsafeMappings.get( id );
+                unsafeMappings.remove( id );
+                unsafeMappings.put( newId, value );
+            }
+
+            migrateId.clear();
+        }
+
+        // push back loaded dependencies
+        for ( Object o : unsafeMappings.keySet() )
+        {
+            String id = (String) o;
+
+            MavenProject project = artifactCache.get( id );
+            if ( project == null )
+            {
+                getLogger().warn( "dependency [" + id + "] does not exists in project." );
+                continue;
+            }
+
+            String license = (String) unsafeMappings.get( id );
+            if ( StringUtils.isEmpty( license ) )
+            {
+
+                // empty license means not fill, skip it
+                continue;
+            }
+
+            // add license in map
+            addLicense( licenseMap, project, license );
+
+            // remove unknown license
+            unsafeDependencies.remove( project );
+        }
+
+        if ( unsafeDependencies.isEmpty() )
+        {
+
+            // no more unknown license in map
+            licenseMap.remove( LicenseMap.getUnknownLicenseMessage() );
+        }
+        else
+        {
+
+            // add a "with no value license" for missing dependencies
+            for ( MavenProject project : unsafeDependencies )
+            {
+                String id = MojoHelper.getArtifactId( project.getArtifact() );
+                unsafeMappings.setProperty( id, "" );
+            }
+        }
+        return unsafeMappings;
+    }
+
     // ----------------------------------------------------------------------
     // Private methods
     // ----------------------------------------------------------------------
@@ -238,10 +510,8 @@ public class DefaultThirdPartyTool
 
         // TODO: this is a bit crude - proper type, or proper handling as metadata rather than an artifact in 2.1?
         Artifact artifact = artifactFactory.createArtifactWithClassifier( project.getGroupId(), project.getArtifactId(),
-                                                                          project.getVersion(), "properties",
-                                                                          "third-party" );
-
-        boolean found = false;
+                                                                          project.getVersion(), DESCRIPTOR_TYPE,
+                                                                          DESCRIPTOR_CLASSIFIER );
         try
         {
             artifactResolver.resolve( artifact, repositories, localRepository );
@@ -249,11 +519,7 @@ public class DefaultThirdPartyTool
             result = artifact.getFile();
 
             // we use zero length files to avoid re-resolution (see below)
-            if ( result.length() > 0 )
-            {
-                found = true;
-            }
-            else
+            if ( result.length() == 0 )
             {
                 getLogger().debug( "Skipped third party descriptor" );
             }
@@ -265,8 +531,8 @@ public class DefaultThirdPartyTool
             // we can afford to write an empty descriptor here as we don't expect it to turn up later in the remote
             // repository, because the parent was already released (and snapshots are updated automatically if changed)
             result = new File( localRepository.getBasedir(), localRepository.pathOf( artifact ) );
-            result.getParentFile().mkdirs();
-            result.createNewFile();
+
+            FileUtil.createNewFile( result );
         }
 
         return result;

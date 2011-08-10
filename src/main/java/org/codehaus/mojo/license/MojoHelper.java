@@ -24,6 +24,8 @@
  */
 package org.codehaus.mojo.license;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Resource;
 import org.apache.maven.project.MavenProject;
 
@@ -31,6 +33,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.MessageFormat;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -103,6 +106,21 @@ public class MojoHelper
         return shouldAdd;
     }
 
+    public static Comparator<MavenProject> newMavenProjectComparator()
+    {
+        return new Comparator<MavenProject>()
+        {
+            public int compare( MavenProject o1, MavenProject o2 )
+            {
+
+                String id1 = getArtifactId( o1.getArtifact() );
+                String id2 = getArtifactId( o2.getArtifact() );
+                return id1.compareTo( id2 );
+            }
+        };
+
+    }
+
     static final protected double[] timeFactors = { 1000000, 1000, 60, 60, 24 };
 
     static final protected String[] timeUnites = { "ns", "ms", "s", "m", "h", "d" };
@@ -148,5 +166,54 @@ public class MojoHelper
         {
             throw new IllegalArgumentException( "could not obtain url " + url, ex );
         }
+    }
+
+    public static String getArtifactId( Artifact artifact )
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.append( artifact.getGroupId() );
+        sb.append( "--" );
+        sb.append( artifact.getArtifactId() );
+        sb.append( "--" );
+        sb.append( artifact.getVersion() );
+        String type = artifact.getType();
+        if ( !StringUtils.isEmpty( type ) && !"pom".equals( type ) )
+        {
+            sb.append( "--" );
+            sb.append( artifact.getType() );
+        }
+        if ( !StringUtils.isEmpty( artifact.getClassifier() ) )
+        {
+            sb.append( "--" );
+            sb.append( artifact.getClassifier() );
+        }
+        return sb.toString();
+    }
+
+    public static String getArtifactName( MavenProject project )
+    {
+        StringBuilder sb = new StringBuilder();
+        if ( project.getName().startsWith( "Unnamed -" ) )
+        {
+
+            // as in Maven 3, let's use the artifact id
+            sb.append( project.getArtifactId() );
+        }
+        else
+        {
+            sb.append( project.getName() );
+        }
+        sb.append( " (" );
+        sb.append( project.getGroupId() );
+        sb.append( ":" );
+        sb.append( project.getArtifactId() );
+        sb.append( ":" );
+        sb.append( project.getVersion() );
+        sb.append( " - " );
+        String url = project.getUrl();
+        sb.append( url == null ? "no url defined" : url );
+        sb.append( ")" );
+
+        return sb.toString();
     }
 }

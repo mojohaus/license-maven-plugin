@@ -32,8 +32,8 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
+import org.codehaus.mojo.license.model.LicenseMap;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -60,7 +60,7 @@ import java.util.*;
  */
 public class AddThirdPartyMojo
     extends AbstractAddThirdPartyMojo
-    implements MavenProjectDependenciesLoader
+    implements MavenProjectDependenciesConfigurator
 {
 
     /**
@@ -81,7 +81,7 @@ public class AddThirdPartyMojo
      * @readonly
      * @since 1.0.0
      */
-    protected List<?> remoteRepositories;
+    protected List remoteRepositories;
 
     /**
      * Deploy the third party missing file in maven repository.
@@ -100,27 +100,15 @@ public class AddThirdPartyMojo
     protected boolean useRepositoryMissingFiles;
 
     /**
-     * Maven Project Builder component.
-     *
-     * @component
-     * @required
-     * @readonly
-     * @since 1.0.0
-     */
-    protected MavenProjectBuilder mavenProjectBuilder;
-
-    /**
-     * third party tool.
+     * dependencies tool.
      *
      * @component
      * @readonly
      * @since 1.0
      */
-    private ThirdPartyTool thridPartyTool;
+    private DependenciesTool dependenciesTool;
 
     private boolean doGenerateMissing;
-
-    private Properties oldMissingFileContent;
 
     @Override
     protected boolean checkPackaging()
@@ -131,7 +119,8 @@ public class AddThirdPartyMojo
     @Override
     protected SortedMap<String, MavenProject> loadDependencies()
     {
-        return ArtifactHelper.loadProjectDependencies( this, getLog(), getArtifactCache() );
+        return dependenciesTool.loadProjectDependencies( getProject(), this, localRepository, remoteRepositories,
+                                                         getArtifactCache() );
     }
 
     @Override
@@ -140,7 +129,8 @@ public class AddThirdPartyMojo
     {
 
         SortedProperties unsafeMappings =
-            getLicenseMap().loadUnsafeMapping( getArtifactCache(), getEncoding(), getMissingFile() );
+            getThridPartyTool().loadUnsafeMapping( getLicenseMap(), getArtifactCache(), getEncoding(),
+                                                   getMissingFile() );
 
         SortedSet<MavenProject> unsafeDependencies = getUnsafeDependencies();
 
@@ -159,10 +149,10 @@ public class AddThirdPartyMojo
                 projects.removeAll( unsafeDependencies );
 
                 SortedProperties resolvedUnsafeMapping =
-                    thridPartyTool.loadThirdPartyDescriptorsForUnsafeMapping( getProject(), getEncoding(), projects,
-                                                                              unsafeDependencies, getLicenseMap(),
-                                                                              getLocalRepository(),
-                                                                              (List<ArtifactRepository>) getRemoteRepositories() );
+                    getThridPartyTool().loadThirdPartyDescriptorsForUnsafeMapping( getEncoding(), projects,
+                                                                                   unsafeDependencies, getLicenseMap(),
+                                                                                   localRepository,
+                                                                                   remoteRepositories );
 
                 // push back resolved unsafe mappings
                 unsafeMappings.putAll( resolvedUnsafeMapping );
@@ -238,8 +228,9 @@ public class AddThirdPartyMojo
         }
 
         File missingFile = getMissingFile();
-        
-        if (!missingFile.exists()) {
+
+        if ( !missingFile.exists() )
+        {
 
             // the missing file does not exists, this happens when
             // using remote missing file from dependencies
@@ -292,7 +283,7 @@ public class AddThirdPartyMojo
             File file = getMissingFile();
 
             getLog().info( "Will deploy third party file from " + file );
-            thridPartyTool.deployThirdPartyDescriptor( getProject(), file );
+            getThridPartyTool().attachThirdPartyDescriptor( getProject(), file );
         }
 
         addResourceDir( getOutputDirectory(), "**/*.txt" );
@@ -349,21 +340,22 @@ public class AddThirdPartyMojo
         return localRepository;
     }
 
-    public List<?> getRemoteRepositories()
+    public List getRemoteRepositories()
     {
         return remoteRepositories;
     }
 
-    public MavenProjectBuilder getMavenProjectBuilder()
-    {
-        return mavenProjectBuilder;
-    }
-
+    /**
+     * {@inheritDoc}
+     */
     public boolean isIncludeTransitiveDependencies()
     {
         return includeTransitiveDependencies;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public List<String> getExcludeScopes()
     {
         return Arrays.asList( Artifact.SCOPE_SYSTEM );
@@ -379,8 +371,4 @@ public class AddThirdPartyMojo
         return useRepositoryMissingFiles;
     }
 
-    public ThirdPartyTool getThridPartyTool()
-    {
-        return thridPartyTool;
-    }
 }

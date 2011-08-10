@@ -5,59 +5,37 @@
  * $Id$
  * $HeadURL$
  * %%
- * Copyright (C) 2010 - 2011 Codehaus
+ * Copyright (C) 2011 CodeLutin, Codehaus, Tony Chemit
  * %%
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as 
- * published by the Free Software Foundation, either version 3 of the 
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
- * You should have received a copy of the GNU General Lesser Public 
+ *
+ * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
 package org.codehaus.mojo.license;
 
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.MavenProjectBuilder;
-
 import java.util.List;
 
 /**
- * Contract of an object which contains everything to build Maven project dependencies.
+ * Contract to configure which dependencies will be loaded by the dependency tool via the method
+ * {@link DependenciesTool#loadProjectDependencies(org.apache.maven.project.MavenProject, MavenProjectDependenciesConfigurator, org.apache.maven.artifact.repository.ArtifactRepository, java.util.List, java.util.SortedMap)}
  *
  * @author tchemit <chemit@codelutin.com>
+ * @see DependenciesTool
  * @since 1.0
  */
-public interface MavenProjectDependenciesLoader
+public interface MavenProjectDependenciesConfigurator
 {
-
-    /**
-     * @return the maven project
-     */
-    MavenProject getProject();
-
-    /**
-     * @return the maven project builder
-     */
-    MavenProjectBuilder getMavenProjectBuilder();
-
-    /**
-     * @return the local repository
-     */
-    ArtifactRepository getLocalRepository();
-
-    /**
-     * @return the list of remote repositories configured for the given project
-     */
-    List getRemoteRepositories();
 
     /**
      * @return {@code true} if should include transitive dependencies, {@code false} to include only direct
@@ -94,6 +72,8 @@ public interface MavenProjectDependenciesLoader
      */
     String getExcludedArtifacts();
 
+    /**
+     * @return {@code true} if verbose mode is on, {@code false} otherwise.
+     */
     boolean isVerbose();
-
 }

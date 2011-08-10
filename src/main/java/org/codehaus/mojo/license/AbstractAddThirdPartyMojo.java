@@ -29,6 +29,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
+import org.codehaus.mojo.license.model.LicenseMap;
 
 import java.io.File;
 import java.io.IOException;
@@ -186,6 +187,15 @@ public abstract class AbstractAddThirdPartyMojo
      */
     protected boolean includeTransitiveDependencies;
 
+    /**
+     * third party tool.
+     *
+     * @component
+     * @readonly
+     * @since 1.0
+     */
+    private ThirdPartyTool thridPartyTool;
+
     private SortedMap<String, MavenProject> projectDependencies;
 
     private LicenseMap licenseMap;
@@ -268,8 +278,9 @@ public abstract class AbstractAddThirdPartyMojo
 
         licenseMap = createLicenseMap( projectDependencies );
 
-        SortedSet<MavenProject> unsafeDependencies = licenseMap.getUnsafeDependencies();
-        
+        SortedSet<MavenProject> unsafeDependencies = getThridPartyTool().getProjectsWithNoLicense( licenseMap,
+                                                                                                   isVerbose() );
+
         setUnsafeDependencies( unsafeDependencies );
 
         if ( !CollectionUtils.isEmpty( unsafeDependencies ) && isUseMissingFile() && isDoGenerate() )
@@ -293,7 +304,7 @@ public abstract class AbstractAddThirdPartyMojo
                 }
                 String[] split = merge.split( "\\|" );
 
-                licenseMap.mergeLicenses( split );
+                thridPartyTool.mergeLicenses( licenseMap, split );
             }
         }
     }
@@ -302,11 +313,10 @@ public abstract class AbstractAddThirdPartyMojo
     {
 
         LicenseMap licenseMap = new LicenseMap();
-        licenseMap.setLog( getLog() );
 
         for ( MavenProject project : dependencies.values() )
         {
-            licenseMap.addLicense( project, project.getLicenses() );
+            thridPartyTool.addLicense( licenseMap, project, project.getLicenses() );
         }
         return licenseMap;
     }
@@ -323,7 +333,7 @@ public abstract class AbstractAddThirdPartyMojo
             {
 
                 // no license found for the dependency
-                log.warn( " - " + ArtifactHelper.getArtifactId( dep.getArtifact() ) );
+                log.warn( " - " + MojoHelper.getArtifactId( dep.getArtifact() ) );
             }
         }
         return unsafe;
@@ -358,7 +368,7 @@ public abstract class AbstractAddThirdPartyMojo
 
                         for ( MavenProject mavenProject : projects )
                         {
-                            String s = ArtifactHelper.getArtifactName( mavenProject );
+                            String s = MojoHelper.getArtifactName( mavenProject );
                             sb.append( "\n  * " ).append( s );
                         }
                     }
@@ -376,7 +386,7 @@ public abstract class AbstractAddThirdPartyMojo
 
                     for ( Map.Entry<MavenProject, String[]> entry : map.entrySet() )
                     {
-                        String artifact = ArtifactHelper.getArtifactName( entry.getKey() );
+                        String artifact = MojoHelper.getArtifactName( entry.getKey() );
                         StringBuilder buffer = new StringBuilder();
                         for ( String license : entry.getValue() )
                         {
@@ -599,5 +609,15 @@ public abstract class AbstractAddThirdPartyMojo
     public void setIncludedArtifacts( String includedArtifacts )
     {
         this.includedArtifacts = includedArtifacts;
+    }
+
+    public ThirdPartyTool getThridPartyTool()
+    {
+        return thridPartyTool;
+    }
+
+    public void setThridPartyTool( ThirdPartyTool thridPartyTool )
+    {
+        this.thridPartyTool = thridPartyTool;
     }
 }

@@ -305,7 +305,7 @@ public abstract class AbstractLicenseMojo
 
         if ( isVerbose() )
         {
-            getLog().info( "Will  check encoding : " + getEncoding() );
+            getLog().info( "Will check encoding : " + getEncoding() );
         }
         if ( StringUtils.isEmpty( getEncoding() ) )
         {

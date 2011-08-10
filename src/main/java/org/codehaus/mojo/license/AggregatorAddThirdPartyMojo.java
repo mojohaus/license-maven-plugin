@@ -30,6 +30,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
+import org.codehaus.mojo.license.model.LicenseMap;
 
 import java.io.File;
 import java.io.IOException;
@@ -115,11 +116,12 @@ public class AggregatorAddThirdPartyMojo
             if ( file.exists() )
             {
 
-                SortedProperties tmp = licenseMap.loadUnsafeMapping( getArtifactCache(), getEncoding(), file );
+                SortedProperties tmp =
+                    getThridPartyTool().loadUnsafeMapping( licenseMap, getArtifactCache(), getEncoding(), file );
                 unsafeMappings.putAll( tmp );
             }
 
-            SortedSet<MavenProject> unsafes = licenseMap.getUnsafeDependencies();
+            SortedSet<MavenProject> unsafes = getThridPartyTool().getProjectsWithNoLicense( licenseMap, isVerbose() );
             if ( CollectionUtils.isEmpty( unsafes ) )
             {
 

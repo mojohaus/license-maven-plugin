@@ -38,7 +38,7 @@ public class ThirdPartyToolException
      * and providing a <code>message</code>.
      *
      * @param message could be null
-     * @param cause could be null
+     * @param cause   could be null
      */
     public ThirdPartyToolException( String message, Exception cause )
     {
@@ -50,7 +50,7 @@ public class ThirdPartyToolException
      * and providing a <code>message</code>.
      *
      * @param message could be null
-     * @param cause could be null
+     * @param cause   could be null
      */
     public ThirdPartyToolException( String message, Throwable cause )
     {
