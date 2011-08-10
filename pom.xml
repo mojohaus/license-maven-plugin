@@ -262,13 +262,6 @@
             <configuration>
               <projectsDirectory>src/it</projectsDirectory>
               <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
-              <pomIncludes>
-                <pomInclude>add-third-party/*/pom.xml</pomInclude>
-                <pomInclude>aggregate-add-third-party/*/pom.xml</pomInclude>
-                <pomInclude>update-file-header/*/pom.xml</pomInclude>
-                <pomInclude>update-project-license/*/pom.xml</pomInclude>
-                <pomInclude>download-licenses/*/pom.xml</pomInclude>
-              </pomIncludes>
               <postBuildHookScript>verify</postBuildHookScript>
               <settingsFile>src/it/settings.xml</settingsFile>
               <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
@@ -281,6 +274,30 @@
                   <goal>install</goal>
                   <goal>run</goal>
                 </goals>
+                <configuration>
+                  <pomIncludes>
+                    <pomInclude>add-third-party/*/pom.xml</pomInclude>
+                    <pomInclude>aggregate-add-third-party/*/pom.xml</pomInclude>
+                    <pomInclude>update-file-header/*/pom.xml</pomInclude>
+                    <pomInclude>update-project-license/*/pom.xml</pomInclude>
+                    <pomInclude>download-licenses/*/pom.xml</pomInclude>
+                  </pomIncludes>
+                  <pomExcludes>
+                    <pomExclude>download-licenses/MOJO-1674/pom.xml</pomExclude>
+                  </pomExcludes>
+                </configuration>
+              </execution>
+              <!-- as this it is run in offline, then execute it after the previous its... -->
+              <execution>
+                <id>integration-test-offline</id>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <pomIncludes>
+                    <pomInclude>download-licenses/MOJO-1674/pom.xml</pomInclude>
+                  </pomIncludes>
+                </configuration>
               </execution>
             </executions>
           </plugin>

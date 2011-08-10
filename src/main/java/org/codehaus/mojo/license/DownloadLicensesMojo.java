@@ -126,8 +126,7 @@ public class DownloadLicensesMojo
     /**
      * Settings offline flag (will not download anything if setted to true).
      *
-     * @parameter default-value="${session.settings.offline}"
-     * @readonly
+     * @parameter default-value="${settings.offline}"
      * @since 1.0
      */
     private boolean offline;
