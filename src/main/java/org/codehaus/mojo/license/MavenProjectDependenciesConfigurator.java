@@ -44,9 +44,14 @@ public interface MavenProjectDependenciesConfigurator
     boolean isIncludeTransitiveDependencies();
 
     /**
+     * @return list of scopes to include while loading dependencies, if {@code null} is setted, then include all scopes.
+     */
+    List<String> getIncludedScopes();
+
+    /**
      * @return list of scopes to exclude while loading dependencies, if {@code null} is setted, then include all scopes.
      */
-    List<String> getExcludeScopes();
+    List<String> getExcludedScopes();
 
     /**
      * @return a pattern to include dependencies by thier {@code artificatId}, if {@code null} is setted then include

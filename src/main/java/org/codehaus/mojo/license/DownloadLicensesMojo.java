@@ -108,6 +108,22 @@ public class DownloadLicensesMojo
     private File licensesOutputFile;
 
     /**
+     * A filter to exclude some scopes.
+     *
+     * @parameter expression="${license.excludedScopes}" default-value="system"
+     * @since 1.0
+     */
+    private String excludedScopes;
+
+    /**
+     * A filter to include only some scopes, if let empty then all scopes will be used (no filter).
+     *
+     * @parameter expression="${license.includedScopes}" default-value=""
+     * @since 1.0
+     */
+    private String includedScopes;
+
+    /**
      * Don't show warnings about bad or missing license files.
      *
      * @parameter default-value="false"
@@ -398,41 +414,85 @@ public class DownloadLicensesMojo
         return remoteRepositories;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean isIncludeTransitiveDependencies()
     {
         return includeTransitiveDependencies;
     }
 
-    // not used at the moment
-    public List<String> getExcludeScopes()
+    /**
+     * {@inheritDoc}
+     */
+    public List<String> getExcludedScopes()
     {
-        return Collections.emptyList();
+        String[] split = excludedScopes==null? new String[0]:excludedScopes.split( "," );
+        return Arrays.asList( split );
+    }
+
+    public void setExcludedScopes( String excludedScopes )
+    {
+        this.excludedScopes = excludedScopes;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public List<String> getIncludedScopes()
+    {
+        String[] split =  includedScopes==null? new String[0]:includedScopes.split( "," );
+        return Arrays.asList( split );
+    }
+
+    public void setIncludedScopes( String includedScopes )
+    {
+        this.includedScopes = includedScopes;
     }
 
     // not used at the moment
+
+    /**
+     * {@inheritDoc}
+     */
     public String getIncludedArtifacts()
     {
         return null;
     }
 
     // not used at the moment
+
+    /**
+     * {@inheritDoc}
+     */
     public String getIncludedGroups()
     {
         return null;
     }
 
     // not used at the moment
+
+    /**
+     * {@inheritDoc}
+     */
     public String getExcludedGroups()
     {
         return null;
     }
 
     // not used at the moment
+
+    /**
+     * {@inheritDoc}
+     */
     public String getExcludedArtifacts()
     {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean isVerbose()
     {
         return getLog().isDebugEnabled();

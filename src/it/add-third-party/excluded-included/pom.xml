@@ -60,6 +60,12 @@
       <artifactId>commons-logging</artifactId>
       <version>1.1.1</version>
     </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.8.2</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -79,6 +85,28 @@
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>license-maven-plugin</artifactId>
         <executions>
+          <execution>
+            <id>exclude-scope-filter</id>
+            <goals>
+              <goal>add-third-party</goal>
+            </goals>
+            <phase>validate</phase>
+            <configuration>
+              <excludedScopes>test</excludedScopes>
+              <thirdPartyFilename>thirdWithoutScope.txt</thirdPartyFilename>
+            </configuration>
+          </execution>
+          <execution>
+            <id>include-scope-filter</id>
+            <goals>
+              <goal>add-third-party</goal>
+            </goals>
+            <phase>validate</phase>
+            <configuration>
+              <includedScopes>test</includedScopes>
+              <thirdPartyFilename>thirdWithScope.txt</thirdPartyFilename>
+            </configuration>
+          </execution>
           <execution>
             <id>group-filter</id>
             <goals>

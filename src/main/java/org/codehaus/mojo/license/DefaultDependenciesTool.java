@@ -24,6 +24,7 @@
  */
 package org.codehaus.mojo.license;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -116,7 +117,8 @@ public class DefaultDependenciesTool
             depArtifacts = project.getDependencyArtifacts();
         }
 
-        List<String> excludeScopes = configuration.getExcludeScopes();
+        List<String> includedScopes = configuration.getIncludedScopes();
+        List<String> excludeScopes = configuration.getExcludedScopes();
 
         boolean verbose = configuration.isVerbose();
 
@@ -126,12 +128,20 @@ public class DefaultDependenciesTool
         {
             Artifact artifact = (Artifact) o;
 
-            if ( excludeScopes.contains( artifact.getScope() ) )
+            String scope = artifact.getScope();
+            if ( CollectionUtils.isNotEmpty( includedScopes ) && !includedScopes.contains( scope ) )
             {
 
-                // never treate system artifacts (they are mysterious and
-                // no information can be retrive from anywhere)...
+                // not in included scopes
                 continue;
+            }
+            {
+                if ( excludeScopes.contains( scope ) )
+                {
+
+                    // in exluced scopes 
+                    continue;
+                }
             }
 
             Logger log = getLogger();

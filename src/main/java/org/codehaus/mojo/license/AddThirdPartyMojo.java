@@ -27,7 +27,6 @@ package org.codehaus.mojo.license;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
@@ -353,13 +352,13 @@ public class AddThirdPartyMojo
         return includeTransitiveDependencies;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public List<String> getExcludeScopes()
-    {
-        return Arrays.asList( Artifact.SCOPE_SYSTEM );
-    }
+//    /**
+//     * {@inheritDoc}
+//     */
+//    public List<String> getExcludedScopes()
+//    {
+//        return Arrays.asList( Artifact.SCOPE_SYSTEM );
+//    }
 
     public boolean isDeployMissingFile()
     {

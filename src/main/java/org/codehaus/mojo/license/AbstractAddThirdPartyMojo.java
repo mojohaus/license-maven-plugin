@@ -148,6 +148,22 @@ public abstract class AbstractAddThirdPartyMojo
     protected boolean groupByLicense;
 
     /**
+     * A filter to exclude some scopes.
+     *
+     * @parameter expression="${license.excludedScopes}" default-value="system"
+     * @since 1.0
+     */
+    protected String excludedScopes;
+
+    /**
+     * A filter to include only some scopes, if let empty then all scopes will be used (no filter).
+     *
+     * @parameter expression="${license.includedScopes}" default-value=""
+     * @since 1.0
+     */
+    protected String includedScopes;
+
+    /**
      * A filter to exclude some GroupIds
      *
      * @parameter expression="${license.excludedGroups}" default-value=""
@@ -278,8 +294,8 @@ public abstract class AbstractAddThirdPartyMojo
 
         licenseMap = createLicenseMap( projectDependencies );
 
-        SortedSet<MavenProject> unsafeDependencies = getThridPartyTool().getProjectsWithNoLicense( licenseMap,
-                                                                                                   isVerbose() );
+        SortedSet<MavenProject> unsafeDependencies =
+            getThridPartyTool().getProjectsWithNoLicense( licenseMap, isVerbose() );
 
         setUnsafeDependencies( unsafeDependencies );
 
@@ -569,6 +585,34 @@ public abstract class AbstractAddThirdPartyMojo
     public void setDoGenerateBundle( boolean doGenerateBundle )
     {
         this.doGenerateBundle = doGenerateBundle;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public List<String> getExcludedScopes()
+    {
+        String[] split = excludedScopes == null ? new String[0] : excludedScopes.split( "," );
+        return Arrays.asList( split );
+    }
+
+    public void setExcludedScopes( String excludedScopes )
+    {
+        this.excludedScopes = excludedScopes;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public List<String> getIncludedScopes()
+    {
+        String[] split = includedScopes == null ? new String[0] : includedScopes.split( "," );
+        return Arrays.asList( split );
+    }
+
+    public void setIncludedScopes( String includedScopes )
+    {
+        this.includedScopes = includedScopes;
     }
 
     public String getExcludedGroups()

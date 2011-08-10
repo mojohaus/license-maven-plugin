@@ -263,12 +263,11 @@
               <projectsDirectory>src/it</projectsDirectory>
               <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
               <pomIncludes>
-                <!--<pomInclude>add-third-party/MOJO-1716/pom.xml</pomInclude>-->
                 <pomInclude>add-third-party/*/pom.xml</pomInclude>
                 <pomInclude>aggregate-add-third-party/*/pom.xml</pomInclude>
                 <pomInclude>update-file-header/*/pom.xml</pomInclude>
                 <pomInclude>update-project-license/*/pom.xml</pomInclude>
-                <pomInclude>download-licenses-*/pom.xml</pomInclude>
+                <pomInclude>download-licenses/*/pom.xml</pomInclude>
               </pomIncludes>
               <postBuildHookScript>verify</postBuildHookScript>
               <settingsFile>src/it/settings.xml</settingsFile>
