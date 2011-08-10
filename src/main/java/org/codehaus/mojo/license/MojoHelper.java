@@ -24,7 +24,6 @@
  */
 package org.codehaus.mojo.license;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Resource;
 import org.apache.maven.project.MavenProject;
@@ -176,17 +175,6 @@ public class MojoHelper
         sb.append( artifact.getArtifactId() );
         sb.append( "--" );
         sb.append( artifact.getVersion() );
-        String type = artifact.getType();
-        if ( !StringUtils.isEmpty( type ) && !"pom".equals( type ) )
-        {
-            sb.append( "--" );
-            sb.append( artifact.getType() );
-        }
-        if ( !StringUtils.isEmpty( artifact.getClassifier() ) )
-        {
-            sb.append( "--" );
-            sb.append( artifact.getClassifier() );
-        }
         return sb.toString();
     }
 

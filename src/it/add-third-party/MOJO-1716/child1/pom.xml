@@ -43,7 +43,7 @@
   <properties>
     <license.failIfWarning>false</license.failIfWarning>
   </properties>
-  
+
   <dependencies>
 
     <!-- this dependency is a bundle type -->
@@ -57,6 +57,15 @@
       <groupId>org.jboss.seam</groupId>
       <artifactId>jboss-seam</artifactId>
     </dependency>
+
+    <!-- a resources.zip dep -->
+    <dependency>
+      <groupId>net.sf.docbook</groupId>
+      <artifactId>docbook-xsl</artifactId>
+      <classifier>resources</classifier>
+      <type>zip</type>
+    </dependency>
+
   </dependencies>
 
 </project>

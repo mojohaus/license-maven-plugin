@@ -193,15 +193,6 @@ public class DefaultDependenciesTool
                     continue;
                 }
 
-                String id2 = MojoHelper.getArtifactId( depMavenProject.getArtifact() );
-
-                if ( !id.equals( id2 ) )
-                {
-
-                    // once project loaded id has changed (probably packaging is no more jar)
-                    id = id2;
-                }
-
                 if ( verbose )
                 {
                     log.info( "add dependency [" + id + "]" );

@@ -26,6 +26,6 @@
 file = new File(basedir, 'child2/src/license/THIRD-PARTY.properties');
 assert file.exists();
 content = file.text;
-assert content.contains('commons-primitives--commons-primitives--1.0--jar=The Apache Software License, Version 2.0');
+assert content.contains('commons-primitives--commons-primitives--1.0=The Apache Software License, Version 2.0');
 
 return true;

@@ -36,7 +36,7 @@
 
   <name>License Test :: MOJO-1716</name>
   <packaging>pom</packaging>
-  
+
   <modules>
     <module>child1</module>
     <module>child2</module>
@@ -61,17 +61,28 @@
   <dependencyManagement>
 
     <dependencies>
+      
       <!-- this dependency is a bundle type -->
       <dependency>
         <groupId>org.springframework.ws</groupId>
         <artifactId>spring-oxm</artifactId>
         <version>1.5.8</version>
       </dependency>
+      
       <!-- this dependency is a ejb type -->
       <dependency>
         <groupId>org.jboss.seam</groupId>
         <artifactId>jboss-seam</artifactId>
         <version>2.2.0.GA</version>
+      </dependency>
+
+      <!-- a -resources.zip dep -->
+      <dependency>
+        <groupId>net.sf.docbook</groupId>
+        <artifactId>docbook-xsl</artifactId>
+        <version>1.76.1</version>
+        <classifier>resources</classifier>
+        <type>zip</type>
       </dependency>
     </dependencies>
 

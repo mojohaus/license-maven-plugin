@@ -51,6 +51,14 @@ Third-party
    Once the file filled, just relaunch the goal to integrate your modifications
    in the generated <<THIRD-PARTY>> file.
 
+** Using missing files as repository 
+
+   When your missing licenses file is filled for a artifact, then this file will be attach to the build with a
+   classifier <<third-parties>> and type <<properties>>.
+
+   If another project use this artifact, then it will load if required the missing third party file from repository
+   (local or remote) and begin to fill the new missing licenses file.
+   
 *** Example
 
   Given a pom with these dependencies :

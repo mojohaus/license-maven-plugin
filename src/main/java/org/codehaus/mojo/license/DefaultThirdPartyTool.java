@@ -43,6 +43,8 @@ import org.codehaus.plexus.logging.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Default implementation of the third party tool.
@@ -373,9 +375,9 @@ public class DefaultThirdPartyTool
 
         SortedProperties unsafeMappings = new SortedProperties( encoding );
 
-        // there is some unsafe dependencies
         if ( missingFile.exists() )
         {
+            // there is some unsafe dependencies
 
             getLogger().info( "Load missing file " + missingFile );
 
@@ -386,29 +388,31 @@ public class DefaultThirdPartyTool
         // get from the missing file, all unknown dependencies
         List<String> unknownDependenciesId = new ArrayList<String>();
 
-        // migrate unsafe mapping (before version 3.0 we do not have the type of
-        // dependency in the missing file, now we must deal with it, so check it
+        // coming from maven-licen-plugin, we used in id type and classifier, now we remove
+        // these informations since GAV is good enough to qualify a license of any artifact of it...
+        Map<String, String> migrateKeys = migrateMissingFileKeys( unsafeMappings.keySet() );
 
-        List<String> migrateId = new ArrayList<String>();
-        for ( Object o : unsafeMappings.keySet() )
+        for ( Object o : migrateKeys.keySet() )
         {
             String id = (String) o;
-            MavenProject project = artifactCache.get( id );
+            String migratedId = migrateKeys.get( id );
+
+            MavenProject project = artifactCache.get( migratedId );
             if ( project == null )
             {
-                // try with the --jar type
-                project = artifactCache.get( id + "--jar" );
-                if ( project == null )
+                // now we are sure this is a unknown dependency
+                unknownDependenciesId.add( id );
+            }
+            else
+            {
+                if ( !id.equals( migratedId ) )
                 {
 
-                    // now we are sure this is a unknown dependency
-                    unknownDependenciesId.add( id );
-                }
-                else
-                {
-
-                    // this dependency must be migrated
-                    migrateId.add( id );
+                    // migrates id to migratedId
+                    getLogger().info( "Migrates [" + id + "] to [" + migratedId + "] in the missing file." );
+                    Object value = unsafeMappings.get( id );
+                    unsafeMappings.remove( id );
+                    unsafeMappings.put( migratedId, value );
                 }
             }
         }
@@ -420,27 +424,11 @@ public class DefaultThirdPartyTool
             for ( String id : unknownDependenciesId )
             {
                 getLogger().warn(
-                    "dependency [" + id + "] does not exists in project, remove it from the missing file." );
+                    "dependency [" + id + "] does not exist in project, remove it from the missing file." );
                 unsafeMappings.remove( id );
             }
 
             unknownDependenciesId.clear();
-        }
-
-        if ( !migrateId.isEmpty() )
-        {
-
-            // there is some dependencies to migrate in the missing file
-            for ( String id : migrateId )
-            {
-                String newId = id + "--jar";
-                getLogger().info( "Migrate " + id + " to " + newId + " in the missing file." );
-                Object value = unsafeMappings.get( id );
-                unsafeMappings.remove( id );
-                unsafeMappings.put( newId, value );
-            }
-
-            migrateId.clear();
         }
 
         // push back loaded dependencies
@@ -451,7 +439,7 @@ public class DefaultThirdPartyTool
             MavenProject project = artifactCache.get( id );
             if ( project == null )
             {
-                getLogger().warn( "dependency [" + id + "] does not exists in project." );
+                getLogger().warn( "dependency [" + id + "] does not exist in project." );
                 continue;
             }
 
@@ -483,6 +471,10 @@ public class DefaultThirdPartyTool
             for ( MavenProject project : unsafeDependencies )
             {
                 String id = MojoHelper.getArtifactId( project.getArtifact() );
+                if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger().debug( "dependency [" + id + "] has no license, add it in the missing file." );
+                }
                 unsafeMappings.setProperty( id, "" );
             }
         }
@@ -536,5 +528,38 @@ public class DefaultThirdPartyTool
         }
 
         return result;
+    }
+
+    private final Pattern GAV_PLUS_TYPE_PATTERN = Pattern.compile( "(.+)--(.+)--(.+)--(.+)" );
+
+    private final Pattern GAV_PLUS_TYPE_AND_CLASSIFIER_PATTERN = Pattern.compile( "(.+)--(.+)--(.+)--(.+)--(.+)" );
+
+    private Map<String, String> migrateMissingFileKeys( Set<Object> missingFileKeys )
+    {
+        Map<String, String> migrateKeys = new HashMap<String, String>();
+        for ( Object object : missingFileKeys )
+        {
+            String id = (String) object;
+            Matcher matcher;
+
+            String newId = id;
+            matcher = GAV_PLUS_TYPE_AND_CLASSIFIER_PATTERN.matcher( id );
+            if ( matcher.matches() )
+            {
+                newId = matcher.group( 1 ) + "--" + matcher.group( 2 ) + "--" + matcher.group( 3 );
+
+            }
+            else
+            {
+                matcher = GAV_PLUS_TYPE_PATTERN.matcher( id );
+                if ( matcher.matches() )
+                {
+                    newId = matcher.group( 1 ) + "--" + matcher.group( 2 ) + "--" + matcher.group( 3 );
+
+                }
+            }
+            migrateKeys.put( id, newId );
+        }
+        return migrateKeys;
     }
 }

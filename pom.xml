@@ -269,7 +269,6 @@
                 <pomInclude>update-file-header/*/pom.xml</pomInclude>
                 <pomInclude>update-project-license/*/pom.xml</pomInclude>
                 <pomInclude>download-licenses-*/pom.xml</pomInclude>
-                <!--<pomInclude>**/pom.xml</pomInclude>-->
               </pomIncludes>
               <postBuildHookScript>verify</postBuildHookScript>
               <settingsFile>src/it/settings.xml</settingsFile>
