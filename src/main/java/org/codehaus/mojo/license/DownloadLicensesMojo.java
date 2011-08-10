@@ -124,6 +124,15 @@ public class DownloadLicensesMojo
     private String includedScopes;
 
     /**
+     * Settings offline flag (will not download anything if setted to true).
+     *
+     * @parameter default-value="${session.settings.offline}"
+     * @readonly
+     * @since 1.0
+     */
+    private boolean offline;
+
+    /**
      * Don't show warnings about bad or missing license files.
      *
      * @parameter default-value="false"
@@ -161,6 +170,12 @@ public class DownloadLicensesMojo
         throws MojoExecutionException
     {
 
+        if ( offline )
+        {
+
+            getLog().warn( "Offline flag is on, download-licenses goal is skip." );
+            return;
+        }
         initDirectories();
 
         Map<String, ProjectLicenseInfo> configuredDepLicensesMap = new HashMap<String, ProjectLicenseInfo>();
@@ -427,7 +442,7 @@ public class DownloadLicensesMojo
      */
     public List<String> getExcludedScopes()
     {
-        String[] split = excludedScopes==null? new String[0]:excludedScopes.split( "," );
+        String[] split = excludedScopes == null ? new String[0] : excludedScopes.split( "," );
         return Arrays.asList( split );
     }
 
@@ -441,7 +456,7 @@ public class DownloadLicensesMojo
      */
     public List<String> getIncludedScopes()
     {
-        String[] split =  includedScopes==null? new String[0]:includedScopes.split( "," );
+        String[] split = includedScopes == null ? new String[0] : includedScopes.split( "," );
         return Arrays.asList( split );
     }
 

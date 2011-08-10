@@ -1,0 +1,19 @@
+import java.io.File;
+
+try
+{
+
+    File summaryFile = new File( basedir, "target/generated-resources/licenses.xml" );
+    if ( summaryFile.isFile() )
+    {
+        System.err.println( "Should not have found license file: " + summaryFile );
+        return false;
+    }
+}
+catch( Throwable t )
+{
+    t.printStackTrace();
+    return false;
+}
+
+return true;
