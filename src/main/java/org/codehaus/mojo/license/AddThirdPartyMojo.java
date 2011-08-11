@@ -275,6 +275,14 @@ public class AddThirdPartyMojo
                 "There is some dependencies with no license, please fill the file " + getMissingFile() );
         }
 
+        if ( !unsafe && isUseMissingFile() && MapUtils.isEmpty( getUnsafeMappings() ) && getMissingFile().exists() )
+        {
+
+            // there is no missing dependencies, but still a missing file, delete it
+            getLog().info( "There is no dependency to put in missing file, delete it at " + getMissingFile() );
+            FileUtil.deleteFile( getMissingFile() );
+        }
+
         if ( !unsafe && isDeployMissingFile() && MapUtils.isNotEmpty( getUnsafeMappings() ) )
         {
 
