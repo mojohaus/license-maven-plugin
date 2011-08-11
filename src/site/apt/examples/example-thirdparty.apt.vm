@@ -13,8 +13,10 @@ Third-party
 
   This goal build the THIRD-PARTY.txt file and add it in build.
 
-  <Since version 2.3>, we can consolidate the generated file by filling another
-  file (the <<missing file>>) for dependencies without license.
+  For dependencies with no license, we consolidate the generated file by filling another
+  file (the <<missing file>>) for dependencies without license. This missing file can also
+  be attached to build (so deployed into remote repositories) to help filling other missing
+  files for projects using this dependency.
 
   <Note:> This mojo has not effect on a <<pom>> project.
 
@@ -39,7 +41,7 @@ Third-party
 
   - Merge licenses (same license but named differently in dependencies poms).
 
-** Add missing licenses.
+** Add missing licenses
 
    While using configuration's property <<useMissingfile>> on third-party goals,
    it will create (or read for aggregate) a file located from property <<missingFile>>
@@ -51,14 +53,6 @@ Third-party
    Once the file filled, just relaunch the goal to integrate your modifications
    in the generated <<THIRD-PARTY>> file.
 
-** Using missing files as repository 
-
-   When your missing licenses file is filled for a artifact, then this file will be attach to the build with a
-   classifier <<third-parties>> and type <<properties>>.
-
-   If another project use this artifact, then it will load if required the missing third party file from repository
-   (local or remote) and begin to fill the new missing licenses file.
-   
 *** Example
 
   Given a pom with these dependencies :
@@ -139,7 +133,6 @@ List of 2 third-party dependencies.
 
   Each entry of <<licenseMerges>> describe a merge, the first license is the one to keep.
 
-
 *** Example
 
   Given a pom with these dependencies :
@@ -206,10 +199,19 @@ List of 2 third-party dependencies.
  (The Apache Software License, Version 2.0) JHLabs Image Processing Filters (com.jhlabs:filters:2.0.235 - http://www.jhlabs.com/ip/index.html)
 -------------------------------------------------------------------------------
 
+** Attach missing files to build
+
+   When your missing licenses file is filled for a project, then this file will be attached to the build with a
+   classifier <<third-parties>> and type <<properties>>.
+
+   If another project use this artifact, then it will load if required the missing third party file from repository
+   (local or remote) and begin to fill the new missing licenses file.
+   
 * Filter the dependencies
 
-  <Since version 2.3>, we can consolidate the THIRD-PARTY file with filters on
-  artifacts and groups, in excluding or only including some of them.
+  * Include or exclude scopes
+
+    Can include all dependencies or exclude them for one or many given scopes.
 
   * Include ArtifactIds or GroupIds
 
@@ -226,10 +228,103 @@ List of 2 third-party dependencies.
     Note that the exclude filter is predominant on include filter. So, if we include
     an artifact but exclude its groupId, it will not be referred in THIRD-PARTY file.
 
+    Note that scope include - exclude is also done before any group or artifact include-exclude.
+
+** exclude scopes
+
+  While using configuration's property <<excludedScopes>> on third-party goals,
+  it will remove all the dependencies came from the given scopes from the
+  THIRD-PARTY file.
+
+*** Example
+
+  Given a pom with these dependencies :
+
+-------------------------------------------------------------------------------
+
+  <dependencies>
+
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <version>1.1.1</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.jhlabs</groupId>
+      <artifactId>filters</artifactId>
+      <version>2.0.235</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.jhlabs</groupId>
+      <artifactId>javaproj</artifactId>
+      <version>1.0</version>
+    </dependency>
+
+  </dependencies>
+-------------------------------------------------------------------------------
+
+  While executing <mvn license:add-third-party -Dlicense.excludedScopes=test>,
+  we obtain the following <<THIRD-PARTY>> file :
+
+-------------------------------------------------------------------------------
+List of 2 third-party dependencies.
+
+ (Apache License, Version 2.0) JHLabs Image Processing Filters (com.jhlabs:filters:2.0.235 - http://www.jhlabs.com/ip/index.html)
+ (The Apache Software License, Version 2.0) JHlabs Java Projection Library (com.jhlabs:javaproj:1.0 - http://www.jhlabs.com/java/maps/proj/index.html)
+-------------------------------------------------------------------------------
+
+** include scopes
+
+  While using configuration's property <<includedScopes>> on third-party goals,
+  it will only skip all the dependencies came from the given scopes from the
+  THIRD-PARTY file.
+
+*** Example
+
+  Given a pom with these dependencies :
+
+-------------------------------------------------------------------------------
+
+  <dependencies>
+
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <version>1.1.1</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.jhlabs</groupId>
+      <artifactId>filters</artifactId>
+      <version>2.0.235</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.jhlabs</groupId>
+      <artifactId>javaproj</artifactId>
+      <version>1.0</version>
+    </dependency>
+
+  </dependencies>
+-------------------------------------------------------------------------------
+
+  While executing <mvn license:add-third-party -Dlicense.includedScopes=test>,
+  we obtain the following <<THIRD-PARTY>> file :
+
+-------------------------------------------------------------------------------
+List of 1 third-party dependency.
+
+ (The Apache Software License, Version 2.0) Commons Logging (commons-logging:commons-logging:1.1.1 - http://commons.apache.org/logging)
+-------------------------------------------------------------------------------
+
 ** exclude groupIds
 
-  While using configuration's property <<excludeGroups>> on third-party goals,
-  it will remove all the dependencies came from the given groupIds fom the
+  While using configuration's property <<excludedGroups>> on third-party goals,
+  it will remove all the dependencies came from the given groupIds from the
   THIRD-PARTY file.
 
 *** Example
@@ -256,23 +351,23 @@ List of 2 third-party dependencies.
       <groupId>com.jhlabs</groupId>
       <artifactId>javaproj</artifactId>
       <version>1.0</version>
-    </dependency<
+    </dependency>
 
   </dependencies>
 -------------------------------------------------------------------------------
 
-  While executing <mvn add-third-party -Dlicense.excludedGroups=com\.jhla.*>,
+  While executing <mvn license:add-third-party -Dlicense.excludedGroups=com\.jhla.*>,
   we obtain the following <<THIRD-PARTY>> file :
 
 -------------------------------------------------------------------------------
-List of 2 third-party dependencies.
+List of 1 third-party dependency.
 
  (The Apache Software License, Version 2.0) Commons Logging (commons-logging:commons-logging:1.1.1 - http://commons.apache.org/logging)
 -------------------------------------------------------------------------------
 
 ** exclude artifactIds
 
-   While using configuration's property <<excludeArtifacts>> on third-party goals,
+   While using configuration's property <<excludedArtifacts>> on third-party goals,
    it will remove all the dependencies came from the given artifactsIds fom the
    THIRD-PARTY file.
 
@@ -300,12 +395,12 @@ List of 2 third-party dependencies.
       <groupId>com.jhlabs</groupId>
       <artifactId>javaproj</artifactId>
       <version>1.0</version>
-    </dependency<
+    </dependency>
 
   </dependencies>
 -------------------------------------------------------------------------------
 
-  While executing <mvn add-third-party -Dlicense.excludedArtifacts=javaproj>,
+  While executing <mvn license:add-third-party -Dlicense.excludedArtifacts=javaproj>,
   we obtain the following <<THIRD-PARTY>> file :
 
 -------------------------------------------------------------------------------
@@ -317,7 +412,7 @@ List of 2 third-party dependencies.
 
 ** include groupIds
 
-   While using configuration's property <<includeGroups>> on third-party goals,
+   While using configuration's property <<includedGroups>> on third-party goals,
    it will include only the dependencies came from the given groupIds fom the
    THIRD-PARTY file.
 
@@ -345,12 +440,12 @@ List of 2 third-party dependencies.
       <groupId>com.jhlabs</groupId>
       <artifactId>javaproj</artifactId>
       <version>1.0</version>
-    </dependency<
+    </dependency>
 
   </dependencies>
 -------------------------------------------------------------------------------
 
-  While executing <mvn add-third-party -Dlicense.includedGroups=com\.jhlabs>,
+  While executing <mvn license:add-third-party -Dlicense.includedGroups=com\.jhlabs>,
   we obtain the following <<THIRD-PARTY>> file :
 
 -------------------------------------------------------------------------------
@@ -362,7 +457,7 @@ List of 2 third-party dependencies.
 
 ** include artifactIds
 
-   While using configuration's property <<excludeArtifacts>> on third-party goals,
+   While using configuration's property <<includedArtifacts>> on third-party goals,
    it will include only the dependencies came from the given artifactIds fom the
    THIRD-PARTY file.
 
@@ -390,16 +485,16 @@ List of 2 third-party dependencies.
       <groupId>com.jhlabs</groupId>
       <artifactId>javaproj</artifactId>
       <version>1.0</version>
-    </dependency<
+    </dependency>
 
   </dependencies>
 -------------------------------------------------------------------------------
 
-  While executing <mvn add-third-party -Dlicense.includedArtifacts=filters>,
+  While executing <mvn license:add-third-party -Dlicense.includedArtifacts=filters>,
   we obtain the following <<THIRD-PARTY>> file :
 
 -------------------------------------------------------------------------------
-List of 2 third-party dependencies.
+List of 1 third-party dependency.
 
   (Apache License, Version 2.0) JHLabs Image Processing Filters (com.jhlabs:filters:2.0.235 - http://www.jhlabs.com/ip/index.html)
 -------------------------------------------------------------------------------

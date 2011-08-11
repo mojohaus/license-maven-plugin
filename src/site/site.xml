@@ -36,5 +36,6 @@
       <item name="Thirdparty Licenses" href="examples/example-thirdparty.html"/>
       <item name="Update File Header" href="examples/update-file-header-config.html"/>
     </menu>
+    <menu ref="reports"/>
   </body>
 </project>

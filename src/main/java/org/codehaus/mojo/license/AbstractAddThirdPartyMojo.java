@@ -587,9 +587,6 @@ public abstract class AbstractAddThirdPartyMojo
         this.doGenerateBundle = doGenerateBundle;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public List<String> getExcludedScopes()
     {
         String[] split = excludedScopes == null ? new String[0] : excludedScopes.split( "," );
@@ -601,9 +598,6 @@ public abstract class AbstractAddThirdPartyMojo
         this.excludedScopes = excludedScopes;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public List<String> getIncludedScopes()
     {
         String[] split = includedScopes == null ? new String[0] : includedScopes.split( "," );
