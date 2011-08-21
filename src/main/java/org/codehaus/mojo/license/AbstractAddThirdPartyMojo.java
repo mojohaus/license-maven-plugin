@@ -26,6 +26,7 @@
 package org.codehaus.mojo.license;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
@@ -309,18 +310,39 @@ public abstract class AbstractAddThirdPartyMojo
         if ( !CollectionUtils.isEmpty( licenseMerges ) )
         {
 
-            // merge licenses in license map
+            // check where is not multi licenses merged main licenses (see OJO-1723)
+            Map<String, String[]> mergedLicenses = new HashMap<String, String[]>();
 
             for ( String merge : licenseMerges )
             {
                 merge = merge.trim();
-                if ( isVerbose() )
-                {
-                    getLog().info( "Will merge [" + merge + "]" );
-                }
                 String[] split = merge.split( "\\|" );
 
-                thridPartyTool.mergeLicenses( licenseMap, split );
+                String mainLicense = split[0];
+
+                if ( mergedLicenses.containsKey( mainLicense ) )
+                {
+
+                    // this license was already describe, fail the build...
+
+                    throw new MojoFailureException(
+                        "The merge main license " + mainLicense + " was already registred in the " +
+                            "configuration, please use only one such entry as describe in example " +
+                            "http://mojo.codehaus.org/license-maven-plugin/examples/example-thirdparty.html#Merge_licenses." );
+                }
+                mergedLicenses.put( mainLicense, split );
+            }
+
+            // merge licenses in license map
+
+            for ( String[] mergedLicense : mergedLicenses.values() )
+            {
+                if ( isVerbose() )
+                {
+                    getLog().info( "Will merge " + Arrays.toString( mergedLicense ) + "" );
+                }
+
+                thridPartyTool.mergeLicenses( licenseMap, mergedLicense );
             }
         }
     }
