@@ -179,10 +179,11 @@ public class UpdateProjectLicenseMojo
         if ( hasClassPath() )
         {
 
-            // copy LICENSE.txt to the resource directory (to be include in
-            // class-path)
+            // copy the license file to the resources directory
             File resourceTarget = new File( getOutputDirectory(), target.getName() );
             FileUtil.copyFile( getLicenseFile(), resourceTarget );
+
+            addResourceDir( getOutputDirectory(), "**/" + resourceTarget.getName() );
 
             if ( isGenerateBundle() )
             {
@@ -190,10 +191,15 @@ public class UpdateProjectLicenseMojo
                 // creates the bundled license file
                 File bundleTarget = FileUtil.getFile( getOutputDirectory(), getBundleLicensePath() );
                 FileUtil.copyFile( target, bundleTarget );
+
+                if ( !resourceTarget.getName().equals( bundleTarget.getName() ) )
+                {
+
+                    addResourceDir( getOutputDirectory(), "**/" + bundleTarget.getName() );
+                }
             }
 
-            // add resources directory as project resources basedir
-            addResourceDir( getOutputDirectory(), "**/*.txt" );
+
         }
     }
 
