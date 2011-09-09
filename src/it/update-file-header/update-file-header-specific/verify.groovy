@@ -85,5 +85,15 @@ assert content.contains('# #L%');
 assert !content.contains('# # \n');
 assert content.contains('$Id');
 
+file = new File(basedir, 'src/files/ftl/index.ftl');
+assert file.exists();
+
+content = file.text;
+assert content.contains('Copyright (C)');
+assert content.contains('<#-- #%L');
+assert content.contains('-- #L%');
+assert content.contains('$Id');
+assert content.contains('-->');
+
 
 return true;
