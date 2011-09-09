@@ -111,9 +111,9 @@ public class UpdateFileHeaderFilter
             modified = true;
 
             // use the new copyright
-            result.setCopyrightFirstYear( result.getCopyrightFirstYear() );
-            result.setCopyrightLastYear( result.getCopyrightLastYear() );
-            result.setCopyrightHolder( result.getCopyrightHolder() );
+            result.setCopyrightFirstYear( newHeader.getCopyrightFirstYear() );
+            result.setCopyrightLastYear( newHeader.getCopyrightLastYear() );
+            result.setCopyrightHolder( newHeader.getCopyrightHolder() );
         }
 
         if ( isUpdateLicense() && !transformer.isLicenseEquals( oldHeader, newHeader ) )

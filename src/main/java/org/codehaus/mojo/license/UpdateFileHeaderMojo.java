@@ -136,6 +136,8 @@ public class UpdateFileHeaderMojo
      * A flag to update copyright application time (change copyright last year
      * if required) according to the last commit made on the processed file.
      *
+     * Note that this functionnality is still not effective.
+     *
      * @parameter expression="${license.updateCopyright}" default-value="false"
      * @since 1.0
      */
@@ -146,7 +148,7 @@ public class UpdateFileHeaderMojo
      * <p/>
      * Sometimes, it is necessary to do this when file is under a specific license.
      * <p/>
-     * <b>Note:</b> If no sets, will use the default tag {@code %}%Ignore-License
+     * <b>Note:</b> If no sets, will use the default tag {@code %%Ignore-License}
      *
      * @parameter expression="${license.ignoreTag}"
      * @since 1.0
