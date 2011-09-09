@@ -30,6 +30,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
@@ -45,6 +46,8 @@ public class LicenseStoreTest
     public static final List<String> DEFAULT_LICENSES =
         Arrays.asList( "agpl_v3", "apache_v2", "cddl_v1", "fdl_v1_3", "gpl_v1", "gpl_v2", "gpl_v3", "lgpl_v2_1",
                        "lgpl_v3", "mit" );
+
+    public static final List<String> NEW_LICENSES = Arrays.asList( "license1", "license2" );
 
     protected LicenseStore store;
 
@@ -85,7 +88,46 @@ public class LicenseStoreTest
 
         for ( String licenseName : store.getLicenseNames() )
         {
-            Assert.assertTrue( LicenseStoreTest.DEFAULT_LICENSES.contains( licenseName ) );
+            Assert.assertTrue( DEFAULT_LICENSES.contains( licenseName ) );
+        }
+    }
+
+    @Test
+    public void testOtherJarRepository()
+        throws IOException
+    {
+
+        URL baseURL = getClass().getResource( "/newRepository" );
+        LicenseRepository jarRepository = new LicenseRepository();
+        jarRepository.setBaseURL( baseURL );
+
+        store = new LicenseStore();
+        store.addRepository( jarRepository );
+        store.init();
+        List<LicenseRepository> repositories = store.getRepositories();
+        Assert.assertNotNull( repositories );
+        Assert.assertEquals( 1, repositories.size() );
+        LicenseRepository repository = repositories.get( 0 );
+
+        License[] licenses1 = repository.getLicenses();
+        License[] licenses = store.getLicenses();
+        Assert.assertNotNull( licenses );
+        Assert.assertNotNull( licenses1 );
+        Assert.assertEquals( licenses1.length, 2 );
+        Assert.assertEquals( licenses1.length, licenses.length );
+
+        for ( String licenseName : NEW_LICENSES )
+        {
+            License license = repository.getLicense( licenseName );
+            License license1 = store.getLicense( licenseName );
+            Assert.assertNotNull( license );
+            Assert.assertNotNull( license1 );
+            Assert.assertEquals( license, license1 );
+        }
+
+        for ( String licenseName : store.getLicenseNames() )
+        {
+            Assert.assertTrue( NEW_LICENSES.contains( licenseName ) );
         }
     }
 }

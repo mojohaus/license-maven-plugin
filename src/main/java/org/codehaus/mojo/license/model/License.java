@@ -163,14 +163,24 @@ public class License
         this.baseURL = baseURL;
     }
 
+    public void setLicenseURL( URL licenseURL )
+    {
+        this.licenseURL = licenseURL;
+    }
+
+    public void setHeaderURL( URL headerURL )
+    {
+        this.headerURL = headerURL;
+    }
+
     @Override
     public String toString()
     {
         ToStringBuilder builder = new ToStringBuilder( this, ToStringStyle.MULTI_LINE_STYLE );
         builder.append( "name", name );
         builder.append( "description", description );
-        builder.append( "licenseURL", getLicenseURL() );
-        builder.append( "headerURL", getHeaderURL() );
+        builder.append( "licenseURL", licenseURL );
+        builder.append( "headerURL", headerURL );
         return builder.toString();
     }
 }

@@ -35,6 +35,8 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author tchemit <chemit@codelutin.com>
@@ -50,6 +52,9 @@ public class LicenseRepository
     private static final Log log = LogFactory.getLog( LicenseRepository.class );
 
     public static final String REPOSITORY_DEFINITION_FILE = "licenses.properties";
+
+    public static final Pattern LICENSE_DESCRIPTION_PATTERN =
+        Pattern.compile( "(.*)\\s*~~\\s*license\\s*:\\s*(.*)\\s*~~\\s*header\\s*:\\s*(.*)\\s*" );
 
     /**
      * the base url of the licenses repository
@@ -115,13 +120,49 @@ public class LicenseRepository
             {
                 String licenseName = (String) entry.getKey();
                 licenseName = licenseName.trim().toLowerCase();
-                String licenseDescription = (String) entry.getValue();
-                URL licenseURL = MojoHelper.getUrl( baseURL, licenseName );
+                URL licenseBaseURL = MojoHelper.getUrl( baseURL, licenseName );
 
                 License license = new License();
                 license.setName( licenseName );
+                license.setBaseURL( licenseBaseURL );
+
+                String licenseDescription = (String) entry.getValue();
+                Matcher matcher = LICENSE_DESCRIPTION_PATTERN.matcher( licenseDescription );
+                String licenseFile;
+                String headerFile;
+
+                if ( matcher.matches() )
+                {
+                    licenseDescription = matcher.group( 1 );
+                    licenseFile = matcher.group( 2 );
+                    headerFile = matcher.group( 3 );
+                }
+                else
+                {
+                    licenseFile = License.LICENSE_CONTENT_FILE;
+                    headerFile = License.LICENSE_HEADER_FILE;
+                }
+
+                URL licenseURL = MojoHelper.getUrl( licenseBaseURL, licenseFile );
+                if ( !checkExists( licenseURL ) )
+                {
+                    throw new IllegalArgumentException(
+                        "Could not find license (" + license + ") content file at [" + licenseURL +
+                            "] for resolver " + this );
+                }
+                license.setLicenseURL( licenseURL );
+
+                URL headerURL = MojoHelper.getUrl( licenseBaseURL, headerFile );
+                if ( !checkExists( headerURL ) )
+                {
+                    throw new IllegalArgumentException(
+                        "Could not find license (" + license + ") header file at [" + headerURL + "] for resolver " +
+                            this );
+                }
+                license.setHeaderURL( headerURL );
+
                 license.setDescription( licenseDescription );
-                license.setBaseURL( licenseURL );
+
                 if ( log.isInfoEnabled() )
                 {
                     log.info( "register " + license.getDescription() );
