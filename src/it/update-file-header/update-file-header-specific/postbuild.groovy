@@ -85,6 +85,28 @@ assert content.contains('# #L%');
 assert !content.contains('# # \n');
 assert content.contains('$Id');
 
+file = new File(basedir, 'src/files/properties/test.sh');
+assert file.exists();
+
+content = file.text;
+assert content.startsWith('#!/bin/sh');
+assert content.contains('Copyright (C)');
+assert content.contains('# #%L');
+assert content.contains('# #L%');
+assert !content.contains('# # \n');
+assert content.contains('$Id');
+
+file = new File(basedir, 'src/files/properties/test2.sh');
+assert file.exists();
+
+content = file.text;
+assert content.startsWith('#!/bin/sh');
+assert content.contains('Copyright (C)');
+assert content.contains('# #%L');
+assert content.contains('# #L%');
+assert !content.contains('# # \n');
+assert content.contains('$Id');
+
 file = new File(basedir, 'src/files/ftl/index.ftl');
 assert file.exists();
 
@@ -94,6 +116,17 @@ assert content.contains('<#-- #%L');
 assert content.contains('-- #L%');
 assert content.contains('$Id');
 assert content.contains('-->');
+
+
+file = new File(basedir, 'src/files/sql/index.sql');
+assert file.exists();
+
+content = file.text;
+assert content.contains('Copyright (C)');
+assert content.contains('-- #%L');
+assert content.contains('-- #L%');
+assert content.contains('$Id');
+assert content.contains('---');
 
 
 return true;

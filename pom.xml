@@ -59,7 +59,6 @@
     <mojo.java.target>1.5</mojo.java.target>
     <mavenVersion>2.2.1</mavenVersion>
     <processorVersion>1.2.2</processorVersion>
-    <helperPluginVersion>1.2.11</helperPluginVersion>
     <pluginPluginVersion>2.5.1</pluginPluginVersion>
     <javadocPluginVersion>2.7</javadocPluginVersion>
 
@@ -253,17 +252,12 @@
           <value>!true</value>
         </property>
       </activation>
-      <properties>
-        <sitePluginVersion>2.0.1</sitePluginVersion>
-      </properties>
       <build>
         <plugins>
           <plugin>
             <artifactId>maven-invoker-plugin</artifactId>
             <configuration>
-              <projectsDirectory>src/it</projectsDirectory>
               <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
-              <postBuildHookScript>verify</postBuildHookScript>
               <settingsFile>src/it/settings.xml</settingsFile>
               <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
               <debug>true</debug>
@@ -277,6 +271,7 @@
                 </goals>
                 <configuration>
                   <pomIncludes>
+                    <!--<pomInclude>update-file-header/update-file-header-specific/pom.xml</pomInclude>-->
                     <pomInclude>add-third-party/*/pom.xml</pomInclude>
                     <pomInclude>aggregate-add-third-party/*/pom.xml</pomInclude>
                     <pomInclude>update-file-header/*/pom.xml</pomInclude>
