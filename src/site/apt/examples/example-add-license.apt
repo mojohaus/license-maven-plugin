@@ -31,6 +31,12 @@ Add a license not present in license-maven-plugin
 
 * Create the license files
 
+  To use a new license, you need to define two content files :
+
+  - the header file (this content will be added in header of all source files)
+  - the license file (this file is the real license file placed at the root of the maven project in
+    (by convention) LICENSE.txt file.
+
   * src/license/my_license/header.txt
 
     Example for GPLv3 :
@@ -93,6 +99,19 @@ Public License instead of this License.  But first, please read
     my_license=My license
     
 -------------------------------------------------------------------------------
+
+  The default (convention) configuration use <<header.txt>> and <<license.txt>> as file names for the header and license file.
+
+  This can be changed using this syntax in the license repository definition file like this
+
+-------------------------------------------------------------------------------
+
+    my_license=My license~~license:licenseFileName.html~~header:headerFileName.html
+
+-------------------------------------------------------------------------------
+
+  In this example, you have then to define a <<licenseFileName.html>> and <<headerFileName.html>> file in the
+  <<my_license>> directory.
 
 
 * Configure the plugin

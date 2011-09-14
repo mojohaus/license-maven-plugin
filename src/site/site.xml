@@ -34,6 +34,7 @@
       <item name="Download Licenses" href="examples/example-download-licenses.html"/>
       <item name="List Licenses" href="examples/example-license-list.html"/>
       <item name="Thirdparty Licenses" href="examples/example-thirdparty.html"/>
+      <item name="List Comment style" href="examples/example-comment-style-list.html"/>
       <item name="Update File Header" href="examples/update-file-header-config.html"/>
     </menu>
     <menu ref="reports"/>
