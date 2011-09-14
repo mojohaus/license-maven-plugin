@@ -1,0 +1,39 @@
+ ------
+ Comment style List Examples
+ ------
+ ------
+ 2011-09-14
+ ------
+
+Comment style List Examples
+
+* comment-style-list goal
+
+  This goal displays the available comment styles to box file header.
+
+  Use it directly (and only) from commandline :
+
+-------------------------------------------------------------------------------
+  mvn license:comment-style-list
+-------------------------------------------------------------------------------
+
+  To display the example, use the <<detail>> parameter :
+
+-------------------------------------------------------------------------------
+  mvn license:comment-style-list -Ddetail
+-------------------------------------------------------------------------------
+
+  for full detail see {{{./comment-style-list-mojo.html}detail page}}.
+
+** Example output
+
+-------------------------------------------------------------------------------
+  [INFO] [license:comment-style-list {execution: default-cli}]
+  [INFO] List of available comment styles:
+
+    - apt        : header transformer with apt comment style
+    - java       : header transformer with java comment style
+    - properties : header transformer with properties file comment style
+    - rst        : header transformer with rst comment style
+    - xml        : header transformer with xml comment style
+-------------------------------------------------------------------------------

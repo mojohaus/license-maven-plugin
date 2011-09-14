@@ -65,7 +65,9 @@ ${project.name}
   * {{{./examples/example-download-licenses.html}Download dependency licenses}}
   
   * {{{./examples/example-license-list.html}List available licenses}}
-  
+
+  * {{{./examples/example-comment-style-list.html}List available Comment styles}}
+
   * {{{./examples/example-thirdparty.html}Check thirdparty licenses}}
   
   * {{{./examples/update-file-header-config.html}Update file header of source files}}
