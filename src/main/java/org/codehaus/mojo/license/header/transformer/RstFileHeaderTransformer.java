@@ -53,6 +53,6 @@ public class RstFileHeaderTransformer
 
     public String[] getDefaultAcceptedExtensions()
     {
-        return new String[]{ "rst" };
+        return new String[]{ NAME };
     }
 }

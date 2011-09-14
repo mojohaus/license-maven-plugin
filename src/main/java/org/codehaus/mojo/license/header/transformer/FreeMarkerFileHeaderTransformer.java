@@ -52,6 +52,6 @@ public class FreeMarkerFileHeaderTransformer extends AbstractFileHeaderTransform
 
     public String[] getDefaultAcceptedExtensions()
     {
-        return new String[]{ "ftl" };
+        return new String[]{ NAME };
     }
 }

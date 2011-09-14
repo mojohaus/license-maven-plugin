@@ -53,6 +53,6 @@ public class AptFileHeaderTransformer
 
     public String[] getDefaultAcceptedExtensions()
     {
-        return new String[]{ "apt" };
+        return new String[]{ NAME };
     }
 }

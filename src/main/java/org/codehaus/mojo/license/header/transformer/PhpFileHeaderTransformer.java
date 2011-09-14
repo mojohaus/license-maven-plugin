@@ -53,7 +53,7 @@ public class PhpFileHeaderTransformer
 
     public String[] getDefaultAcceptedExtensions()
     {
-        return new String[]{ "php" };
+        return new String[]{ NAME };
     }
 
 }

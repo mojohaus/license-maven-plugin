@@ -51,7 +51,7 @@ public class JspFileHeaderTransformer
 
     public String[] getDefaultAcceptedExtensions()
     {
-        return new String[]{ "jsp", "jspx" };
+        return new String[]{ NAME, "jspx" };
     }
 
 }
