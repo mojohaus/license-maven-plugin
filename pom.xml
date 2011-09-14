@@ -17,7 +17,8 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/lgpl-3.0.html>.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
     <groupId>org.codehaus.mojo</groupId>
     <artifactId>mojo-parent</artifactId>
@@ -28,7 +29,7 @@
   <artifactId>license-maven-plugin</artifactId>
   <packaging>maven-plugin</packaging>
   <name>License Maven Plugin</name>
-  <version>1.0-beta-4-SNAPSHOT</version>
+  <version>1.0-SNAPSHOT</version>
   <description>Maven plugin to download and collect license files from project dependencies.</description>
 
   <scm>
@@ -39,7 +40,7 @@
 
   <issueManagement>
     <system>JIRA</system>
-    <url>http://jira.codehaus.org/browse/MOJO</url>
+    <url>http://jira.codehaus.org/browse/MLICENSE</url>
   </issueManagement>
 
   <inceptionYear>2010</inceptionYear>
@@ -109,7 +110,7 @@
       </exclusions>
     </dependency>
 
-     <dependency>
+    <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
       <version>1.5.15</version>
@@ -207,14 +208,14 @@
     <pluginManagement>
       <plugins>
         <plugin>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-component-metadata</artifactId>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-component-metadata</artifactId>
           <version>1.5.2</version>
         </plugin>
 
         <plugin>
-            <artifactId>maven-dependency-plugin</artifactId>
-            <version>2.1</version>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <version>2.1</version>
         </plugin>
 
         <plugin>
@@ -242,8 +243,8 @@
       </plugins>
     </pluginManagement>
   </build>
-  
-  <profiles>    
+
+  <profiles>
     <profile>
       <id>run-its</id>
       <activation>
@@ -327,6 +328,24 @@
           </plugin>
         </plugins>
       </build>
+    </profile>
+
+    <profile>
+      <id>reporting</id>
+      <activation>
+        <property>
+          <name>skipReports</name>
+          <value>!true</value>
+        </property>
+      </activation>
+
+      <reporting>
+        <plugins>
+          <plugin>
+            <artifactId>maven-invoker-plugin</artifactId>
+          </plugin>
+        </plugins>
+      </reporting>
     </profile>
 
     <profile>
