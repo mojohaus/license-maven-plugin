@@ -1,1 +1,0 @@
-To fix the MOJO-1739 (see http://jira.codehaus.org/browse/MOJO-1739)

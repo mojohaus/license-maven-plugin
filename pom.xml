@@ -210,12 +210,12 @@
         <plugin>
           <groupId>org.codehaus.plexus</groupId>
           <artifactId>plexus-component-metadata</artifactId>
-          <version>1.5.2</version>
+          <version>1.5.5</version>
         </plugin>
 
         <plugin>
           <artifactId>maven-dependency-plugin</artifactId>
-          <version>2.1</version>
+          <version>2.3</version>
         </plugin>
 
         <plugin>
@@ -261,7 +261,7 @@
               <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
               <settingsFile>src/it/settings.xml</settingsFile>
               <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
-              <debug>true</debug>
+              <debug>false</debug>
             </configuration>
             <executions>
               <execution>
@@ -272,7 +272,7 @@
                 </goals>
                 <configuration>
                   <pomIncludes>
-                    <!--<pomInclude>update-file-header/update-file-header-specific/pom.xml</pomInclude>-->
+                    <!--<pomInclude>update-file-header/test-mojo/pom.xml</pomInclude>-->
                     <pomInclude>add-third-party/*/pom.xml</pomInclude>
                     <pomInclude>aggregate-add-third-party/*/pom.xml</pomInclude>
                     <pomInclude>update-file-header/*/pom.xml</pomInclude>

@@ -7,8 +7,9 @@
 
 ${project.name}
 
-  This plugin reads the dependencies of a project and attempts to download the associated license
-  files based on the "url" field in the dependency POMs.
+  This plugin manages the license of a maven project and its dependencies
+  (update file headers, download dependencies licenses, check thirdparty
+  licenses, ...)
    
 * {Goals} Overview
   

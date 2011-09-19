@@ -78,7 +78,7 @@ Usage
 
 ** update-project-license goal
 
-  This goal creates or updates the LICENSE.txt file and add it in build.
+  This goal creates or updates the LICENSE.txt file and adds it in the build.
 
   It can also generate a bundle License file to avoid name collision in a final
   application.
@@ -87,38 +87,32 @@ Usage
 
 ** update-file-header goal
 
-  This goal adds or updates the license header on some files using a xml
-  descriptor file to describe all files to include in license process for a
-  whole module.
+  This goal adds or updates the license header based on the configuration.
 
   For more information, see the {{{./examples/update-file-header-config.html}examples}} and
   for full detail see {{{./update-file-header-mojo.html}detail page}}.
 
-  In case of any descriptor file, all the <*.java *.rst *.xml et *.properties>
-  files from <"src/**/*"> are treated. However, it is necessary to give the license
-  to use, with the parameter <licenseName>.
-
-  for full detail see {{{./update-file-header-config.html}detail page}}.
+  for full detail on the configuration see {{{./update-file-header-config.html}detail page}}.
 
 
 * Getting Dependency License Information
 
 ** add-third-party goal
 
-  This goal build the THIRD-PARTY.txt file and add it in build.
+  This goal builds the THIRD-PARTY.txt file and adds it in the build.
 
-  <Since version 2.3>, we can consolidate the generated file by filling another
+  We also are able to consolidate the generated file by filling another
   file (the <<missing file>>) for dependencies without license.
 
   <Note:> This mojo has not effect on a <<pom>> project.
 
   For more information, see the {{{./examples/example-thirdparty.html}examples}} and for
-  full detail see {{{./add-third-party-mojo.html}the add third party mojo page}}.
+  full details see {{{./add-third-party-mojo.html}the add third party mojo page}}.
 
 ** aggregate-add-third-party goal
 
-  This goal build the THIRD-PARTY.txt file on a multi-module project from
-  the dependencies of all his modules.
+  This goal builds the THIRD-PARTY.txt file on a multi-module project from
+  the dependencies of all its modules.
 
   <Note:> This mojo has only effect on a <<pom>> project.
 

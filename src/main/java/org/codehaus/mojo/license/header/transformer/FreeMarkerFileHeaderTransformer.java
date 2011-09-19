@@ -39,9 +39,9 @@ public class FreeMarkerFileHeaderTransformer extends AbstractFileHeaderTransform
 
     public static final String DESCRIPTION = "header transformer with free marker comment style";
 
-    public static final String COMMENT_LINE_PREFIX = "<#-- ";
+    public static final String COMMENT_LINE_PREFIX = " ";
 
-    public static final String COMMENT_START_TAG = "  ";
+    public static final String COMMENT_START_TAG = "<#--";
 
     public static final String COMMENT_END_TAG = "-->";
 

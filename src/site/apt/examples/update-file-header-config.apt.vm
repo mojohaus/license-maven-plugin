@@ -43,20 +43,24 @@ Update File Header Examples
   To see all extensions accepted run the <<comment-style-list>> goal.
 
 -------------------------------------------------------------------------------
-[INFO] --- license-maven-plugin:1.0:comment-style-list (default-cli) @ license-maven-plugin ---
+[INFO] --- license-maven-plugin:${project.version}:comment-style-list (default-cli) @ license-maven-plugin ---
 [INFO] List of available comment styles:
 
   - apt        : header transformer with apt comment style            , extensions : [apt]
-  - java       : header transformer with java comment style           , extensions : [java, groovy, css, cs, as, aj, c, h, cpp]
+  - ftl        : header transformer with free marker comment style    , extensions : [ftl]
+  - java       : header transformer with java comment style           , extensions : [java, groovy, css, cs, as, aj, c, h, cpp, js, json]
+  - jsp        : header transformer with jsp comment style            , extensions : [jsp, jspx]
+  - php        : header transformer with php comment style            , extensions : [php]
   - properties : header transformer with properties file comment style, extensions : [properties, sh, py, rb, pl, pm]
   - rst        : header transformer with rst comment style            , extensions : [rst]
-  - xml        : header transformer with xml comment style            , extensions : [pom, xml, xhtml, mxlm, dtd, jspx, fml, xsl, html, htm, jaxx, kml, gsp, tml]
+  - sql        : header transformer with sql comment style            , extensions : [sql]
+  - xml        : header transformer with xml comment style            , extensions : [pom, xml, xhtml, mxlm, dtd, fml, xsl, html, htm, jaxx, kml, gsp, tml]
 -------------------------------------------------------------------------------
 
 Root Directories
 
   By default, All the files in <src, target/generated-sources, target/processed-source> are treated.
-  This could be changed with the property <roots>. The roots property is a list of base directories from which the
+  This could be changed with the property <roots>. The <roots> property is a list of base directories from which the
   update-file-header will be applied.
 
 * Example
@@ -108,7 +112,7 @@ Includes
 
   By default, all the files from the roots and with the adequate extension are treated.
   With the list parameters <includes>, we can specify with more precision which
-  files we want to deals.
+  files we want to deal.
 
 * Example
 
@@ -213,7 +217,7 @@ ExtraExtensions
         <version>${project.version}</version>
         <configuration>
           <extraExtensions>
-            <yo>java</yo>
+            <myProprietaryExtension>java</myProprietaryExtension>
           </extraExtensions>
         </configuration>
       </plugin>
@@ -221,5 +225,5 @@ ExtraExtensions
 
 -------------------------------------------------------------------------------
 
-  Files with extension <<yo>> will be treated as java files (says using the comment style named java).
+  Files with extension <<myProprietaryExtension>> will be treated as java files (says using the comment style named java).
 

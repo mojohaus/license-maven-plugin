@@ -1,0 +1,1 @@
+To fix the MLICENSE-3 bug (see http://jira.codehaus.org/browse/MLICENSE-3)
