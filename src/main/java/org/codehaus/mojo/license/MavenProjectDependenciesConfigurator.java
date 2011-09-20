@@ -72,7 +72,7 @@ public interface MavenProjectDependenciesConfigurator
     String getExcludedGroups();
 
     /**
-     * @return a pattern to exclude dependencies by theire {@code groupId}, if {@code null} is setted then no exclude
+     * @return a pattern to exclude dependencies by their {@code groupId}, if {@code null} is setted then no exclude
      *         is done on groupId.
      */
     String getExcludedArtifacts();

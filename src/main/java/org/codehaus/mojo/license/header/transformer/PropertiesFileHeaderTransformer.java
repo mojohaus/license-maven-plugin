@@ -51,7 +51,7 @@ public class PropertiesFileHeaderTransformer
     public PropertiesFileHeaderTransformer()
     {
         super( NAME, DESCRIPTION, COMMENT_START_TAG, COMMENT_END_TAG, COMMENT_LINE_PREFIX );
-        linesep = System.getProperty("line.separator");
+        linesep = System.getProperty( "line.separator" );
     }
 
     public String[] getDefaultAcceptedExtensions()

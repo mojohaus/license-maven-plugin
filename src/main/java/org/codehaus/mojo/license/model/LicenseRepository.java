@@ -147,8 +147,8 @@ public class LicenseRepository
                 if ( !checkExists( licenseURL ) )
                 {
                     throw new IllegalArgumentException(
-                        "Could not find license (" + license + ") content file at [" + licenseURL +
-                            "] for resolver " + this );
+                        "Could not find license (" + license + ") content file at [" + licenseURL + "] for resolver " +
+                            this );
                 }
                 license.setLicenseURL( licenseURL );
 

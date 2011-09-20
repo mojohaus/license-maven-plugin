@@ -32,7 +32,8 @@ package org.codehaus.mojo.license.header.transformer;
  * @plexus.component role-hint="ftl"
  * @since 1.0
  */
-public class FreeMarkerFileHeaderTransformer extends AbstractFileHeaderTransformer
+public class FreeMarkerFileHeaderTransformer
+    extends AbstractFileHeaderTransformer
 {
 
     public static final String NAME = "ftl";

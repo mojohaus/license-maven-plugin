@@ -322,7 +322,7 @@ List of 1 third-party dependency.
 
 ** exclude groupIds
 
-  Using configuration's property <<excludedGroupIds>>, will remove from the
+  Using configuration's property <<excludedGroups>>, will remove from the
   THIRD-PARTY file all the dependencies coming from the given groupIds.
 
 *** Example
@@ -365,7 +365,7 @@ List of 1 third-party dependency.
 
 ** exclude artifactIds
 
-  Using configuration's property <<excludedArtifactIds>>, will remove from the
+  Using configuration's property <<excludedArtifacts>>, will remove from the
   THIRD-PARTY file all the dependencies coming from the given artifactIds.
 
 *** Example
@@ -409,7 +409,7 @@ List of 2 third-party dependencies.
 
 ** include groupIds
 
-  Using configuration's property <<includedGroupIds>>, will only put in the
+  Using configuration's property <<includedGroups>>, will only put in the
   THIRD-PARTY file all the dependencies coming from the given groupIds.
 
 *** Example
@@ -453,7 +453,7 @@ List of 2 third-party dependencies.
 
 ** include artifactIds
 
-  Using configuration's property <<includedArtifactIds>>, will only put in the
+  Using configuration's property <<includedArtifacts>>, will only put in the
   THIRD-PARTY file all the dependencies coming from the given artifactIds.
 
 *** Example
