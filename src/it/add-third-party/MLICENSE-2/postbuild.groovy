@@ -27,14 +27,14 @@ file = new File(basedir, 'child1/src/license/THIRD-PARTY.properties');
 assert file.exists();
 content = file.text;
 assert content.contains('org.springframework.ws--spring-oxm--1.5.8=');
-assert content.contains('org.jboss.seam--jboss-seam--2.2.0.GA=');
+assert content.contains('org.springframework.ws--spring-xml--1.5.8=');
 assert content.contains('net.sf.docbook--docbook-xsl--1.76.1=');
 
 file = new File(basedir, 'child2/src/license/THIRD-PARTY.properties');
 assert file.exists();
 content = file.text;
 assert content.contains('org.springframework.ws--spring-oxm--1.5.8=The Apache Software License, Version 2.0');
-assert content.contains('org.jboss.seam--jboss-seam--2.2.0.GA=The Apache Software License, Version 2.0');
+assert content.contains('org.springframework.ws--spring-xml--1.5.8=The Apache Software License, Version 2.0');
 assert content.contains('net.sf.docbook--docbook-xsl--1.76.1=Docbook license (MIT-like)');
 
 return true;

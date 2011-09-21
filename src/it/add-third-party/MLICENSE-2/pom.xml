@@ -69,13 +69,6 @@
         <version>1.5.8</version>
       </dependency>
       
-      <!-- this dependency is a ejb type -->
-      <dependency>
-        <groupId>org.jboss.seam</groupId>
-        <artifactId>jboss-seam</artifactId>
-        <version>2.2.0.GA</version>
-      </dependency>
-
       <!-- a -resources.zip dep -->
       <dependency>
         <groupId>net.sf.docbook</groupId>

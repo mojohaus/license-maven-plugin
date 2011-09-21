@@ -52,12 +52,6 @@
       <artifactId>spring-oxm</artifactId>
     </dependency>
 
-    <!-- this dependency is a ejb type -->
-    <dependency>
-      <groupId>org.jboss.seam</groupId>
-      <artifactId>jboss-seam</artifactId>
-    </dependency>
-
     <!-- a resources.zip dep -->
     <dependency>
       <groupId>net.sf.docbook</groupId>
