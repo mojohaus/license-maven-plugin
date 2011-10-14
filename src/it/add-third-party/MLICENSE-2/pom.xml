@@ -31,10 +31,10 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.codehaus.mojo.license.test</groupId>
-  <artifactId>test-MOJO-1716</artifactId>
+  <artifactId>test-MLICENSE-2</artifactId>
   <version>@pom.version@</version>
 
-  <name>License Test :: MOJO-1716</name>
+  <name>License Test :: MLICENSE-2</name>
   <packaging>pom</packaging>
 
   <modules>

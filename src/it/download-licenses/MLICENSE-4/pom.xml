@@ -31,10 +31,10 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.codehaus.mojo.license.test</groupId>
-  <artifactId>MOJO-1674</artifactId>
+  <artifactId>MLICENSE-4</artifactId>
   <version>1.0</version>
 
-  <name>License Test :: MOJO-1674</name>
+  <name>License Test :: MLICENSE-4</name>
 
   <url>no-url</url>
 

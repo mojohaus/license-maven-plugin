@@ -32,18 +32,18 @@
 
   <parent>
     <groupId>org.codehaus.mojo.license.test</groupId>
-    <artifactId>test-MOJO-1714</artifactId>
+    <artifactId>test-MLICENSE-21</artifactId>
     <version>@pom.version@</version>
   </parent>
 
-  <artifactId>test-MOJO-1714-child2</artifactId>
+  <artifactId>test-MLICENSE-21-child2</artifactId>
 
-  <name>License Test :: MOJO-1714-child2</name>
+  <name>License Test :: MLICENSE-21-child2</name>
 
   <dependencies>
     <dependency>
       <groupId>org.codehaus.mojo.license.test</groupId>
-      <artifactId>test-MOJO-1714-child1</artifactId>
+      <artifactId>test-MLICENSE-21-child1</artifactId>
       <version>@pom.version@</version>
     </dependency>
   </dependencies>

@@ -32,13 +32,13 @@
 
   <parent>
     <groupId>org.codehaus.mojo.license.test</groupId>
-    <artifactId>test-MOJO-1716</artifactId>
+    <artifactId>test-MLICENSE-2</artifactId>
     <version>@pom.version@</version>
   </parent>
 
-  <artifactId>test-MOJO-1716-child1</artifactId>
+  <artifactId>test-MLICENSE-2-child1</artifactId>
 
-  <name>License Test :: MOJO-1716-child1</name>
+  <name>License Test :: MLICENSE-2-child1</name>
 
   <properties>
     <license.failIfWarning>false</license.failIfWarning>
