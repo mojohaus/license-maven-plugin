@@ -260,7 +260,7 @@
               <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
               <settingsFile>src/it/settings.xml</settingsFile>
               <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
-              <debug>false</debug>
+              <debug>true</debug>
             </configuration>
             <executions>
               <execution>
@@ -272,11 +272,12 @@
                 <configuration>
                   <pomIncludes>
                     <!--<pomInclude>update-file-header/test-mojo/pom.xml</pomInclude>-->
-                    <pomInclude>add-third-party/*/pom.xml</pomInclude>
-                    <pomInclude>aggregate-add-third-party/*/pom.xml</pomInclude>
-                    <pomInclude>update-file-header/*/pom.xml</pomInclude>
-                    <pomInclude>update-project-license/*/pom.xml</pomInclude>
-                    <pomInclude>download-licenses/*/pom.xml</pomInclude>
+                    <pomInclude>add-third-party/MLICENSE-25/pom.xml</pomInclude>
+                    <!--<pomInclude>add-third-party/*/pom.xml</pomInclude>-->
+                    <!--<pomInclude>aggregate-add-third-party/*/pom.xml</pomInclude>-->
+                    <!--<pomInclude>update-file-header/*/pom.xml</pomInclude>-->
+                    <!--<pomInclude>update-project-license/*/pom.xml</pomInclude>-->
+                    <!--<pomInclude>download-licenses/*/pom.xml</pomInclude>-->
                   </pomIncludes>
                   <pomExcludes>
                     <pomExclude>download-licenses/MOJO-1674/pom.xml</pomExclude>

@@ -33,6 +33,7 @@ import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
 import org.codehaus.mojo.license.model.LicenseMap;
+import org.codehaus.plexus.util.StringUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -99,6 +100,16 @@ public class AddThirdPartyMojo
     protected boolean useRepositoryMissingFiles;
 
     /**
+     * To execute or not this mojo if project packaging is pom.
+     *
+     * <strong>Note:</strong> The default value is {@code false}.
+     *
+     * @parameter expression="${license.acceptPomPackaging}"  default-value="false"
+     * @since 1.1
+     */
+    protected boolean acceptPomPackaging;
+
+    /**
      * dependencies tool.
      *
      * @component
@@ -112,6 +123,13 @@ public class AddThirdPartyMojo
     @Override
     protected boolean checkPackaging()
     {
+        if (acceptPomPackaging) {
+
+            // rejects nothing
+            return true;
+        }
+
+        // can reject pom packaging
         return rejectPackaging( "pom" );
     }
 
