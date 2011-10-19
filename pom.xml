@@ -279,7 +279,7 @@
                     <pomInclude>download-licenses/*/pom.xml</pomInclude>
                   </pomIncludes>
                   <pomExcludes>
-                    <pomExclude>download-licenses/MOJO-1674/pom.xml</pomExclude>
+                    <pomExclude>download-licenses/MLICENSE-4/pom.xml</pomExclude>
                   </pomExcludes>
                 </configuration>
               </execution>
