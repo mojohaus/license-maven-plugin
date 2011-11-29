@@ -21,7 +21,7 @@
   <parent>
     <groupId>org.codehaus.mojo</groupId>
     <artifactId>mojo-parent</artifactId>
-    <version>28</version>
+    <version>29</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.codehaus.mojo</groupId>
@@ -41,6 +41,10 @@
     <system>JIRA</system>
     <url>http://jira.codehaus.org/browse/MLICENSE</url>
   </issueManagement>
+  <ciManagement>
+    <system>bamboo</system>
+    <url>http://bamboo.ci.codehaus.org/browse/MOJO-LICENSECI</url>
+  </ciManagement>
 
   <inceptionYear>2010</inceptionYear>
   <licenses>
@@ -52,19 +56,13 @@
   </licenses>
 
   <prerequisites>
-    <maven>2.2.1</maven>
+    <maven>${mavenVersion}</maven>
   </prerequisites>
 
   <properties>
     <mojo.java.target>1.5</mojo.java.target>
     <mavenVersion>2.2.1</mavenVersion>
     <processorVersion>1.2.2</processorVersion>
-    <pluginPluginVersion>2.5.1</pluginPluginVersion>
-    <javadocPluginVersion>2.7</javadocPluginVersion>
-
-    <!-- versions of javadoc tagglets -->
-    <mavenPluginToolsJavadocVersion>2.5.1</mavenPluginToolsJavadocVersion>
-    <plexusComponentJavadocVersion>1.3.0</plexusComponentJavadocVersion>
 
   </properties>
 
@@ -79,7 +77,6 @@
       <artifactId>maven-project</artifactId>
       <version>${mavenVersion}</version>
     </dependency>
-
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-artifact</artifactId>
@@ -211,34 +208,6 @@
           <artifactId>plexus-component-metadata</artifactId>
           <version>1.5.5</version>
         </plugin>
-
-        <plugin>
-          <artifactId>maven-dependency-plugin</artifactId>
-          <version>2.3</version>
-        </plugin>
-
-        <plugin>
-          <artifactId>maven-javadoc-plugin</artifactId>
-          <version>${javadocPluginVersion}</version>
-          <configuration>
-            <charset>${project.reporting.outputEncoding}</charset>
-            <links>
-              <link>http://download.oracle.com/javase/6/docs/api</link>
-            </links>
-            <tagletArtifacts>
-              <tagletArtifact>
-                <groupId>org.apache.maven.plugin-tools</groupId>
-                <artifactId>maven-plugin-tools-javadoc</artifactId>
-                <version>${mavenPluginToolsJavadocVersion}</version>
-              </tagletArtifact>
-              <tagletArtifact>
-                <groupId>org.codehaus.plexus</groupId>
-                <artifactId>plexus-component-javadoc</artifactId>
-                <version>${plexusComponentJavadocVersion}</version>
-              </tagletArtifact>
-            </tagletArtifacts>
-          </configuration>
-        </plugin>
       </plugins>
     </pluginManagement>
   </build>
@@ -302,35 +271,6 @@
     </profile>
 
     <profile>
-      <id>maven-3</id>
-      <activation>
-        <file>
-          <!--  This employs that the basedir expression is only recognized by Maven 3.x (see MNG-2363) -->
-          <exists>${basedir}</exists>
-        </file>
-      </activation>
-      <properties>
-        <!-- MLICENSE-26 : maven-site-plugin 3.0 is buggy -->
-        <sitePluginVersion>3.0-beta-3</sitePluginVersion>
-      </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-site-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>attach-descriptor</id>
-                <goals>
-                  <goal>attach-descriptor</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <profile>
       <id>reporting</id>
       <activation>
         <property>
@@ -347,37 +287,6 @@
           </plugin>
         </plugins>
       </reporting>
-    </profile>
-
-    <profile>
-      <id>analyze-dependencies</id>
-      <activation>
-        <property>
-          <name>performRelease</name>
-          <value>true</value>
-        </property>
-      </activation>
-      <build>
-        <defaultGoal>verify</defaultGoal>
-        <plugins>
-          <plugin>
-            <artifactId>maven-dependency-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>analyze</id>
-                <goals>
-                  <goal>analyze-only</goal>
-                </goals>
-                <configuration>
-                  <verbose>true</verbose>
-                  <failOnWarning>true</failOnWarning>
-                  <ignoreNonCompile>true</ignoreNonCompile>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
     </profile>
   </profiles>
 </project>
