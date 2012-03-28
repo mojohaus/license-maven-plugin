@@ -55,7 +55,7 @@ public abstract class AbstractFileHeaderTransformer
      * </ul>
      */
     protected static final Pattern COPYRIGHT_PATTERN =
-        Pattern.compile( "(.[^\\d]+)?\\s(\\d{4})?(\\s+-\\s+(\\d{4})?){0,1}\\s+(.+)?" );
+        Pattern.compile( "(.[^\\d]+)?\\s(\\d{4})?(\\s+-\\s+(\\d{4})?){0,1}\\s+(.+)?", Pattern.DOTALL );
 
     /**
      * name of transformer

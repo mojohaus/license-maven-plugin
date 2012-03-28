@@ -150,6 +150,20 @@ public class AbstractFileHeaderTransformerTest
         Assert.assertEquals( "2012", lastYear );
         holder = matcher.group( 5 );
         Assert.assertEquals( "Tony", holder );
+
+        // Test MLICENSE-34 (multi-line copyright holders)
+        actual = "Copyright (C) 2010 - 2012    Tony\nAnd Yet\n Another\nLine";
+        matcher = COPYRIGHT_PATTERN.matcher( actual );
+        Assert.assertTrue( matcher.matches() );
+        Assert.assertEquals( 5, matcher.groupCount() );
+        prefix = matcher.group( 1 );
+        Assert.assertEquals( "Copyright (C)", prefix );
+        firstYear = matcher.group( 2 );
+        Assert.assertEquals( "2010", firstYear );
+        lastYear = matcher.group( 4 );
+        Assert.assertEquals( "2012", lastYear );
+        holder = matcher.group( 5 );
+        Assert.assertEquals( "Tony\nAnd Yet\n Another\nLine", holder );
     }
 
     @Test
