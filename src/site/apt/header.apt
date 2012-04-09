@@ -68,11 +68,11 @@ Header model
 
   You can configure those things :
 
-  * start process tag (using the {{{./update-file-header-mojo.html#processStartTag}}processStartTag} parameter)
+  * start process tag (using the {{{./update-file-header-mojo.html#processStartTag}processStartTag}} parameter)
 
-  * header section delimiter (using the {{{./update-file-header-mojo.html#sectionDelimiter}}sectionDelimiter} parameter)
+  * header section delimiter (using the {{{./update-file-header-mojo.html#sectionDelimiter}sectionDelimiter}} parameter)
   
-  * end process tag (using the {{{./update-file-header-mojo.html#processEndTag}}processEndTag} parameter)
+  * end process tag (using the {{{./update-file-header-mojo.html#processEndTag}processEndTag}} parameter)
 
   <<Note:>>
 

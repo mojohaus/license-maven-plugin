@@ -1,9 +1,6 @@
 /*
  * #%L
  * License Maven Plugin
- *
- * $Id$
- * $HeadURL$
  * %%
  * Copyright (C) 2011 CodeLutin, Codehaus, Tony Chemit
  * %%
@@ -24,11 +21,16 @@
  */
 package org.codehaus.mojo.license;
 
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.project.MavenProject;
+import org.codehaus.mojo.license.api.DependenciesTool;
+
 import java.util.List;
+import java.util.SortedMap;
 
 /**
  * Contract to configure which dependencies will be loaded by the dependency tool via the method
- * {@link DependenciesTool#loadProjectDependencies(org.apache.maven.project.MavenProject, MavenProjectDependenciesConfigurator, org.apache.maven.artifact.repository.ArtifactRepository, java.util.List, java.util.SortedMap)}
+ * {@link DependenciesTool#loadProjectDependencies(MavenProject, MavenProjectDependenciesConfigurator, ArtifactRepository, List, SortedMap)}
  *
  * @author tchemit <chemit@codelutin.com>
  * @see DependenciesTool

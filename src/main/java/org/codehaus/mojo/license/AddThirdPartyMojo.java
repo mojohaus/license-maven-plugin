@@ -1,9 +1,6 @@
 /*
  * #%L
  * License Maven Plugin
- * 
- * $Id$
- * $HeadURL$
  * %%
  * Copyright (C) 2008 - 2011 CodeLutin, Codehaus, Tony Chemit
  * %%
@@ -27,18 +24,21 @@ package org.codehaus.mojo.license;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
 import org.codehaus.mojo.license.model.LicenseMap;
-import org.codehaus.plexus.util.StringUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.SortedSet;
 
 /**
  * Goal to generate the third-party license file.
@@ -64,32 +64,12 @@ public class AddThirdPartyMojo
 {
 
     /**
-     * Local Repository.
-     *
-     * @parameter expression="${localRepository}"
-     * @required
-     * @readonly
-     * @since 1.0.0
-     */
-    protected ArtifactRepository localRepository;
-
-    /**
-     * Remote repositories used for the project.
-     *
-     * @parameter expression="${project.remoteArtifactRepositories}"
-     * @required
-     * @readonly
-     * @since 1.0.0
-     */
-    protected List remoteRepositories;
-
-    /**
      * Deploy the third party missing file in maven repository.
      *
      * @parameter expression="${license.deployMissingFile}"  default-value="true"
      * @since 1.0
      */
-    protected boolean deployMissingFile;
+    private boolean deployMissingFile;
 
     /**
      * Load from repositories third party missing files.
@@ -97,33 +77,84 @@ public class AddThirdPartyMojo
      * @parameter expression="${license.useRepositoryMissingFiles}"  default-value="true"
      * @since 1.0
      */
-    protected boolean useRepositoryMissingFiles;
+    private boolean useRepositoryMissingFiles;
 
     /**
      * To execute or not this mojo if project packaging is pom.
-     *
+     * <p/>
      * <strong>Note:</strong> The default value is {@code false}.
      *
      * @parameter expression="${license.acceptPomPackaging}"  default-value="false"
      * @since 1.1
      */
-    protected boolean acceptPomPackaging;
+    private boolean acceptPomPackaging;
 
     /**
-     * dependencies tool.
+     * A filter to exclude some scopes.
      *
-     * @component
-     * @readonly
-     * @since 1.0
+     * @parameter expression="${license.excludedScopes}" default-value="system"
+     * @since 1.1
      */
-    private DependenciesTool dependenciesTool;
+    private String excludedScopes;
+
+    /**
+     * A filter to include only some scopes, if let empty then all scopes will be used (no filter).
+     *
+     * @parameter expression="${license.includedScopes}" default-value=""
+     * @since 1.1
+     */
+    private String includedScopes;
+
+    /**
+     * A filter to exclude some GroupIds
+     *
+     * @parameter expression="${license.excludedGroups}" default-value=""
+     * @since 1.1
+     */
+    private String excludedGroups;
+
+    /**
+     * A filter to include only some GroupIds
+     *
+     * @parameter expression="${license.includedGroups}" default-value=""
+     * @since 1.1
+     */
+    private String includedGroups;
+
+    /**
+     * A filter to exclude some ArtifactsIds
+     *
+     * @parameter expression="${license.excludedArtifacts}" default-value=""
+     * @since 1.1
+     */
+    private String excludedArtifacts;
+
+    /**
+     * A filter to include only some ArtifactsIds
+     *
+     * @parameter expression="${license.includedArtifacts}" default-value=""
+     * @since 1.1
+     */
+    private String includedArtifacts;
+
+    /**
+     * Include transitive dependencies when downloading license files.
+     *
+     * @parameter default-value="true"
+     * @since 1.1
+     */
+    private boolean includeTransitiveDependencies;
 
     private boolean doGenerateMissing;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected boolean checkPackaging()
     {
-        if (acceptPomPackaging) {
+        if ( acceptPomPackaging )
+        {
 
             // rejects nothing
             return true;
@@ -133,60 +164,37 @@ public class AddThirdPartyMojo
         return rejectPackaging( "pom" );
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected SortedMap<String, MavenProject> loadDependencies()
     {
-        return dependenciesTool.loadProjectDependencies( getProject(), this, localRepository, remoteRepositories,
-                                                         getArtifactCache() );
+        return getHelper().loadDependencies( this );
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected SortedProperties createUnsafeMapping()
         throws ProjectBuildingException, IOException, ThirdPartyToolException
     {
 
-        SortedProperties unsafeMappings =
-            getThridPartyTool().loadUnsafeMapping( getLicenseMap(), getArtifactCache(), getEncoding(),
-                                                   getMissingFile() );
-
         SortedSet<MavenProject> unsafeDependencies = getUnsafeDependencies();
 
-        if ( CollectionUtils.isNotEmpty( unsafeDependencies ) )
-        {
-
-            // there is some unresolved license
-
-            if ( isUseRepositoryMissingFiles() )
-            {
-
-                // try to load missing third party files from dependencies
-
-                Collection<MavenProject> projects = new ArrayList<MavenProject>( getProjectDependencies().values() );
-                projects.remove( getProject() );
-                projects.removeAll( unsafeDependencies );
-
-                SortedProperties resolvedUnsafeMapping =
-                    getThridPartyTool().loadThirdPartyDescriptorsForUnsafeMapping( getEncoding(), projects,
-                                                                                   unsafeDependencies, getLicenseMap(),
-                                                                                   localRepository,
-                                                                                   remoteRepositories );
-
-                // push back resolved unsafe mappings
-                unsafeMappings.putAll( resolvedUnsafeMapping );
-
-            }
-        }
+        SortedProperties unsafeMappings =
+            getHelper().createUnsafeMapping( getLicenseMap(), getMissingFile(), useRepositoryMissingFiles,
+                                             unsafeDependencies, getProjectDependencies().values() );
         if ( isVerbose() )
         {
             getLog().info( "found " + unsafeMappings.size() + " unsafe mappings" );
         }
 
         // compute if missing file should be (re)-generate
-        boolean generateMissingfile = computeDoGenerateMissingFile( unsafeMappings, unsafeDependencies );
+        doGenerateMissing = computeDoGenerateMissingFile( unsafeMappings, unsafeDependencies );
 
-        setDoGenerateMissing( generateMissingfile );
-
-        if ( generateMissingfile && isVerbose() )
+        if ( doGenerateMissing && isVerbose() )
         {
             StringBuilder sb = new StringBuilder();
             sb.append( "Will use from missing file " );
@@ -208,6 +216,124 @@ public class AddThirdPartyMojo
             }
         }
         return unsafeMappings;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean checkSkip()
+    {
+        if ( !isDoGenerate() && !isDoGenerateBundle() && !doGenerateMissing )
+        {
+
+            getLog().info( "All files are up to date, skip goal execution." );
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void doAction()
+        throws Exception
+    {
+
+        boolean unsafe = checkUnsafeDependencies();
+
+        writeThirdPartyFile();
+
+        if ( doGenerateMissing )
+        {
+
+            writeMissingFile();
+        }
+
+        if ( unsafe && isFailIfWarning() )
+        {
+            throw new MojoFailureException(
+                "There is some dependencies with no license, please fill the file " + getMissingFile() );
+        }
+
+        if ( !unsafe && isUseMissingFile() && MapUtils.isEmpty( getUnsafeMappings() ) && getMissingFile().exists() )
+        {
+
+            // there is no missing dependencies, but still a missing file, delete it
+            getLog().info( "There is no dependency to put in missing file, delete it at " + getMissingFile() );
+            FileUtil.deleteFile( getMissingFile() );
+        }
+
+        if ( !unsafe && deployMissingFile && MapUtils.isNotEmpty( getUnsafeMappings() ) )
+        {
+
+            // can deploy missing file
+            File file = getMissingFile();
+
+            getLog().info( "Will deploy third party file from " + file );
+            getHelper().attachThirdPartyDescriptor( file );
+        }
+
+        addResourceDir( getOutputDirectory(), "**/*.txt" );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public List<String> getExcludedScopes()
+    {
+        String[] split = excludedScopes == null ? new String[0] : excludedScopes.split( "," );
+        return Arrays.asList( split );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public List<String> getIncludedScopes()
+    {
+        String[] split = includedScopes == null ? new String[0] : includedScopes.split( "," );
+        return Arrays.asList( split );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getExcludedGroups()
+    {
+        return excludedGroups;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getIncludedGroups()
+    {
+        return includedGroups;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getExcludedArtifacts()
+    {
+        return excludedArtifacts;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getIncludedArtifacts()
+    {
+        return includedArtifacts;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isIncludeTransitiveDependencies()
+    {
+        return includeTransitiveDependencies;
     }
 
     /**
@@ -260,60 +386,6 @@ public class AddThirdPartyMojo
         return !unsafeMappings.equals( oldUnsafeMappings );
     }
 
-    @Override
-    protected boolean checkSkip()
-    {
-        if ( !isDoGenerate() && !isDoGenerateBundle() && !isDoGenerateMissing() )
-        {
-
-            getLog().info( "All files are up to date, skip goal execution." );
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    protected void doAction()
-        throws Exception
-    {
-
-        boolean unsafe = checkUnsafeDependencies();
-
-        writeThirdPartyFile();
-
-        if ( isDoGenerateMissing() )
-        {
-
-            writeMissingFile();
-        }
-
-        if ( unsafe && isFailIfWarning() )
-        {
-            throw new MojoFailureException(
-                "There is some dependencies with no license, please fill the file " + getMissingFile() );
-        }
-
-        if ( !unsafe && isUseMissingFile() && MapUtils.isEmpty( getUnsafeMappings() ) && getMissingFile().exists() )
-        {
-
-            // there is no missing dependencies, but still a missing file, delete it
-            getLog().info( "There is no dependency to put in missing file, delete it at " + getMissingFile() );
-            FileUtil.deleteFile( getMissingFile() );
-        }
-
-        if ( !unsafe && isDeployMissingFile() && MapUtils.isNotEmpty( getUnsafeMappings() ) )
-        {
-
-            // can deploy missing file
-            File file = getMissingFile();
-
-            getLog().info( "Will deploy third party file from " + file );
-            getThridPartyTool().attachThirdPartyDescriptor( getProject(), file );
-        }
-
-        addResourceDir( getOutputDirectory(), "**/*.txt" );
-    }
-
     protected void writeMissingFile()
         throws IOException
     {
@@ -330,7 +402,7 @@ public class AddThirdPartyMojo
         {
             StringBuilder sb = new StringBuilder( " Generated by " + getClass().getName() );
             List<String> licenses = new ArrayList<String>( licenseMap.keySet() );
-            licenses.remove( LicenseMap.getUnknownLicenseMessage() );
+            licenses.remove( LicenseMap.UNKNOWN_LICENSE_MESSAGE );
             if ( !licenses.isEmpty() )
             {
                 sb.append( "\n-------------------------------------------------------------------------------" );
@@ -349,51 +421,4 @@ public class AddThirdPartyMojo
             writer.close();
         }
     }
-
-    public boolean isDoGenerateMissing()
-    {
-        return doGenerateMissing;
-    }
-
-    public void setDoGenerateMissing( boolean doGenerateMissing )
-    {
-        this.doGenerateMissing = doGenerateMissing;
-    }
-
-    public ArtifactRepository getLocalRepository()
-    {
-        return localRepository;
-    }
-
-    public List getRemoteRepositories()
-    {
-        return remoteRepositories;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean isIncludeTransitiveDependencies()
-    {
-        return includeTransitiveDependencies;
-    }
-
-//    /**
-//     * {@inheritDoc}
-//     */
-//    public List<String> getExcludedScopes()
-//    {
-//        return Arrays.asList( Artifact.SCOPE_SYSTEM );
-//    }
-
-    public boolean isDeployMissingFile()
-    {
-        return deployMissingFile;
-    }
-
-    public boolean isUseRepositoryMissingFiles()
-    {
-        return useRepositoryMissingFiles;
-    }
-
 }

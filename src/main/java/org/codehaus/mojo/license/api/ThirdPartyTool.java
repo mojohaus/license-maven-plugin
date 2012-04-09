@@ -1,9 +1,6 @@
 /*
  * #%L
  * License Maven Plugin
- *
- * $Id$
- * $HeadURL$
  * %%
  * Copyright (C) 2011 CodeLutin, Codehaus, Tony Chemit
  * %%
@@ -22,11 +19,13 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
-package org.codehaus.mojo.license;
+package org.codehaus.mojo.license.api;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.License;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.mojo.license.SortedProperties;
+import org.codehaus.mojo.license.ThirdPartyToolException;
 import org.codehaus.mojo.license.model.LicenseMap;
 
 import java.io.File;
@@ -60,8 +59,9 @@ public interface ThirdPartyTool
      * @param localRepository    local repository
      * @param remoteRepositories remote repositories
      * @return the map of loaded missing from the remote missing third party files
-     * @throws ThirdPartyToolException if any
-     * @throws IOException             if any
+     * @throws org.codehaus.mojo.license.ThirdPartyToolException
+     *                     if any
+     * @throws IOException if any
      */
     SortedProperties loadThirdPartyDescriptorsForUnsafeMapping( String encoding, Collection<MavenProject> projects,
                                                                 SortedSet<MavenProject> unsafeProjects,
@@ -146,4 +146,11 @@ public interface ThirdPartyTool
      * @param licenses   all the licenses to merge (the first license will be the unique one to kkep)
      */
     void mergeLicenses( LicenseMap licenseMap, String... licenses );
+
+    void writeThirdPartyFile( LicenseMap licenseMap, boolean groupByLicense, File thirdPartyFile, boolean verbose,
+                              String encoding )
+        throws IOException;
+
+    void writeBundleThirdPartyFile( File thirdPartyFile, File outputDirectory, String bundleThirdPartyPath )
+        throws IOException;
 }

@@ -1,9 +1,6 @@
 /*
  * #%L
  * License Maven Plugin
- * 
- * $Id$
- * $HeadURL$
  * %%
  * Copyright (C) 2008 - 2011 CodeLutin, Codehaus, Tony Chemit
  * %%
@@ -29,7 +26,11 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.codehaus.mojo.license.header.transformer.FileHeaderTransformer;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Displays all the available comment style to box file headers.
@@ -60,6 +61,9 @@ public class CommentStyleListMojo
      */
     private Map<String, FileHeaderTransformer> transformers;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void init()
         throws Exception
@@ -67,6 +71,9 @@ public class CommentStyleListMojo
         //nothing to do
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void doAction()
         throws MojoExecutionException, MojoFailureException
@@ -114,25 +121,5 @@ public class CommentStyleListMojo
         }
 
         getLog().info( buffer.toString() );
-    }
-
-    public boolean isDetail()
-    {
-        return detail;
-    }
-
-    public void setDetail( boolean detail )
-    {
-        this.detail = detail;
-    }
-
-    public Map<String, FileHeaderTransformer> getTransformers()
-    {
-        return transformers;
-    }
-
-    public void setTransformers( Map<String, FileHeaderTransformer> transformers )
-    {
-        this.transformers = transformers;
     }
 }

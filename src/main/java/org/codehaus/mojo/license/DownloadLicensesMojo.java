@@ -1,9 +1,6 @@
 /*
  * #%L
  * License Maven Plugin
- *
- * $Id$
- * $HeadURL$
  * %%
  * Copyright (C) 2010 - 2011 CodeLutin, Codehaus, Tony Chemit
  * %%
@@ -22,6 +19,7 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
+
 package org.codehaus.mojo.license;
 
 import org.apache.maven.artifact.Artifact;
@@ -30,6 +28,7 @@ import org.apache.maven.model.License;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.mojo.license.api.DependenciesTool;
 import org.codehaus.mojo.license.model.ProjectLicenseInfo;
 
 import java.io.File;
@@ -38,7 +37,14 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
 
 /**
  * Download the license files of all the current project's dependencies, and generate a summary file containing a list
@@ -163,7 +169,7 @@ public class DownloadLicensesMojo
     private Set<String> downloadedLicenseURLs = new HashSet<String>();
 
     /**
-     * Main Maven plugin execution
+     * {@inheritDoc}
      */
     public void execute()
         throws MojoExecutionException
@@ -413,21 +419,6 @@ public class DownloadLicensesMojo
 
     }
 
-    public MavenProject getProject()
-    {
-        return project;
-    }
-
-    public ArtifactRepository getLocalRepository()
-    {
-        return localRepository;
-    }
-
-    public List getRemoteRepositories()
-    {
-        return remoteRepositories;
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -457,11 +448,6 @@ public class DownloadLicensesMojo
     {
         String[] split = includedScopes == null ? new String[0] : includedScopes.split( "," );
         return Arrays.asList( split );
-    }
-
-    public void setIncludedScopes( String includedScopes )
-    {
-        this.includedScopes = includedScopes;
     }
 
     // not used at the moment

@@ -1,9 +1,6 @@
 /*
  * #%L
  * License Maven Plugin
- *
- * $Id$
- * $HeadURL$
  * %%
  * Copyright (C) 2011 CodeLutin, Codehaus, Tony Chemit
  * %%
@@ -22,10 +19,11 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
-package org.codehaus.mojo.license;
+package org.codehaus.mojo.license.api;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.mojo.license.MavenProjectDependenciesConfigurator;
 
 import java.util.List;
 import java.util.SortedMap;
@@ -51,7 +49,7 @@ public interface DependenciesTool
      * @param remoteRepositories remote repositories used to resolv dependencies
      * @param cache              a optional cache where to keep resolved dependencies
      * @return the map of resolved dependencies indexed by their unique id.
-     * @see MavenProjectDependenciesConfigurator
+     * @see org.codehaus.mojo.license.MavenProjectDependenciesConfigurator
      */
     SortedMap<String, MavenProject> loadProjectDependencies( MavenProject project,
                                                              MavenProjectDependenciesConfigurator configuration,

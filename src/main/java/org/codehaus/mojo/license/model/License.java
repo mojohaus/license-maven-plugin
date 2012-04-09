@@ -173,6 +173,9 @@ public class License
         this.headerURL = headerURL;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString()
     {

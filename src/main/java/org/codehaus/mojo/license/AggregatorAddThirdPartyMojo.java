@@ -1,9 +1,6 @@
 /*
  * #%L
  * License Maven Plugin
- * 
- * $Id$
- * $HeadURL$
  * %%
  * Copyright (C) 2008 - 2011 CodeLutin, Codehaus, Tony Chemit
  * %%
@@ -65,12 +62,18 @@ public class AggregatorAddThirdPartyMojo
      */
     protected List<?> reactorProjects;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected boolean checkPackaging()
     {
         return acceptPackaging( "pom" );
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected boolean checkSkip()
     {
@@ -83,13 +86,19 @@ public class AggregatorAddThirdPartyMojo
         return super.checkSkip();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected SortedMap<String, MavenProject> loadDependencies()
     {
         // use the cache filled by modules in reactor
-        return getArtifactCache();
+        return getHelper().getArtifactCache();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected SortedProperties createUnsafeMapping()
         throws ProjectBuildingException, IOException
@@ -116,12 +125,11 @@ public class AggregatorAddThirdPartyMojo
             if ( file.exists() )
             {
 
-                SortedProperties tmp =
-                    getThridPartyTool().loadUnsafeMapping( licenseMap, getArtifactCache(), getEncoding(), file );
+                SortedProperties tmp = getHelper().loadUnsafeMapping( licenseMap, file );
                 unsafeMappings.putAll( tmp );
             }
 
-            SortedSet<MavenProject> unsafes = getThridPartyTool().getProjectsWithNoLicense( licenseMap, isVerbose() );
+            SortedSet<MavenProject> unsafes = getHelper().getProjectsWithNoLicense( licenseMap );
             if ( CollectionUtils.isEmpty( unsafes ) )
             {
 
@@ -132,6 +140,9 @@ public class AggregatorAddThirdPartyMojo
         return unsafeMappings;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void doAction()
         throws Exception
@@ -142,7 +153,7 @@ public class AggregatorAddThirdPartyMojo
         {
             log.info( "After executing on " + reactorProjects.size() + " project(s)" );
         }
-        SortedMap<String, MavenProject> artifacts = getArtifactCache();
+        SortedMap<String, MavenProject> artifacts = getHelper().getArtifactCache();
 
         LicenseMap licenseMap = getLicenseMap();
 

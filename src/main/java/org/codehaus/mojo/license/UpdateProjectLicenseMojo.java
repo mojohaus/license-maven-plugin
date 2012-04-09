@@ -1,9 +1,6 @@
 /*
  * #%L
  * License Maven Plugin
- * 
- * $Id$
- * $HeadURL$
  * %%
  * Copyright (C) 2008 - 2011 CodeLutin, Codehaus, Tony Chemit
  * %%
@@ -115,6 +112,9 @@ public class UpdateProjectLicenseMojo
      */
     private boolean doGenerate;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void init()
         throws Exception
@@ -128,15 +128,17 @@ public class UpdateProjectLicenseMojo
         super.init();
 
         // must generate if file does not exist or pom never thant license file
-        File licenseFile = getLicenseFile();
         if ( licenseFile != null )
         {
             File pomFile = getProject().getFile();
 
-            setDoGenerate( isForce() || !licenseFile.exists() || licenseFile.lastModified() <= pomFile.lastModified() );
+            this.doGenerate = force || !licenseFile.exists() || licenseFile.lastModified() <= pomFile.lastModified();
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void doAction()
         throws Exception
@@ -144,93 +146,59 @@ public class UpdateProjectLicenseMojo
 
         License license = getLicense();
 
-        File target = getLicenseFile();
-
-        if ( isDoGenerate() )
+        if ( doGenerate )
         {
 
-            getLog().info( "Will create or update license file [" + license.getName() + "] to " + target );
+            getLog().info( "Will create or update license file [" + license.getName() + "] to " + licenseFile );
             if ( isVerbose() )
             {
                 getLog().info( "detail of license :\n" + license );
             }
 
-            if ( target.exists() && isKeepBackup() )
+            if ( licenseFile.exists() && isKeepBackup() )
             {
                 if ( isVerbose() )
                 {
-                    getLog().info( "backup " + target );
+                    getLog().info( "backup " + licenseFile );
                 }
                 // copy it to backup file
-                FileUtil.backupFile( target );
+                FileUtil.backupFile( licenseFile );
             }
         }
 
         // obtain license content
         String licenseContent = license.getLicenseContent( getEncoding() );
 
-        if ( isDoGenerate() )
+        if ( doGenerate )
         {
 
             // writes it root main license file
-            FileUtil.writeString( target, licenseContent, getEncoding() );
+            FileUtil.writeString( licenseFile, licenseContent, getEncoding() );
         }
 
         if ( hasClassPath() )
         {
 
             // copy the license file to the resources directory
-            File resourceTarget = new File( getOutputDirectory(), target.getName() );
-            FileUtil.copyFile( getLicenseFile(), resourceTarget );
+            File resourceTarget = new File( outputDirectory, licenseFile.getName() );
+            FileUtil.copyFile( this.licenseFile, resourceTarget );
 
-            addResourceDir( getOutputDirectory(), "**/" + resourceTarget.getName() );
+            addResourceDir( outputDirectory, "**/" + resourceTarget.getName() );
 
-            if ( isGenerateBundle() )
+            if ( generateBundle )
             {
 
                 // creates the bundled license file
-                File bundleTarget = FileUtil.getFile( getOutputDirectory(), getBundleLicensePath() );
-                FileUtil.copyFile( target, bundleTarget );
+                File bundleTarget = FileUtil.getFile( outputDirectory, bundleLicensePath );
+                FileUtil.copyFile( licenseFile, bundleTarget );
 
                 if ( !resourceTarget.getName().equals( bundleTarget.getName() ) )
                 {
 
-                    addResourceDir( getOutputDirectory(), "**/" + bundleTarget.getName() );
+                    addResourceDir( outputDirectory, "**/" + bundleTarget.getName() );
                 }
             }
-
-
         }
-    }
-
-    public File getLicenseFile()
-    {
-        return licenseFile;
-    }
-
-    public boolean isGenerateBundle()
-    {
-        return generateBundle;
-    }
-
-    public File getOutputDirectory()
-    {
-        return outputDirectory;
-    }
-
-    public String getBundleLicensePath()
-    {
-        return bundleLicensePath;
-    }
-
-    public boolean isDoGenerate()
-    {
-        return doGenerate;
-    }
-
-    public boolean isForce()
-    {
-        return force;
     }
 
     @Override
@@ -239,39 +207,10 @@ public class UpdateProjectLicenseMojo
         return skipUpdateProjectLicense;
     }
 
-    public void setLicenseFile( File licenseFile )
-    {
-        this.licenseFile = licenseFile;
-    }
-
-    public void setGenerateBundle( boolean generateBundle )
-    {
-        this.generateBundle = generateBundle;
-    }
-
-    public void setOutputDirectory( File outputDirectory )
-    {
-        this.outputDirectory = outputDirectory;
-    }
-
-    public void setBundleLicensePath( String bundleLicensePath )
-    {
-        this.bundleLicensePath = bundleLicensePath;
-    }
-
-    public void setDoGenerate( boolean doGenerate )
-    {
-        this.doGenerate = doGenerate;
-    }
-
     @Override
     public void setSkip( boolean skipUpdateProjectLicense )
     {
         this.skipUpdateProjectLicense = skipUpdateProjectLicense;
     }
 
-    public void setForce( boolean force )
-    {
-        this.force = force;
-    }
 }

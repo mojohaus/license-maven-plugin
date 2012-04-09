@@ -50,7 +50,7 @@ public class LicenseStore
     /**
      * Logger
      */
-    private static final Log log = LogFactory.getLog( LicenseStore.class );
+    private static final Log LOG = LogFactory.getLog( LicenseStore.class );
 
     /**
      * class-path directory where is the licenses repository
@@ -172,9 +172,9 @@ public class LicenseStore
                 break;
             }
         }
-        if ( result == null && log.isDebugEnabled() )
+        if ( result == null && LOG.isDebugEnabled() )
         {
-            log.debug( "could not find license named '" + licenseName + "'" );
+            LOG.debug( "could not find license named '" + licenseName + "'" );
         }
         return result;
     }
@@ -191,9 +191,9 @@ public class LicenseStore
         checkNotInit( "addRepository" );
         LicenseRepository repository = new LicenseRepository();
         repository.setBaseURL( baseURL );
-        if ( log.isDebugEnabled() )
+        if ( LOG.isDebugEnabled() )
         {
-            log.debug( "Adding a license repository " + repository );
+            LOG.debug( "Adding a license repository " + repository );
         }
         addRepository( repository );
     }
@@ -205,13 +205,16 @@ public class LicenseStore
         URL baseURL = getClass().getResource( JAR_LICENSE_REPOSITORY );
         LicenseRepository repository = new LicenseRepository();
         repository.setBaseURL( baseURL );
-        if ( log.isDebugEnabled() )
+        if ( LOG.isDebugEnabled() )
         {
-            log.debug( "Adding a jar license repository " + repository );
+            LOG.debug( "Adding a jar license repository " + repository );
         }
         addRepository( repository );
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Iterator<LicenseRepository> iterator()
     {
         return getRepositories().iterator();
@@ -225,9 +228,9 @@ public class LicenseStore
             repositories = new ArrayList<LicenseRepository>();
 
         }
-        if ( log.isInfoEnabled() )
+        if ( LOG.isInfoEnabled() )
         {
-            log.info( "Adding a license repository " + repository.getBaseURL() );
+            LOG.info( "Adding a license repository " + repository.getBaseURL() );
         }
         repositories.add( repository );
     }

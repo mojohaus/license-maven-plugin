@@ -1,9 +1,6 @@
 /*
  * #%L
  * License Maven Plugin
- * 
- * $Id$
- * $HeadURL$
  * %%
  * Copyright (C) 2008 - 2011 CodeLutin, Codehaus, Tony Chemit
  * %%
@@ -69,15 +66,21 @@ public class LicenseListMojo
      */
     protected LicenseStore licenseStore;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void init()
         throws Exception
     {
 
         // obtain licenses store
-        licenseStore = LicenseStore.createLicenseStore( getLog(), getExtraResolver() );
+        licenseStore = LicenseStore.createLicenseStore( getLog(), extraResolver );
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void doAction()
         throws MojoExecutionException, MojoFailureException
@@ -109,7 +112,7 @@ public class LicenseListMojo
         {
             License license = licenseStore.getLicense( licenseName );
             buffer.append( String.format( pattern, licenseName, license.getDescription() ) );
-            if ( isDetail() )
+            if ( detail )
             {
                 try
                 {
@@ -126,25 +129,5 @@ public class LicenseListMojo
             }
         }
         getLog().info( buffer.toString() );
-    }
-
-    public String getExtraResolver()
-    {
-        return extraResolver;
-    }
-
-    public boolean isDetail()
-    {
-        return detail;
-    }
-
-    public void setExtraResolver( String extraResolver )
-    {
-        this.extraResolver = extraResolver;
-    }
-
-    public void setDetail( boolean detail )
-    {
-        this.detail = detail;
     }
 }

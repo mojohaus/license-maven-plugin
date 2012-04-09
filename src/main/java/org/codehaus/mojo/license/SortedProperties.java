@@ -1,9 +1,6 @@
 /*
  * #%L
  * Maven helper plugin
- * 
- * $Id$
- * $HeadURL$
  * %%
  * Copyright (C) 2009 - 2010 Tony Chemit, CodeLutin
  * %%
@@ -26,8 +23,16 @@
 package org.codehaus.mojo.license;
 
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Properties;
+import java.util.Vector;
 
 /**
  * Permet d'avoir les fichiers de proprietes tries.
@@ -70,6 +75,9 @@ public class SortedProperties
         super( defaults );
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Enumeration<Object> keys()
     {

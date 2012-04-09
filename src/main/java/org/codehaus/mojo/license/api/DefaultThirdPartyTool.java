@@ -1,9 +1,6 @@
 /*
  * #%L
  * License Maven Plugin
- *
- * $Id$
- * $HeadURL$
  * %%
  * Copyright (C) 2011 CodeLutin, Codehaus, Tony Chemit
  * %%
@@ -22,7 +19,7 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
-package org.codehaus.mojo.license;
+package org.codehaus.mojo.license.api;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -36,13 +33,28 @@ import org.apache.maven.model.License;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.MavenProjectHelper;
+import org.codehaus.mojo.license.FileUtil;
+import org.codehaus.mojo.license.MojoHelper;
+import org.codehaus.mojo.license.SortedProperties;
+import org.codehaus.mojo.license.ThirdPartyToolException;
 import org.codehaus.mojo.license.model.LicenseMap;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -51,7 +63,7 @@ import java.util.regex.Pattern;
  *
  * @author <a href="mailto:tchemit@codelutin.com">Tony Chemit</a>
  * @version $Id$
- * @plexus.component role="org.codehaus.mojo.license.ThirdPartyTool" role-hint="default"
+ * @plexus.component role="org.codehaus.mojo.license.api.ThirdPartyTool" role-hint="default"
  */
 public class DefaultThirdPartyTool
     extends AbstractLogEnabled
@@ -98,6 +110,9 @@ public class DefaultThirdPartyTool
      */
     private final Comparator<MavenProject> projectComparator = MojoHelper.newMavenProjectComparator();
 
+
+    public static final String NO_DEPENDENCIES_MESSAGE = "the project has no dependencies.";
+
     /**
      * {@inheritDoc}
      */
@@ -116,7 +131,7 @@ public class DefaultThirdPartyTool
         Logger log = getLogger();
 
         // get unsafe dependencies (says with no license)
-        SortedSet<MavenProject> unsafeDependencies = licenseMap.get( LicenseMap.getUnknownLicenseMessage() );
+        SortedSet<MavenProject> unsafeDependencies = licenseMap.get( LicenseMap.UNKNOWN_LICENSE_MESSAGE );
 
         if ( doLog )
         {
@@ -297,7 +312,7 @@ public class DefaultThirdPartyTool
         {
 
             // no license found for the dependency
-            licenseMap.put( LicenseMap.getUnknownLicenseMessage(), project );
+            licenseMap.put( LicenseMap.UNKNOWN_LICENSE_MESSAGE, project );
             return;
         }
 
@@ -323,7 +338,7 @@ public class DefaultThirdPartyTool
             if ( StringUtils.isEmpty( licenseKey ) )
             {
                 getLogger().warn( "No license url defined for " + id );
-                licenseKey = LicenseMap.getUnknownLicenseMessage();
+                licenseKey = LicenseMap.UNKNOWN_LICENSE_MESSAGE;
             }
             licenseMap.put( licenseKey, project );
         }
@@ -462,7 +477,7 @@ public class DefaultThirdPartyTool
         {
 
             // no more unknown license in map
-            licenseMap.remove( LicenseMap.getUnknownLicenseMessage() );
+            licenseMap.remove( LicenseMap.UNKNOWN_LICENSE_MESSAGE );
         }
         else
         {
@@ -479,6 +494,97 @@ public class DefaultThirdPartyTool
             }
         }
         return unsafeMappings;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void writeThirdPartyFile( LicenseMap licenseMap, boolean groupByLicense, File thirdPartyFile,
+                                     boolean verbose, String encoding )
+        throws IOException
+    {
+
+        Logger log = getLogger();
+
+        StringBuilder sb = new StringBuilder();
+        if ( licenseMap.isEmpty() )
+        {
+            sb.append( NO_DEPENDENCIES_MESSAGE );
+        }
+        else
+        {
+            if ( groupByLicense )
+            {
+
+                // group by license
+                sb.append( "List of third-party dependencies grouped by " + "their license type." );
+                for ( String licenseName : licenseMap.keySet() )
+                {
+                    SortedSet<MavenProject> projects = licenseMap.get( licenseName );
+                    sb.append( "\n\n" ).append( licenseName ).append( " : " );
+
+                    for ( MavenProject mavenProject : projects )
+                    {
+                        String s = MojoHelper.getArtifactName( mavenProject );
+                        sb.append( "\n  * " ).append( s );
+                    }
+                }
+
+            }
+            else
+            {
+
+                // group by dependencies
+                SortedMap<MavenProject, String[]> map = licenseMap.toDependencyMap();
+
+                sb.append( "List of " ).append( map.size() ).append( " third-party dependencies.\n" );
+
+                List<String> lines = new ArrayList<String>();
+
+                for ( Map.Entry<MavenProject, String[]> entry : map.entrySet() )
+                {
+                    String artifact = MojoHelper.getArtifactName( entry.getKey() );
+                    StringBuilder buffer = new StringBuilder();
+                    for ( String license : entry.getValue() )
+                    {
+                        buffer.append( " (" ).append( license ).append( ")" );
+                    }
+                    String licenses = buffer.toString();
+                    String line = licenses + " " + artifact;
+                    lines.add( line );
+                }
+
+                Collections.sort( lines );
+                for ( String line : lines )
+                {
+                    sb.append( '\n' ).append( line );
+                }
+                lines.clear();
+            }
+        }
+        String content = sb.toString();
+
+        log.info( "Writing third-party file to " + thirdPartyFile );
+        if ( verbose )
+        {
+            log.info( content );
+        }
+
+        FileUtil.writeString( thirdPartyFile, content, encoding );
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void writeBundleThirdPartyFile( File thirdPartyFile, File outputDirectory, String bundleThirdPartyPath )
+        throws IOException
+    {
+
+        // creates the bundled license file
+        File bundleTarget = FileUtil.getFile( outputDirectory, bundleThirdPartyPath );
+        getLogger().info( "Writing bundled third-party file to " + bundleTarget );
+        FileUtil.copyFile( thirdPartyFile, bundleTarget );
     }
 
     // ----------------------------------------------------------------------

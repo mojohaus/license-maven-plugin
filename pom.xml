@@ -1,23 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- 
- Codehaus License Maven Plugin
-     
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Lesser General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
+<!--
+  #%L
+  License Maven Plugin
+  %%
+  Copyright (C) 2011-2012 CodeLutin, Codehaus
+  %%
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU Lesser General Public License as
+  published by the Free Software Foundation, either version 3 of the
+  License, or (at your option) any later version.
 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Lesser General Public License for more details.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Lesser Public License for more details.
 
- You should have received a copy of the GNU Lesser General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/lgpl-3.0.html>.
+  You should have received a copy of the GNU General Lesser Public
+  License along with this program.  If not, see
+  <http://www.gnu.org/licenses/lgpl-3.0.html>.
+  #L%
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
     <groupId>org.codehaus.mojo</groupId>
     <artifactId>mojo-parent</artifactId>
@@ -55,6 +61,30 @@
     </license>
   </licenses>
 
+  <developers>
+    <developer>
+      <name>Tony Chemit</name>
+      <email>chemit at codelutin.com</email>
+      <roles>
+        <role>Lead Developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
+    <developer>
+      <name>Paul Gier</name>
+      <email>pgier at redhat</email>
+      <roles>
+        <role>Developer</role>
+      </roles>
+    </developer>
+  </developers>
+
+  <contributors>
+    <contributor>
+      <name>Curtis Rueden</name>
+    </contributor>
+  </contributors>
+
   <prerequisites>
     <maven>${mavenVersion}</maven>
   </prerequisites>
@@ -63,6 +93,13 @@
     <mojo.java.target>1.5</mojo.java.target>
     <mavenVersion>2.2.1</mavenVersion>
     <processorVersion>1.2.2</processorVersion>
+
+    <doxiaVersion>1.0</doxiaVersion>
+    <doxia-sitetoolsVersion>1.0</doxia-sitetoolsVersion>
+
+    <!-- license configuration -->
+    <license.useMissingFile>true</license.useMissingFile>
+    <license.failIfWarning>true</license.failIfWarning>
 
   </properties>
 
@@ -103,6 +140,46 @@
           <artifactId>commons-cli</artifactId>
         </exclusion>
 
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.maven.reporting</groupId>
+      <artifactId>maven-reporting-api</artifactId>
+      <version>${mavenVersion}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.reporting</groupId>
+      <artifactId>maven-reporting-impl</artifactId>
+      <version>2.1</version>
+    </dependency>
+
+    <!-- Doxia -->
+    <dependency>
+      <groupId>org.apache.maven.doxia</groupId>
+      <artifactId>doxia-core</artifactId>
+      <version>${doxiaVersion}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.doxia</groupId>
+      <artifactId>doxia-sink-api</artifactId>
+      <version>${doxiaVersion}</version>
+    </dependency>
+
+    <!-- Doxia-sitetools -->
+    <dependency>
+      <groupId>org.apache.maven.doxia</groupId>
+      <artifactId>doxia-site-renderer</artifactId>
+      <version>${doxia-sitetoolsVersion}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-container-default</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-component-api</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
 
@@ -155,8 +232,6 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.10</version>
-      <scope>test</scope>
     </dependency>
   </dependencies>
 
@@ -241,6 +316,7 @@
                 <configuration>
                   <pomIncludes>
                     <!--<pomInclude>update-file-header/test-mojo/pom.xml</pomInclude>-->
+                    <pomInclude>third-party-report/*/pom.xml</pomInclude>
                     <pomInclude>add-third-party/*/pom.xml</pomInclude>
                     <pomInclude>aggregate-add-third-party/*/pom.xml</pomInclude>
                     <pomInclude>update-file-header/*/pom.xml</pomInclude>
@@ -271,6 +347,25 @@
     </profile>
 
     <profile>
+      <id>mojo-release</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>license-maven-plugin</artifactId>
+            <version>${project.version}</version>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>add-third-party</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
       <id>reporting</id>
       <activation>
         <property>
@@ -284,6 +379,19 @@
           <plugin>
             <artifactId>maven-invoker-plugin</artifactId>
             <version>1.5</version>
+          </plugin>
+
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>license-maven-plugin</artifactId>
+            <version>${project.version}</version>
+            <reportSets>
+              <reportSet>
+                <reports>
+                  <report>third-party-report</report>
+                </reports>
+              </reportSet>
+            </reportSets>
           </plugin>
         </plugins>
       </reporting>

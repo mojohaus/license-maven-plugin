@@ -1,9 +1,6 @@
 /*
  * #%L
  * License Maven Plugin
- * 
- * $Id$
- * $HeadURL$
  * %%
  * Copyright (C) 2008 - 2011 CodeLutin, Codehaus, Tony Chemit
  * %%
@@ -27,7 +24,17 @@ package org.codehaus.mojo.license.model;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.mojo.license.MojoHelper;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 /**
  * Map of artifacts (stub in mavenproject) group by their license.
@@ -41,15 +48,25 @@ public class LicenseMap
 
     private static final long serialVersionUID = 864199843545688069L;
 
-    public static final String unknownLicenseMessage = "Unknown license";
+    public static final String UNKNOWN_LICENSE_MESSAGE = "Unknown license";
 
     private final Comparator<MavenProject> projectComparator;
 
+    /**
+     * Default contructor.
+     */
     public LicenseMap()
     {
         projectComparator = MojoHelper.newMavenProjectComparator();
     }
 
+    /**
+     * Store in the license map a project to a given license.
+     *
+     * @param key   the license on which to associate the gieven project
+     * @param value project to register in the license map
+     * @return the set of projects using the given license
+     */
     public SortedSet<MavenProject> put( String key, MavenProject value )
     {
 
@@ -65,6 +82,12 @@ public class LicenseMap
         return put( key, valueList );
     }
 
+    /**
+     * Build a dependencies map from the license map, this is a map of license for each project registred in the
+     * license map.
+     *
+     * @return the generated dependencies map
+     */
     public SortedMap<MavenProject, String[]> toDependencyMap()
     {
         SortedMap<MavenProject, Set<String>> tmp = new TreeMap<MavenProject, Set<String>>( projectComparator );
@@ -95,10 +118,4 @@ public class LicenseMap
         tmp.clear();
         return result;
     }
-
-    public static String getUnknownLicenseMessage()
-    {
-        return unknownLicenseMessage;
-    }
-
 }

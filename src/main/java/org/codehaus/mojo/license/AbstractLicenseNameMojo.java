@@ -1,9 +1,6 @@
 /*
  * #%L
  * License Maven Plugin
- * 
- * $Id$
- * $HeadURL$
  * %%
  * Copyright (C) 2008 - 2011 CodeLutin, Codehaus, Tony Chemit
  * %%
@@ -94,6 +91,9 @@ public abstract class AbstractLicenseNameMojo
      */
     public abstract void setSkip( boolean skip );
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected boolean checkSkip()
     {
@@ -105,6 +105,9 @@ public abstract class AbstractLicenseNameMojo
         return super.checkSkip();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void init()
         throws Exception
@@ -166,26 +169,6 @@ public abstract class AbstractLicenseNameMojo
     public License getLicense()
     {
         return license;
-    }
-
-    public void setKeepBackup( boolean keepBackup )
-    {
-        this.keepBackup = keepBackup;
-    }
-
-    public void setLicenseResolver( String licenseResolver )
-    {
-        this.licenseResolver = licenseResolver;
-    }
-
-    public void setLicenseName( String licenseName )
-    {
-        this.licenseName = licenseName;
-    }
-
-    public void setLicenseStore( LicenseStore licenseStore )
-    {
-        this.licenseStore = licenseStore;
     }
 
 }

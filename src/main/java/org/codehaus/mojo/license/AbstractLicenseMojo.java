@@ -1,9 +1,6 @@
 /*
  * #%L
  * License Maven Plugin
- * 
- * $Id$
- * $HeadURL$
  * %%
  * Copyright (C) 2008 - 2011 CodeLutin, Codehaus, Tony Chemit
  * %%
@@ -121,6 +118,9 @@ public abstract class AbstractLicenseMojo
     protected abstract void doAction()
         throws Exception;
 
+    /**
+     * {@inheritDoc}
+     */
     public final void execute()
         throws MojoExecutionException, MojoFailureException
     {
@@ -320,11 +320,6 @@ public abstract class AbstractLicenseMojo
         return project;
     }
 
-    public final void setProject( MavenProject project )
-    {
-        this.project = project;
-    }
-
     public final boolean isVerbose()
     {
         return verbose;
@@ -338,11 +333,6 @@ public abstract class AbstractLicenseMojo
     public final MavenSession getSession()
     {
         return session;
-    }
-
-    public final void setSession( MavenSession session )
-    {
-        this.session = session;
     }
 
     public final long getBuildTimestamp()

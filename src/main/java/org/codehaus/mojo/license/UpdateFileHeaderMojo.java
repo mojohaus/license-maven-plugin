@@ -1,9 +1,6 @@
 /*
  * #%L
  * License Maven Plugin
- * 
- * $Id$
- * $HeadURL$
  * %%
  * Copyright (C) 2008 - 2011 CodeLutin, Codehaus, Tony Chemit
  * %%
@@ -22,7 +19,6 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
-
 package org.codehaus.mojo.license;
 
 import org.apache.commons.lang.StringUtils;
@@ -411,6 +407,9 @@ public class UpdateFileHeaderMojo
      */
     private Map<String, List<File>> filesToTreateByCommentStyle;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void init()
         throws Exception
@@ -421,11 +420,11 @@ public class UpdateFileHeaderMojo
             return;
         }
 
-        if ( StringUtils.isEmpty( getIgnoreTag() ) )
+        if ( StringUtils.isEmpty( ignoreTag ) )
         {
 
             // use default value
-            setIgnoreTag( "%" + "%Ignore-License" );
+            this.ignoreTag = "%" + "%Ignore-License";
         }
 
         if ( isVerbose() )
@@ -435,7 +434,7 @@ public class UpdateFileHeaderMojo
             StringBuilder buffer = new StringBuilder();
             buffer.append( "config - available comment styles :" );
             String commentFormat = "\n  * %1$s (%2$s)";
-            for ( String transformerName : getTransformers().keySet() )
+            for ( String transformerName : transformers.keySet() )
             {
                 FileHeaderTransformer transformer = getTransformer( transformerName );
                 String str = String.format( commentFormat, transformer.getName(), transformer.getDescription() );
@@ -444,7 +443,7 @@ public class UpdateFileHeaderMojo
             getLog().info( buffer.toString() );
         }
 
-        if ( isUpdateCopyright() )
+        if ( updateCopyright )
         {
 
             getLog().warn( "\n\nupdateCopyright is not still available...\n\n" );
@@ -456,16 +455,16 @@ public class UpdateFileHeaderMojo
         }
 
         // set timestamp used for temporary files
-        setTimestamp( System.nanoTime() );
+        this.timestamp = System.nanoTime();
 
         // add flags to authorize or not updates of header
-        getFilter().setUpdateCopyright( isCanUpdateCopyright() );
-        getFilter().setUpdateDescription( isCanUpdateDescription() );
-        getFilter().setUpdateLicense( isCanUpdateLicense() );
+        filter.setUpdateCopyright( canUpdateCopyright );
+        filter.setUpdateDescription( canUpdateDescription );
+        filter.setUpdateLicense( canUpdateLicense );
 
-        getFilter().setLog( getLog() );
-        getProcessor().setConfiguration( this );
-        getProcessor().setFilter( filter );
+        filter.setLog( getLog() );
+        processor.setConfiguration( this );
+        processor.setFilter( filter );
 
         super.init();
 
@@ -638,6 +637,9 @@ public class UpdateFileHeaderMojo
         return result;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void doAction()
         throws Exception
@@ -653,7 +655,7 @@ public class UpdateFileHeaderMojo
         try
         {
 
-            for ( Map.Entry<String, List<File>> commentStyleFiles : getFilesToTreateByCommentStyle().entrySet() )
+            for ( Map.Entry<String, List<File>> commentStyleFiles : filesToTreateByCommentStyle.entrySet() )
             {
 
                 String commentStyle = commentStyleFiles.getKey();
@@ -666,7 +668,7 @@ public class UpdateFileHeaderMojo
         finally
         {
 
-            int nbFiles = getProcessedFiles().size();
+            int nbFiles = processedFiles.size();
             if ( nbFiles == 0 )
             {
                 getLog().warn( "No file to scan." );
@@ -698,7 +700,7 @@ public class UpdateFileHeaderMojo
             }
 
             // clean internal states
-            if ( isClearAfterOperation() )
+            if ( clearAfterOperation )
             {
                 clear();
             }
@@ -716,18 +718,14 @@ public class UpdateFileHeaderMojo
         getLog().info( " - using " + license.getDescription() );
 
         // use header transformer according to comment style given in header
-        setTransformer( getTransformer( commentStyle ) );
+        this.transformer = getTransformer( commentStyle );
 
         // file header to use if no header is found on a file
-        FileHeader defaultFileHeader =
-            buildDefaultFileHeader( license, getProjectName(), getInceptionYear(), getOrganizationName(),
-                                    isAddSvnKeyWords(), getEncoding() );
-
-        // change default license header in processor
-        setHeader( defaultFileHeader );
+        this.header = buildDefaultFileHeader( license, projectName, inceptionYear, organizationName, addSvnKeyWords,
+                                              getEncoding() );
 
         // update processor filter
-        getProcessor().populateFilter();
+        processor.populateFilter();
 
         for ( File file : filesToTreat )
         {
@@ -740,14 +738,14 @@ public class UpdateFileHeaderMojo
         throws IOException
     {
 
-        if ( getProcessedFiles().contains( file ) )
+        if ( processedFiles.contains( file ) )
         {
             getLog().info( " - skip already processed file " + file );
             return;
         }
 
         // output file
-        File processFile = new File( file.getAbsolutePath() + "_" + getTimestamp() );
+        File processFile = new File( file.getAbsolutePath() + "_" + timestamp );
         boolean doFinalize = false;
         try
         {
@@ -757,17 +755,17 @@ public class UpdateFileHeaderMojo
         {
             getLog().warn( "skip failed file : " + e.getMessage() +
                                ( e.getCause() == null ? "" : " Cause : " + e.getCause().getMessage() ), e );
-            FileState.fail.addFile( file, getResult() );
+            FileState.fail.addFile( file, result );
             doFinalize = false;
         }
         finally
         {
 
             // always clean processor internal states
-            getProcessor().reset();
+            processor.reset();
 
             // whatever was the result, this file is treated.
-            getProcessedFiles().add( file );
+            processedFiles.add( file );
 
             if ( doFinalize )
             {
@@ -819,16 +817,14 @@ public class UpdateFileHeaderMojo
         }
 
         //check that file is not marked to be ignored
-        if ( content.contains( getIgnoreTag() ) )
+        if ( content.contains( ignoreTag ) )
         {
-            getLog().info( " - ignore file (detected " + getIgnoreTag() + ") " + file );
+            getLog().info( " - ignore file (detected " + ignoreTag + ") " + file );
 
-            FileState.ignore.addFile( file, getResult() );
+            FileState.ignore.addFile( file, result );
 
             return false;
         }
-
-        FileHeaderProcessor processor = getProcessor();
 
         // process file to detect header
 
@@ -864,12 +860,12 @@ public class UpdateFileHeaderMojo
                 // header content has changed
                 // must copy back process file to file (if not dry run)
 
-                FileState.update.addFile( file, getResult() );
+                FileState.update.addFile( file, result );
                 return true;
 
             }
 
-            FileState.uptodate.addFile( file, getResult() );
+            FileState.uptodate.addFile( file, result );
             return false;
         }
 
@@ -888,14 +884,14 @@ public class UpdateFileHeaderMojo
         getLog().info( " - adding license header on file " + file );
 
         //FIXME tchemit 20100409 xml files must add header after a xml prolog line
-        content = getTransformer().addHeader( getFilter().getFullHeaderContent(), content );
+        content = getTransformer().addHeader( filter.getFullHeaderContent(), content );
 
-        if ( !isDryRun() )
+        if ( !dryRun )
         {
             FileUtil.writeString( processFile, content, getEncoding() );
         }
 
-        FileState.add.addFile( file, getResult() );
+        FileState.add.addFile( file, result );
         return true;
     }
 
@@ -903,7 +899,7 @@ public class UpdateFileHeaderMojo
         throws IOException
     {
 
-        if ( isKeepBackup() && !isDryRun() )
+        if ( isKeepBackup() && !dryRun )
         {
             File backupFile = FileUtil.getBackupFile( file );
 
@@ -922,7 +918,7 @@ public class UpdateFileHeaderMojo
             FileUtil.renameFile( file, backupFile );
         }
 
-        if ( isDryRun() )
+        if ( dryRun )
         {
 
             // dry run, delete temporary file
@@ -952,6 +948,9 @@ public class UpdateFileHeaderMojo
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void finalize()
         throws Throwable
@@ -962,12 +961,10 @@ public class UpdateFileHeaderMojo
 
     protected void clear()
     {
-        Set<File> files = getProcessedFiles();
-        if ( files != null )
+        if ( processedFiles != null )
         {
-            files.clear();
+            processedFiles.clear();
         }
-        EnumMap<FileState, Set<File>> result = getResult();
         if ( result != null )
         {
             for ( Set<File> fileSet : result.values() )
@@ -1077,7 +1074,6 @@ public class UpdateFileHeaderMojo
         {
             throw new IllegalArgumentException( "transformerName can not be null, nor empty!" );
         }
-        Map<String, FileHeaderTransformer> transformers = getTransformers();
         if ( transformers == null )
         {
             throw new IllegalStateException( "No transformers initialized!" );
@@ -1109,90 +1105,29 @@ public class UpdateFileHeaderMojo
         return result;
     }
 
-    public boolean isClearAfterOperation()
-    {
-        return clearAfterOperation;
-    }
-
-    public long getTimestamp()
-    {
-        return timestamp;
-    }
-
-    public String getProjectName()
-    {
-        return projectName;
-    }
-
-    public String getInceptionYear()
-    {
-        return inceptionYear;
-    }
-
-    public String getOrganizationName()
-    {
-        return organizationName;
-    }
-
-    public boolean isUpdateCopyright()
-    {
-        return updateCopyright;
-    }
-
-    public boolean isCanUpdateDescription()
-    {
-        return canUpdateDescription;
-    }
-
-    public boolean isCanUpdateCopyright()
-    {
-        return canUpdateCopyright;
-    }
-
-    public boolean isCanUpdateLicense()
-    {
-        return canUpdateLicense;
-    }
-
-    public String getIgnoreTag()
-    {
-        return ignoreTag;
-    }
-
-    public boolean isDryRun()
-    {
-        return dryRun;
-    }
-
-    public UpdateFileHeaderFilter getFilter()
-    {
-        return filter;
-    }
-
+    /**
+     * {@inheritDoc}
+     */
     public FileHeader getFileHeader()
     {
         return header;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public FileHeaderTransformer getTransformer()
     {
         return transformer;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isSkip()
     {
         return skipUpdateLicense;
-    }
-
-    public Set<File> getProcessedFiles()
-    {
-        return processedFiles;
-    }
-
-    public EnumMap<FileState, Set<File>> getResult()
-    {
-        return result;
     }
 
     public Set<File> getFiles( FileState state )
@@ -1200,155 +1135,13 @@ public class UpdateFileHeaderMojo
         return result.get( state );
     }
 
-    public boolean isAddSvnKeyWords()
-    {
-        return addSvnKeyWords;
-    }
-
-    public FileHeaderProcessor getProcessor()
-    {
-        return processor;
-    }
-
-    public Map<String, FileHeaderTransformer> getTransformers()
-    {
-        return transformers;
-    }
-
-    public Map<String, List<File>> getFilesToTreateByCommentStyle()
-    {
-        return filesToTreateByCommentStyle;
-    }
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setSkip( boolean skipUpdateLicense )
     {
         this.skipUpdateLicense = skipUpdateLicense;
-    }
-
-    public void setDryRun( boolean dryRun )
-    {
-        this.dryRun = dryRun;
-    }
-
-    public void setTimestamp( long timestamp )
-    {
-        this.timestamp = timestamp;
-    }
-
-    public void setProjectName( String projectName )
-    {
-        this.projectName = projectName;
-    }
-
-    public void setSkipUpdateLicense( boolean skipUpdateLicense )
-    {
-        this.skipUpdateLicense = skipUpdateLicense;
-    }
-
-    public void setInceptionYear( String inceptionYear )
-    {
-        this.inceptionYear = inceptionYear;
-    }
-
-    public void setOrganizationName( String organizationName )
-    {
-        this.organizationName = organizationName;
-    }
-
-    public void setUpdateCopyright( boolean updateCopyright )
-    {
-        this.updateCopyright = updateCopyright;
-    }
-
-    public void setIgnoreTag( String ignoreTag )
-    {
-        this.ignoreTag = ignoreTag;
-    }
-
-    public void setAddSvnKeyWords( boolean addSvnKeyWords )
-    {
-        this.addSvnKeyWords = addSvnKeyWords;
-    }
-
-    public void setClearAfterOperation( boolean clearAfterOperation )
-    {
-        this.clearAfterOperation = clearAfterOperation;
-    }
-
-    public void setTransformer( FileHeaderTransformer transformer )
-    {
-        this.transformer = transformer;
-    }
-
-    public void setHeader( FileHeader header )
-    {
-        this.header = header;
-    }
-
-    public void setProcessor( FileHeaderProcessor processor )
-    {
-        this.processor = processor;
-    }
-
-    public void setFilter( UpdateFileHeaderFilter filter )
-    {
-        this.filter = filter;
-    }
-
-    public void setCanUpdateDescription( boolean canUpdateDescription )
-    {
-        this.canUpdateDescription = canUpdateDescription;
-    }
-
-    public void setCanUpdateCopyright( boolean canUpdateCopyright )
-    {
-        this.canUpdateCopyright = canUpdateCopyright;
-    }
-
-    public void setCanUpdateLicense( boolean canUpdateLicense )
-    {
-        this.canUpdateLicense = canUpdateLicense;
-    }
-
-    public void setTransformers( Map<String, FileHeaderTransformer> transformers )
-    {
-        this.transformers = transformers;
-    }
-
-    public void setFilesToTreateByCommentStyle( Map<String, List<File>> filesToTreateByCommentStyle )
-    {
-        this.filesToTreateByCommentStyle = filesToTreateByCommentStyle;
-    }
-
-    public void setRoots( String[] roots )
-    {
-        this.roots = roots;
-    }
-
-    public void setRoots( String roots )
-    {
-        this.roots = roots.split( "," );
-    }
-
-    public void setIncludes( String[] includes )
-    {
-        this.includes = includes;
-    }
-
-    public void setIncludes( String includes )
-    {
-        this.includes = includes.split( "," );
-    }
-
-    public void setExcludes( String[] excludes )
-    {
-        this.excludes = excludes;
-    }
-
-    public void setExcludes( String excludes )
-    {
-        this.excludes = excludes.split( "," );
     }
 
     /**

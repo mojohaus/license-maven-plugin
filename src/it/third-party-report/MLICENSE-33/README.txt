@@ -1,0 +1,1 @@
+Tests the MLICENSE-33 (see http://jira.codehaus.org/browse/MLICENSE-33).

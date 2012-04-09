@@ -118,11 +118,6 @@ public class ProjectLicenseInfo
         licenses.add( license );
     }
 
-    public String toString()
-    {
-        return getId();
-    }
-
     /**
      * The unique ID for the project
      *
@@ -134,9 +129,18 @@ public class ProjectLicenseInfo
     }
 
     /**
-     * Compare this artifact to another ProjectLicenseInfo, or compare to an instance
-     * of org.apache.maven.artifact.Artifact
+     * {@inheritDoc}
      */
+    @Override
+    public String toString()
+    {
+        return getId();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean equals( Object compareTo )
     {
         if ( compareTo instanceof ProjectLicenseInfo )
@@ -158,6 +162,10 @@ public class ProjectLicenseInfo
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public int hashCode()
     {
         return getId().hashCode();

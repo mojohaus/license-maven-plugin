@@ -1,9 +1,6 @@
 /*
  * #%L
  * License Maven Plugin
- * 
- * $Id$
- * $HeadURL$
  * %%
  * Copyright (C) 2008 - 2011 CodeLutin, Codehaus, Tony Chemit
  * %%
@@ -33,8 +30,12 @@ import org.codehaus.mojo.license.MojoHelper;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map.Entry;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -49,7 +50,7 @@ public class LicenseRepository
     /**
      * Logger
      */
-    private static final Log log = LogFactory.getLog( LicenseRepository.class );
+    private static final Log LOG = LogFactory.getLog( LicenseRepository.class );
 
     public static final String REPOSITORY_DEFINITION_FILE = "licenses.properties";
 
@@ -163,13 +164,13 @@ public class LicenseRepository
 
                 license.setDescription( licenseDescription );
 
-                if ( log.isInfoEnabled() )
+                if ( LOG.isInfoEnabled() )
                 {
-                    log.info( "register " + license.getDescription() );
+                    LOG.info( "register " + license.getDescription() );
                 }
-                if ( log.isDebugEnabled() )
+                if ( LOG.isDebugEnabled() )
                 {
-                    log.debug( license );
+                    LOG.debug( license );
                 }
                 licenses.add( license );
             }
@@ -220,6 +221,9 @@ public class LicenseRepository
         return license;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Iterator<License> iterator()
     {
         checkInit( "iterator" );

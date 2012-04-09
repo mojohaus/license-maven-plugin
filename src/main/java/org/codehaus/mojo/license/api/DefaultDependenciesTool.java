@@ -1,9 +1,6 @@
 /*
  * #%L
  * License Maven Plugin
- *
- * $Id$
- * $HeadURL$
  * %%
  * Copyright (C) 2011 CodeLutin, Codehaus, Tony Chemit
  * %%
@@ -22,15 +19,18 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
-package org.codehaus.mojo.license;
+package org.codehaus.mojo.license.api;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
+import org.codehaus.mojo.license.MavenProjectDependenciesConfigurator;
+import org.codehaus.mojo.license.MojoHelper;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
 
@@ -47,7 +47,7 @@ import java.util.regex.PatternSyntaxException;
  *
  * @author tchemit <chemit@codelutin.com>
  * @version $Id$
- * @plexus.component role="org.codehaus.mojo.license.DependenciesTool" role-hint="default"
+ * @plexus.component role="org.codehaus.mojo.license.api.DependenciesTool" role-hint="default"
  * @since 1.0
  */
 public class DefaultDependenciesTool
@@ -196,6 +196,7 @@ public class DefaultDependenciesTool
                 {
                     depMavenProject =
                         mavenProjectBuilder.buildFromRepository( artifact, remoteRepositories, localRepository, true );
+                    depMavenProject.getArtifact().setScope( artifact.getScope() );
                 }
                 catch ( ProjectBuildingException e )
                 {

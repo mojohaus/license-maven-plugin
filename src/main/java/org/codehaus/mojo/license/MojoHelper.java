@@ -1,9 +1,6 @@
 /*
  * #%L
  * License Maven Plugin
- *
- * $Id$
- * $HeadURL$
  * %%
  * Copyright (C) 2010 - 2011 Codehaus
  * %%
@@ -109,6 +106,9 @@ public class MojoHelper
     {
         return new Comparator<MavenProject>()
         {
+            /**
+             * {@inheritDoc}
+             */
             public int compare( MavenProject o1, MavenProject o2 )
             {
 
