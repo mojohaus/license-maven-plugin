@@ -26,7 +26,11 @@
 package org.codehaus.mojo.license;
 
 import org.apache.commons.lang.StringUtils;
-import org.codehaus.mojo.license.header.*;
+import org.codehaus.mojo.license.header.FileHeader;
+import org.codehaus.mojo.license.header.FileHeaderProcessor;
+import org.codehaus.mojo.license.header.FileHeaderProcessorConfiguration;
+import org.codehaus.mojo.license.header.InvalideFileHeaderException;
+import org.codehaus.mojo.license.header.UpdateFileHeaderFilter;
 import org.codehaus.mojo.license.header.transformer.FileHeaderTransformer;
 import org.codehaus.mojo.license.model.License;
 import org.codehaus.plexus.util.DirectoryScanner;
@@ -34,7 +38,17 @@ import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 /**
  * The goal to update (or add) the header on project source files.
@@ -87,6 +101,36 @@ public class UpdateFileHeaderMojo
      * @since 1.0
      */
     protected String inceptionYear;
+
+    /**
+     * To overwrite the processStartTag used to build header model.
+     * <p/>
+     * See http://mojo.codehaus.org/license-maven-plugin/header.html#Configuration .
+     *
+     * @parameter expression="${license.processStartTag}"
+     * @since 1.1
+     */
+    protected String processStartTag;
+
+    /**
+     * To overwrite the processEndTag used to build header model.
+     * <p/>
+     * See http://mojo.codehaus.org/license-maven-plugin/header.html#Configuration .
+     *
+     * @parameter expression="${license.processEndTag}"
+     * @since 1.1
+     */
+    protected String processEndTag;
+
+    /**
+     * To overwrite the sectionDelimiter used to build header model.
+     * <p/>
+     * See http://mojo.codehaus.org/license-maven-plugin/header.html#Configuration .
+     *
+     * @parameter expression="${license.sectionDelimiter}"
+     * @since 1.1
+     */
+    protected String sectionDelimiter;
 
     /**
      * A flag to add svn:keywords on new header.
@@ -454,11 +498,33 @@ public class UpdateFileHeaderMojo
 
         extensionToCommentStyle = new TreeMap<String, String>();
 
+        processStartTag = cleanHeaderConfiguration( processStartTag, FileHeaderTransformer.DEFAULT_PROCESS_START_TAG );
+        if ( isVerbose() )
+        {
+            getLog().info( "Will use processStartTag: " + processEndTag );
+        }
+        processEndTag = cleanHeaderConfiguration( processEndTag, FileHeaderTransformer.DEFAULT_PROCESS_END_TAG );
+        if ( isVerbose() )
+        {
+            getLog().info( "Will use processEndTag: " + processEndTag );
+        }
+        sectionDelimiter =
+            cleanHeaderConfiguration( sectionDelimiter, FileHeaderTransformer.DEFAULT_SECTION_DELIMITER );
+
+        if ( isVerbose() )
+        {
+            getLog().info( "Will use sectionDelimiter: " + sectionDelimiter );
+        }
+
         // add default extensions from header transformers
         for ( Map.Entry<String, FileHeaderTransformer> entry : transformers.entrySet() )
         {
             String commentStyle = entry.getKey();
             FileHeaderTransformer transformer = entry.getValue();
+
+            transformer.setProcessStartTag( processStartTag );
+            transformer.setProcessEndTag( processEndTag );
+            transformer.setSectionDelimiter( sectionDelimiter );
 
             String[] extensions = transformer.getDefaultAcceptedExtensions();
             for ( String extension : extensions )
@@ -670,7 +736,6 @@ public class UpdateFileHeaderMojo
         filesToTreat.clear();
     }
 
-
     protected void prepareProcessFile( File file )
         throws IOException
     {
@@ -715,6 +780,7 @@ public class UpdateFileHeaderMojo
         }
 
     }
+
 
     /**
      * Process the given {@code file} and save the result in the given
@@ -1023,6 +1089,24 @@ public class UpdateFileHeaderMojo
                 "transformerName " + transformerName + " is unknow, use one this one : " + transformers.keySet() );
         }
         return transformer;
+    }
+
+    protected String cleanHeaderConfiguration( String value, String defaultValue )
+    {
+        String result;
+        if ( StringUtils.isEmpty( value ) )
+        {
+
+            // use default value
+            result = defaultValue;
+        }
+        else
+        {
+
+            // clean all spaces of it
+            result = value.replaceAll( "\\s", "" );
+        }
+        return result;
     }
 
     public boolean isClearAfterOperation()

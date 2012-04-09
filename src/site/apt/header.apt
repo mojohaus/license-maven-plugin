@@ -31,9 +31,13 @@ Overview
 
 Header model
 
+  The header model defines how to display the header on each file.
+
+  This header is boxed in a comment proper to each type of file (we call it <comment box>).
+
 * Example
 
-  Here is an example of a file header (with NO comment box) :
+  Here is an example of a file header (with <NO> comment box) :
 
 --------------------------------------------------------------------------------
 
@@ -64,11 +68,20 @@ Header model
 
   You can configure those things :
 
-  * start process tag
+  * start process tag (using the {{{./update-file-header-mojo.html#processStartTag}}processStartTag} parameter)
 
-  * header section delimiter
+  * header section delimiter (using the {{{./update-file-header-mojo.html#sectionDelimiter}}sectionDelimiter} parameter)
   
-  * end process tag
+  * end process tag (using the {{{./update-file-header-mojo.html#processEndTag}}processEndTag} parameter)
+
+  <<Note:>>
+
+  * The plugin won't be able to migrate from a header configuration to another one, so prepare this
+    configuration before the first execution of the goal (and never change it :().
+
+  * As the configuration has a special meaning for the goal to treat a file and should not be eable to be found more
+    than once in a file, we can use special space separator, the goal will remove then. In that way the exact
+    configuration won't be found twice in your pom.xml.
 
 * Copyright model
 
@@ -176,7 +189,7 @@ Available comment styles
 Ignore a header
 
   If you don't want {{{./update-file-header-mojo.html}update-file-header}}
-  goal to treate a specific file, you can use a specific tag in your class :
+  goal to treat a specific file, you can use a specific tag in your file:
 
 --------------------------------------------------------------------------------
 
