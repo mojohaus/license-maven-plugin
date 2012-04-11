@@ -30,8 +30,7 @@ package org.codehaus.mojo.license.header.transformer;
  * @since 1.0
  */
 public class JavaFileHeaderTransformer
-    extends AbstractFileHeaderTransformer
-{
+        extends AbstractFileHeaderTransformer {
 
     public static final String NAME = "java";
 
@@ -43,14 +42,12 @@ public class JavaFileHeaderTransformer
 
     public static final String COMMENT_END_TAG = " */";
 
-    public JavaFileHeaderTransformer()
-    {
-        super( NAME, DESCRIPTION, COMMENT_START_TAG, COMMENT_END_TAG, COMMENT_LINE_PREFIX );
+    public JavaFileHeaderTransformer() {
+        super(NAME, DESCRIPTION, COMMENT_START_TAG, COMMENT_END_TAG, COMMENT_LINE_PREFIX);
     }
 
-    public String[] getDefaultAcceptedExtensions()
-    {
-        return new String[]{ NAME, "groovy", "css", "cs", "as", "aj", "c", "h", "cpp", "js", "json"
+    public String[] getDefaultAcceptedExtensions() {
+        return new String[]{NAME, "groovy", "css", "cs", "as", "aj", "c", "h", "cpp", "js", "json"
 
         };
     }

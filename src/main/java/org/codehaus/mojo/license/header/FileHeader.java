@@ -38,27 +38,18 @@ package org.codehaus.mojo.license.header;
  * @author tchemit <chemit@codelutin.com>
  * @since 1.0
  */
-public class FileHeader
-{
+public class FileHeader {
 
-    /**
-     * Copyright to string format
-     */
+    /** Copyright to string format */
     protected static final String COPYRIGHT_TO_STRING_FORMAT = "Copyright (C) %1$s %2$s";
 
-    /**
-     * Description of the project or module to add in header
-     */
+    /** Description of the project or module to add in header */
     protected String description;
 
-    /**
-     * Copyright holder
-     */
+    /** Copyright holder */
     protected String copyrightHolder;
 
-    /**
-     * Copyright first year of application
-     */
+    /** Copyright first year of application */
     protected Integer copyrightFirstYear;
 
     /**
@@ -67,33 +58,24 @@ public class FileHeader
      */
     protected Integer copyrightLastYear;
 
-    /**
-     * License used in the header.
-     */
+    /** License used in the header. */
     protected String license;
 
     /**
      * @return the project name, or nay other common informations for all
      *         files of a project (or module)
      */
-    public String getDescription()
-    {
+    public String getDescription() {
         return description;
     }
 
-    /**
-     * @return the copyright holder
-     */
-    public String getCopyrightHolder()
-    {
+    /** @return the copyright holder */
+    public String getCopyrightHolder() {
         return copyrightHolder;
     }
 
-    /**
-     * @return the first year of the copyright
-     */
-    public Integer getCopyrightFirstYear()
-    {
+    /** @return the first year of the copyright */
+    public Integer getCopyrightFirstYear() {
         return copyrightFirstYear;
     }
 
@@ -101,8 +83,7 @@ public class FileHeader
      * @return the last year of the copyright (if copyright affects only one
      *         year, can be equals to the {@link #getCopyrightFirstYear()}).
      */
-    public Integer getCopyrightLastYear()
-    {
+    public Integer getCopyrightLastYear() {
         return copyrightLastYear;
     }
 
@@ -121,22 +102,18 @@ public class FileHeader
      *
      * @return the String representation of the copyright
      */
-    public String getCopyright()
-    {
+    public String getCopyright() {
         String copyright;
-        if ( getCopyrightLastYear() == null )
-        {
+        if (getCopyrightLastYear() == null) {
 
             // copyright on one year
-            copyright = String.format( COPYRIGHT_TO_STRING_FORMAT, getCopyrightFirstYear(), getCopyrightHolder() );
-        }
-        else
-        {
+            copyright = String.format(COPYRIGHT_TO_STRING_FORMAT, getCopyrightFirstYear(), getCopyrightHolder());
+        } else {
 
             // copyright on more than one year
             copyright =
-                String.format( COPYRIGHT_TO_STRING_FORMAT, getCopyrightFirstYear() + " - " + getCopyrightLastYear(),
-                               getCopyrightHolder() );
+                    String.format(COPYRIGHT_TO_STRING_FORMAT, getCopyrightFirstYear() + " - " + getCopyrightLastYear(),
+                                  getCopyrightHolder());
         }
         return copyright;
     }
@@ -145,33 +122,27 @@ public class FileHeader
      * @return the license content (this is not the fully license content,
      *         but just a per file license resume)
      */
-    public String getLicense()
-    {
+    public String getLicense() {
         return license;
     }
 
-    public void setDescription( String description )
-    {
+    public void setDescription(String description) {
         this.description = description;
     }
 
-    public void setCopyrightHolder( String copyrightHolder )
-    {
+    public void setCopyrightHolder(String copyrightHolder) {
         this.copyrightHolder = copyrightHolder;
     }
 
-    public void setCopyrightFirstYear( Integer copyrightFirstYear )
-    {
+    public void setCopyrightFirstYear(Integer copyrightFirstYear) {
         this.copyrightFirstYear = copyrightFirstYear;
     }
 
-    public void setCopyrightLastYear( Integer copyrightLastYear )
-    {
+    public void setCopyrightLastYear(Integer copyrightLastYear) {
         this.copyrightLastYear = copyrightLastYear;
     }
 
-    public void setLicense( String license )
-    {
+    public void setLicense(String license) {
         this.license = license;
     }
 }

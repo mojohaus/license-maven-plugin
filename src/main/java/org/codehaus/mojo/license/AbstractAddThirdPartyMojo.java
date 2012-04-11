@@ -31,7 +31,11 @@ import org.codehaus.mojo.license.api.DefaultThirdPartyHelper;
 import org.codehaus.mojo.license.api.DependenciesTool;
 import org.codehaus.mojo.license.api.ThirdPartyHelper;
 import org.codehaus.mojo.license.api.ThirdPartyTool;
+import org.codehaus.mojo.license.api.ThirdPartyToolException;
 import org.codehaus.mojo.license.model.LicenseMap;
+import org.codehaus.mojo.license.utils.FileUtil;
+import org.codehaus.mojo.license.utils.MojoHelper;
+import org.codehaus.mojo.license.utils.SortedProperties;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,8 +50,7 @@ import java.util.SortedSet;
  * @since 1.0
  */
 public abstract class AbstractAddThirdPartyMojo
-    extends AbstractLicenseMojo
-{
+        extends AbstractLicenseMojo {
 
     /**
      * Directory where to generate files.
@@ -208,50 +211,41 @@ public abstract class AbstractAddThirdPartyMojo
     protected abstract SortedMap<String, MavenProject> loadDependencies();
 
     protected abstract SortedProperties createUnsafeMapping()
-        throws ProjectBuildingException, IOException, ThirdPartyToolException;
+            throws ProjectBuildingException, IOException, ThirdPartyToolException;
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     protected void init()
-        throws Exception
-    {
+            throws Exception {
 
         Log log = getLog();
 
-        if ( log.isDebugEnabled() )
-        {
+        if (log.isDebugEnabled()) {
 
             // always be verbose in debug mode
-            setVerbose( true );
+            setVerbose(true);
         }
 
-        thirdPartyFile = new File( getOutputDirectory(), thirdPartyFilename );
+        thirdPartyFile = new File(getOutputDirectory(), thirdPartyFilename);
 
         long buildTimestamp = getBuildTimestamp();
 
-        if ( isVerbose() )
-        {
-            log.info( "Build start   at : " + buildTimestamp );
-            log.info( "third-party file : " + thirdPartyFile.lastModified() );
+        if (isVerbose()) {
+            log.info("Build start   at : " + buildTimestamp);
+            log.info("third-party file : " + thirdPartyFile.lastModified());
         }
 
         doGenerate = isForce() || !thirdPartyFile.exists() || buildTimestamp > thirdPartyFile.lastModified();
 
-        if ( generateBundle )
-        {
+        if (generateBundle) {
 
-            File bundleFile = FileUtil.getFile( getOutputDirectory(), bundleThirdPartyPath );
+            File bundleFile = FileUtil.getFile(getOutputDirectory(), bundleThirdPartyPath);
 
-            if ( isVerbose() )
-            {
-                log.info( "bundle third-party file : " + bundleFile.lastModified() );
+            if (isVerbose()) {
+                log.info("bundle third-party file : " + bundleFile.lastModified());
             }
             doGenerateBundle = isForce() || !bundleFile.exists() || buildTimestamp > bundleFile.lastModified();
-        }
-        else
-        {
+        } else {
 
             // not generating bundled file
             doGenerateBundle = false;
@@ -259,119 +253,99 @@ public abstract class AbstractAddThirdPartyMojo
 
         projectDependencies = loadDependencies();
 
-        licenseMap = getHelper().createLicenseMap( projectDependencies );
+        licenseMap = getHelper().createLicenseMap(projectDependencies);
 
-        unsafeDependencies = getHelper().getProjectsWithNoLicense( licenseMap );
+        unsafeDependencies = getHelper().getProjectsWithNoLicense(licenseMap);
 
-        if ( !CollectionUtils.isEmpty( unsafeDependencies ) && isUseMissingFile() && isDoGenerate() )
-        {
+        if (!CollectionUtils.isEmpty(unsafeDependencies) && isUseMissingFile() && isDoGenerate()) {
 
             // load unsafeMapping
             unsafeMappings = createUnsafeMapping();
         }
 
-        getHelper().mergeLicenses( licenseMerges, licenseMap );
+        getHelper().mergeLicenses(licenseMerges, licenseMap);
     }
 
-    protected ThirdPartyHelper getHelper()
-    {
-        if ( helper == null )
-        {
+    protected ThirdPartyHelper getHelper() {
+        if (helper == null) {
             helper =
-                new DefaultThirdPartyHelper( getProject(), getEncoding(), isVerbose(), dependenciesTool, thirdPartyTool,
-                                             localRepository, remoteRepositories, getLog() );
+                    new DefaultThirdPartyHelper(getProject(), getEncoding(), isVerbose(), dependenciesTool, thirdPartyTool,
+                                                localRepository, remoteRepositories, getLog());
         }
         return helper;
     }
 
-    protected boolean checkUnsafeDependencies()
-    {
+    protected boolean checkUnsafeDependencies() {
         SortedSet<MavenProject> unsafeDependencies = getUnsafeDependencies();
-        boolean unsafe = !CollectionUtils.isEmpty( unsafeDependencies );
-        if ( unsafe )
-        {
+        boolean unsafe = !CollectionUtils.isEmpty(unsafeDependencies);
+        if (unsafe) {
             Log log = getLog();
-            log.warn( "There is " + unsafeDependencies.size() + " dependencies with no license :" );
-            for ( MavenProject dep : unsafeDependencies )
-            {
+            log.warn("There is " + unsafeDependencies.size() + " dependencies with no license :");
+            for (MavenProject dep : unsafeDependencies) {
 
                 // no license found for the dependency
-                log.warn( " - " + MojoHelper.getArtifactId( dep.getArtifact() ) );
+                log.warn(" - " + MojoHelper.getArtifactId(dep.getArtifact()));
             }
         }
         return unsafe;
     }
 
     protected void writeThirdPartyFile()
-        throws IOException
-    {
+            throws IOException {
 
-        if ( doGenerate )
-        {
+        if (doGenerate) {
 
-            thirdPartyTool.writeThirdPartyFile( getLicenseMap(), groupByLicense, thirdPartyFile, isVerbose(),
-                                                getEncoding() );
+            thirdPartyTool.writeThirdPartyFile(getLicenseMap(), groupByLicense, thirdPartyFile, isVerbose(),
+                                               getEncoding());
         }
 
-        if ( doGenerateBundle )
-        {
+        if (doGenerateBundle) {
 
-            thirdPartyTool.writeBundleThirdPartyFile( thirdPartyFile, outputDirectory, bundleThirdPartyPath );
+            thirdPartyTool.writeBundleThirdPartyFile(thirdPartyFile, outputDirectory, bundleThirdPartyPath);
         }
     }
 
-    public File getOutputDirectory()
-    {
+    public File getOutputDirectory() {
         return outputDirectory;
     }
 
-    public boolean isFailIfWarning()
-    {
+    public boolean isFailIfWarning() {
         return failIfWarning;
     }
 
-    public SortedMap<String, MavenProject> getProjectDependencies()
-    {
+    public SortedMap<String, MavenProject> getProjectDependencies() {
         return projectDependencies;
     }
 
-    public SortedSet<MavenProject> getUnsafeDependencies()
-    {
+    public SortedSet<MavenProject> getUnsafeDependencies() {
         return unsafeDependencies;
     }
 
-    public LicenseMap getLicenseMap()
-    {
+    public LicenseMap getLicenseMap() {
         return licenseMap;
     }
 
-    public boolean isUseMissingFile()
-    {
+    public boolean isUseMissingFile() {
         return useMissingFile;
     }
 
-    public File getMissingFile()
-    {
+    public File getMissingFile() {
         return missingFile;
     }
 
-    public SortedProperties getUnsafeMappings()
-    {
+    public SortedProperties getUnsafeMappings() {
         return unsafeMappings;
     }
 
-    public boolean isForce()
-    {
+    public boolean isForce() {
         return force;
     }
 
-    public boolean isDoGenerate()
-    {
+    public boolean isDoGenerate() {
         return doGenerate;
     }
 
-    public boolean isDoGenerateBundle()
-    {
+    public boolean isDoGenerateBundle() {
         return doGenerateBundle;
     }
 }

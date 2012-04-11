@@ -28,57 +28,36 @@ package org.codehaus.mojo.license.api;
  * @author tchemit <chemit@codelutin.com>
  * @since 1.1
  */
-public interface ThirdPartyDetails
-{
+public interface ThirdPartyDetails {
 
-    /**
-     * @return the groupId of the dependency
-     */
+    /** @return the groupId of the dependency */
     String getGroupId();
 
-    /**
-     * @return the artifactId of the dependency
-     */
+    /** @return the artifactId of the dependency */
     String getArtifactId();
 
-    /**
-     * @return the version of the dependency
-     */
+    /** @return the version of the dependency */
     String getVersion();
 
-    /**
-     * @return the type of the dependency
-     */
+    /** @return the type of the dependency */
     String getType();
 
-    /**
-     * @return the classifier of the dependency
-     */
+    /** @return the classifier of the dependency */
     String getClassifier();
 
-    /**
-     * @return the scope of the dependency
-     */
+    /** @return the scope of the dependency */
     String getScope();
 
-    /**
-     * @return {@code true} if the project contains at least one license (from pom or third-party missing file).
-     */
+    /** @return {@code true} if the project contains at least one license (from pom or third-party missing file). */
     boolean hasLicenses();
 
-    /**
-     * @return the licenses defined of the dependency
-     */
+    /** @return the licenses defined of the dependency */
     String[] getLicenses();
 
-    /**
-     * @return {@code true} if the project contains a license in his pom.
-     */
+    /** @return {@code true} if the project contains a license in his pom. */
     boolean hasPomLicenses();
 
-    /**
-     * @return the licenses defined in the pom of the project.
-     */
+    /** @return the licenses defined in the pom of the project. */
     String[] getPomLicenses();
 
     /**
@@ -86,11 +65,9 @@ public interface ThirdPartyDetails
      *
      * @param pomLicenses licenses loaded from the pom file
      */
-    void setPomLicenses( String[] pomLicenses );
+    void setPomLicenses(String[] pomLicenses);
 
-    /**
-     * @return the licenses defined in the third-party file.
-     */
+    /** @return the licenses defined in the third-party file. */
     String[] getThirdPartyLicenses();
 
     /**
@@ -98,10 +75,8 @@ public interface ThirdPartyDetails
      *
      * @param thirdPartyLicenses licenses loaded from the third-party file
      */
-    void setThirdPartyLicenses( String[] thirdPartyLicenses );
+    void setThirdPartyLicenses(String[] thirdPartyLicenses);
 
-    /**
-     * @return {@code true} if the project has his licenses defined in the third-party file.
-     */
+    /** @return {@code true} if the project has his licenses defined in the third-party file. */
     boolean hasThirdPartyLicenses();
 }

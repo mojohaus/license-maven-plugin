@@ -19,7 +19,7 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
-package org.codehaus.mojo.license;
+package org.codehaus.mojo.license.utils;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Resource;
@@ -38,8 +38,7 @@ import java.util.List;
  * @author tchemit <chemit@codelutin.com>
  * @since 1.0
  */
-public class MojoHelper
-{
+public class MojoHelper {
 
     /**
      * Add the directory as a resource of the given project.
@@ -49,10 +48,9 @@ public class MojoHelper
      * @param includes the includes of the resource
      * @return {@code true} if the resources was added (not already existing)
      */
-    public static boolean addResourceDir( File dir, MavenProject project, String... includes )
-    {
+    public static boolean addResourceDir(File dir, MavenProject project, String... includes) {
         List<?> resources = project.getResources();
-        return addResourceDir( dir, project, resources, includes );
+        return addResourceDir(dir, project, resources, includes);
     }
 
     /**
@@ -64,84 +62,70 @@ public class MojoHelper
      * @param includes  includes of the new resources
      * @return {@code true} if the resource was added (not already existing)
      */
-    public static boolean addResourceDir( File dir, MavenProject project, List<?> resources, String... includes )
-    {
+    public static boolean addResourceDir(File dir, MavenProject project, List<?> resources, String... includes) {
         String newresourceDir = dir.getAbsolutePath();
         boolean shouldAdd = true;
-        for ( Object o : resources )
-        {
+        for (Object o : resources) {
             Resource r = (Resource) o;
-            if ( !r.getDirectory().equals( newresourceDir ) )
-            {
+            if (!r.getDirectory().equals(newresourceDir)) {
                 continue;
             }
 
-            for ( String i : includes )
-            {
-                if ( !r.getIncludes().contains( i ) )
-                {
-                    r.addInclude( i );
+            for (String i : includes) {
+                if (!r.getIncludes().contains(i)) {
+                    r.addInclude(i);
                 }
             }
             shouldAdd = false;
             break;
         }
-        if ( shouldAdd )
-        {
+        if (shouldAdd) {
             Resource r = new Resource();
-            r.setDirectory( newresourceDir );
-            for ( String i : includes )
-            {
-                if ( !r.getIncludes().contains( i ) )
-                {
-                    r.addInclude( i );
+            r.setDirectory(newresourceDir);
+            for (String i : includes) {
+                if (!r.getIncludes().contains(i)) {
+                    r.addInclude(i);
                 }
             }
-            project.addResource( r );
+            project.addResource(r);
         }
         return shouldAdd;
     }
 
-    public static Comparator<MavenProject> newMavenProjectComparator()
-    {
-        return new Comparator<MavenProject>()
-        {
+    public static Comparator<MavenProject> newMavenProjectComparator() {
+        return new Comparator<MavenProject>() {
             /**
              * {@inheritDoc}
              */
-            public int compare( MavenProject o1, MavenProject o2 )
-            {
+            public int compare(MavenProject o1, MavenProject o2) {
 
-                String id1 = getArtifactId( o1.getArtifact() );
-                String id2 = getArtifactId( o2.getArtifact() );
-                return id1.compareTo( id2 );
+                String id1 = getArtifactId(o1.getArtifact());
+                String id2 = getArtifactId(o2.getArtifact());
+                return id1.compareTo(id2);
             }
         };
 
     }
 
-    static final protected double[] timeFactors = { 1000000, 1000, 60, 60, 24 };
+    static final protected double[] timeFactors = {1000000, 1000, 60, 60, 24};
 
-    static final protected String[] timeUnites = { "ns", "ms", "s", "m", "h", "d" };
+    static final protected String[] timeUnites = {"ns", "ms", "s", "m", "h", "d"};
 
-    static public String convertTime( long value )
-    {
-        return convert( value, timeFactors, timeUnites );
+    static public String convertTime(long value) {
+        return convert(value, timeFactors, timeUnites);
     }
 
-    static public String convert( long value, double[] factors, String[] unites )
-    {
-        long sign = value == 0 ? 1 : value / Math.abs( value );
+    static public String convert(long value, double[] factors, String[] unites) {
+        long sign = value == 0 ? 1 : value / Math.abs(value);
         int i = 0;
-        double tmp = Math.abs( value );
-        while ( i < factors.length && i < unites.length && tmp > factors[i] )
-        {
+        double tmp = Math.abs(value);
+        while (i < factors.length && i < unites.length && tmp > factors[i]) {
             tmp = tmp / factors[i++];
         }
 
         tmp *= sign;
         String result;
-        result = MessageFormat.format( "{0,number,0.###}{1}", tmp, unites[i] );
+        result = MessageFormat.format("{0,number,0.###}{1}", tmp, unites[i]);
         return result;
     }
 
@@ -153,54 +137,45 @@ public class MojoHelper
      * @return the new url
      * @throws IllegalArgumentException if malformed url.
      */
-    public static URL getUrl( URL baseUrl, String suffix )
-        throws IllegalArgumentException
-    {
+    public static URL getUrl(URL baseUrl, String suffix)
+            throws IllegalArgumentException {
         String url = baseUrl.toString() + "/" + suffix;
-        try
-        {
-            return new URL( url );
-        }
-        catch ( MalformedURLException ex )
-        {
-            throw new IllegalArgumentException( "could not obtain url " + url, ex );
+        try {
+            return new URL(url);
+        } catch (MalformedURLException ex) {
+            throw new IllegalArgumentException("could not obtain url " + url, ex);
         }
     }
 
-    public static String getArtifactId( Artifact artifact )
-    {
+    public static String getArtifactId(Artifact artifact) {
         StringBuilder sb = new StringBuilder();
-        sb.append( artifact.getGroupId() );
-        sb.append( "--" );
-        sb.append( artifact.getArtifactId() );
-        sb.append( "--" );
-        sb.append( artifact.getVersion() );
+        sb.append(artifact.getGroupId());
+        sb.append("--");
+        sb.append(artifact.getArtifactId());
+        sb.append("--");
+        sb.append(artifact.getVersion());
         return sb.toString();
     }
 
-    public static String getArtifactName( MavenProject project )
-    {
+    public static String getArtifactName(MavenProject project) {
         StringBuilder sb = new StringBuilder();
-        if ( project.getName().startsWith( "Unnamed -" ) )
-        {
+        if (project.getName().startsWith("Unnamed -")) {
 
             // as in Maven 3, let's use the artifact id
-            sb.append( project.getArtifactId() );
+            sb.append(project.getArtifactId());
+        } else {
+            sb.append(project.getName());
         }
-        else
-        {
-            sb.append( project.getName() );
-        }
-        sb.append( " (" );
-        sb.append( project.getGroupId() );
-        sb.append( ":" );
-        sb.append( project.getArtifactId() );
-        sb.append( ":" );
-        sb.append( project.getVersion() );
-        sb.append( " - " );
+        sb.append(" (");
+        sb.append(project.getGroupId());
+        sb.append(":");
+        sb.append(project.getArtifactId());
+        sb.append(":");
+        sb.append(project.getVersion());
+        sb.append(" - ");
         String url = project.getUrl();
-        sb.append( url == null ? "no url defined" : url );
-        sb.append( ")" );
+        sb.append(url == null ? "no url defined" : url);
+        sb.append(")");
 
         return sb.toString();
     }

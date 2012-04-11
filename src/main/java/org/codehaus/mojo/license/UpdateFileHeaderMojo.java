@@ -29,6 +29,8 @@ import org.codehaus.mojo.license.header.InvalideFileHeaderException;
 import org.codehaus.mojo.license.header.UpdateFileHeaderFilter;
 import org.codehaus.mojo.license.header.transformer.FileHeaderTransformer;
 import org.codehaus.mojo.license.model.License;
+import org.codehaus.mojo.license.utils.FileUtil;
+import org.codehaus.mojo.license.utils.MojoHelper;
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.FileUtils;
 
@@ -61,9 +63,8 @@ import java.util.TreeMap;
  * @since 1.0
  */
 public class UpdateFileHeaderMojo
-    extends AbstractLicenseNameMojo
-    implements FileHeaderProcessorConfiguration
-{
+        extends AbstractLicenseNameMojo
+        implements FileHeaderProcessorConfiguration {
 
     /**
      * Name of project (or module).
@@ -308,19 +309,13 @@ public class UpdateFileHeaderMojo
      */
     private Map<String, FileHeaderTransformer> transformers;
 
-    /**
-     * internal file header transformer.
-     */
+    /** internal file header transformer. */
     private FileHeaderTransformer transformer;
 
-    /**
-     * internal default file header.
-     */
+    /** internal default file header. */
     private FileHeader header;
 
-    /**
-     * timestamp used for generation.
-     */
+    /** timestamp used for generation. */
     private long timestamp;
 
     /**
@@ -330,15 +325,15 @@ public class UpdateFileHeaderMojo
      */
     private Map<String, String> extensionToCommentStyle;
 
-    public static final String[] DEFAULT_INCLUDES = new String[]{ "**/*" };
+    public static final String[] DEFAULT_INCLUDES = new String[]{"**/*"};
 
     public static final String[] DEFAULT_EXCLUDES =
-        new String[]{ "**/*.zargo", "**/*.uml", "**/*.umldi", "**/*.xmi", /* modelisation */
-            "**/*.img", "**/*.png", "**/*.jpg", "**/*.jpeg", "**/*.gif", /* images */
-            "**/*.zip", "**/*.jar", "**/*.war", "**/*.ear", "**/*.tgz", "**/*.gz" };
+            new String[]{"**/*.zargo", "**/*.uml", "**/*.umldi", "**/*.xmi", /* modelisation */
+                         "**/*.img", "**/*.png", "**/*.jpg", "**/*.jpeg", "**/*.gif", /* images */
+                         "**/*.zip", "**/*.jar", "**/*.war", "**/*.ear", "**/*.tgz", "**/*.gz"};
 
     public static final String[] DEFAULT_ROOTS =
-        new String[]{ "src", "target/generated-sources", "target/processed-sources" };
+            new String[]{"src", "target/generated-sources", "target/processed-sources"};
 
     /**
      * Defines state of a file after process.
@@ -346,32 +341,21 @@ public class UpdateFileHeaderMojo
      * @author tchemit <chemit@codelutin.com>
      * @since 1.0
      */
-    enum FileState
-    {
+    enum FileState {
 
-        /**
-         * file was updated
-         */
+        /** file was updated */
         update,
 
-        /**
-         * file was up to date
-         */
+        /** file was up to date */
         uptodate,
 
-        /**
-         * something was added on file
-         */
+        /** something was added on file */
         add,
 
-        /**
-         * file was ignored
-         */
+        /** file was ignored */
         ignore,
 
-        /**
-         * treatment failed for file
-         */
+        /** treatment failed for file */
         fail;
 
         /**
@@ -380,73 +364,57 @@ public class UpdateFileHeaderMojo
          * @param file   file to add
          * @param result dictionary to update
          */
-        public void addFile( File file, EnumMap<FileState, Set<File>> result )
-        {
-            Set<File> fileSet = result.get( this );
-            if ( fileSet == null )
-            {
+        public void addFile(File file, EnumMap<FileState, Set<File>> result) {
+            Set<File> fileSet = result.get(this);
+            if (fileSet == null) {
                 fileSet = new HashSet<File>();
-                result.put( this, fileSet );
+                result.put(this, fileSet);
             }
-            fileSet.add( file );
+            fileSet.add(file);
         }
     }
 
-    /**
-     * set of processed files
-     */
+    /** set of processed files */
     private Set<File> processedFiles;
 
-    /**
-     * Dictionnary of treated files indexed by their state.
-     */
+    /** Dictionnary of treated files indexed by their state. */
     private EnumMap<FileState, Set<File>> result;
 
-    /**
-     * Dictonnary of files to treate indexed by their CommentStyle.
-     */
+    /** Dictonnary of files to treate indexed by their CommentStyle. */
     private Map<String, List<File>> filesToTreateByCommentStyle;
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public void init()
-        throws Exception
-    {
+            throws Exception {
 
-        if ( isSkip() )
-        {
+        if (isSkip()) {
             return;
         }
 
-        if ( StringUtils.isEmpty( ignoreTag ) )
-        {
+        if (StringUtils.isEmpty(ignoreTag)) {
 
             // use default value
             this.ignoreTag = "%" + "%Ignore-License";
         }
 
-        if ( isVerbose() )
-        {
+        if (isVerbose()) {
 
             // print availables comment styles (transformers)
             StringBuilder buffer = new StringBuilder();
-            buffer.append( "config - available comment styles :" );
+            buffer.append("config - available comment styles :");
             String commentFormat = "\n  * %1$s (%2$s)";
-            for ( String transformerName : transformers.keySet() )
-            {
-                FileHeaderTransformer transformer = getTransformer( transformerName );
-                String str = String.format( commentFormat, transformer.getName(), transformer.getDescription() );
-                buffer.append( str );
+            for (String transformerName : transformers.keySet()) {
+                FileHeaderTransformer transformer = getTransformer(transformerName);
+                String str = String.format(commentFormat, transformer.getName(), transformer.getDescription());
+                buffer.append(str);
             }
-            getLog().info( buffer.toString() );
+            getLog().info(buffer.toString());
         }
 
-        if ( updateCopyright )
-        {
+        if (updateCopyright) {
 
-            getLog().warn( "\n\nupdateCopyright is not still available...\n\n" );
+            getLog().warn("\n\nupdateCopyright is not still available...\n\n");
             //TODO-TC20100409 checks scm
             // checks scm is ok
             // for the moment, will only deal with svn except if scm
@@ -458,108 +426,92 @@ public class UpdateFileHeaderMojo
         this.timestamp = System.nanoTime();
 
         // add flags to authorize or not updates of header
-        filter.setUpdateCopyright( canUpdateCopyright );
-        filter.setUpdateDescription( canUpdateDescription );
-        filter.setUpdateLicense( canUpdateLicense );
+        filter.setUpdateCopyright(canUpdateCopyright);
+        filter.setUpdateDescription(canUpdateDescription);
+        filter.setUpdateLicense(canUpdateLicense);
 
-        filter.setLog( getLog() );
-        processor.setConfiguration( this );
-        processor.setFilter( filter );
+        filter.setLog(getLog());
+        processor.setConfiguration(this);
+        processor.setFilter(filter);
 
         super.init();
 
-        if ( roots == null || roots.length == 0 )
-        {
+        if (roots == null || roots.length == 0) {
             roots = DEFAULT_ROOTS;
-            if ( isVerbose() )
-            {
-                getLog().info( "Will use default roots " + Arrays.toString( roots ) );
+            if (isVerbose()) {
+                getLog().info("Will use default roots " + Arrays.toString(roots));
             }
         }
 
-        if ( includes == null || includes.length == 0 )
-        {
+        if (includes == null || includes.length == 0) {
             includes = DEFAULT_INCLUDES;
-            if ( isVerbose() )
-            {
-                getLog().info( "Will use default includes " + Arrays.toString( includes ) );
+            if (isVerbose()) {
+                getLog().info("Will use default includes " + Arrays.toString(includes));
             }
         }
 
-        if ( excludes == null || excludes.length == 0 )
-        {
+        if (excludes == null || excludes.length == 0) {
             excludes = DEFAULT_EXCLUDES;
-            if ( isVerbose() )
-            {
-                getLog().info( "Will use default excludes" + Arrays.toString( excludes ) );
+            if (isVerbose()) {
+                getLog().info("Will use default excludes" + Arrays.toString(excludes));
             }
         }
 
         extensionToCommentStyle = new TreeMap<String, String>();
 
-        processStartTag = cleanHeaderConfiguration( processStartTag, FileHeaderTransformer.DEFAULT_PROCESS_START_TAG );
-        if ( isVerbose() )
-        {
-            getLog().info( "Will use processStartTag: " + processEndTag );
+        processStartTag = cleanHeaderConfiguration(processStartTag, FileHeaderTransformer.DEFAULT_PROCESS_START_TAG);
+        if (isVerbose()) {
+            getLog().info("Will use processStartTag: " + processEndTag);
         }
-        processEndTag = cleanHeaderConfiguration( processEndTag, FileHeaderTransformer.DEFAULT_PROCESS_END_TAG );
-        if ( isVerbose() )
-        {
-            getLog().info( "Will use processEndTag: " + processEndTag );
+        processEndTag = cleanHeaderConfiguration(processEndTag, FileHeaderTransformer.DEFAULT_PROCESS_END_TAG);
+        if (isVerbose()) {
+            getLog().info("Will use processEndTag: " + processEndTag);
         }
         sectionDelimiter =
-            cleanHeaderConfiguration( sectionDelimiter, FileHeaderTransformer.DEFAULT_SECTION_DELIMITER );
+                cleanHeaderConfiguration(sectionDelimiter, FileHeaderTransformer.DEFAULT_SECTION_DELIMITER);
 
-        if ( isVerbose() )
-        {
-            getLog().info( "Will use sectionDelimiter: " + sectionDelimiter );
+        if (isVerbose()) {
+            getLog().info("Will use sectionDelimiter: " + sectionDelimiter);
         }
 
         // add default extensions from header transformers
-        for ( Map.Entry<String, FileHeaderTransformer> entry : transformers.entrySet() )
-        {
+        for (Map.Entry<String, FileHeaderTransformer> entry : transformers.entrySet()) {
             String commentStyle = entry.getKey();
             FileHeaderTransformer transformer = entry.getValue();
 
-            transformer.setProcessStartTag( processStartTag );
-            transformer.setProcessEndTag( processEndTag );
-            transformer.setSectionDelimiter( sectionDelimiter );
+            transformer.setProcessStartTag(processStartTag);
+            transformer.setProcessEndTag(processEndTag);
+            transformer.setSectionDelimiter(sectionDelimiter);
 
             String[] extensions = transformer.getDefaultAcceptedExtensions();
-            for ( String extension : extensions )
-            {
-                if ( isVerbose() )
-                {
-                    getLog().info( "Associate extension " + extension + " to comment style " + commentStyle );
+            for (String extension : extensions) {
+                if (isVerbose()) {
+                    getLog().info("Associate extension " + extension + " to comment style " + commentStyle);
                 }
-                extensionToCommentStyle.put( extension, commentStyle );
+                extensionToCommentStyle.put(extension, commentStyle);
             }
         }
 
-        if ( extraExtensions != null )
-        {
+        if (extraExtensions != null) {
 
             // fill extra extensions for each transformer
-            for ( Map.Entry<String, String> entry : extraExtensions.entrySet() )
-            {
+            for (Map.Entry<String, String> entry : extraExtensions.entrySet()) {
                 String extension = entry.getKey();
-                if ( extensionToCommentStyle.containsKey( extension ) )
-                {
+                if (extensionToCommentStyle.containsKey(extension)) {
 
                     // override existing extension mapping
-                    getLog().warn( "The extension " + extension + " is already accepted for comment style " +
-                                       extensionToCommentStyle.get( extension ) );
+                    getLog().warn("The extension " + extension + " is already accepted for comment style " +
+                                  extensionToCommentStyle.get(extension));
                 }
                 String commentStyle = entry.getValue();
 
                 // check transformer exists
-                getTransformer( commentStyle );
+                getTransformer(commentStyle);
 
-                if ( isVerbose() )
-                {
-                    getLog().info( "Associate extension '" + extension + "' to comment style '" + commentStyle + "'" );
+                if (isVerbose()) {
+                    getLog().info("Associate extension '" + extension + "' to comment style '" + commentStyle + "'");
                 }
-                extensionToCommentStyle.put( extension, commentStyle );
+                extensionToCommentStyle.put(extension, commentStyle);
             }
         }
 
@@ -567,213 +519,173 @@ public class UpdateFileHeaderMojo
         filesToTreateByCommentStyle = obtainFilesToTreateByCommentStyle();
     }
 
-    protected Map<String, List<File>> obtainFilesToTreateByCommentStyle()
-    {
+    protected Map<String, List<File>> obtainFilesToTreateByCommentStyle() {
 
         Map<String, List<File>> result = new HashMap<String, List<File>>();
 
         // add for all known comment style (says transformer) a empty list
         // this permits not to have to test if there is an already list each time
         // we wants to add a new file...
-        for ( String commentStyle : transformers.keySet() )
-        {
-            result.put( commentStyle, new ArrayList<File>() );
+        for (String commentStyle : transformers.keySet()) {
+            result.put(commentStyle, new ArrayList<File>());
         }
 
-        List<String> rootsList = new ArrayList<String>( roots.length );
-        for ( String root : roots )
-        {
-            File f = new File( root );
-            if ( f.isAbsolute() )
-            {
-                rootsList.add( f.getAbsolutePath() );
+        List<String> rootsList = new ArrayList<String>(roots.length);
+        for (String root : roots) {
+            File f = new File(root);
+            if (f.isAbsolute()) {
+                rootsList.add(f.getAbsolutePath());
+            } else {
+                f = new File(getProject().getBasedir(), root);
             }
-            else
-            {
-                f = new File( getProject().getBasedir(), root );
-            }
-            if ( f.exists() )
-            {
-                getLog().info( "Will search files to update from root " + f );
-                rootsList.add( f.getAbsolutePath() );
-            }
-            else
-            {
-                if ( isVerbose() )
-                {
-                    getLog().info( "Skip not found root " + f );
+            if (f.exists()) {
+                getLog().info("Will search files to update from root " + f);
+                rootsList.add(f.getAbsolutePath());
+            } else {
+                if (isVerbose()) {
+                    getLog().info("Skip not found root " + f);
                 }
             }
         }
 
         // Obtain all files to treate
         Map<File, String[]> allFiles = new HashMap<File, String[]>();
-        getFilesToTreateForRoots( includes, excludes, rootsList, allFiles );
+        getFilesToTreateForRoots(includes, excludes, rootsList, allFiles);
 
         // filter all these files according to their extension
 
-        for ( Map.Entry<File, String[]> entry : allFiles.entrySet() )
-        {
+        for (Map.Entry<File, String[]> entry : allFiles.entrySet()) {
             File root = entry.getKey();
             String[] filesPath = entry.getValue();
 
             // sort them by the associated comment style to their extension
-            for ( String path : filesPath )
-            {
-                String extension = FileUtils.extension( path );
-                String commentStyle = extensionToCommentStyle.get( extension );
-                if ( StringUtils.isEmpty( commentStyle ) )
-                {
+            for (String path : filesPath) {
+                String extension = FileUtils.extension(path);
+                String commentStyle = extensionToCommentStyle.get(extension);
+                if (StringUtils.isEmpty(commentStyle)) {
 
                     // unknown extension, do not treate this file
                     continue;
                 }
                 //
-                File file = new File( root, path );
-                List<File> files = result.get( commentStyle );
-                files.add( file );
+                File file = new File(root, path);
+                List<File> files = result.get(commentStyle);
+                files.add(file);
             }
         }
         return result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public void doAction()
-        throws Exception
-    {
+            throws Exception {
 
         long t0 = System.nanoTime();
 
         clear();
 
         processedFiles = new HashSet<File>();
-        result = new EnumMap<FileState, Set<File>>( FileState.class );
+        result = new EnumMap<FileState, Set<File>>(FileState.class);
 
-        try
-        {
+        try {
 
-            for ( Map.Entry<String, List<File>> commentStyleFiles : filesToTreateByCommentStyle.entrySet() )
-            {
+            for (Map.Entry<String, List<File>> commentStyleFiles : filesToTreateByCommentStyle.entrySet()) {
 
                 String commentStyle = commentStyleFiles.getKey();
                 List<File> files = commentStyleFiles.getValue();
 
-                processCommentStyle( commentStyle, files );
+                processCommentStyle(commentStyle, files);
             }
 
-        }
-        finally
-        {
+        } finally {
 
             int nbFiles = processedFiles.size();
-            if ( nbFiles == 0 )
-            {
-                getLog().warn( "No file to scan." );
-            }
-            else
-            {
-                String delay = MojoHelper.convertTime( System.nanoTime() - t0 );
+            if (nbFiles == 0) {
+                getLog().warn("No file to scan.");
+            } else {
+                String delay = MojoHelper.convertTime(System.nanoTime() - t0);
                 String message =
-                    String.format( "Scan %s file%s header done in %s.", nbFiles, nbFiles > 1 ? "s" : "", delay );
-                getLog().info( message );
+                        String.format("Scan %s file%s header done in %s.", nbFiles, nbFiles > 1 ? "s" : "", delay);
+                getLog().info(message);
             }
             Set<FileState> states = result.keySet();
-            if ( states.size() == 1 && states.contains( FileState.uptodate ) )
-            {
+            if (states.size() == 1 && states.contains(FileState.uptodate)) {
                 // all files where up to date
-                getLog().info( "All files are up-to-date." );
-            }
-            else
-            {
+                getLog().info("All files are up-to-date.");
+            } else {
 
                 StringBuilder buffer = new StringBuilder();
-                for ( FileState state : FileState.values() )
-                {
+                for (FileState state : FileState.values()) {
 
-                    reportType( state, buffer );
+                    reportType(state, buffer);
                 }
 
-                getLog().info( buffer.toString() );
+                getLog().info(buffer.toString());
             }
 
             // clean internal states
-            if ( clearAfterOperation )
-            {
+            if (clearAfterOperation) {
                 clear();
             }
         }
     }
 
-    protected void processCommentStyle( String commentStyle, List<File> filesToTreat )
-        throws IOException
-    {
+    protected void processCommentStyle(String commentStyle, List<File> filesToTreat)
+            throws IOException {
 
         // obtain license from definition
-        License license = getLicense( getLicenseName(), true );
+        License license = getLicense(getLicenseName(), true);
 
-        getLog().info( "Process header '" + commentStyle + "'" );
-        getLog().info( " - using " + license.getDescription() );
+        getLog().info("Process header '" + commentStyle + "'");
+        getLog().info(" - using " + license.getDescription());
 
         // use header transformer according to comment style given in header
-        this.transformer = getTransformer( commentStyle );
+        this.transformer = getTransformer(commentStyle);
 
         // file header to use if no header is found on a file
-        this.header = buildDefaultFileHeader( license, projectName, inceptionYear, organizationName, addSvnKeyWords,
-                                              getEncoding() );
+        this.header = buildDefaultFileHeader(license, projectName, inceptionYear, organizationName, addSvnKeyWords,
+                                             getEncoding());
 
         // update processor filter
         processor.populateFilter();
 
-        for ( File file : filesToTreat )
-        {
-            prepareProcessFile( file );
+        for (File file : filesToTreat) {
+            prepareProcessFile(file);
         }
         filesToTreat.clear();
     }
 
-    protected void prepareProcessFile( File file )
-        throws IOException
-    {
+    protected void prepareProcessFile(File file)
+            throws IOException {
 
-        if ( processedFiles.contains( file ) )
-        {
-            getLog().info( " - skip already processed file " + file );
+        if (processedFiles.contains(file)) {
+            getLog().info(" - skip already processed file " + file);
             return;
         }
 
         // output file
-        File processFile = new File( file.getAbsolutePath() + "_" + timestamp );
+        File processFile = new File(file.getAbsolutePath() + "_" + timestamp);
         boolean doFinalize = false;
-        try
-        {
-            doFinalize = processFile( file, processFile );
-        }
-        catch ( Exception e )
-        {
-            getLog().warn( "skip failed file : " + e.getMessage() +
-                               ( e.getCause() == null ? "" : " Cause : " + e.getCause().getMessage() ), e );
-            FileState.fail.addFile( file, result );
+        try {
+            doFinalize = processFile(file, processFile);
+        } catch (Exception e) {
+            getLog().warn("skip failed file : " + e.getMessage() +
+                          (e.getCause() == null ? "" : " Cause : " + e.getCause().getMessage()), e);
+            FileState.fail.addFile(file, result);
             doFinalize = false;
-        }
-        finally
-        {
+        } finally {
 
             // always clean processor internal states
             processor.reset();
 
             // whatever was the result, this file is treated.
-            processedFiles.add( file );
+            processedFiles.add(file);
 
-            if ( doFinalize )
-            {
-                finalizeFile( file, processFile );
-            }
-            else
-            {
-                FileUtil.deleteFile( processFile );
+            if (doFinalize) {
+                finalizeFile(file, processFile);
+            } else {
+                FileUtil.deleteFile(processFile);
             }
         }
 
@@ -789,222 +701,180 @@ public class UpdateFileHeaderMojo
      * @return {@code true} if prepareProcessFile can be finalize, otherwise need to be delete
      * @throws IOException if any pb while treatment
      */
-    protected boolean processFile( File file, File processFile )
-        throws IOException
-    {
+    protected boolean processFile(File file, File processFile)
+            throws IOException {
 
-        if ( getLog().isDebugEnabled() )
-        {
-            getLog().debug( " - process file " + file );
-            getLog().debug( " - will process into file " + processFile );
+        if (getLog().isDebugEnabled()) {
+            getLog().debug(" - process file " + file);
+            getLog().debug(" - will process into file " + processFile);
         }
 
         String content;
 
-        try
-        {
+        try {
 
             // check before all that file should not be skip by the ignoreTag
             // this is a costy operation
             //TODO-TC-20100411 We should process always from the read content not reading again from file
 
-            content = FileUtil.readAsString( file, getEncoding() );
+            content = FileUtil.readAsString(file, getEncoding());
 
-        }
-        catch ( IOException e )
-        {
-            throw new IOException( "Could not obtain content of file " + file );
+        } catch (IOException e) {
+            throw new IOException("Could not obtain content of file " + file);
         }
 
         //check that file is not marked to be ignored
-        if ( content.contains( ignoreTag ) )
-        {
-            getLog().info( " - ignore file (detected " + ignoreTag + ") " + file );
+        if (content.contains(ignoreTag)) {
+            getLog().info(" - ignore file (detected " + ignoreTag + ") " + file);
 
-            FileState.ignore.addFile( file, result );
+            FileState.ignore.addFile(file, result);
 
             return false;
         }
 
         // process file to detect header
 
-        try
-        {
-            processor.process( file, processFile );
-        }
-        catch ( IllegalStateException e )
-        {
+        try {
+            processor.process(file, processFile);
+        } catch (IllegalStateException e) {
             // could not obtain existing header
             throw new InvalideFileHeaderException(
-                "Could not extract header on file " + file + " for reason " + e.getMessage() );
-        }
-        catch ( Exception e )
-        {
-            if ( e instanceof InvalideFileHeaderException )
-            {
+                    "Could not extract header on file " + file + " for reason " + e.getMessage());
+        } catch (Exception e) {
+            if (e instanceof InvalideFileHeaderException) {
                 throw (InvalideFileHeaderException) e;
             }
-            throw new IOException( "Could not process file " + file + " for reason " + e.getMessage() );
+            throw new IOException("Could not process file " + file + " for reason " + e.getMessage());
         }
 
-        if ( processor.isTouched() )
-        {
+        if (processor.isTouched()) {
 
-            if ( isVerbose() )
-            {
-                getLog().info( " - header was updated for " + file );
+            if (isVerbose()) {
+                getLog().info(" - header was updated for " + file);
             }
-            if ( processor.isModified() )
-            {
+            if (processor.isModified()) {
 
                 // header content has changed
                 // must copy back process file to file (if not dry run)
 
-                FileState.update.addFile( file, result );
+                FileState.update.addFile(file, result);
                 return true;
 
             }
 
-            FileState.uptodate.addFile( file, result );
+            FileState.uptodate.addFile(file, result);
             return false;
         }
 
         // header was not fully (or not at all) detected in file
 
-        if ( processor.isDetectHeader() )
-        {
+        if (processor.isDetectHeader()) {
 
             // file has not a valid header (found a start process atg, but
             // not an ending one), can not do anything
-            throw new InvalideFileHeaderException( "Could not find header end on file " + file );
+            throw new InvalideFileHeaderException("Could not find header end on file " + file);
         }
 
         // no header at all, add a new header
 
-        getLog().info( " - adding license header on file " + file );
+        getLog().info(" - adding license header on file " + file);
 
         //FIXME tchemit 20100409 xml files must add header after a xml prolog line
-        content = getTransformer().addHeader( filter.getFullHeaderContent(), content );
+        content = getTransformer().addHeader(filter.getFullHeaderContent(), content);
 
-        if ( !dryRun )
-        {
-            FileUtil.writeString( processFile, content, getEncoding() );
+        if (!dryRun) {
+            FileUtil.writeString(processFile, content, getEncoding());
         }
 
-        FileState.add.addFile( file, result );
+        FileState.add.addFile(file, result);
         return true;
     }
 
-    protected void finalizeFile( File file, File processFile )
-        throws IOException
-    {
+    protected void finalizeFile(File file, File processFile)
+            throws IOException {
 
-        if ( isKeepBackup() && !dryRun )
-        {
-            File backupFile = FileUtil.getBackupFile( file );
+        if (isKeepBackup() && !dryRun) {
+            File backupFile = FileUtil.getBackupFile(file);
 
-            if ( backupFile.exists() )
-            {
+            if (backupFile.exists()) {
 
                 // always delete backup file, before the renaming
-                FileUtil.deleteFile( backupFile );
+                FileUtil.deleteFile(backupFile);
             }
 
-            if ( isVerbose() )
-            {
-                getLog().debug( " - backup original file " + file );
+            if (isVerbose()) {
+                getLog().debug(" - backup original file " + file);
             }
 
-            FileUtil.renameFile( file, backupFile );
+            FileUtil.renameFile(file, backupFile);
         }
 
-        if ( dryRun )
-        {
+        if (dryRun) {
 
             // dry run, delete temporary file
-            FileUtil.deleteFile( processFile );
-        }
-        else
-        {
+            FileUtil.deleteFile(processFile);
+        } else {
 
-            try
-            {
+            try {
 
                 // replace file with the updated one
-                FileUtil.renameFile( processFile, file );
-            }
-            catch ( IOException e )
-            {
+                FileUtil.renameFile(processFile, file);
+            } catch (IOException e) {
 
                 // workaround windows problem to rename  files
-                getLog().warn( e.getMessage() );
+                getLog().warn(e.getMessage());
 
                 // try to copy content (fail on windows xp...)
-                FileUtils.copyFile( processFile, file );
+                FileUtils.copyFile(processFile, file);
 
                 // then delete process file
-                FileUtil.deleteFile( processFile );
+                FileUtil.deleteFile(processFile);
             }
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     protected void finalize()
-        throws Throwable
-    {
+            throws Throwable {
         super.finalize();
         clear();
     }
 
-    protected void clear()
-    {
-        if ( processedFiles != null )
-        {
+    protected void clear() {
+        if (processedFiles != null) {
             processedFiles.clear();
         }
-        if ( result != null )
-        {
-            for ( Set<File> fileSet : result.values() )
-            {
+        if (result != null) {
+            for (Set<File> fileSet : result.values()) {
                 fileSet.clear();
             }
             result.clear();
         }
     }
 
-    protected void reportType( FileState state, StringBuilder buffer )
-    {
+    protected void reportType(FileState state, StringBuilder buffer) {
         String operation = state.name();
 
-        Set<File> set = getFiles( state );
-        if ( set == null || set.isEmpty() )
-        {
-            if ( isVerbose() )
-            {
-                buffer.append( "\n * no header to " );
-                buffer.append( operation );
-                buffer.append( "." );
+        Set<File> set = getFiles(state);
+        if (set == null || set.isEmpty()) {
+            if (isVerbose()) {
+                buffer.append("\n * no header to ");
+                buffer.append(operation);
+                buffer.append(".");
             }
             return;
         }
-        buffer.append( "\n * " ).append( operation ).append( " header on " );
-        buffer.append( set.size() );
-        if ( set.size() == 1 )
-        {
-            buffer.append( " file." );
+        buffer.append("\n * ").append(operation).append(" header on ");
+        buffer.append(set.size());
+        if (set.size() == 1) {
+            buffer.append(" file.");
+        } else {
+            buffer.append(" files.");
         }
-        else
-        {
-            buffer.append( " files." );
-        }
-        if ( isVerbose() )
-        {
-            for ( File file : set )
-            {
-                buffer.append( "\n   - " ).append( file );
+        if (isVerbose()) {
+            for (File file : set) {
+                buffer.append("\n   - ").append(file);
             }
         }
     }
@@ -1021,126 +891,101 @@ public class UpdateFileHeaderMojo
      * @return the new file header
      * @throws IOException if any problem while creating file header
      */
-    protected FileHeader buildDefaultFileHeader( License license, String projectName, String inceptionYear,
-                                                 String copyrightHolder, boolean addSvnKeyWords, String encoding )
-        throws IOException
-    {
+    protected FileHeader buildDefaultFileHeader(License license, String projectName, String inceptionYear,
+                                                String copyrightHolder, boolean addSvnKeyWords, String encoding)
+            throws IOException {
         FileHeader result = new FileHeader();
 
         StringBuilder buffer = new StringBuilder();
-        buffer.append( projectName );
-        if ( addSvnKeyWords )
-        {
+        buffer.append(projectName);
+        if (addSvnKeyWords) {
             // add svn keyworks
             char ls = FileHeaderTransformer.LINE_SEPARATOR;
-            buffer.append( ls );
+            buffer.append(ls);
 
             // breaks the keyword otherwise svn will update them here
             //TC-20100415 : do not generate thoses redundant keywords
 //            buffer.append(ls).append("$" + "Author$");
 //            buffer.append(ls).append("$" + "LastChangedDate$");
 //            buffer.append(ls).append("$" + "LastChangedRevision$");
-            buffer.append( ls ).append( "$" + "Id$" );
-            buffer.append( ls ).append( "$" + "HeadURL$" );
+            buffer.append(ls).append("$" + "Id$");
+            buffer.append(ls).append("$" + "HeadURL$");
 
         }
-        result.setDescription( buffer.toString() );
-        if ( getLog().isDebugEnabled() )
-        {
-            getLog().debug( "header description : " + result.getDescription() );
+        result.setDescription(buffer.toString());
+        if (getLog().isDebugEnabled()) {
+            getLog().debug("header description : " + result.getDescription());
         }
 
-        String licenseContent = license.getHeaderContent( encoding );
-        result.setLicense( licenseContent );
+        String licenseContent = license.getHeaderContent(encoding);
+        result.setLicense(licenseContent);
 
-        Integer firstYear = Integer.valueOf( inceptionYear );
-        result.setCopyrightFirstYear( firstYear );
+        Integer firstYear = Integer.valueOf(inceptionYear);
+        result.setCopyrightFirstYear(firstYear);
 
         Calendar cal = Calendar.getInstance();
-        cal.setTime( new Date() );
-        Integer lastYear = cal.get( Calendar.YEAR );
-        if ( firstYear < lastYear )
-        {
-            result.setCopyrightLastYear( lastYear );
+        cal.setTime(new Date());
+        Integer lastYear = cal.get(Calendar.YEAR);
+        if (firstYear < lastYear) {
+            result.setCopyrightLastYear(lastYear);
         }
-        result.setCopyrightHolder( copyrightHolder );
+        result.setCopyrightHolder(copyrightHolder);
         return result;
     }
 
-    public FileHeaderTransformer getTransformer( String transformerName )
-        throws IllegalArgumentException, IllegalStateException
-    {
-        if ( StringUtils.isEmpty( transformerName ) )
-        {
-            throw new IllegalArgumentException( "transformerName can not be null, nor empty!" );
+    public FileHeaderTransformer getTransformer(String transformerName)
+            throws IllegalArgumentException, IllegalStateException {
+        if (StringUtils.isEmpty(transformerName)) {
+            throw new IllegalArgumentException("transformerName can not be null, nor empty!");
         }
-        if ( transformers == null )
-        {
-            throw new IllegalStateException( "No transformers initialized!" );
+        if (transformers == null) {
+            throw new IllegalStateException("No transformers initialized!");
         }
-        FileHeaderTransformer transformer = transformers.get( transformerName );
-        if ( transformer == null )
-        {
+        FileHeaderTransformer transformer = transformers.get(transformerName);
+        if (transformer == null) {
             throw new IllegalArgumentException(
-                "transformerName " + transformerName + " is unknow, use one this one : " + transformers.keySet() );
+                    "transformerName " + transformerName + " is unknow, use one this one : " + transformers.keySet());
         }
         return transformer;
     }
 
-    protected String cleanHeaderConfiguration( String value, String defaultValue )
-    {
+    protected String cleanHeaderConfiguration(String value, String defaultValue) {
         String result;
-        if ( StringUtils.isEmpty( value ) )
-        {
+        if (StringUtils.isEmpty(value)) {
 
             // use default value
             result = defaultValue;
-        }
-        else
-        {
+        } else {
 
             // clean all spaces of it
-            result = value.replaceAll( "\\s", "" );
+            result = value.replaceAll("\\s", "");
         }
         return result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public FileHeader getFileHeader()
-    {
+    /** {@inheritDoc} */
+    public FileHeader getFileHeader() {
         return header;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public FileHeaderTransformer getTransformer()
-    {
+    /** {@inheritDoc} */
+    public FileHeaderTransformer getTransformer() {
         return transformer;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
-    public boolean isSkip()
-    {
+    public boolean isSkip() {
         return skipUpdateLicense;
     }
 
-    public Set<File> getFiles( FileState state )
-    {
-        return result.get( state );
+    public Set<File> getFiles(FileState state) {
+        return result.get(state);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
-    public void setSkip( boolean skipUpdateLicense )
-    {
+    public void setSkip(boolean skipUpdateLicense) {
         this.skipUpdateLicense = skipUpdateLicense;
     }
 
@@ -1152,61 +997,53 @@ public class UpdateFileHeaderMojo
      * @param roots    root directories to treate
      * @param files    cache of file detected indexed by their root directory
      */
-    protected void getFilesToTreateForRoots( String[] includes, String[] excludes, List<String> roots,
-                                             Map<File, String[]> files )
-    {
+    protected void getFilesToTreateForRoots(String[] includes, String[] excludes, List<String> roots,
+                                            Map<File, String[]> files) {
 
         DirectoryScanner ds = new DirectoryScanner();
-        ds.setIncludes( includes );
-        if ( excludes != null )
-        {
-            ds.setExcludes( excludes );
+        ds.setIncludes(includes);
+        if (excludes != null) {
+            ds.setExcludes(excludes);
         }
-        for ( String src : roots )
-        {
+        for (String src : roots) {
 
-            File f = new File( src );
-            if ( !f.exists() )
-            {
+            File f = new File(src);
+            if (!f.exists()) {
                 // do nothing on a non-existent
                 continue;
             }
 
-            if ( getLog().isDebugEnabled() )
-            {
-                getLog().debug( "discovering source files in " + src );
+            if (getLog().isDebugEnabled()) {
+                getLog().debug("discovering source files in " + src);
             }
 
-            ds.setBasedir( f );
+            ds.setBasedir(f);
             // scan
             ds.scan();
 
             // get files
             String[] tmp = ds.getIncludedFiles();
 
-            if ( tmp.length < 1 )
-            {
+            if (tmp.length < 1) {
                 // no files found
                 continue;
             }
 
             List<String> toTreate = new ArrayList<String>();
 
-            for ( String filePath : tmp )
-            {
-                File srcFile = new File( f, filePath );
+            for (String filePath : tmp) {
+                File srcFile = new File(f, filePath);
                 // check file is up-to-date
-                toTreate.add( filePath );
+                toTreate.add(filePath);
             }
 
-            if ( toTreate.isEmpty() )
-            {
+            if (toTreate.isEmpty()) {
                 // no file or all are up-to-date
                 continue;
             }
 
             // register files
-            files.put( f, toTreate.toArray( new String[toTreate.size()] ) );
+            files.put(f, toTreate.toArray(new String[toTreate.size()]));
         }
     }
 }

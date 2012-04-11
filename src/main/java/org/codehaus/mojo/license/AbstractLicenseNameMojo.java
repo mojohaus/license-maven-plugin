@@ -36,8 +36,7 @@ import java.util.Arrays;
  * @since 1.0
  */
 public abstract class AbstractLicenseNameMojo
-    extends AbstractLicenseMojo
-{
+        extends AbstractLicenseMojo {
 
     /**
      * To specify an external extra licenses repository resolver (says the base
@@ -64,14 +63,10 @@ public abstract class AbstractLicenseNameMojo
      */
     private String licenseName;
 
-    /**
-     * License loaded from the {@link #licenseName}.
-     */
+    /** License loaded from the {@link #licenseName}. */
     private License license;
 
-    /**
-     * Store of available licenses.
-     */
+    /** Store of available licenses. */
     private LicenseStore licenseStore;
 
     /**
@@ -89,85 +84,68 @@ public abstract class AbstractLicenseNameMojo
      *
      * @param skip new state value
      */
-    public abstract void setSkip( boolean skip );
+    public abstract void setSkip(boolean skip);
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
-    protected boolean checkSkip()
-    {
-        if ( isSkip() )
-        {
-            getLog().info( "skip flag is on, will skip goal." );
+    protected boolean checkSkip() {
+        if (isSkip()) {
+            getLog().info("skip flag is on, will skip goal.");
             return false;
         }
         return super.checkSkip();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     protected void init()
-        throws Exception
-    {
+            throws Exception {
 
-        if ( isSkip() )
-        {
+        if (isSkip()) {
             return;
         }
 
         // init licenses store
-        licenseStore = LicenseStore.createLicenseStore( getLog(), getLicenseResolver() );
+        licenseStore = LicenseStore.createLicenseStore(getLog(), getLicenseResolver());
 
         // check licenseName exists
-        license = getLicense( licenseName, true );
+        license = getLicense(licenseName, true);
     }
 
-    public License getLicense( String licenseName, boolean checkIfExists )
-        throws IllegalArgumentException, IllegalStateException
-    {
-        if ( StringUtils.isEmpty( licenseName ) )
-        {
-            throw new IllegalArgumentException( "licenseName can not be null, nor empty" );
+    public License getLicense(String licenseName, boolean checkIfExists)
+            throws IllegalArgumentException, IllegalStateException {
+        if (StringUtils.isEmpty(licenseName)) {
+            throw new IllegalArgumentException("licenseName can not be null, nor empty");
         }
         LicenseStore licenseStore = getLicenseStore();
-        if ( licenseStore == null )
-        {
-            throw new IllegalStateException( "No license store initialized!" );
+        if (licenseStore == null) {
+            throw new IllegalStateException("No license store initialized!");
         }
-        License license = licenseStore.getLicense( licenseName );
-        if ( checkIfExists && license == null )
-        {
-            throw new IllegalArgumentException( "License named '" + licenseName + "' is unknown, use one of " +
-                                                    Arrays.toString( licenseStore.getLicenseNames() ) );
+        License license = licenseStore.getLicense(licenseName);
+        if (checkIfExists && license == null) {
+            throw new IllegalArgumentException("License named '" + licenseName + "' is unknown, use one of " +
+                                               Arrays.toString(licenseStore.getLicenseNames()));
         }
         return license;
     }
 
-    public boolean isKeepBackup()
-    {
+    public boolean isKeepBackup() {
         return keepBackup;
     }
 
-    public String getLicenseName()
-    {
+    public String getLicenseName() {
         return licenseName;
     }
 
-    public String getLicenseResolver()
-    {
+    public String getLicenseResolver() {
         return licenseResolver;
     }
 
-    public LicenseStore getLicenseStore()
-    {
+    public LicenseStore getLicenseStore() {
         return licenseStore;
     }
 
-    public License getLicense()
-    {
+    public License getLicense() {
         return license;
     }
 

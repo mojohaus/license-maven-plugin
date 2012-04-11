@@ -28,6 +28,7 @@ import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
 import org.codehaus.mojo.license.model.LicenseMap;
+import org.codehaus.mojo.license.utils.SortedProperties;
 
 import java.io.File;
 import java.io.IOException;
@@ -49,8 +50,7 @@ import java.util.SortedSet;
  * @since 1.0
  */
 public class AggregatorAddThirdPartyMojo
-    extends AbstractAddThirdPartyMojo
-{
+        extends AbstractAddThirdPartyMojo {
 
     /**
      * The projects in the reactor.
@@ -62,76 +62,59 @@ public class AggregatorAddThirdPartyMojo
      */
     protected List<?> reactorProjects;
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
-    protected boolean checkPackaging()
-    {
-        return acceptPackaging( "pom" );
+    protected boolean checkPackaging() {
+        return acceptPackaging("pom");
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
-    protected boolean checkSkip()
-    {
-        if ( !isDoGenerate() && !isDoGenerateBundle() )
-        {
+    protected boolean checkSkip() {
+        if (!isDoGenerate() && !isDoGenerateBundle()) {
 
-            getLog().info( "All files are up to date, skip goal execution." );
+            getLog().info("All files are up to date, skip goal execution.");
             return false;
         }
         return super.checkSkip();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
-    protected SortedMap<String, MavenProject> loadDependencies()
-    {
+    protected SortedMap<String, MavenProject> loadDependencies() {
         // use the cache filled by modules in reactor
         return getHelper().getArtifactCache();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     protected SortedProperties createUnsafeMapping()
-        throws ProjectBuildingException, IOException
-    {
+            throws ProjectBuildingException, IOException {
 
         String path =
-            getMissingFile().getAbsolutePath().substring( getProject().getBasedir().getAbsolutePath().length() + 1 );
+                getMissingFile().getAbsolutePath().substring(getProject().getBasedir().getAbsolutePath().length() + 1);
 
-        if ( isVerbose() )
-        {
-            getLog().info( "Use missing file path : " + path );
+        if (isVerbose()) {
+            getLog().info("Use missing file path : " + path);
         }
 
-        SortedProperties unsafeMappings = new SortedProperties( getEncoding() );
+        SortedProperties unsafeMappings = new SortedProperties(getEncoding());
 
         LicenseMap licenseMap = getLicenseMap();
 
-        for ( Object o : reactorProjects )
-        {
+        for (Object o : reactorProjects) {
             MavenProject p = (MavenProject) o;
 
-            File file = new File( p.getBasedir(), path );
+            File file = new File(p.getBasedir(), path);
 
-            if ( file.exists() )
-            {
+            if (file.exists()) {
 
-                SortedProperties tmp = getHelper().loadUnsafeMapping( licenseMap, file );
-                unsafeMappings.putAll( tmp );
+                SortedProperties tmp = getHelper().loadUnsafeMapping(licenseMap, file);
+                unsafeMappings.putAll(tmp);
             }
 
-            SortedSet<MavenProject> unsafes = getHelper().getProjectsWithNoLicense( licenseMap );
-            if ( CollectionUtils.isEmpty( unsafes ) )
-            {
+            SortedSet<MavenProject> unsafes = getHelper().getProjectsWithNoLicense(licenseMap);
+            if (CollectionUtils.isEmpty(unsafes)) {
 
                 // no more unsafe dependencies, can break
                 break;
@@ -140,46 +123,37 @@ public class AggregatorAddThirdPartyMojo
         return unsafeMappings;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     protected void doAction()
-        throws Exception
-    {
+            throws Exception {
         Log log = getLog();
 
-        if ( isVerbose() )
-        {
-            log.info( "After executing on " + reactorProjects.size() + " project(s)" );
+        if (isVerbose()) {
+            log.info("After executing on " + reactorProjects.size() + " project(s)");
         }
         SortedMap<String, MavenProject> artifacts = getHelper().getArtifactCache();
 
         LicenseMap licenseMap = getLicenseMap();
 
-        getLog().info( artifacts.size() + " detected artifact(s)." );
-        if ( isVerbose() )
-        {
-            for ( String id : artifacts.keySet() )
-            {
-                getLog().info( " - " + id );
+        getLog().info(artifacts.size() + " detected artifact(s).");
+        if (isVerbose()) {
+            for (String id : artifacts.keySet()) {
+                getLog().info(" - " + id);
             }
         }
-        getLog().info( licenseMap.size() + " detected license(s)." );
-        if ( isVerbose() )
-        {
-            for ( String id : licenseMap.keySet() )
-            {
-                getLog().info( " - " + id );
+        getLog().info(licenseMap.size() + " detected license(s).");
+        if (isVerbose()) {
+            for (String id : licenseMap.keySet()) {
+                getLog().info(" - " + id);
             }
         }
         boolean unsafe = checkUnsafeDependencies();
 
         writeThirdPartyFile();
 
-        if ( unsafe && isFailIfWarning() )
-        {
-            throw new MojoFailureException( "There is some dependencies with no license, please review the modules." );
+        if (unsafe && isFailIfWarning()) {
+            throw new MojoFailureException("There is some dependencies with no license, please review the modules.");
         }
     }
 

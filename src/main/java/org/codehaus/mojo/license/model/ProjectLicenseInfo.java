@@ -36,8 +36,7 @@ import java.util.List;
  * @author pgier
  * @since 1.0
  */
-public class ProjectLicenseInfo
-{
+public class ProjectLicenseInfo {
     private String groupId;
 
     private String artifactId;
@@ -48,74 +47,59 @@ public class ProjectLicenseInfo
 
     private String licenseResolutionResult;
 
-    public String getLicenseResolutionResult()
-    {
+    public String getLicenseResolutionResult() {
         return licenseResolutionResult;
     }
 
-    public void setLicenseResolutionResult( String licenseResolutionResult )
-    {
+    public void setLicenseResolutionResult(String licenseResolutionResult) {
         this.licenseResolutionResult = licenseResolutionResult;
     }
 
-    /**
-     * Default constructor
-     */
-    public ProjectLicenseInfo()
-    {
+    /** Default constructor */
+    public ProjectLicenseInfo() {
 
     }
 
-    public ProjectLicenseInfo( String groupId, String artifactId, String version )
-    {
+    public ProjectLicenseInfo(String groupId, String artifactId, String version) {
         this.groupId = groupId;
         this.artifactId = artifactId;
         this.version = version;
     }
 
-    public String getGroupId()
-    {
+    public String getGroupId() {
         return groupId;
     }
 
-    public void setGroupId( String groupId )
-    {
+    public void setGroupId(String groupId) {
         this.groupId = groupId;
     }
 
-    public String getArtifactId()
-    {
+    public String getArtifactId() {
         return artifactId;
     }
 
-    public void setArtifactId( String artifactId )
-    {
+    public void setArtifactId(String artifactId) {
         this.artifactId = artifactId;
     }
 
-    public String getVersion()
-    {
+    public String getVersion() {
         return version;
     }
 
-    public void setVersion( String version )
-    {
+    public void setVersion(String version) {
         this.version = version;
     }
 
-    public List<License> getLicenses()
-    {
+    public List<License> getLicenses() {
         return licenses;
     }
 
-    public void setLicenses( List<License> licenses )
-    {
+    public void setLicenses(List<License> licenses) {
         this.licenses = licenses;
     }
 
-    public void addLicense( License license )
-    {
-        licenses.add( license );
+    public void addLicense(License license) {
+        licenses.add(license);
     }
 
     /**
@@ -123,51 +107,37 @@ public class ProjectLicenseInfo
      *
      * @return String containing "groupId:artifactId"
      */
-    public String getId()
-    {
+    public String getId() {
         return groupId + ":" + artifactId;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
-    public String toString()
-    {
+    public String toString() {
         return getId();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
-    public boolean equals( Object compareTo )
-    {
-        if ( compareTo instanceof ProjectLicenseInfo )
-        {
+    public boolean equals(Object compareTo) {
+        if (compareTo instanceof ProjectLicenseInfo) {
             ProjectLicenseInfo compare = (ProjectLicenseInfo) compareTo;
-            if ( groupId.equals( compare.getGroupId() ) && artifactId.equals( compare.getArtifactId() ) )
-            {
+            if (groupId.equals(compare.getGroupId()) && artifactId.equals(compare.getArtifactId())) {
                 return true;
             }
         }
-        if ( compareTo instanceof Artifact )
-        {
+        if (compareTo instanceof Artifact) {
             Artifact compare = (Artifact) compareTo;
-            if ( groupId.equals( compare.getGroupId() ) && artifactId.equals( compare.getArtifactId() ) )
-            {
+            if (groupId.equals(compare.getGroupId()) && artifactId.equals(compare.getArtifactId())) {
                 return true;
             }
         }
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         return getId().hashCode();
     }
 

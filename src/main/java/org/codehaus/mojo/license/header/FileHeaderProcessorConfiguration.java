@@ -31,22 +31,15 @@ import org.codehaus.mojo.license.header.transformer.FileHeaderTransformer;
  * @author tchemit <chemit@codelutin.com>
  * @since 1.0
  */
-public interface FileHeaderProcessorConfiguration
-{
+public interface FileHeaderProcessorConfiguration {
 
-    /**
-     * @return mojo logger
-     */
+    /** @return mojo logger */
     Log getLog();
 
-    /**
-     * @return the current file header to use
-     */
+    /** @return the current file header to use */
     FileHeader getFileHeader();
 
-    /**
-     * @return the current file transformer to use
-     */
+    /** @return the current file transformer to use */
     FileHeaderTransformer getTransformer();
 
 }

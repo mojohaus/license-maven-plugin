@@ -23,6 +23,7 @@
 package org.codehaus.mojo.license;
 
 import org.codehaus.mojo.license.model.License;
+import org.codehaus.mojo.license.utils.FileUtil;
 
 import java.io.File;
 
@@ -41,8 +42,7 @@ import java.io.File;
  * @since 1.0
  */
 public class UpdateProjectLicenseMojo
-    extends AbstractLicenseNameMojo
-{
+        extends AbstractLicenseNameMojo {
 
     /**
      * Project license file to synchronize with main license defined in
@@ -107,109 +107,89 @@ public class UpdateProjectLicenseMojo
      */
     protected boolean skipUpdateProjectLicense;
 
-    /**
-     * Flag to known if generate is needed.
-     */
+    /** Flag to known if generate is needed. */
     private boolean doGenerate;
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     protected void init()
-        throws Exception
-    {
+            throws Exception {
 
-        if ( isSkip() )
-        {
+        if (isSkip()) {
             return;
         }
 
         super.init();
 
         // must generate if file does not exist or pom never thant license file
-        if ( licenseFile != null )
-        {
+        if (licenseFile != null) {
             File pomFile = getProject().getFile();
 
             this.doGenerate = force || !licenseFile.exists() || licenseFile.lastModified() <= pomFile.lastModified();
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     protected void doAction()
-        throws Exception
-    {
+            throws Exception {
 
         License license = getLicense();
 
-        if ( doGenerate )
-        {
+        if (doGenerate) {
 
-            getLog().info( "Will create or update license file [" + license.getName() + "] to " + licenseFile );
-            if ( isVerbose() )
-            {
-                getLog().info( "detail of license :\n" + license );
+            getLog().info("Will create or update license file [" + license.getName() + "] to " + licenseFile);
+            if (isVerbose()) {
+                getLog().info("detail of license :\n" + license);
             }
 
-            if ( licenseFile.exists() && isKeepBackup() )
-            {
-                if ( isVerbose() )
-                {
-                    getLog().info( "backup " + licenseFile );
+            if (licenseFile.exists() && isKeepBackup()) {
+                if (isVerbose()) {
+                    getLog().info("backup " + licenseFile);
                 }
                 // copy it to backup file
-                FileUtil.backupFile( licenseFile );
+                FileUtil.backupFile(licenseFile);
             }
         }
 
         // obtain license content
-        String licenseContent = license.getLicenseContent( getEncoding() );
+        String licenseContent = license.getLicenseContent(getEncoding());
 
-        if ( doGenerate )
-        {
+        if (doGenerate) {
 
             // writes it root main license file
-            FileUtil.writeString( licenseFile, licenseContent, getEncoding() );
+            FileUtil.writeString(licenseFile, licenseContent, getEncoding());
         }
 
-        if ( hasClassPath() )
-        {
+        if (hasClassPath()) {
 
             // copy the license file to the resources directory
-            File resourceTarget = new File( outputDirectory, licenseFile.getName() );
-            FileUtil.copyFile( this.licenseFile, resourceTarget );
+            File resourceTarget = new File(outputDirectory, licenseFile.getName());
+            FileUtil.copyFile(this.licenseFile, resourceTarget);
 
-            addResourceDir( outputDirectory, "**/" + resourceTarget.getName() );
+            addResourceDir(outputDirectory, "**/" + resourceTarget.getName());
 
-            if ( generateBundle )
-            {
+            if (generateBundle) {
 
                 // creates the bundled license file
-                File bundleTarget = FileUtil.getFile( outputDirectory, bundleLicensePath );
-                FileUtil.copyFile( licenseFile, bundleTarget );
+                File bundleTarget = FileUtil.getFile(outputDirectory, bundleLicensePath);
+                FileUtil.copyFile(licenseFile, bundleTarget);
 
-                if ( !resourceTarget.getName().equals( bundleTarget.getName() ) )
-                {
+                if (!resourceTarget.getName().equals(bundleTarget.getName())) {
 
-                    addResourceDir( outputDirectory, "**/" + bundleTarget.getName() );
+                    addResourceDir(outputDirectory, "**/" + bundleTarget.getName());
                 }
             }
         }
     }
 
     @Override
-    public boolean isSkip()
-    {
+    public boolean isSkip() {
         return skipUpdateProjectLicense;
     }
 
     @Override
-    public void setSkip( boolean skipUpdateProjectLicense )
-    {
+    public void setSkip(boolean skipUpdateProjectLicense) {
         this.skipUpdateProjectLicense = skipUpdateProjectLicense;
     }
 

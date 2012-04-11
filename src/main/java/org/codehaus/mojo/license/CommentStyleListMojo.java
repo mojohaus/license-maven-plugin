@@ -42,8 +42,7 @@ import java.util.Map;
  * @since 1.0
  */
 public class CommentStyleListMojo
-    extends AbstractLicenseMojo
-{
+        extends AbstractLicenseMojo {
 
     /**
      * A flag to display also the content of each license.
@@ -61,65 +60,53 @@ public class CommentStyleListMojo
      */
     private Map<String, FileHeaderTransformer> transformers;
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     protected void init()
-        throws Exception
-    {
+            throws Exception {
         //nothing to do
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public void doAction()
-        throws MojoExecutionException, MojoFailureException
-    {
+            throws MojoExecutionException, MojoFailureException {
 
         StringBuilder buffer = new StringBuilder();
-        if ( isVerbose() )
-        {
-            buffer.append( "\n\n-------------------------------------------------------------------------------\n" );
-            buffer.append( "                           license-maven-plugin\n" );
-            buffer.append( "-------------------------------------------------------------------------------\n\n" );
+        if (isVerbose()) {
+            buffer.append("\n\n-------------------------------------------------------------------------------\n");
+            buffer.append("                           license-maven-plugin\n");
+            buffer.append("-------------------------------------------------------------------------------\n\n");
         }
-        List<String> names = new ArrayList<String>( transformers.keySet() );
-        Collections.sort( names );
+        List<String> names = new ArrayList<String>(transformers.keySet());
+        Collections.sort(names);
 
         int maxLength = 0;
         int maxDLength = 0;
-        for ( String name : names )
-        {
-            if ( name.length() > maxLength )
-            {
+        for (String name : names) {
+            if (name.length() > maxLength) {
                 maxLength = name.length();
             }
-            FileHeaderTransformer transformer = transformers.get( name );
-            if ( transformer.getDescription().length() > maxDLength )
-            {
+            FileHeaderTransformer transformer = transformers.get(name);
+            if (transformer.getDescription().length() > maxDLength) {
                 maxDLength = transformer.getDescription().length();
             }
         }
 
         String pattern = "  - %1$-" + maxLength + "s : %2$-" + maxDLength + "s, extensions : %3$s\n";
 
-        buffer.append( "List of available comment styles:\n\n" );
-        for ( String transformerName : names )
-        {
-            FileHeaderTransformer transformer = transformers.get( transformerName );
-            buffer.append( String.format( pattern, transformerName, transformer.getDescription(),
-                                          Arrays.toString( transformer.getDefaultAcceptedExtensions() ) ) );
-            if ( detail )
-            {
-                buffer.append( "\n   example : \n" );
-                buffer.append( transformer.boxComment( "header", true ) );
-                buffer.append( '\n' );
+        buffer.append("List of available comment styles:\n\n");
+        for (String transformerName : names) {
+            FileHeaderTransformer transformer = transformers.get(transformerName);
+            buffer.append(String.format(pattern, transformerName, transformer.getDescription(),
+                                        Arrays.toString(transformer.getDefaultAcceptedExtensions())));
+            if (detail) {
+                buffer.append("\n   example : \n");
+                buffer.append(transformer.boxComment("header", true));
+                buffer.append('\n');
             }
         }
 
-        getLog().info( buffer.toString() );
+        getLog().info(buffer.toString());
     }
 }

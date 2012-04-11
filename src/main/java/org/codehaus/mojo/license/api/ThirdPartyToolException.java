@@ -19,7 +19,7 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
-package org.codehaus.mojo.license;
+package org.codehaus.mojo.license.api;
 
 /**
  * An exception occurring during the execution of this tool.
@@ -28,8 +28,7 @@ package org.codehaus.mojo.license;
  * @version $Id$
  */
 public class ThirdPartyToolException
-    extends Exception
-{
+        extends Exception {
     /**
      * Construct a new <code>ThirdPartyToolException</code> exception wrapping an underlying <code>Exception</code>
      * and providing a <code>message</code>.
@@ -37,9 +36,8 @@ public class ThirdPartyToolException
      * @param message could be null
      * @param cause   could be null
      */
-    public ThirdPartyToolException( String message, Exception cause )
-    {
-        super( message, cause );
+    public ThirdPartyToolException(String message, Exception cause) {
+        super(message, cause);
     }
 
     /**
@@ -49,9 +47,8 @@ public class ThirdPartyToolException
      * @param message could be null
      * @param cause   could be null
      */
-    public ThirdPartyToolException( String message, Throwable cause )
-    {
-        super( message, cause );
+    public ThirdPartyToolException(String message, Throwable cause) {
+        super(message, cause);
     }
 
     /**
@@ -59,8 +56,7 @@ public class ThirdPartyToolException
      *
      * @param message could be null
      */
-    public ThirdPartyToolException( String message )
-    {
-        super( message );
+    public ThirdPartyToolException(String message) {
+        super(message);
     }
 }

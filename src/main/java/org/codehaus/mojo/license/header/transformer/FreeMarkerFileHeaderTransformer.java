@@ -30,8 +30,7 @@ package org.codehaus.mojo.license.header.transformer;
  * @since 1.0
  */
 public class FreeMarkerFileHeaderTransformer
-    extends AbstractFileHeaderTransformer
-{
+        extends AbstractFileHeaderTransformer {
 
     public static final String NAME = "ftl";
 
@@ -43,13 +42,11 @@ public class FreeMarkerFileHeaderTransformer
 
     public static final String COMMENT_END_TAG = "-->";
 
-    public FreeMarkerFileHeaderTransformer()
-    {
-        super( NAME, DESCRIPTION, COMMENT_START_TAG, COMMENT_END_TAG, COMMENT_LINE_PREFIX );
+    public FreeMarkerFileHeaderTransformer() {
+        super(NAME, DESCRIPTION, COMMENT_START_TAG, COMMENT_END_TAG, COMMENT_LINE_PREFIX);
     }
 
-    public String[] getDefaultAcceptedExtensions()
-    {
-        return new String[]{ NAME };
+    public String[] getDefaultAcceptedExtensions() {
+        return new String[]{NAME};
     }
 }

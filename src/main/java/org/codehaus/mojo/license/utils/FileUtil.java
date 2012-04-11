@@ -20,7 +20,7 @@
  * #L%
  */
 
-package org.codehaus.mojo.license;
+package org.codehaus.mojo.license.utils;
 
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
@@ -43,37 +43,26 @@ import java.io.OutputStreamWriter;
  * @author tchemit <chemit@codelutin.com>
  * @since 1.0
  */
-public class FileUtil
-{
+public class FileUtil {
 
-    public static void tryClose( InputStream is )
-    {
-        if ( is == null )
-        {
+    public static void tryClose(InputStream is) {
+        if (is == null) {
             return;
         }
-        try
-        {
+        try {
             is.close();
-        }
-        catch ( IOException e )
-        {
+        } catch (IOException e) {
             // do nothing
         }
     }
 
-    public static void tryClose( OutputStream os )
-    {
-        if ( os == null )
-        {
+    public static void tryClose(OutputStream os) {
+        if (os == null) {
             return;
         }
-        try
-        {
+        try {
             os.close();
-        }
-        catch ( IOException e )
-        {
+        } catch (IOException e) {
             // do nothing
         }
     }
@@ -86,31 +75,25 @@ public class FileUtil
      *         need to create it
      * @throws IOException if could not create directory
      */
-    public static boolean createDirectoryIfNecessary( File dir )
-        throws IOException
-    {
-        if ( !dir.exists() )
-        {
+    public static boolean createDirectoryIfNecessary(File dir)
+            throws IOException {
+        if (!dir.exists()) {
             boolean b = dir.mkdirs();
-            if ( !b )
-            {
-                throw new IOException( "Could not create directory " + dir );
+            if (!b) {
+                throw new IOException("Could not create directory " + dir);
             }
             return true;
         }
         return false;
     }
 
-    public static boolean createNewFile( File file )
-        throws IOException
-    {
-        createDirectoryIfNecessary( file.getParentFile() );
-        if ( !file.exists() )
-        {
+    public static boolean createNewFile(File file)
+            throws IOException {
+        createDirectoryIfNecessary(file.getParentFile());
+        if (!file.exists()) {
             boolean b = file.createNewFile();
-            if ( !b )
-            {
-                throw new IOException( "Could not create new file " + file );
+            if (!b) {
+                throw new IOException("Could not create new file " + file);
             }
             return true;
         }
@@ -123,18 +106,15 @@ public class FileUtil
      * @param file the file to delete
      * @throws IOException if could not delete the file
      */
-    public static void deleteFile( File file )
-        throws IOException
-    {
-        if ( !file.exists() )
-        {
+    public static void deleteFile(File file)
+            throws IOException {
+        if (!file.exists()) {
             // file does not exist, can not delete it
             return;
         }
         boolean b = file.delete();
-        if ( !b )
-        {
-            throw new IOException( "could not delete file " + file );
+        if (!b) {
+            throw new IOException("could not delete file " + file);
         }
     }
 
@@ -145,13 +125,11 @@ public class FileUtil
      * @param destination the destination file
      * @throws IOException if could not rename the file
      */
-    public static void renameFile( File file, File destination )
-        throws IOException
-    {
-        boolean b = file.renameTo( destination );
-        if ( !b )
-        {
-            throw new IOException( "could not rename " + file + " to " + destination );
+    public static void renameFile(File file, File destination)
+            throws IOException {
+        boolean b = file.renameTo(destination);
+        if (!b) {
+            throw new IOException("could not rename " + file + " to " + destination);
         }
     }
 
@@ -162,30 +140,26 @@ public class FileUtil
      * @param target file name of destination file.
      * @throws IOException if could not copy file.
      */
-    public static void copyFile( File source, File target )
-        throws IOException
-    {
-        createDirectoryIfNecessary( target.getParentFile() );
-        FileUtils.copyFile( source, target );
+    public static void copyFile(File source, File target)
+            throws IOException {
+        createDirectoryIfNecessary(target.getParentFile());
+        FileUtils.copyFile(source, target);
     }
 
-    public static File getFile( File base, String... paths )
-    {
+    public static File getFile(File base, String... paths) {
         StringBuilder buffer = new StringBuilder();
-        for ( String path : paths )
-        {
-            buffer.append( File.separator ).append( path );
+        for (String path : paths) {
+            buffer.append(File.separator).append(path);
         }
-        return new File( base, buffer.substring( 1 ) );
+        return new File(base, buffer.substring(1));
     }
 
     /**
      * @param file the source file
      * @return the backup file
      */
-    public static File getBackupFile( File file )
-    {
-        return new File( file.getAbsolutePath() + "~" );
+    public static File getBackupFile(File file) {
+        return new File(file.getAbsolutePath() + "~");
     }
 
     /**
@@ -195,11 +169,10 @@ public class FileUtil
      * @param f the file to backup
      * @throws IOException if any pb while copying the file
      */
-    public static void backupFile( File f )
-        throws IOException
-    {
-        File dst = FileUtil.getBackupFile( f );
-        copyFile( f, dst );
+    public static void backupFile(File f)
+            throws IOException {
+        File dst = getBackupFile(f);
+        copyFile(f, dst);
     }
 
     /**
@@ -211,17 +184,13 @@ public class FileUtil
      * @return the content of the file
      * @throws IOException if IO pb
      */
-    static public String readAsString( File file, String encoding )
-        throws IOException
-    {
-        FileInputStream inf = new FileInputStream( file );
-        BufferedReader in = new BufferedReader( new InputStreamReader( inf, encoding ) );
-        try
-        {
-            return IOUtil.toString( in );
-        }
-        finally
-        {
+    static public String readAsString(File file, String encoding)
+            throws IOException {
+        FileInputStream inf = new FileInputStream(file);
+        BufferedReader in = new BufferedReader(new InputStreamReader(inf, encoding));
+        try {
+            return IOUtil.toString(in);
+        } finally {
             in.close();
         }
     }
@@ -234,18 +203,14 @@ public class FileUtil
      * @param encoding l'encoding d'ecriture
      * @throws IOException if IO pb
      */
-    public static void writeString( File file, String content, String encoding )
-        throws IOException
-    {
-        createDirectoryIfNecessary( file.getParentFile() );
+    public static void writeString(File file, String content, String encoding)
+            throws IOException {
+        createDirectoryIfNecessary(file.getParentFile());
         BufferedWriter out;
-        out = new BufferedWriter( new OutputStreamWriter( new FileOutputStream( file ), encoding ) );
-        try
-        {
-            IOUtil.copy( content, out );
-        }
-        finally
-        {
+        out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), encoding));
+        try {
+            IOUtil.copy(content, out);
+        } finally {
             out.close();
         }
     }

@@ -32,16 +32,13 @@ import java.io.IOException;
  * @since 1.0
  */
 public class InvalideFileHeaderException
-    extends IOException
-{
+        extends IOException {
     private static final long serialVersionUID = 1L;
 
-    public InvalideFileHeaderException()
-    {
+    public InvalideFileHeaderException() {
     }
 
-    public InvalideFileHeaderException( String message )
-    {
-        super( message );
+    public InvalideFileHeaderException(String message) {
+        super(message);
     }
 }

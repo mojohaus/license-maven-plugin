@@ -27,7 +27,7 @@ package org.codehaus.mojo.license.model;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
-import org.codehaus.mojo.license.MojoHelper;
+import org.codehaus.mojo.license.utils.MojoHelper;
 import org.codehaus.plexus.util.IOUtil;
 
 import java.io.BufferedReader;
@@ -42,148 +42,111 @@ import java.net.URL;
  * @author tchemit <chemit@codelutin.com>
  * @since 1.0
  */
-public class License
-{
+public class License {
 
     public static final String LICENSE_HEADER_FILE = "header.txt";
 
     public static final String LICENSE_CONTENT_FILE = "license.txt";
 
-    /**
-     * base url of license (directory where to find license files)
-     */
+    /** base url of license (directory where to find license files) */
     protected URL baseURL;
 
-    /**
-     * the name of the licenses (ex lgpl-3.0)
-     */
+    /** the name of the licenses (ex lgpl-3.0) */
     protected String name;
 
-    /**
-     * the description of the license
-     */
+    /** the description of the license */
     protected String description;
 
-    /**
-     * url of the license's content
-     */
+    /** url of the license's content */
     protected URL licenseURL;
 
-    /**
-     * url of the license header's content
-     */
+    /** url of the license header's content */
     protected URL headerURL;
 
-    public License()
-    {
+    public License() {
     }
 
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
-    public URL getLicenseURL()
-    {
-        if ( licenseURL == null )
-        {
-            licenseURL = MojoHelper.getUrl( getBaseURL(), LICENSE_CONTENT_FILE );
+    public URL getLicenseURL() {
+        if (licenseURL == null) {
+            licenseURL = MojoHelper.getUrl(getBaseURL(), LICENSE_CONTENT_FILE);
         }
         return licenseURL;
     }
 
-    public URL getHeaderURL()
-    {
-        if ( headerURL == null )
-        {
-            headerURL = MojoHelper.getUrl( getBaseURL(), LICENSE_HEADER_FILE );
+    public URL getHeaderURL() {
+        if (headerURL == null) {
+            headerURL = MojoHelper.getUrl(getBaseURL(), LICENSE_HEADER_FILE);
         }
         return headerURL;
     }
 
-    public String getDescription()
-    {
+    public String getDescription() {
         return description;
     }
 
-    public URL getBaseURL()
-    {
+    public URL getBaseURL() {
         return baseURL;
     }
 
-    public String getLicenseContent( String encoding )
-        throws IOException
-    {
-        if ( baseURL == null )
-        {
-            throw new IllegalStateException( "no baseURL defined, can not obtain license content in " + this );
+    public String getLicenseContent(String encoding)
+            throws IOException {
+        if (baseURL == null) {
+            throw new IllegalStateException("no baseURL defined, can not obtain license content in " + this);
         }
 
-        Reader r = new BufferedReader( new InputStreamReader( getLicenseURL().openStream(), encoding ) );
-        try
-        {
-            return IOUtil.toString( r );
-        }
-        finally
-        {
+        Reader r = new BufferedReader(new InputStreamReader(getLicenseURL().openStream(), encoding));
+        try {
+            return IOUtil.toString(r);
+        } finally {
             r.close();
         }
     }
 
-    public String getHeaderContent( String encoding )
-        throws IOException
-    {
-        if ( baseURL == null )
-        {
-            throw new IllegalStateException( "no baseURL defined, can not obtain header content in " + this );
+    public String getHeaderContent(String encoding)
+            throws IOException {
+        if (baseURL == null) {
+            throw new IllegalStateException("no baseURL defined, can not obtain header content in " + this);
         }
-        Reader r = new BufferedReader( new InputStreamReader( getHeaderURL().openStream(), encoding ) );
-        try
-        {
-            return IOUtil.toString( r );
-        }
-        finally
-        {
+        Reader r = new BufferedReader(new InputStreamReader(getHeaderURL().openStream(), encoding));
+        try {
+            return IOUtil.toString(r);
+        } finally {
             r.close();
         }
     }
 
-    public void setName( String name )
-    {
+    public void setName(String name) {
         this.name = name;
     }
 
-    public void setDescription( String description )
-    {
+    public void setDescription(String description) {
         this.description = description;
     }
 
-    public void setBaseURL( URL baseURL )
-    {
+    public void setBaseURL(URL baseURL) {
         this.baseURL = baseURL;
     }
 
-    public void setLicenseURL( URL licenseURL )
-    {
+    public void setLicenseURL(URL licenseURL) {
         this.licenseURL = licenseURL;
     }
 
-    public void setHeaderURL( URL headerURL )
-    {
+    public void setHeaderURL(URL headerURL) {
         this.headerURL = headerURL;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
-    public String toString()
-    {
-        ToStringBuilder builder = new ToStringBuilder( this, ToStringStyle.MULTI_LINE_STYLE );
-        builder.append( "name", name );
-        builder.append( "description", description );
-        builder.append( "licenseURL", licenseURL );
-        builder.append( "headerURL", headerURL );
+    public String toString() {
+        ToStringBuilder builder = new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE);
+        builder.append("name", name);
+        builder.append("description", description);
+        builder.append("licenseURL", licenseURL);
+        builder.append("headerURL", headerURL);
         return builder.toString();
     }
 }

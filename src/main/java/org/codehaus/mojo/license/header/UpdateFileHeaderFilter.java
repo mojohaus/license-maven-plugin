@@ -33,31 +33,22 @@ import org.codehaus.mojo.license.header.transformer.FileHeaderTransformer;
  * @since 1.0
  */
 public class UpdateFileHeaderFilter
-    extends FileHeaderFilter
-{
+        extends FileHeaderFilter {
 
-    /**
-     * Flag sets to {@code true} if description can be updated.
-     */
+    /** Flag sets to {@code true} if description can be updated. */
     protected boolean updateDescription;
 
-    /**
-     * Flag set to {@code true} if license can be updated.
-     */
+    /** Flag set to {@code true} if license can be updated. */
     protected boolean updateLicense;
 
-    /**
-     * Flag sets to {@code true} if copyright can be updated.
-     */
+    /** Flag sets to {@code true} if copyright can be updated. */
     protected boolean updateCopyright;
 
-    public UpdateFileHeaderFilter()
-    {
+    public UpdateFileHeaderFilter() {
     }
 
     @Override
-    protected FileHeader getNewHeader( FileHeader oldHeader )
-    {
+    protected FileHeader getNewHeader(FileHeader oldHeader) {
 
         FileHeader result = new FileHeader();
 
@@ -68,71 +59,64 @@ public class UpdateFileHeaderFilter
         boolean modified = false;
 
         // by default, reuse the old header
-        result.setDescription( oldHeader.getDescription() );
-        result.setCopyrightFirstYear( oldHeader.getCopyrightFirstYear() );
-        result.setCopyrightLastYear( oldHeader.getCopyrightLastYear() );
-        result.setCopyrightHolder( oldHeader.getCopyrightHolder() );
-        result.setLicense( oldHeader.getLicense() );
+        result.setDescription(oldHeader.getDescription());
+        result.setCopyrightFirstYear(oldHeader.getCopyrightFirstYear());
+        result.setCopyrightLastYear(oldHeader.getCopyrightLastYear());
+        result.setCopyrightHolder(oldHeader.getCopyrightHolder());
+        result.setLicense(oldHeader.getLicense());
 
-        if ( isUpdateDescription() && !transformer.isDescriptionEquals( oldHeader, newHeader ) )
-        {
+        if (isUpdateDescription() && !transformer.isDescriptionEquals(oldHeader, newHeader)) {
 
             // can update description and it has changed
 
-            if ( log.isDebugEnabled() )
-            {
-                log.debug( "description has changed from [" + oldHeader.getDescription() + "] to [" +
-                               newHeader.getDescription() + "]" );
+            if (log.isDebugEnabled()) {
+                log.debug("description has changed from [" + oldHeader.getDescription() + "] to [" +
+                          newHeader.getDescription() + "]");
             }
 
             // description has changed, mark header to be updated
             modified = true;
 
             // use the new description
-            result.setDescription( newHeader.getDescription() );
+            result.setDescription(newHeader.getDescription());
         }
 
-        if ( isUpdateCopyright() && !transformer.isCopyrightEquals( oldHeader, newHeader ) )
-        {
+        if (isUpdateCopyright() && !transformer.isCopyrightEquals(oldHeader, newHeader)) {
 
             // can update copyright and it has changed
 
-            if ( log.isDebugEnabled() )
-            {
+            if (log.isDebugEnabled()) {
                 log.debug(
-                    "copyright has changed from [" + oldHeader.getCopyright() + "] to [" + newHeader.getCopyright() +
-                        "]" );
+                        "copyright has changed from [" + oldHeader.getCopyright() + "] to [" + newHeader.getCopyright() +
+                        "]");
             }
 
             // description has changed, mark header to be updated
             modified = true;
 
             // use the new copyright
-            result.setCopyrightFirstYear( newHeader.getCopyrightFirstYear() );
-            result.setCopyrightLastYear( newHeader.getCopyrightLastYear() );
-            result.setCopyrightHolder( newHeader.getCopyrightHolder() );
+            result.setCopyrightFirstYear(newHeader.getCopyrightFirstYear());
+            result.setCopyrightLastYear(newHeader.getCopyrightLastYear());
+            result.setCopyrightHolder(newHeader.getCopyrightHolder());
         }
 
-        if ( isUpdateLicense() && !transformer.isLicenseEquals( oldHeader, newHeader ) )
-        {
+        if (isUpdateLicense() && !transformer.isLicenseEquals(oldHeader, newHeader)) {
 
             // can update license and it has changed
 
-            if ( log.isDebugEnabled() )
-            {
+            if (log.isDebugEnabled()) {
                 log.debug(
-                    "license has changed from [" + oldHeader.getLicense() + "] to [" + newHeader.getLicense() + "]" );
+                        "license has changed from [" + oldHeader.getLicense() + "] to [" + newHeader.getLicense() + "]");
             }
 
             // description has changed, mark header to be updated
             modified = true;
 
             // use the new license
-            result.setLicense( newHeader.getLicense() );
+            result.setLicense(newHeader.getLicense());
         }
 
-        if ( !modified )
-        {
+        if (!modified) {
 
             // nothing has to be updated, so return a {@code null} result
             result = null;
@@ -141,33 +125,27 @@ public class UpdateFileHeaderFilter
         return result;
     }
 
-    public boolean isUpdateCopyright()
-    {
+    public boolean isUpdateCopyright() {
         return updateCopyright;
     }
 
-    public void setUpdateCopyright( boolean updateCopyright )
-    {
+    public void setUpdateCopyright(boolean updateCopyright) {
         this.updateCopyright = updateCopyright;
     }
 
-    public boolean isUpdateDescription()
-    {
+    public boolean isUpdateDescription() {
         return updateDescription;
     }
 
-    public void setUpdateDescription( boolean updateDescription )
-    {
+    public void setUpdateDescription(boolean updateDescription) {
         this.updateDescription = updateDescription;
     }
 
-    public boolean isUpdateLicense()
-    {
+    public boolean isUpdateLicense() {
         return updateLicense;
     }
 
-    public void setUpdateLicense( boolean updateLicense )
-    {
+    public void setUpdateLicense(boolean updateLicense) {
         this.updateLicense = updateLicense;
     }
 }

@@ -19,7 +19,7 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
-package org.codehaus.mojo.license;
+package org.codehaus.mojo.license.utils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -35,36 +35,29 @@ import java.net.URLConnection;
  * @author pgier
  * @since 1.0
  */
-public class LicenseDownloader
-{
+public class LicenseDownloader {
 
-    /**
-     * Defines the connection timeout in milliseconds when attempting to download license files.
-     */
+    /** Defines the connection timeout in milliseconds when attempting to download license files. */
     public static final int DEFAULT_CONNECTION_TIMEOUT = 5000;
 
-    public static void downloadLicense( String licenseUrlString, File outputFile )
-        throws IOException
-    {
+    public static void downloadLicense(String licenseUrlString, File outputFile)
+            throws IOException {
         InputStream licenseInputStream = null;
         FileOutputStream fos = null;
 
-        try
-        {
-            URL licenseUrl = new URL( licenseUrlString );
+        try {
+            URL licenseUrl = new URL(licenseUrlString);
             URLConnection connection = licenseUrl.openConnection();
-            connection.setConnectTimeout( DEFAULT_CONNECTION_TIMEOUT );
-            connection.setReadTimeout( DEFAULT_CONNECTION_TIMEOUT );
+            connection.setConnectTimeout(DEFAULT_CONNECTION_TIMEOUT);
+            connection.setReadTimeout(DEFAULT_CONNECTION_TIMEOUT);
             licenseInputStream = connection.getInputStream();
-            fos = new FileOutputStream( outputFile );
-            copyStream( licenseInputStream, fos );
+            fos = new FileOutputStream(outputFile);
+            copyStream(licenseInputStream, fos);
             licenseInputStream.close();
             fos.close();
-        }
-        finally
-        {
-            FileUtil.tryClose( licenseInputStream );
-            FileUtil.tryClose( fos );
+        } finally {
+            FileUtil.tryClose(licenseInputStream);
+            FileUtil.tryClose(fos);
         }
 
     }
@@ -76,14 +69,12 @@ public class LicenseDownloader
      * @param outStream
      * @throws IOException
      */
-    private static void copyStream( InputStream inStream, OutputStream outStream )
-        throws IOException
-    {
+    private static void copyStream(InputStream inStream, OutputStream outStream)
+            throws IOException {
         byte[] buf = new byte[1024];
         int len;
-        while ( ( len = inStream.read( buf ) ) > 0 )
-        {
-            outStream.write( buf, 0, len );
+        while ((len = inStream.read(buf)) > 0) {
+            outStream.write(buf, 0, len);
         }
     }
 

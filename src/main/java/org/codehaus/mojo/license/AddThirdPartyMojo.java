@@ -28,7 +28,11 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
+import org.codehaus.mojo.license.api.MavenProjectDependenciesConfigurator;
+import org.codehaus.mojo.license.api.ThirdPartyToolException;
 import org.codehaus.mojo.license.model.LicenseMap;
+import org.codehaus.mojo.license.utils.FileUtil;
+import org.codehaus.mojo.license.utils.SortedProperties;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -59,9 +63,8 @@ import java.util.SortedSet;
  * @since 1.0
  */
 public class AddThirdPartyMojo
-    extends AbstractAddThirdPartyMojo
-    implements MavenProjectDependenciesConfigurator
-{
+        extends AbstractAddThirdPartyMojo
+        implements MavenProjectDependenciesConfigurator {
 
     /**
      * Deploy the third party missing file in maven repository.
@@ -147,192 +150,144 @@ public class AddThirdPartyMojo
 
     private boolean doGenerateMissing;
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
-    protected boolean checkPackaging()
-    {
-        if ( acceptPomPackaging )
-        {
+    protected boolean checkPackaging() {
+        if (acceptPomPackaging) {
 
             // rejects nothing
             return true;
         }
 
         // can reject pom packaging
-        return rejectPackaging( "pom" );
+        return rejectPackaging("pom");
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
-    protected SortedMap<String, MavenProject> loadDependencies()
-    {
-        return getHelper().loadDependencies( this );
+    protected SortedMap<String, MavenProject> loadDependencies() {
+        return getHelper().loadDependencies(this);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     protected SortedProperties createUnsafeMapping()
-        throws ProjectBuildingException, IOException, ThirdPartyToolException
-    {
+            throws ProjectBuildingException, IOException, ThirdPartyToolException {
 
         SortedSet<MavenProject> unsafeDependencies = getUnsafeDependencies();
 
         SortedProperties unsafeMappings =
-            getHelper().createUnsafeMapping( getLicenseMap(), getMissingFile(), useRepositoryMissingFiles,
-                                             unsafeDependencies, getProjectDependencies().values() );
-        if ( isVerbose() )
-        {
-            getLog().info( "found " + unsafeMappings.size() + " unsafe mappings" );
+                getHelper().createUnsafeMapping(getLicenseMap(), getMissingFile(), useRepositoryMissingFiles,
+                                                unsafeDependencies, getProjectDependencies().values());
+        if (isVerbose()) {
+            getLog().info("found " + unsafeMappings.size() + " unsafe mappings");
         }
 
         // compute if missing file should be (re)-generate
-        doGenerateMissing = computeDoGenerateMissingFile( unsafeMappings, unsafeDependencies );
+        doGenerateMissing = computeDoGenerateMissingFile(unsafeMappings, unsafeDependencies);
 
-        if ( doGenerateMissing && isVerbose() )
-        {
+        if (doGenerateMissing && isVerbose()) {
             StringBuilder sb = new StringBuilder();
-            sb.append( "Will use from missing file " );
-            sb.append( unsafeMappings.size() );
-            sb.append( " dependencies :" );
-            for ( Map.Entry<Object, Object> entry : unsafeMappings.entrySet() )
-            {
+            sb.append("Will use from missing file ");
+            sb.append(unsafeMappings.size());
+            sb.append(" dependencies :");
+            for (Map.Entry<Object, Object> entry : unsafeMappings.entrySet()) {
                 String id = (String) entry.getKey();
                 String license = (String) entry.getValue();
-                sb.append( "\n - " ).append( id ).append( " - " ).append( license );
+                sb.append("\n - ").append(id).append(" - ").append(license);
             }
-            getLog().info( sb.toString() );
-        }
-        else
-        {
-            if ( isUseMissingFile() && !unsafeMappings.isEmpty() )
-            {
-                getLog().info( "Missing file " + getMissingFile() + " is up-to-date." );
+            getLog().info(sb.toString());
+        } else {
+            if (isUseMissingFile() && !unsafeMappings.isEmpty()) {
+                getLog().info("Missing file " + getMissingFile() + " is up-to-date.");
             }
         }
         return unsafeMappings;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
-    protected boolean checkSkip()
-    {
-        if ( !isDoGenerate() && !isDoGenerateBundle() && !doGenerateMissing )
-        {
+    protected boolean checkSkip() {
+        if (!isDoGenerate() && !isDoGenerateBundle() && !doGenerateMissing) {
 
-            getLog().info( "All files are up to date, skip goal execution." );
+            getLog().info("All files are up to date, skip goal execution.");
             return false;
         }
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     protected void doAction()
-        throws Exception
-    {
+            throws Exception {
 
         boolean unsafe = checkUnsafeDependencies();
 
         writeThirdPartyFile();
 
-        if ( doGenerateMissing )
-        {
+        if (doGenerateMissing) {
 
             writeMissingFile();
         }
 
-        if ( unsafe && isFailIfWarning() )
-        {
+        if (unsafe && isFailIfWarning()) {
             throw new MojoFailureException(
-                "There is some dependencies with no license, please fill the file " + getMissingFile() );
+                    "There is some dependencies with no license, please fill the file " + getMissingFile());
         }
 
-        if ( !unsafe && isUseMissingFile() && MapUtils.isEmpty( getUnsafeMappings() ) && getMissingFile().exists() )
-        {
+        if (!unsafe && isUseMissingFile() && MapUtils.isEmpty(getUnsafeMappings()) && getMissingFile().exists()) {
 
             // there is no missing dependencies, but still a missing file, delete it
-            getLog().info( "There is no dependency to put in missing file, delete it at " + getMissingFile() );
-            FileUtil.deleteFile( getMissingFile() );
+            getLog().info("There is no dependency to put in missing file, delete it at " + getMissingFile());
+            FileUtil.deleteFile(getMissingFile());
         }
 
-        if ( !unsafe && deployMissingFile && MapUtils.isNotEmpty( getUnsafeMappings() ) )
-        {
+        if (!unsafe && deployMissingFile && MapUtils.isNotEmpty(getUnsafeMappings())) {
 
             // can deploy missing file
             File file = getMissingFile();
 
-            getLog().info( "Will deploy third party file from " + file );
-            getHelper().attachThirdPartyDescriptor( file );
+            getLog().info("Will deploy third party file from " + file);
+            getHelper().attachThirdPartyDescriptor(file);
         }
 
-        addResourceDir( getOutputDirectory(), "**/*.txt" );
+        addResourceDir(getOutputDirectory(), "**/*.txt");
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public List<String> getExcludedScopes()
-    {
-        String[] split = excludedScopes == null ? new String[0] : excludedScopes.split( "," );
-        return Arrays.asList( split );
+    /** {@inheritDoc} */
+    public List<String> getExcludedScopes() {
+        String[] split = excludedScopes == null ? new String[0] : excludedScopes.split(",");
+        return Arrays.asList(split);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public List<String> getIncludedScopes()
-    {
-        String[] split = includedScopes == null ? new String[0] : includedScopes.split( "," );
-        return Arrays.asList( split );
+    /** {@inheritDoc} */
+    public List<String> getIncludedScopes() {
+        String[] split = includedScopes == null ? new String[0] : includedScopes.split(",");
+        return Arrays.asList(split);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public String getExcludedGroups()
-    {
+    /** {@inheritDoc} */
+    public String getExcludedGroups() {
         return excludedGroups;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public String getIncludedGroups()
-    {
+    /** {@inheritDoc} */
+    public String getIncludedGroups() {
         return includedGroups;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public String getExcludedArtifacts()
-    {
+    /** {@inheritDoc} */
+    public String getExcludedArtifacts() {
         return excludedArtifacts;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public String getIncludedArtifacts()
-    {
+    /** {@inheritDoc} */
+    public String getIncludedArtifacts() {
         return includedArtifacts;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public boolean isIncludeTransitiveDependencies()
-    {
+    /** {@inheritDoc} */
+    public boolean isIncludeTransitiveDependencies() {
         return includeTransitiveDependencies;
     }
 
@@ -343,27 +298,23 @@ public class AddThirdPartyMojo
      * @throws IOException if any IO problem
      * @since 1.0
      */
-    protected boolean computeDoGenerateMissingFile( SortedProperties unsafeMappings,
-                                                    SortedSet<MavenProject> unsafeDependencies )
-        throws IOException
-    {
+    protected boolean computeDoGenerateMissingFile(SortedProperties unsafeMappings,
+                                                   SortedSet<MavenProject> unsafeDependencies)
+            throws IOException {
 
-        if ( !isUseMissingFile() )
-        {
+        if (!isUseMissingFile()) {
 
             // never use the missing file
             return false;
         }
 
-        if ( isForce() )
-        {
+        if (isForce()) {
 
             // the mapping for missing file is not empty, regenerate it
-            return !CollectionUtils.isEmpty( unsafeMappings.keySet() );
+            return !CollectionUtils.isEmpty(unsafeMappings.keySet());
         }
 
-        if ( !CollectionUtils.isEmpty( unsafeDependencies ) )
-        {
+        if (!CollectionUtils.isEmpty(unsafeDependencies)) {
 
             // there is some unsafe dependencies from the project, must
             // regenerate missing file
@@ -372,8 +323,7 @@ public class AddThirdPartyMojo
 
         File missingFile = getMissingFile();
 
-        if ( !missingFile.exists() )
-        {
+        if (!missingFile.exists()) {
 
             // the missing file does not exists, this happens when
             // using remote missing file from dependencies
@@ -381,43 +331,37 @@ public class AddThirdPartyMojo
         }
 
         // check if the missing file has changed
-        SortedProperties oldUnsafeMappings = new SortedProperties( getEncoding() );
-        oldUnsafeMappings.load( missingFile );
-        return !unsafeMappings.equals( oldUnsafeMappings );
+        SortedProperties oldUnsafeMappings = new SortedProperties(getEncoding());
+        oldUnsafeMappings.load(missingFile);
+        return !unsafeMappings.equals(oldUnsafeMappings);
     }
 
     protected void writeMissingFile()
-        throws IOException
-    {
+            throws IOException {
 
         Log log = getLog();
         LicenseMap licenseMap = getLicenseMap();
         File file = getMissingFile();
 
-        FileUtil.createDirectoryIfNecessary( file.getParentFile() );
-        log.info( "Regenerate missing license file " + file );
+        FileUtil.createDirectoryIfNecessary(file.getParentFile());
+        log.info("Regenerate missing license file " + file);
 
-        FileOutputStream writer = new FileOutputStream( file );
-        try
-        {
-            StringBuilder sb = new StringBuilder( " Generated by " + getClass().getName() );
-            List<String> licenses = new ArrayList<String>( licenseMap.keySet() );
-            licenses.remove( LicenseMap.UNKNOWN_LICENSE_MESSAGE );
-            if ( !licenses.isEmpty() )
-            {
-                sb.append( "\n-------------------------------------------------------------------------------" );
-                sb.append( "\n Already used licenses in project :" );
-                for ( String license : licenses )
-                {
-                    sb.append( "\n - " ).append( license );
+        FileOutputStream writer = new FileOutputStream(file);
+        try {
+            StringBuilder sb = new StringBuilder(" Generated by " + getClass().getName());
+            List<String> licenses = new ArrayList<String>(licenseMap.keySet());
+            licenses.remove(LicenseMap.UNKNOWN_LICENSE_MESSAGE);
+            if (!licenses.isEmpty()) {
+                sb.append("\n-------------------------------------------------------------------------------");
+                sb.append("\n Already used licenses in project :");
+                for (String license : licenses) {
+                    sb.append("\n - ").append(license);
                 }
             }
-            sb.append( "\n-------------------------------------------------------------------------------" );
-            sb.append( "\n Please fill the missing licenses for dependencies :\n\n" );
-            getUnsafeMappings().store( writer, sb.toString() );
-        }
-        finally
-        {
+            sb.append("\n-------------------------------------------------------------------------------");
+            sb.append("\n Please fill the missing licenses for dependencies :\n\n");
+            getUnsafeMappings().store(writer, sb.toString());
+        } finally {
             writer.close();
         }
     }

@@ -38,8 +38,7 @@ import java.util.regex.Pattern;
  * @since 1.0
  */
 public abstract class AbstractFileHeaderTransformer
-    implements FileHeaderTransformer
-{
+        implements FileHeaderTransformer {
 
     /**
      * pattern of the copyright string representation :
@@ -52,66 +51,47 @@ public abstract class AbstractFileHeaderTransformer
      * </ul>
      */
     protected static final Pattern COPYRIGHT_PATTERN =
-        Pattern.compile( "(.[^\\d]+)?\\s(\\d{4})?(\\s+-\\s+(\\d{4})?){0,1}\\s+(.+)?", Pattern.DOTALL );
+            Pattern.compile("(.[^\\d]+)?\\s(\\d{4})?(\\s+-\\s+(\\d{4})?){0,1}\\s+(.+)?", Pattern.DOTALL);
 
-    /**
-     * name of transformer
-     */
+    /** name of transformer */
     protected String name;
 
-    /**
-     * description of transfomer
-     */
+    /** description of transfomer */
     protected String description;
 
-    /**
-     * section delimiter
-     */
+    /** section delimiter */
     protected String sectionDelimiter = DEFAULT_SECTION_DELIMITER;
 
-    /**
-     * start process tag
-     */
+    /** start process tag */
     protected String processStartTag = DEFAULT_PROCESS_START_TAG;
 
-    /**
-     * end process tag
-     */
+    /** end process tag */
     protected String processEndTag = DEFAULT_PROCESS_END_TAG;
 
-    /**
-     * comment start tag
-     */
+    /** comment start tag */
     protected String commentStartTag;
 
-    /**
-     * comment end tag
-     */
+    /** comment end tag */
     protected String commentEndTag;
 
-    /**
-     * comment line prefix (to add for header content)
-     */
+    /** comment line prefix (to add for header content) */
     protected String commentLinePrefix;
 
-    protected AbstractFileHeaderTransformer( String name, String description, String commentStartTag,
-                                             String commentEndTag, String commentLinePrefix )
-    {
+    protected AbstractFileHeaderTransformer(String name, String description, String commentStartTag,
+                                            String commentEndTag, String commentLinePrefix) {
         this.name = name;
         this.description = description;
 
         // checks comment start tag is different from comment prefix
-        if ( commentStartTag.equals( commentLinePrefix ) )
-        {
+        if (commentStartTag.equals(commentLinePrefix)) {
             throw new IllegalStateException(
-                "commentStartTag can not be equals to commentPrefixLine, " + "but was [" + commentStartTag + "]" );
+                    "commentStartTag can not be equals to commentPrefixLine, " + "but was [" + commentStartTag + "]");
         }
 
         // checks comment end tag is different from comment prefix
-        if ( commentEndTag.equals( commentLinePrefix ) )
-        {
+        if (commentEndTag.equals(commentLinePrefix)) {
             throw new IllegalStateException(
-                "commentEndTag can not be equals to commentPrefixLine, " + "but was [" + commentEndTag + "]" );
+                    "commentEndTag can not be equals to commentPrefixLine, " + "but was [" + commentEndTag + "]");
         }
 
         this.commentStartTag = commentStartTag;
@@ -119,292 +99,243 @@ public abstract class AbstractFileHeaderTransformer
         this.commentLinePrefix = commentLinePrefix;
     }
 
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
-    public void setName( String name )
-    {
+    public void setName(String name) {
         this.name = name;
     }
 
-    public String getDescription()
-    {
+    public String getDescription() {
         return description;
     }
 
-    public void setDescription( String description )
-    {
+    public void setDescription(String description) {
         this.description = description;
     }
 
-    public String getSectionDelimiter()
-    {
+    public String getSectionDelimiter() {
         return sectionDelimiter;
     }
 
-    public void setSectionDelimiter( String sectionDelimiter )
-    {
+    public void setSectionDelimiter(String sectionDelimiter) {
         this.sectionDelimiter = sectionDelimiter;
     }
 
-    public String getProcessStartTag()
-    {
+    public String getProcessStartTag() {
         return processStartTag;
     }
 
-    public void setProcessStartTag( String processStartTag )
-    {
+    public void setProcessStartTag(String processStartTag) {
         this.processStartTag = processStartTag;
     }
 
-    public String getProcessEndTag()
-    {
+    public String getProcessEndTag() {
         return processEndTag;
     }
 
-    public void setProcessEndTag( String processEndTag )
-    {
+    public void setProcessEndTag(String processEndTag) {
         this.processEndTag = processEndTag;
     }
 
-    public String getCommentStartTag()
-    {
+    public String getCommentStartTag() {
         return commentStartTag;
     }
 
-    public void setCommentStartTag( String commentStartTag )
-    {
+    public void setCommentStartTag(String commentStartTag) {
         this.commentStartTag = commentStartTag;
     }
 
-    public String getCommentEndTag()
-    {
+    public String getCommentEndTag() {
         return commentEndTag;
     }
 
-    public void setCommentEndTag( String commentEndTag )
-    {
+    public void setCommentEndTag(String commentEndTag) {
         this.commentEndTag = commentEndTag;
     }
 
-    public String getCommentLinePrefix()
-    {
+    public String getCommentLinePrefix() {
         return commentLinePrefix;
     }
 
-    public String addHeader( String header, String content )
-    {
+    public String addHeader(String header, String content) {
         return header + content;
     }
 
-    public void setCommentLinePrefix( String commentLinePrefix )
-    {
+    public void setCommentLinePrefix(String commentLinePrefix) {
         this.commentLinePrefix = commentLinePrefix;
     }
 
-    public FileHeader toFileHeader( String header )
-    {
+    public FileHeader toFileHeader(String header) {
         FileHeader model = new FileHeader();
 
-        String[] sections = header.split( getSectionDelimiter() );
-        if ( sections.length != 3 )
-        {
-            throw new IllegalStateException( "could not find 3 sections in\n" + header );
+        String[] sections = header.split(getSectionDelimiter());
+        if (sections.length != 3) {
+            throw new IllegalStateException("could not find 3 sections in\n" + header);
         }
 
         // first section is the description
         String description = sections[0].trim();
-        model.setDescription( description );
+        model.setDescription(description);
 
         // second section is the copyright
         String copyright = sections[1].trim();
-        Matcher matcher = COPYRIGHT_PATTERN.matcher( copyright );
-        if ( !matcher.matches() )
-        {
-            throw new IllegalStateException( "copyright [" + copyright + "] is not valid" );
+        Matcher matcher = COPYRIGHT_PATTERN.matcher(copyright);
+        if (!matcher.matches()) {
+            throw new IllegalStateException("copyright [" + copyright + "] is not valid");
         }
-        String firstYear = matcher.group( 2 );
-        String lastYear = matcher.group( 4 );
-        String holder = matcher.group( 5 );
-        model.setCopyrightFirstYear( Integer.valueOf( firstYear.trim() ) );
-        if ( lastYear != null )
-        {
-            model.setCopyrightLastYear( Integer.valueOf( lastYear.trim() ) );
+        String firstYear = matcher.group(2);
+        String lastYear = matcher.group(4);
+        String holder = matcher.group(5);
+        model.setCopyrightFirstYear(Integer.valueOf(firstYear.trim()));
+        if (lastYear != null) {
+            model.setCopyrightLastYear(Integer.valueOf(lastYear.trim()));
         }
-        model.setCopyrightHolder( holder.trim() );
+        model.setCopyrightHolder(holder.trim());
 
         // third section is the license
         String license = sections[2].trim();
-        model.setLicense( license );
+        model.setLicense(license);
         return model;
     }
 
-    public String toString( FileHeader model )
-        throws NullPointerException
-    {
-        if ( model == null )
-        {
-            throw new NullPointerException( "model can not be null!" );
+    public String toString(FileHeader model)
+            throws NullPointerException {
+        if (model == null) {
+            throw new NullPointerException("model can not be null!");
         }
         StringBuilder buffer = new StringBuilder();
 
         String sectionDelimiter = LINE_SEPARATOR + getSectionDelimiter() + LINE_SEPARATOR;
 
         // add description section
-        buffer.append( model.getDescription().trim() );
-        buffer.append( sectionDelimiter );
+        buffer.append(model.getDescription().trim());
+        buffer.append(sectionDelimiter);
 
         // add copyright section
-        buffer.append( model.getCopyright().trim() );
-        buffer.append( sectionDelimiter );
+        buffer.append(model.getCopyright().trim());
+        buffer.append(sectionDelimiter);
 
         // add license section
-        buffer.append( model.getLicense().trim() ).append( LINE_SEPARATOR );
+        buffer.append(model.getLicense().trim()).append(LINE_SEPARATOR);
         return buffer.toString();
     }
 
-    public String toHeaderContent( FileHeader model )
-        throws NullPointerException
-    {
+    public String toHeaderContent(FileHeader model)
+            throws NullPointerException {
 
         String result;
 
         // model to text
-        result = toString( model );
+        result = toString(model);
 
         // box with process tag
-        result = boxProcessTag( result );
+        result = boxProcessTag(result);
 
         // box header with comment prefix
-        result = boxComment( result, false );
+        result = boxComment(result, false);
 
         // remove all before process start tag
         // remove all after process end tag
         // this is a requirement for processor to respect involution.
-        int index = result.indexOf( getProcessStartTag() );
-        int lastIndex = result.lastIndexOf( getProcessEndTag() ) + getProcessEndTag().length();
+        int index = result.indexOf(getProcessStartTag());
+        int lastIndex = result.lastIndexOf(getProcessEndTag()) + getProcessEndTag().length();
 
-        result = result.substring( index, lastIndex );
+        result = result.substring(index, lastIndex);
         return result;
     }
 
-    public String boxComment( String header, boolean withTags )
-    {
+    public String boxComment(String header, boolean withTags) {
         StringBuilder buffer = new StringBuilder();
-        if ( withTags )
-        {
-            buffer.append( getCommentStartTag() ).append( LINE_SEPARATOR );
+        if (withTags) {
+            buffer.append(getCommentStartTag()).append(LINE_SEPARATOR);
         }
-        for ( String line : header.split( LINE_SEPARATOR + "" ) )
-        {
-            buffer.append( getCommentLinePrefix() );
-            buffer.append( line );
-            buffer.append( LINE_SEPARATOR );
+        for (String line : header.split(LINE_SEPARATOR + "")) {
+            buffer.append(getCommentLinePrefix());
+            buffer.append(line);
+            buffer.append(LINE_SEPARATOR);
         }
-        if ( withTags )
-        {
-            buffer.append( getCommentEndTag() ).append( LINE_SEPARATOR );
+        if (withTags) {
+            buffer.append(getCommentEndTag()).append(LINE_SEPARATOR);
         }
         return buffer.toString();
     }
 
-    public String unboxComent( String header )
-    {
+    public String unboxComent(String header) {
         StringBuilder buffer = new StringBuilder();
         int prefixLength = getCommentLinePrefix().length();
-        for ( String line : header.split( LINE_SEPARATOR + "" ) )
-        {
-            if ( StringUtils.isEmpty( line ) || line.contains( getCommentStartTag() ) ||
-                line.contains( getCommentEndTag() ) )
-            {
+        for (String line : header.split(LINE_SEPARATOR + "")) {
+            if (StringUtils.isEmpty(line) || line.contains(getCommentStartTag()) ||
+                line.contains(getCommentEndTag())) {
 
                 // not be unboxed, but just skipped
                 continue;
             }
-            int index = line.indexOf( getCommentLinePrefix() );
-            if ( index > -1 )
-            {
+            int index = line.indexOf(getCommentLinePrefix());
+            if (index > -1) {
 
                 // remove comment prefix
-                line = line.substring( index + prefixLength );
-            }
-            else
-            {
+                line = line.substring(index + prefixLength);
+            } else {
                 String s = getCommentLinePrefix().trim();
-                if ( line.startsWith( s ) )
-                {
-                    if ( line.length() <= s.length() )
-                    {
+                if (line.startsWith(s)) {
+                    if (line.length() <= s.length()) {
                         line = "";
                     }
-                }
-                else
-                {
-                    line = line.substring( s.length() );
+                } else {
+                    line = line.substring(s.length());
                 }
             }
-            buffer.append( line ).append( LINE_SEPARATOR );
+            buffer.append(line).append(LINE_SEPARATOR);
         }
         return buffer.toString();
     }
 
-    public String boxProcessTag( String header )
-    {
+    public String boxProcessTag(String header) {
         StringBuilder buffer = new StringBuilder();
-        buffer.append( getProcessStartTag() ).append( LINE_SEPARATOR );
-        buffer.append( header.trim() ).append( LINE_SEPARATOR );
-        buffer.append( getProcessEndTag() ).append( LINE_SEPARATOR );
+        buffer.append(getProcessStartTag()).append(LINE_SEPARATOR);
+        buffer.append(header.trim()).append(LINE_SEPARATOR);
+        buffer.append(getProcessEndTag()).append(LINE_SEPARATOR);
         return buffer.toString();
     }
 
-    public String unboxProcessTag( String boxedHeader )
-    {
+    public String unboxProcessTag(String boxedHeader) {
         StringBuilder buffer = new StringBuilder();
-        for ( String line : boxedHeader.split( LINE_SEPARATOR + "" ) )
-        {
-            if ( StringUtils.isEmpty( line ) || line.contains( getProcessStartTag() ) ||
-                line.contains( getProcessEndTag() ) )
-            {
+        for (String line : boxedHeader.split(LINE_SEPARATOR + "")) {
+            if (StringUtils.isEmpty(line) || line.contains(getProcessStartTag()) ||
+                line.contains(getProcessEndTag())) {
 
                 // not be unboxed, but just skipped
                 continue;
             }
-            buffer.append( line ).append( LINE_SEPARATOR );
+            buffer.append(line).append(LINE_SEPARATOR);
         }
         return buffer.toString();
     }
 
-    public boolean isDescriptionEquals( FileHeader header1, FileHeader header2 )
-    {
-        return header1.getDescription().equals( header2.getDescription() );
+    public boolean isDescriptionEquals(FileHeader header1, FileHeader header2) {
+        return header1.getDescription().equals(header2.getDescription());
     }
 
-    public boolean isCopyrightEquals( FileHeader header1, FileHeader header2 )
-    {
-        return header1.getCopyright().equals( header2.getCopyright() );
+    public boolean isCopyrightEquals(FileHeader header1, FileHeader header2) {
+        return header1.getCopyright().equals(header2.getCopyright());
     }
 
-    public boolean isLicenseEquals( FileHeader header1, FileHeader header2 )
-    {
-        String license1 = removeSpaces( header1.getLicense() );
-        String license2 = removeSpaces( header2.getLicense() );
-        return license1.equals( license2 );
+    public boolean isLicenseEquals(FileHeader header1, FileHeader header2) {
+        String license1 = removeSpaces(header1.getLicense());
+        String license2 = removeSpaces(header2.getLicense());
+        return license1.equals(license2);
     }
 
-    protected static final Pattern REMOVE_SPACE_PATTERN = Pattern.compile( "(\\s+)" );
+    protected static final Pattern REMOVE_SPACE_PATTERN = Pattern.compile("(\\s+)");
 
-    protected String removeSpaces( String str )
-    {
-        Matcher matcher = REMOVE_SPACE_PATTERN.matcher( str );
+    protected String removeSpaces(String str) {
+        Matcher matcher = REMOVE_SPACE_PATTERN.matcher(str);
         String result;
-        if ( matcher.find() )
-        {
-            result = matcher.replaceAll( "" );
-        }
-        else
-        {
+        if (matcher.find()) {
+            result = matcher.replaceAll("");
+        } else {
             result = str;
         }
         return result;

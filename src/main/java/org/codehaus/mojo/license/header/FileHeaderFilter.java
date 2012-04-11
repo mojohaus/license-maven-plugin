@@ -33,8 +33,7 @@ import org.nuiton.processor.filters.DefaultFilter;
  * @since 1.0
  */
 public abstract class FileHeaderFilter
-    extends DefaultFilter
-{
+        extends DefaultFilter {
 
     /**
      * flag set to {@code true} when a header was detected (says detects both
@@ -42,44 +41,28 @@ public abstract class FileHeaderFilter
      */
     protected boolean touched;
 
-    /**
-     * flag set to {@code true} when a header was detected and was modified.
-     */
+    /** flag set to {@code true} when a header was detected and was modified. */
     protected boolean modified;
 
-    /**
-     * flag set to {@code true} as soon as start process tag was detected.
-     */
+    /** flag set to {@code true} as soon as start process tag was detected. */
     protected boolean detectHeader;
 
-    /**
-     * incoming default file header model
-     */
+    /** incoming default file header model */
     protected FileHeader fileHeader;
 
-    /**
-     * header transformer
-     */
+    /** header transformer */
     protected FileHeaderTransformer transformer;
 
-    /**
-     * cached header content
-     */
+    /** cached header content */
     protected String headerContent;
 
-    /**
-     * cached full header content (with process tag + comment box)
-     */
+    /** cached full header content (with process tag + comment box) */
     protected String processTagHeaderContent;
 
-    /**
-     * cached full header content (with process tag + comment box)
-     */
+    /** cached full header content (with process tag + comment box) */
     protected String fullHeaderContent;
 
-    /**
-     * maven logger
-     */
+    /** maven logger */
     protected Log log;
 
     /**
@@ -91,59 +74,49 @@ public abstract class FileHeaderFilter
      * @return {@code null} if header is still the same, otherwise the new header to apply
      * @since 1.0
      */
-    protected abstract FileHeader getNewHeader( FileHeader oldHeader );
+    protected abstract FileHeader getNewHeader(FileHeader oldHeader);
 
-    public FileHeaderFilter()
-    {
+    public FileHeaderFilter() {
     }
 
-    public Log getLog()
-    {
+    public Log getLog() {
         return log;
     }
 
-    public void setLog( Log log )
-    {
+    public void setLog(Log log) {
         this.log = log;
     }
 
     @Override
-    protected String performInFilter( String ch )
-    {
-        if ( log.isDebugEnabled() )
-        {
-            log.debug( "performInFilter - original header =\n" + ch );
+    protected String performInFilter(String ch) {
+        if (log.isDebugEnabled()) {
+            log.debug("performInFilter - original header =\n" + ch);
         }
-        if ( isTouched() )
-        {
+        if (isTouched()) {
             // Can NOT authorize two header in a same source
-            throw new IllegalStateException( "Can only have one file header start tag : " + getHeader() );
+            throw new IllegalStateException("Can only have one file header start tag : " + getHeader());
         }
-        if ( getMatchIndexFor( ch, getHeader() ) == NOT_FOUND )
-        {
+        if (getMatchIndexFor(ch, getHeader()) == NOT_FOUND) {
 
             // the header was detected, mark file to be touched
             touched = true;
 
             // obtain old header model
             FileHeaderTransformer headerTransformer = getTransformer();
-            String tmp = headerTransformer.unboxComent( ch );
-            FileHeader oldHeader = headerTransformer.toFileHeader( tmp );
+            String tmp = headerTransformer.unboxComent(ch);
+            FileHeader oldHeader = headerTransformer.toFileHeader(tmp);
 
             // obtain the new header (according to what to update)
-            FileHeader newFileHeader = getNewHeader( oldHeader );
+            FileHeader newFileHeader = getNewHeader(oldHeader);
 
             FileHeader header;
 
-            if ( newFileHeader == null )
-            {
+            if (newFileHeader == null) {
 
                 // keep the old header
                 header = oldHeader;
 
-            }
-            else
-            {
+            } else {
 
                 // mark that the header was updated
                 modified = true;
@@ -151,7 +124,7 @@ public abstract class FileHeaderFilter
                 header = newFileHeader;
             }
 
-            return transformer.toHeaderContent( header );
+            return transformer.toHeaderContent(header);
         }
         // Means we detects the process start tag but not the end one.
         // coming then here from the flush filter method... So changes nothing
@@ -160,115 +133,94 @@ public abstract class FileHeaderFilter
     }
 
     @Override
-    protected String performOutFilter( String ch )
-    {
-        if ( log.isDebugEnabled() )
-        {
-            log.debug( ch );
+    protected String performOutFilter(String ch) {
+        if (log.isDebugEnabled()) {
+            log.debug(ch);
         }
         return ch;
     }
 
     @Override
-    protected String getHeader()
-    {
+    protected String getHeader() {
         return getTransformer().getProcessStartTag();
     }
 
     @Override
-    protected String getFooter()
-    {
+    protected String getFooter() {
         return getTransformer().getProcessEndTag();
     }
 
     @Override
-    protected void changeState( State newState )
-    {
-        super.changeState( newState );
-        if ( newState == State.SEARCH_FOOTER )
-        {
+    protected void changeState(State newState) {
+        super.changeState(newState);
+        if (newState == State.SEARCH_FOOTER) {
             // on a decouvert un header
             detectHeader = true;
         }
     }
 
-    public String getHeaderContent()
-    {
-        if ( headerContent == null )
-        {
-            headerContent = getTransformer().toString( getFileHeader() );
+    public String getHeaderContent() {
+        if (headerContent == null) {
+            headerContent = getTransformer().toString(getFileHeader());
         }
         return headerContent;
     }
 
-    public String getProcessTagHeaderContent()
-    {
-        if ( processTagHeaderContent == null )
-        {
+    public String getProcessTagHeaderContent() {
+        if (processTagHeaderContent == null) {
 
             // box with process tag
-            processTagHeaderContent = getTransformer().boxProcessTag( getHeaderContent() );
+            processTagHeaderContent = getTransformer().boxProcessTag(getHeaderContent());
 
         }
         return processTagHeaderContent;
     }
 
-    public String getFullHeaderContent()
-    {
-        if ( fullHeaderContent == null )
-        {
+    public String getFullHeaderContent() {
+        if (fullHeaderContent == null) {
 
             // box with comment
-            fullHeaderContent = getTransformer().boxComment( getProcessTagHeaderContent(), true );
+            fullHeaderContent = getTransformer().boxComment(getProcessTagHeaderContent(), true);
         }
         return fullHeaderContent;
     }
 
-    public boolean isTouched()
-    {
+    public boolean isTouched() {
         return touched;
     }
 
-    public boolean isModified()
-    {
+    public boolean isModified() {
         return modified;
     }
 
-    public boolean isDetectHeader()
-    {
+    public boolean isDetectHeader() {
         return detectHeader;
     }
 
-    public FileHeader getFileHeader()
-    {
+    public FileHeader getFileHeader() {
         return fileHeader;
     }
 
-    public FileHeaderTransformer getTransformer()
-    {
+    public FileHeaderTransformer getTransformer() {
         return transformer;
     }
 
-    public void setFileHeader( FileHeader fileHeader )
-    {
+    public void setFileHeader(FileHeader fileHeader) {
         this.fileHeader = fileHeader;
     }
 
-    public void setTransformer( FileHeaderTransformer transformer )
-    {
+    public void setTransformer(FileHeaderTransformer transformer) {
         this.transformer = transformer;
     }
 
-    public void reset()
-    {
+    public void reset() {
         touched = false;
         modified = false;
         detectHeader = false;
         state = State.SEARCH_HEADER;
     }
 
-    public void resetContent()
-    {
+    public void resetContent() {
         headerContent = null;
         processTagHeaderContent = null;
         fullHeaderContent = null;
