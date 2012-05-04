@@ -57,7 +57,6 @@ public class FreeMarkerHelperTest {
         deps2.setGroupId("groupId2");
         deps2.setArtifactId("artifactId2");
         deps2.setVersion("version2");
-//        deps2.setUrl("url2");
         licenseMap.put("license 1", deps);
         licenseMap.put("license 1", deps2);
         licenseMap.put("license 2", deps2);
@@ -92,7 +91,6 @@ public class FreeMarkerHelperTest {
         deps.setGroupId("groupId");
         deps.setArtifactId("artifactId");
         deps.setVersion("version");
-//        deps.setUrl("url");
         MavenProject deps2 = new MavenProject();
         deps2.setArtifact(new DefaultArtifact(
                 "groupId2",
