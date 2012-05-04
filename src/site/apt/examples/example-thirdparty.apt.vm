@@ -33,6 +33,13 @@ Third-party
 
   for full detail see {{{./aggregate-add-third-party-mojo.html}detail page}}.
 
+* Change the format of the third-party file
+
+  Since version 1.1, it is possible to give a freemarker template (fill the
+  <<fileTemplate>> property of the mojo) to says how to generate the file.
+
+  Have a look on existing templates :
+  https://fisheye.codehaus.org/browse/mojo/trunk/mojo/license-maven-plugin/src/main/resources/org/codehaus/mojo/license
 
 * How to consolidate the THIRD-PARTY file
 
