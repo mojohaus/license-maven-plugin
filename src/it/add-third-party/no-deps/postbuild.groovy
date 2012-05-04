@@ -26,11 +26,11 @@
 file = new File(basedir, 'target/generated-sources/license/THIRD-PARTY.txt');
 assert file.exists();
 content = file.text;
-assert content.contains('the project has no dependencies.');
+assert content.contains('The project has no dependencies.');
 
 file = new File(basedir, 'target/generated-sources/license/META-INF/test-add-third-party-no-deps-THIRD-PARTY.txt');
 assert file.exists();
 content = file.text;
-assert content.contains('the project has no dependencies.');
+assert content.contains('The project has no dependencies.');
 
 return true;

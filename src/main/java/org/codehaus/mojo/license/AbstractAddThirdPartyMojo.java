@@ -148,11 +148,27 @@ public abstract class AbstractAddThirdPartyMojo
      * By default, group by dependecies.
      * <p/>
      * If sets to {@code true}, the it will group by license type.
+     * <p/>
+     * <strong>Note:</strong> This parameter is deprecated, please now use the
+     * correct template for this purpose (value {@code /org/codehaus/mojo/license/third-party-file-groupByLicense.ftl}
+     * to parameter {@code fileTemplate})
      *
      * @parameter expression="${license.groupByLicense}"  default-value="false"
      * @since 1.0
+     * @deprecated since 1.1, please use the correct value for the parameter {@code fileTemplate}
      */
+    @Deprecated
     private boolean groupByLicense;
+
+    /**
+     * Template used to build the third-party file.
+     * <p/>
+     * (This template use freemarker).
+     *
+     * @parameter expression="${license.fileTemplate}" default-value="/org/codehaus/mojo/license/third-party-file.ftl"
+     * @since 1.1
+     */
+    private String fileTemplate;
 
     /**
      * Local Repository.
@@ -237,6 +253,9 @@ public abstract class AbstractAddThirdPartyMojo
 
         doGenerate = isForce() || !thirdPartyFile.exists() || buildTimestamp > thirdPartyFile.lastModified();
 
+        if (groupByLicense) {
+            fileTemplate = "/org/codehaus/mojo/license/third-party-file-groupByLicense.ftl";
+        }
         if (generateBundle) {
 
             File bundleFile = FileUtil.getFile(getOutputDirectory(), bundleThirdPartyPath);
@@ -295,8 +314,9 @@ public abstract class AbstractAddThirdPartyMojo
 
         if (doGenerate) {
 
-            thirdPartyTool.writeThirdPartyFile(getLicenseMap(), groupByLicense, thirdPartyFile, isVerbose(),
-                                               getEncoding());
+            thirdPartyTool.writeThirdPartyFile(getLicenseMap(), thirdPartyFile, isVerbose(),
+                                               getEncoding(),
+                                               fileTemplate);
         }
 
         if (doGenerateBundle) {

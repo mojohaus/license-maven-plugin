@@ -142,10 +142,28 @@ public interface ThirdPartyTool {
      */
     void mergeLicenses(LicenseMap licenseMap, String... licenses);
 
-    void writeThirdPartyFile(LicenseMap licenseMap, boolean groupByLicense, File thirdPartyFile, boolean verbose,
-                             String encoding)
+    /**
+     * Write the content of the third-party file.
+     *
+     * @param licenseMap     map of all license to use
+     * @param thirdPartyFile location of file to generate
+     * @param verbose        verbose flag
+     * @param encoding       encoding used to generate file
+     * @param template       the location of the freemarker template used to generate the file content
+     * @throws IOException if any probem while writing file
+     */
+    void writeThirdPartyFile(LicenseMap licenseMap, File thirdPartyFile, boolean verbose,
+                             String encoding, String template)
             throws IOException;
 
+    /**
+     * Writes the bundled version of the third-party file.
+     *
+     * @param thirdPartyFile       location of normal third-party file
+     * @param outputDirectory      where to generate bundled version of the third-party file
+     * @param bundleThirdPartyPath relative end path of the file to generate
+     * @throws IOException if any problem while writing file
+     */
     void writeBundleThirdPartyFile(File thirdPartyFile, File outputDirectory, String bundleThirdPartyPath)
             throws IOException;
 }

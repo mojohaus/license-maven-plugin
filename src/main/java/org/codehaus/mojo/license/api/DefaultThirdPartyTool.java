@@ -21,6 +21,7 @@
  */
 package org.codehaus.mojo.license.api;
 
+import freemarker.template.Template;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.artifact.Artifact;
@@ -45,7 +46,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -103,11 +103,11 @@ public class DefaultThirdPartyTool
      */
     private MavenProjectHelper projectHelper;
 
+    /** @plexus.requirement */
+    private FreeMarkerHelper freeMarkerHelper;
+
     /** Maven project comparator. */
     private final Comparator<MavenProject> projectComparator = MojoHelper.newMavenProjectComparator();
-
-
-    public static final String NO_DEPENDENCIES_MESSAGE = "the project has no dependencies.";
 
     /** {@inheritDoc} */
     public void attachThirdPartyDescriptor(MavenProject project, File file) {
@@ -416,58 +416,19 @@ public class DefaultThirdPartyTool
     }
 
     /** {@inheritDoc} */
-    public void writeThirdPartyFile(LicenseMap licenseMap, boolean groupByLicense, File thirdPartyFile,
-                                    boolean verbose, String encoding)
+    public void writeThirdPartyFile(LicenseMap licenseMap, File thirdPartyFile,
+                                    boolean verbose, String encoding,
+                                    String lineFormat)
             throws IOException {
 
         Logger log = getLogger();
 
-        StringBuilder sb = new StringBuilder();
-        if (licenseMap.isEmpty()) {
-            sb.append(NO_DEPENDENCIES_MESSAGE);
-        } else {
-            if (groupByLicense) {
+        Template lineTemplate = freeMarkerHelper.getTemplate(lineFormat);
 
-                // group by license
-                sb.append("List of third-party dependencies grouped by " + "their license type.");
-                for (String licenseName : licenseMap.keySet()) {
-                    SortedSet<MavenProject> projects = licenseMap.get(licenseName);
-                    sb.append("\n\n").append(licenseName).append(" : ");
-
-                    for (MavenProject mavenProject : projects) {
-                        String s = MojoHelper.getArtifactName(mavenProject);
-                        sb.append("\n  * ").append(s);
-                    }
-                }
-
-            } else {
-
-                // group by dependencies
-                SortedMap<MavenProject, String[]> map = licenseMap.toDependencyMap();
-
-                sb.append("List of ").append(map.size()).append(" third-party dependencies.\n");
-
-                List<String> lines = new ArrayList<String>();
-
-                for (Map.Entry<MavenProject, String[]> entry : map.entrySet()) {
-                    String artifact = MojoHelper.getArtifactName(entry.getKey());
-                    StringBuilder buffer = new StringBuilder();
-                    for (String license : entry.getValue()) {
-                        buffer.append(" (").append(license).append(")");
-                    }
-                    String licenses = buffer.toString();
-                    String line = licenses + " " + artifact;
-                    lines.add(line);
-                }
-
-                Collections.sort(lines);
-                for (String line : lines) {
-                    sb.append('\n').append(line);
-                }
-                lines.clear();
-            }
-        }
-        String content = sb.toString();
+        Map<String, Object> properties = new HashMap<String, Object>();
+        properties.put("licenseMap", licenseMap.entrySet());
+        properties.put("dependencyMap", licenseMap.toDependencyMap().entrySet());
+        String content = freeMarkerHelper.renderTemplate(lineFormat, properties);
 
         log.info("Writing third-party file to " + thirdPartyFile);
         if (verbose) {
