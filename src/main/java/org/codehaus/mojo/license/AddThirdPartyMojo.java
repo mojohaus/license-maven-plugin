@@ -223,6 +223,12 @@ public class AddThirdPartyMojo
 
         boolean unsafe = checkUnsafeDependencies();
 
+        boolean safeLicense = checkForbiddenLicenses();
+
+        if (!safeLicense && isFailIfWarning()) {
+            throw new MojoFailureException(
+                "There is some forbidden licenses used, please check your dependencies.");
+        }
         writeThirdPartyFile();
 
         if (doGenerateMissing) {

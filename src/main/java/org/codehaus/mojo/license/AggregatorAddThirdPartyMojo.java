@@ -150,6 +150,12 @@ public class AggregatorAddThirdPartyMojo
         }
         boolean unsafe = checkUnsafeDependencies();
 
+        boolean safeLicense = checkForbiddenLicenses();
+
+        if (!safeLicense && isFailIfWarning()) {
+            throw new MojoFailureException(
+                "There is some forbidden licenses used, please check your dependencies.");
+        }
         writeThirdPartyFile();
 
         if (unsafe && isFailIfWarning()) {

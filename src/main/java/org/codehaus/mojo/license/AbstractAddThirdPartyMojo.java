@@ -39,7 +39,10 @@ import org.codehaus.mojo.license.utils.SortedProperties;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 
@@ -103,6 +106,17 @@ public abstract class AbstractAddThirdPartyMojo
      * @since 1.0
      */
     private List<String> licenseMerges;
+
+    /**
+     * To specify some licenses to exclude (separated by {@code |}).
+     * <p/>
+     * If a such license is found then build will failed when property
+     * {@link #failIfWarning} is setted on.
+     *
+     * @parameter expression="${license.excludedLicenses}" default-value=""
+     * @since 1.1
+     */
+    private String excludedLicenses;
 
     /**
      * The path of the bundled third party file to produce when
@@ -294,6 +308,11 @@ public abstract class AbstractAddThirdPartyMojo
         return helper;
     }
 
+    public List<String> getExcludedLicenses() {
+        String[] split = excludedLicenses == null ? new String[0] : excludedLicenses.split("\\s*\\|\\s*");
+        return Arrays.asList(split);
+    }
+
     protected boolean checkUnsafeDependencies() {
         SortedSet<MavenProject> unsafeDependencies = getUnsafeDependencies();
         boolean unsafe = !CollectionUtils.isEmpty(unsafeDependencies);
@@ -307,6 +326,45 @@ public abstract class AbstractAddThirdPartyMojo
             }
         }
         return unsafe;
+    }
+
+    protected boolean checkForbiddenLicenses() {
+        List<String> excludeLicenses = getExcludedLicenses();
+        Set<String> unsafeLicenses = new HashSet<String>(  );
+        if (CollectionUtils.isNotEmpty(excludeLicenses)) {
+            Set<String> licenses = getLicenseMap().keySet();
+            getLog().info( "Excluded licenses "+excludeLicenses );
+            getLog().info( "All licenses "+licenses);
+
+            for ( String excludeLicense : excludeLicenses )
+            {
+                if (licenses.contains( excludeLicense )) {
+                    //bad license found
+                    unsafeLicenses.add( excludeLicense );
+                }
+            }
+        }
+
+        boolean safe = CollectionUtils.isEmpty( unsafeLicenses );
+
+        if (!safe) {
+            Log log = getLog();
+            log.warn("There is " + unsafeLicenses.size() + " forbidden licenses used :");
+            for ( String unsafeLicense: unsafeLicenses) {
+
+                SortedSet<MavenProject> deps = getLicenseMap().get( unsafeLicense );
+                StringBuilder sb = new StringBuilder(  );
+                sb.append( "License " ).append( unsafeLicense ).append( "used by " ).append( deps.size() ).append(
+                    " dependencies:" );
+                for ( MavenProject dep : deps )
+                {
+                    sb.append( "\n -" ).append( MojoHelper.getArtifactName( dep ) );
+                }
+
+                log.warn( sb.toString() );
+            }
+        }
+        return safe;
     }
 
     protected void writeThirdPartyFile()

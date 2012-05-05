@@ -218,7 +218,16 @@ List of 2 third-party dependencies.
 
    If another project use this artifact, then it will load if required the missing third party file from repository
    (local or remote) and begin to fill the new missing licenses file.
-   
+
+* Exclude some licenses
+
+  Since version <<1.1>>, you can make failed the build if there is some not expected licenses in your project dependencies.
+
+  Use the <<excludedLicenses>> parameter to fill not wanted license separated by <<|>>.
+
+  To make build failed when a forbidden license is used, you just have to set to <true> value of
+  parameter <<failIfWarning>>.
+
 * Filter the dependencies
 
   * Include or exclude scopes
