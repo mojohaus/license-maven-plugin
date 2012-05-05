@@ -9,21 +9,25 @@
    values are all dependencies using this license
 -->
 <#function artifactFormat p>
-  <#return p.name + " (" + p.groupId + ":" + p.artifactId + ":" + p.version + " - " + (p.url!"no url defined") + ")">
+    <#if p.name?index_of('Unnamed') &gt; -1>
+        <#return p.artifactId + " (" + p.groupId + ":" + p.artifactId + ":" + p.version + " - " + (p.url!"no url defined") + ")">
+    <#else>
+        <#return p.name + " (" + p.groupId + ":" + p.artifactId + ":" + p.version + " - " + (p.url!"no url defined") + ")">
+    </#if>
 </#function>
 
 <#if licenseMap?size == 0>
 The project has no dependencies.
 <#else>
 List of third-party dependencies grouped by their license type.
-  <#list licenseMap as e>
-    <#assign license = e.getKey()/>
-    <#assign projects = e.getValue()/>
+    <#list licenseMap as e>
+        <#assign license = e.getKey()/>
+        <#assign projects = e.getValue()/>
 
-${license}:
+    ${license}:
 
-    <#list projects as project>
- * ${artifactFormat(project)}
+        <#list projects as project>
+        * ${artifactFormat(project)}
+        </#list>
     </#list>
-  </#list>
 </#if>
