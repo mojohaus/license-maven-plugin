@@ -30,7 +30,8 @@ package org.codehaus.mojo.license.header.transformer;
  * @since 1.0
  */
 public class PhpFileHeaderTransformer
-        extends AbstractFileHeaderTransformer {
+    extends AbstractFileHeaderTransformer
+{
 
     public static final String NAME = "php";
 
@@ -42,12 +43,14 @@ public class PhpFileHeaderTransformer
 
     public static final String COMMENT_END_TAG = " */ ?>";
 
-    public PhpFileHeaderTransformer() {
-        super(NAME, DESCRIPTION, COMMENT_START_TAG, COMMENT_END_TAG, COMMENT_LINE_PREFIX);
+    public PhpFileHeaderTransformer()
+    {
+        super( NAME, DESCRIPTION, COMMENT_START_TAG, COMMENT_END_TAG, COMMENT_LINE_PREFIX );
     }
 
-    public String[] getDefaultAcceptedExtensions() {
-        return new String[]{NAME};
+    public String[] getDefaultAcceptedExtensions()
+    {
+        return new String[]{ NAME };
     }
 
 }

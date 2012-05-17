@@ -26,8 +26,6 @@ package org.codehaus.mojo.license.utils;
 
 import org.apache.maven.model.License;
 import org.codehaus.mojo.license.model.ProjectLicenseInfo;
-import org.codehaus.mojo.license.utils.LicenseSummaryReader;
-import org.codehaus.mojo.license.utils.LicenseSummaryWriter;
 import org.junit.Assert;
 import org.junit.Test;
 import org.xml.sax.SAXException;
@@ -57,7 +55,7 @@ public class LicenseSummaryTest
         File licenseSummaryFile = new File( "src/test/resources/license-summary-test.xml" );
         Assert.assertTrue( licenseSummaryFile.exists() );
         FileInputStream fis = new FileInputStream( licenseSummaryFile );
-        List<ProjectLicenseInfo> list = LicenseSummaryReader.parseLicenseSummary(fis);
+        List<ProjectLicenseInfo> list = LicenseSummaryReader.parseLicenseSummary( fis );
         fis.close();
         ProjectLicenseInfo dep = list.get( 0 );
         Assert.assertEquals( "org.codehaus.mojo", dep.getGroupId() );
@@ -91,7 +89,7 @@ public class LicenseSummaryTest
 
         File licenseSummaryFile = File.createTempFile( "licSummary", "tmp" );
         // File licenseSummaryFile = new File( "src/test/resources/license-summary-test-2.xml" );
-        LicenseSummaryWriter.writeLicenseSummary(licSummary, licenseSummaryFile);
+        LicenseSummaryWriter.writeLicenseSummary( licSummary, licenseSummaryFile );
 
         Assert.assertTrue( licenseSummaryFile.exists() );
         FileInputStream fis = new FileInputStream( licenseSummaryFile );

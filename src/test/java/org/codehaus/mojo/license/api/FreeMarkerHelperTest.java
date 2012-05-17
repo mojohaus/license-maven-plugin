@@ -17,105 +17,88 @@ import java.util.Map;
  * @author tchemit <chemit@codelutin.com>
  * @since 1.1
  */
-public class FreeMarkerHelperTest {
+public class FreeMarkerHelperTest
+{
 
-    /** Logger. */
-    private static final Log log =
-            LogFactory.getLog(FreeMarkerHelperTest.class);
+    /**
+     * Logger.
+     */
+    private static final Log log = LogFactory.getLog( FreeMarkerHelperTest.class );
 
     @Test
-    public void testRenderTemplateFroThirdPartyFile() throws Exception {
+    public void testRenderTemplateFroThirdPartyFile()
+        throws Exception
+    {
 
         FreeMarkerHelper helper = new FreeMarkerHelper();
 
         LicenseMap licenseMap = new LicenseMap();
 
         MavenProject deps = new MavenProject();
-        deps.setArtifact(new DefaultArtifact(
-                "groupId",
-                "artifactId",
-                VersionRange.createFromVersionSpec("0"),
-                "compile",
-                "type",
-                "classifier",
-                null
-        ));
-        deps.setGroupId("groupId");
-        deps.setArtifactId("artifactId");
-        deps.setVersion("version");
-        deps.setUrl("url");
+        deps.setArtifact(
+            new DefaultArtifact( "groupId", "artifactId", VersionRange.createFromVersionSpec( "0" ), "compile", "type",
+                                 "classifier", null ) );
+        deps.setGroupId( "groupId" );
+        deps.setArtifactId( "artifactId" );
+        deps.setVersion( "version" );
+        deps.setUrl( "url" );
         MavenProject deps2 = new MavenProject();
-        deps2.setArtifact(new DefaultArtifact(
-                "groupId2",
-                "artifactId2",
-                VersionRange.createFromVersionSpec("2"),
-                "compile",
-                "type",
-                "classifier",
-                null
-        ));
-        deps2.setGroupId("groupId2");
-        deps2.setArtifactId("artifactId2");
-        deps2.setVersion("version2");
-        licenseMap.put("license 1", deps);
-        licenseMap.put("license 1", deps2);
-        licenseMap.put("license 2", deps2);
+        deps2.setArtifact(
+            new DefaultArtifact( "groupId2", "artifactId2", VersionRange.createFromVersionSpec( "2" ), "compile",
+                                 "type", "classifier", null ) );
+        deps2.setGroupId( "groupId2" );
+        deps2.setArtifactId( "artifactId2" );
+        deps2.setVersion( "version2" );
+        licenseMap.put( "license 1", deps );
+        licenseMap.put( "license 1", deps2 );
+        licenseMap.put( "license 2", deps2 );
         Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("licenseMap", licenseMap.entrySet());
-        properties.put("dependencyMap", licenseMap.toDependencyMap().entrySet());
+        properties.put( "licenseMap", licenseMap.entrySet() );
+        properties.put( "dependencyMap", licenseMap.toDependencyMap().entrySet() );
 
-        String s = helper.renderTemplate(
-                "/org/codehaus/mojo/license/third-party-file.ftl", properties);
-        if (log.isInfoEnabled()) {
-            log.info(s);
+        String s = helper.renderTemplate( "/org/codehaus/mojo/license/third-party-file.ftl", properties );
+        if ( log.isInfoEnabled() )
+        {
+            log.info( s );
         }
     }
 
     @Test
-    public void testRenderTemplateFroThirdPartyFileGroupByLicense() throws Exception {
+    public void testRenderTemplateFroThirdPartyFileGroupByLicense()
+        throws Exception
+    {
 
         FreeMarkerHelper helper = new FreeMarkerHelper();
 
         LicenseMap licenseMap = new LicenseMap();
 
         MavenProject deps = new MavenProject();
-        deps.setArtifact(new DefaultArtifact(
-                "groupId",
-                "artifactId",
-                VersionRange.createFromVersionSpec("0"),
-                "compile",
-                "type",
-                "classifier",
-                null
-        ));
-        deps.setGroupId("groupId");
-        deps.setArtifactId("artifactId");
-        deps.setVersion("version");
+        deps.setArtifact(
+            new DefaultArtifact( "groupId", "artifactId", VersionRange.createFromVersionSpec( "0" ), "compile", "type",
+                                 "classifier", null ) );
+        deps.setGroupId( "groupId" );
+        deps.setArtifactId( "artifactId" );
+        deps.setVersion( "version" );
         MavenProject deps2 = new MavenProject();
-        deps2.setArtifact(new DefaultArtifact(
-                "groupId2",
-                "artifactId2",
-                VersionRange.createFromVersionSpec("2"),
-                "compile",
-                "type",
-                "classifier",
-                null
-        ));
-        deps2.setGroupId("groupId2");
-        deps2.setArtifactId("artifactId2");
-        deps2.setVersion("version2");
-        deps2.setUrl("url2");
-        licenseMap.put("license 1", deps);
-        licenseMap.put("license 1", deps2);
-        licenseMap.put("license 2", deps2);
+        deps2.setArtifact(
+            new DefaultArtifact( "groupId2", "artifactId2", VersionRange.createFromVersionSpec( "2" ), "compile",
+                                 "type", "classifier", null ) );
+        deps2.setGroupId( "groupId2" );
+        deps2.setArtifactId( "artifactId2" );
+        deps2.setVersion( "version2" );
+        deps2.setUrl( "url2" );
+        licenseMap.put( "license 1", deps );
+        licenseMap.put( "license 1", deps2 );
+        licenseMap.put( "license 2", deps2 );
         Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("licenseMap", licenseMap.entrySet());
-        properties.put("dependencyMap", licenseMap.toDependencyMap().entrySet());
+        properties.put( "licenseMap", licenseMap.entrySet() );
+        properties.put( "dependencyMap", licenseMap.toDependencyMap().entrySet() );
 
-        String s = helper.renderTemplate(
-                "/org/codehaus/mojo/license/third-party-file-groupByLicense.ftl", properties);
-        if (log.isInfoEnabled()) {
-            log.info(s);
+        String s =
+            helper.renderTemplate( "/org/codehaus/mojo/license/third-party-file-groupByLicense.ftl", properties );
+        if ( log.isInfoEnabled() )
+        {
+            log.info( s );
         }
     }
 }

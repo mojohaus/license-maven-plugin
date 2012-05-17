@@ -30,7 +30,8 @@ package org.codehaus.mojo.license.header.transformer;
  * @since 1.0
  */
 public class PropertiesFileHeaderTransformer
-        extends AbstractFileHeaderTransformer {
+    extends AbstractFileHeaderTransformer
+{
 
     public static final String NAME = "properties";
 
@@ -44,44 +45,52 @@ public class PropertiesFileHeaderTransformer
 
     protected final String linesep;
 
-    public PropertiesFileHeaderTransformer() {
-        super(NAME, DESCRIPTION, COMMENT_START_TAG, COMMENT_END_TAG, COMMENT_LINE_PREFIX);
-        linesep = System.getProperty("line.separator");
+    public PropertiesFileHeaderTransformer()
+    {
+        super( NAME, DESCRIPTION, COMMENT_START_TAG, COMMENT_END_TAG, COMMENT_LINE_PREFIX );
+        linesep = System.getProperty( "line.separator" );
     }
 
-    public String[] getDefaultAcceptedExtensions() {
-        return new String[]{NAME, "sh", "py", "rb", "pl", "pm"};
+    public String[] getDefaultAcceptedExtensions()
+    {
+        return new String[]{ NAME, "sh", "py", "rb", "pl", "pm" };
     }
 
     @Override
-    public String addHeader(String header, String content) {
+    public String addHeader( String header, String content )
+    {
 
         String result;
 
         String prolog = null;
-        int startProlog = content.indexOf("#!");
-        if (startProlog > -1) {
+        int startProlog = content.indexOf( "#!" );
+        if ( startProlog > -1 )
+        {
 
             // shebang was detected
 
-            int endProlog = content.indexOf(linesep);
+            int endProlog = content.indexOf( linesep );
 
-            if (endProlog > -1) {
+            if ( endProlog > -1 )
+            {
 
                 // prolog end was detected
-                prolog = content.substring(0, endProlog + linesep.length());
+                prolog = content.substring( 0, endProlog + linesep.length() );
             }
         }
 
-        if (prolog == null) {
+        if ( prolog == null )
+        {
 
             // no shebang detected
-            result = super.addHeader(header, content);
-        } else {
+            result = super.addHeader( header, content );
+        }
+        else
+        {
 
             // shebang detected
-            content = content.substring(prolog.length());
-            result = super.addHeader(prolog + '\n' + header, content);
+            content = content.substring( prolog.length() );
+            result = super.addHeader( prolog + '\n' + header, content );
         }
         return result;
     }

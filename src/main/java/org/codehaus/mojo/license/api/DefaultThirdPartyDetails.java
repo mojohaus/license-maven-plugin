@@ -31,7 +31,8 @@ import org.apache.maven.project.MavenProject;
  * @since 1.1
  */
 public class DefaultThirdPartyDetails
-        implements ThirdPartyDetails {
+    implements ThirdPartyDetails
+{
 
     private String[] pomLicenses;
 
@@ -39,83 +40,129 @@ public class DefaultThirdPartyDetails
 
     private final MavenProject project;
 
-    public DefaultThirdPartyDetails(MavenProject project) {
+    public DefaultThirdPartyDetails( MavenProject project )
+    {
         this.project = project;
     }
 
-    /** {@inheritDoc} */
-    public String getGroupId() {
+    /**
+     * {@inheritDoc}
+     */
+    public String getGroupId()
+    {
         return project.getArtifact().getGroupId();
     }
 
-    /** {@inheritDoc} */
-    public String getArtifactId() {
+    /**
+     * {@inheritDoc}
+     */
+    public String getArtifactId()
+    {
         return project.getArtifact().getArtifactId();
     }
 
-    /** {@inheritDoc} */
-    public String getVersion() {
+    /**
+     * {@inheritDoc}
+     */
+    public String getVersion()
+    {
         return project.getArtifact().getVersion();
     }
 
-    /** {@inheritDoc} */
-    public String getType() {
+    /**
+     * {@inheritDoc}
+     */
+    public String getType()
+    {
         return project.getArtifact().getType();
     }
 
-    /** {@inheritDoc} */
-    public String getClassifier() {
+    /**
+     * {@inheritDoc}
+     */
+    public String getClassifier()
+    {
         return project.getArtifact().getClassifier();
     }
 
-    /** {@inheritDoc} */
-    public String getScope() {
+    /**
+     * {@inheritDoc}
+     */
+    public String getScope()
+    {
         return project.getArtifact().getScope();
     }
 
-    /** {@inheritDoc} */
-    public boolean hasPomLicenses() {
+    /**
+     * {@inheritDoc}
+     */
+    public boolean hasPomLicenses()
+    {
         return pomLicenses != null && pomLicenses.length > 0;
     }
 
-    /** {@inheritDoc} */
-    public String[] getLicenses() {
+    /**
+     * {@inheritDoc}
+     */
+    public String[] getLicenses()
+    {
         String[] result = null;
-        if (hasPomLicenses()) {
+        if ( hasPomLicenses() )
+        {
             result = getPomLicenses();
-        } else if (hasThirdPartyLicenses()) {
+        }
+        else if ( hasThirdPartyLicenses() )
+        {
             result = getThirdPartyLicenses();
         }
         return result;
     }
 
-    /** {@inheritDoc} */
-    public boolean hasLicenses() {
+    /**
+     * {@inheritDoc}
+     */
+    public boolean hasLicenses()
+    {
         return hasPomLicenses() || hasThirdPartyLicenses();
     }
 
-    /** {@inheritDoc} */
-    public String[] getPomLicenses() {
+    /**
+     * {@inheritDoc}
+     */
+    public String[] getPomLicenses()
+    {
         return pomLicenses;
     }
 
-    /** {@inheritDoc} */
-    public void setPomLicenses(String[] pomLicenses) {
+    /**
+     * {@inheritDoc}
+     */
+    public void setPomLicenses( String[] pomLicenses )
+    {
         this.pomLicenses = pomLicenses;
     }
 
-    /** {@inheritDoc} */
-    public String[] getThirdPartyLicenses() {
+    /**
+     * {@inheritDoc}
+     */
+    public String[] getThirdPartyLicenses()
+    {
         return thirdPartyLicenses;
     }
 
-    /** {@inheritDoc} */
-    public boolean hasThirdPartyLicenses() {
+    /**
+     * {@inheritDoc}
+     */
+    public boolean hasThirdPartyLicenses()
+    {
         return thirdPartyLicenses != null && thirdPartyLicenses.length > 0;
     }
 
-    /** {@inheritDoc} */
-    public void setThirdPartyLicenses(String[] thirdPartyLicenses) {
+    /**
+     * {@inheritDoc}
+     */
+    public void setThirdPartyLicenses( String[] thirdPartyLicenses )
+    {
         this.thirdPartyLicenses = thirdPartyLicenses;
     }
 }

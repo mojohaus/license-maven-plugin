@@ -63,8 +63,9 @@ import java.util.SortedMap;
  * @since 1.0
  */
 public class DownloadLicensesMojo
-        extends AbstractMojo
-        implements MavenProjectDependenciesConfigurator {
+    extends AbstractMojo
+    implements MavenProjectDependenciesConfigurator
+{
 
     /**
      * The Maven Project Object
@@ -172,13 +173,17 @@ public class DownloadLicensesMojo
      */
     private Set<String> downloadedLicenseURLs = new HashSet<String>();
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public void execute()
-            throws MojoExecutionException {
+        throws MojoExecutionException
+    {
 
-        if (offline) {
+        if ( offline )
+        {
 
-            getLog().warn("Offline flag is on, download-licenses goal is skip.");
+            getLog().warn( "Offline flag is on, download-licenses goal is skip." );
             return;
         }
         initDirectories();
@@ -186,52 +191,65 @@ public class DownloadLicensesMojo
         Map<String, ProjectLicenseInfo> configuredDepLicensesMap = new HashMap<String, ProjectLicenseInfo>();
 
         // License info from previous build
-        if (licensesOutputFile.exists()) {
-            loadLicenseInfo(configuredDepLicensesMap, licensesOutputFile, true);
+        if ( licensesOutputFile.exists() )
+        {
+            loadLicenseInfo( configuredDepLicensesMap, licensesOutputFile, true );
         }
 
         // Manually configured license info, loaded second to override previously loaded info
-        if (licensesConfigFile.exists()) {
-            loadLicenseInfo(configuredDepLicensesMap, licensesConfigFile, false);
+        if ( licensesConfigFile.exists() )
+        {
+            loadLicenseInfo( configuredDepLicensesMap, licensesConfigFile, false );
         }
 
         SortedMap<String, MavenProject> dependencies =
-                dependenciesTool.loadProjectDependencies(project, this, localRepository, remoteRepositories, null);
+            dependenciesTool.loadProjectDependencies( project, this, localRepository, remoteRepositories, null );
 
         // The resulting list of licenses after dependency resolution
         List<ProjectLicenseInfo> depProjectLicenses = new ArrayList<ProjectLicenseInfo>();
 
-        for (MavenProject project : dependencies.values()) {
+        for ( MavenProject project : dependencies.values() )
+        {
             Artifact artifact = project.getArtifact();
-            getLog().debug("Checking licenses for project " + artifact);
-            String artifactProjectId = getArtifactProjectId(artifact);
+            getLog().debug( "Checking licenses for project " + artifact );
+            String artifactProjectId = getArtifactProjectId( artifact );
             ProjectLicenseInfo depProject;
-            if (configuredDepLicensesMap.containsKey(artifactProjectId)) {
-                depProject = configuredDepLicensesMap.get(artifactProjectId);
-                depProject.setVersion(artifact.getVersion());
-            } else {
-                depProject = createDependencyProject(project);
+            if ( configuredDepLicensesMap.containsKey( artifactProjectId ) )
+            {
+                depProject = configuredDepLicensesMap.get( artifactProjectId );
+                depProject.setVersion( artifact.getVersion() );
             }
-            downloadLicenses(depProject);
-            depProjectLicenses.add(depProject);
+            else
+            {
+                depProject = createDependencyProject( project );
+            }
+            downloadLicenses( depProject );
+            depProjectLicenses.add( depProject );
         }
 
-        try {
-            LicenseSummaryWriter.writeLicenseSummary(depProjectLicenses, licensesOutputFile);
-        } catch (Exception e) {
-            throw new MojoExecutionException("Unable to write license summary file: " + licensesOutputFile, e);
+        try
+        {
+            LicenseSummaryWriter.writeLicenseSummary( depProjectLicenses, licensesOutputFile );
+        }
+        catch ( Exception e )
+        {
+            throw new MojoExecutionException( "Unable to write license summary file: " + licensesOutputFile, e );
         }
 
     }
 
     private void initDirectories()
-            throws MojoExecutionException {
-        try {
-            FileUtil.createDirectoryIfNecessary(licensesOutputDirectory);
+        throws MojoExecutionException
+    {
+        try
+        {
+            FileUtil.createDirectoryIfNecessary( licensesOutputDirectory );
 
-            FileUtil.createDirectoryIfNecessary(licensesOutputFile.getParentFile());
-        } catch (IOException e) {
-            throw new MojoExecutionException("Unable to create a directory...", e);
+            FileUtil.createDirectoryIfNecessary( licensesOutputFile.getParentFile() );
+        }
+        catch ( IOException e )
+        {
+            throw new MojoExecutionException( "Unable to create a directory...", e );
         }
     }
 
@@ -244,26 +262,35 @@ public class DownloadLicensesMojo
      * @param previouslyDownloaded     Whether these licenses were already downloaded
      * @throws MojoExecutionException if could not load license infos
      */
-    private void loadLicenseInfo(Map<String, ProjectLicenseInfo> configuredDepLicensesMap, File licenseConfigFile,
-                                 boolean previouslyDownloaded)
-            throws MojoExecutionException {
+    private void loadLicenseInfo( Map<String, ProjectLicenseInfo> configuredDepLicensesMap, File licenseConfigFile,
+                                  boolean previouslyDownloaded )
+        throws MojoExecutionException
+    {
         FileInputStream fis = null;
-        try {
-            fis = new FileInputStream(licenseConfigFile);
-            List<ProjectLicenseInfo> licensesList = LicenseSummaryReader.parseLicenseSummary(fis);
-            for (ProjectLicenseInfo dep : licensesList) {
-                configuredDepLicensesMap.put(dep.getId(), dep);
-                if (previouslyDownloaded) {
-                    for (License license : dep.getLicenses()) {
+        try
+        {
+            fis = new FileInputStream( licenseConfigFile );
+            List<ProjectLicenseInfo> licensesList = LicenseSummaryReader.parseLicenseSummary( fis );
+            for ( ProjectLicenseInfo dep : licensesList )
+            {
+                configuredDepLicensesMap.put( dep.getId(), dep );
+                if ( previouslyDownloaded )
+                {
+                    for ( License license : dep.getLicenses() )
+                    {
                         // Save the URL so we don't download it again
-                        downloadedLicenseURLs.add(license.getUrl());
+                        downloadedLicenseURLs.add( license.getUrl() );
                     }
                 }
             }
-        } catch (Exception e) {
-            throw new MojoExecutionException("Unable to parse license summary output file: " + licenseConfigFile, e);
-        } finally {
-            FileUtil.tryClose(fis);
+        }
+        catch ( Exception e )
+        {
+            throw new MojoExecutionException( "Unable to parse license summary output file: " + licenseConfigFile, e );
+        }
+        finally
+        {
+            FileUtil.tryClose( fis );
         }
     }
 
@@ -273,7 +300,8 @@ public class DownloadLicensesMojo
      * @param artifact the artifact
      * @return groupId:artifactId
      */
-    public String getArtifactProjectId(Artifact artifact) {
+    public String getArtifactProjectId( Artifact artifact )
+    {
         return artifact.getGroupId() + ":" + artifact.getArtifactId();
     }
 
@@ -283,13 +311,15 @@ public class DownloadLicensesMojo
      * @param depMavenProject the dependency maven project
      * @return DependencyProject with artifact and license info
      */
-    public ProjectLicenseInfo createDependencyProject(MavenProject depMavenProject) {
+    public ProjectLicenseInfo createDependencyProject( MavenProject depMavenProject )
+    {
         ProjectLicenseInfo dependencyProject =
-                new ProjectLicenseInfo(depMavenProject.getGroupId(), depMavenProject.getArtifactId(),
-                                       depMavenProject.getVersion());
+            new ProjectLicenseInfo( depMavenProject.getGroupId(), depMavenProject.getArtifactId(),
+                                    depMavenProject.getVersion() );
         List<?> licenses = depMavenProject.getLicenses();
-        for (Object license : licenses) {
-            dependencyProject.addLicense((License) license);
+        for ( Object license : licenses )
+        {
+            dependencyProject.addLicense( (License) license );
         }
         return dependencyProject;
     }
@@ -302,20 +332,23 @@ public class DownloadLicensesMojo
      * @return A filename to be used for the downloaded license file
      * @throws MalformedURLException if the license url is malformed
      */
-    private String getLicenseFileName(License license)
-            throws MalformedURLException {
-        URL licenseUrl = new URL(license.getUrl());
-        File licenseUrlFile = new File(licenseUrl.getPath());
+    private String getLicenseFileName( License license )
+        throws MalformedURLException
+    {
+        URL licenseUrl = new URL( license.getUrl() );
+        File licenseUrlFile = new File( licenseUrl.getPath() );
         String licenseFileName = licenseUrlFile.getName();
 
-        if (license.getName() != null) {
+        if ( license.getName() != null )
+        {
             licenseFileName = license.getName() + " - " + licenseUrlFile.getName();
         }
 
         // Check if the file has a valid file extention
         final String DEFAULT_EXTENSION = ".txt";
-        int extensionIndex = licenseFileName.lastIndexOf(".");
-        if (extensionIndex == -1 || extensionIndex > (licenseFileName.length() - 3)) {
+        int extensionIndex = licenseFileName.lastIndexOf( "." );
+        if ( extensionIndex == -1 || extensionIndex > ( licenseFileName.length() - 3 ) )
+        {
             // This means it isn't a valid file extension, so append the default
             licenseFileName = licenseFileName + DEFAULT_EXTENSION;
         }
@@ -331,102 +364,142 @@ public class DownloadLicensesMojo
      *
      * @param depProject The project which generated the dependency
      */
-    private void downloadLicenses(ProjectLicenseInfo depProject) {
-        getLog().debug("Downloading license(s) for project " + depProject);
+    private void downloadLicenses( ProjectLicenseInfo depProject )
+    {
+        getLog().debug( "Downloading license(s) for project " + depProject );
 
         List<License> licenses = depProject.getLicenses();
 
-        if (depProject.getLicenses() == null || depProject.getLicenses().isEmpty()) {
-            if (!quiet) {
-                getLog().warn("No license information available for: " + depProject);
+        if ( depProject.getLicenses() == null || depProject.getLicenses().isEmpty() )
+        {
+            if ( !quiet )
+            {
+                getLog().warn( "No license information available for: " + depProject );
             }
             return;
         }
 
-        for (License license : licenses) {
-            try {
-                String licenseFileName = getLicenseFileName(license);
+        for ( License license : licenses )
+        {
+            try
+            {
+                String licenseFileName = getLicenseFileName( license );
 
-                File licenseOutputFile = new File(licensesOutputDirectory, licenseFileName);
-                if (licenseOutputFile.exists()) {
+                File licenseOutputFile = new File( licensesOutputDirectory, licenseFileName );
+                if ( licenseOutputFile.exists() )
+                {
                     continue;
                 }
 
-                if (!downloadedLicenseURLs.contains(license.getUrl())) {
-                    LicenseDownloader.downloadLicense(license.getUrl(), licenseOutputFile);
-                    downloadedLicenseURLs.add(license.getUrl());
+                if ( !downloadedLicenseURLs.contains( license.getUrl() ) )
+                {
+                    LicenseDownloader.downloadLicense( license.getUrl(), licenseOutputFile );
+                    downloadedLicenseURLs.add( license.getUrl() );
                 }
-            } catch (MalformedURLException e) {
-                if (!quiet) {
-                    getLog().warn("POM for dependency " + depProject.toString() + " has an invalid license URL: " +
-                                  license.getUrl());
+            }
+            catch ( MalformedURLException e )
+            {
+                if ( !quiet )
+                {
+                    getLog().warn( "POM for dependency " + depProject.toString() + " has an invalid license URL: " +
+                                       license.getUrl() );
                 }
-            } catch (FileNotFoundException e) {
-                if (!quiet) {
-                    getLog().warn("POM for dependency " + depProject.toString() +
-                                  " has a license URL that returns file not found: " + license.getUrl());
+            }
+            catch ( FileNotFoundException e )
+            {
+                if ( !quiet )
+                {
+                    getLog().warn( "POM for dependency " + depProject.toString() +
+                                       " has a license URL that returns file not found: " + license.getUrl() );
                 }
-            } catch (IOException e) {
-                getLog().warn("Unable to retrieve license for dependency: " + depProject.toString());
-                getLog().warn(license.getUrl());
-                getLog().warn(e.getMessage());
+            }
+            catch ( IOException e )
+            {
+                getLog().warn( "Unable to retrieve license for dependency: " + depProject.toString() );
+                getLog().warn( license.getUrl() );
+                getLog().warn( e.getMessage() );
             }
 
         }
 
     }
 
-    /** {@inheritDoc} */
-    public boolean isIncludeTransitiveDependencies() {
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isIncludeTransitiveDependencies()
+    {
         return includeTransitiveDependencies;
     }
 
-    /** {@inheritDoc} */
-    public List<String> getExcludedScopes() {
-        String[] split = excludedScopes == null ? new String[0] : excludedScopes.split(",");
-        return Arrays.asList(split);
+    /**
+     * {@inheritDoc}
+     */
+    public List<String> getExcludedScopes()
+    {
+        String[] split = excludedScopes == null ? new String[0] : excludedScopes.split( "," );
+        return Arrays.asList( split );
     }
 
-    public void setExcludedScopes(String excludedScopes) {
+    public void setExcludedScopes( String excludedScopes )
+    {
         this.excludedScopes = excludedScopes;
     }
 
-    /** {@inheritDoc} */
-    public List<String> getIncludedScopes() {
-        String[] split = includedScopes == null ? new String[0] : includedScopes.split(",");
-        return Arrays.asList(split);
+    /**
+     * {@inheritDoc}
+     */
+    public List<String> getIncludedScopes()
+    {
+        String[] split = includedScopes == null ? new String[0] : includedScopes.split( "," );
+        return Arrays.asList( split );
     }
 
     // not used at the moment
 
-    /** {@inheritDoc} */
-    public String getIncludedArtifacts() {
+    /**
+     * {@inheritDoc}
+     */
+    public String getIncludedArtifacts()
+    {
         return null;
     }
 
     // not used at the moment
 
-    /** {@inheritDoc} */
-    public String getIncludedGroups() {
+    /**
+     * {@inheritDoc}
+     */
+    public String getIncludedGroups()
+    {
         return null;
     }
 
     // not used at the moment
 
-    /** {@inheritDoc} */
-    public String getExcludedGroups() {
+    /**
+     * {@inheritDoc}
+     */
+    public String getExcludedGroups()
+    {
         return null;
     }
 
     // not used at the moment
 
-    /** {@inheritDoc} */
-    public String getExcludedArtifacts() {
+    /**
+     * {@inheritDoc}
+     */
+    public String getExcludedArtifacts()
+    {
         return null;
     }
 
-    /** {@inheritDoc} */
-    public boolean isVerbose() {
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isVerbose()
+    {
         return getLog().isDebugEnabled();
     }
 }

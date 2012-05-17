@@ -42,7 +42,8 @@ import java.util.List;
  * @since 1.0
  */
 public class LicenseListMojo
-        extends AbstractLicenseMojo {
+    extends AbstractLicenseMojo
+{
 
     /**
      * the url of an extra license repository.
@@ -60,57 +61,73 @@ public class LicenseListMojo
      */
     private boolean detail;
 
-    /** store of licenses */
+    /**
+     * store of licenses
+     */
     protected LicenseStore licenseStore;
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void init()
-            throws Exception {
+        throws Exception
+    {
 
         // obtain licenses store
-        licenseStore = LicenseStore.createLicenseStore(getLog(), extraResolver);
+        licenseStore = LicenseStore.createLicenseStore( getLog(), extraResolver );
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void doAction()
-            throws MojoExecutionException, MojoFailureException {
+        throws MojoExecutionException, MojoFailureException
+    {
         StringBuilder buffer = new StringBuilder();
 
-        if (isVerbose()) {
-            buffer.append("\n\n-------------------------------------------------------------------------------\n");
-            buffer.append("                           maven-license-plugin\n");
-            buffer.append("-------------------------------------------------------------------------------\n\n");
+        if ( isVerbose() )
+        {
+            buffer.append( "\n\n-------------------------------------------------------------------------------\n" );
+            buffer.append( "                           maven-license-plugin\n" );
+            buffer.append( "-------------------------------------------------------------------------------\n\n" );
         }
-        buffer.append("Available licenses :\n\n");
+        buffer.append( "Available licenses :\n\n" );
 
-        List<String> names = Arrays.asList(licenseStore.getLicenseNames());
+        List<String> names = Arrays.asList( licenseStore.getLicenseNames() );
 
         int maxLength = 0;
-        for (String name : names) {
-            if (name.length() > maxLength) {
+        for ( String name : names )
+        {
+            if ( name.length() > maxLength )
+            {
                 maxLength = name.length();
             }
         }
-        Collections.sort(names);
+        Collections.sort( names );
 
         String pattern = " * %1$-" + maxLength + "s : %2$s\n";
-        for (String licenseName : names) {
-            License license = licenseStore.getLicense(licenseName);
-            buffer.append(String.format(pattern, licenseName, license.getDescription()));
-            if (detail) {
-                try {
-                    buffer.append("\n");
-                    buffer.append(license.getHeaderContent(getEncoding()));
-                    buffer.append("\n\n");
-                } catch (IOException ex) {
+        for ( String licenseName : names )
+        {
+            License license = licenseStore.getLicense( licenseName );
+            buffer.append( String.format( pattern, licenseName, license.getDescription() ) );
+            if ( detail )
+            {
+                try
+                {
+                    buffer.append( "\n" );
+                    buffer.append( license.getHeaderContent( getEncoding() ) );
+                    buffer.append( "\n\n" );
+                }
+                catch ( IOException ex )
+                {
                     throw new MojoExecutionException(
-                            "could not instanciate license with name " + licenseName + " for reason " + ex.getMessage(),
-                            ex);
+                        "could not instanciate license with name " + licenseName + " for reason " + ex.getMessage(),
+                        ex );
                 }
             }
         }
-        getLog().info(buffer.toString());
+        getLog().info( buffer.toString() );
     }
 }

@@ -42,9 +42,12 @@ import java.util.SortedSet;
  * @author tchemit <chemit@codelutin.com>
  * @since 1.0
  */
-public interface ThirdPartyTool {
+public interface ThirdPartyTool
+{
 
-    /** Plexus Role */
+    /**
+     * Plexus Role
+     */
     String ROLE = ThirdPartyTool.class.getName();
 
     /**
@@ -58,12 +61,12 @@ public interface ThirdPartyTool {
      * @throws ThirdPartyToolException if any
      * @throws IOException             if any
      */
-    SortedProperties loadThirdPartyDescriptorsForUnsafeMapping(String encoding, Collection<MavenProject> projects,
-                                                               SortedSet<MavenProject> unsafeProjects,
-                                                               LicenseMap licenseMap,
-                                                               ArtifactRepository localRepository,
-                                                               List<ArtifactRepository> remoteRepositories)
-            throws ThirdPartyToolException, IOException;
+    SortedProperties loadThirdPartyDescriptorsForUnsafeMapping( String encoding, Collection<MavenProject> projects,
+                                                                SortedSet<MavenProject> unsafeProjects,
+                                                                LicenseMap licenseMap,
+                                                                ArtifactRepository localRepository,
+                                                                List<ArtifactRepository> remoteRepositories )
+        throws ThirdPartyToolException, IOException;
 
     /**
      * For the given {@code project}, attach the given {@code file} as a third-party file.
@@ -73,7 +76,7 @@ public interface ThirdPartyTool {
      * @param project the project on which to attch the third-party file
      * @param file    the third-party file to attach.
      */
-    void attachThirdPartyDescriptor(MavenProject project, File file);
+    void attachThirdPartyDescriptor( MavenProject project, File file );
 
     /**
      * Obtain the third party file from the repository.
@@ -86,9 +89,9 @@ public interface ThirdPartyTool {
      * @return the locale file resolved into the local repository
      * @throws ThirdPartyToolException if any
      */
-    File resolvThirdPartyDescriptor(MavenProject project, ArtifactRepository localRepository,
-                                    List<ArtifactRepository> repositories)
-            throws ThirdPartyToolException;
+    File resolvThirdPartyDescriptor( MavenProject project, ArtifactRepository localRepository,
+                                     List<ArtifactRepository> repositories )
+        throws ThirdPartyToolException;
 
     /**
      * From the given {@code licenseMap}, obtain all the projects with no license.
@@ -97,11 +100,11 @@ public interface ThirdPartyTool {
      * @param doLog      a flag to add debug logs
      * @return the set of projects with no license
      */
-    SortedSet<MavenProject> getProjectsWithNoLicense(LicenseMap licenseMap, boolean doLog);
+    SortedSet<MavenProject> getProjectsWithNoLicense( LicenseMap licenseMap, boolean doLog );
 
-    SortedProperties loadUnsafeMapping(LicenseMap licenseMap, SortedMap<String, MavenProject> artifactCache,
-                                       String encoding, File missingFile)
-            throws IOException;
+    SortedProperties loadUnsafeMapping( LicenseMap licenseMap, SortedMap<String, MavenProject> artifactCache,
+                                        String encoding, File missingFile )
+        throws IOException;
 
     /**
      * Add a license (name and url are {@code licenseName}) to the given {@code licenseMap} for the given
@@ -111,7 +114,7 @@ public interface ThirdPartyTool {
      * @param project     the project
      * @param licenseName the name of the license
      */
-    void addLicense(LicenseMap licenseMap, MavenProject project, String licenseName);
+    void addLicense( LicenseMap licenseMap, MavenProject project, String licenseName );
 
     /**
      * Add a given {@code license} to the given {@code licenseMap} for the given {@code project}.
@@ -120,7 +123,7 @@ public interface ThirdPartyTool {
      * @param project    the project
      * @param license    the license to add
      */
-    void addLicense(LicenseMap licenseMap, MavenProject project, License license);
+    void addLicense( LicenseMap licenseMap, MavenProject project, License license );
 
     /**
      * Add a given {@code licenses} to the given {@code licenseMap} for the given {@code project}.
@@ -129,7 +132,7 @@ public interface ThirdPartyTool {
      * @param project    the project
      * @param licenses   the licenses to add
      */
-    void addLicense(LicenseMap licenseMap, MavenProject project, List<?> licenses);
+    void addLicense( LicenseMap licenseMap, MavenProject project, List<?> licenses );
 
     /**
      * For a given {@code licenseMap}, merge all {@code licenses}.
@@ -140,7 +143,7 @@ public interface ThirdPartyTool {
      * @param licenseMap the license map to merge
      * @param licenses   all the licenses to merge (the first license will be the unique one to kkep)
      */
-    void mergeLicenses(LicenseMap licenseMap, String... licenses);
+    void mergeLicenses( LicenseMap licenseMap, String... licenses );
 
     /**
      * Write the content of the third-party file.
@@ -152,9 +155,9 @@ public interface ThirdPartyTool {
      * @param template       the location of the freemarker template used to generate the file content
      * @throws IOException if any probem while writing file
      */
-    void writeThirdPartyFile(LicenseMap licenseMap, File thirdPartyFile, boolean verbose,
-                             String encoding, String template)
-            throws IOException;
+    void writeThirdPartyFile( LicenseMap licenseMap, File thirdPartyFile, boolean verbose, String encoding,
+                              String template )
+        throws IOException;
 
     /**
      * Writes the bundled version of the third-party file.
@@ -164,6 +167,6 @@ public interface ThirdPartyTool {
      * @param bundleThirdPartyPath relative end path of the file to generate
      * @throws IOException if any problem while writing file
      */
-    void writeBundleThirdPartyFile(File thirdPartyFile, File outputDirectory, String bundleThirdPartyPath)
-            throws IOException;
+    void writeBundleThirdPartyFile( File thirdPartyFile, File outputDirectory, String bundleThirdPartyPath )
+        throws IOException;
 }

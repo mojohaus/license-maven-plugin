@@ -35,7 +35,8 @@ import java.util.SortedMap;
  * @see DependenciesTool
  * @since 1.0
  */
-public interface MavenProjectDependenciesConfigurator {
+public interface MavenProjectDependenciesConfigurator
+{
 
     /**
      * @return {@code true} if should include transitive dependencies, {@code false} to include only direct
@@ -43,10 +44,14 @@ public interface MavenProjectDependenciesConfigurator {
      */
     boolean isIncludeTransitiveDependencies();
 
-    /** @return list of scopes to include while loading dependencies, if {@code null} is setted, then include all scopes. */
+    /**
+     * @return list of scopes to include while loading dependencies, if {@code null} is setted, then include all scopes.
+     */
     List<String> getIncludedScopes();
 
-    /** @return list of scopes to exclude while loading dependencies, if {@code null} is setted, then include all scopes. */
+    /**
+     * @return list of scopes to exclude while loading dependencies, if {@code null} is setted, then include all scopes.
+     */
     List<String> getExcludedScopes();
 
     /**
@@ -73,6 +78,8 @@ public interface MavenProjectDependenciesConfigurator {
      */
     String getExcludedArtifacts();
 
-    /** @return {@code true} if verbose mode is on, {@code false} otherwise. */
+    /**
+     * @return {@code true} if verbose mode is on, {@code false} otherwise.
+     */
     boolean isVerbose();
 }

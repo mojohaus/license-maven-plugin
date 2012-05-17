@@ -44,7 +44,8 @@ import java.util.List;
  * @version $Revision$
  * @since 1.0
  */
-public class LicenseSummaryReader {
+public class LicenseSummaryReader
+{
 
     /**
      * Read a component-info.xml from an input stream into a ComponentInfo object.
@@ -55,25 +56,28 @@ public class LicenseSummaryReader {
      * @throws ParserConfigurationException if there is a problem parsing the XML stream
      * @throws SAXException                 if there is a problem parsing the XML stream
      */
-    public static List<ProjectLicenseInfo> parseLicenseSummary(InputStream licSummaryIS)
-            throws IOException, ParserConfigurationException, SAXException {
+    public static List<ProjectLicenseInfo> parseLicenseSummary( InputStream licSummaryIS )
+        throws IOException, ParserConfigurationException, SAXException
+    {
         List<ProjectLicenseInfo> dependencies = new ArrayList<ProjectLicenseInfo>();
 
         DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
-        Document doc = docBuilder.parse(licSummaryIS);
+        Document doc = docBuilder.parse( licSummaryIS );
 
         // normalize text representation
         doc.getDocumentElement().normalize();
         Element documentElement = doc.getDocumentElement();
 
-        Node dependenciesNode = documentElement.getElementsByTagName("dependencies").item(0);
+        Node dependenciesNode = documentElement.getElementsByTagName( "dependencies" ).item( 0 );
         NodeList dependencyNodes = dependenciesNode.getChildNodes();
 
-        for (int i = 0; i < dependencyNodes.getLength(); ++i) {
-            Node dependencyNode = dependencyNodes.item(i);
-            if (dependencyNode.getNodeType() == Node.ELEMENT_NODE) {
-                dependencies.add(parseDependencyNode(dependencyNode));
+        for ( int i = 0; i < dependencyNodes.getLength(); ++i )
+        {
+            Node dependencyNode = dependencyNodes.item( i );
+            if ( dependencyNode.getNodeType() == Node.ELEMENT_NODE )
+            {
+                dependencies.add( parseDependencyNode( dependencyNode ) );
             }
         }
 
@@ -81,25 +85,36 @@ public class LicenseSummaryReader {
 
     }
 
-    private static ProjectLicenseInfo parseDependencyNode(Node dependencyNode) {
+    private static ProjectLicenseInfo parseDependencyNode( Node dependencyNode )
+    {
         ProjectLicenseInfo dependency = new ProjectLicenseInfo();
         NodeList depElements = dependencyNode.getChildNodes();
-        for (int i = 0; i < depElements.getLength(); ++i) {
-            Node node = depElements.item(i);
+        for ( int i = 0; i < depElements.getLength(); ++i )
+        {
+            Node node = depElements.item( i );
 
-            if (node.getNodeName().equals("groupId")) {
-                dependency.setGroupId(node.getTextContent());
-            } else if (node.getNodeName().equals("artifactId")) {
-                dependency.setArtifactId(node.getTextContent());
-            } else if (node.getNodeName().equals("version")) {
-                dependency.setVersion(node.getTextContent());
-            } else if (node.getNodeName().equals("licenses")) {
+            if ( node.getNodeName().equals( "groupId" ) )
+            {
+                dependency.setGroupId( node.getTextContent() );
+            }
+            else if ( node.getNodeName().equals( "artifactId" ) )
+            {
+                dependency.setArtifactId( node.getTextContent() );
+            }
+            else if ( node.getNodeName().equals( "version" ) )
+            {
+                dependency.setVersion( node.getTextContent() );
+            }
+            else if ( node.getNodeName().equals( "licenses" ) )
+            {
                 NodeList licensesChildNodes = node.getChildNodes();
-                for (int j = 0; j < licensesChildNodes.getLength(); ++j) {
-                    Node licensesChildNode = licensesChildNodes.item(j);
-                    if (licensesChildNode.getNodeName().equals("license")) {
-                        License license = parseLicense(licensesChildNode);
-                        dependency.addLicense(license);
+                for ( int j = 0; j < licensesChildNodes.getLength(); ++j )
+                {
+                    Node licensesChildNode = licensesChildNodes.item( j );
+                    if ( licensesChildNode.getNodeName().equals( "license" ) )
+                    {
+                        License license = parseLicense( licensesChildNode );
+                        dependency.addLicense( license );
                     }
                 }
             }
@@ -107,19 +122,28 @@ public class LicenseSummaryReader {
         return dependency;
     }
 
-    private static License parseLicense(Node licenseNode) {
+    private static License parseLicense( Node licenseNode )
+    {
         License license = new License();
         NodeList licenseElements = licenseNode.getChildNodes();
-        for (int i = 0; i < licenseElements.getLength(); ++i) {
-            Node node = licenseElements.item(i);
-            if (node.getNodeName().equals("name")) {
-                license.setName(node.getTextContent());
-            } else if (node.getNodeName().equals("url")) {
-                license.setUrl(node.getTextContent());
-            } else if (node.getNodeName().equals("distribution")) {
-                license.setDistribution(node.getTextContent());
-            } else if (node.getNodeName().equals("comments")) {
-                license.setComments(node.getTextContent());
+        for ( int i = 0; i < licenseElements.getLength(); ++i )
+        {
+            Node node = licenseElements.item( i );
+            if ( node.getNodeName().equals( "name" ) )
+            {
+                license.setName( node.getTextContent() );
+            }
+            else if ( node.getNodeName().equals( "url" ) )
+            {
+                license.setUrl( node.getTextContent() );
+            }
+            else if ( node.getNodeName().equals( "distribution" ) )
+            {
+                license.setDistribution( node.getTextContent() );
+            }
+            else if ( node.getNodeName().equals( "comments" ) )
+            {
+                license.setComments( node.getTextContent() );
             }
         }
         return license;

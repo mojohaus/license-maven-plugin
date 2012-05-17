@@ -29,7 +29,8 @@ package org.codehaus.mojo.license.header.transformer;
  * @since 1.0
  */
 public class SqlFileHeaderTransformer
-        extends AbstractFileHeaderTransformer {
+    extends AbstractFileHeaderTransformer
+{
     public static final String NAME = "sql";
 
     public static final String DESCRIPTION = "header transformer with sql comment style";
@@ -40,11 +41,13 @@ public class SqlFileHeaderTransformer
 
     public static final String COMMENT_END_TAG = "---";
 
-    public SqlFileHeaderTransformer() {
-        super(NAME, DESCRIPTION, COMMENT_START_TAG, COMMENT_END_TAG, COMMENT_LINE_PREFIX);
+    public SqlFileHeaderTransformer()
+    {
+        super( NAME, DESCRIPTION, COMMENT_START_TAG, COMMENT_END_TAG, COMMENT_LINE_PREFIX );
     }
 
-    public String[] getDefaultAcceptedExtensions() {
-        return new String[]{NAME};
+    public String[] getDefaultAcceptedExtensions()
+    {
+        return new String[]{ NAME };
     }
 }

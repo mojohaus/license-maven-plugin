@@ -30,7 +30,8 @@ package org.codehaus.mojo.license.header.transformer;
  * @since 1.0
  */
 public class XmlFileHeaderTransformer
-        extends AbstractFileHeaderTransformer {
+    extends AbstractFileHeaderTransformer
+{
 
     public static final String NAME = "xml";
 
@@ -42,43 +43,51 @@ public class XmlFileHeaderTransformer
 
     public static final String COMMENT_END_TAG = "  -->";
 
-    public XmlFileHeaderTransformer() {
-        super(NAME, DESCRIPTION, COMMENT_START_TAG, COMMENT_END_TAG, COMMENT_LINE_PREFIX);
+    public XmlFileHeaderTransformer()
+    {
+        super( NAME, DESCRIPTION, COMMENT_START_TAG, COMMENT_END_TAG, COMMENT_LINE_PREFIX );
     }
 
-    public String[] getDefaultAcceptedExtensions() {
-        return new String[]{"pom", "xml", "xhtml", "mxlm", "dtd", "fml", "xsl", "html", "htm", "jaxx", "kml", "gsp",
-                            "tml"};
+    public String[] getDefaultAcceptedExtensions()
+    {
+        return new String[]{ "pom", "xml", "xhtml", "mxlm", "dtd", "fml", "xsl", "html", "htm", "jaxx", "kml", "gsp",
+            "tml" };
     }
 
     @Override
-    public String addHeader(String header, String content) {
+    public String addHeader( String header, String content )
+    {
 
         String result;
 
         String prolog = null;
-        int startProlog = content.indexOf("<?xml");
-        if (startProlog > -1) {
+        int startProlog = content.indexOf( "<?xml" );
+        if ( startProlog > -1 )
+        {
 
             // prolog start was detected
-            int endProlog = content.indexOf("?>", startProlog);
+            int endProlog = content.indexOf( "?>", startProlog );
 
-            if (endProlog > -1) {
+            if ( endProlog > -1 )
+            {
 
                 // prolog end was detected
-                prolog = content.substring(0, endProlog + 2);
+                prolog = content.substring( 0, endProlog + 2 );
             }
         }
 
-        if (prolog == null) {
+        if ( prolog == null )
+        {
 
             // no prolog detected
-            result = super.addHeader(header, content);
-        } else {
+            result = super.addHeader( header, content );
+        }
+        else
+        {
 
             // prolog detected
-            content = content.substring(prolog.length());
-            result = super.addHeader(prolog + '\n' + header, content);
+            content = content.substring( prolog.length() );
+            result = super.addHeader( prolog + '\n' + header, content );
         }
         return result;
     }

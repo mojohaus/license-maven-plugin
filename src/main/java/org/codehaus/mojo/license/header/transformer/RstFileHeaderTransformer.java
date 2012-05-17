@@ -30,7 +30,8 @@ package org.codehaus.mojo.license.header.transformer;
  * @since 1.0
  */
 public class RstFileHeaderTransformer
-        extends AbstractFileHeaderTransformer {
+    extends AbstractFileHeaderTransformer
+{
 
     public static final String NAME = "rst";
 
@@ -42,11 +43,13 @@ public class RstFileHeaderTransformer
 
     public static final String COMMENT_END_TAG = ".. -";
 
-    public RstFileHeaderTransformer() {
-        super(NAME, DESCRIPTION, COMMENT_START_TAG, COMMENT_END_TAG, COMMENT_LINE_PREFIX);
+    public RstFileHeaderTransformer()
+    {
+        super( NAME, DESCRIPTION, COMMENT_START_TAG, COMMENT_END_TAG, COMMENT_LINE_PREFIX );
     }
 
-    public String[] getDefaultAcceptedExtensions() {
-        return new String[]{NAME};
+    public String[] getDefaultAcceptedExtensions()
+    {
+        return new String[]{ NAME };
     }
 }

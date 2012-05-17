@@ -44,20 +44,27 @@ import java.util.regex.Pattern;
  * @since 1.0
  */
 public class LicenseRepository
-        implements Iterable<License> {
+    implements Iterable<License>
+{
 
-    /** Logger */
-    private static final Log LOG = LogFactory.getLog(LicenseRepository.class);
+    /**
+     * Logger
+     */
+    private static final Log LOG = LogFactory.getLog( LicenseRepository.class );
 
     public static final String REPOSITORY_DEFINITION_FILE = "licenses.properties";
 
     public static final Pattern LICENSE_DESCRIPTION_PATTERN =
-            Pattern.compile("(.*)\\s*~~\\s*license\\s*:\\s*(.*)\\s*~~\\s*header\\s*:\\s*(.*)\\s*");
+        Pattern.compile( "(.*)\\s*~~\\s*license\\s*:\\s*(.*)\\s*~~\\s*header\\s*:\\s*(.*)\\s*" );
 
-    /** the base url of the licenses repository */
+    /**
+     * the base url of the licenses repository
+     */
     protected URL baseURL;
 
-    /** licenses of this repository */
+    /**
+     * licenses of this repository
+     */
     protected List<License> licenses;
 
     /**
@@ -66,119 +73,146 @@ public class LicenseRepository
      */
     protected boolean init;
 
-    public LicenseRepository() {
+    public LicenseRepository()
+    {
     }
 
-    public URL getBaseURL() {
+    public URL getBaseURL()
+    {
         return baseURL;
     }
 
-    public void setBaseURL(URL baseURL) {
-        checkNotInit("setBaseURL");
+    public void setBaseURL( URL baseURL )
+    {
+        checkNotInit( "setBaseURL" );
         this.baseURL = baseURL;
     }
 
     public void load()
-            throws IOException {
-        checkNotInit("load");
-        try {
-            if (baseURL == null || StringUtils.isEmpty(baseURL.toString())) {
-                throw new IllegalStateException("no baseURL defined in " + this);
+        throws IOException
+    {
+        checkNotInit( "load" );
+        try
+        {
+            if ( baseURL == null || StringUtils.isEmpty( baseURL.toString() ) )
+            {
+                throw new IllegalStateException( "no baseURL defined in " + this );
             }
 
-            URL definitionURL = MojoHelper.getUrl(getBaseURL(), REPOSITORY_DEFINITION_FILE);
-            if (licenses != null) {
+            URL definitionURL = MojoHelper.getUrl( getBaseURL(), REPOSITORY_DEFINITION_FILE );
+            if ( licenses != null )
+            {
                 licenses.clear();
-            } else {
+            }
+            else
+            {
                 licenses = new ArrayList<License>();
             }
 
-            if (!checkExists(definitionURL)) {
+            if ( !checkExists( definitionURL ) )
+            {
                 throw new IllegalArgumentException(
-                        "no licenses.properties found with url [" + definitionURL + "] for resolver " + this);
+                    "no licenses.properties found with url [" + definitionURL + "] for resolver " + this );
             }
             Properties p = new Properties();
-            p.load(definitionURL.openStream());
+            p.load( definitionURL.openStream() );
 
-            for (Entry<Object, Object> entry : p.entrySet()) {
+            for ( Entry<Object, Object> entry : p.entrySet() )
+            {
                 String licenseName = (String) entry.getKey();
                 licenseName = licenseName.trim().toLowerCase();
-                URL licenseBaseURL = MojoHelper.getUrl(baseURL, licenseName);
+                URL licenseBaseURL = MojoHelper.getUrl( baseURL, licenseName );
 
                 License license = new License();
-                license.setName(licenseName);
-                license.setBaseURL(licenseBaseURL);
+                license.setName( licenseName );
+                license.setBaseURL( licenseBaseURL );
 
                 String licenseDescription = (String) entry.getValue();
-                Matcher matcher = LICENSE_DESCRIPTION_PATTERN.matcher(licenseDescription);
+                Matcher matcher = LICENSE_DESCRIPTION_PATTERN.matcher( licenseDescription );
                 String licenseFile;
                 String headerFile;
 
-                if (matcher.matches()) {
-                    licenseDescription = matcher.group(1);
-                    licenseFile = matcher.group(2);
-                    headerFile = matcher.group(3);
-                } else {
+                if ( matcher.matches() )
+                {
+                    licenseDescription = matcher.group( 1 );
+                    licenseFile = matcher.group( 2 );
+                    headerFile = matcher.group( 3 );
+                }
+                else
+                {
                     licenseFile = License.LICENSE_CONTENT_FILE;
                     headerFile = License.LICENSE_HEADER_FILE;
                 }
 
-                URL licenseURL = MojoHelper.getUrl(licenseBaseURL, licenseFile);
-                if (!checkExists(licenseURL)) {
+                URL licenseURL = MojoHelper.getUrl( licenseBaseURL, licenseFile );
+                if ( !checkExists( licenseURL ) )
+                {
                     throw new IllegalArgumentException(
-                            "Could not find license (" + license + ") content file at [" + licenseURL + "] for resolver " +
-                            this);
+                        "Could not find license (" + license + ") content file at [" + licenseURL + "] for resolver " +
+                            this );
                 }
-                license.setLicenseURL(licenseURL);
+                license.setLicenseURL( licenseURL );
 
-                URL headerURL = MojoHelper.getUrl(licenseBaseURL, headerFile);
-                if (!checkExists(headerURL)) {
+                URL headerURL = MojoHelper.getUrl( licenseBaseURL, headerFile );
+                if ( !checkExists( headerURL ) )
+                {
                     throw new IllegalArgumentException(
-                            "Could not find license (" + license + ") header file at [" + headerURL + "] for resolver " +
-                            this);
+                        "Could not find license (" + license + ") header file at [" + headerURL + "] for resolver " +
+                            this );
                 }
-                license.setHeaderURL(headerURL);
+                license.setHeaderURL( headerURL );
 
-                license.setDescription(licenseDescription);
+                license.setDescription( licenseDescription );
 
-                if (LOG.isInfoEnabled()) {
-                    LOG.info("register " + license.getDescription());
+                if ( LOG.isInfoEnabled() )
+                {
+                    LOG.info( "register " + license.getDescription() );
                 }
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug(license);
+                if ( LOG.isDebugEnabled() )
+                {
+                    LOG.debug( license );
                 }
-                licenses.add(license);
+                licenses.add( license );
             }
-            licenses = Collections.unmodifiableList(licenses);
-        } finally {
+            licenses = Collections.unmodifiableList( licenses );
+        }
+        finally
+        {
             // mark repository as available
             init = true;
         }
     }
 
-    public String[] getLicenseNames() {
-        checkInit("getLicenseNames");
-        List<String> result = new ArrayList<String>(licenses.size());
-        for (License license : this) {
-            result.add(license.getName());
+    public String[] getLicenseNames()
+    {
+        checkInit( "getLicenseNames" );
+        List<String> result = new ArrayList<String>( licenses.size() );
+        for ( License license : this )
+        {
+            result.add( license.getName() );
         }
-        return result.toArray(new String[result.size()]);
+        return result.toArray( new String[result.size()] );
     }
 
-    public License[] getLicenses() {
-        checkInit("getLicenses");
-        return licenses.toArray(new License[licenses.size()]);
+    public License[] getLicenses()
+    {
+        checkInit( "getLicenses" );
+        return licenses.toArray( new License[licenses.size()] );
     }
 
-    public License getLicense(String licenseName) {
-        checkInit("getLicense");
-        if (StringUtils.isEmpty(licenseName)) {
-            throw new IllegalArgumentException("licenceName can not be null, nor empty");
+    public License getLicense( String licenseName )
+    {
+        checkInit( "getLicense" );
+        if ( StringUtils.isEmpty( licenseName ) )
+        {
+            throw new IllegalArgumentException( "licenceName can not be null, nor empty" );
         }
 
         License license = null;
-        for (License l : this) {
-            if (licenseName.equals(l.getName())) {
+        for ( License l : this )
+        {
+            if ( licenseName.equals( l.getName() ) )
+            {
                 // got it
                 license = l;
                 break;
@@ -187,31 +221,39 @@ public class LicenseRepository
         return license;
     }
 
-    /** {@inheritDoc} */
-    public Iterator<License> iterator() {
-        checkInit("iterator");
+    /**
+     * {@inheritDoc}
+     */
+    public Iterator<License> iterator()
+    {
+        checkInit( "iterator" );
         return licenses.iterator();
     }
 
-    protected boolean checkExists(URL url)
-            throws IOException {
+    protected boolean checkExists( URL url )
+        throws IOException
+    {
         URLConnection openConnection = url.openConnection();
         return openConnection.getContentLength() > 0;
     }
 
-    protected void checkInit(String operation)
-            throws IllegalStateException {
-        if (!init) {
+    protected void checkInit( String operation )
+        throws IllegalStateException
+    {
+        if ( !init )
+        {
             throw new IllegalStateException(
-                    "repository " + this + " was not init, operation [" + operation + "] not possible.");
+                "repository " + this + " was not init, operation [" + operation + "] not possible." );
         }
     }
 
-    protected void checkNotInit(String operation)
-            throws IllegalStateException {
-        if (init) {
+    protected void checkNotInit( String operation )
+        throws IllegalStateException
+    {
+        if ( init )
+        {
             throw new IllegalStateException(
-                    "repository " + this + "was init, operation [" + operation + "+] not possible.");
+                "repository " + this + "was init, operation [" + operation + "+] not possible." );
         }
     }
 

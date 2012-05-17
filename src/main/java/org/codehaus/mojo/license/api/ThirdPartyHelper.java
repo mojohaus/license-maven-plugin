@@ -41,31 +41,32 @@ import java.util.SortedSet;
  * @author tchemit <chemit@codelutin.com>
  * @since 1.1
  */
-public interface ThirdPartyHelper {
+public interface ThirdPartyHelper
+{
 
-    SortedMap<String, MavenProject> loadDependencies(MavenProjectDependenciesConfigurator configuration);
+    SortedMap<String, MavenProject> loadDependencies( MavenProjectDependenciesConfigurator configuration );
 
-    SortedProperties loadThirdPartyDescriptorForUnsafeMapping(SortedSet<MavenProject> unsafeDependencies,
-                                                              Collection<MavenProject> projects,
-                                                              LicenseMap licenseMap)
-            throws ThirdPartyToolException, IOException;
+    SortedProperties loadThirdPartyDescriptorForUnsafeMapping( SortedSet<MavenProject> unsafeDependencies,
+                                                               Collection<MavenProject> projects,
+                                                               LicenseMap licenseMap )
+        throws ThirdPartyToolException, IOException;
 
-    SortedProperties loadUnsafeMapping(LicenseMap licenseMap, File missingFile)
-            throws IOException;
+    SortedProperties loadUnsafeMapping( LicenseMap licenseMap, File missingFile )
+        throws IOException;
 
-    LicenseMap createLicenseMap(SortedMap<String, MavenProject> dependencies);
+    LicenseMap createLicenseMap( SortedMap<String, MavenProject> dependencies );
 
-    void attachThirdPartyDescriptor(File file);
+    void attachThirdPartyDescriptor( File file );
 
-    SortedSet<MavenProject> getProjectsWithNoLicense(LicenseMap licenseMap);
+    SortedSet<MavenProject> getProjectsWithNoLicense( LicenseMap licenseMap );
 
     SortedMap<String, MavenProject> getArtifactCache();
 
-    SortedProperties createUnsafeMapping(LicenseMap licenseMap, File missingFile, boolean useRepositoryMissingFiles,
-                                         SortedSet<MavenProject> unsafeDependencies,
-                                         Collection<MavenProject> projectDependencies)
-            throws ProjectBuildingException, IOException, ThirdPartyToolException;
+    SortedProperties createUnsafeMapping( LicenseMap licenseMap, File missingFile, boolean useRepositoryMissingFiles,
+                                          SortedSet<MavenProject> unsafeDependencies,
+                                          Collection<MavenProject> projectDependencies )
+        throws ProjectBuildingException, IOException, ThirdPartyToolException;
 
-    void mergeLicenses(List<String> licenseMerges, LicenseMap licenseMap)
-            throws MojoFailureException;
+    void mergeLicenses( List<String> licenseMerges, LicenseMap licenseMap )
+        throws MojoFailureException;
 }

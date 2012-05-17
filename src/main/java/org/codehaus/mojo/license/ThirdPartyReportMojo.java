@@ -58,8 +58,9 @@ import java.util.TreeSet;
  * @since 1.1
  */
 public class ThirdPartyReportMojo
-        extends AbstractLicenseReportMojo
-        implements MavenProjectDependenciesConfigurator {
+    extends AbstractLicenseReportMojo
+    implements MavenProjectDependenciesConfigurator
+{
 
     /**
      * A filter to exclude some scopes.
@@ -159,118 +160,161 @@ public class ThirdPartyReportMojo
      */
     private List<String> licenseMerges;
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    protected void doGenerateReport(Locale locale, Sink sink)
-            throws MavenReportException, MojoExecutionException, MojoFailureException {
+    protected void doGenerateReport( Locale locale, Sink sink )
+        throws MavenReportException, MojoExecutionException, MojoFailureException
+    {
 
         Collection<ThirdPartyDetails> details;
 
-        try {
+        try
+        {
             details = createThirdPartyDetails();
-        } catch (IOException e) {
-            throw new MavenReportException(e.getMessage(), e);
-        } catch (ThirdPartyToolException e) {
-            throw new MavenReportException(e.getMessage(), e);
-        } catch (ProjectBuildingException e) {
-            throw new MavenReportException(e.getMessage(), e);
+        }
+        catch ( IOException e )
+        {
+            throw new MavenReportException( e.getMessage(), e );
+        }
+        catch ( ThirdPartyToolException e )
+        {
+            throw new MavenReportException( e.getMessage(), e );
+        }
+        catch ( ProjectBuildingException e )
+        {
+            throw new MavenReportException( e.getMessage(), e );
         }
 
         ThirdPartyReportRenderer renderer =
-                new ThirdPartyReportRenderer(sink, getI18n(), getOutputName(), locale, details);
+            new ThirdPartyReportRenderer( sink, getI18n(), getOutputName(), locale, details );
         renderer.render();
     }
 
-    /** {@inheritDoc} */
-    public String getOutputName() {
+    /**
+     * {@inheritDoc}
+     */
+    public String getOutputName()
+    {
         return "third-party-report";
     }
 
-    /** {@inheritDoc} */
-    public List<String> getExcludedScopes() {
-        String[] split = excludedScopes == null ? new String[0] : excludedScopes.split(",");
-        return Arrays.asList(split);
+    /**
+     * {@inheritDoc}
+     */
+    public List<String> getExcludedScopes()
+    {
+        String[] split = excludedScopes == null ? new String[0] : excludedScopes.split( "," );
+        return Arrays.asList( split );
     }
 
-    /** {@inheritDoc} */
-    public List<String> getIncludedScopes() {
-        String[] split = includedScopes == null ? new String[0] : includedScopes.split(",");
-        return Arrays.asList(split);
+    /**
+     * {@inheritDoc}
+     */
+    public List<String> getIncludedScopes()
+    {
+        String[] split = includedScopes == null ? new String[0] : includedScopes.split( "," );
+        return Arrays.asList( split );
     }
 
-    /** {@inheritDoc} */
-    public String getExcludedGroups() {
+    /**
+     * {@inheritDoc}
+     */
+    public String getExcludedGroups()
+    {
         return excludedGroups;
     }
 
-    /** {@inheritDoc} */
-    public String getIncludedGroups() {
+    /**
+     * {@inheritDoc}
+     */
+    public String getIncludedGroups()
+    {
         return includedGroups;
     }
 
-    /** {@inheritDoc} */
-    public String getExcludedArtifacts() {
+    /**
+     * {@inheritDoc}
+     */
+    public String getExcludedArtifacts()
+    {
         return excludedArtifacts;
     }
 
-    /** {@inheritDoc} */
-    public String getIncludedArtifacts() {
+    /**
+     * {@inheritDoc}
+     */
+    public String getIncludedArtifacts()
+    {
         return includedArtifacts;
     }
 
-    /** {@inheritDoc} */
-    public boolean isIncludeTransitiveDependencies() {
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isIncludeTransitiveDependencies()
+    {
         return includeTransitiveDependencies;
     }
 
     protected Collection<ThirdPartyDetails> createThirdPartyDetails()
-            throws IOException, ThirdPartyToolException, ProjectBuildingException, MojoFailureException {
+        throws IOException, ThirdPartyToolException, ProjectBuildingException, MojoFailureException
+    {
 
         // load dependencies of the project
-        SortedMap<String, MavenProject> projectDependencies = getHelper().loadDependencies(this);
+        SortedMap<String, MavenProject> projectDependencies = getHelper().loadDependencies( this );
 
         // create licenseMap from it
-        LicenseMap licenseMap = getHelper().createLicenseMap(projectDependencies);
+        LicenseMap licenseMap = getHelper().createLicenseMap( projectDependencies );
 
         // Get unsafe dependencies (dependencies with no license in pom)
-        SortedSet<MavenProject> dependenciesWithNoLicense = getHelper().getProjectsWithNoLicense(licenseMap);
+        SortedSet<MavenProject> dependenciesWithNoLicense = getHelper().getProjectsWithNoLicense( licenseMap );
 
         // compute safe dependencies (with pom licenses)
         Set<MavenProject> dependenciesWithPomLicense =
-                new TreeSet<MavenProject>(MojoHelper.newMavenProjectComparator());
-        dependenciesWithPomLicense.addAll(projectDependencies.values());
+            new TreeSet<MavenProject>( MojoHelper.newMavenProjectComparator() );
+        dependenciesWithPomLicense.addAll( projectDependencies.values() );
 
-        if (CollectionUtils.isNotEmpty(dependenciesWithNoLicense)) {
+        if ( CollectionUtils.isNotEmpty( dependenciesWithNoLicense ) )
+        {
             // there is some unsafe dependencies, remove them from safe dependencies
-            dependenciesWithPomLicense.removeAll(dependenciesWithNoLicense);
+            dependenciesWithPomLicense.removeAll( dependenciesWithNoLicense );
 
-            if (useMissingFile) {
+            if ( useMissingFile )
+            {
                 // Resolv unsafe dependencies using missing files, this will update licenseMap and unsafeDependencies
-                getHelper().createUnsafeMapping(licenseMap, missingFile, useRepositoryMissingFiles,
-                                                dependenciesWithNoLicense, projectDependencies.values());
+                getHelper().createUnsafeMapping( licenseMap, missingFile, useRepositoryMissingFiles,
+                                                 dependenciesWithNoLicense, projectDependencies.values() );
             }
         }
 
         // LicenseMap is now complete, let's merge licenses if necessary
-        getHelper().mergeLicenses(licenseMerges, licenseMap);
+        getHelper().mergeLicenses( licenseMerges, licenseMap );
 
         // let's build thirdparty details for each dependencies
         Collection<ThirdPartyDetails> details = new ArrayList<ThirdPartyDetails>();
 
-        for (Map.Entry<MavenProject, String[]> entry : licenseMap.toDependencyMap().entrySet()) {
+        for ( Map.Entry<MavenProject, String[]> entry : licenseMap.toDependencyMap().entrySet() )
+        {
             MavenProject dependency = entry.getKey();
             String[] licenses = entry.getValue();
-            ThirdPartyDetails detail = new DefaultThirdPartyDetails(dependency);
-            details.add(detail);
-            if (dependenciesWithPomLicense.contains(dependency)) {
+            ThirdPartyDetails detail = new DefaultThirdPartyDetails( dependency );
+            details.add( detail );
+            if ( dependenciesWithPomLicense.contains( dependency ) )
+            {
 
                 // this is a pom licenses
-                detail.setPomLicenses(licenses);
-            } else if (!dependenciesWithNoLicense.contains(dependency)) {
+                detail.setPomLicenses( licenses );
+            }
+            else if ( !dependenciesWithNoLicense.contains( dependency ) )
+            {
 
                 // this is a third-party licenses
-                detail.setThirdPartyLicenses(licenses);
-            } else {
+                detail.setThirdPartyLicenses( licenses );
+            }
+            else
+            {
                 // no license at all
             }
         }

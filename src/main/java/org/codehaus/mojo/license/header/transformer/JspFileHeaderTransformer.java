@@ -29,7 +29,8 @@ package org.codehaus.mojo.license.header.transformer;
  * @since 1.0
  */
 public class JspFileHeaderTransformer
-        extends AbstractFileHeaderTransformer {
+    extends AbstractFileHeaderTransformer
+{
     public static final String NAME = "jsp";
 
     public static final String DESCRIPTION = "header transformer with jsp comment style";
@@ -40,12 +41,14 @@ public class JspFileHeaderTransformer
 
     public static final String COMMENT_END_TAG = "  --%>";
 
-    public JspFileHeaderTransformer() {
-        super(NAME, DESCRIPTION, COMMENT_START_TAG, COMMENT_END_TAG, COMMENT_LINE_PREFIX);
+    public JspFileHeaderTransformer()
+    {
+        super( NAME, DESCRIPTION, COMMENT_START_TAG, COMMENT_END_TAG, COMMENT_LINE_PREFIX );
     }
 
-    public String[] getDefaultAcceptedExtensions() {
-        return new String[]{NAME, "jspx"};
+    public String[] getDefaultAcceptedExtensions()
+    {
+        return new String[]{ NAME, "jspx" };
     }
 
 }

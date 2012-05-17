@@ -33,7 +33,8 @@ import java.util.SortedMap;
  * @author tchemit <chemit@codelutin.com>
  * @since 1.0
  */
-public interface DependenciesTool {
+public interface DependenciesTool
+{
 
     /**
      * For a given {@code project}, obtain the universe of his dependencies after applying transitivity and
@@ -49,9 +50,9 @@ public interface DependenciesTool {
      * @return the map of resolved dependencies indexed by their unique id.
      * @see MavenProjectDependenciesConfigurator
      */
-    SortedMap<String, MavenProject> loadProjectDependencies(MavenProject project,
-                                                            MavenProjectDependenciesConfigurator configuration,
-                                                            ArtifactRepository localRepository,
-                                                            List<ArtifactRepository> remoteRepositories,
-                                                            SortedMap<String, MavenProject> cache);
+    SortedMap<String, MavenProject> loadProjectDependencies( MavenProject project,
+                                                             MavenProjectDependenciesConfigurator configuration,
+                                                             ArtifactRepository localRepository,
+                                                             List<ArtifactRepository> remoteRepositories,
+                                                             SortedMap<String, MavenProject> cache );
 }

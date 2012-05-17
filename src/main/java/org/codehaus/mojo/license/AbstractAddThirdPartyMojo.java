@@ -53,7 +53,8 @@ import java.util.SortedSet;
  * @since 1.0
  */
 public abstract class AbstractAddThirdPartyMojo
-        extends AbstractLicenseMojo {
+    extends AbstractLicenseMojo
+{
 
     /**
      * Directory where to generate files.
@@ -241,44 +242,54 @@ public abstract class AbstractAddThirdPartyMojo
     protected abstract SortedMap<String, MavenProject> loadDependencies();
 
     protected abstract SortedProperties createUnsafeMapping()
-            throws ProjectBuildingException, IOException, ThirdPartyToolException;
+        throws ProjectBuildingException, IOException, ThirdPartyToolException;
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void init()
-            throws Exception {
+        throws Exception
+    {
 
         Log log = getLog();
 
-        if (log.isDebugEnabled()) {
+        if ( log.isDebugEnabled() )
+        {
 
             // always be verbose in debug mode
-            setVerbose(true);
+            setVerbose( true );
         }
 
-        thirdPartyFile = new File(getOutputDirectory(), thirdPartyFilename);
+        thirdPartyFile = new File( getOutputDirectory(), thirdPartyFilename );
 
         long buildTimestamp = getBuildTimestamp();
 
-        if (isVerbose()) {
-            log.info("Build start   at : " + buildTimestamp);
-            log.info("third-party file : " + thirdPartyFile.lastModified());
+        if ( isVerbose() )
+        {
+            log.info( "Build start   at : " + buildTimestamp );
+            log.info( "third-party file : " + thirdPartyFile.lastModified() );
         }
 
         doGenerate = isForce() || !thirdPartyFile.exists() || buildTimestamp > thirdPartyFile.lastModified();
 
-        if (groupByLicense) {
+        if ( groupByLicense )
+        {
             fileTemplate = "/org/codehaus/mojo/license/third-party-file-groupByLicense.ftl";
         }
-        if (generateBundle) {
+        if ( generateBundle )
+        {
 
-            File bundleFile = FileUtil.getFile(getOutputDirectory(), bundleThirdPartyPath);
+            File bundleFile = FileUtil.getFile( getOutputDirectory(), bundleThirdPartyPath );
 
-            if (isVerbose()) {
-                log.info("bundle third-party file : " + bundleFile.lastModified());
+            if ( isVerbose() )
+            {
+                log.info( "bundle third-party file : " + bundleFile.lastModified() );
             }
             doGenerateBundle = isForce() || !bundleFile.exists() || buildTimestamp > bundleFile.lastModified();
-        } else {
+        }
+        else
+        {
 
             // not generating bundled file
             doGenerateBundle = false;
@@ -286,59 +297,69 @@ public abstract class AbstractAddThirdPartyMojo
 
         projectDependencies = loadDependencies();
 
-        licenseMap = getHelper().createLicenseMap(projectDependencies);
+        licenseMap = getHelper().createLicenseMap( projectDependencies );
 
-        unsafeDependencies = getHelper().getProjectsWithNoLicense(licenseMap);
+        unsafeDependencies = getHelper().getProjectsWithNoLicense( licenseMap );
 
-        if (!CollectionUtils.isEmpty(unsafeDependencies) && isUseMissingFile() && isDoGenerate()) {
+        if ( !CollectionUtils.isEmpty( unsafeDependencies ) && isUseMissingFile() && isDoGenerate() )
+        {
 
             // load unsafeMapping
             unsafeMappings = createUnsafeMapping();
         }
 
-        getHelper().mergeLicenses(licenseMerges, licenseMap);
+        getHelper().mergeLicenses( licenseMerges, licenseMap );
     }
 
-    protected ThirdPartyHelper getHelper() {
-        if (helper == null) {
+    protected ThirdPartyHelper getHelper()
+    {
+        if ( helper == null )
+        {
             helper =
-                    new DefaultThirdPartyHelper(getProject(), getEncoding(), isVerbose(), dependenciesTool, thirdPartyTool,
-                                                localRepository, remoteRepositories, getLog());
+                new DefaultThirdPartyHelper( getProject(), getEncoding(), isVerbose(), dependenciesTool, thirdPartyTool,
+                                             localRepository, remoteRepositories, getLog() );
         }
         return helper;
     }
 
-    public List<String> getExcludedLicenses() {
-        String[] split = excludedLicenses == null ? new String[0] : excludedLicenses.split("\\s*\\|\\s*");
-        return Arrays.asList(split);
+    public List<String> getExcludedLicenses()
+    {
+        String[] split = excludedLicenses == null ? new String[0] : excludedLicenses.split( "\\s*\\|\\s*" );
+        return Arrays.asList( split );
     }
 
-    protected boolean checkUnsafeDependencies() {
+    protected boolean checkUnsafeDependencies()
+    {
         SortedSet<MavenProject> unsafeDependencies = getUnsafeDependencies();
-        boolean unsafe = !CollectionUtils.isEmpty(unsafeDependencies);
-        if (unsafe) {
+        boolean unsafe = !CollectionUtils.isEmpty( unsafeDependencies );
+        if ( unsafe )
+        {
             Log log = getLog();
-            log.warn("There is " + unsafeDependencies.size() + " dependencies with no license :");
-            for (MavenProject dep : unsafeDependencies) {
+            log.warn( "There is " + unsafeDependencies.size() + " dependencies with no license :" );
+            for ( MavenProject dep : unsafeDependencies )
+            {
 
                 // no license found for the dependency
-                log.warn(" - " + MojoHelper.getArtifactId(dep.getArtifact()));
+                log.warn( " - " + MojoHelper.getArtifactId( dep.getArtifact() ) );
             }
         }
         return unsafe;
     }
 
-    protected boolean checkForbiddenLicenses() {
+    protected boolean checkForbiddenLicenses()
+    {
         List<String> excludeLicenses = getExcludedLicenses();
-        Set<String> unsafeLicenses = new HashSet<String>(  );
-        if (CollectionUtils.isNotEmpty(excludeLicenses)) {
+        Set<String> unsafeLicenses = new HashSet<String>();
+        if ( CollectionUtils.isNotEmpty( excludeLicenses ) )
+        {
             Set<String> licenses = getLicenseMap().keySet();
-            getLog().info( "Excluded licenses "+excludeLicenses );
-            getLog().info( "All licenses "+licenses);
+            getLog().info( "Excluded licenses " + excludeLicenses );
+            getLog().info( "All licenses " + licenses );
 
             for ( String excludeLicense : excludeLicenses )
             {
-                if (licenses.contains( excludeLicense )) {
+                if ( licenses.contains( excludeLicense ) )
+                {
                     //bad license found
                     unsafeLicenses.add( excludeLicense );
                 }
@@ -347,13 +368,15 @@ public abstract class AbstractAddThirdPartyMojo
 
         boolean safe = CollectionUtils.isEmpty( unsafeLicenses );
 
-        if (!safe) {
+        if ( !safe )
+        {
             Log log = getLog();
-            log.warn("There is " + unsafeLicenses.size() + " forbidden licenses used :");
-            for ( String unsafeLicense: unsafeLicenses) {
+            log.warn( "There is " + unsafeLicenses.size() + " forbidden licenses used :" );
+            for ( String unsafeLicense : unsafeLicenses )
+            {
 
                 SortedSet<MavenProject> deps = getLicenseMap().get( unsafeLicense );
-                StringBuilder sb = new StringBuilder(  );
+                StringBuilder sb = new StringBuilder();
                 sb.append( "License " ).append( unsafeLicense ).append( "used by " ).append( deps.size() ).append(
                     " dependencies:" );
                 for ( MavenProject dep : deps )
@@ -368,62 +391,75 @@ public abstract class AbstractAddThirdPartyMojo
     }
 
     protected void writeThirdPartyFile()
-            throws IOException {
+        throws IOException
+    {
 
-        if (doGenerate) {
+        if ( doGenerate )
+        {
 
-            thirdPartyTool.writeThirdPartyFile(getLicenseMap(), thirdPartyFile, isVerbose(),
-                                               getEncoding(),
-                                               fileTemplate);
+            thirdPartyTool.writeThirdPartyFile( getLicenseMap(), thirdPartyFile, isVerbose(), getEncoding(),
+                                                fileTemplate );
         }
 
-        if (doGenerateBundle) {
+        if ( doGenerateBundle )
+        {
 
-            thirdPartyTool.writeBundleThirdPartyFile(thirdPartyFile, outputDirectory, bundleThirdPartyPath);
+            thirdPartyTool.writeBundleThirdPartyFile( thirdPartyFile, outputDirectory, bundleThirdPartyPath );
         }
     }
 
-    public File getOutputDirectory() {
+    public File getOutputDirectory()
+    {
         return outputDirectory;
     }
 
-    public boolean isFailIfWarning() {
+    public boolean isFailIfWarning()
+    {
         return failIfWarning;
     }
 
-    public SortedMap<String, MavenProject> getProjectDependencies() {
+    public SortedMap<String, MavenProject> getProjectDependencies()
+    {
         return projectDependencies;
     }
 
-    public SortedSet<MavenProject> getUnsafeDependencies() {
+    public SortedSet<MavenProject> getUnsafeDependencies()
+    {
         return unsafeDependencies;
     }
 
-    public LicenseMap getLicenseMap() {
+    public LicenseMap getLicenseMap()
+    {
         return licenseMap;
     }
 
-    public boolean isUseMissingFile() {
+    public boolean isUseMissingFile()
+    {
         return useMissingFile;
     }
 
-    public File getMissingFile() {
+    public File getMissingFile()
+    {
         return missingFile;
     }
 
-    public SortedProperties getUnsafeMappings() {
+    public SortedProperties getUnsafeMappings()
+    {
         return unsafeMappings;
     }
 
-    public boolean isForce() {
+    public boolean isForce()
+    {
         return force;
     }
 
-    public boolean isDoGenerate() {
+    public boolean isDoGenerate()
+    {
         return doGenerate;
     }
 
-    public boolean isDoGenerateBundle() {
+    public boolean isDoGenerateBundle()
+    {
         return doGenerateBundle;
     }
 }

@@ -47,7 +47,8 @@ import java.util.Locale;
  * @since 1.1
  */
 public abstract class AbstractLicenseReportMojo
-        extends AbstractMavenReport {
+    extends AbstractMavenReport
+{
 
     /**
      * The Maven Project.
@@ -157,10 +158,12 @@ public abstract class AbstractLicenseReportMojo
 
     private ThirdPartyHelper helper;
 
-    protected ThirdPartyHelper getHelper() {
-        if (helper == null) {
-            helper = new DefaultThirdPartyHelper(project, encoding, verbose, dependenciesTool, thirdPartyTool,
-                                                 localRepository, remoteRepositories, getLog());
+    protected ThirdPartyHelper getHelper()
+    {
+        if ( helper == null )
+        {
+            helper = new DefaultThirdPartyHelper( project, encoding, verbose, dependenciesTool, thirdPartyTool,
+                                                  localRepository, remoteRepositories, getLog() );
         }
         return helper;
     }
@@ -172,51 +175,76 @@ public abstract class AbstractLicenseReportMojo
      * @param sink   the report formatting tool.
      * @throws MavenReportException when things go wrong.
      */
-    protected abstract void doGenerateReport(Locale locale, Sink sink)
-            throws MavenReportException, MojoExecutionException, MojoFailureException;
+    protected abstract void doGenerateReport( Locale locale, Sink sink )
+        throws MavenReportException, MojoExecutionException, MojoFailureException;
 
-    /** {@inheritDoc} */
-    protected void executeReport(Locale locale)
-            throws MavenReportException {
+    /**
+     * {@inheritDoc}
+     */
+    protected void executeReport( Locale locale )
+        throws MavenReportException
+    {
 
-        if (!Boolean.TRUE.equals(skip)) {
-            try {
-                doGenerateReport(locale, getSink());
-            } catch (MojoExecutionException e) {
-                throw new MavenReportException(e.getMessage(), e);
-            } catch (MojoFailureException e) {
-                throw new MavenReportException(e.getMessage(), e);
+        if ( !Boolean.TRUE.equals( skip ) )
+        {
+            try
+            {
+                doGenerateReport( locale, getSink() );
+            }
+            catch ( MojoExecutionException e )
+            {
+                throw new MavenReportException( e.getMessage(), e );
+            }
+            catch ( MojoFailureException e )
+            {
+                throw new MavenReportException( e.getMessage(), e );
             }
         }
     }
 
-    /** {@inheritDoc} */
-    protected MavenProject getProject() {
+    /**
+     * {@inheritDoc}
+     */
+    protected MavenProject getProject()
+    {
         return project;
     }
 
-    /** {@inheritDoc} */
-    protected String getOutputDirectory() {
-        if (!outputDirectory.isAbsolute()) {
-            outputDirectory = new File(project.getBasedir(), outputDirectory.getPath());
+    /**
+     * {@inheritDoc}
+     */
+    protected String getOutputDirectory()
+    {
+        if ( !outputDirectory.isAbsolute() )
+        {
+            outputDirectory = new File( project.getBasedir(), outputDirectory.getPath() );
         }
 
         return outputDirectory.getAbsolutePath();
     }
 
-    /** {@inheritDoc} */
-    protected Renderer getSiteRenderer() {
+    /**
+     * {@inheritDoc}
+     */
+    protected Renderer getSiteRenderer()
+    {
         return siteRenderer;
     }
 
-    /** {@inheritDoc} */
-    public String getDescription(Locale locale) {
-        return getText(locale, "report.description");
+    /**
+     * {@inheritDoc}
+     */
+    public String getDescription( Locale locale )
+    {
+        return getText( locale, "report.description" );
     }
 
-    /** {@inheritDoc} */
-    public String getName(Locale locale) {
-        return getText(locale, "report.title");
+    /**
+     * {@inheritDoc}
+     */
+    public String getName( Locale locale )
+    {
+        return getText( locale, "report.title" );
     }
 
     /**
@@ -226,19 +254,23 @@ public abstract class AbstractLicenseReportMojo
      * @param key    the message key.
      * @return the message.
      */
-    public String getText(Locale locale, String key) {
-        return i18n.getString(getOutputName(), locale, key);
+    public String getText( Locale locale, String key )
+    {
+        return i18n.getString( getOutputName(), locale, key );
     }
 
-    public I18N getI18n() {
+    public I18N getI18n()
+    {
         return i18n;
     }
 
-    public boolean isVerbose() {
+    public boolean isVerbose()
+    {
         return verbose;
     }
 
-    public final String getEncoding() {
+    public final String getEncoding()
+    {
         return encoding;
     }
 }
