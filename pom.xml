@@ -100,6 +100,7 @@
     <!-- license configuration -->
     <license.useMissingFile>true</license.useMissingFile>
     <license.failIfWarning>true</license.failIfWarning>
+    <licensePluginVersion>1.0</licensePluginVersion>
 
   </properties>
 
@@ -359,7 +360,7 @@
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>license-maven-plugin</artifactId>
-            <version>${project.version}</version>
+            <version>${licensePluginVersion}</version>
             <executions>
               <execution>
                 <goals>
@@ -387,10 +388,10 @@
             <version>1.5</version>
           </plugin>
 
-          <plugin>
+          <!--plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>license-maven-plugin</artifactId>
-            <version>${project.version}</version>
+            <version>${licensePluginVersion}</version>
             <reportSets>
               <reportSet>
                 <reports>
@@ -398,7 +399,7 @@
                 </reports>
               </reportSet>
             </reportSets>
-          </plugin>
+          </plugin-->
         </plugins>
       </reporting>
     </profile>
