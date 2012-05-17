@@ -219,14 +219,16 @@ List of 2 third-party dependencies.
    If another project use this artifact, then it will load if required the missing third party file from repository
    (local or remote) and begin to fill the new missing licenses file.
 
-* Exclude some licenses
+* Include / Exclude some licenses
 
-  Since version <<1.1>>, you can make failed the build if there is some not expected licenses in your project dependencies.
+  Since version <<1.1>>, you can have more control on licenses used in your project.
 
-  Use the <<excludedLicenses>> parameter to fill not wanted license separated by <<|>>.
+  Use the <<includedLicenses>> (whitelist of licenses) or/and <<excludedLicenses>> (blacklist of licenses).
 
-  To make build failed when a forbidden license is used, you just have to set to <true> value of
-  parameter <<failIfWarning>>.
+  These parameters contains licenses separated by <<|>>.
+
+  If parameter <<failIfWarning>> is set to <true>, then build will fail if one license is not in whiltelist or is in
+  blacklist.
 
 * Filter the dependencies
 

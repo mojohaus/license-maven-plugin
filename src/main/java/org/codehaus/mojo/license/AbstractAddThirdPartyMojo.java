@@ -109,6 +109,17 @@ public abstract class AbstractAddThirdPartyMojo
     private List<String> licenseMerges;
 
     /**
+     * To specify some licenses to include (separated by {@code |}).
+     * <p/>
+     * If this parameter is filled and a license is not in this {@code whitelist} then build will failed when property
+     * {@link #failIfWarning} is setted on.
+     *
+     * @parameter expression="${license.includedLicenses}" default-value=""
+     * @since 1.1
+     */
+    private String includedLicenses;
+
+    /**
      * To specify some licenses to exclude (separated by {@code |}).
      * <p/>
      * If a such license is found then build will failed when property
@@ -328,6 +339,12 @@ public abstract class AbstractAddThirdPartyMojo
         return Arrays.asList( split );
     }
 
+    public List<String> getIncludedLicenses()
+    {
+        String[] split = includedLicenses == null ? new String[0] : includedLicenses.split( "\\s*\\|\\s*" );
+        return Arrays.asList( split );
+    }
+
     protected boolean checkUnsafeDependencies()
     {
         SortedSet<MavenProject> unsafeDependencies = getUnsafeDependencies();
@@ -348,13 +365,13 @@ public abstract class AbstractAddThirdPartyMojo
 
     protected boolean checkForbiddenLicenses()
     {
+        List<String> includedLicenses = getIncludedLicenses();
         List<String> excludeLicenses = getExcludedLicenses();
         Set<String> unsafeLicenses = new HashSet<String>();
         if ( CollectionUtils.isNotEmpty( excludeLicenses ) )
         {
             Set<String> licenses = getLicenseMap().keySet();
-            getLog().info( "Excluded licenses " + excludeLicenses );
-            getLog().info( "All licenses " + licenses );
+            getLog().info( "Excluded licenses (blacklist): " + excludeLicenses );
 
             for ( String excludeLicense : excludeLicenses )
             {
@@ -366,12 +383,27 @@ public abstract class AbstractAddThirdPartyMojo
             }
         }
 
+        if ( CollectionUtils.isNotEmpty( includedLicenses ) )
+        {
+            Set<String> licenses = getLicenseMap().keySet();
+            getLog().info( "Included licenses (whitelist): " + includedLicenses );
+
+            for ( String license : licenses )
+            {
+                if ( !includedLicenses.contains( license ) )
+                {
+                    //bad license found
+                    unsafeLicenses.add( license );
+                }
+            }
+        }
+
         boolean safe = CollectionUtils.isEmpty( unsafeLicenses );
 
         if ( !safe )
         {
             Log log = getLog();
-            log.warn( "There is " + unsafeLicenses.size() + " forbidden licenses used :" );
+            log.warn( "There is " + unsafeLicenses.size() + " forbidden licenses used:" );
             for ( String unsafeLicense : unsafeLicenses )
             {
 
