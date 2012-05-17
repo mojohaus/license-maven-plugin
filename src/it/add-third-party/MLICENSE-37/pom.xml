@@ -3,8 +3,8 @@
   #%L
   License Maven Plugin
 
-  $Id: pom.xml 13433 2011-01-22 08:36:13Z tchemit $
-  $HeadURL: https://svn.codehaus.org/mojo/trunk/mojo/license-maven-plugin/src/it/add-third-party/no-deps/pom.xml $
+  $Id$
+  $HeadURL$
   %%
   Copyright (C) 2008 - 2011 CodeLutin, Codehaus, Tony Chemit
   %%

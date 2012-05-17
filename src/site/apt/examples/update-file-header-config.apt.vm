@@ -39,7 +39,9 @@ Update File Header Examples
     there is no default excludes files.
 
     * extraExtensions: Dictionnary of extensions to map to existing comment style.
-    
+
+    * customize description section: Define a template to change the description section of a file header.
+
   To see all extensions accepted run the <<comment-style-list>> goal.
 
 -------------------------------------------------------------------------------
@@ -227,3 +229,55 @@ ExtraExtensions
 
   Files with extension <<myProprietaryExtension>> will be treated as java files (says using the comment style named java).
 
+Customize the description section
+
+  Since version <1.1>, it is possible to customize the description section of a file header using a freemarker template.
+
+  Use your own template by overriding the {{{../update-file-header-mojo.html#descriptionTemplate}descriptionTemplate}} parameter.
+
+  In the template you can use these variables:
+
+  * {{{../update-file-header-mojo.html#project}project}}
+
+  * {{{../update-file-header-mojo.html#addSvnKeyWords}addSvnKeyWords}}
+
+  * {{{../update-file-header-mojo.html#organizationName}organizationName}}
+
+  * {{{../update-file-header-mojo.html#projectName}projectName}}
+
+  * {{{../update-file-header-mojo.html#inceptionYear}inceptionYear}}
+
+  * file (current file to treat)
+
+* Example
+
+-------------------------------------------------------------------------------
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>${project.version}</version>
+        <configuration>
+          <descriptionTemplate>${basedir}/src/license/myDescriptionTemplate.ftl</descriptionTemplate>
+        </configuration>
+      </plugin>
+    </plugins>
+-------------------------------------------------------------------------------
+
+  With this freemarker template located in <${basedir}/src/license/myDescriptionTemplate.ftl>:
+
+-------------------------------------------------------------------------------
+<#-- To render the description of a license file header.
+ Available context :
+ - project the maven project
+ - addSvnKeyWords
+ - organizationName
+ - projectName
+ - inceptionYear
+ - file current file to treat
+-->
+${file.name} - ${projectName} - ${organizationName} - ${inceptionYear}
+${project.groupId}-${project.artifactId}-${project.version}
+$Id$
+$HeadURL$
+-------------------------------------------------------------------------------

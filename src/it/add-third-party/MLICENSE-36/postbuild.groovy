@@ -2,8 +2,8 @@
  * #%L
  * License Maven Plugin
  *
- * $Id: postbuild.groovy 16527 2012-05-04 16:30:52Z tchemit $
- * $HeadURL: https://svn.codehaus.org/mojo/trunk/mojo/license-maven-plugin/src/it/add-third-party/no-deps/postbuild.groovy $
+ * $Id$
+ * $HeadURL$
  * %%
  * Copyright (C) 2008 - 2011 CodeLutin, Codehaus, Tony Chemit
  * %%

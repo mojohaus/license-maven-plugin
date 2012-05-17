@@ -21,7 +21,9 @@
  */
 package org.codehaus.mojo.license;
 
+import freemarker.template.Template;
 import org.apache.commons.lang.StringUtils;
+import org.codehaus.mojo.license.api.FreeMarkerHelper;
 import org.codehaus.mojo.license.header.FileHeader;
 import org.codehaus.mojo.license.header.FileHeaderProcessor;
 import org.codehaus.mojo.license.header.FileHeaderProcessorConfiguration;
@@ -134,7 +136,10 @@ public class UpdateFileHeaderMojo
      * A flag to add svn:keywords on new header.
      * <p/>
      * Will add svn keywords :
-     * <pre>Author, Id, Rev, URL and Date</pre>
+     * <pre>Id, HeadURL</pre>
+     *
+     * <strong>Note:</strong> This parameter is used by the {@link #descriptionTemplate}, so if you change this
+     * template, the parameter could be no more used (depends what you put in your own template...).
      *
      * @parameter expression="${license.addSvnKeyWords}" default-value="false"
      * @since 1.0
@@ -289,6 +294,16 @@ public class UpdateFileHeaderMojo
     protected Map<String, String> extraExtensions;
 
     /**
+     * Template used to build the description scetion of the license header.
+     * <p/>
+     * (This template use freemarker).
+     *
+     * @parameter expression="${license.descriptionTemplate}" default-value="/org/codehaus/mojo/license/default-file-header-description.ftl"
+     * @since 1.1
+     */
+    protected String descriptionTemplate;
+
+    /**
      * @component role="org.nuiton.processor.Processor" roleHint="file-header"
      * @since 1.0
      */
@@ -316,6 +331,14 @@ public class UpdateFileHeaderMojo
     private FileHeaderTransformer transformer;
 
     /**
+     * Freemarker helper component.
+     *
+     * @component role="org.codehaus.mojo.license.api.FreeMarkerHelper"
+     * @since 1.0
+     */
+    private FreeMarkerHelper freeMarkerHelper;
+
+    /**
      * internal default file header.
      */
     private FileHeader header;
@@ -331,6 +354,13 @@ public class UpdateFileHeaderMojo
      * @since 1.0
      */
     private Map<String, String> extensionToCommentStyle;
+
+    /**
+     * The freemarker template used to render the description section of the file header.
+     *
+     * @since 1.1
+     */
+    private Template descriptionTemplate0;
 
     public static final String[] DEFAULT_INCLUDES = new String[]{ "**/*" };
 
@@ -567,6 +597,13 @@ public class UpdateFileHeaderMojo
 
         // get all files to treate indexed by their comment style
         filesToTreateByCommentStyle = obtainFilesToTreateByCommentStyle();
+
+        // build the description template
+        if ( isVerbose() )
+        {
+            getLog().info( "Use description template : " + descriptionTemplate );
+        }
+        descriptionTemplate0 = freeMarkerHelper.getTemplate( descriptionTemplate );
     }
 
     protected Map<String, List<File>> obtainFilesToTreateByCommentStyle()
@@ -723,8 +760,7 @@ public class UpdateFileHeaderMojo
         this.transformer = getTransformer( commentStyle );
 
         // file header to use if no header is found on a file
-        this.header = buildDefaultFileHeader( license, projectName, inceptionYear, organizationName, addSvnKeyWords,
-                                              getEncoding() );
+        this.header = buildDefaultFileHeader( license, getEncoding() );
 
         // update processor filter
         processor.populateFilter();
@@ -800,6 +836,9 @@ public class UpdateFileHeaderMojo
             getLog().debug( " - process file " + file );
             getLog().debug( " - will process into file " + processFile );
         }
+
+        // update the file header description
+        updateFileHeaderDescription( file );
 
         String content;
 
@@ -1015,42 +1054,14 @@ public class UpdateFileHeaderMojo
      * Build a default header given the parameters.
      *
      * @param license         the license type ot use in header
-     * @param projectName     project name as header description
-     * @param inceptionYear   first year of copyright
-     * @param copyrightHolder holder of copyright
      * @param encoding        encoding used to read or write files
-     * @param addSvnKeyWords  a flag to add in description section svn keywords
      * @return the new file header
      * @throws IOException if any problem while creating file header
      */
-    protected FileHeader buildDefaultFileHeader( License license, String projectName, String inceptionYear,
-                                                 String copyrightHolder, boolean addSvnKeyWords, String encoding )
+    protected FileHeader buildDefaultFileHeader( License license, String encoding )
         throws IOException
     {
         FileHeader result = new FileHeader();
-
-        StringBuilder buffer = new StringBuilder();
-        buffer.append( projectName );
-        if ( addSvnKeyWords )
-        {
-            // add svn keyworks
-            char ls = FileHeaderTransformer.LINE_SEPARATOR;
-            buffer.append( ls );
-
-            // breaks the keyword otherwise svn will update them here
-            //TC-20100415 : do not generate thoses redundant keywords
-//            buffer.append(ls).append("$" + "Author$");
-//            buffer.append(ls).append("$" + "LastChangedDate$");
-//            buffer.append(ls).append("$" + "LastChangedRevision$");
-            buffer.append( ls ).append( "$" + "Id$" );
-            buffer.append( ls ).append( "$" + "HeadURL$" );
-
-        }
-        result.setDescription( buffer.toString() );
-        if ( getLog().isDebugEnabled() )
-        {
-            getLog().debug( "header description : " + result.getDescription() );
-        }
 
         String licenseContent = license.getHeaderContent( encoding );
         result.setLicense( licenseContent );
@@ -1065,8 +1076,35 @@ public class UpdateFileHeaderMojo
         {
             result.setCopyrightLastYear( lastYear );
         }
-        result.setCopyrightHolder( copyrightHolder );
+        result.setCopyrightHolder( organizationName );
         return result;
+    }
+
+    /**
+     * Update in file header the description parts given the current file.
+     *
+     * @param file            current file to treat
+     * @throws IOException if any problem while creating file header
+     */
+    protected void updateFileHeaderDescription( File file)
+        throws IOException
+    {
+
+        Map<String, Object> descriptionParameters = new HashMap<String, Object>();
+        descriptionParameters.put( "project", getProject() );
+        descriptionParameters.put( "addSvnKeyWords", addSvnKeyWords);
+        descriptionParameters.put( "projectName", projectName );
+        descriptionParameters.put( "inceptionYear", inceptionYear );
+        descriptionParameters.put( "organizationName",  organizationName);
+        descriptionParameters.put( "file", file );
+
+        String description = freeMarkerHelper.renderTemplate( descriptionTemplate0, descriptionParameters );
+        header.setDescription( description );
+
+        if ( getLog().isDebugEnabled() )
+        {
+            getLog().debug( "header description : " + header.getDescription() );
+        }
     }
 
     public FileHeaderTransformer getTransformer( String transformerName )

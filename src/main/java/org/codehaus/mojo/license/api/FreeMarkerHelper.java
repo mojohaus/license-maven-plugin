@@ -75,6 +75,24 @@ public class FreeMarkerHelper
     {
 
         Template template = getTemplate( templateName );
+        return renderTemplate( template, parameters );
+//        StringWriter out = new StringWriter();
+//        try
+//        {
+//            template.process( parameters, out );
+//        }
+//        catch ( TemplateException e )
+//        {
+//            throw new IOException( "Could not render template " +
+//                                       templateName + " for reason " + e.getMessage() );
+//        }
+//        return out.toString();
+    }
+
+    public String renderTemplate( Template template, Map<String, Object> parameters )
+        throws IOException
+    {
+
         StringWriter out = new StringWriter();
         try
         {
@@ -83,7 +101,7 @@ public class FreeMarkerHelper
         catch ( TemplateException e )
         {
             throw new IOException( "Could not render template " +
-                                       templateName + " for reason " + e.getMessage() );
+                                       template.getName() + " for reason " + e.getMessage() );
         }
         return out.toString();
     }

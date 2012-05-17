@@ -31,15 +31,16 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.codehaus.mojo.license.test</groupId>
-  <artifactId>test-MLICENSE-36</artifactId>
-  <version>@pom.version@</version>
+  <artifactId>MLICENSE-30</artifactId>
+  <version>1.1</version>
 
-  <name>License Test :: MLICENSE-36</name>
+  <name>License Test :: MLICENSE-30</name>
 
+  <organization>
+    <name>License Test</name>
+  </organization>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <license.verbose>true</license.verbose>
-    <license.fileTemplate>${basedir}/src/main/license/myTemplate.ftl</license.fileTemplate>
   </properties>
   <build>
 
@@ -50,9 +51,19 @@
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>license-maven-plugin</artifactId>
           <version>@pom.version@</version>
+          <configuration>
+            <verbose>true</verbose>
+            <addSvnKeyWords>true</addSvnKeyWords>
+            <licenseName>gpl_v3</licenseName>
+            <canUpdateDescription>true</canUpdateDescription>
+            <inceptionYear>2112</inceptionYear>
+            <descriptionTemplate>${basedir}/src/main/license/descriptionTemplate.ftl</descriptionTemplate>
+          </configuration>
+
         </plugin>
       </plugins>
     </pluginManagement>
+
   </build>
 
 </project>

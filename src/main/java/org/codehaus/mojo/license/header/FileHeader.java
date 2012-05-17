@@ -47,17 +47,17 @@ public class FileHeader
     protected static final String COPYRIGHT_TO_STRING_FORMAT = "Copyright (C) %1$s %2$s";
 
     /**
-     * Description of the project or module to add in header
+     * Description of the project or module to add in header.
      */
     protected String description;
 
     /**
-     * Copyright holder
+     * Copyright holder.
      */
     protected String copyrightHolder;
 
     /**
-     * Copyright first year of application
+     * Copyright first year of application.
      */
     protected Integer copyrightFirstYear;
 

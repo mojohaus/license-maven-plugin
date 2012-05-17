@@ -1,10 +1,12 @@
 package org.codehaus.mojo.license.api;
 
+import junit.framework.Assert;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.mojo.license.UpdateFileHeaderMojo;
 import org.codehaus.mojo.license.model.LicenseMap;
 import org.junit.Test;
 
@@ -26,7 +28,7 @@ public class FreeMarkerHelperTest
     private static final Log log = LogFactory.getLog( FreeMarkerHelperTest.class );
 
     @Test
-    public void testRenderTemplateFroThirdPartyFile()
+    public void testRenderTemplateForThirdPartyFile()
         throws Exception
     {
 
@@ -64,7 +66,7 @@ public class FreeMarkerHelperTest
     }
 
     @Test
-    public void testRenderTemplateFroThirdPartyFileGroupByLicense()
+    public void testRenderTemplateForThirdPartyFileGroupByLicense()
         throws Exception
     {
 
@@ -96,6 +98,39 @@ public class FreeMarkerHelperTest
 
         String s =
             helper.renderTemplate( "/org/codehaus/mojo/license/third-party-file-groupByLicense.ftl", properties );
+        if ( log.isInfoEnabled() )
+        {
+            log.info( s );
+        }
+    }
+
+    @Test
+    public void testRenderTemplateForUpdateFileHeader()
+        throws Exception
+    {
+
+        FreeMarkerHelper helper = new FreeMarkerHelper();
+
+        MavenProject project = new MavenProject();
+        project.setArtifact(
+            new DefaultArtifact( "groupId", "artifactId", VersionRange.createFromVersionSpec( "0" ), "compile", "type",
+                                 "classifier", null ) );
+        project.setGroupId( "groupId" );
+        project.setArtifactId( "artifactId" );
+        project.setVersion( "version" );
+
+        Map<String, Object> properties = new HashMap<String, Object>();
+        properties.put( "project", project );
+        properties.put( "projectName", "projectName");
+        properties.put( "inceptionYear", "inceptionYear" );
+        properties.put( "organizationName",  "organizationName");
+        properties.put( "addSvnKeyWords",  true);
+
+        String s =
+            helper.renderTemplate( "/org/codehaus/mojo/license/default-file-header-description.ftl", properties );
+        Assert.assertEquals("projectName\n" +
+                                "$Id$\n" +
+                                "$HeadURL$", s);
         if ( log.isInfoEnabled() )
         {
             log.info( s );

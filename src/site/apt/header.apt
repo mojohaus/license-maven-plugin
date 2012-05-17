@@ -83,6 +83,14 @@ Header model
     than once in a file, we can use special space separator, the goal will remove then. In that way the exact
     configuration won't be found twice in your pom.xml.
 
+* Description section template
+
+  Since version 1.1, it is possible to customize the description section using a freemarker template.
+
+  Default template is given to reproduce exactly the previous hardcoded description.
+
+  See {{{./examples/update-file-header-config.html#Customize_the_description_section}example}} for more details.
+
 * Copyright model
 
   Copyright section must exactly be of this form :
