@@ -1,3 +1,5 @@
+package org.codehaus.mojo.license.header;
+
 /*
  * #%L
  * License Maven Plugin
@@ -20,8 +22,6 @@
  * #L%
  */
 
-package org.codehaus.mojo.license.header;
-
 /**
  * Contract of a file header.
  * <p/>
@@ -42,7 +42,7 @@ public class FileHeader
 {
 
     /**
-     * Copyright to string format
+     * Copyright to string format.
      */
     protected static final String COPYRIGHT_TO_STRING_FORMAT = "Copyright (C) %1$s %2$s";
 

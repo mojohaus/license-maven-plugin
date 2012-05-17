@@ -1,3 +1,5 @@
+package org.codehaus.mojo.license;
+
 /*
  * #%L
  * License Maven Plugin
@@ -19,8 +21,6 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
-
-package org.codehaus.mojo.license;
 
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.doxia.parser.Parser;

@@ -1,9 +1,8 @@
+package org.codehaus.mojo.license.model;
+
 /*
  * #%L
  * License Maven Plugin
- * 
- * $Id$
- * $HeadURL$
  * %%
  * Copyright (C) 2008 - 2011 CodeLutin, Codehaus, Tony Chemit
  * %%
@@ -22,8 +21,6 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
-
-package org.codehaus.mojo.license.model;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
@@ -50,27 +47,27 @@ public class License
     public static final String LICENSE_CONTENT_FILE = "license.txt";
 
     /**
-     * base url of license (directory where to find license files)
+     * base url of license (directory where to find license files).
      */
     protected URL baseURL;
 
     /**
-     * the name of the licenses (ex lgpl-3.0)
+     * the name of the licenses (ex lgpl-3.0).
      */
     protected String name;
 
     /**
-     * the description of the license
+     * the description of the license.
      */
     protected String description;
 
     /**
-     * url of the license's content
+     * url of the license's content.
      */
     protected URL licenseURL;
 
     /**
-     * url of the license header's content
+     * url of the license header's content.
      */
     protected URL headerURL;
 

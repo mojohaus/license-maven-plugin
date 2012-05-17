@@ -1,3 +1,5 @@
+package org.codehaus.mojo.license.header;
+
 /*
  * #%L
  * License Maven Plugin
@@ -19,8 +21,6 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
-
-package org.codehaus.mojo.license.header;
 
 import org.apache.maven.plugin.logging.Log;
 import org.codehaus.mojo.license.header.transformer.FileHeaderTransformer;

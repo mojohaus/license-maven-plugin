@@ -1,3 +1,5 @@
+package org.codehaus.mojo.license.header.transformer;
+
 /*
  * #%L
  * License Maven Plugin
@@ -20,8 +22,6 @@
  * #L%
  */
 
-package org.codehaus.mojo.license.header.transformer;
-
 /**
  * Implementation of {@link FileHeaderTransformer} for properties format.
  *
@@ -33,29 +33,31 @@ public class PropertiesFileHeaderTransformer
     extends AbstractFileHeaderTransformer
 {
 
-    public static final String NAME = "properties";
-
-    public static final String DESCRIPTION = "header transformer with properties file comment style";
-
-    public static final String COMMENT_LINE_PREFIX = "# ";
-
-    public static final String COMMENT_START_TAG = "###";
-
-    public static final String COMMENT_END_TAG = "###";
-
+    /**
+     * Line separator caracter.
+     */
     protected final String linesep;
 
+    /**
+     * Default constructor.
+     */
     public PropertiesFileHeaderTransformer()
     {
-        super( NAME, DESCRIPTION, COMMENT_START_TAG, COMMENT_END_TAG, COMMENT_LINE_PREFIX );
+        super( "properties", "header transformer with properties file comment style", "###", "###", "# " );
         linesep = System.getProperty( "line.separator" );
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String[] getDefaultAcceptedExtensions()
     {
-        return new String[]{ NAME, "sh", "py", "rb", "pl", "pm" };
+        return new String[]{ "properties", "sh", "py", "rb", "pl", "pm" };
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String addHeader( String header, String content )
     {

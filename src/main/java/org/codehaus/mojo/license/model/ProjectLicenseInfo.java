@@ -1,9 +1,8 @@
+package org.codehaus.mojo.license.model;
+
 /*
  * #%L
  * License Maven Plugin
- *
- * $Id$
- * $HeadURL$
  * %%
  * Copyright (C) 2010 - 2011 Codehaus
  * %%
@@ -22,7 +21,6 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
-package org.codehaus.mojo.license.model;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.License;
@@ -59,7 +57,7 @@ public class ProjectLicenseInfo
     }
 
     /**
-     * Default constructor
+     * Default constructor.
      */
     public ProjectLicenseInfo()
     {

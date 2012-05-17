@@ -1,3 +1,5 @@
+package org.codehaus.mojo.license.utils;
+
 /*
  * #%L
  * License Maven Plugin
@@ -19,7 +21,6 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
-package org.codehaus.mojo.license.utils;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Resource;
@@ -29,6 +30,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
@@ -120,16 +122,16 @@ public class MojoHelper
 
     }
 
-    static final protected double[] timeFactors = { 1000000, 1000, 60, 60, 24 };
+    protected static final double[] TIME_FACTORS = { 1000000, 1000, 60, 60, 24 };
 
-    static final protected String[] timeUnites = { "ns", "ms", "s", "m", "h", "d" };
+    protected static final String[] TIME_UNITES = { "ns", "ms", "s", "m", "h", "d" };
 
-    static public String convertTime( long value )
+    public static String convertTime( long value )
     {
-        return convert( value, timeFactors, timeUnites );
+        return convert( value, TIME_FACTORS, TIME_UNITES );
     }
 
-    static public String convert( long value, double[] factors, String[] unites )
+    public static String convert( long value, double[] factors, String[] unites )
     {
         long sign = value == 0 ? 1 : value / Math.abs( value );
         int i = 0;
@@ -151,10 +153,8 @@ public class MojoHelper
      * @param baseUrl base url to use
      * @param suffix  suffix to add
      * @return the new url
-     * @throws IllegalArgumentException if malformed url.
      */
     public static URL getUrl( URL baseUrl, String suffix )
-        throws IllegalArgumentException
     {
         String url = baseUrl.toString() + "/" + suffix;
         try
@@ -203,5 +203,11 @@ public class MojoHelper
         sb.append( ")" );
 
         return sb.toString();
+    }
+
+    public static List<String> getParams( String params )
+    {
+        String[] split = params == null ? new String[0] : params.split( "," );
+        return Arrays.asList( split );
     }
 }

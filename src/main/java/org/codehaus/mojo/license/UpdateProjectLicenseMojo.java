@@ -1,3 +1,5 @@
+package org.codehaus.mojo.license;
+
 /*
  * #%L
  * License Maven Plugin
@@ -19,8 +21,6 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
-
-package org.codehaus.mojo.license;
 
 import org.codehaus.mojo.license.model.License;
 import org.codehaus.mojo.license.utils.FileUtil;
@@ -209,9 +209,9 @@ public class UpdateProjectLicenseMojo
     }
 
     @Override
-    public void setSkip( boolean skipUpdateProjectLicense )
+    public void setSkip( boolean skip )
     {
-        this.skipUpdateProjectLicense = skipUpdateProjectLicense;
+        this.skipUpdateProjectLicense = skip;
     }
 
 }

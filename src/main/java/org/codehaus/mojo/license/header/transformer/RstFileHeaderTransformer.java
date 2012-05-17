@@ -1,3 +1,5 @@
+package org.codehaus.mojo.license.header.transformer;
+
 /*
  * #%L
  * License Maven Plugin
@@ -20,8 +22,6 @@
  * #L%
  */
 
-package org.codehaus.mojo.license.header.transformer;
-
 /**
  * Implementation of {@link FileHeaderTransformer} for apt format.
  *
@@ -33,23 +33,19 @@ public class RstFileHeaderTransformer
     extends AbstractFileHeaderTransformer
 {
 
-    public static final String NAME = "rst";
-
-    public static final String DESCRIPTION = "header transformer with rst comment style";
-
-    public static final String COMMENT_LINE_PREFIX = ".. * ";
-
-    public static final String COMMENT_START_TAG = ".. -";
-
-    public static final String COMMENT_END_TAG = ".. -";
-
+    /**
+     * Default constructor.
+     */
     public RstFileHeaderTransformer()
     {
-        super( NAME, DESCRIPTION, COMMENT_START_TAG, COMMENT_END_TAG, COMMENT_LINE_PREFIX );
+        super( "rst", "header transformer with rst comment style", ".. -", ".. -", ".. * " );
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String[] getDefaultAcceptedExtensions()
     {
-        return new String[]{ NAME };
+        return new String[]{ "rst" };
     }
 }

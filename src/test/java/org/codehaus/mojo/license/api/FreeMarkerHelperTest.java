@@ -1,12 +1,33 @@
 package org.codehaus.mojo.license.api;
 
+/*
+ * #%L
+ * License Maven Plugin
+ * %%
+ * Copyright (C) 2012 Codehaus, Tony Chemit
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Lesser Public License for more details.
+ *
+ * You should have received a copy of the GNU General Lesser Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/lgpl-3.0.html>.
+ * #L%
+ */
+
 import junit.framework.Assert;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.mojo.license.UpdateFileHeaderMojo;
 import org.codehaus.mojo.license.model.LicenseMap;
 import org.junit.Test;
 
@@ -121,16 +142,16 @@ public class FreeMarkerHelperTest
 
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put( "project", project );
-        properties.put( "projectName", "projectName");
+        properties.put( "projectName", "projectName" );
         properties.put( "inceptionYear", "inceptionYear" );
-        properties.put( "organizationName",  "organizationName");
-        properties.put( "addSvnKeyWords",  true);
+        properties.put( "organizationName", "organizationName" );
+        properties.put( "addSvnKeyWords", true );
 
         String s =
             helper.renderTemplate( "/org/codehaus/mojo/license/default-file-header-description.ftl", properties );
-        Assert.assertEquals("projectName\n" +
-                                "$Id:"+"$\n" +
-                                "$HeadURL:"+"$", s);
+        Assert.assertEquals( "projectName\n" +
+                                 "$Id:" + "$\n" +
+                                 "$HeadURL:" + "$", s );
         if ( log.isInfoEnabled() )
         {
             log.info( s );

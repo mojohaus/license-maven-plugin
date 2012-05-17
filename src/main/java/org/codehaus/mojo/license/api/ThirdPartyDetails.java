@@ -1,3 +1,5 @@
+package org.codehaus.mojo.license.api;
+
 /*
  * #%L
  * License Maven Plugin
@@ -19,8 +21,6 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
-
-package org.codehaus.mojo.license.api;
 
 /**
  * Details of a artifact about his third-parties stuff.

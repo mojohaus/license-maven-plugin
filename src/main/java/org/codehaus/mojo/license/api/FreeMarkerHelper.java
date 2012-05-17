@@ -1,5 +1,27 @@
 package org.codehaus.mojo.license.api;
 
+/*
+ * #%L
+ * License Maven Plugin
+ * %%
+ * Copyright (C) 2011 CodeLutin, Codehaus, Tony Chemit
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Lesser Public License for more details.
+ *
+ * You should have received a copy of the GNU General Lesser Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/lgpl-3.0.html>.
+ * #L%
+ */
+
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.cache.FileTemplateLoader;
 import freemarker.cache.TemplateLoader;
@@ -15,7 +37,7 @@ import java.io.StringWriter;
 import java.util.Map;
 
 /**
- * A helper to deal with freemarker templating
+ * A helper to deal with freemarker templating.
  *
  * @author tchemit <chemit@codelutin.com>
  * @plexus.component role="org.codehaus.mojo.license.api.FreeMarkerHelper" role-hint="default"
@@ -76,17 +98,6 @@ public class FreeMarkerHelper
 
         Template template = getTemplate( templateName );
         return renderTemplate( template, parameters );
-//        StringWriter out = new StringWriter();
-//        try
-//        {
-//            template.process( parameters, out );
-//        }
-//        catch ( TemplateException e )
-//        {
-//            throw new IOException( "Could not render template " +
-//                                       templateName + " for reason " + e.getMessage() );
-//        }
-//        return out.toString();
     }
 
     public String renderTemplate( Template template, Map<String, Object> parameters )

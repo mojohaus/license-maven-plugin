@@ -1,3 +1,5 @@
+package org.codehaus.mojo.license;
+
 /*
  * #%L
  * License Maven Plugin
@@ -19,8 +21,6 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
-
-package org.codehaus.mojo.license;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -347,13 +347,13 @@ public abstract class AbstractAddThirdPartyMojo
 
     protected boolean checkUnsafeDependencies()
     {
-        SortedSet<MavenProject> unsafeDependencies = getUnsafeDependencies();
-        boolean unsafe = !CollectionUtils.isEmpty( unsafeDependencies );
+        SortedSet<MavenProject> unsafeDeps = getUnsafeDependencies();
+        boolean unsafe = !CollectionUtils.isEmpty( unsafeDeps );
         if ( unsafe )
         {
             Log log = getLog();
-            log.warn( "There is " + unsafeDependencies.size() + " dependencies with no license :" );
-            for ( MavenProject dep : unsafeDependencies )
+            log.warn( "There is " + unsafeDeps.size() + " dependencies with no license :" );
+            for ( MavenProject dep : unsafeDeps )
             {
 
                 // no license found for the dependency
@@ -365,15 +365,15 @@ public abstract class AbstractAddThirdPartyMojo
 
     protected boolean checkForbiddenLicenses()
     {
-        List<String> includedLicenses = getIncludedLicenses();
-        List<String> excludeLicenses = getExcludedLicenses();
+        List<String> whiteLicenses = getIncludedLicenses();
+        List<String> blackLicenses = getExcludedLicenses();
         Set<String> unsafeLicenses = new HashSet<String>();
-        if ( CollectionUtils.isNotEmpty( excludeLicenses ) )
+        if ( CollectionUtils.isNotEmpty( blackLicenses ) )
         {
             Set<String> licenses = getLicenseMap().keySet();
-            getLog().info( "Excluded licenses (blacklist): " + excludeLicenses );
+            getLog().info( "Excluded licenses (blacklist): " + blackLicenses );
 
-            for ( String excludeLicense : excludeLicenses )
+            for ( String excludeLicense : blackLicenses )
             {
                 if ( licenses.contains( excludeLicense ) )
                 {
@@ -383,14 +383,14 @@ public abstract class AbstractAddThirdPartyMojo
             }
         }
 
-        if ( CollectionUtils.isNotEmpty( includedLicenses ) )
+        if ( CollectionUtils.isNotEmpty( whiteLicenses ) )
         {
             Set<String> licenses = getLicenseMap().keySet();
-            getLog().info( "Included licenses (whitelist): " + includedLicenses );
+            getLog().info( "Included licenses (whitelist): " + whiteLicenses );
 
             for ( String license : licenses )
             {
-                if ( !includedLicenses.contains( license ) )
+                if ( !whiteLicenses.contains( license ) )
                 {
                     //bad license found
                     unsafeLicenses.add( license );

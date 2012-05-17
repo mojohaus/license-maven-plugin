@@ -1,3 +1,5 @@
+package org.codehaus.mojo.license.utils;
+
 /*
  * #%L
  * Maven helper plugin
@@ -19,9 +21,6 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
-
-package org.codehaus.mojo.license.utils;
-
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -159,7 +158,7 @@ public class SortedProperties
      *                                  voulue.
      */
     @SuppressWarnings( { "unchecked" } )
-    static public <O> List<O> toGenericList( List<?> list, Class<O> type )
+    public static <O> List<O> toGenericList( List<?> list, Class<O> type )
         throws IllegalArgumentException
     {
         if ( list.isEmpty() )

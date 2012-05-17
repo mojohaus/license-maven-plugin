@@ -1,3 +1,5 @@
+package org.codehaus.mojo.license.header.transformer;
+
 /*
  * #%L
  * License Maven Plugin
@@ -19,7 +21,6 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
-package org.codehaus.mojo.license.header.transformer;
 
 /**
  * Implementation of {@link FileHeaderTransformer} for jsp format.
@@ -31,24 +32,21 @@ package org.codehaus.mojo.license.header.transformer;
 public class JspFileHeaderTransformer
     extends AbstractFileHeaderTransformer
 {
-    public static final String NAME = "jsp";
 
-    public static final String DESCRIPTION = "header transformer with jsp comment style";
-
-    public static final String COMMENT_LINE_PREFIX = "  ";
-
-    public static final String COMMENT_START_TAG = "<%--";
-
-    public static final String COMMENT_END_TAG = "  --%>";
-
+    /**
+     * Default constructor.
+     */
     public JspFileHeaderTransformer()
     {
-        super( NAME, DESCRIPTION, COMMENT_START_TAG, COMMENT_END_TAG, COMMENT_LINE_PREFIX );
+        super( "jsp", "header transformer with jsp comment style", "<%--", "  --%>", "  " );
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String[] getDefaultAcceptedExtensions()
     {
-        return new String[]{ NAME, "jspx" };
+        return new String[]{ "jsp", "jspx" };
     }
 
 }

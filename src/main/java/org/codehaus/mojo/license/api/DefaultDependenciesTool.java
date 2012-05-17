@@ -1,3 +1,5 @@
+package org.codehaus.mojo.license.api;
+
 /*
  * #%L
  * License Maven Plugin
@@ -19,7 +21,6 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
-package org.codehaus.mojo.license.api;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -53,6 +54,9 @@ public class DefaultDependenciesTool
     implements DependenciesTool
 {
 
+    /**
+     * Message used when an invalid expression pattern is found.
+     */
     public static final String INVALID_PATTERN_MESSAGE =
         "The pattern specified by expression <%s> seems to be invalid.";
 
@@ -133,13 +137,12 @@ public class DefaultDependenciesTool
                 // not in included scopes
                 continue;
             }
-            {
-                if ( excludeScopes.contains( scope ) )
-                {
 
-                    // in exluced scopes 
-                    continue;
-                }
+            if ( excludeScopes.contains( scope ) )
+            {
+
+                // in exluced scopes
+                continue;
             }
 
             Logger log = getLogger();
@@ -187,7 +190,6 @@ public class DefaultDependenciesTool
             }
             else
             {
-
                 // build project
 
                 try
@@ -217,10 +219,17 @@ public class DefaultDependenciesTool
             // keep the project
             result.put( id, depMavenProject );
         }
-
         return result;
     }
 
+    /**
+     * Tests if the given project is includable against a groupdId pattern and a artifact pattern.
+     *
+     * @param project                 the project to test
+     * @param includedGroupPattern    the include group pattern
+     * @param includedArtifactPattern the include artifact pattenr
+     * @return {@code true} if the project is includavble, {@code false} otherwise
+     */
     protected boolean isIncludable( Artifact project, Pattern includedGroupPattern, Pattern includedArtifactPattern )
     {
 
@@ -269,10 +278,17 @@ public class DefaultDependenciesTool
                 log.warn( String.format( INVALID_PATTERN_MESSAGE, includedArtifactPattern.pattern() ) );
             }
         }
-
         return false;
     }
 
+    /**
+     * Tests if the given project is excludable against a groupdId pattern and a artifact pattern.
+     *
+     * @param project                 the project to test
+     * @param excludedGroupPattern    the exlcude group pattern
+     * @param excludedArtifactPattern the exclude artifact pattenr
+     * @return {@code true} if the project is excludable, {@code false} otherwise
+     */
     protected boolean isExcludable( Artifact project, Pattern excludedGroupPattern, Pattern excludedArtifactPattern )
     {
 
@@ -321,7 +337,6 @@ public class DefaultDependenciesTool
                 log.warn( String.format( INVALID_PATTERN_MESSAGE, excludedArtifactPattern.pattern() ) );
             }
         }
-
         return false;
     }
 }

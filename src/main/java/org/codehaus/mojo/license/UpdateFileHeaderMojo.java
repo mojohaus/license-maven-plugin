@@ -1,3 +1,5 @@
+package org.codehaus.mojo.license;
+
 /*
  * #%L
  * License Maven Plugin
@@ -19,7 +21,6 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
-package org.codehaus.mojo.license;
 
 import freemarker.template.Template;
 import org.apache.commons.lang.StringUtils;
@@ -41,6 +42,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -137,7 +139,7 @@ public class UpdateFileHeaderMojo
      * <p/>
      * Will add svn keywords :
      * <pre>Id, HeadURL</pre>
-     *
+     * <p/>
      * <strong>Note:</strong> This parameter is used by the {@link #descriptionTemplate}, so if you change this
      * template, the parameter could be no more used (depends what you put in your own template...).
      *
@@ -410,15 +412,15 @@ public class UpdateFileHeaderMojo
          * register a file for this state on result dictionary.
          *
          * @param file   file to add
-         * @param result dictionary to update
+         * @param results dictionary to update
          */
-        public void addFile( File file, EnumMap<FileState, Set<File>> result )
+        public void addFile( File file, EnumMap<FileState, Set<File>> results )
         {
-            Set<File> fileSet = result.get( this );
+            Set<File> fileSet = results.get( this );
             if ( fileSet == null )
             {
                 fileSet = new HashSet<File>();
-                result.put( this, fileSet );
+                results.put( this, fileSet );
             }
             fileSet.add( file );
         }
@@ -468,8 +470,8 @@ public class UpdateFileHeaderMojo
             String commentFormat = "\n  * %1$s (%2$s)";
             for ( String transformerName : transformers.keySet() )
             {
-                FileHeaderTransformer transformer = getTransformer( transformerName );
-                String str = String.format( commentFormat, transformer.getName(), transformer.getDescription() );
+                FileHeaderTransformer aTransformer = getTransformer( transformerName );
+                String str = String.format( commentFormat, aTransformer.getName(), aTransformer.getDescription() );
                 buffer.append( str );
             }
             getLog().info( buffer.toString() );
@@ -551,13 +553,13 @@ public class UpdateFileHeaderMojo
         for ( Map.Entry<String, FileHeaderTransformer> entry : transformers.entrySet() )
         {
             String commentStyle = entry.getKey();
-            FileHeaderTransformer transformer = entry.getValue();
+            FileHeaderTransformer aTransformer = entry.getValue();
 
-            transformer.setProcessStartTag( processStartTag );
-            transformer.setProcessEndTag( processEndTag );
-            transformer.setSectionDelimiter( sectionDelimiter );
+            aTransformer.setProcessStartTag( processStartTag );
+            aTransformer.setProcessEndTag( processEndTag );
+            aTransformer.setSectionDelimiter( sectionDelimiter );
 
-            String[] extensions = transformer.getDefaultAcceptedExtensions();
+            String[] extensions = aTransformer.getDefaultAcceptedExtensions();
             for ( String extension : extensions )
             {
                 if ( isVerbose() )
@@ -609,14 +611,14 @@ public class UpdateFileHeaderMojo
     protected Map<String, List<File>> obtainFilesToTreateByCommentStyle()
     {
 
-        Map<String, List<File>> result = new HashMap<String, List<File>>();
+        Map<String, List<File>> results = new HashMap<String, List<File>>();
 
         // add for all known comment style (says transformer) a empty list
         // this permits not to have to test if there is an already list each time
         // we wants to add a new file...
         for ( String commentStyle : transformers.keySet() )
         {
-            result.put( commentStyle, new ArrayList<File>() );
+            results.put( commentStyle, new ArrayList<File>() );
         }
 
         List<String> rootsList = new ArrayList<String>( roots.length );
@@ -669,11 +671,11 @@ public class UpdateFileHeaderMojo
                 }
                 //
                 File file = new File( root, path );
-                List<File> files = result.get( commentStyle );
+                List<File> files = results.get( commentStyle );
                 files.add( file );
             }
         }
-        return result;
+        return results;
     }
 
     /**
@@ -1053,49 +1055,49 @@ public class UpdateFileHeaderMojo
     /**
      * Build a default header given the parameters.
      *
-     * @param license         the license type ot use in header
-     * @param encoding        encoding used to read or write files
+     * @param license  the license type ot use in header
+     * @param encoding encoding used to read or write files
      * @return the new file header
      * @throws IOException if any problem while creating file header
      */
     protected FileHeader buildDefaultFileHeader( License license, String encoding )
         throws IOException
     {
-        FileHeader result = new FileHeader();
+        FileHeader defaultFileHeader = new FileHeader();
 
         String licenseContent = license.getHeaderContent( encoding );
-        result.setLicense( licenseContent );
+        defaultFileHeader.setLicense( licenseContent );
 
         Integer firstYear = Integer.valueOf( inceptionYear );
-        result.setCopyrightFirstYear( firstYear );
+        defaultFileHeader.setCopyrightFirstYear( firstYear );
 
         Calendar cal = Calendar.getInstance();
         cal.setTime( new Date() );
         Integer lastYear = cal.get( Calendar.YEAR );
         if ( firstYear < lastYear )
         {
-            result.setCopyrightLastYear( lastYear );
+            defaultFileHeader.setCopyrightLastYear( lastYear );
         }
-        result.setCopyrightHolder( organizationName );
-        return result;
+        defaultFileHeader.setCopyrightHolder( organizationName );
+        return defaultFileHeader;
     }
 
     /**
      * Update in file header the description parts given the current file.
      *
-     * @param file            current file to treat
+     * @param file current file to treat
      * @throws IOException if any problem while creating file header
      */
-    protected void updateFileHeaderDescription( File file)
+    protected void updateFileHeaderDescription( File file )
         throws IOException
     {
 
         Map<String, Object> descriptionParameters = new HashMap<String, Object>();
         descriptionParameters.put( "project", getProject() );
-        descriptionParameters.put( "addSvnKeyWords", addSvnKeyWords);
+        descriptionParameters.put( "addSvnKeyWords", addSvnKeyWords );
         descriptionParameters.put( "projectName", projectName );
         descriptionParameters.put( "inceptionYear", inceptionYear );
-        descriptionParameters.put( "organizationName",  organizationName);
+        descriptionParameters.put( "organizationName", organizationName );
         descriptionParameters.put( "file", file );
 
         String description = freeMarkerHelper.renderTemplate( descriptionTemplate0, descriptionParameters );
@@ -1108,7 +1110,6 @@ public class UpdateFileHeaderMojo
     }
 
     public FileHeaderTransformer getTransformer( String transformerName )
-        throws IllegalArgumentException, IllegalStateException
     {
         if ( StringUtils.isEmpty( transformerName ) )
         {
@@ -1129,20 +1130,20 @@ public class UpdateFileHeaderMojo
 
     protected String cleanHeaderConfiguration( String value, String defaultValue )
     {
-        String result;
+        String resultHeader;
         if ( StringUtils.isEmpty( value ) )
         {
 
             // use default value
-            result = defaultValue;
+            resultHeader = defaultValue;
         }
         else
         {
 
             // clean all spaces of it
-            result = value.replaceAll( "\\s", "" );
+            resultHeader = value.replaceAll( "\\s", "" );
         }
-        return result;
+        return resultHeader;
     }
 
     /**
@@ -1179,9 +1180,9 @@ public class UpdateFileHeaderMojo
      * {@inheritDoc}
      */
     @Override
-    public void setSkip( boolean skipUpdateLicense )
+    public void setSkip( boolean skip )
     {
-        this.skipUpdateLicense = skipUpdateLicense;
+        this.skipUpdateLicense = skip;
     }
 
     /**
@@ -1232,12 +1233,7 @@ public class UpdateFileHeaderMojo
 
             List<String> toTreate = new ArrayList<String>();
 
-            for ( String filePath : tmp )
-            {
-                File srcFile = new File( f, filePath );
-                // check file is up-to-date
-                toTreate.add( filePath );
-            }
+            Collections.addAll( toTreate, tmp );
 
             if ( toTreate.isEmpty() )
             {

@@ -1,3 +1,5 @@
+package org.codehaus.mojo.license;
+
 /*
  * #%L
  * License Maven Plugin
@@ -19,8 +21,6 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
-
-package org.codehaus.mojo.license;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -345,12 +345,12 @@ public class DownloadLicensesMojo
         }
 
         // Check if the file has a valid file extention
-        final String DEFAULT_EXTENSION = ".txt";
+        final String defaultExtension = ".txt";
         int extensionIndex = licenseFileName.lastIndexOf( "." );
         if ( extensionIndex == -1 || extensionIndex > ( licenseFileName.length() - 3 ) )
         {
             // This means it isn't a valid file extension, so append the default
-            licenseFileName = licenseFileName + DEFAULT_EXTENSION;
+            licenseFileName = licenseFileName + defaultExtension;
         }
 
         // Force lower case so we don't end up with multiple copies of the same license

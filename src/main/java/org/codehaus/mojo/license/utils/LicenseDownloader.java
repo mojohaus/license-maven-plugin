@@ -1,3 +1,5 @@
+package org.codehaus.mojo.license.utils;
+
 /*
  * #%L
  * License Maven Plugin
@@ -19,7 +21,6 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
-package org.codehaus.mojo.license.utils;
 
 import java.io.File;
 import java.io.FileOutputStream;

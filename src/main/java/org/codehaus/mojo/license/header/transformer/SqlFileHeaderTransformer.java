@@ -1,3 +1,5 @@
+package org.codehaus.mojo.license.header.transformer;
+
 /*
  * #%L
  * License Maven Plugin
@@ -19,7 +21,6 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
-package org.codehaus.mojo.license.header.transformer;
 
 /**
  * Implementation of {@link FileHeaderTransformer} for sql format.
@@ -31,23 +32,20 @@ package org.codehaus.mojo.license.header.transformer;
 public class SqlFileHeaderTransformer
     extends AbstractFileHeaderTransformer
 {
-    public static final String NAME = "sql";
 
-    public static final String DESCRIPTION = "header transformer with sql comment style";
-
-    public static final String COMMENT_LINE_PREFIX = "-- ";
-
-    public static final String COMMENT_START_TAG = "---";
-
-    public static final String COMMENT_END_TAG = "---";
-
+    /**
+     * Default constructor.
+     */
     public SqlFileHeaderTransformer()
     {
-        super( NAME, DESCRIPTION, COMMENT_START_TAG, COMMENT_END_TAG, COMMENT_LINE_PREFIX );
+        super( "sql", "header transformer with sql comment style", "---", "---", "-- " );
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String[] getDefaultAcceptedExtensions()
     {
-        return new String[]{ NAME };
+        return new String[]{ "sql" };
     }
 }

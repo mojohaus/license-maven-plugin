@@ -1,3 +1,5 @@
+package org.codehaus.mojo.license.header.transformer;
+
 /*
  * #%L
  * License Maven Plugin
@@ -19,9 +21,6 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
-
-package org.codehaus.mojo.license.header.transformer;
-
 
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.mojo.license.header.FileHeader;
@@ -55,42 +54,42 @@ public abstract class AbstractFileHeaderTransformer
         Pattern.compile( "(.[^\\d]+)?\\s(\\d{4})?(\\s+-\\s+(\\d{4})?){0,1}\\s+(.+)?", Pattern.DOTALL );
 
     /**
-     * name of transformer
+     * name of transformer.
      */
     protected String name;
 
     /**
-     * description of transfomer
+     * description of transfomer.
      */
     protected String description;
 
     /**
-     * section delimiter
+     * section delimiter.
      */
     protected String sectionDelimiter = DEFAULT_SECTION_DELIMITER;
 
     /**
-     * start process tag
+     * start process tag.
      */
     protected String processStartTag = DEFAULT_PROCESS_START_TAG;
 
     /**
-     * end process tag
+     * end process tag.
      */
     protected String processEndTag = DEFAULT_PROCESS_END_TAG;
 
     /**
-     * comment start tag
+     * comment start tag.
      */
     protected String commentStartTag;
 
     /**
-     * comment end tag
+     * comment end tag.
      */
     protected String commentEndTag;
 
     /**
-     * comment line prefix (to add for header content)
+     * comment line prefix (to add for header content).
      */
     protected String commentLinePrefix;
 
@@ -119,91 +118,145 @@ public abstract class AbstractFileHeaderTransformer
         this.commentLinePrefix = commentLinePrefix;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getName()
     {
         return name;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void setName( String name )
     {
         this.name = name;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getDescription()
     {
         return description;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void setDescription( String description )
     {
         this.description = description;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getSectionDelimiter()
     {
         return sectionDelimiter;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void setSectionDelimiter( String sectionDelimiter )
     {
         this.sectionDelimiter = sectionDelimiter;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getProcessStartTag()
     {
         return processStartTag;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void setProcessStartTag( String processStartTag )
     {
         this.processStartTag = processStartTag;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getProcessEndTag()
     {
         return processEndTag;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void setProcessEndTag( String processEndTag )
     {
         this.processEndTag = processEndTag;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getCommentStartTag()
     {
         return commentStartTag;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void setCommentStartTag( String commentStartTag )
     {
         this.commentStartTag = commentStartTag;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getCommentEndTag()
     {
         return commentEndTag;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void setCommentEndTag( String commentEndTag )
     {
         this.commentEndTag = commentEndTag;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getCommentLinePrefix()
     {
         return commentLinePrefix;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String addHeader( String header, String content )
     {
         return header + content;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void setCommentLinePrefix( String commentLinePrefix )
     {
         this.commentLinePrefix = commentLinePrefix;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public FileHeader toFileHeader( String header )
     {
         FileHeader model = new FileHeader();
@@ -241,8 +294,10 @@ public abstract class AbstractFileHeaderTransformer
         return model;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String toString( FileHeader model )
-        throws NullPointerException
     {
         if ( model == null )
         {
@@ -265,8 +320,10 @@ public abstract class AbstractFileHeaderTransformer
         return buffer.toString();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String toHeaderContent( FileHeader model )
-        throws NullPointerException
     {
 
         String result;
@@ -290,6 +347,9 @@ public abstract class AbstractFileHeaderTransformer
         return result;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String boxComment( String header, boolean withTags )
     {
         StringBuilder buffer = new StringBuilder();
@@ -310,6 +370,9 @@ public abstract class AbstractFileHeaderTransformer
         return buffer.toString();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String unboxComent( String header )
     {
         StringBuilder buffer = new StringBuilder();
@@ -350,6 +413,9 @@ public abstract class AbstractFileHeaderTransformer
         return buffer.toString();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String boxProcessTag( String header )
     {
         StringBuilder buffer = new StringBuilder();
@@ -359,6 +425,9 @@ public abstract class AbstractFileHeaderTransformer
         return buffer.toString();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String unboxProcessTag( String boxedHeader )
     {
         StringBuilder buffer = new StringBuilder();
@@ -376,16 +445,25 @@ public abstract class AbstractFileHeaderTransformer
         return buffer.toString();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean isDescriptionEquals( FileHeader header1, FileHeader header2 )
     {
         return header1.getDescription().equals( header2.getDescription() );
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean isCopyrightEquals( FileHeader header1, FileHeader header2 )
     {
         return header1.getCopyright().equals( header2.getCopyright() );
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean isLicenseEquals( FileHeader header1, FileHeader header2 )
     {
         String license1 = removeSpaces( header1.getLicense() );

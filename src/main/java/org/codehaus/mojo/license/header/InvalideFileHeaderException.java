@@ -1,3 +1,5 @@
+package org.codehaus.mojo.license.header;
+
 /*
  * #%L
  * License Maven Plugin
@@ -20,8 +22,6 @@
  * #L%
  */
 
-package org.codehaus.mojo.license.header;
-
 import java.io.IOException;
 
 /**
@@ -36,10 +36,18 @@ public class InvalideFileHeaderException
 {
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Default constructor.
+     */
     public InvalideFileHeaderException()
     {
     }
 
+    /**
+     * Constructor with a message.
+     *
+     * @param message message of the error
+     */
     public InvalideFileHeaderException( String message )
     {
         super( message );

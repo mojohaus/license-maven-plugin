@@ -1,3 +1,5 @@
+package org.codehaus.mojo.license;
+
 /*
  * #%L
  * License Maven Plugin
@@ -20,8 +22,6 @@
  * #L%
  */
 
-package org.codehaus.mojo.license;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.maven.plugin.MojoFailureException;
@@ -32,13 +32,13 @@ import org.codehaus.mojo.license.api.MavenProjectDependenciesConfigurator;
 import org.codehaus.mojo.license.api.ThirdPartyToolException;
 import org.codehaus.mojo.license.model.LicenseMap;
 import org.codehaus.mojo.license.utils.FileUtil;
+import org.codehaus.mojo.license.utils.MojoHelper;
 import org.codehaus.mojo.license.utils.SortedProperties;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
@@ -291,24 +291,6 @@ public class AddThirdPartyMojo
     /**
      * {@inheritDoc}
      */
-    public List<String> getExcludedScopes()
-    {
-        String[] split = excludedScopes == null ? new String[0] : excludedScopes.split( "," );
-        return Arrays.asList( split );
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public List<String> getIncludedScopes()
-    {
-        String[] split = includedScopes == null ? new String[0] : includedScopes.split( "," );
-        return Arrays.asList( split );
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public String getExcludedGroups()
     {
         return excludedGroups;
@@ -320,6 +302,22 @@ public class AddThirdPartyMojo
     public String getIncludedGroups()
     {
         return includedGroups;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public List<String> getExcludedScopes()
+    {
+        return MojoHelper.getParams( excludedScopes );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public List<String> getIncludedScopes()
+    {
+        return MojoHelper.getParams( includedScopes );
     }
 
     /**

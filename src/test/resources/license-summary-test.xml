@@ -2,9 +2,6 @@
 <!--
   #%L
   License Maven Plugin
-
-  $Id$
-  $HeadURL$
   %%
   Copyright (C) 2010 - 2011 Codehaus
   %%
@@ -23,7 +20,6 @@
   <http://www.gnu.org/licenses/lgpl-3.0.html>.
   #L%
   -->
-
 
 <licenseSummary xmlns="http://mojo.codehaus.org/"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
