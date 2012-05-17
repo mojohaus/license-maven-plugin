@@ -10,5 +10,5 @@
 ${projectName}
 <#if addSvnKeyWords>
 <#--Add svn Keywords-->
-$Id$
-$HeadURL$</#if>
+${"|Id:|"?replace("|", "$")}
+${"|HeadURL:|"?replace("|", "$")}</#if>

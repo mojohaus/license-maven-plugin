@@ -11,5 +11,5 @@ ${file.name} - ${projectName} - ${organizationName} - ${inceptionYear}
 ${project.groupId}-${project.artifactId}-${project.version}
 <#if addSvnKeyWords>
 <#--Add svn Keywords-->
-$Id$
-$HeadURL$</#if>
+${"|Id:|"?replace("|", "$")}
+${"|HeadURL:|"?replace("|", "$")}</#if>

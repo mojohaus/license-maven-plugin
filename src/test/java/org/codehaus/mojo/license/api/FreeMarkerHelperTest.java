@@ -129,8 +129,8 @@ public class FreeMarkerHelperTest
         String s =
             helper.renderTemplate( "/org/codehaus/mojo/license/default-file-header-description.ftl", properties );
         Assert.assertEquals("projectName\n" +
-                                "$Id$\n" +
-                                "$HeadURL$", s);
+                                "$Id:"+"$\n" +
+                                "$HeadURL:"+"$", s);
         if ( log.isInfoEnabled() )
         {
             log.info( s );
