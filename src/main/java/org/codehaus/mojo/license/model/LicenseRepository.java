@@ -1,3 +1,5 @@
+package org.codehaus.mojo.license.model;
+
 /*
  * #%L
  * License Maven Plugin
@@ -19,8 +21,6 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
-
-package org.codehaus.mojo.license.model;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -48,7 +48,7 @@ public class LicenseRepository
 {
 
     /**
-     * Logger
+     * Logger.
      */
     private static final Log LOG = LogFactory.getLog( LicenseRepository.class );
 
@@ -58,12 +58,12 @@ public class LicenseRepository
         Pattern.compile( "(.*)\\s*~~\\s*license\\s*:\\s*(.*)\\s*~~\\s*header\\s*:\\s*(.*)\\s*" );
 
     /**
-     * the base url of the licenses repository
+     * the base url of the licenses repository.
      */
     protected URL baseURL;
 
     /**
-     * licenses of this repository
+     * licenses of this repository.
      */
     protected List<License> licenses;
 
@@ -238,7 +238,6 @@ public class LicenseRepository
     }
 
     protected void checkInit( String operation )
-        throws IllegalStateException
     {
         if ( !init )
         {
@@ -248,7 +247,6 @@ public class LicenseRepository
     }
 
     protected void checkNotInit( String operation )
-        throws IllegalStateException
     {
         if ( init )
         {

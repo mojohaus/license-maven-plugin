@@ -1,3 +1,5 @@
+package org.codehaus.mojo.license.api;
+
 /*
  * #%L
  * License Maven Plugin
@@ -19,8 +21,6 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
-
-package org.codehaus.mojo.license.api;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -53,25 +53,49 @@ public class DefaultThirdPartyHelper
     implements ThirdPartyHelper
 {
 
+    /**
+     * DependenciesTool to load dependencies.
+     *
+     * @see DependenciesTool
+     */
     private final DependenciesTool dependenciesTool;
 
+    /**
+     * ThirdPartyTool to load third-parties descriptors.
+     *
+     * @see ThirdPartyTool
+     */
     private final ThirdPartyTool thirdPartyTool;
 
+    /**
+     * Local repository used.
+     */
     private final ArtifactRepository localRepository;
 
+    /**
+     * List of remote repositories.
+     */
     private final List<ArtifactRepository> remoteRepositories;
 
+    /**
+     * Current maven project.
+     */
     private final MavenProject project;
 
+    /**
+     * Encoding used to read and write files.
+     */
     private final String encoding;
 
+    /**
+     * Verbose flag.
+     */
     private final boolean verbose;
 
     /**
-     * Instance logger
+     * Instance logger.
      */
     private final Log log;
-
 
     private static SortedMap<String, MavenProject> artifactCache;
 

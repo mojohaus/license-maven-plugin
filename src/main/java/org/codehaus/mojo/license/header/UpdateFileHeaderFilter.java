@@ -1,3 +1,5 @@
+package org.codehaus.mojo.license.header;
+
 /*
  * #%L
  * License Maven Plugin
@@ -19,9 +21,6 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
-
-package org.codehaus.mojo.license.header;
-
 
 import org.codehaus.mojo.license.header.transformer.FileHeaderTransformer;
 
@@ -51,10 +50,16 @@ public class UpdateFileHeaderFilter
      */
     protected boolean updateCopyright;
 
+    /**
+     * Default constructor.
+     */
     public UpdateFileHeaderFilter()
     {
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected FileHeader getNewHeader( FileHeader oldHeader )
     {

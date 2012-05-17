@@ -1,9 +1,8 @@
+package org.codehaus.mojo.license.header.transformer;
+
 /*
  * #%L
  * License Maven Plugin
- * 
- * $Id$
- * $HeadURL$
  * %%
  * Copyright (C) 2008 - 2011 CodeLutin, Codehaus, Tony Chemit
  * %%
@@ -23,8 +22,6 @@
  * #L%
  */
 
-package org.codehaus.mojo.license.header.transformer;
-
 import org.codehaus.mojo.license.header.FileHeader;
 import org.junit.After;
 import org.junit.Assert;
@@ -34,11 +31,7 @@ import org.junit.Test;
 import java.util.regex.Matcher;
 
 import static org.codehaus.mojo.license.header.transformer.AbstractFileHeaderTransformer.COPYRIGHT_PATTERN;
-import static org.codehaus.mojo.license.header.transformer.FileHeaderTransformer.DEFAULT_PROCESS_END_TAG;
-import static org.codehaus.mojo.license.header.transformer.FileHeaderTransformer.DEFAULT_PROCESS_START_TAG;
-import static org.codehaus.mojo.license.header.transformer.FileHeaderTransformer.DEFAULT_SECTION_DELIMITER;
-import static org.codehaus.mojo.license.header.transformer.FileHeaderTransformer.LINE_SEPARATOR;
-import static org.codehaus.mojo.license.header.transformer.JavaFileHeaderTransformer.*;
+import static org.codehaus.mojo.license.header.transformer.FileHeaderTransformer.*;
 
 /**
  * Tests the {@link AbstractFileHeaderTransformer}.
@@ -259,36 +252,39 @@ public class AbstractFileHeaderTransformerTest
         header = transformer.toString( model1 );
         boxedHeader = transformer.boxComment( header, true );
 
-        Assert.assertEquals( COMMENT_START_TAG + LINE_SEPARATOR + COMMENT_LINE_PREFIX + "Description" + LINE_SEPARATOR +
-                                 COMMENT_LINE_PREFIX + DEFAULT_SECTION_DELIMITER + LINE_SEPARATOR +
-                                 COMMENT_LINE_PREFIX + "Copyright (C) 2010 Tony" + LINE_SEPARATOR +
-                                 COMMENT_LINE_PREFIX + DEFAULT_SECTION_DELIMITER + LINE_SEPARATOR +
-                                 COMMENT_LINE_PREFIX + "License" + LINE_SEPARATOR + COMMENT_END_TAG + LINE_SEPARATOR,
+        String commentLinePrefix = " * ";
+        String commentStartTag = "/*";
+        String commentEndTag = " */";
+        Assert.assertEquals( commentStartTag + LINE_SEPARATOR + commentLinePrefix + "Description" + LINE_SEPARATOR +
+                                 commentLinePrefix + DEFAULT_SECTION_DELIMITER + LINE_SEPARATOR +
+                                 commentLinePrefix + "Copyright (C) 2010 Tony" + LINE_SEPARATOR +
+                                 commentLinePrefix + DEFAULT_SECTION_DELIMITER + LINE_SEPARATOR +
+                                 commentLinePrefix + "License" + LINE_SEPARATOR + commentEndTag + LINE_SEPARATOR,
                              boxedHeader );
 
         boxedHeader = transformer.boxComment( header, false );
 
         Assert.assertEquals(
-            COMMENT_LINE_PREFIX + "Description" + LINE_SEPARATOR + COMMENT_LINE_PREFIX + DEFAULT_SECTION_DELIMITER +
-                LINE_SEPARATOR + COMMENT_LINE_PREFIX + "Copyright (C) 2010 Tony" + LINE_SEPARATOR +
-                COMMENT_LINE_PREFIX + DEFAULT_SECTION_DELIMITER + LINE_SEPARATOR + COMMENT_LINE_PREFIX + "License" +
+            commentLinePrefix + "Description" + LINE_SEPARATOR + commentLinePrefix + DEFAULT_SECTION_DELIMITER +
+                LINE_SEPARATOR + commentLinePrefix + "Copyright (C) 2010 Tony" + LINE_SEPARATOR +
+                commentLinePrefix + DEFAULT_SECTION_DELIMITER + LINE_SEPARATOR + commentLinePrefix + "License" +
                 LINE_SEPARATOR, boxedHeader );
 
         header = transformer.toString( model2 );
 
         boxedHeader = transformer.boxComment( header, true );
-        Assert.assertEquals(
-            COMMENT_START_TAG + LINE_SEPARATOR + COMMENT_LINE_PREFIX + "Description2" + LINE_SEPARATOR +
-                COMMENT_LINE_PREFIX + DEFAULT_SECTION_DELIMITER + LINE_SEPARATOR + COMMENT_LINE_PREFIX +
-                "Copyright (C) 2010 - 2012 Tony2" + LINE_SEPARATOR + COMMENT_LINE_PREFIX + DEFAULT_SECTION_DELIMITER +
-                LINE_SEPARATOR + COMMENT_LINE_PREFIX + "License2" + LINE_SEPARATOR + COMMENT_END_TAG + LINE_SEPARATOR,
-            boxedHeader );
+        Assert.assertEquals( commentStartTag + LINE_SEPARATOR + commentLinePrefix + "Description2" + LINE_SEPARATOR +
+                                 commentLinePrefix + DEFAULT_SECTION_DELIMITER + LINE_SEPARATOR + commentLinePrefix +
+                                 "Copyright (C) 2010 - 2012 Tony2" + LINE_SEPARATOR + commentLinePrefix +
+                                 DEFAULT_SECTION_DELIMITER +
+                                 LINE_SEPARATOR + commentLinePrefix + "License2" + LINE_SEPARATOR + commentEndTag +
+                                 LINE_SEPARATOR, boxedHeader );
 
         boxedHeader = transformer.boxComment( header, false );
         Assert.assertEquals(
-            COMMENT_LINE_PREFIX + "Description2" + LINE_SEPARATOR + COMMENT_LINE_PREFIX + DEFAULT_SECTION_DELIMITER +
-                LINE_SEPARATOR + COMMENT_LINE_PREFIX + "Copyright (C) 2010 - 2012 Tony2" + LINE_SEPARATOR +
-                COMMENT_LINE_PREFIX + DEFAULT_SECTION_DELIMITER + LINE_SEPARATOR + COMMENT_LINE_PREFIX + "License2" +
+            commentLinePrefix + "Description2" + LINE_SEPARATOR + commentLinePrefix + DEFAULT_SECTION_DELIMITER +
+                LINE_SEPARATOR + commentLinePrefix + "Copyright (C) 2010 - 2012 Tony2" + LINE_SEPARATOR +
+                commentLinePrefix + DEFAULT_SECTION_DELIMITER + LINE_SEPARATOR + commentLinePrefix + "License2" +
                 LINE_SEPARATOR, boxedHeader );
     }
 

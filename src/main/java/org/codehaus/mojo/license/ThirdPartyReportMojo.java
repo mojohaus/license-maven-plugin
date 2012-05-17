@@ -1,3 +1,5 @@
+package org.codehaus.mojo.license;
+
 /*
  * #%L
  * License Maven Plugin
@@ -19,7 +21,6 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
-package org.codehaus.mojo.license;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.maven.doxia.sink.Sink;
@@ -38,7 +39,6 @@ import org.codehaus.mojo.license.utils.MojoHelper;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
@@ -205,8 +205,7 @@ public class ThirdPartyReportMojo
      */
     public List<String> getExcludedScopes()
     {
-        String[] split = excludedScopes == null ? new String[0] : excludedScopes.split( "," );
-        return Arrays.asList( split );
+        return MojoHelper.getParams( excludedScopes );
     }
 
     /**
@@ -214,8 +213,7 @@ public class ThirdPartyReportMojo
      */
     public List<String> getIncludedScopes()
     {
-        String[] split = includedScopes == null ? new String[0] : includedScopes.split( "," );
-        return Arrays.asList( split );
+        return MojoHelper.getParams( includedScopes );
     }
 
     /**
@@ -312,10 +310,6 @@ public class ThirdPartyReportMojo
 
                 // this is a third-party licenses
                 detail.setThirdPartyLicenses( licenses );
-            }
-            else
-            {
-                // no license at all
             }
         }
         return details;

@@ -1,3 +1,5 @@
+package org.codehaus.mojo.license;
+
 /*
  * #%L
  * License Maven Plugin
@@ -19,8 +21,6 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
-
-package org.codehaus.mojo.license;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.doxia.sink.Sink;
@@ -174,6 +174,8 @@ public abstract class AbstractLicenseReportMojo
      * @param locale the locale to generate the report for.
      * @param sink   the report formatting tool.
      * @throws MavenReportException when things go wrong.
+     * @throws MojoExecutionException when things go wrong.
+     * @throws MojoFailureException when things go wrong.
      */
     protected abstract void doGenerateReport( Locale locale, Sink sink )
         throws MavenReportException, MojoExecutionException, MojoFailureException;

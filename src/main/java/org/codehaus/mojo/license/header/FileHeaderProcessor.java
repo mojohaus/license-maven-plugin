@@ -1,3 +1,5 @@
+package org.codehaus.mojo.license.header;
+
 /*
  * #%L
  * License Maven Plugin
@@ -20,8 +22,6 @@
  * #L%
  */
 
-package org.codehaus.mojo.license.header;
-
 import org.codehaus.mojo.license.header.transformer.FileHeaderTransformer;
 import org.nuiton.processor.Processor;
 
@@ -42,12 +42,12 @@ public class FileHeaderProcessor
 {
 
     /**
-     * processor configuration
+     * processor configuration.
      */
     protected FileHeaderProcessorConfiguration configuration;
 
     /**
-     * internal file header filter
+     * internal file header filter.
      */
     protected FileHeaderFilter filter;
 
@@ -95,7 +95,7 @@ public class FileHeaderProcessor
     }
 
     public void process( File filein, File fileout )
-        throws IOException, IllegalStateException
+        throws IOException
     {
 
         checkInit();
@@ -124,8 +124,6 @@ public class FileHeaderProcessor
     {
         FileHeader fileHeader = getConfiguration().getFileHeader();
         boolean change = false;
-
-        FileHeaderFilter filter = getFilter();
 
         if ( !fileHeader.equals( filter.getFileHeader() ) )
         {
@@ -182,7 +180,6 @@ public class FileHeaderProcessor
     }
 
     protected void checkInit()
-        throws IllegalStateException
     {
         if ( getConfiguration() == null )
         {

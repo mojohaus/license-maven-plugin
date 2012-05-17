@@ -1,3 +1,5 @@
+package org.codehaus.mojo.license;
+
 /*
  * #%L
  * License Maven Plugin
@@ -19,8 +21,6 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
-
-package org.codehaus.mojo.license;
 
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.mojo.license.model.License;
@@ -126,7 +126,6 @@ public abstract class AbstractLicenseNameMojo
     }
 
     public License getLicense( String licenseName, boolean checkIfExists )
-        throws IllegalArgumentException, IllegalStateException
     {
         if ( StringUtils.isEmpty( licenseName ) )
         {

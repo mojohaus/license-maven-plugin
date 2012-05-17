@@ -1,9 +1,8 @@
+package org.codehaus.mojo.license.model;
+
 /*
  * #%L
  * License Maven Plugin
- * 
- * $Id$
- * $HeadURL$
  * %%
  * Copyright (C) 2008 - 2011 CodeLutin, Codehaus, Tony Chemit
  * %%
@@ -22,8 +21,6 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
-
-package org.codehaus.mojo.license.model;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -48,22 +45,22 @@ public class LicenseStore
 {
 
     /**
-     * Logger
+     * Logger.
      */
     private static final Log LOG = LogFactory.getLog( LicenseStore.class );
 
     /**
-     * class-path directory where is the licenses repository
+     * class-path directory where is the licenses repository.
      */
     public static final String JAR_LICENSE_REPOSITORY = "/META-INF/licenses";
 
     /**
-     * list of available license repositories
+     * list of available license repositories.
      */
     protected List<LicenseRepository> repositories;
 
     /**
-     * flag to know if store was init
+     * flag to know if store was init.
      */
     protected boolean init;
 
@@ -236,7 +233,6 @@ public class LicenseStore
     }
 
     protected void checkInit( String operation )
-        throws IllegalStateException
     {
         if ( !init )
         {
@@ -245,7 +241,6 @@ public class LicenseStore
     }
 
     protected void checkNotInit( String operation )
-        throws IllegalStateException
     {
         if ( init )
         {

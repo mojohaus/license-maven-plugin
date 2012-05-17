@@ -1,3 +1,5 @@
+package org.codehaus.mojo.license;
+
 /*
  * #%L
  * License Maven Plugin
@@ -19,7 +21,6 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
-package org.codehaus.mojo.license;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.maven.doxia.sink.Sink;
@@ -181,13 +182,13 @@ public class ThirdPartyReportRenderer
         int numWithPomLicense = 0;
         int numWithThirdPartyLicense = 0;
         int numWithNoLicense = 0;
-        for ( ThirdPartyDetails details : allThirdParties )
+        for ( ThirdPartyDetails detail : allThirdParties )
         {
-            if ( details.hasPomLicenses() )
+            if ( detail.hasPomLicenses() )
             {
                 numWithPomLicense++;
             }
-            else if ( details.hasThirdPartyLicenses() )
+            else if ( detail.hasThirdPartyLicenses() )
             {
                 numWithThirdPartyLicense++;
             }
@@ -252,13 +253,13 @@ public class ThirdPartyReportRenderer
         sink.section2_();
     }
 
-    private void renderThirdPartyDetail( ThirdPartyDetails details )
+    private void renderThirdPartyDetail( ThirdPartyDetails detail )
     {
         sink.section2();
         sink.sectionTitle2();
-        sink.text( getGAV( details ) );
+        sink.text( getGAV( detail ) );
         sink.sectionTitle2_();
-        renderThirdPartyDetailTable( details );
+        renderThirdPartyDetailTable( detail );
 
         sink.link( "./third-party-report.html#" + getText( "report.overview.title" ) );
         sink.text( getText( "report.back.to.top.page" ) );

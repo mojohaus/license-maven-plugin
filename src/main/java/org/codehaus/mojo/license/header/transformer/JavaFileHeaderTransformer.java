@@ -1,3 +1,5 @@
+package org.codehaus.mojo.license.header.transformer;
+
 /*
  * #%L
  * License Maven Plugin
@@ -20,8 +22,6 @@
  * #L%
  */
 
-package org.codehaus.mojo.license.header.transformer;
-
 /**
  * Implementation of {@link FileHeaderTransformer} for java format.
  *
@@ -33,24 +33,20 @@ public class JavaFileHeaderTransformer
     extends AbstractFileHeaderTransformer
 {
 
-    public static final String NAME = "java";
-
-    public static final String DESCRIPTION = "header transformer with java comment style";
-
-    public static final String COMMENT_LINE_PREFIX = " * ";
-
-    public static final String COMMENT_START_TAG = "/*";
-
-    public static final String COMMENT_END_TAG = " */";
-
+    /**
+     * Default constructor.
+     */
     public JavaFileHeaderTransformer()
     {
-        super( NAME, DESCRIPTION, COMMENT_START_TAG, COMMENT_END_TAG, COMMENT_LINE_PREFIX );
+        super( "java", "header transformer with java comment style", "/*", " */", " * " );
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String[] getDefaultAcceptedExtensions()
     {
-        return new String[]{ NAME, "groovy", "css", "cs", "as", "aj", "c", "h", "cpp", "js", "json"
+        return new String[]{ "java", "groovy", "css", "cs", "as", "aj", "c", "h", "cpp", "js", "json"
 
         };
     }

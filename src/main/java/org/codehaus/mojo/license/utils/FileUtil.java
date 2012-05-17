@@ -1,3 +1,5 @@
+package org.codehaus.mojo.license.utils;
+
 /*
  * #%L
  * License Maven Plugin
@@ -19,8 +21,6 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
-
-package org.codehaus.mojo.license.utils;
 
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
@@ -204,14 +204,14 @@ public class FileUtil
 
     /**
      * Permet de lire un fichier et de retourner sont contenu sous forme d'une
-     * chaine de carateres
+     * chaine de carateres.
      *
      * @param file     le fichier a lire
      * @param encoding encoding to read file
      * @return the content of the file
      * @throws IOException if IO pb
      */
-    static public String readAsString( File file, String encoding )
+    public static String readAsString( File file, String encoding )
         throws IOException
     {
         FileInputStream inf = new FileInputStream( file );

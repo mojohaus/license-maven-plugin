@@ -1,3 +1,5 @@
+package org.codehaus.mojo.license.header.transformer;
+
 /*
  * #%L
  * License Maven Plugin
@@ -20,8 +22,6 @@
  * #L%
  */
 
-package org.codehaus.mojo.license.header.transformer;
-
 /**
  * Implementation of {@link FileHeaderTransformer} for xml format.
  *
@@ -33,27 +33,26 @@ public class XmlFileHeaderTransformer
     extends AbstractFileHeaderTransformer
 {
 
-    public static final String NAME = "xml";
-
-    public static final String DESCRIPTION = "header transformer with xml comment style";
-
-    public static final String COMMENT_LINE_PREFIX = "  ";
-
-    public static final String COMMENT_START_TAG = "<!--";
-
-    public static final String COMMENT_END_TAG = "  -->";
-
+    /**
+     * Default constructor.
+     */
     public XmlFileHeaderTransformer()
     {
-        super( NAME, DESCRIPTION, COMMENT_START_TAG, COMMENT_END_TAG, COMMENT_LINE_PREFIX );
+        super( "xml", "header transformer with xml comment style", "<!--", "  -->", "  " );
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String[] getDefaultAcceptedExtensions()
     {
         return new String[]{ "pom", "xml", "xhtml", "mxlm", "dtd", "fml", "xsl", "html", "htm", "jaxx", "kml", "gsp",
             "tml" };
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String addHeader( String header, String content )
     {

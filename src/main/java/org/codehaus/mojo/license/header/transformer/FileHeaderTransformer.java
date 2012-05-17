@@ -1,3 +1,5 @@
+package org.codehaus.mojo.license.header.transformer;
+
 /*
  * #%L
  * License Maven Plugin
@@ -19,9 +21,6 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
-
-package org.codehaus.mojo.license.header.transformer;
-
 
 import org.codehaus.mojo.license.header.FileHeader;
 
@@ -49,25 +48,28 @@ public interface FileHeaderTransformer
 {
 
     /**
-     * Plexus component role
+     * Plexus component role.
      */
     String ROLE_NAME = FileHeaderTransformer.class.getName();
 
     /**
-     * default section delimiter
+     * default section delimiter.
      */
     String DEFAULT_SECTION_DELIMITER = "%" + "%";
 
     /**
-     * default process start tag
+     * default process start tag.
      */
     String DEFAULT_PROCESS_START_TAG = "#" + "%" + "L";
 
     /**
-     * default process end tag
+     * default process end tag.
      */
     String DEFAULT_PROCESS_END_TAG = "#" + "L" + "%";
 
+    /**
+     * File separator.
+     */
     char LINE_SEPARATOR = '\n';
 
     /**
@@ -193,22 +195,18 @@ public interface FileHeaderTransformer
     /**
      * Build a UNBOXED header content from the given {@code model}.
      *
-     * @param model the model of the file header
+     * @param model the model of the file header (can not be null)
      * @return the UNBOXED header content
-     * @throws NullPointerException if model is null
      */
-    String toString( FileHeader model )
-        throws NullPointerException;
+    String toString( FileHeader model );
 
     /**
      * Build a fully boxed header content from the given {@code model}.
      *
-     * @param model the model of the file header
+     * @param model the model of the file header (can not be null)
      * @return the fully boxed header content
-     * @throws NullPointerException if model is null
      */
-    String toHeaderContent( FileHeader model )
-        throws NullPointerException;
+    String toHeaderContent( FileHeader model );
 
     /**
      * Tests if the description of the two models are equals.

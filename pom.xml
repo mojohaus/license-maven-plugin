@@ -4,7 +4,7 @@
   #%L
   License Maven Plugin
   %%
-  Copyright (C) 2011-2012 CodeLutin, Codehaus
+  Copyright (C) 2011-2012 CodeLutin, Codehaus, tony Chzemit
   %%
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU Lesser General Public License as
@@ -33,7 +33,7 @@
   <artifactId>license-maven-plugin</artifactId>
   <packaging>maven-plugin</packaging>
   <name>License Maven Plugin</name>
-  <version>1.2-SNAPSHOT</version>
+  <version>1.1-SNAPSHOT</version>
   <description>Maven plugin to download and collect license files from project dependencies.</description>
 
   <scm>
@@ -387,6 +387,14 @@
             <version>1.5</version>
           </plugin>
 
+          <plugin>
+            <artifactId>maven-checkstyle-plugin</artifactId>
+            <configuration>
+              <headerLocation>config/checkstyle-header.txt</headerLocation>
+            </configuration>
+          </plugin>
+
+          <!-- TODO Will be used after release of version 1.1 -->
           <!--plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>license-maven-plugin</artifactId>

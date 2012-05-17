@@ -1,3 +1,5 @@
+package org.codehaus.mojo.license.header.transformer;
+
 /*
  * #%L
  * License Maven Plugin
@@ -19,7 +21,6 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
-package org.codehaus.mojo.license.header.transformer;
 
 /**
  * Implementation of {@link FileHeaderTransformer} for PHP format.
@@ -33,24 +34,20 @@ public class PhpFileHeaderTransformer
     extends AbstractFileHeaderTransformer
 {
 
-    public static final String NAME = "php";
-
-    public static final String DESCRIPTION = "header transformer with php comment style";
-
-    public static final String COMMENT_LINE_PREFIX = " * ";
-
-    public static final String COMMENT_START_TAG = "<?php /*";
-
-    public static final String COMMENT_END_TAG = " */ ?>";
-
+    /**
+     * Default constructor.
+     */
     public PhpFileHeaderTransformer()
     {
-        super( NAME, DESCRIPTION, COMMENT_START_TAG, COMMENT_END_TAG, COMMENT_LINE_PREFIX );
+        super( "php", "header transformer with php comment style", "<?php /*", " */ ?>", " * " );
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String[] getDefaultAcceptedExtensions()
     {
-        return new String[]{ NAME };
+        return new String[]{ "php" };
     }
 
 }

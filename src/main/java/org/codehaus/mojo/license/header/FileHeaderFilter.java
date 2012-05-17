@@ -1,3 +1,5 @@
+package org.codehaus.mojo.license.header;
+
 /*
  * #%L
  * License Maven Plugin
@@ -19,8 +21,6 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
-
-package org.codehaus.mojo.license.header;
 
 import org.apache.maven.plugin.logging.Log;
 import org.codehaus.mojo.license.header.transformer.FileHeaderTransformer;
@@ -53,32 +53,32 @@ public abstract class FileHeaderFilter
     protected boolean detectHeader;
 
     /**
-     * incoming default file header model
+     * incoming default file header model.
      */
     protected FileHeader fileHeader;
 
     /**
-     * header transformer
+     * header transformer.
      */
     protected FileHeaderTransformer transformer;
 
     /**
-     * cached header content
+     * cached header content.
      */
     protected String headerContent;
 
     /**
-     * cached full header content (with process tag + comment box)
+     * cached full header content (with process tag + comment box).
      */
     protected String processTagHeaderContent;
 
     /**
-     * cached full header content (with process tag + comment box)
+     * cached full header content (with process tag + comment box).
      */
     protected String fullHeaderContent;
 
     /**
-     * maven logger
+     * maven logger.
      */
     protected Log log;
 
@@ -93,20 +93,35 @@ public abstract class FileHeaderFilter
      */
     protected abstract FileHeader getNewHeader( FileHeader oldHeader );
 
+    /**
+     * Default constructor.
+     */
     public FileHeaderFilter()
     {
     }
 
+    /**
+     *
+     * @return logger
+     */
     public Log getLog()
     {
         return log;
     }
 
+    /**
+     * Sets the logger.
+     *
+     * @param log logger to use
+     */
     public void setLog( Log log )
     {
         this.log = log;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected String performInFilter( String ch )
     {
@@ -159,6 +174,9 @@ public abstract class FileHeaderFilter
         return ch;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected String performOutFilter( String ch )
     {
@@ -169,18 +187,27 @@ public abstract class FileHeaderFilter
         return ch;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected String getHeader()
     {
         return getTransformer().getProcessStartTag();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected String getFooter()
     {
         return getTransformer().getProcessEndTag();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void changeState( State newState )
     {

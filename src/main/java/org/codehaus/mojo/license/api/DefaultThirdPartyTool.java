@@ -1,3 +1,5 @@
+package org.codehaus.mojo.license.api;
+
 /*
  * #%L
  * License Maven Plugin
@@ -19,9 +21,7 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
-package org.codehaus.mojo.license.api;
 
-import freemarker.template.Template;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.artifact.Artifact;
@@ -32,7 +32,6 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.model.License;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.MavenProjectHelper;
 import org.codehaus.mojo.license.model.LicenseMap;
 import org.codehaus.mojo.license.utils.FileUtil;
@@ -68,9 +67,26 @@ public class DefaultThirdPartyTool
     extends AbstractLogEnabled
     implements ThirdPartyTool
 {
+    /**
+     * Classifier of the third-parties descriptor attached to a maven module.
+     */
     public static final String DESCRIPTOR_CLASSIFIER = "third-party";
 
+    /**
+     * Type of the the third-parties descriptor attached to a maven module.
+     */
     public static final String DESCRIPTOR_TYPE = "properties";
+
+    /**
+     * Pattern of a GAV plus a type.
+     */
+    private static final Pattern GAV_PLUS_TYPE_PATTERN = Pattern.compile( "(.+)--(.+)--(.+)--(.+)" );
+
+    /**
+     * Pattenr of a GAV plus a type plus a classifier.
+     */
+    private static final Pattern GAV_PLUS_TYPE_AND_CLASSIFIER_PATTERN =
+        Pattern.compile( "(.+)--(.+)--(.+)--(.+)--(.+)" );
 
     // ----------------------------------------------------------------------
     // Components
@@ -89,13 +105,6 @@ public class DefaultThirdPartyTool
      * @plexus.requirement
      */
     private ArtifactFactory artifactFactory;
-
-    /**
-     * Project builder.
-     *
-     * @plexus.requirement
-     */
-    private MavenProjectBuilder mavenProjectBuilder;
 
     /**
      * Maven ProjectHelper.
@@ -119,7 +128,6 @@ public class DefaultThirdPartyTool
      */
     public void attachThirdPartyDescriptor( MavenProject project, File file )
     {
-
         projectHelper.attachArtifact( project, DESCRIPTOR_TYPE, DESCRIPTOR_CLASSIFIER, file );
     }
 
@@ -507,8 +515,6 @@ public class DefaultThirdPartyTool
 
         Logger log = getLogger();
 
-        Template lineTemplate = freeMarkerHelper.getTemplate( lineFormat );
-
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put( "licenseMap", licenseMap.entrySet() );
         properties.put( "dependencyMap", licenseMap.toDependencyMap().entrySet() );
@@ -585,10 +591,6 @@ public class DefaultThirdPartyTool
 
         return result;
     }
-
-    private final Pattern GAV_PLUS_TYPE_PATTERN = Pattern.compile( "(.+)--(.+)--(.+)--(.+)" );
-
-    private final Pattern GAV_PLUS_TYPE_AND_CLASSIFIER_PATTERN = Pattern.compile( "(.+)--(.+)--(.+)--(.+)--(.+)" );
 
     private Map<String, String> migrateMissingFileKeys( Set<Object> missingFileKeys )
     {
