@@ -56,7 +56,7 @@ public class AggregatorAddThirdPartyMojo
     /**
      * The projects in the reactor.
      *
-     * @parameter expression="${reactorProjects}"
+     * @parameter property="reactorProjects"
      * @readonly
      * @required
      * @since 1.0

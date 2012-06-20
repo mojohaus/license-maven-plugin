@@ -48,7 +48,7 @@ public class CommentStyleListMojo
     /**
      * A flag to display also the content of each license.
      *
-     * @parameter expression="${detail}"
+     * @parameter property="detail"
      * @since 1.0
      */
     private boolean detail;

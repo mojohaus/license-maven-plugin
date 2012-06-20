@@ -70,7 +70,7 @@ public class AddThirdPartyMojo
     /**
      * Deploy the third party missing file in maven repository.
      *
-     * @parameter expression="${license.deployMissingFile}"  default-value="true"
+     * @parameter property="license.deployMissingFile"  default-value="true"
      * @since 1.0
      */
     private boolean deployMissingFile;
@@ -78,7 +78,7 @@ public class AddThirdPartyMojo
     /**
      * Load from repositories third party missing files.
      *
-     * @parameter expression="${license.useRepositoryMissingFiles}"  default-value="true"
+     * @parameter property="license.useRepositoryMissingFiles"  default-value="true"
      * @since 1.0
      */
     private boolean useRepositoryMissingFiles;
@@ -88,7 +88,7 @@ public class AddThirdPartyMojo
      * <p/>
      * <strong>Note:</strong> The default value is {@code false}.
      *
-     * @parameter expression="${license.acceptPomPackaging}"  default-value="false"
+     * @parameter property="license.acceptPomPackaging"  default-value="false"
      * @since 1.1
      */
     private boolean acceptPomPackaging;
@@ -96,7 +96,7 @@ public class AddThirdPartyMojo
     /**
      * A filter to exclude some scopes.
      *
-     * @parameter expression="${license.excludedScopes}" default-value="system"
+     * @parameter property="license.excludedScopes" default-value="system"
      * @since 1.1
      */
     private String excludedScopes;
@@ -104,7 +104,7 @@ public class AddThirdPartyMojo
     /**
      * A filter to include only some scopes, if let empty then all scopes will be used (no filter).
      *
-     * @parameter expression="${license.includedScopes}" default-value=""
+     * @parameter property="license.includedScopes" default-value=""
      * @since 1.1
      */
     private String includedScopes;
@@ -112,7 +112,7 @@ public class AddThirdPartyMojo
     /**
      * A filter to exclude some GroupIds
      *
-     * @parameter expression="${license.excludedGroups}" default-value=""
+     * @parameter property="license.excludedGroups" default-value=""
      * @since 1.1
      */
     private String excludedGroups;
@@ -120,7 +120,7 @@ public class AddThirdPartyMojo
     /**
      * A filter to include only some GroupIds
      *
-     * @parameter expression="${license.includedGroups}" default-value=""
+     * @parameter property="license.includedGroups" default-value=""
      * @since 1.1
      */
     private String includedGroups;
@@ -128,7 +128,7 @@ public class AddThirdPartyMojo
     /**
      * A filter to exclude some ArtifactsIds
      *
-     * @parameter expression="${license.excludedArtifacts}" default-value=""
+     * @parameter property="license.excludedArtifacts" default-value=""
      * @since 1.1
      */
     private String excludedArtifacts;
@@ -136,7 +136,7 @@ public class AddThirdPartyMojo
     /**
      * A filter to include only some ArtifactsIds
      *
-     * @parameter expression="${license.includedArtifacts}" default-value=""
+     * @parameter property="license.includedArtifacts" default-value=""
      * @since 1.1
      */
     private String includedArtifacts;

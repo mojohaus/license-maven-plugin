@@ -97,7 +97,7 @@ public class DownloadLicensesMojo
     /**
      * Input file containing a mapping between each dependency and it's license information.
      *
-     * @parameter default-value="${project.basedir}/src/license/licenses.xml" expression="${licensesConfigFile}"
+     * @parameter property="licensesConfigFile" default-value="${project.basedir}/src/license/licenses.xml"
      * @since 1.0
      */
     private File licensesConfigFile;
@@ -105,7 +105,7 @@ public class DownloadLicensesMojo
     /**
      * The directory to which the dependency licenses should be written.
      *
-     * @parameter default-value="${project.build.directory}/generated-resources/licenses" expression="${licensesOutputDirectory}
+     * @parameter property="licensesOutputDirectory" default-value="${project.build.directory}/generated-resources/licenses"
      * @since 1.0
      */
     private File licensesOutputDirectory;
@@ -113,7 +113,7 @@ public class DownloadLicensesMojo
     /**
      * The output file containing a mapping between each dependency and it's license information.
      *
-     * @parameter default-value="${project.build.directory}/generated-resources/licenses.xml" expression="${licensesOutputFile}
+     * @parameter property="licensesOutputFile" default-value="${project.build.directory}/generated-resources/licenses.xml"
      * @since 1.0
      */
     private File licensesOutputFile;
@@ -121,7 +121,7 @@ public class DownloadLicensesMojo
     /**
      * A filter to exclude some scopes.
      *
-     * @parameter expression="${license.excludedScopes}" default-value="system"
+     * @parameter property="license.excludedScopes" default-value="system"
      * @since 1.0
      */
     private String excludedScopes;
@@ -129,7 +129,7 @@ public class DownloadLicensesMojo
     /**
      * A filter to include only some scopes, if let empty then all scopes will be used (no filter).
      *
-     * @parameter expression="${license.includedScopes}" default-value=""
+     * @parameter property="license.includedScopes" default-value=""
      * @since 1.0
      */
     private String includedScopes;

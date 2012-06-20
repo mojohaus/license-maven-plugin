@@ -59,7 +59,7 @@ public abstract class AbstractAddThirdPartyMojo
     /**
      * Directory where to generate files.
      *
-     * @parameter expression="${license.outputDirectory}" default-value="${project.build.directory}/generated-sources/license"
+     * @parameter property="license.outputDirectory" default-value="${project.build.directory}/generated-sources/license"
      * @required
      * @since 1.0
      */
@@ -68,7 +68,7 @@ public abstract class AbstractAddThirdPartyMojo
     /**
      * File where to wirte the third-party file.
      *
-     * @parameter expression="${license.thirdPartyFilename}" default-value="THIRD-PARTY.txt"
+     * @parameter property="license.thirdPartyFilename" default-value="THIRD-PARTY.txt"
      * @required
      * @since 1.0
      */
@@ -77,7 +77,7 @@ public abstract class AbstractAddThirdPartyMojo
     /**
      * A flag to use the missing licenses file to consolidate the THID-PARTY file.
      *
-     * @parameter expression="${license.useMissingFile}"  default-value="false"
+     * @parameter property="license.useMissingFile"  default-value="false"
      * @since 1.0
      */
     private boolean useMissingFile;
@@ -85,7 +85,7 @@ public abstract class AbstractAddThirdPartyMojo
     /**
      * The file where to fill the license for dependencies with unknwon license.
      *
-     * @parameter expression="${license.missingFile}"  default-value="src/license/THIRD-PARTY.properties"
+     * @parameter property="license.missingFile"  default-value="src/license/THIRD-PARTY.properties"
      * @since 1.0
      */
     private File missingFile;
@@ -114,7 +114,7 @@ public abstract class AbstractAddThirdPartyMojo
      * If this parameter is filled and a license is not in this {@code whitelist} then build will failed when property
      * {@link #failIfWarning} is setted on.
      *
-     * @parameter expression="${license.includedLicenses}" default-value=""
+     * @parameter property="license.includedLicenses" default-value=""
      * @since 1.1
      */
     private String includedLicenses;
@@ -125,7 +125,7 @@ public abstract class AbstractAddThirdPartyMojo
      * If a such license is found then build will failed when property
      * {@link #failIfWarning} is setted on.
      *
-     * @parameter expression="${license.excludedLicenses}" default-value=""
+     * @parameter property="license.excludedLicenses" default-value=""
      * @since 1.1
      */
     private String excludedLicenses;
@@ -136,7 +136,7 @@ public abstract class AbstractAddThirdPartyMojo
      * <p/>
      * <b>Note:</b> This option is not available for {@code pom} module types.
      *
-     * @parameter expression="${license.bundleThirdPartyPath}"  default-value="META-INF/${project.artifactId}-THIRD-PARTY.txt"
+     * @parameter property="license.bundleThirdPartyPath"  default-value="META-INF/${project.artifactId}-THIRD-PARTY.txt"
      * @since 1.0
      */
     private String bundleThirdPartyPath;
@@ -147,7 +147,7 @@ public abstract class AbstractAddThirdPartyMojo
      * <p/>
      * The file will be copied at the {@link #bundleThirdPartyPath} location.
      *
-     * @parameter expression="${license.generateBundle}"  default-value="false"
+     * @parameter property="license.generateBundle"  default-value="false"
      * @since 1.0
      */
     private boolean generateBundle;
@@ -155,7 +155,7 @@ public abstract class AbstractAddThirdPartyMojo
     /**
      * To force generation of the third-party file even if every thing is up to date.
      *
-     * @parameter expression="${license.force}"  default-value="false"
+     * @parameter property="license.force"  default-value="false"
      * @since 1.0
      */
     private boolean force;
@@ -163,7 +163,7 @@ public abstract class AbstractAddThirdPartyMojo
     /**
      * A flag to fail the build if at least one dependency was detected without a license.
      *
-     * @parameter expression="${license.failIfWarning}"  default-value="false"
+     * @parameter property="license.failIfWarning"  default-value="false"
      * @since 1.0
      */
     private boolean failIfWarning;
@@ -179,7 +179,7 @@ public abstract class AbstractAddThirdPartyMojo
      * correct template for this purpose (value {@code /org/codehaus/mojo/license/third-party-file-groupByLicense.ftl}
      * to parameter {@code fileTemplate})
      *
-     * @parameter expression="${license.groupByLicense}"  default-value="false"
+     * @parameter property="license.groupByLicense"  default-value="false"
      * @since 1.0
      * @deprecated since 1.1, please use the correct value for the parameter {@code fileTemplate}
      */
@@ -191,7 +191,7 @@ public abstract class AbstractAddThirdPartyMojo
      * <p/>
      * (This template use freemarker).
      *
-     * @parameter expression="${license.fileTemplate}" default-value="/org/codehaus/mojo/license/third-party-file.ftl"
+     * @parameter property="license.fileTemplate" default-value="/org/codehaus/mojo/license/third-party-file.ftl"
      * @since 1.1
      */
     private String fileTemplate;
@@ -199,7 +199,7 @@ public abstract class AbstractAddThirdPartyMojo
     /**
      * Local Repository.
      *
-     * @parameter expression="${localRepository}"
+     * @parameter property="localRepository"
      * @required
      * @readonly
      * @since 1.0.0
@@ -209,7 +209,7 @@ public abstract class AbstractAddThirdPartyMojo
     /**
      * Remote repositories used for the project.
      *
-     * @parameter expression="${project.remoteArtifactRepositories}"
+     * @parameter property="project.remoteArtifactRepositories"
      * @required
      * @readonly
      * @since 1.0.0

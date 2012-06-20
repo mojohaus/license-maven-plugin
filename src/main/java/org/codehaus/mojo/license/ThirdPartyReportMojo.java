@@ -65,7 +65,7 @@ public class ThirdPartyReportMojo
     /**
      * A filter to exclude some scopes.
      *
-     * @parameter expression="${license.excludedScopes}" default-value="system"
+     * @parameter property="license.excludedScopes" default-value="system"
      * @since 1.1
      */
     private String excludedScopes;
@@ -73,7 +73,7 @@ public class ThirdPartyReportMojo
     /**
      * A filter to include only some scopes, if let empty then all scopes will be used (no filter).
      *
-     * @parameter expression="${license.includedScopes}" default-value=""
+     * @parameter property="license.includedScopes" default-value=""
      * @since 1.1
      */
     private String includedScopes;
@@ -81,7 +81,7 @@ public class ThirdPartyReportMojo
     /**
      * A filter to exclude some GroupIds
      *
-     * @parameter expression="${license.excludedGroups}" default-value=""
+     * @parameter property="license.excludedGroups" default-value=""
      * @since 1.1
      */
     private String excludedGroups;
@@ -89,7 +89,7 @@ public class ThirdPartyReportMojo
     /**
      * A filter to include only some GroupIds
      *
-     * @parameter expression="${license.includedGroups}" default-value=""
+     * @parameter property="license.includedGroups" default-value=""
      * @since 1.1
      */
     private String includedGroups;
@@ -97,7 +97,7 @@ public class ThirdPartyReportMojo
     /**
      * A filter to exclude some ArtifactsIds
      *
-     * @parameter expression="${license.excludedArtifacts}" default-value=""
+     * @parameter property="license.excludedArtifacts" default-value=""
      * @since 1.1
      */
     private String excludedArtifacts;
@@ -105,7 +105,7 @@ public class ThirdPartyReportMojo
     /**
      * A filter to include only some ArtifactsIds
      *
-     * @parameter expression="${license.includedArtifacts}" default-value=""
+     * @parameter property="license.includedArtifacts" default-value=""
      * @since 1.1
      */
     private String includedArtifacts;
@@ -121,7 +121,7 @@ public class ThirdPartyReportMojo
     /**
      * A flag to use the missing licenses file to consolidate the THID-PARTY file.
      *
-     * @parameter expression="${license.useMissingFile}"  default-value="false"
+     * @parameter property="license.useMissingFile"  default-value="false"
      * @since 1.1
      */
     private boolean useMissingFile;
@@ -129,7 +129,7 @@ public class ThirdPartyReportMojo
     /**
      * The file where to fill the license for dependencies with unknwon license.
      *
-     * @parameter expression="${license.missingFile}"  default-value="src/license/THIRD-PARTY.properties"
+     * @parameter property="license.missingFile"  default-value="src/license/THIRD-PARTY.properties"
      * @since 1.1
      */
     private File missingFile;
@@ -137,7 +137,7 @@ public class ThirdPartyReportMojo
     /**
      * Load from repositories third party missing files.
      *
-     * @parameter expression="${license.useRepositoryMissingFiles}"  default-value="true"
+     * @parameter property="license.useRepositoryMissingFiles"  default-value="true"
      * @since 1.0
      */
     private boolean useRepositoryMissingFiles;

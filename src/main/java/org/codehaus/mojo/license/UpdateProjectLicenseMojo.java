@@ -49,7 +49,7 @@ public class UpdateProjectLicenseMojo
      * Project license file to synchronize with main license defined in
      * descriptor file.
      *
-     * @parameter expression="${license.licenceFile}" default-value="${basedir}/LICENSE.txt"
+     * @parameter property="license.licenceFile" default-value="${basedir}/LICENSE.txt"
      * @required
      * @since 1.0
      */
@@ -60,7 +60,7 @@ public class UpdateProjectLicenseMojo
      * <p/>
      * <b>Note:</b> This option is not available for {@code pom} module types.
      *
-     * @parameter expression="${license.outputDirectory}"  default-value="target/generated-sources/license"
+     * @parameter property="license.outputDirectory"  default-value="target/generated-sources/license"
      * @since 1.0
      */
     protected File outputDirectory;
@@ -76,7 +76,7 @@ public class UpdateProjectLicenseMojo
      * <p/>
      * <b>Note:</b> This option is not available for {@code pom} module types.
      *
-     * @parameter expression="${license.generateBundle}"  default-value="false"
+     * @parameter property="license.generateBundle"  default-value="false"
      * @since 1.0
      */
     protected boolean generateBundle;
@@ -87,7 +87,7 @@ public class UpdateProjectLicenseMojo
      * <p/>
      * <b>Note:</b> This option is not available for {@code pom} module types.
      *
-     * @parameter expression="${license.bundleLicensePath}"  default-value="META-INF/${project.artifactId}-LICENSE.txt"
+     * @parameter property="license.bundleLicensePath"  default-value="META-INF/${project.artifactId}-LICENSE.txt"
      * @since 1.0
      */
     protected String bundleLicensePath;
@@ -95,7 +95,7 @@ public class UpdateProjectLicenseMojo
     /**
      * A flag to force to generate project license file even if it is up-to-date.
      *
-     * @parameter expression="${license.force}"  default-value="false"
+     * @parameter property="license.force"  default-value="false"
      * @since 1.0.0
      */
     protected boolean force;
@@ -103,7 +103,7 @@ public class UpdateProjectLicenseMojo
     /**
      * A flag to skip the goal.
      *
-     * @parameter expression="${license.skipUpdateProjectLicense}" default-value="false"
+     * @parameter property="license.skipUpdateProjectLicense" default-value="false"
      * @since 1.0
      */
     protected boolean skipUpdateProjectLicense;

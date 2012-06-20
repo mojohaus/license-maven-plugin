@@ -43,7 +43,7 @@ public abstract class AbstractLicenseNameMojo
      * To specify an external extra licenses repository resolver (says the base
      * url of the repository where the {@code license.properties} is present).
      *
-     * @parameter expression="${license.licenseResolver}"
+     * @parameter property="license.licenseResolver"
      * @since 1.0
      */
     private String licenseResolver;
@@ -51,7 +51,7 @@ public abstract class AbstractLicenseNameMojo
     /**
      * A flag to keep a backup of every modified file.
      *
-     * @parameter expression="${license.keepBackup}"  default-value="false"
+     * @parameter property="license.keepBackup"  default-value="false"
      * @since 1.0
      */
     private boolean keepBackup;
@@ -59,7 +59,7 @@ public abstract class AbstractLicenseNameMojo
     /**
      * Name of the license to use in the project.
      *
-     * @parameter expression="${license.licenseName}"
+     * @parameter property="license.licenseName"
      * @since 1.0
      */
     private String licenseName;

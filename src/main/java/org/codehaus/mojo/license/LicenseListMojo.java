@@ -48,7 +48,7 @@ public class LicenseListMojo
     /**
      * the url of an extra license repository.
      *
-     * @parameter expression="${extraResolver}"
+     * @parameter property="extraResolver"
      * @since 1.0
      */
     private String extraResolver;
@@ -56,7 +56,7 @@ public class LicenseListMojo
     /**
      * A flag to display also the content of each license.
      *
-     * @parameter expression="${detail}"
+     * @parameter property="detail"
      * @since 1.0
      */
     private boolean detail;

@@ -47,7 +47,7 @@ public abstract class AbstractLicenseMojo
     /**
      * Current maven session. (used to launch certain mojo once by build).
      *
-     * @parameter expression="${session}"
+     * @parameter property="session"
      * @required
      * @readonly
      * @since 1.0
@@ -69,7 +69,7 @@ public abstract class AbstractLicenseMojo
      * <b>Note:</b> Verbose mode is always on if you starts a debug maven instance
      * (says via {@code -X}).
      *
-     * @parameter expression="${license.verbose}"  default-value="${maven.verbose}"
+     * @parameter property="license.verbose"  default-value="${maven.verbose}"
      * @since 1.0
      */
     private boolean verbose;
@@ -80,7 +80,7 @@ public abstract class AbstractLicenseMojo
      * <b>Note:</b> If nothing is filled here, we will use the system
      * property {@code file.encoding}.
      *
-     * @parameter expression="${license.encoding}" default-value="${project.build.sourceEncoding}"
+     * @parameter property="license.encoding" default-value="${project.build.sourceEncoding}"
      * @since 1.0
      */
     private String encoding;

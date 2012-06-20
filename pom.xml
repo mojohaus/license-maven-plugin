@@ -269,17 +269,6 @@
         </executions>
       </plugin>
 
-      <plugin>
-        <artifactId>maven-plugin-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>helpmojo</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
     </plugins>
 
     <pluginManagement>
@@ -288,6 +277,10 @@
           <groupId>org.codehaus.plexus</groupId>
           <artifactId>plexus-component-metadata</artifactId>
           <version>1.5.5</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-plugin-plugin</artifactId>
+          <version>3.0</version>
         </plugin>
       </plugins>
     </pluginManagement>

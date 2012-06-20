@@ -53,7 +53,7 @@ public abstract class AbstractLicenseReportMojo
     /**
      * The Maven Project.
      *
-     * @parameter expression="${project}"
+     * @parameter property="project"
      * @required
      * @readonly
      * @since 1.1
@@ -77,7 +77,7 @@ public abstract class AbstractLicenseReportMojo
      * <b>Note:</b> Verbose mode is always on if you starts a debug maven instance
      * (says via {@code -X}).
      *
-     * @parameter expression="${license.verbose}"  default-value="${maven.verbose}"
+     * @parameter property="license.verbose"  default-value="${maven.verbose}"
      * @since 1.0
      */
     private boolean verbose;
@@ -86,7 +86,7 @@ public abstract class AbstractLicenseReportMojo
     /**
      * Skip to generate the report.
      *
-     * @parameter expression="${license.skip}"
+     * @parameter property="license.skip"
      * @since 1.1
      */
     private Boolean skip;
@@ -97,7 +97,7 @@ public abstract class AbstractLicenseReportMojo
      * <b>Note:</b> If nothing is filled here, we will use the system
      * property {@code file.encoding}.
      *
-     * @parameter expression="${license.encoding}" default-value="${project.build.sourceEncoding}"
+     * @parameter property="license.encoding" default-value="${project.build.sourceEncoding}"
      * @since 1.0
      */
     private String encoding;
@@ -121,7 +121,7 @@ public abstract class AbstractLicenseReportMojo
     /**
      * Local Repository.
      *
-     * @parameter expression="${localRepository}"
+     * @parameter property="localRepository"
      * @required
      * @readonly
      * @since 1.1
@@ -131,7 +131,7 @@ public abstract class AbstractLicenseReportMojo
     /**
      * Remote repositories used for the project.
      *
-     * @parameter expression="${project.remoteArtifactRepositories}"
+     * @parameter property="project.remoteArtifactRepositories"
      * @required
      * @readonly
      * @since 1.1
