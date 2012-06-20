@@ -88,6 +88,15 @@
     <maven>${mavenVersion}</maven>
   </prerequisites>
 
+  <!-- tchemit-20120620 Do not remove this, it is used to deploy SNAPSHOT site -->
+  <distributionManagement>
+    <site>
+      <id>codehaus.org</id>
+      <name>Mojo Website</name>
+      <url>dav:https://dav.codehaus.org/mojo/license-maven-plugin</url>
+    </site>
+  </distributionManagement>
+
   <properties>
     <mojo.java.target>1.5</mojo.java.target>
     <mavenVersion>2.2.1</mavenVersion>
