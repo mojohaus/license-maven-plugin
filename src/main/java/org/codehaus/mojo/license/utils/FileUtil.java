@@ -35,6 +35,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * Some basic file io utilities
@@ -248,5 +253,17 @@ public class FileUtil
         {
             out.close();
         }
+    }
+
+    public static List<File> orderFiles(Collection<File> files) {
+        List<File> result = new ArrayList<File>( files );
+        Collections.sort( result, new Comparator<File>()
+        {
+            public int compare( File o1, File o2 )
+            {
+                return o1.getAbsolutePath().compareTo( o2.getAbsolutePath() );
+            }
+        } );
+        return result;
     }
 }

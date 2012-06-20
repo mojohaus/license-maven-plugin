@@ -99,6 +99,7 @@
     <!-- license configuration -->
     <license.useMissingFile>true</license.useMissingFile>
     <license.failIfWarning>true</license.failIfWarning>
+    <license.licenseName>lgpl_v3</license.licenseName>
     <licensePluginVersion>1.1</licensePluginVersion>
 
   </properties>
