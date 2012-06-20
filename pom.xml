@@ -89,6 +89,7 @@
   </prerequisites>
 
   <!-- tchemit-20120620 Do not remove this, it is used to deploy SNAPSHOT site -->
+  <url>http://mojo.codehaus.org/license-maven-plugin</url>
   <distributionManagement>
     <site>
       <id>codehaus.org</id>
