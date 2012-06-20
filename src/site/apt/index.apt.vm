@@ -54,13 +54,13 @@ ${project.name}
   
   * <<<{{{./update-file-header-mojo.html}license:update-file-header}}>>>\
     Update the license header of the current project source files.
-  
+
+  * <<<{{{./check-file-header-mojo.html}license:check-file-header}}>>>\
+    check the license header of the current project source files.
+
   * <<<{{{./update-project-license-mojo.html}license:update-project-license}}>>>\
     Updates (or creates) the main project license file according to the license defined in the licenseName parameter.
 
-    * <<<{{{./check-project-license-mojo.html}license:check-project-license}}>>>\
-    Checks the main project license file according to the license defined in the licenseName parameter.
-  
 * {Usage}
   
   General instructions on how to use the License Plugin can be found on the {{{./usage.html}usage page}}. Some more

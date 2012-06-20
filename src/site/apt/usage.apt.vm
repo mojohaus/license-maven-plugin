@@ -120,10 +120,7 @@ Usage
 
   This goal checks the license header based on the configuration on project sources files.
 
-  For more information, see the {{{./examples/update-file-header-config.html}examples}} and
-  for full detail see {{{./update-file-header-mojo.html}detail page}}.
-
-  for full detail on the configuration see {{{./checks-file-header-config.html}detail page}}.
+  For full detail see {{{./check-file-header-mojo.html}detail page}}.
 
   This goal has same behaviour that the update-file-header with dryRun option.
 
