@@ -31,6 +31,7 @@ import org.codehaus.mojo.license.header.FileHeaderProcessorConfiguration;
 import org.codehaus.mojo.license.header.InvalideFileHeaderException;
 import org.codehaus.mojo.license.header.UpdateFileHeaderFilter;
 import org.codehaus.mojo.license.header.transformer.FileHeaderTransformer;
+import org.codehaus.mojo.license.header.transformer.JavaFileHeaderTransformer;
 import org.codehaus.mojo.license.model.License;
 import org.codehaus.mojo.license.utils.FileUtil;
 import org.codehaus.mojo.license.utils.MojoHelper;
@@ -231,6 +232,18 @@ public class UpdateFileHeaderMojo
     protected boolean clearAfterOperation;
 
     /**
+     * A flag to add the license header in java files after the package statement.
+     * <p/>
+     * This is a pratice used by many people (apache, codehaus, ...).
+     * <p/>
+     * <b>Note:</b> By default this property is then to {@code true} since it is a good pratice.
+     *
+     * @parameter expression="${license.addJavaLicenseAfterPackage}" default-value="true"
+     * @since 1.2
+     */
+    protected boolean addJavaLicenseAfterPackage;
+
+    /**
      * To specify the base dir from which we apply the license.
      * <p/>
      * Should be on form "root1,root2,rootn".
@@ -411,7 +424,7 @@ public class UpdateFileHeaderMojo
         /**
          * register a file for this state on result dictionary.
          *
-         * @param file   file to add
+         * @param file    file to add
          * @param results dictionary to update
          */
         public void addFile( File file, EnumMap<FileState, Set<File>> results )
@@ -558,6 +571,12 @@ public class UpdateFileHeaderMojo
             aTransformer.setProcessStartTag( processStartTag );
             aTransformer.setProcessEndTag( processEndTag );
             aTransformer.setSectionDelimiter( sectionDelimiter );
+
+            if ( aTransformer instanceof JavaFileHeaderTransformer )
+            {
+                ( (JavaFileHeaderTransformer) aTransformer ).setAddJavaLicenseAfterPackage(
+                    addJavaLicenseAfterPackage );
+            }
 
             String[] extensions = aTransformer.getDefaultAcceptedExtensions();
             for ( String extension : extensions )

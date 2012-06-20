@@ -34,6 +34,13 @@ public class JavaFileHeaderTransformer
 {
 
     /**
+     * Flag to add the license header after the {@code package} statement.
+     *
+     * @since 1.2
+     */
+    protected boolean addJavaLicenseAfterPackage;
+
+    /**
      * Default constructor.
      */
     public JavaFileHeaderTransformer()
@@ -49,6 +56,63 @@ public class JavaFileHeaderTransformer
         return new String[]{ "java", "groovy", "css", "cs", "as", "aj", "c", "h", "cpp", "js", "json"
 
         };
+    }
+
+    /**
+     * Sets the value to the property {@link #addJavaLicenseAfterPackage}.
+     *
+     * @param addJavaLicenseAfterPackage the new value to set
+     * @since 1.2
+     */
+    public void setAddJavaLicenseAfterPackage( boolean addJavaLicenseAfterPackage )
+    {
+        this.addJavaLicenseAfterPackage = addJavaLicenseAfterPackage;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String addHeader( String header, String content )
+    {
+
+        if ( !addJavaLicenseAfterPackage )
+        {
+            return super.addHeader( header, content );
+        }
+
+        String result;
+
+        String prolog = null;
+        int startProlog = content.indexOf( "package" );
+        if ( startProlog > -1 )
+        {
+
+            // package was detected
+            int endProlog = content.indexOf( ";", startProlog );
+
+            if ( endProlog > -1 )
+            {
+
+                // prolog end was detected
+                prolog = content.substring( 0, endProlog + 2 );
+            }
+        }
+
+        if ( prolog == null )
+        {
+
+            // no prolog detected
+            result = super.addHeader( header, content );
+        }
+        else
+        {
+
+            // prolog detected
+            content = content.substring( prolog.length() );
+            result = super.addHeader( prolog + header, content );
+        }
+        return result;
     }
 
 }
