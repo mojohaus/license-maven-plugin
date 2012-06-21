@@ -169,24 +169,6 @@ public abstract class AbstractAddThirdPartyMojo
     private boolean failIfWarning;
 
     /**
-     * A flag to change the grouping of the generated THIRD-PARTY file.
-     * <p/>
-     * By default, group by dependecies.
-     * <p/>
-     * If sets to {@code true}, the it will group by license type.
-     * <p/>
-     * <strong>Note:</strong> This parameter is deprecated, please now use the
-     * correct template for this purpose (value {@code /org/codehaus/mojo/license/third-party-file-groupByLicense.ftl}
-     * to parameter {@code fileTemplate})
-     *
-     * @parameter property="license.groupByLicense"  default-value="false"
-     * @since 1.0
-     * @deprecated since 1.1, please use the correct value for the parameter {@code fileTemplate}
-     */
-    @Deprecated
-    private boolean groupByLicense;
-
-    /**
      * Template used to build the third-party file.
      * <p/>
      * (This template use freemarker).
@@ -284,10 +266,6 @@ public abstract class AbstractAddThirdPartyMojo
 
         doGenerate = isForce() || !thirdPartyFile.exists() || buildTimestamp > thirdPartyFile.lastModified();
 
-        if ( groupByLicense )
-        {
-            fileTemplate = "/org/codehaus/mojo/license/third-party-file-groupByLicense.ftl";
-        }
         if ( generateBundle )
         {
 
