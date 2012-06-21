@@ -1083,6 +1083,7 @@ public abstract class AbstractFileHeaderMojo
 
         String description = freeMarkerHelper.renderTemplate( descriptionTemplate0, descriptionParameters );
         header.setDescription( description );
+        filter.resetContent();
 
         if ( getLog().isDebugEnabled() )
         {

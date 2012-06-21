@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.codehaus.mojo.license.test</groupId>
+  <artifactId>MLICENSE-44</artifactId>
+  <name>Test MLICENSE-44</name>
+  <version>1.1</version>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>@project.version@</version>
+        <configuration>
+          <encoding>UTF-8</encoding>
+          <includes>
+            <include>**/*.java</include>
+          </includes>
+          <licenseName>test</licenseName>
+          <organizationName>CodeHaus</organizationName>
+          <licenseResolver>file:${basedir}/src/license</licenseResolver>
+          <descriptionTemplate>${basedir}/src/license/test/descriptionTemplate.ftl</descriptionTemplate>
+          <inceptionYear>2010</inceptionYear>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>process-sources</phase>
+            <goals>
+              <goal>update-file-header</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>
