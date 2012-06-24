@@ -97,8 +97,23 @@ public class DefaultThirdPartyHelper
      */
     private final Log log;
 
+    /**
+     * Cache of dependencies (as maven project) loaded.
+     */
     private static SortedMap<String, MavenProject> artifactCache;
 
+    /**
+     * Constructor of the helper.
+     *
+     * @param project            Current maven project
+     * @param encoding           Encoding used to read and write files
+     * @param verbose            Verbose flag
+     * @param dependenciesTool   tool to load dependencies
+     * @param thirdPartyTool     tool to load third-parties descriptors
+     * @param localRepository    maven local repository
+     * @param remoteRepositories maven remote repositories
+     * @param log                logger
+     */
     public DefaultThirdPartyHelper( MavenProject project, String encoding, boolean verbose,
                                     DependenciesTool dependenciesTool, ThirdPartyTool thirdPartyTool,
                                     ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories,

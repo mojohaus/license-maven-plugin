@@ -103,6 +103,16 @@ public interface ThirdPartyTool
      */
     SortedSet<MavenProject> getProjectsWithNoLicense( LicenseMap licenseMap, boolean doLog );
 
+    /**
+     * Loads unsafe mapping and returns it.
+     *
+     * @param licenseMap    license map
+     * @param artifactCache cache of dependencies (used for id migration from missing file)
+     * @param encoding      encoding used to load missing file
+     * @param missingFile   location of the optional missing file
+     * @return the unsafe mapping
+     * @throws IOException if pb while reading missing file
+     */
     SortedProperties loadUnsafeMapping( LicenseMap licenseMap, SortedMap<String, MavenProject> artifactCache,
                                         String encoding, File missingFile )
         throws IOException;

@@ -53,10 +53,10 @@ ${project.name}
     Display all available licenses.
   
   * <<<{{{./update-file-header-mojo.html}license:update-file-header}}>>>\
-    Update the license header of the current project source files.
+    Updates the license header of the current project source files.
 
   * <<<{{{./check-file-header-mojo.html}license:check-file-header}}>>>\
-    check the license header of the current project source files.
+    Checks the license header of the current project source files.
 
   * <<<{{{./update-project-license-mojo.html}license:update-project-license}}>>>\
     Updates (or creates) the main project license file according to the license defined in the licenseName parameter.

@@ -156,6 +156,9 @@ public abstract class AbstractLicenseReportMojo
      */
     private ThirdPartyTool thirdPartyTool;
 
+    /**
+     * Third-party helper (high level tool with common code for mojo and report).
+     */
     private ThirdPartyHelper helper;
 
     protected ThirdPartyHelper getHelper()
@@ -173,9 +176,9 @@ public abstract class AbstractLicenseReportMojo
      *
      * @param locale the locale to generate the report for.
      * @param sink   the report formatting tool.
-     * @throws MavenReportException when things go wrong.
+     * @throws MavenReportException   when things go wrong.
      * @throws MojoExecutionException when things go wrong.
-     * @throws MojoFailureException when things go wrong.
+     * @throws MojoFailureException   when things go wrong.
      */
     protected abstract void doGenerateReport( Locale locale, Sink sink )
         throws MavenReportException, MojoExecutionException, MojoFailureException;

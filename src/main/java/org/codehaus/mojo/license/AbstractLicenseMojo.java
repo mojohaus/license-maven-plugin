@@ -85,11 +85,19 @@ public abstract class AbstractLicenseMojo
      */
     private String encoding;
 
+    /**
+     * @return the enconding used to read and write files.
+     */
     public final String getEncoding()
     {
         return encoding;
     }
 
+    /**
+     * Sets new encoding used to read and write files.
+     *
+     * @param encoding new encodnignt ing to use
+     */
     public final void setEncoding( String encoding )
     {
         this.encoding = encoding;
@@ -208,7 +216,7 @@ public abstract class AbstractLicenseMojo
     }
 
     /**
-     * A call back to execute after the {@link #execute()} is done
+     * A call back to execute after the {@link #execute()} is done.
      */
     protected void afterExecute()
     {
@@ -316,26 +324,43 @@ public abstract class AbstractLicenseMojo
         }
     }
 
+    /**
+     * @return the current maven project
+     */
     public final MavenProject getProject()
     {
         return project;
     }
 
+    /**
+     * @return {@code true} if verbose flag is on, {@code false} otherwise
+     */
     public final boolean isVerbose()
     {
         return verbose;
     }
 
+    /**
+     * Sets new value to {@link #verbose} flag.
+     *
+     * @param verbose new value to set
+     */
     public final void setVerbose( boolean verbose )
     {
         this.verbose = verbose;
     }
 
+    /**
+     * @return the {@link MavenSession}.
+     */
     public final MavenSession getSession()
     {
         return session;
     }
 
+    /**
+     * @return the build timestamp (used to have a unique timestamp all over a build).
+     */
     public final long getBuildTimestamp()
     {
         return session.getStartTime().getTime();

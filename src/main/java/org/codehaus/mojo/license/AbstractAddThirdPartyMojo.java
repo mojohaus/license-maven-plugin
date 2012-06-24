@@ -199,7 +199,7 @@ public abstract class AbstractAddThirdPartyMojo
     private List remoteRepositories;
 
     /**
-     * third party tool.
+     * Third party tool.
      *
      * @component
      * @readonly
@@ -208,7 +208,7 @@ public abstract class AbstractAddThirdPartyMojo
     private ThirdPartyTool thirdPartyTool;
 
     /**
-     * dependencies tool.
+     * Dependencies tool.
      *
      * @component
      * @readonly
@@ -216,6 +216,9 @@ public abstract class AbstractAddThirdPartyMojo
      */
     private DependenciesTool dependenciesTool;
 
+    /**
+     * Third-party helper (high level tool with common code for mojo and report).
+     */
     private ThirdPartyHelper helper;
 
     private SortedMap<String, MavenProject> projectDependencies;
@@ -232,8 +235,23 @@ public abstract class AbstractAddThirdPartyMojo
 
     private boolean doGenerateBundle;
 
+    /**
+     * Loads the dependencies of the project (as {@link MavenProject}, indexed by their gav.
+     *
+     * @return the map of dependencies of the maven project indexed by their gav.
+     */
     protected abstract SortedMap<String, MavenProject> loadDependencies();
 
+    /**
+     * Creates the unsafe mapping (says dependencies with no license given by their pom).
+     * <p/>
+     * Can come from loaded missing file or from dependencies with no license at all.
+     *
+     * @return the map of usafe mapping indexed by their gav.
+     * @throws ProjectBuildingException if could not create maven porject for some dependencies
+     * @throws IOException              if could not load missing file
+     * @throws ThirdPartyToolException  for third party tool error
+     */
     protected abstract SortedProperties createUnsafeMapping()
         throws ProjectBuildingException, IOException, ThirdPartyToolException;
 

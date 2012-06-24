@@ -370,6 +370,22 @@ public abstract class AbstractFileHeaderMojo
     private Map<String, List<File>> filesToTreateByCommentStyle;
 
     /**
+     * @return {@code true} if mojo must be a simple dry run (says do not modifiy any scanned files),
+     *         {@code false} otherise.
+     */
+    protected abstract boolean isDryRun();
+
+    /**
+     * @return {@code true} if mojo should fails if dryRun and there is some missing license header, {@code false} otherwise.
+     */
+    protected abstract boolean isFailOnMissingHeader();
+
+    /**
+     * @return {@code true} if mojo should fails if dryRun and there is some obsolete license header, {@code false} otherwise.
+     */
+    protected abstract boolean isFailOnNotUptodateHeader();
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -537,7 +553,7 @@ public abstract class AbstractFileHeaderMojo
         }
 
         // get all files to treate indexed by their comment style
-        filesToTreateByCommentStyle = obtainFilesToTreateByCommentStyle();
+        filesToTreateByCommentStyle = obtainFilesToProcessByCommentStyle();
 
         // build the description template
         if ( isVerbose() )
@@ -546,82 +562,6 @@ public abstract class AbstractFileHeaderMojo
         }
         descriptionTemplate0 = freeMarkerHelper.getTemplate( descriptionTemplate );
     }
-
-    protected Map<String, List<File>> obtainFilesToTreateByCommentStyle()
-    {
-
-        Map<String, List<File>> results = new HashMap<String, List<File>>();
-
-        // add for all known comment style (says transformer) a empty list
-        // this permits not to have to test if there is an already list each time
-        // we wants to add a new file...
-        for ( String commentStyle : transformers.keySet() )
-        {
-            results.put( commentStyle, new ArrayList<File>() );
-        }
-
-        List<String> rootsList = new ArrayList<String>( roots.length );
-        for ( String root : roots )
-        {
-            File f = new File( root );
-            if ( f.isAbsolute() )
-            {
-                rootsList.add( f.getAbsolutePath() );
-            }
-            else
-            {
-                f = new File( getProject().getBasedir(), root );
-            }
-            if ( f.exists() )
-            {
-                getLog().info( "Will search files to update from root " + f );
-                rootsList.add( f.getAbsolutePath() );
-            }
-            else
-            {
-                if ( isVerbose() )
-                {
-                    getLog().info( "Skip not found root " + f );
-                }
-            }
-        }
-
-        // Obtain all files to treate
-        Map<File, String[]> allFiles = new HashMap<File, String[]>();
-        getFilesToTreateForRoots( includes, excludes, rootsList, allFiles );
-
-        // filter all these files according to their extension
-
-        for ( Map.Entry<File, String[]> entry : allFiles.entrySet() )
-        {
-            File root = entry.getKey();
-            String[] filesPath = entry.getValue();
-
-            // sort them by the associated comment style to their extension
-            for ( String path : filesPath )
-            {
-                String extension = FileUtils.extension( path );
-                String commentStyle = extensionToCommentStyle.get( extension );
-                if ( StringUtils.isEmpty( commentStyle ) )
-                {
-
-                    // unknown extension, do not treate this file
-                    continue;
-                }
-                //
-                File file = new File( root, path );
-                List<File> files = results.get( commentStyle );
-                files.add( file );
-            }
-        }
-        return results;
-    }
-
-    protected abstract boolean isDryRun();
-
-    protected abstract boolean isFailOnMissingHeader();
-
-    protected abstract boolean isFailOnNotUptodateHeader();
 
     /**
      * {@inheritDoc}
@@ -694,6 +634,104 @@ public abstract class AbstractFileHeaderMojo
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public FileHeader getFileHeader()
+    {
+        return header;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public FileHeaderTransformer getTransformer()
+    {
+        return transformer;
+    }
+
+    /**
+     * Gets all files to process indexed by their comment style.
+     *
+     * @return for each comment style, list of files to process
+     */
+    protected Map<String, List<File>> obtainFilesToProcessByCommentStyle()
+    {
+
+        Map<String, List<File>> results = new HashMap<String, List<File>>();
+
+        // add for all known comment style (says transformer) a empty list
+        // this permits not to have to test if there is an already list each time
+        // we wants to add a new file...
+        for ( String commentStyle : transformers.keySet() )
+        {
+            results.put( commentStyle, new ArrayList<File>() );
+        }
+
+        List<String> rootsList = new ArrayList<String>( roots.length );
+        for ( String root : roots )
+        {
+            File f = new File( root );
+            if ( f.isAbsolute() )
+            {
+                rootsList.add( f.getAbsolutePath() );
+            }
+            else
+            {
+                f = new File( getProject().getBasedir(), root );
+            }
+            if ( f.exists() )
+            {
+                getLog().info( "Will search files to update from root " + f );
+                rootsList.add( f.getAbsolutePath() );
+            }
+            else
+            {
+                if ( isVerbose() )
+                {
+                    getLog().info( "Skip not found root " + f );
+                }
+            }
+        }
+
+        // Obtain all files to treate
+        Map<File, String[]> allFiles = new HashMap<File, String[]>();
+        getFilesToTreateForRoots( includes, excludes, rootsList, allFiles );
+
+        // filter all these files according to their extension
+
+        for ( Map.Entry<File, String[]> entry : allFiles.entrySet() )
+        {
+            File root = entry.getKey();
+            String[] filesPath = entry.getValue();
+
+            // sort them by the associated comment style to their extension
+            for ( String path : filesPath )
+            {
+                String extension = FileUtils.extension( path );
+                String commentStyle = extensionToCommentStyle.get( extension );
+                if ( StringUtils.isEmpty( commentStyle ) )
+                {
+
+                    // unknown extension, do not treate this file
+                    continue;
+                }
+                //
+                File file = new File( root, path );
+                List<File> files = results.get( commentStyle );
+                files.add( file );
+            }
+        }
+        return results;
+    }
+
+    /**
+     * Checks the results of the mojo execution using the {@link #isFailOnMissingHeader()} and
+     * {@link #isFailOnNotUptodateHeader()}.
+     *
+     * @param result processed files by their status
+     * @throws MojoFailureException if check is not ok (some file with no header or to update)
+     */
     protected void checkResults( EnumMap<FileState, Set<File>> result )
         throws MojoFailureException
     {
@@ -729,6 +767,13 @@ public abstract class AbstractFileHeaderMojo
         }
     }
 
+    /**
+     * Process a given comment styl to all his detected files.
+     *
+     * @param commentStyle comment style to treat
+     * @param filesToTreat files using this comment style to treat
+     * @throws IOException if any IO error while processing files
+     */
     protected void processCommentStyle( String commentStyle, List<File> filesToTreat )
         throws IOException
     {
@@ -750,12 +795,18 @@ public abstract class AbstractFileHeaderMojo
 
         for ( File file : filesToTreat )
         {
-            prepareProcessFile( file );
+            processFile( file );
         }
         filesToTreat.clear();
     }
 
-    protected void prepareProcessFile( File file )
+    /**
+     * Process the given file (will copy it, process the clone file and finally finalizeFile after process)...
+     *
+     * @param file original file to process
+     * @throws IOException if any IO error while processing this file
+     */
+    protected void processFile( File file )
         throws IOException
     {
 
@@ -797,9 +848,7 @@ public abstract class AbstractFileHeaderMojo
                 FileUtil.deleteFile( processFile );
             }
         }
-
     }
-
 
     /**
      * Process the given {@code file} and save the result in the given
@@ -919,6 +968,15 @@ public abstract class AbstractFileHeaderMojo
         return true;
     }
 
+    /**
+     * Finalize the process of a file.
+     * <p/>
+     * If ad DryRun then just remove processed file, else use process file as original file.
+     *
+     * @param file        the original file
+     * @param processFile the processed file
+     * @throws IOException if any IO error while finalizing file
+     */
     protected void finalizeFile( File file, File processFile )
         throws IOException
     {
@@ -950,7 +1008,6 @@ public abstract class AbstractFileHeaderMojo
         }
         else
         {
-
             try
             {
 
@@ -983,6 +1040,9 @@ public abstract class AbstractFileHeaderMojo
         clear();
     }
 
+    /**
+     * Clear internal states of the mojo after execution. (will only invoked if {@link #clearAfterOperation} if on).
+     */
     protected void clear()
     {
         if ( processedFiles != null )
@@ -999,6 +1059,12 @@ public abstract class AbstractFileHeaderMojo
         }
     }
 
+    /**
+     * Reports into the given {@code buffer} stats for the given {@code state}.
+     *
+     * @param state  state of file to report
+     * @param buffer where to report
+     */
     protected void reportType( FileState state, StringBuilder buffer )
     {
         String operation = state.name();
@@ -1091,7 +1157,13 @@ public abstract class AbstractFileHeaderMojo
         }
     }
 
-    public FileHeaderTransformer getTransformer( String transformerName )
+    /**
+     * Obtains the {@link FileHeaderTransformer} given his name.
+     *
+     * @param transformerName the name of the transformer to find
+     * @return the transformer for the givne tramsformer name
+     */
+    protected FileHeaderTransformer getTransformer( String transformerName )
     {
         if ( StringUtils.isEmpty( transformerName ) )
         {
@@ -1110,6 +1182,13 @@ public abstract class AbstractFileHeaderMojo
         return transformer;
     }
 
+    /**
+     * Obtain for a given value, a trim version of it. If value is empty then use the given default value
+     *
+     * @param value        the value to trim (if not empty)
+     * @param defaultValue the default value to use if value is empty
+     * @return the trim value (or default value if value is empty)
+     */
     protected String cleanHeaderConfiguration( String value, String defaultValue )
     {
         String resultHeader;
@@ -1129,22 +1208,12 @@ public abstract class AbstractFileHeaderMojo
     }
 
     /**
-     * {@inheritDoc}
+     * Gets all files for the given {@code state}.
+     *
+     * @param state state of files to get
+     * @return all files of the given state
      */
-    public FileHeader getFileHeader()
-    {
-        return header;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public FileHeaderTransformer getTransformer()
-    {
-        return transformer;
-    }
-
-    public Set<File> getFiles( FileState state )
+    protected Set<File> getFiles( FileState state )
     {
         return result.get( state );
     }
@@ -1245,7 +1314,7 @@ public abstract class AbstractFileHeaderMojo
         fail;
 
         /**
-         * register a file for this state on result dictionary.
+         * Register a file for this state on result dictionary.
          *
          * @param file    file to add
          * @param results dictionary to update

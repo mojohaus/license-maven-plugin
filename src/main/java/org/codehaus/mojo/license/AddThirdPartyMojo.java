@@ -149,6 +149,9 @@ public class AddThirdPartyMojo
      */
     private boolean includeTransitiveDependencies;
 
+    /**
+     * Internal flag to know if missing file must be generated.
+     */
     private boolean doGenerateMissing;
 
     /**
@@ -394,6 +397,11 @@ public class AddThirdPartyMojo
         return !unsafeMappings.equals( oldUnsafeMappings );
     }
 
+    /**
+     * Write the missing file ({@link #getMissingFile()}.
+     *
+     * @throws IOException if error while writing missing file
+     */
     protected void writeMissingFile()
         throws IOException
     {
