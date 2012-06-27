@@ -1,0 +1,1 @@
+To test the feature MLICENSE-28 (see http://jira.codehaus.org/browse/MLICENSE-28)

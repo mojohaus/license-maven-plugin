@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.codehaus.mojo.license.test</groupId>
+  <artifactId>MLICENSE-28</artifactId>
+  <version>@project.version@</version>
+
+  <packaging>pom</packaging>
+
+  <modules>
+    <module>child1</module>
+    <module>child2</module>
+  </modules>
+
+  <properties>
+    <license.useMissingFile>true</license.useMissingFile>
+    <license.failIfWarning>true</license.failIfWarning>
+    <license.encoding>UTF-8</license.encoding>
+  </properties>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>@project.version@</version>
+      </plugin>
+    </plugins>
+  </build>
+</project>
