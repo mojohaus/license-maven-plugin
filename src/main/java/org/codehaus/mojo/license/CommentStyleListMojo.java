@@ -24,6 +24,9 @@ package org.codehaus.mojo.license;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.codehaus.mojo.license.header.transformer.FileHeaderTransformer;
 
 import java.util.ArrayList;
@@ -35,31 +38,41 @@ import java.util.Map;
 /**
  * Displays all the available comment style to box file headers.
  *
- * @author themit <chemit@codelutin.com>
- * @requiresProject false
- * @requiresDirectInvocation
- * @goal comment-style-list
+ * @author tchemit <chemit@codelutin.com>
  * @since 1.0
  */
+@Mojo( name = "comment-style-list", requiresProject = false, requiresDirectInvocation = true )
 public class CommentStyleListMojo
     extends AbstractLicenseMojo
 {
 
+    // ----------------------------------------------------------------------
+    // Mojo Parameters
+    // ----------------------------------------------------------------------
+
     /**
      * A flag to display also the content of each license.
      *
-     * @parameter property="detail"
      * @since 1.0
      */
+    @Parameter( property = "detail" )
     private boolean detail;
+
+    // ----------------------------------------------------------------------
+    // Plexus Components
+    // ----------------------------------------------------------------------
 
     /**
      * All available header transformers.
      *
-     * @component role="org.codehaus.mojo.license.header.transformer.FileHeaderTransformer"
      * @since 1.0
      */
+    @Component( role = FileHeaderTransformer.class )
     private Map<String, FileHeaderTransformer> transformers;
+
+    // ----------------------------------------------------------------------
+    // AbstractLicenseMojo Implementation
+    // ----------------------------------------------------------------------
 
     /**
      * {@inheritDoc}

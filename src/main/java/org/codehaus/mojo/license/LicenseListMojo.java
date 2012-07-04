@@ -24,6 +24,8 @@ package org.codehaus.mojo.license;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.codehaus.mojo.license.model.License;
 import org.codehaus.mojo.license.model.LicenseStore;
 
@@ -36,35 +38,45 @@ import java.util.List;
  * Display all available licenses.
  *
  * @author tchemit <chemit@codelutin.com>
- * @goal license-list
- * @requiresProject false
- * @requiresDirectInvocation
  * @since 1.0
  */
+@Mojo( name = "license-list", requiresProject = false, requiresDirectInvocation = true )
 public class LicenseListMojo
     extends AbstractLicenseMojo
 {
 
+    // ----------------------------------------------------------------------
+    // Mojo Parameters
+    // ----------------------------------------------------------------------
+
     /**
      * the url of an extra license repository.
      *
-     * @parameter property="extraResolver"
      * @since 1.0
      */
+    @Parameter( property = "extraResolver" )
     private String extraResolver;
 
     /**
      * A flag to display also the content of each license.
      *
-     * @parameter property="detail"
      * @since 1.0
      */
+    @Parameter( property = "detail" )
     private boolean detail;
 
+    // ----------------------------------------------------------------------
+    // Private Fields
+    // ----------------------------------------------------------------------
+
     /**
-     * store of licenses
+     * Store of licenses.
      */
-    protected LicenseStore licenseStore;
+    private LicenseStore licenseStore;
+
+    // ----------------------------------------------------------------------
+    // AbstractLicenseMojo Implementaton
+    // ----------------------------------------------------------------------
 
     /**
      * {@inheritDoc}

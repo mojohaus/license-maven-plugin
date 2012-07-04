@@ -25,6 +25,8 @@ package org.codehaus.mojo.license;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
 import org.codehaus.mojo.license.api.DefaultThirdPartyHelper;
@@ -56,6 +58,10 @@ public abstract class AbstractAddThirdPartyMojo
     extends AbstractLicenseMojo
 {
 
+    // ----------------------------------------------------------------------
+    // Mojo Parameters
+    // ----------------------------------------------------------------------
+
     /**
      * Directory where to generate files.
      *
@@ -63,31 +69,33 @@ public abstract class AbstractAddThirdPartyMojo
      * @required
      * @since 1.0
      */
+    @Parameter( property = "license.outputDirectory",
+                defaultValue = "${project.build.directory}/generated-sources/license", required = true )
     private File outputDirectory;
 
     /**
      * File where to wirte the third-party file.
      *
-     * @parameter property="license.thirdPartyFilename" default-value="THIRD-PARTY.txt"
      * @required
      * @since 1.0
      */
+    @Parameter( property = "license.thirdPartyFilename", defaultValue = "THIRD-PARTY.txt", required = true )
     private String thirdPartyFilename;
 
     /**
      * A flag to use the missing licenses file to consolidate the THID-PARTY file.
      *
-     * @parameter property="license.useMissingFile"  default-value="false"
      * @since 1.0
      */
+    @Parameter( property = "license.useMissingFile", defaultValue = "false" )
     private boolean useMissingFile;
 
     /**
      * The file where to fill the license for dependencies with unknwon license.
      *
-     * @parameter property="license.missingFile"  default-value="src/license/THIRD-PARTY.properties"
      * @since 1.0
      */
+    @Parameter( property = "license.missingFile", defaultValue = "src/license/THIRD-PARTY.properties" )
     private File missingFile;
 
     /**
@@ -106,6 +114,7 @@ public abstract class AbstractAddThirdPartyMojo
      * @parameter
      * @since 1.0
      */
+    @Parameter
     private List<String> licenseMerges;
 
     /**
@@ -114,9 +123,9 @@ public abstract class AbstractAddThirdPartyMojo
      * If this parameter is filled and a license is not in this {@code whitelist} then build will failed when property
      * {@link #failIfWarning} is setted on.
      *
-     * @parameter property="license.includedLicenses" default-value=""
      * @since 1.1
      */
+    @Parameter( property = "license.includedLicenses", defaultValue = "" )
     private String includedLicenses;
 
     /**
@@ -125,9 +134,9 @@ public abstract class AbstractAddThirdPartyMojo
      * If a such license is found then build will failed when property
      * {@link #failIfWarning} is setted on.
      *
-     * @parameter property="license.excludedLicenses" default-value=""
      * @since 1.1
      */
+    @Parameter( property = "license.excludedLicenses", defaultValue = "" )
     private String excludedLicenses;
 
     /**
@@ -136,9 +145,10 @@ public abstract class AbstractAddThirdPartyMojo
      * <p/>
      * <b>Note:</b> This option is not available for {@code pom} module types.
      *
-     * @parameter property="license.bundleThirdPartyPath"  default-value="META-INF/${project.artifactId}-THIRD-PARTY.txt"
      * @since 1.0
      */
+    @Parameter( property = "license.bundleThirdPartyPath",
+                defaultValue = "META-INF/${project.artifactId}-THIRD-PARTY.txt" )
     private String bundleThirdPartyPath;
 
     /**
@@ -147,25 +157,25 @@ public abstract class AbstractAddThirdPartyMojo
      * <p/>
      * The file will be copied at the {@link #bundleThirdPartyPath} location.
      *
-     * @parameter property="license.generateBundle"  default-value="false"
      * @since 1.0
      */
+    @Parameter( property = "license.generateBundle", defaultValue = "false" )
     private boolean generateBundle;
 
     /**
      * To force generation of the third-party file even if every thing is up to date.
      *
-     * @parameter property="license.force"  default-value="false"
      * @since 1.0
      */
+    @Parameter( property = "license.force", defaultValue = "false" )
     private boolean force;
 
     /**
      * A flag to fail the build if at least one dependency was detected without a license.
      *
-     * @parameter property="license.failIfWarning"  default-value="false"
      * @since 1.0
      */
+    @Parameter( property = "license.failIfWarning", defaultValue = "false" )
     private boolean failIfWarning;
 
     /**
@@ -173,48 +183,52 @@ public abstract class AbstractAddThirdPartyMojo
      * <p/>
      * (This template use freemarker).
      *
-     * @parameter property="license.fileTemplate" default-value="/org/codehaus/mojo/license/third-party-file.ftl"
      * @since 1.1
      */
+    @Parameter( property = "license.fileTemplate", defaultValue = "/org/codehaus/mojo/license/third-party-file.ftl" )
     private String fileTemplate;
 
     /**
      * Local Repository.
      *
-     * @parameter property="localRepository"
-     * @required
-     * @readonly
      * @since 1.0.0
      */
+    @Parameter( property = "localRepository", required = true, readonly = true )
     private ArtifactRepository localRepository;
 
     /**
      * Remote repositories used for the project.
      *
-     * @parameter property="project.remoteArtifactRepositories"
-     * @required
-     * @readonly
      * @since 1.0.0
      */
+    @Parameter( property = "project.remoteArtifactRepositories", required = true, readonly = true )
     private List remoteRepositories;
+
+    // ----------------------------------------------------------------------
+    // Plexus components
+    // ----------------------------------------------------------------------
 
     /**
      * Third party tool.
      *
-     * @component
      * @readonly
      * @since 1.0
      */
+    @Component
     private ThirdPartyTool thirdPartyTool;
 
     /**
      * Dependencies tool.
      *
-     * @component
      * @readonly
      * @since 1.1
      */
+    @Component
     private DependenciesTool dependenciesTool;
+
+    // ----------------------------------------------------------------------
+    // Private fields
+    // ----------------------------------------------------------------------
 
     /**
      * Third-party helper (high level tool with common code for mojo and report).
@@ -235,6 +249,10 @@ public abstract class AbstractAddThirdPartyMojo
 
     private boolean doGenerateBundle;
 
+    // ----------------------------------------------------------------------
+    // Abstract Methods
+    // ----------------------------------------------------------------------
+
     /**
      * Loads the dependencies of the project (as {@link MavenProject}, indexed by their gav.
      *
@@ -254,6 +272,10 @@ public abstract class AbstractAddThirdPartyMojo
      */
     protected abstract SortedProperties createUnsafeMapping()
         throws ProjectBuildingException, IOException, ThirdPartyToolException;
+
+    // ----------------------------------------------------------------------
+    // AbstractLicenseMojo Implementaton
+    // ----------------------------------------------------------------------
 
     /**
      * {@inheritDoc}
@@ -317,6 +339,69 @@ public abstract class AbstractAddThirdPartyMojo
 
         getHelper().mergeLicenses( licenseMerges, licenseMap );
     }
+
+    // ----------------------------------------------------------------------
+    // Public Methods
+    // ----------------------------------------------------------------------
+
+    public File getOutputDirectory()
+    {
+        return outputDirectory;
+    }
+
+    public boolean isFailIfWarning()
+    {
+        return failIfWarning;
+    }
+
+    public SortedMap<String, MavenProject> getProjectDependencies()
+    {
+        return projectDependencies;
+    }
+
+    public SortedSet<MavenProject> getUnsafeDependencies()
+    {
+        return unsafeDependencies;
+    }
+
+    public LicenseMap getLicenseMap()
+    {
+        return licenseMap;
+    }
+
+    public boolean isUseMissingFile()
+    {
+        return useMissingFile;
+    }
+
+    public File getMissingFile()
+    {
+        return missingFile;
+    }
+
+    public SortedProperties getUnsafeMappings()
+    {
+        return unsafeMappings;
+    }
+
+    public boolean isForce()
+    {
+        return force;
+    }
+
+    public boolean isDoGenerate()
+    {
+        return doGenerate;
+    }
+
+    public boolean isDoGenerateBundle()
+    {
+        return doGenerateBundle;
+    }
+
+    // ----------------------------------------------------------------------
+    // Protected Methods
+    // ----------------------------------------------------------------------
 
     protected ThirdPartyHelper getHelper()
     {
@@ -436,58 +521,4 @@ public abstract class AbstractAddThirdPartyMojo
         }
     }
 
-    public File getOutputDirectory()
-    {
-        return outputDirectory;
-    }
-
-    public boolean isFailIfWarning()
-    {
-        return failIfWarning;
-    }
-
-    public SortedMap<String, MavenProject> getProjectDependencies()
-    {
-        return projectDependencies;
-    }
-
-    public SortedSet<MavenProject> getUnsafeDependencies()
-    {
-        return unsafeDependencies;
-    }
-
-    public LicenseMap getLicenseMap()
-    {
-        return licenseMap;
-    }
-
-    public boolean isUseMissingFile()
-    {
-        return useMissingFile;
-    }
-
-    public File getMissingFile()
-    {
-        return missingFile;
-    }
-
-    public SortedProperties getUnsafeMappings()
-    {
-        return unsafeMappings;
-    }
-
-    public boolean isForce()
-    {
-        return force;
-    }
-
-    public boolean isDoGenerate()
-    {
-        return doGenerate;
-    }
-
-    public boolean isDoGenerateBundle()
-    {
-        return doGenerateBundle;
-    }
 }

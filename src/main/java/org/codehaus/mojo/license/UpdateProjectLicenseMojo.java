@@ -22,6 +22,9 @@ package org.codehaus.mojo.license;
  * #L%
  */
 
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.codehaus.mojo.license.model.License;
 import org.codehaus.mojo.license.utils.FileUtil;
 
@@ -36,23 +39,25 @@ import java.io.File;
  * {@code META-INF class-path directory}.
  *
  * @author tchemit <chemit@codelutin.com>
- * @goal update-project-license
- * @phase generate-resources
- * @requiresProject true
  * @since 1.0
  */
+@Mojo( name = "update-project-license", requiresProject = true, defaultPhase = LifecyclePhase.GENERATE_RESOURCES )
 public class UpdateProjectLicenseMojo
     extends AbstractLicenseNameMojo
 {
+
+    // ----------------------------------------------------------------------
+    // Mojo Parameters
+    // ----------------------------------------------------------------------
 
     /**
      * Project license file to synchronize with main license defined in
      * descriptor file.
      *
-     * @parameter property="license.licenceFile" default-value="${basedir}/LICENSE.txt"
      * @required
      * @since 1.0
      */
+    @Parameter( property = "license.licenceFile", defaultValue = "${basedir}/LICENSE.txt" )
     protected File licenseFile;
 
     /**
@@ -60,9 +65,9 @@ public class UpdateProjectLicenseMojo
      * <p/>
      * <b>Note:</b> This option is not available for {@code pom} module types.
      *
-     * @parameter property="license.outputDirectory"  default-value="target/generated-sources/license"
      * @since 1.0
      */
+    @Parameter( property = "license.outputDirectory", defaultValue = "target/generated-sources/license" )
     protected File outputDirectory;
 
     /**
@@ -76,9 +81,9 @@ public class UpdateProjectLicenseMojo
      * <p/>
      * <b>Note:</b> This option is not available for {@code pom} module types.
      *
-     * @parameter property="license.generateBundle"  default-value="false"
      * @since 1.0
      */
+    @Parameter( property = "license.generateBundle", defaultValue = "false" )
     protected boolean generateBundle;
 
     /**
@@ -87,31 +92,39 @@ public class UpdateProjectLicenseMojo
      * <p/>
      * <b>Note:</b> This option is not available for {@code pom} module types.
      *
-     * @parameter property="license.bundleLicensePath"  default-value="META-INF/${project.artifactId}-LICENSE.txt"
      * @since 1.0
      */
+    @Parameter( property = "license.bundleLicensePath", defaultValue = "META-INF/${project.artifactId}-LICENSE.txt" )
     protected String bundleLicensePath;
 
     /**
      * A flag to force to generate project license file even if it is up-to-date.
      *
-     * @parameter property="license.force"  default-value="false"
      * @since 1.0.0
      */
+    @Parameter( property = "license.force", defaultValue = "false" )
     protected boolean force;
 
     /**
      * A flag to skip the goal.
      *
-     * @parameter property="license.skipUpdateProjectLicense" default-value="false"
      * @since 1.0
      */
+    @Parameter( property = "license.skipUpdateProjectLicense", defaultValue = "false" )
     protected boolean skipUpdateProjectLicense;
+
+    // ----------------------------------------------------------------------
+    // Private Fields
+    // ----------------------------------------------------------------------
 
     /**
      * Flag to known if generate is needed.
      */
     private boolean doGenerate;
+
+    // ----------------------------------------------------------------------
+    // AbstractLicenceMojo Implementation
+    // ----------------------------------------------------------------------
 
     /**
      * {@inheritDoc}
@@ -202,12 +215,22 @@ public class UpdateProjectLicenseMojo
         }
     }
 
+    // ----------------------------------------------------------------------
+    // AbstractLicenceNameMojo Implementation
+    // ----------------------------------------------------------------------
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isSkip()
     {
         return skipUpdateProjectLicense;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setSkip( boolean skip )
     {

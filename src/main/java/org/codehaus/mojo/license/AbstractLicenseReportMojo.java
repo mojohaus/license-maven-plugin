@@ -27,6 +27,8 @@ import org.apache.maven.doxia.sink.Sink;
 import org.apache.maven.doxia.siterenderer.Renderer;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.AbstractMavenReport;
 import org.apache.maven.reporting.MavenReportException;
@@ -50,25 +52,18 @@ public abstract class AbstractLicenseReportMojo
     extends AbstractMavenReport
 {
 
-    /**
-     * The Maven Project.
-     *
-     * @parameter property="project"
-     * @required
-     * @readonly
-     * @since 1.1
-     */
-    private MavenProject project;
+    // ----------------------------------------------------------------------
+    // Mojo Parameters
+    // ----------------------------------------------------------------------
 
     /**
      * The output directory for the report. Note that this parameter is only evaluated if the goal is run directly from
      * the command line. If the goal is run indirectly as part of a site generation, the output directory configured in
      * the Maven Site Plugin is used instead.
      *
-     * @parameter default-value="${project.reporting.outputDirectory}"
-     * @required
      * @since 1.1
      */
+    @Parameter( defaultValue = "${project.reporting.outputDirectory}", required = true )
     private File outputDirectory;
 
     /**
@@ -77,18 +72,18 @@ public abstract class AbstractLicenseReportMojo
      * <b>Note:</b> Verbose mode is always on if you starts a debug maven instance
      * (says via {@code -X}).
      *
-     * @parameter property="license.verbose"  default-value="${maven.verbose}"
      * @since 1.0
      */
+    @Parameter( property = "license.verbose", defaultValue = "${maven.verbose}" )
     private boolean verbose;
 
 
     /**
      * Skip to generate the report.
      *
-     * @parameter property="license.skip"
      * @since 1.1
      */
+    @Parameter( property = "license.skip" )
     private Boolean skip;
 
     /**
@@ -97,10 +92,38 @@ public abstract class AbstractLicenseReportMojo
      * <b>Note:</b> If nothing is filled here, we will use the system
      * property {@code file.encoding}.
      *
-     * @parameter property="license.encoding" default-value="${project.build.sourceEncoding}"
      * @since 1.0
      */
+    @Parameter( property = "license.encoding", defaultValue = "${project.build.sourceEncoding}" )
     private String encoding;
+
+    /**
+     * Local Repository.
+     *
+     * @since 1.1
+     */
+    @Parameter( property = "localRepository", required = true, readonly = true )
+    private ArtifactRepository localRepository;
+
+    /**
+     * Remote repositories used for the project.
+     *
+     * @since 1.1
+     */
+    @Parameter( property = "project.remoteArtifactRepositories", required = true, readonly = true )
+    private List remoteRepositories;
+
+    // ----------------------------------------------------------------------
+    // Plexus Components
+    // ----------------------------------------------------------------------
+
+    /**
+     * The Maven Project.
+     *
+     * @since 1.1
+     */
+    @Component
+    private MavenProject project;
 
     /**
      * Doxia Site Renderer component.
@@ -108,6 +131,7 @@ public abstract class AbstractLicenseReportMojo
      * @component
      * @since 1.1
      */
+    @Component
     private Renderer siteRenderer;
 
     /**
@@ -116,27 +140,8 @@ public abstract class AbstractLicenseReportMojo
      * @component
      * @since 1.1
      */
+    @Component
     private I18N i18n;
-
-    /**
-     * Local Repository.
-     *
-     * @parameter property="localRepository"
-     * @required
-     * @readonly
-     * @since 1.1
-     */
-    private ArtifactRepository localRepository;
-
-    /**
-     * Remote repositories used for the project.
-     *
-     * @parameter property="project.remoteArtifactRepositories"
-     * @required
-     * @readonly
-     * @since 1.1
-     */
-    private List remoteRepositories;
 
     /**
      * dependencies tool.
@@ -145,6 +150,7 @@ public abstract class AbstractLicenseReportMojo
      * @readonly
      * @since 1.1
      */
+    @Component
     private DependenciesTool dependenciesTool;
 
     /**
@@ -154,6 +160,7 @@ public abstract class AbstractLicenseReportMojo
      * @readonly
      * @since 1.1
      */
+    @Component
     private ThirdPartyTool thirdPartyTool;
 
     /**
@@ -161,15 +168,9 @@ public abstract class AbstractLicenseReportMojo
      */
     private ThirdPartyHelper helper;
 
-    protected ThirdPartyHelper getHelper()
-    {
-        if ( helper == null )
-        {
-            helper = new DefaultThirdPartyHelper( project, encoding, verbose, dependenciesTool, thirdPartyTool,
-                                                  localRepository, remoteRepositories, getLog() );
-        }
-        return helper;
-    }
+    // ----------------------------------------------------------------------
+    // Abstract Methods
+    // ----------------------------------------------------------------------
 
     /**
      * Generates the report.
@@ -182,6 +183,23 @@ public abstract class AbstractLicenseReportMojo
      */
     protected abstract void doGenerateReport( Locale locale, Sink sink )
         throws MavenReportException, MojoExecutionException, MojoFailureException;
+    // ----------------------------------------------------------------------
+    // Protected Methods
+    // ----------------------------------------------------------------------
+
+    protected ThirdPartyHelper getHelper()
+    {
+        if ( helper == null )
+        {
+            helper = new DefaultThirdPartyHelper( project, encoding, verbose, dependenciesTool, thirdPartyTool,
+                                                  localRepository, remoteRepositories, getLog() );
+        }
+        return helper;
+    }
+
+    // ----------------------------------------------------------------------
+    // AbstractMavenReport Implementaton
+    // ----------------------------------------------------------------------
 
     /**
      * {@inheritDoc}
@@ -251,6 +269,10 @@ public abstract class AbstractLicenseReportMojo
     {
         return getText( locale, "report.title" );
     }
+
+    // ----------------------------------------------------------------------
+    // Public Methods
+    // ----------------------------------------------------------------------
 
     /**
      * Gets the localized message for this report.

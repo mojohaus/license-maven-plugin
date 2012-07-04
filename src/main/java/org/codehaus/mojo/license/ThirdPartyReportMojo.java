@@ -26,6 +26,9 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.maven.doxia.sink.Sink;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.reporting.MavenReportException;
@@ -52,62 +55,64 @@ import java.util.TreeSet;
  * Generates a report of all third-parties detected in the module.
  *
  * @author tchemit <chemit@codelutin.com>
- * @goal third-party-report
- * @requiresDependencyResolution runtime
- * @requiresProject true
  * @since 1.1
  */
+@Mojo( name = "third-party-report", requiresProject = true, requiresDependencyResolution = ResolutionScope.RUNTIME )
 public class ThirdPartyReportMojo
     extends AbstractLicenseReportMojo
     implements MavenProjectDependenciesConfigurator
 {
 
+    // ----------------------------------------------------------------------
+    // Mojo Parameters
+    // ----------------------------------------------------------------------
+
     /**
      * A filter to exclude some scopes.
      *
-     * @parameter property="license.excludedScopes" default-value="system"
      * @since 1.1
      */
+    @Parameter( property = "license.excludedScopes", defaultValue = "system" )
     private String excludedScopes;
 
     /**
      * A filter to include only some scopes, if let empty then all scopes will be used (no filter).
      *
-     * @parameter property="license.includedScopes" default-value=""
      * @since 1.1
      */
+    @Parameter( property = "license.includedScopes", defaultValue = "" )
     private String includedScopes;
 
     /**
      * A filter to exclude some GroupIds
      *
-     * @parameter property="license.excludedGroups" default-value=""
      * @since 1.1
      */
+    @Parameter( property = "license.excludedGroups", defaultValue = "" )
     private String excludedGroups;
 
     /**
      * A filter to include only some GroupIds
      *
-     * @parameter property="license.includedGroups" default-value=""
      * @since 1.1
      */
+    @Parameter( property = "license.includedGroups", defaultValue = "" )
     private String includedGroups;
 
     /**
      * A filter to exclude some ArtifactsIds
      *
-     * @parameter property="license.excludedArtifacts" default-value=""
      * @since 1.1
      */
+    @Parameter( property = "license.excludedArtifacts", defaultValue = "" )
     private String excludedArtifacts;
 
     /**
      * A filter to include only some ArtifactsIds
      *
-     * @parameter property="license.includedArtifacts" default-value=""
      * @since 1.1
      */
+    @Parameter( property = "license.includedArtifacts", defaultValue = "" )
     private String includedArtifacts;
 
     /**
@@ -116,30 +121,31 @@ public class ThirdPartyReportMojo
      * @parameter default-value="true"
      * @since 1.1
      */
+    @Parameter( defaultValue = "true" )
     private boolean includeTransitiveDependencies;
 
     /**
      * A flag to use the missing licenses file to consolidate the THID-PARTY file.
      *
-     * @parameter property="license.useMissingFile"  default-value="false"
      * @since 1.1
      */
+    @Parameter( property = "license.useMissingFile", defaultValue = "false" )
     private boolean useMissingFile;
 
     /**
      * The file where to fill the license for dependencies with unknwon license.
      *
-     * @parameter property="license.missingFile"  default-value="src/license/THIRD-PARTY.properties"
      * @since 1.1
      */
+    @Parameter( property = "license.missingFile", defaultValue = "src/license/THIRD-PARTY.properties" )
     private File missingFile;
 
     /**
      * Load from repositories third party missing files.
      *
-     * @parameter property="license.useRepositoryMissingFiles"  default-value="true"
      * @since 1.0
      */
+    @Parameter( property = "license.useRepositoryMissingFiles", defaultValue = "true" )
     private boolean useRepositoryMissingFiles;
 
     /**
@@ -158,7 +164,24 @@ public class ThirdPartyReportMojo
      * @parameter
      * @since 1.0
      */
+    @Parameter
     private List<String> licenseMerges;
+
+    // ----------------------------------------------------------------------
+    // MavenReport Implementaton
+    // ----------------------------------------------------------------------
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getOutputName()
+    {
+        return "third-party-report";
+    }
+
+    // ----------------------------------------------------------------------
+    // AbstractLicenseReportMojo Implementaton
+    // ----------------------------------------------------------------------
 
     /**
      * {@inheritDoc}
@@ -192,13 +215,9 @@ public class ThirdPartyReportMojo
         renderer.render();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public String getOutputName()
-    {
-        return "third-party-report";
-    }
+    // ----------------------------------------------------------------------
+    // MavenProjectDependenciesConfigurator Implementaton
+    // ----------------------------------------------------------------------
 
     /**
      * {@inheritDoc}
@@ -256,7 +275,11 @@ public class ThirdPartyReportMojo
         return includeTransitiveDependencies;
     }
 
-    protected Collection<ThirdPartyDetails> createThirdPartyDetails()
+    // ----------------------------------------------------------------------
+    // Private Methods
+    // ----------------------------------------------------------------------
+
+    private Collection<ThirdPartyDetails> createThirdPartyDetails()
         throws IOException, ThirdPartyToolException, ProjectBuildingException, MojoFailureException
     {
 

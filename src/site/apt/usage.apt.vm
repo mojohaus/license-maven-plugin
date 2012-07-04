@@ -122,7 +122,7 @@ Usage
 
   For full detail see {{{./check-file-header-mojo.html}detail page}}.
 
-  This goal has same behaviour that the update-file-header with dryRun option.
+  This goal has same behaviour that the update-file-header with <dryRun> option.
 
 
 * Getting Dependency License Information

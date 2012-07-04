@@ -26,6 +26,10 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
 import org.codehaus.mojo.license.api.MavenProjectDependenciesConfigurator;
@@ -56,31 +60,33 @@ import java.util.SortedSet;
  * a resource of the build).
  *
  * @author tchemit <chemit@codelutin.com>
- * @goal add-third-party
- * @phase generate-resources
- * @requiresDependencyResolution test
- * @requiresProject true
  * @since 1.0
  */
+@Mojo( name = "add-third-party", requiresProject = true, requiresDependencyResolution = ResolutionScope.TEST,
+       defaultPhase = LifecyclePhase.GENERATE_RESOURCES )
 public class AddThirdPartyMojo
     extends AbstractAddThirdPartyMojo
     implements MavenProjectDependenciesConfigurator
 {
 
+    // ----------------------------------------------------------------------
+    // Mojo Parameters
+    // ----------------------------------------------------------------------
+
     /**
      * Deploy the third party missing file in maven repository.
      *
-     * @parameter property="license.deployMissingFile"  default-value="true"
      * @since 1.0
      */
+    @Parameter( property = "license.deployMissingFile", defaultValue = "true" )
     private boolean deployMissingFile;
 
     /**
      * Load from repositories third party missing files.
      *
-     * @parameter property="license.useRepositoryMissingFiles"  default-value="true"
      * @since 1.0
      */
+    @Parameter( property = "license.useRepositoryMissingFiles", defaultValue = "true" )
     private boolean useRepositoryMissingFiles;
 
     /**
@@ -88,71 +94,79 @@ public class AddThirdPartyMojo
      * <p/>
      * <strong>Note:</strong> The default value is {@code false}.
      *
-     * @parameter property="license.acceptPomPackaging"  default-value="false"
      * @since 1.1
      */
+    @Parameter( property = "license.acceptPomPackaging", defaultValue = "false" )
     private boolean acceptPomPackaging;
 
     /**
      * A filter to exclude some scopes.
      *
-     * @parameter property="license.excludedScopes" default-value="system"
      * @since 1.1
      */
+    @Parameter( property = "license.excludedScopes", defaultValue = "system" )
     private String excludedScopes;
 
     /**
      * A filter to include only some scopes, if let empty then all scopes will be used (no filter).
      *
-     * @parameter property="license.includedScopes" default-value=""
      * @since 1.1
      */
+    @Parameter( property = "license.includedScopes", defaultValue = "" )
     private String includedScopes;
 
     /**
      * A filter to exclude some GroupIds
      *
-     * @parameter property="license.excludedGroups" default-value=""
      * @since 1.1
      */
+    @Parameter( property = "license.excludedGroups", defaultValue = "" )
     private String excludedGroups;
 
     /**
      * A filter to include only some GroupIds
      *
-     * @parameter property="license.includedGroups" default-value=""
      * @since 1.1
      */
+    @Parameter( property = "license.includedGroups", defaultValue = "" )
     private String includedGroups;
 
     /**
      * A filter to exclude some ArtifactsIds
      *
-     * @parameter property="license.excludedArtifacts" default-value=""
      * @since 1.1
      */
+    @Parameter( property = "license.excludedArtifacts", defaultValue = "" )
     private String excludedArtifacts;
 
     /**
      * A filter to include only some ArtifactsIds
      *
-     * @parameter property="license.includedArtifacts" default-value=""
      * @since 1.1
      */
+    @Parameter( property = "license.includedArtifacts", defaultValue = "" )
     private String includedArtifacts;
 
     /**
      * Include transitive dependencies when downloading license files.
      *
-     * @parameter default-value="true"
      * @since 1.1
      */
+    @Parameter( defaultValue = "true" )
     private boolean includeTransitiveDependencies;
+
+    // ----------------------------------------------------------------------
+    // Private Fields
+    // ----------------------------------------------------------------------
 
     /**
      * Internal flag to know if missing file must be generated.
      */
     private boolean doGenerateMissing;
+
+    // ----------------------------------------------------------------------
+    // AbstractLicenseMojo Implementaton
+    // ----------------------------------------------------------------------
 
     /**
      * {@inheritDoc}
@@ -169,60 +183,6 @@ public class AddThirdPartyMojo
 
         // can reject pom packaging
         return rejectPackaging( "pom" );
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected SortedMap<String, MavenProject> loadDependencies()
-    {
-        return getHelper().loadDependencies( this );
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected SortedProperties createUnsafeMapping()
-        throws ProjectBuildingException, IOException, ThirdPartyToolException
-    {
-
-        SortedSet<MavenProject> unsafeDependencies = getUnsafeDependencies();
-
-        SortedProperties unsafeMappings =
-            getHelper().createUnsafeMapping( getLicenseMap(), getMissingFile(), useRepositoryMissingFiles,
-                                             unsafeDependencies, getProjectDependencies().values() );
-        if ( isVerbose() )
-        {
-            getLog().info( "found " + unsafeMappings.size() + " unsafe mappings" );
-        }
-
-        // compute if missing file should be (re)-generate
-        doGenerateMissing = computeDoGenerateMissingFile( unsafeMappings, unsafeDependencies );
-
-        if ( doGenerateMissing && isVerbose() )
-        {
-            StringBuilder sb = new StringBuilder();
-            sb.append( "Will use from missing file " );
-            sb.append( unsafeMappings.size() );
-            sb.append( " dependencies :" );
-            for ( Map.Entry<Object, Object> entry : unsafeMappings.entrySet() )
-            {
-                String id = (String) entry.getKey();
-                String license = (String) entry.getValue();
-                sb.append( "\n - " ).append( id ).append( " - " ).append( license );
-            }
-            getLog().info( sb.toString() );
-        }
-        else
-        {
-            if ( isUseMissingFile() && !unsafeMappings.isEmpty() )
-            {
-                getLog().info( "Missing file " + getMissingFile() + " is up-to-date." );
-            }
-        }
-        return unsafeMappings;
     }
 
     /**
@@ -291,6 +251,68 @@ public class AddThirdPartyMojo
         addResourceDir( getOutputDirectory(), "**/*.txt" );
     }
 
+    // ----------------------------------------------------------------------
+    // AbstractAddThirdPartyMojo Implementaton
+    // ----------------------------------------------------------------------
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected SortedMap<String, MavenProject> loadDependencies()
+    {
+        return getHelper().loadDependencies( this );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected SortedProperties createUnsafeMapping()
+        throws ProjectBuildingException, IOException, ThirdPartyToolException
+    {
+
+        SortedSet<MavenProject> unsafeDependencies = getUnsafeDependencies();
+
+        SortedProperties unsafeMappings =
+            getHelper().createUnsafeMapping( getLicenseMap(), getMissingFile(), useRepositoryMissingFiles,
+                                             unsafeDependencies, getProjectDependencies().values() );
+        if ( isVerbose() )
+        {
+            getLog().info( "found " + unsafeMappings.size() + " unsafe mappings" );
+        }
+
+        // compute if missing file should be (re)-generate
+        doGenerateMissing = computeDoGenerateMissingFile( unsafeMappings, unsafeDependencies );
+
+        if ( doGenerateMissing && isVerbose() )
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.append( "Will use from missing file " );
+            sb.append( unsafeMappings.size() );
+            sb.append( " dependencies :" );
+            for ( Map.Entry<Object, Object> entry : unsafeMappings.entrySet() )
+            {
+                String id = (String) entry.getKey();
+                String license = (String) entry.getValue();
+                sb.append( "\n - " ).append( id ).append( " - " ).append( license );
+            }
+            getLog().info( sb.toString() );
+        }
+        else
+        {
+            if ( isUseMissingFile() && !unsafeMappings.isEmpty() )
+            {
+                getLog().info( "Missing file " + getMissingFile() + " is up-to-date." );
+            }
+        }
+        return unsafeMappings;
+    }
+
+    // ----------------------------------------------------------------------
+    // MavenProjectDependenciesConfigurator Implementaton
+    // ----------------------------------------------------------------------
+
     /**
      * {@inheritDoc}
      */
@@ -347,6 +369,10 @@ public class AddThirdPartyMojo
         return includeTransitiveDependencies;
     }
 
+    // ----------------------------------------------------------------------
+    // Private Methods
+    // ----------------------------------------------------------------------
+
     /**
      * @param unsafeMappings     the unsafe mapping coming from the missing file
      * @param unsafeDependencies the unsafe dependencies from the project
@@ -354,8 +380,8 @@ public class AddThirdPartyMojo
      * @throws IOException if any IO problem
      * @since 1.0
      */
-    protected boolean computeDoGenerateMissingFile( SortedProperties unsafeMappings,
-                                                    SortedSet<MavenProject> unsafeDependencies )
+    private boolean computeDoGenerateMissingFile( SortedProperties unsafeMappings,
+                                                  SortedSet<MavenProject> unsafeDependencies )
         throws IOException
     {
 
@@ -402,7 +428,7 @@ public class AddThirdPartyMojo
      *
      * @throws IOException if error while writing missing file
      */
-    protected void writeMissingFile()
+    private void writeMissingFile()
         throws IOException
     {
 

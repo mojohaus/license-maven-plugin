@@ -25,8 +25,11 @@ package org.codehaus.mojo.license;
 import freemarker.template.Template;
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.codehaus.mojo.license.api.FreeMarkerHelper;
 import org.codehaus.mojo.license.header.FileHeader;
+import org.codehaus.mojo.license.header.FileHeaderFilter;
 import org.codehaus.mojo.license.header.FileHeaderProcessor;
 import org.codehaus.mojo.license.header.FileHeaderProcessorConfiguration;
 import org.codehaus.mojo.license.header.InvalideFileHeaderException;
@@ -38,6 +41,7 @@ import org.codehaus.mojo.license.utils.FileUtil;
 import org.codehaus.mojo.license.utils.MojoHelper;
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.FileUtils;
+import org.nuiton.processor.Processor;
 
 import java.io.File;
 import java.io.IOException;
@@ -66,6 +70,10 @@ public abstract class AbstractFileHeaderMojo
     implements FileHeaderProcessorConfiguration
 {
 
+    // ----------------------------------------------------------------------
+    // Constants
+    // ----------------------------------------------------------------------
+
     public static final String[] DEFAULT_INCLUDES = new String[]{ "**/*" };
 
     public static final String[] DEFAULT_EXCLUDES =
@@ -76,15 +84,18 @@ public abstract class AbstractFileHeaderMojo
     public static final String[] DEFAULT_ROOTS =
         new String[]{ "src", "target/generated-sources", "target/processed-sources" };
 
+    // ----------------------------------------------------------------------
+    // Mojo Parameters
+    // ----------------------------------------------------------------------
+
     /**
      * Name of project (or module).
      * <p/>
      * Will be used as description section of new header.
      *
-     * @parameter property="license.projectName" default-value="${project.name}"
-     * @required
      * @since 1.0
      */
+    @Parameter( property = "license.projectName", defaultValue = "${project.name}", required = true )
     protected String projectName;
 
     /**
@@ -92,10 +103,9 @@ public abstract class AbstractFileHeaderMojo
      * <p/>
      * Will be used as copyrigth's holder in new header.
      *
-     * @parameter property="license.organizationName" default-value="${project.organization.name}"
-     * @required
      * @since 1.0
      */
+    @Parameter( property = "license.organizationName", defaultValue = "${project.organization.name}", required = true )
     protected String organizationName;
 
     /**
@@ -103,10 +113,9 @@ public abstract class AbstractFileHeaderMojo
      * <p/>
      * Will be used as first year of copyright section in new header.
      *
-     * @parameter property="license.inceptionYear" default-value="${project.inceptionYear}"
-     * @required
      * @since 1.0
      */
+    @Parameter( property = "license.inceptionYear", defaultValue = "${project.inceptionYear}", required = true )
     protected String inceptionYear;
 
     /**
@@ -114,9 +123,9 @@ public abstract class AbstractFileHeaderMojo
      * <p/>
      * See http://mojo.codehaus.org/license-maven-plugin/header.html#Configuration .
      *
-     * @parameter property="license.processStartTag"
      * @since 1.1
      */
+    @Parameter( property = "license.processStartTag" )
     protected String processStartTag;
 
     /**
@@ -124,9 +133,9 @@ public abstract class AbstractFileHeaderMojo
      * <p/>
      * See http://mojo.codehaus.org/license-maven-plugin/header.html#Configuration .
      *
-     * @parameter property="license.processEndTag"
      * @since 1.1
      */
+    @Parameter( property = "license.processEndTag" )
     protected String processEndTag;
 
     /**
@@ -134,9 +143,9 @@ public abstract class AbstractFileHeaderMojo
      * <p/>
      * See http://mojo.codehaus.org/license-maven-plugin/header.html#Configuration .
      *
-     * @parameter property="license.sectionDelimiter"
      * @since 1.1
      */
+    @Parameter( property = "license.sectionDelimiter" )
     protected String sectionDelimiter;
 
     /**
@@ -148,9 +157,9 @@ public abstract class AbstractFileHeaderMojo
      * <strong>Note:</strong> This parameter is used by the {@link #descriptionTemplate}, so if you change this
      * template, the parameter could be no more used (depends what you put in your own template...).
      *
-     * @parameter property="license.addSvnKeyWords" default-value="false"
      * @since 1.0
      */
+    @Parameter( property = "license.addSvnKeyWords", defaultValue = "false" )
     protected boolean addSvnKeyWords;
 
     /**
@@ -159,9 +168,9 @@ public abstract class AbstractFileHeaderMojo
      * <b>Note:</b> By default, do NOT authorize it since description can change
      * on each file).
      *
-     * @parameter property="license.canUpdateDescription" default-value="false"
      * @since 1.0
      */
+    @Parameter( property = "license.canUpdateDescription", defaultValue = "false" )
     protected boolean canUpdateDescription;
 
     /**
@@ -170,9 +179,9 @@ public abstract class AbstractFileHeaderMojo
      * <b>Note:</b> By default, do NOT authorize it since copyright part should be
      * handled by developpers (holder can change on each file for example).
      *
-     * @parameter property="license.canUpdateCopyright" default-value="false"
      * @since 1.0
      */
+    @Parameter( property = "license.canUpdateCopyright", defaultValue = "false" )
     protected boolean canUpdateCopyright;
 
     /**
@@ -181,9 +190,9 @@ public abstract class AbstractFileHeaderMojo
      * <b>Note:</b> By default, authorize it since license part should always be
      * generated by the plugin.
      *
-     * @parameter property="license.canUpdateLicense" default-value="true"
      * @since 1.0
      */
+    @Parameter( property = "license.canUpdateLicense", defaultValue = "true" )
     protected boolean canUpdateLicense;
 
     /**
@@ -191,11 +200,11 @@ public abstract class AbstractFileHeaderMojo
      * <p/>
      * Sometimes, it is necessary to do this when file is under a specific license.
      * <p/>
-     * <b>Note:</b> If no sets, will use the default tag {@code % % Ignore-License}
+     * <b>Note:</b> If no sets, will use the default tag {@code %% Ignore-License}
      *
-     * @parameter property="license.ignoreTag"
      * @since 1.0
      */
+    @Parameter( property = "license.ignoreTag" )
     protected String ignoreTag;
 
     /**
@@ -203,9 +212,9 @@ public abstract class AbstractFileHeaderMojo
      * <p/>
      * <b>Note:</b> This property should ONLY be used for test purpose.
      *
-     * @parameter property="license.clearAfterOperation" default-value="true"
      * @since 1.0
      */
+    @Parameter( property = "license.clearAfterOperation", defaultValue = "true" )
     protected boolean clearAfterOperation;
 
     /**
@@ -215,9 +224,9 @@ public abstract class AbstractFileHeaderMojo
      * <p/>
      * <b>Note:</b> By default this property is then to {@code true} since it is a good pratice.
      *
-     * @parameter property="license.addJavaLicenseAfterPackage" default-value="true"
      * @since 1.2
      */
+    @Parameter( property = "license.addJavaLicenseAfterPackage", defaultValue = "true" )
     protected boolean addJavaLicenseAfterPackage;
 
     /**
@@ -232,9 +241,9 @@ public abstract class AbstractFileHeaderMojo
      * <p/>
      * <b>Note:</b> This parameter is not useable if you are still using a project file descriptor.
      *
-     * @parameter property="license.roots"
      * @since 1.0
      */
+    @Parameter( property = "license.roots" )
     protected String[] roots;
 
     /**
@@ -242,9 +251,9 @@ public abstract class AbstractFileHeaderMojo
      * <p/>
      * <b>Note:</b> This parameter is not useable if you are still using a project file descriptor.
      *
-     * @parameter property="license.includes"
      * @since 1.0
      */
+    @Parameter( property = "license.includes" )
     protected String[] includes;
 
     /**
@@ -257,9 +266,9 @@ public abstract class AbstractFileHeaderMojo
      * <p/>
      * <b>Note:</b> This parameter is not useable if you are still using a project file descriptor.
      *
-     * @parameter property="license.excludes"
      * @since 1.0
      */
+    @Parameter( property = "license.excludes" )
     protected String[] excludes;
 
     /**
@@ -283,6 +292,7 @@ public abstract class AbstractFileHeaderMojo
      * @parameter
      * @since 1.0
      */
+    @Parameter
     protected Map<String, String> extraExtensions;
 
     /**
@@ -290,45 +300,54 @@ public abstract class AbstractFileHeaderMojo
      * <p/>
      * (This template use freemarker).
      *
-     * @parameter property="license.descriptionTemplate" default-value="/org/codehaus/mojo/license/default-file-header-description.ftl"
      * @since 1.1
      */
+    @Parameter( property = "license.descriptionTemplate",
+                defaultValue = "/org/codehaus/mojo/license/default-file-header-description.ftl" )
     protected String descriptionTemplate;
 
+    // ----------------------------------------------------------------------
+    // Plexus components
+    // ----------------------------------------------------------------------
+
     /**
-     * @component role="org.nuiton.processor.Processor" roleHint="file-header"
      * @since 1.0
      */
+    @Component( role = Processor.class, hint = "file-header" )
     private FileHeaderProcessor processor;
 
     /**
      * The processor filter used to change header content.
      *
-     * @component role="org.codehaus.mojo.license.header.FileHeaderFilter" roleHint="update-file-header"
      * @since 1.0
      */
+    @Component( role = FileHeaderFilter.class, hint = "update-file-header" )
     private UpdateFileHeaderFilter filter;
 
     /**
      * All available header transformers.
      *
-     * @component role="org.codehaus.mojo.license.header.transformer.FileHeaderTransformer"
      * @since 1.0
      */
+    @Component( role = FileHeaderTransformer.class )
     private Map<String, FileHeaderTransformer> transformers;
+
+    /**
+     * Freemarker helper component.
+     *
+     * @since 1.0
+     */
+    @Component( role = FreeMarkerHelper.class )
+    private FreeMarkerHelper freeMarkerHelper;
+
+    // ----------------------------------------------------------------------
+    // Private fields
+    // ----------------------------------------------------------------------
 
     /**
      * internal file header transformer.
      */
     private FileHeaderTransformer transformer;
-
-    /**
-     * Freemarker helper component.
-     *
-     * @component role="org.codehaus.mojo.license.api.FreeMarkerHelper"
-     * @since 1.0
-     */
-    private FreeMarkerHelper freeMarkerHelper;
 
     /**
      * internal default file header.
@@ -369,6 +388,10 @@ public abstract class AbstractFileHeaderMojo
      */
     private Map<String, List<File>> filesToTreateByCommentStyle;
 
+    // ----------------------------------------------------------------------
+    // Abstract Methods
+    // ----------------------------------------------------------------------
+
     /**
      * @return {@code true} if mojo must be a simple dry run (says do not modifiy any scanned files),
      *         {@code false} otherise.
@@ -384,6 +407,10 @@ public abstract class AbstractFileHeaderMojo
      * @return {@code true} if mojo should fails if dryRun and there is some obsolete license header, {@code false} otherwise.
      */
     protected abstract boolean isFailOnNotUptodateHeader();
+
+    // ----------------------------------------------------------------------
+    // AbstractLicenseMojo Implementaton
+    // ----------------------------------------------------------------------
 
     /**
      * {@inheritDoc}
@@ -634,6 +661,10 @@ public abstract class AbstractFileHeaderMojo
         }
     }
 
+    // ----------------------------------------------------------------------
+    // FileHeaderProcessorConfiguration Implementaton
+    // ----------------------------------------------------------------------
+
     /**
      * {@inheritDoc}
      */
@@ -649,6 +680,10 @@ public abstract class AbstractFileHeaderMojo
     {
         return transformer;
     }
+
+    // ----------------------------------------------------------------------
+    // Protected Methods
+    // ----------------------------------------------------------------------
 
     /**
      * Gets all files to process indexed by their comment style.

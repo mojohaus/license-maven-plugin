@@ -23,6 +23,7 @@ package org.codehaus.mojo.license;
  */
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.codehaus.mojo.license.model.License;
 import org.codehaus.mojo.license.model.LicenseStore;
 
@@ -39,21 +40,25 @@ public abstract class AbstractLicenseNameMojo
     extends AbstractLicenseMojo
 {
 
+    // ----------------------------------------------------------------------
+    // Mojo Parameters
+    // ----------------------------------------------------------------------
+
     /**
      * To specify an external extra licenses repository resolver (says the base
      * url of the repository where the {@code license.properties} is present).
      *
-     * @parameter property="license.licenseResolver"
      * @since 1.0
      */
+    @Parameter( property = "license.licenseResolver" )
     private String licenseResolver;
 
     /**
      * A flag to keep a backup of every modified file.
      *
-     * @parameter property="license.keepBackup"  default-value="false"
      * @since 1.0
      */
+    @Parameter( property = "license.keepBackup", defaultValue = "false" )
     private boolean keepBackup;
 
     /**
@@ -62,7 +67,12 @@ public abstract class AbstractLicenseNameMojo
      * @parameter property="license.licenseName"
      * @since 1.0
      */
+    @Parameter( property = "license.licenseName" )
     private String licenseName;
+
+    // ----------------------------------------------------------------------
+    // Private Fields
+    // ----------------------------------------------------------------------
 
     /**
      * License loaded from the {@link #licenseName}.
@@ -73,6 +83,10 @@ public abstract class AbstractLicenseNameMojo
      * Store of available licenses.
      */
     private LicenseStore licenseStore;
+
+    // ----------------------------------------------------------------------
+    // Abstract Methods
+    // ----------------------------------------------------------------------
 
     /**
      * When is sets to {@code true}, will skip execution.
@@ -90,6 +104,10 @@ public abstract class AbstractLicenseNameMojo
      * @param skip new state value
      */
     public abstract void setSkip( boolean skip );
+
+    // ----------------------------------------------------------------------
+    // AbstractLicenseMojo Implementaton
+    // ----------------------------------------------------------------------
 
     /**
      * {@inheritDoc}
@@ -124,6 +142,10 @@ public abstract class AbstractLicenseNameMojo
         // check licenseName exists
         license = getLicense( licenseName, true );
     }
+
+    // ----------------------------------------------------------------------
+    // Public Methods
+    // ----------------------------------------------------------------------
 
     public License getLicense( String licenseName, boolean checkIfExists )
     {

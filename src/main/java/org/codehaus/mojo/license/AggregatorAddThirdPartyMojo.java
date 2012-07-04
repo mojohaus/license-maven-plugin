@@ -25,6 +25,10 @@ package org.codehaus.mojo.license;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.plugins.annotations.Execute;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
 import org.codehaus.mojo.license.model.LicenseMap;
@@ -42,26 +46,30 @@ import java.util.SortedSet;
  * then aggreates all the third-party files in final one in the pom project.
  *
  * @author tchemit <chemit@codelutin.com>
- * @goal aggregate-add-third-party
- * @phase generate-resources
- * @requiresProject true
- * @aggregator
- * @execute goal="add-third-party"
  * @since 1.0
  */
+@Mojo( name = "aggregate-add-third-party", requiresProject = true, aggregator = true,
+       defaultPhase = LifecyclePhase.GENERATE_RESOURCES )
+@Execute( goal = "add-third-party" )
 public class AggregatorAddThirdPartyMojo
     extends AbstractAddThirdPartyMojo
 {
 
+    // ----------------------------------------------------------------------
+    // Mojo Parameters
+    // ----------------------------------------------------------------------
+
     /**
      * The projects in the reactor.
      *
-     * @parameter property="reactorProjects"
-     * @readonly
-     * @required
      * @since 1.0
      */
+    @Parameter( property = "reactorProjects", readonly = true, required = true )
     protected List<?> reactorProjects;
+
+    // ----------------------------------------------------------------------
+    // AbstractLicenseMojo Implementaton
+    // ----------------------------------------------------------------------
 
     /**
      * {@inheritDoc}
@@ -86,6 +94,59 @@ public class AggregatorAddThirdPartyMojo
         }
         return super.checkSkip();
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void doAction()
+        throws Exception
+    {
+        Log log = getLog();
+
+        if ( isVerbose() )
+        {
+            log.info( "After executing on " + reactorProjects.size() + " project(s)" );
+        }
+        SortedMap<String, MavenProject> artifacts = getHelper().getArtifactCache();
+
+        LicenseMap licenseMap = getLicenseMap();
+
+        getLog().info( artifacts.size() + " detected artifact(s)." );
+        if ( isVerbose() )
+        {
+            for ( String id : artifacts.keySet() )
+            {
+                getLog().info( " - " + id );
+            }
+        }
+        getLog().info( licenseMap.size() + " detected license(s)." );
+        if ( isVerbose() )
+        {
+            for ( String id : licenseMap.keySet() )
+            {
+                getLog().info( " - " + id );
+            }
+        }
+        boolean unsafe = checkUnsafeDependencies();
+
+        boolean safeLicense = checkForbiddenLicenses();
+
+        if ( !safeLicense && isFailIfWarning() )
+        {
+            throw new MojoFailureException( "There is some forbidden licenses used, please check your dependencies." );
+        }
+        writeThirdPartyFile();
+
+        if ( unsafe && isFailIfWarning() )
+        {
+            throw new MojoFailureException( "There is some dependencies with no license, please review the modules." );
+        }
+    }
+
+    // ----------------------------------------------------------------------
+    // AbstractAddThirdPartyMojo Implementaton
+    // ----------------------------------------------------------------------
 
     /**
      * {@inheritDoc}
@@ -139,55 +200,6 @@ public class AggregatorAddThirdPartyMojo
             }
         }
         return unsafeMappings;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void doAction()
-        throws Exception
-    {
-        Log log = getLog();
-
-        if ( isVerbose() )
-        {
-            log.info( "After executing on " + reactorProjects.size() + " project(s)" );
-        }
-        SortedMap<String, MavenProject> artifacts = getHelper().getArtifactCache();
-
-        LicenseMap licenseMap = getLicenseMap();
-
-        getLog().info( artifacts.size() + " detected artifact(s)." );
-        if ( isVerbose() )
-        {
-            for ( String id : artifacts.keySet() )
-            {
-                getLog().info( " - " + id );
-            }
-        }
-        getLog().info( licenseMap.size() + " detected license(s)." );
-        if ( isVerbose() )
-        {
-            for ( String id : licenseMap.keySet() )
-            {
-                getLog().info( " - " + id );
-            }
-        }
-        boolean unsafe = checkUnsafeDependencies();
-
-        boolean safeLicense = checkForbiddenLicenses();
-
-        if ( !safeLicense && isFailIfWarning() )
-        {
-            throw new MojoFailureException( "There is some forbidden licenses used, please check your dependencies." );
-        }
-        writeThirdPartyFile();
-
-        if ( unsafe && isFailIfWarning() )
-        {
-            throw new MojoFailureException( "There is some dependencies with no license, please review the modules." );
-        }
     }
 
 }

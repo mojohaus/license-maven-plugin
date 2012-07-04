@@ -101,7 +101,6 @@ public abstract class FileHeaderFilter
     }
 
     /**
-     *
      * @return logger
      */
     public Log getLog()

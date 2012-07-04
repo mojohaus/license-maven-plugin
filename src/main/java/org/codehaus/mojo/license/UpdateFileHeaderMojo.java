@@ -22,6 +22,9 @@ package org.codehaus.mojo.license;
  * #L%
  */
 
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+
 /**
  * The goal to update (or add) the header on project source files.
  * <p/>
@@ -32,13 +35,16 @@ package org.codehaus.mojo.license;
  * describe all files to update for a whole project.
  *
  * @author tchemit <chemit@codelutin.com>
- * @requiresProject true
- * @goal update-file-header
  * @since 1.0
  */
+@Mojo( name = "update-file-header", requiresProject = true )
 public class UpdateFileHeaderMojo
     extends AbstractFileHeaderMojo
 {
+
+    // ----------------------------------------------------------------------
+    // Mojo Parameters
+    // ----------------------------------------------------------------------
 
     /**
      * A flag to fail the build if {@link #dryRun} flag is on and some files with
@@ -46,9 +52,9 @@ public class UpdateFileHeaderMojo
      * <p/>
      * <strong>Note:</strong> If {@link #dryRun} flag is not set, there is no effect.
      *
-     * @parameter property="license.failOnMissingHeader" default-value="false"
      * @since 1.2
      */
+    @Parameter( property = "license.failOnMissingHeader", defaultValue = "false" )
     protected boolean failOnMissingHeader;
 
     /**
@@ -57,26 +63,30 @@ public class UpdateFileHeaderMojo
      * <p/>
      * <strong>Note:</strong> If {@link #dryRun} flag is not set, there is no effect.
      *
-     * @parameter property="license.failOnNotUptodateHeader" default-value="false"
      * @since 1.2
      */
+    @Parameter( property = "license.failOnNotUptodateHeader", defaultValue = "false" )
     protected boolean failOnNotUptodateHeader;
 
     /**
      * A flag to skip the goal.
      *
-     * @parameter property="license.skipUpdateLicense" default-value="false"
      * @since 1.0
      */
+    @Parameter( property = "license.skipUpdateLicense", defaultValue = "false" )
     protected boolean skipUpdateLicense;
 
     /**
      * A flag to test plugin but modify no file.
      *
-     * @parameter property="dryRun" default-value="false"
      * @since 1.0
      */
+    @Parameter( property = "dryRun", defaultValue = "false" )
     protected boolean dryRun;
+
+    // ----------------------------------------------------------------------
+    // AbstractLicenceNameMojo Implementation
+    // ----------------------------------------------------------------------
 
     /**
      * {@inheritDoc}
@@ -96,6 +106,13 @@ public class UpdateFileHeaderMojo
         this.skipUpdateLicense = skip;
     }
 
+    // ----------------------------------------------------------------------
+    // AbstractFileHeaderMojo Implementation
+    // ----------------------------------------------------------------------
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected boolean isDryRun()
     {

@@ -22,42 +22,52 @@ package org.codehaus.mojo.license;
  * #L%
  */
 
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+
 /**
  * The goal to check if the state of header on project source files.
  * <p/>
  *
  * @author tchemit <chemit@codelutin.com>
- * @requiresProject true
- * @goal check-file-header
  * @since 1.2
  */
+@Mojo( name = "check-file-header", requiresProject = true )
 public class CheckFileHeaderMojo
     extends AbstractFileHeaderMojo
 {
 
+    // ----------------------------------------------------------------------
+    // Mojo Parameters
+    // ----------------------------------------------------------------------
+
     /**
      * A flag to fail the build if there is some files with no header are detected.
      *
-     * @parameter property="license.failOnMissingHeader" default-value="false"
      * @since 1.2
      */
+    @Parameter( property = "license.failOnMissingHeader", defaultValue = "false" )
     protected boolean failOnMissingHeader;
 
     /**
      * A flag to fail the build if there is some files with headers to update.
      *
-     * @parameter property="license.failOnNotUptodateHeader" default-value="false"
      * @since 1.2
      */
+    @Parameter( property = "license.failOnNotUptodateHeader", defaultValue = "false" )
     protected boolean failOnNotUptodateHeader;
 
     /**
      * A flag to skip the goal.
      *
-     * @parameter property="license.skipCheckLicense" default-value="false"
      * @since 1.2
      */
+    @Parameter( property = "license.skipCheckLicense", defaultValue = "false" )
     protected boolean skipCheckLicense;
+
+    // ----------------------------------------------------------------------
+    // AbstractLicenseFileNameMojo Implementation
+    // ----------------------------------------------------------------------
 
     /**
      * {@inheritDoc}
@@ -76,6 +86,10 @@ public class CheckFileHeaderMojo
     {
         this.skipCheckLicense = skip;
     }
+
+    // ----------------------------------------------------------------------
+    // AbstractFileHeaderMojo Implementation
+    // ----------------------------------------------------------------------
 
     /**
      * {@inheritDoc}

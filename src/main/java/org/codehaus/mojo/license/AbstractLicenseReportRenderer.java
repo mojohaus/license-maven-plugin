@@ -23,7 +23,9 @@ package org.codehaus.mojo.license;
  */
 
 import org.apache.maven.artifact.ArtifactUtils;
-import org.apache.maven.doxia.parser.Parser;
+import org.apache.maven.doxia.sink.Sink;
+import org.apache.maven.doxia.sink.SinkEventAttributeSet;
+import org.apache.maven.doxia.sink.SinkEventAttributes;
 import org.apache.maven.reporting.AbstractMavenReportRenderer;
 import org.codehaus.mojo.license.api.ThirdPartyDetails;
 import org.codehaus.plexus.i18n.I18N;
@@ -170,14 +172,20 @@ public abstract class AbstractLicenseReportRenderer
 
     protected void sinkHeaderCellText( String width, String text )
     {
-        sink.tableHeaderCell( width );
+
+        SinkEventAttributes attrs = new SinkEventAttributeSet(  );
+        attrs.addAttribute( SinkEventAttributes.WIDTH, width );
+
+        sink.tableHeaderCell( attrs);
         sink.text( text );
         sink.tableHeaderCell_();
     }
 
     protected void sinkCellText( String width, String text )
     {
-        sink.tableCell( width );
+        SinkEventAttributes attrs = new SinkEventAttributeSet(  );
+        attrs.addAttribute( SinkEventAttributes.WIDTH, width );
+        sink.tableCell( attrs);
         sink.text( text );
         sink.tableCell_();
     }
@@ -310,10 +318,12 @@ public abstract class AbstractLicenseReportRenderer
         final String cellWidth = "80%";
         final String headerWidth = "20%";
         sink.table();
-        sink.tableRows( new int[]{ Parser.JUSTIFY_RIGHT, Parser.JUSTIFY_LEFT }, false );
+        sink.tableRows( new int[]{ Sink.JUSTIFY_RIGHT, Sink.JUSTIFY_LEFT }, false );
         sink.tableRow();
         sinkHeaderCellText( headerWidth, getText( "report.status" ) );
-        sink.tableCell( cellWidth );
+        SinkEventAttributes attrs = new SinkEventAttributeSet(  );
+        attrs.addAttribute( SinkEventAttributes.WIDTH, cellWidth );
+        sink.tableCell( attrs );
         if ( details.hasPomLicenses() )
         {
             renderSuccessIcon();
@@ -367,7 +377,8 @@ public abstract class AbstractLicenseReportRenderer
         {
             sink.tableRow();
             sinkHeaderCellText( headerWidth, getText( "report.licenses" ) );
-            sink.tableCell( cellWidth );
+
+            sink.tableCell( attrs );
             for ( int i = 0; i < licenses.length; i++ )
             {
                 if ( i > 0 )
@@ -384,7 +395,7 @@ public abstract class AbstractLicenseReportRenderer
         {
             sink.tableRow();
             sinkHeaderCellText( headerWidth, getText( "report.licenses" ) );
-            sink.tableCell( cellWidth );
+            sink.tableCell( attrs );
             for ( int i = 0; i < licenses.length; i++ )
             {
                 if ( i > 0 )

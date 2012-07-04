@@ -27,6 +27,11 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.License;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.mojo.license.api.DependenciesTool;
 import org.codehaus.mojo.license.api.MavenProjectDependenciesConfigurator;
@@ -57,121 +62,136 @@ import java.util.SortedMap;
  *
  * @author Paul Gier
  * @version $Revision$
- * @phase package
- * @goal download-licenses
- * @requiresDependencyResolution test
  * @since 1.0
  */
+@Mojo( name = "download-licenses", requiresDependencyResolution = ResolutionScope.TEST,
+       defaultPhase = LifecyclePhase.PACKAGE )
 public class DownloadLicensesMojo
     extends AbstractMojo
     implements MavenProjectDependenciesConfigurator
 {
 
-    /**
-     * The Maven Project Object
-     *
-     * @parameter default-value="${project}"
-     * @readonly
-     * @since 1.0
-     */
-    private MavenProject project;
+    // ----------------------------------------------------------------------
+    // Mojo Parameters
+    // ----------------------------------------------------------------------
 
     /**
      * Location of the local repository.
      *
-     * @parameter default-value="${localRepository}"
-     * @readonly
      * @since 1.0
      */
+    @Parameter( defaultValue = "${localRepository}", readonly = true )
     private ArtifactRepository localRepository;
 
     /**
      * List of Remote Repositories used by the resolver
      *
-     * @parameter default-value="${project.remoteArtifactRepositories}"
-     * @readonly
      * @since 1.0
      */
+    @Parameter( defaultValue = "${project.remoteArtifactRepositories}", readonly = true )
     private List remoteRepositories;
 
     /**
      * Input file containing a mapping between each dependency and it's license information.
      *
-     * @parameter property="licensesConfigFile" default-value="${project.basedir}/src/license/licenses.xml"
      * @since 1.0
      */
+    @Parameter( property = "licensesConfigFile", defaultValue = "${project.basedir}/src/license/licenses.xml" )
     private File licensesConfigFile;
 
     /**
      * The directory to which the dependency licenses should be written.
      *
-     * @parameter property="licensesOutputDirectory" default-value="${project.build.directory}/generated-resources/licenses"
      * @since 1.0
      */
+    @Parameter( property = "licensesOutputDirectory",
+                defaultValue = "${project.build.directory}/generated-resources/licenses" )
     private File licensesOutputDirectory;
 
     /**
      * The output file containing a mapping between each dependency and it's license information.
      *
-     * @parameter property="licensesOutputFile" default-value="${project.build.directory}/generated-resources/licenses.xml"
      * @since 1.0
      */
+    @Parameter( property = "licensesOutputFile",
+                defaultValue = "${project.build.directory}/generated-resources/licenses.xml" )
     private File licensesOutputFile;
 
     /**
      * A filter to exclude some scopes.
      *
-     * @parameter property="license.excludedScopes" default-value="system"
      * @since 1.0
      */
+    @Parameter( property = "license.excludedScopes", defaultValue = "system" )
     private String excludedScopes;
 
     /**
      * A filter to include only some scopes, if let empty then all scopes will be used (no filter).
      *
-     * @parameter property="license.includedScopes" default-value=""
      * @since 1.0
      */
+    @Parameter( property = "license.includedScopes", defaultValue = "" )
     private String includedScopes;
 
     /**
      * Settings offline flag (will not download anything if setted to true).
      *
-     * @parameter default-value="${settings.offline}"
      * @since 1.0
      */
+    @Parameter( defaultValue = "${settings.offline}" )
     private boolean offline;
 
     /**
      * Don't show warnings about bad or missing license files.
      *
-     * @parameter default-value="false"
      * @since 1.0
      */
+    @Parameter( defaultValue = "false" )
     private boolean quiet;
 
     /**
      * Include transitive dependencies when downloading license files.
      *
-     * @parameter default-value="true"
      * @since 1.0
      */
+    @Parameter( defaultValue = "true" )
     private boolean includeTransitiveDependencies;
 
+    // ----------------------------------------------------------------------
+    // Plexus Components
+    // ----------------------------------------------------------------------
+
     /**
-     * dependencies tool.
+     * The Maven Project Object
+     *
+     * @since 1.0
+     */
+    @Component
+    private MavenProject project;
+
+    /**
+     * Dependencies tool.
      *
      * @component
      * @readonly
      * @since 1.0
      */
+    @Component
     private DependenciesTool dependenciesTool;
+
+    // ----------------------------------------------------------------------
+    // Private Fields
+    // ----------------------------------------------------------------------
 
     /**
      * Keeps a collection of the URLs of the licenses that have been downlaoded. This helps the plugin to avoid
      * downloading the same license multiple times.
      */
     private Set<String> downloadedLicenseURLs = new HashSet<String>();
+
+    // ----------------------------------------------------------------------
+    // Mojo Implementation
+    // ----------------------------------------------------------------------
 
     /**
      * {@inheritDoc}
@@ -235,8 +255,94 @@ public class DownloadLicensesMojo
         {
             throw new MojoExecutionException( "Unable to write license summary file: " + licensesOutputFile, e );
         }
-
     }
+
+    // ----------------------------------------------------------------------
+    // MavenProjectDependenciesConfigurator Implementation
+    // ----------------------------------------------------------------------
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isIncludeTransitiveDependencies()
+    {
+        return includeTransitiveDependencies;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public List<String> getExcludedScopes()
+    {
+        String[] split = excludedScopes == null ? new String[0] : excludedScopes.split( "," );
+        return Arrays.asList( split );
+    }
+
+    public void setExcludedScopes( String excludedScopes )
+    {
+        this.excludedScopes = excludedScopes;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public List<String> getIncludedScopes()
+    {
+        String[] split = includedScopes == null ? new String[0] : includedScopes.split( "," );
+        return Arrays.asList( split );
+    }
+
+    // not used at the moment
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getIncludedArtifacts()
+    {
+        return null;
+    }
+
+    // not used at the moment
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getIncludedGroups()
+    {
+        return null;
+    }
+
+    // not used at the moment
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getExcludedGroups()
+    {
+        return null;
+    }
+
+    // not used at the moment
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getExcludedArtifacts()
+    {
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isVerbose()
+    {
+        return getLog().isDebugEnabled();
+    }
+
+    // ----------------------------------------------------------------------
+    // Private Methods
+    // ----------------------------------------------------------------------
 
     private void initDirectories()
         throws MojoExecutionException
@@ -300,7 +406,7 @@ public class DownloadLicensesMojo
      * @param artifact the artifact
      * @return groupId:artifactId
      */
-    public String getArtifactProjectId( Artifact artifact )
+    private String getArtifactProjectId( Artifact artifact )
     {
         return artifact.getGroupId() + ":" + artifact.getArtifactId();
     }
@@ -311,7 +417,7 @@ public class DownloadLicensesMojo
      * @param depMavenProject the dependency maven project
      * @return DependencyProject with artifact and license info
      */
-    public ProjectLicenseInfo createDependencyProject( MavenProject depMavenProject )
+    private ProjectLicenseInfo createDependencyProject( MavenProject depMavenProject )
     {
         ProjectLicenseInfo dependencyProject =
             new ProjectLicenseInfo( depMavenProject.getGroupId(), depMavenProject.getArtifactId(),
@@ -424,82 +530,4 @@ public class DownloadLicensesMojo
 
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public boolean isIncludeTransitiveDependencies()
-    {
-        return includeTransitiveDependencies;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public List<String> getExcludedScopes()
-    {
-        String[] split = excludedScopes == null ? new String[0] : excludedScopes.split( "," );
-        return Arrays.asList( split );
-    }
-
-    public void setExcludedScopes( String excludedScopes )
-    {
-        this.excludedScopes = excludedScopes;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public List<String> getIncludedScopes()
-    {
-        String[] split = includedScopes == null ? new String[0] : includedScopes.split( "," );
-        return Arrays.asList( split );
-    }
-
-    // not used at the moment
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getIncludedArtifacts()
-    {
-        return null;
-    }
-
-    // not used at the moment
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getIncludedGroups()
-    {
-        return null;
-    }
-
-    // not used at the moment
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getExcludedGroups()
-    {
-        return null;
-    }
-
-    // not used at the moment
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getExcludedArtifacts()
-    {
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean isVerbose()
-    {
-        return getLog().isDebugEnabled();
-    }
 }

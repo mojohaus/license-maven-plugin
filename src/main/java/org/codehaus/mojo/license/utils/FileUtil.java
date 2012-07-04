@@ -255,7 +255,8 @@ public class FileUtil
         }
     }
 
-    public static List<File> orderFiles(Collection<File> files) {
+    public static List<File> orderFiles( Collection<File> files )
+    {
         List<File> result = new ArrayList<File>( files );
         Collections.sort( result, new Comparator<File>()
         {
