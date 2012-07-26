@@ -28,6 +28,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.maven.plugin.MojoExecutionException;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -179,7 +180,25 @@ public class LicenseStore
     public void addRepository( String extraResolver )
         throws IOException
     {
-        addRepository( new URL( extraResolver ) );
+        try 
+        {
+            addRepository( new URL( extraResolver ) );
+        } 
+        catch ( MalformedURLException e ) 
+        {
+            if ( LOG.isDebugEnabled() )
+            {
+                LOG.debug( "Malformed URL, try to load extra resolver from classloader with '" + extraResolver + "'" );
+            }
+
+            URL resource = getClass().getClassLoader().getResource( extraResolver );
+
+            if ( resource == null ) {
+                throw new IOException( "Unable to load extra resolver '" + extraResolver + "' from classloader." );
+            }
+
+            addRepository( resource );
+        }
     }
 
     public void addRepository( URL baseURL )
