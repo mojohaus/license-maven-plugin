@@ -125,7 +125,7 @@ public class JavaFileHeaderTransformer
 
             // prolog detected
             content = content.substring( prolog.length() );
-            result = super.addHeader( prolog + header, content );
+            result = super.addHeader( prolog + "\n" + header, content );
         }
         return result;
     }

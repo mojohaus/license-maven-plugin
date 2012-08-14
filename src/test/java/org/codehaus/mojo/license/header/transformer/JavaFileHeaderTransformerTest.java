@@ -55,7 +55,7 @@ public class JavaFileHeaderTransformerTest
         transformer.setAddJavaLicenseAfterPackage( true );
 
         result = transformer.addHeader( HEADER, content );
-        Assert.assertEquals( PACKAGE + "\n" + HEADER + CONTENT, result );
+        Assert.assertEquals( PACKAGE + "\n\n" + HEADER + CONTENT, result );
 
     }
 
