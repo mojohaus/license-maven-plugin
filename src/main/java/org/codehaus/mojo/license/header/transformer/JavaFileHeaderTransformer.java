@@ -95,7 +95,22 @@ public class JavaFileHeaderTransformer
             {
 
                 // prolog end was detected
-                prolog = content.substring( 0, endProlog + 2 );
+
+                int lastIndex = endProlog + 1;
+
+                prolog = content.substring( 0, lastIndex );
+
+                // prolog goes to next line
+                prolog += "\n";
+
+                if ( lastIndex == content.length() )
+                {
+
+                    // adding a new empty end line to the content
+                    content += "\n";
+                }
+
+
             }
         }
 
