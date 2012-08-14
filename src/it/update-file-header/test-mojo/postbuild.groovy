@@ -64,6 +64,13 @@ def assertNotContains(file, content, expected)
 //TEST Java files
 //
 
+file = new File(basedir, 'src/main/java/org/codehaus/mojo/license/java-info.java');
+assertExistsFile(file);
+
+content = file.text;
+assert assertContains(file, content, 'Copyright (C) 2012 License Test');
+
+
 file = new File(basedir, 'src/main/java/org/codehaus/mojo/license/MyBean.java');
 assertExistsFile(file);
 
