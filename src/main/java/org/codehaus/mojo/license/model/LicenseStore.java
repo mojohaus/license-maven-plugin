@@ -28,7 +28,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.maven.plugin.MojoExecutionException;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -54,6 +53,11 @@ public class LicenseStore
      * class-path directory where is the licenses repository.
      */
     public static final String JAR_LICENSE_REPOSITORY = "/META-INF/licenses";
+
+    /**
+     * Classpath protocol prefix for extra license resolver to seek in classpath.
+     */
+    public static final String CLASSPATH_PROTOCOL = "classpath://";
 
     /**
      * list of available license repositories.
@@ -180,25 +184,21 @@ public class LicenseStore
     public void addRepository( String extraResolver )
         throws IOException
     {
-        try 
+        URL baseURL;
+        if ( extraResolver.startsWith( CLASSPATH_PROTOCOL ) )
         {
-            addRepository( new URL( extraResolver ) );
-        } 
-        catch ( MalformedURLException e ) 
-        {
+            extraResolver = extraResolver.substring( CLASSPATH_PROTOCOL.length() );
             if ( LOG.isDebugEnabled() )
             {
-                LOG.debug( "Malformed URL, try to load extra resolver from classloader with '" + extraResolver + "'" );
+                LOG.info( "Using classpath extraresolver: " + extraResolver );
             }
-
-            URL resource = getClass().getClassLoader().getResource( extraResolver );
-
-            if ( resource == null ) {
-                throw new IOException( "Unable to load extra resolver '" + extraResolver + "' from classloader." );
-            }
-
-            addRepository( resource );
+            baseURL = getClass().getClassLoader().getResource( extraResolver );
         }
+        else
+        {
+            baseURL = new URL( extraResolver );
+        }
+        addRepository( baseURL );
     }
 
     public void addRepository( URL baseURL )

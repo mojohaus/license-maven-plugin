@@ -24,11 +24,8 @@
           <encoding>UTF-8</encoding>
           <licenseName>classpath</licenseName>
           <organizationName>CodeHaus</organizationName>
-          <licenseResolver>mylicensestore</licenseResolver>
+          <licenseResolver>classpath://mypackage/mylicensestore</licenseResolver>
           <inceptionYear>2012</inceptionYear>
-          <!--includes>
-            <include>**/*.java</include>
-          </includes-->
         </configuration>
         <executions>
           <execution>

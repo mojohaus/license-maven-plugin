@@ -162,3 +162,42 @@ Public License instead of this License.  But first, please read
 
 -------------------------------------------------------------------------------
 
+* Using a license resolver from classpath
+
+  Since version 1.3, it is possible to use a license resolver from classpath (means included into a jar or any
+  dependency of the plugin dependencies).
+
+  Just use the <<classpath://>> protocol in the plugin configuration.
+
+  Imagine you have a license resolver in an artifact <com.my:extraLicenseResolvers:1.0> in package <foo.bar>
+
+  Next example show how to use this license resolver from classpath:
+
+-------------------------------------------------------------------------------
+
+<plugin>
+  <groupId>org.codehaus.mojo</groupId>
+  <artifactId>license-maven-plugin</artifactId>
+  <configuration>
+      <licenseName>my_license</licenseName>
+      <licenseResolver>classpath://foo/bar</licenseResolver>
+  </configuration>
+  <executions>
+      <execution>
+          <goals>
+              <goal>update-file-header</goal>
+          </goals>
+          <phase>process-sources</phase>
+      </execution>
+  </executions>
+  <dependencies>
+      <dependency>
+          <groupId>com.my</groupId>
+          <artifactId>extraLicenseResolvers</artifactId>
+          <version>1.0</version>
+      </dependency>
+  </dependencies>
+</plugin>
+
+-------------------------------------------------------------------------------
+
