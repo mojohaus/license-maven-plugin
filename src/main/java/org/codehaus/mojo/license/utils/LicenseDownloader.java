@@ -44,7 +44,7 @@ public class LicenseDownloader
      */
     public static final int DEFAULT_CONNECTION_TIMEOUT = 5000;
 
-    public static void downloadLicense( String licenseUrlString, File outputFile )
+    public static void downloadLicense( String licenseUrlString, String loginPassword, File outputFile )
         throws IOException
     {
         InputStream licenseInputStream = null;
@@ -54,6 +54,11 @@ public class LicenseDownloader
         {
             URL licenseUrl = new URL( licenseUrlString );
             URLConnection connection = licenseUrl.openConnection();
+
+            if ( loginPassword != null )
+            {
+                connection.setRequestProperty( "Proxy-Authorization", loginPassword );
+            }
             connection.setConnectTimeout( DEFAULT_CONNECTION_TIMEOUT );
             connection.setReadTimeout( DEFAULT_CONNECTION_TIMEOUT );
             licenseInputStream = connection.getInputStream();

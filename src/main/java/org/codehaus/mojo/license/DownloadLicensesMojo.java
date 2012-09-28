@@ -33,6 +33,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.settings.Proxy;
 import org.codehaus.mojo.license.api.DependenciesTool;
 import org.codehaus.mojo.license.api.MavenProjectDependenciesConfigurator;
 import org.codehaus.mojo.license.model.ProjectLicenseInfo;
@@ -40,6 +41,7 @@ import org.codehaus.mojo.license.utils.FileUtil;
 import org.codehaus.mojo.license.utils.LicenseDownloader;
 import org.codehaus.mojo.license.utils.LicenseSummaryReader;
 import org.codehaus.mojo.license.utils.LicenseSummaryWriter;
+import org.codehaus.plexus.util.Base64;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -53,7 +55,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.SortedMap;
 
@@ -158,6 +159,14 @@ public class DownloadLicensesMojo
     @Parameter( defaultValue = "true" )
     private boolean includeTransitiveDependencies;
 
+    /**
+     * Get declared proxies from the {@code settings.xml} file.
+     *
+     * @since 1.4
+     */
+    @Parameter( defaultValue = "${settings.proxies}", readonly = true )
+    private List<Proxy> proxies;
+
     // ----------------------------------------------------------------------
     // Plexus Components
     // ----------------------------------------------------------------------
@@ -190,6 +199,13 @@ public class DownloadLicensesMojo
      */
     private Set<String> downloadedLicenseURLs = new HashSet<String>();
 
+    /**
+     * Proxy Login/Password encoded(only if usgin a proxy with authentication).
+     *
+     * @since 1.4
+     */
+    private String proxyLoginPasswordEncoded;
+
     // ----------------------------------------------------------------------
     // Mojo Implementation
     // ----------------------------------------------------------------------
@@ -208,6 +224,8 @@ public class DownloadLicensesMojo
             return;
         }
         initDirectories();
+
+        initProxy();
 
         Map<String, ProjectLicenseInfo> configuredDepLicensesMap = new HashMap<String, ProjectLicenseInfo>();
 
@@ -360,6 +378,35 @@ public class DownloadLicensesMojo
         }
     }
 
+    private void initProxy()
+        throws MojoExecutionException
+    {
+        Proxy proxyToUse = null;
+        for ( Proxy proxy : proxies )
+        {
+            if ( proxy.isActive() && "http".equals( proxy.getProtocol() ) )
+            {
+
+                // found our proxy
+                proxyToUse = proxy;
+                break;
+            }
+        }
+        if ( proxyToUse != null )
+        {
+
+            System.getProperties().put( "proxySet", "true" );
+            System.setProperty( "proxyHost", proxyToUse.getHost() );
+            System.setProperty( "proxyPort", String.valueOf( proxyToUse.getPort() ) );
+            System.setProperty( "nonProxyHosts", proxyToUse.getNonProxyHosts() );
+            if ( proxyToUse.getUsername() != null )
+            {
+                String loginPassword = proxyToUse.getUsername() + ":" + proxyToUse.getPassword();
+                proxyLoginPasswordEncoded = new String( Base64.encodeBase64( loginPassword.getBytes() ) );
+            }
+        }
+    }
+
     /**
      * Load the license information contained in a file if it exists. Will overwrite existing license information in the
      * map for dependencies with the same id. If the config file does not exist, the method does nothing.
@@ -473,25 +520,6 @@ public class DownloadLicensesMojo
      */
     private void downloadLicenses( ProjectLicenseInfo depProject )
     {
-        if ( project != null )
-        {
-            Properties projectProperties = project.getProperties();
-
-            if ( projectProperties != null )
-            {
-                String proxyHostKey = "proxyHost";
-                String proxyPortKey = "proxyPort";
-                String nonProxyHostsKey = "nonProxyHosts";
-
-                String proxyHost = projectProperties.getProperty( proxyHostKey, "" );
-                String proxyPort = projectProperties.getProperty( proxyPortKey, "" );
-                String nonProxyHosts = projectProperties.getProperty( nonProxyHostsKey, "" );
-
-                System.setProperty( proxyHostKey, proxyHost );
-                System.setProperty( proxyPortKey, proxyPort );
-                System.setProperty( nonProxyHostsKey, nonProxyHosts );
-            }
-        }
 
         getLog().debug( "Downloading license(s) for project " + depProject );
 
@@ -520,7 +548,7 @@ public class DownloadLicensesMojo
 
                 if ( !downloadedLicenseURLs.contains( license.getUrl() ) )
                 {
-                    LicenseDownloader.downloadLicense( license.getUrl(), licenseOutputFile );
+                    LicenseDownloader.downloadLicense( license.getUrl(), proxyLoginPasswordEncoded, licenseOutputFile );
                     downloadedLicenseURLs.add( license.getUrl() );
                 }
             }
