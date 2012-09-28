@@ -53,6 +53,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.SortedMap;
 
@@ -472,6 +473,26 @@ public class DownloadLicensesMojo
      */
     private void downloadLicenses( ProjectLicenseInfo depProject )
     {
+        if ( project != null )
+        {
+            Properties projectProperties = project.getProperties();
+
+            if ( projectProperties != null )
+            {
+                String proxyHostKey = "proxyHost";
+                String proxyPortKey = "proxyPort";
+                String nonProxyHostsKey = "nonProxyHosts";
+
+                String proxyHost = projectProperties.getProperty( proxyHostKey, "" );
+                String proxyPort = projectProperties.getProperty( proxyPortKey, "" );
+                String nonProxyHosts = projectProperties.getProperty( nonProxyHostsKey, "" );
+
+                System.setProperty( proxyHostKey, proxyHost );
+                System.setProperty( proxyPortKey, proxyPort );
+                System.setProperty( nonProxyHostsKey, nonProxyHosts );
+            }
+        }
+
         getLog().debug( "Downloading license(s) for project " + depProject );
 
         List<License> licenses = depProject.getLicenses();
