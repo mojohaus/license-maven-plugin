@@ -77,14 +77,14 @@ mvn package
 +-----+
     
   For the <<<download-licenses>>> goal, licenses will by default be downloaded into the directory 
-  <<<target/licenses>>>.  This can be configured using the <<<licensesOutputDirectory>>> parameter.
+  <<<target/generated-resources/licenses>>>.  This can be configured using the <<<licensesOutputDirectory>>> parameter.
   
 * Manual License Configuration
 
   By default the plugin will look at the POM of each dependency for license information.  However,
   not all POMs have been configured with the correct license information.  In these cases, 
   the required license information can be configured manually.  By default, the plugin will look
-  for a file called <<src/licenses.xml>>.  This file contains manually configured license information
+  for a file called <<src/license/licenses.xml>>.  This file contains manually configured license information
   which will be merged with information from the dependency POMs to create the final license report.  
   The location of this file can be configured using the <<licensesConfigFile>> parameter
   The following is an example license config file.
