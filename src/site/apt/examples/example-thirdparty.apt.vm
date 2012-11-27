@@ -43,7 +43,7 @@ Third-party
 
   <Note:> This mojo has not effect on a <<pom>> project.
 
-  for full detail see {{{./add-third-party-mojo.html}detail page}}.
+  For full detail see {{{../add-third-party-mojo.html}detail page}}.
 
 
 * aggregate-add-third-party goal
@@ -53,7 +53,7 @@ Third-party
 
   <Note:> This mojo has only effect on a <<pom>> project.
 
-  for full detail see {{{./aggregate-add-third-party-mojo.html}detail page}}.
+  For full detail see {{{../aggregate-add-third-party-mojo.html}detail page}}.
 
 * Change the format of the third-party file
 
@@ -109,7 +109,7 @@ Third-party
    Here is a <<THIRD-PARTY>> file with unnamed licenses launched by
 
 --------------------------------------------------------------------------------
-mvn license:add-third-party -DuseMissingFile
+mvn license:add-third-party -Dlicense.useMissingFile
 
 List of 2 third-party dependencies.
 
