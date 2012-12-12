@@ -46,5 +46,20 @@
         </p>
       </answer>
     </faq>
+    <faq id="mysql-file-header">
+          <question>Why sql style should not be used with mysql sql files ?</question>
+          <answer>
+            <p>
+              Mysql does not accept <strong>---</strong> as comment (which is used to mark license header for normal sql files).
+              You should use the <i>mysql</i> header style instead, with with configuration:
+              <pre>
+              &lt;extraExtensions&gt;
+              &lt;sql&gt;mysql&lt;/sql&gt;
+              &lt;/extraExtensions&gt;
+              </pre>
+              <a href="http://jira.codehaus.org/browse/MLICENSE-56">Bug detail.</a>
+            </p>
+          </answer>
+        </faq>
   </part>
 </faqs>

@@ -22,7 +22,7 @@ package org.codehaus.mojo.license.header.transformer;
  * #L%
  */
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.codehaus.mojo.license.header.FileHeader;
 
 import java.util.regex.Matcher;

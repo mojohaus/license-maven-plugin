@@ -90,6 +90,7 @@
                 <jsp2>jsp</jsp2>
                 <ftl2>ftl</ftl2>
                 <sql2>sql</sql2>
+                <mysql2>mysql</mysql2>
               </extraExtensions>
               <!--<excludes>-->
               <!--<param>**/*.rst</param>-->

@@ -478,6 +478,49 @@ assert assertContains(file, content, '-- #L%');
 assert assertContains(file, content, '$Id');
 assert assertContains(file, content, '---');
 
+//
+// Test mysql files
+//
+file = new File(basedir, 'src/files/mysql/test.mysql');
+assertExistsFile(file);
+
+content = file.text;
+assert assertContains(file, content, 'Copyright (C)');
+assert assertContains(file, content, '-- #%L');
+assert assertContains(file, content, '-- #L%');
+assert assertContains(file, content, '$Id');
+assert assertContains(file, content, '-- -');
+
+file = new File(basedir, 'src/files/mysql/test2.mysql');
+assertExistsFile(file);
+
+content = file.text;
+assert assertContains(file, content, 'Copyright (C)');
+assert assertContains(file, content, '-- #%L');
+assert assertContains(file, content, '-- #L%');
+assert assertContains(file, content, '$Id');
+assert assertContains(file, content, '-- -');
+
+file = new File(basedir, 'src/files/mysql/test.mysql2');
+assertExistsFile(file);
+
+content = file.text;
+assert assertContains(file, content, 'Copyright (C)');
+assert assertContains(file, content, '-- #%L');
+assert assertContains(file, content, '-- #L%');
+assert assertContains(file, content, '$Id');
+assert assertContains(file, content, '-- -');
+
+file = new File(basedir, 'src/files/mysql/test2.mysql2');
+assertExistsFile(file);
+
+content = file.text;
+assert assertContains(file, content, 'Copyright (C)');
+assert assertContains(file, content, '-- #%L');
+assert assertContains(file, content, '-- #L%');
+assert assertContains(file, content, '$Id');
+assert assertContains(file, content, '-- -');
+
 // Test on the child1 module
 
 file = new File(basedir, 'child1/src/main/java/org/codehaus/mojo2/license/MyBean.java');
@@ -697,5 +740,28 @@ assert assertContains(file, content, '-- #%L');
 assert assertContains(file, content, '-- #L%');
 assert assertContains(file, content, '$Id');
 assert assertContains(file, content, '---');
+
+//
+// Test sql files
+//
+file = new File(basedir, 'child1/src/files/mysql/test.mysql');
+assertExistsFile(file);
+
+content = file.text;
+assert assertContains(file, content, 'Copyright (C)');
+assert assertContains(file, content, '-- #%L');
+assert assertContains(file, content, '-- #L%');
+assert assertContains(file, content, '$Id');
+assert assertContains(file, content, '-- -');
+
+file = new File(basedir, 'child1/src/files/mysql/test2.mysql');
+assertExistsFile(file);
+
+content = file.text;
+assert assertContains(file, content, 'Copyright (C)');
+assert assertContains(file, content, '-- #%L');
+assert assertContains(file, content, '-- #L%');
+assert assertContains(file, content, '$Id');
+assert assertContains(file, content, '-- -');
 
 return true;
