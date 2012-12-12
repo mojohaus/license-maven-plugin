@@ -45,7 +45,7 @@ License List Examples
   mvn license:license-list -Ddetail
 -------------------------------------------------------------------------------
 
-  for full detail see {{{./license-list-mojo.html}detail page}}.
+  for full detail see {{{../license-list-mojo.html}detail page}}.
 
 ** Example output
 

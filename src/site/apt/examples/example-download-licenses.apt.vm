@@ -30,7 +30,7 @@
 Download Licenses Examples
 
   This page provides examples of how to use the <<<download-licenses>>> goal.
-  By default, the <<<{{{./download-licenses-mojo.html}download-licenses}}>>> goal will attempt to 
+  By default, the <<<{{{../download-licenses-mojo.html}download-licenses}}>>> goal will attempt to
   resolve the license of each project dependency.  These files will be downloaded to a local directory
   to be included in the final packaging of the project if desired.  The licenses are downloaded
   based on the url field of the dependency POM.

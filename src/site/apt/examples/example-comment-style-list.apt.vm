@@ -45,7 +45,7 @@ Comment style List Examples
   mvn license:comment-style-list -Ddetail
 -------------------------------------------------------------------------------
 
-  for full detail see {{{./comment-style-list-mojo.html}detail page}}.
+  for full detail see {{{../comment-style-list-mojo.html}detail page}}.
 
 ** Example output
 
@@ -60,6 +60,7 @@ Comment style List Examples
   - php        : header transformer with php comment style            , extensions : [php]
   - properties : header transformer with properties file comment style, extensions : [properties, sh, py, rb, pl, pm]
   - rst        : header transformer with rst comment style            , extensions : [rst]
+  - mysql      : header transformer with mysql comment style          , extensions : [mysql]
   - sql        : header transformer with sql comment style            , extensions : [sql]
   - xml        : header transformer with xml comment style            , extensions : [pom, xml, xhtml, mxlm, dtd, fml, xsl, html, htm, jaxx, kml, gsp, tml]
 -------------------------------------------------------------------------------
