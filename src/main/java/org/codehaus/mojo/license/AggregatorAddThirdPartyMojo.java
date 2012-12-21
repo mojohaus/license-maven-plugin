@@ -41,9 +41,14 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 
 /**
- * This aggregator goal (will be executed only once and only on pom projects)
- * executed the {@code add-third-party} on all his modules (in a parellel build cycle)
- * then aggreates all the third-party files in final one in the pom project.
+ * This goal forks executions of the add-third-party goal for all the leaf projects
+ * of the tree of modules below the point where it is executed. Note that this
+ * plugin sets a specific name, 'add-third-party', for the forked executions in the
+ * individual projects. From command level, then
+ * even though the execution of this goal is named 'default-cli', the forked executions
+ * have the name 'add-third-party'. Thus, to use the <tt>pluginManagement</tt> element of
+ * the POM to set options, you have to name the execution 'add-third-party',
+ * not 'default-cli'.
  *
  * @author tchemit <chemit@codelutin.com>
  * @since 1.0
