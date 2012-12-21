@@ -74,7 +74,7 @@ public class AddThirdPartyMojo
     // ----------------------------------------------------------------------
 
     /**
-     * Deploy the third party missing file in maven repository.
+     * Attach the 'missing' file as an additional artifact so that it is deployed in the deploy phase.
      *
      * @since 1.0
      */
@@ -82,7 +82,10 @@ public class AddThirdPartyMojo
     private boolean deployMissingFile;
 
     /**
-     * Load from repositories third party missing files.
+     * Load files supplying information for missing third party licenses from repositories.
+     * The plugin looks for Maven artifacts with coordinates of the form G:A:V:T:C, where
+     * the group, artifact, and version are those of the artifact for which the license is missing,
+     * while the type is 'properties' and the classifier is 'third-party'.
      *
      * @since 1.0
      */
@@ -117,6 +120,7 @@ public class AddThirdPartyMojo
 
     /**
      * A filter to exclude some GroupIds
+     * This is a regular expression that is applied to groupIds (not an ant pattern).
      *
      * @since 1.1
      */
@@ -125,6 +129,7 @@ public class AddThirdPartyMojo
 
     /**
      * A filter to include only some GroupIds
+     * This is a regular expression applied to artifactIds.
      *
      * @since 1.1
      */
@@ -133,6 +138,7 @@ public class AddThirdPartyMojo
 
     /**
      * A filter to exclude some ArtifactsIds
+     * This is a regular expression applied to artifactIds.
      *
      * @since 1.1
      */
@@ -141,6 +147,7 @@ public class AddThirdPartyMojo
 
     /**
      * A filter to include only some ArtifactsIds
+     * This is a regular expression applied to artifactIds.
      *
      * @since 1.1
      */
@@ -244,7 +251,7 @@ public class AddThirdPartyMojo
             // can deploy missing file
             File file = getMissingFile();
 
-            getLog().info( "Will deploy third party file from " + file );
+            getLog().info( "Will attach third party file from " + file );
             getHelper().attachThirdPartyDescriptor( file );
         }
 
@@ -252,7 +259,7 @@ public class AddThirdPartyMojo
     }
 
     // ----------------------------------------------------------------------
-    // AbstractAddThirdPartyMojo Implementaton
+    // AbstractAddThirdPartyMojo Implementation
     // ----------------------------------------------------------------------
 
     /**

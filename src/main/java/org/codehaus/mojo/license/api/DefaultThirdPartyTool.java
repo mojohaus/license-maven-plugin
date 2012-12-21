@@ -193,7 +193,7 @@ public class DefaultThirdPartyTool
                 break;
             }
 
-            File thirdPartyDescriptor = resolvThirdPartyDescriptor( mavenProject, localRepository, remoteRepositories );
+            File thirdPartyDescriptor = resolvThirdPartyDescriptor(mavenProject, localRepository, remoteRepositories);
 
             if ( thirdPartyDescriptor != null && thirdPartyDescriptor.exists() && thirdPartyDescriptor.length() > 0 )
             {
@@ -412,7 +412,7 @@ public class DefaultThirdPartyTool
         // get from the missing file, all unknown dependencies
         List<String> unknownDependenciesId = new ArrayList<String>();
 
-        // coming from maven-licen-plugin, we used in id type and classifier, now we remove
+        // coming from maven-license-plugin, we used in id type and classifier, now we remove
         // these informations since GAV is good enough to qualify a license of any artifact of it...
         Map<String, String> migrateKeys = migrateMissingFileKeys( unsafeMappings.keySet() );
 

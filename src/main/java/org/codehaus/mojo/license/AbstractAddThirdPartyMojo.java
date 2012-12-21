@@ -74,9 +74,8 @@ public abstract class AbstractAddThirdPartyMojo
     private File outputDirectory;
 
     /**
-     * File where to wirte the third-party file.
+     * File where to write the third-party file.
      *
-     * @required
      * @since 1.0
      */
     @Parameter( property = "license.thirdPartyFilename", defaultValue = "THIRD-PARTY.txt", required = true )
@@ -91,7 +90,7 @@ public abstract class AbstractAddThirdPartyMojo
     private boolean useMissingFile;
 
     /**
-     * The file where to fill the license for dependencies with unknwon license.
+     * The file to write with a license information template for dependencies with unknown license.
      *
      * @since 1.0
      */
