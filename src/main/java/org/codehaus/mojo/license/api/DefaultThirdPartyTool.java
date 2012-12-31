@@ -225,17 +225,16 @@ public class DefaultThirdPartyTool
                 resolveUnsafe( unsafeDependencies, licenseMap, unsafeProjects, unsafeMappings, result );
             }
 
-            try
-            {
-                loadGlobalLicenses( topLevelDependencies, localRepository, remoteRepositories,
-                        unsafeDependencies, licenseMap, unsafeProjects, result );
-            } catch (ArtifactNotFoundException e)
-            {
-                throw new ThirdPartyToolException( "Failed to load global licenses", e );
-            } catch (ArtifactResolutionException e) {
-                throw new ThirdPartyToolException( "Failed to load global licenses", e );
-            }
-
+        }
+        try
+        {
+            loadGlobalLicenses( topLevelDependencies, localRepository, remoteRepositories,
+                    unsafeDependencies, licenseMap, unsafeProjects, result );
+        } catch (ArtifactNotFoundException e)
+        {
+            throw new ThirdPartyToolException( "Failed to load global licenses", e );
+        } catch (ArtifactResolutionException e) {
+            throw new ThirdPartyToolException( "Failed to load global licenses", e );
         }
         return result;
     }
