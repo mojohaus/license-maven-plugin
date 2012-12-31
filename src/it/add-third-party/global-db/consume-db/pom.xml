@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  #%L
+  License Maven Plugin
+  %%
+  Copyright (C) 2012 - Benson Margulies
+  %%
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU Lesser General Public License as 
+  published by the Free Software Foundation, either version 3 of the 
+  License, or (at your option) any later version.
+  
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Lesser Public License for more details.
+  
+  You should have received a copy of the GNU General Lesser Public 
+  License along with this program.  If not, see
+  <http://www.gnu.org/licenses/lgpl-3.0.html>.
+  #L%
+  -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.codehaus.mojo.license.test</groupId>
+  <artifactId>test-add-third-party-global-db-consume-db</artifactId>
+
+  <parent>
+    <groupId>org.codehaus.mojo.license.test</groupId>
+    <artifactId>test-add-third-party-global-db</artifactId>
+    <version>@pom.version@</version>
+  </parent>
+
+  <name>License Test :: global-db - consume</name>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <license.verbose>true</license.verbose>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>test-add-third-party-global-db-publish-db</artifactId>
+      <classifier>ldb</classifier>
+      <type>license.properties</type>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>test-add-third-party-global-db-misc-dep</artifactId>
+      <version>1</version>
+    </dependency>
+  </dependencies>
+</project>
+
+
