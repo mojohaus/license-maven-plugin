@@ -180,7 +180,7 @@ public class ThirdPartyReportMojo
     }
 
     // ----------------------------------------------------------------------
-    // AbstractLicenseReportMojo Implementaton
+    // AbstractLicenseReportMojo Implementation
     // ----------------------------------------------------------------------
 
     /**
@@ -304,7 +304,7 @@ public class ThirdPartyReportMojo
 
             if ( useMissingFile )
             {
-                // Resolv unsafe dependencies using missing files, this will update licenseMap and unsafeDependencies
+                // Resolve unsafe dependencies using missing files, this will update licenseMap and unsafeDependencies
                 getHelper().createUnsafeMapping( licenseMap, missingFile, useRepositoryMissingFiles,
                                                  dependenciesWithNoLicense, projectDependencies.values() );
             }

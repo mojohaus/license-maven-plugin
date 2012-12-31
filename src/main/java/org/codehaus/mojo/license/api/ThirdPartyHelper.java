@@ -22,6 +22,7 @@ package org.codehaus.mojo.license.api;
  * #L%
  */
 
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
@@ -32,6 +33,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 
@@ -57,14 +59,16 @@ public interface ThirdPartyHelper
      * Try to load maximum of unsafe license mapping using third-party descriptors (from maven repositories) and
      * return it.
      *
+     * @param topLevelDependencies project dependencies to scan for .license.properties files.
      * @param projects           all projects where to read third parties descriptors
-     * @param unsafeDependencies all unsafe dependences
+     * @param unsafeDependencies all unsafe dependencies
      * @param licenseMap         license map where to store new licenses
      * @return the map of loaded missing from the remote missing third party files
      * @throws ThirdPartyToolException if any
      * @throws IOException             if any
      */
-    SortedProperties loadThirdPartyDescriptorForUnsafeMapping( SortedSet<MavenProject> unsafeDependencies,
+    SortedProperties loadThirdPartyDescriptorForUnsafeMapping( Set<Artifact> topLevelDependencies,
+                                                               SortedSet<MavenProject> unsafeDependencies,
                                                                Collection<MavenProject> projects,
                                                                LicenseMap licenseMap )
         throws ThirdPartyToolException, IOException;

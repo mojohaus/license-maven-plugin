@@ -53,7 +53,7 @@
         <executions>
           <execution>
             <id>attach-artifacts</id>
-            <phase>package</phase>
+            <phase>generate-sources</phase>
             <goals>
               <goal>attach-artifact</goal>
             </goals>

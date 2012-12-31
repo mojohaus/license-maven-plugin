@@ -401,7 +401,6 @@
                   </pomIncludes>
                   <pomExcludes>
                     <pomExclude>download-licenses/MLICENSE-4/pom.xml</pomExclude>
-                    <pomExclude>add-third-party/global-db/pom.xml</pomExclude>
                   </pomExcludes>
                 </configuration>
               </execution>

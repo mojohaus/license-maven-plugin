@@ -23,6 +23,7 @@ package org.codehaus.mojo.license.api;
  */
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
@@ -41,6 +42,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
@@ -155,12 +157,14 @@ public class DefaultThirdPartyHelper
     /**
      * {@inheritDoc}
      */
-    public SortedProperties loadThirdPartyDescriptorForUnsafeMapping( SortedSet<MavenProject> unsafeDependencies,
+    public SortedProperties loadThirdPartyDescriptorForUnsafeMapping( Set<Artifact> topLevelDependencies,
+                                                                      SortedSet<MavenProject> unsafeDependencies,
                                                                       Collection<MavenProject> projects,
                                                                       LicenseMap licenseMap )
         throws ThirdPartyToolException, IOException
     {
-        return thirdPartyTool.loadThirdPartyDescriptorsForUnsafeMapping( encoding, projects, unsafeDependencies,
+        return thirdPartyTool.loadThirdPartyDescriptorsForUnsafeMapping( topLevelDependencies,
+                                                                         encoding, projects, unsafeDependencies,
                                                                          licenseMap, localRepository,
                                                                          remoteRepositories );
     }
@@ -236,7 +240,7 @@ public class DefaultThirdPartyHelper
                 projects.removeAll( unsafeDependencies );
 
                 SortedProperties resolvedUnsafeMapping =
-                    loadThirdPartyDescriptorForUnsafeMapping( unsafeDependencies, projects, licenseMap );
+                    loadThirdPartyDescriptorForUnsafeMapping( project.getArtifacts(), unsafeDependencies, projects, licenseMap );
 
                 // push back resolved unsafe mappings
                 unsafeMappings.putAll( resolvedUnsafeMapping );

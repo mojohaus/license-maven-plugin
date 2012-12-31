@@ -345,28 +345,10 @@ public abstract class AbstractAddThirdPartyMojo
 
         if ( !CollectionUtils.isEmpty( unsafeDependencies )  )
         {
-
-            /*
-             * TODO: This order is not quite right; it will scan for third-party classified artifacts
-             * TODO: even if the global artifact(s) account for them. Better to read the globals first
-             * TODO: and see what's sorted out. However, let's see if this works.
-             */
             if (isUseMissingFile() && isDoGenerate() )
             {
                 // load unsafeMapping from local file and/or third-party classified items.
                 unsafeMappings = createUnsafeMapping();
-            }
-
-            try {
-                if ( unsafeMappings == null )
-                {
-                    unsafeMappings = new SortedProperties( "utf-8" ); // encoding won't matter, we use reader method.
-                }
-                unsafeMappings.putAll(thirdPartyTool.loadGlobalLicenses(dependencies, localRepository, remoteRepositories));
-            } catch (ArtifactNotFoundException e) {
-                throw new ThirdPartyToolException( "Error loading global license database(s)", e );
-            } catch (ArtifactResolutionException e) {
-                throw new ThirdPartyToolException( "Error loading global license database(s)", e );
             }
         }
 

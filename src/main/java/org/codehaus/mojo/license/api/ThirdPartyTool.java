@@ -57,6 +57,9 @@ public interface ThirdPartyTool
     String ROLE = ThirdPartyTool.class.getName();
 
     /**
+     * Collect license information from property file, 'third-party' classified artifacts, and .license.properties dependencies.
+     *
+     * @param dependencies       top-level dependencies to scan for .license.properties files.
      * @param encoding           encoding used to read or write properties files
      * @param projects           all projects where to read third parties descriptors
      * @param unsafeProjects     all unsafe projects
@@ -67,7 +70,8 @@ public interface ThirdPartyTool
      * @throws ThirdPartyToolException if any
      * @throws IOException             if any
      */
-    SortedProperties loadThirdPartyDescriptorsForUnsafeMapping( String encoding, Collection<MavenProject> projects,
+    SortedProperties loadThirdPartyDescriptorsForUnsafeMapping( Set<Artifact> dependencies,
+                                                                String encoding, Collection<MavenProject> projects,
                                                                 SortedSet<MavenProject> unsafeProjects,
                                                                 LicenseMap licenseMap,
                                                                 ArtifactRepository localRepository,
@@ -185,14 +189,4 @@ public interface ThirdPartyTool
      */
     void writeBundleThirdPartyFile( File thirdPartyFile, File outputDirectory, String bundleThirdPartyPath )
         throws IOException;
-
-    /**
-     * Scan the declared dependencies for .license.properties files; load contents into map, return map.
-     * @param dependencies dependencies declared for the project.
-     * @param localRepository the local repository.
-     * @param repositories the list of all declared repositories.
-     * @return the map.
-     */
-    Map<String, String> loadGlobalLicenses( Set<Artifact> dependencies, ArtifactRepository localRepository,
-                                           List<ArtifactRepository> repositories ) throws IOException, ArtifactNotFoundException, ArtifactResolutionException;
 }
