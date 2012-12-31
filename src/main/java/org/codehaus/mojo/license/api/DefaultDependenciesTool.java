@@ -130,6 +130,12 @@ public class DefaultDependenciesTool
         {
             Artifact artifact = (Artifact) o;
 
+            if ( DefaultThirdPartyTool.LICENSE_DB_TYPE.equals( artifact.getType( ) ) )
+            {
+                // the special dependencies for license databases don't count.
+                continue;
+            }
+
             String scope = artifact.getScope();
             if ( CollectionUtils.isNotEmpty( includedScopes ) && !includedScopes.contains( scope ) )
             {
@@ -141,7 +147,7 @@ public class DefaultDependenciesTool
             if ( excludeScopes.contains( scope ) )
             {
 
-                // in exluced scopes
+                // in excluded scopes
                 continue;
             }
 

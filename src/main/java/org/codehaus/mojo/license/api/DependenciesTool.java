@@ -38,7 +38,7 @@ public interface DependenciesTool
 {
 
     /**
-     * For a given {@code project}, obtain the universe of his dependencies after applying transitivity and
+     * For a given {@code project}, obtain the universe of its dependencies after applying transitivity and
      * filtering rules given in the {@code configuration} object.
      * <p/>
      * Result is given in a map where keys are unique artifact id

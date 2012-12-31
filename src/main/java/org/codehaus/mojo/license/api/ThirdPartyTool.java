@@ -22,7 +22,10 @@ package org.codehaus.mojo.license.api;
  * #L%
  */
 
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.model.License;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.mojo.license.model.LicenseMap;
@@ -32,6 +35,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 
@@ -180,4 +185,14 @@ public interface ThirdPartyTool
      */
     void writeBundleThirdPartyFile( File thirdPartyFile, File outputDirectory, String bundleThirdPartyPath )
         throws IOException;
+
+    /**
+     * Scan the declared dependencies for .license.properties files; load contents into map, return map.
+     * @param dependencies dependencies declared for the project.
+     * @param localRepository the local repository.
+     * @param repositories the list of all declared repositories.
+     * @return the map.
+     */
+    Map<String, String> loadGlobalLicenses( Set<Artifact> dependencies, ArtifactRepository localRepository,
+                                           List<ArtifactRepository> repositories ) throws IOException, ArtifactNotFoundException, ArtifactResolutionException;
 }

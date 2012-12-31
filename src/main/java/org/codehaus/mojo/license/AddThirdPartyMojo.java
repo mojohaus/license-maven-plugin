@@ -51,13 +51,12 @@ import java.util.SortedSet;
 /**
  * Goal to generate the third-party license file.
  * <p/>
- * This file contains a list of the dependencies and their licenses.  Each dependency and it's
+ * This file contains a list of the dependencies and their licenses.  Each dependency and its
  * license is displayed on a single line in the format <br/>
  * <pre>
  *   (&lt;license-name&gt;) &lt;project-name&gt; &lt;groupId&gt;:&lt;artifactId&gt;:&lt;version&gt; - &lt;project-url&gt;
  * </pre>
- * It will also copy it in the class-path (says add the generated directory as
- * a resource of the build).
+ * The directory containing the license database file is added to the classpath as an additional resource.
  *
  * @author tchemit <chemit@codelutin.com>
  * @since 1.0

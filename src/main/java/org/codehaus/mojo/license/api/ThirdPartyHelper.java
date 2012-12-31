@@ -112,12 +112,22 @@ public interface ThirdPartyHelper
     SortedMap<String, MavenProject> getArtifactCache();
 
     /**
-     * Loads unsafe mapping and if there is unsafe dependencies try to load them from maven repositories
-     * (if flag is on) and returns it.
+     * Loads unsafe mappings. Unsafe mappings are files that supply license metadata
+     * for artifacts that lack it in their POM models. It's called 'unsafe' because its
+     * safer to see actual metadata.
+     * <br/>
+     * There are three sources of this data:
+     * <ul>
+     *     <li>the 'missing' file.</li>
+     *     <li>additional property files attached to artifacts; these have classifier=third-party and are expected
+     *     to contain the license information the base artifact's dependencies. These are controlled by a parameter,</li>
+     *     <li>declared dependencies of type <tt>license.properties</tt>. These are in the same format, and
+     *     provide global information.</li>
+     * </ul>
      *
      * @param licenseMap                license map to read
      * @param missingFile               location of an optional missing file
-     * @param useRepositoryMissingFiles flag to use or not third-party descriptor from maven repositories
+     * @param useRepositoryMissingFiles flag to use or not third-party descriptors via the 'third-party' classifier from maven repositories
      * @param unsafeDependencies        all unsafe dependencies
      * @param projectDependencies       all project dependencies
      * @return the loaded unsafe mapping

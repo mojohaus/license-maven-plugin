@@ -89,6 +89,10 @@
     <contributor>
       <name>Jérôme Joslet</name>
     </contributor>
+    <contributor>
+        <name>Benson Margulies</name>
+        <email>bimargulies at apache</email>
+    </contributor>
   </contributors>
 
   <prerequisites>
@@ -251,6 +255,11 @@
       <groupId>commons-collections</groupId>
       <artifactId>commons-collections</artifactId>
       <version>3.2.1</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>2.4</version>
     </dependency>
 
     <dependency>

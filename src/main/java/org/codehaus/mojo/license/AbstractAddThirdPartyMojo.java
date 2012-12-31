@@ -23,7 +23,10 @@ package org.codehaus.mojo.license;
  */
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -44,6 +47,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
@@ -110,7 +114,6 @@ public abstract class AbstractAddThirdPartyMojo
      * &lt;/licenseMerges&gt;
      * &lt;/pre&gt;
      *
-     * @parameter
      * @since 1.0
      */
     @Parameter
@@ -120,7 +123,7 @@ public abstract class AbstractAddThirdPartyMojo
      * To specify some licenses to include (separated by {@code |}).
      * <p/>
      * If this parameter is filled and a license is not in this {@code whitelist} then build will failed when property
-     * {@link #failIfWarning} is setted on.
+     * {@link #failIfWarning} is <tt>true</tt>.
      *
      * @since 1.1
      */
@@ -131,7 +134,7 @@ public abstract class AbstractAddThirdPartyMojo
      * To specify some licenses to exclude (separated by {@code |}).
      * <p/>
      * If a such license is found then build will failed when property
-     * {@link #failIfWarning} is setted on.
+     * {@link #failIfWarning} is <tt>true</tt>.
      *
      * @since 1.1
      */
@@ -151,7 +154,7 @@ public abstract class AbstractAddThirdPartyMojo
     private String bundleThirdPartyPath;
 
     /**
-     * A flag to copy a bundled version of the third-party file. This is usefull
+     * A flag to copy a bundled version of the third-party file. This is useful
      * to avoid for a final application collision name of third party file.
      * <p/>
      * The file will be copied at the {@link #bundleThirdPartyPath} location.
@@ -162,7 +165,7 @@ public abstract class AbstractAddThirdPartyMojo
     private boolean generateBundle;
 
     /**
-     * To force generation of the third-party file even if every thing is up to date.
+     * To force generation of the third-party file even if everything is up to date.
      *
      * @since 1.0
      */
@@ -201,25 +204,30 @@ public abstract class AbstractAddThirdPartyMojo
      * @since 1.0.0
      */
     @Parameter( property = "project.remoteArtifactRepositories", required = true, readonly = true )
-    private List remoteRepositories;
+    private List<ArtifactRepository> remoteRepositories;
+
+    /**
+     * The set of dependencies for the current project, used to locate license databases.
+     */
+    @Parameter( property = "project.artifacts", required = true, readonly = true)
+    private Set<Artifact> dependencies;
 
     // ----------------------------------------------------------------------
     // Plexus components
     // ----------------------------------------------------------------------
 
     /**
-     * Third party tool.
+     * Third party tool (much of the logic of these mojos is implemented here).
      *
-     * @readonly
      * @since 1.0
      */
     @Component
     private ThirdPartyTool thirdPartyTool;
 
     /**
-     * Dependencies tool.
+     * Dependencies tool. (pluggable component to find dependencies that match up with
+     * criteria).
      *
-     * @readonly
      * @since 1.1
      */
     @Component
@@ -247,6 +255,12 @@ public abstract class AbstractAddThirdPartyMojo
     private boolean doGenerate;
 
     private boolean doGenerateBundle;
+
+    /**
+     * Map from G/A/V as string to license key, obtained from global dependencies of type=.ld.properties.
+     * This could probably be refactored to have more in common with the classifier-based loader.
+     */
+    private Map<String, String> globalKnownLicenses;
 
     // ----------------------------------------------------------------------
     // Abstract Methods
@@ -329,11 +343,31 @@ public abstract class AbstractAddThirdPartyMojo
 
         unsafeDependencies = getHelper().getProjectsWithNoLicense( licenseMap );
 
-        if ( !CollectionUtils.isEmpty( unsafeDependencies ) && isUseMissingFile() && isDoGenerate() )
+        if ( !CollectionUtils.isEmpty( unsafeDependencies )  )
         {
 
-            // load unsafeMapping
-            unsafeMappings = createUnsafeMapping();
+            /*
+             * TODO: This order is not quite right; it will scan for third-party classified artifacts
+             * TODO: even if the global artifact(s) account for them. Better to read the globals first
+             * TODO: and see what's sorted out. However, let's see if this works.
+             */
+            if (isUseMissingFile() && isDoGenerate() )
+            {
+                // load unsafeMapping from local file and/or third-party classified items.
+                unsafeMappings = createUnsafeMapping();
+            }
+
+            try {
+                if ( unsafeMappings == null )
+                {
+                    unsafeMappings = new SortedProperties( "utf-8" ); // encoding won't matter, we use reader method.
+                }
+                unsafeMappings.putAll(thirdPartyTool.loadGlobalLicenses(dependencies, localRepository, remoteRepositories));
+            } catch (ArtifactNotFoundException e) {
+                throw new ThirdPartyToolException( "Error loading global license database(s)", e );
+            } catch (ArtifactResolutionException e) {
+                throw new ThirdPartyToolException( "Error loading global license database(s)", e );
+            }
         }
 
         getHelper().mergeLicenses( licenseMerges, licenseMap );

@@ -31,6 +31,8 @@ import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.model.License;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 import org.codehaus.mojo.license.model.LicenseMap;
@@ -39,9 +41,14 @@ import org.codehaus.mojo.license.utils.MojoHelper;
 import org.codehaus.mojo.license.utils.SortedProperties;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
-
+import org.apache.commons.io.IOUtils;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -49,6 +56,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
@@ -83,10 +91,12 @@ public class DefaultThirdPartyTool
     private static final Pattern GAV_PLUS_TYPE_PATTERN = Pattern.compile( "(.+)--(.+)--(.+)--(.+)" );
 
     /**
-     * Pattenr of a GAV plus a type plus a classifier.
+     * Pattern of a GAV plus a type plus a classifier.
      */
     private static final Pattern GAV_PLUS_TYPE_AND_CLASSIFIER_PATTERN =
         Pattern.compile( "(.+)--(.+)--(.+)--(.+)--(.+)" );
+
+    static final String LICENSE_DB_TYPE = "license.properties";
 
     // ----------------------------------------------------------------------
     // Components
@@ -313,7 +323,7 @@ public class DefaultThirdPartyTool
         if ( Artifact.SCOPE_SYSTEM.equals( project.getArtifact().getScope() ) )
         {
 
-            // do NOT treate system dependency
+            // do NOT treat system dependency
             return;
         }
 
@@ -381,7 +391,7 @@ public class DefaultThirdPartyTool
                 getLogger().warn( "No license [" + license + "] found, skip this merge." );
                 continue;
             }
-            getLogger().info( "Merge license [" + license + "] (" + set.size() + " depedencies)." );
+            getLogger().info( "Merge license [" + license + "] (" + set.size() + " dependencies)." );
             mainSet.addAll( set );
             set.clear();
             licenseMap.remove( license );
@@ -412,8 +422,8 @@ public class DefaultThirdPartyTool
         // get from the missing file, all unknown dependencies
         List<String> unknownDependenciesId = new ArrayList<String>();
 
-        // coming from maven-license-plugin, we used in id type and classifier, now we remove
-        // these informations since GAV is good enough to qualify a license of any artifact of it...
+        // coming from maven-license-plugin, we used the full g/a/v/c/t. Now we remove classifier and type
+        // since GAV is good enough to qualify a license of any artifact of it...
         Map<String, String> migrateKeys = migrateMissingFileKeys( unsafeMappings.keySet() );
 
         for ( Object o : migrateKeys.keySet() )
@@ -541,6 +551,49 @@ public class DefaultThirdPartyTool
         File bundleTarget = FileUtil.getFile( outputDirectory, bundleThirdPartyPath );
         getLogger().info( "Writing bundled third-party file to " + bundleTarget );
         FileUtil.copyFile( thirdPartyFile, bundleTarget );
+    }
+
+    public Map<String, String> loadGlobalLicenses( Set<Artifact> dependencies, ArtifactRepository localRepository,
+                                                  List<ArtifactRepository> repositories ) throws IOException, ArtifactNotFoundException, ArtifactResolutionException {
+        Map<String, String> resultMap = new HashMap<String, String>();
+
+        for ( Artifact dep : dependencies )
+        {
+            if (LICENSE_DB_TYPE.equals(dep.getType()) )
+            {
+                loadOneGlobalSet( resultMap, dep, localRepository, repositories );
+            }
+        }
+
+        return resultMap;
+    }
+
+    private void loadOneGlobalSet(Map<String, String> resultMap, Artifact dep, ArtifactRepository localRepository, List<ArtifactRepository> repositories) throws IOException, ArtifactNotFoundException, ArtifactResolutionException {
+        artifactResolver.resolve( dep, repositories, localRepository );
+        File propFile = dep.getFile();
+        /* What encoding to use here? We will document UTF-8 and let people stew if they don't like it.
+           Alternative is to just load from a stream and make the usual, documented, 8859-1 assumption.
+         */
+        getLogger().info( String.format( "Loading global license map from %s: %s", dep.toString( ), propFile.getAbsolutePath() ));
+        Properties props = new Properties();
+        Reader propReader = null;
+
+        try
+        {
+            propReader = new InputStreamReader( new FileInputStream( propFile ), Charset.forName( "utf-8" ) );
+            props.load( propReader );
+        }
+        finally
+        {
+            IOUtils.closeQuietly(propReader);
+        }
+
+        for ( Object keyObj : props.keySet() )
+        {
+            String key = (String) keyObj;
+            String val = (String) props.get( key );
+            resultMap.put( key, val );
+        }
     }
 
     // ----------------------------------------------------------------------

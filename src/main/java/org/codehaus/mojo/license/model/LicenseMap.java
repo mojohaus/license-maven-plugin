@@ -84,7 +84,7 @@ public class LicenseMap
     }
 
     /**
-     * Build a dependencies map from the license map, this is a map of license for each project registred in the
+     * Build a dependencies map from the license map, this is a map of license for each project registered in the
      * license map.
      *
      * @return the generated dependencies map

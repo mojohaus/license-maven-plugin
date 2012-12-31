@@ -24,6 +24,8 @@ package org.codehaus.mojo.license.api;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
@@ -169,7 +171,7 @@ public class DefaultThirdPartyHelper
     public SortedProperties loadUnsafeMapping( LicenseMap licenseMap, File missingFile )
         throws IOException
     {
-        return thirdPartyTool.loadUnsafeMapping( licenseMap, getArtifactCache(), encoding, missingFile );
+        return thirdPartyTool.loadUnsafeMapping(licenseMap, getArtifactCache(), encoding, missingFile);
     }
 
     /**
@@ -208,6 +210,7 @@ public class DefaultThirdPartyHelper
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings("unchecked") // project.getArtifacts()
     public SortedProperties createUnsafeMapping( LicenseMap licenseMap, File missingFile,
                                                  boolean useRepositoryMissingFiles,
                                                  SortedSet<MavenProject> unsafeDependencies,
@@ -216,6 +219,7 @@ public class DefaultThirdPartyHelper
     {
 
         SortedProperties unsafeMappings = loadUnsafeMapping( licenseMap, missingFile );
+
 
         if ( CollectionUtils.isNotEmpty( unsafeDependencies ) )
         {
