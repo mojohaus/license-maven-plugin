@@ -43,6 +43,7 @@ import org.apache.commons.io.IOUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.Charset;
@@ -599,16 +600,16 @@ public class DefaultThirdPartyTool
         File propFile = dep.getFile();
         getLogger().info( String.format( "Loading global license map from %s: %s", dep.toString( ), propFile.getAbsolutePath() ));
         SortedProperties props = new SortedProperties( "utf-8" );
-        Reader propReader = null;
+        InputStream propStream = null;
 
         try
         {
-            propReader = new InputStreamReader( new FileInputStream( propFile ), Charset.forName( "utf-8" ) );
-            props.load( propReader );
+            propStream = new FileInputStream( propFile );
+            props.load( propStream );
         }
         finally
         {
-            IOUtils.closeQuietly( propReader );
+            IOUtils.closeQuietly( propStream );
         }
 
         for ( Object keyObj : props.keySet() )
