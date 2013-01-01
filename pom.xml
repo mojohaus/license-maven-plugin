@@ -129,7 +129,6 @@
     <invokerPluginVersion>1.8</invokerPluginVersion>
     <javadocPluginVersion>2.9</javadocPluginVersion>
 
-
   </properties>
 
   <dependencies>
@@ -322,6 +321,37 @@
           <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
         </configuration>
       </plugin>
+      <!-- 
+           To test reading third party data from an artifact, we need an artifact.
+           In the aggregate case, we can't depend on it in the reactor, since
+           there's no way to get any other reactor execution to create it 
+           in the forked execution of aggregate-add-third-party, not unless
+           we want involved in a custom lifecycle. So this barnicle exists
+           so that the tests can use it. It's a pity it will end up on Central.
+      -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>1.7</version>
+        <executions>
+          <execution>
+            <id>attach-artifacts</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>attach-artifact</goal>
+            </goals>
+            <configuration>
+              <artifacts>
+                <artifact>
+                  <file>src/license-test/test.license.properties</file>
+                  <type>license.properties</type>
+                  <classifier>test-third-party</classifier>
+                </artifact>
+              </artifacts>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
 
     </plugins>
 
@@ -390,6 +420,9 @@
                   <goal>run</goal>
                 </goals>
                 <configuration>
+                  <extraArtifacts>
+                    <extraArtifact>${project.groupId}:${project.artifactId}:${project.version}:license.properties:test-third-party</extraArtifact>
+                  </extraArtifacts>
                   <pomIncludes>
                     <!--<pomInclude>update-file-header/test-mojo/pom.xml</pomInclude>-->
                     <pomInclude>third-party-report/*/pom.xml</pomInclude>

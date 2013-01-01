@@ -24,12 +24,16 @@
  Thirdparty Licenses Examples
  ------
  ------
- 2011-02-04
+ 2013-01-01
  ------
 
 Third-party
 
-  The project offers some goals to deal with THIRD-PARTY files in a project.
+  The license-maven-plugin provides some goals to help deal with dependencies
+  that do not provide license metadata in their pom.xml files. These are referred to
+  as 'third party' items. The overall goal is to allow you keep track of
+  your dependencies' licenses, through build warnings, errors, output files,
+  or site plugin report content.
 
 * add-third-party goal
 

@@ -198,7 +198,7 @@ public abstract class AbstractLicenseReportMojo
     }
 
     // ----------------------------------------------------------------------
-    // AbstractMavenReport Implementaton
+    // AbstractMavenReport Implementation
     // ----------------------------------------------------------------------
 
     /**

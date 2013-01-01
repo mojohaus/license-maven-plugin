@@ -133,6 +133,8 @@ public class DefaultDependenciesTool
             if ( DefaultThirdPartyTool.LICENSE_DB_TYPE.equals( artifact.getType() ) )
             {
                 // the special dependencies for license databases don't count.
+                // Note that this will still see transitive deps of a license db; so using the build helper inside of another project
+                // to make them will be noisy.
                 continue;
             }
 
@@ -229,7 +231,7 @@ public class DefaultDependenciesTool
     }
 
     /**
-     * Tests if the given project is includable against a groupdId pattern and a artifact pattern.
+     * Tests if the given project is includeable against a groupdId pattern and a artifact pattern.
      *
      * @param project                 the project to test
      * @param includedGroupPattern    the include group pattern

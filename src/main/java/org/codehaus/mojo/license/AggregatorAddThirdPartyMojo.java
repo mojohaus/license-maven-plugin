@@ -59,7 +59,6 @@ import java.util.SortedSet;
 public class AggregatorAddThirdPartyMojo
     extends AbstractAddThirdPartyMojo
 {
-
     // ----------------------------------------------------------------------
     // Mojo Parameters
     // ----------------------------------------------------------------------

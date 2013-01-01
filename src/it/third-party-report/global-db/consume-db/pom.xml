@@ -28,49 +28,33 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.codehaus.mojo.license.test</groupId>
-  <artifactId>test-add-third-party-global-db-publish-db</artifactId>
+  <artifactId>test-third-party-report-global-db-consume-db</artifactId>
 
   <parent>
     <groupId>org.codehaus.mojo.license.test</groupId>
-    <artifactId>test-add-third-party-global-db</artifactId>
-    <version>@pom.version@</version> 
+    <artifactId>test-third-party-report-global-db</artifactId>
+    <version>@pom.version@</version>
   </parent>
 
-  <name>License Test :: global-db - publish</name>
-
+  <name>License Test :: global-db - consume</name>
   <properties>
-
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <license.verbose>true</license.verbose>
   </properties>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>build-helper-maven-plugin</artifactId>
-        <version>1.7</version>
-        <executions>
-          <execution>
-            <id>attach-artifacts</id>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>attach-artifact</goal>
-            </goals>
-            <configuration>
-              <artifacts>
-                <artifact>
-                  <file>src/license/test.license.properties</file>
-                  <type>license.properties</type>
-                  <classifier>ldb</classifier>
-                </artifact>
-              </artifacts>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
+  <dependencies>
+    <dependency>
+      <groupId>org.codehaus.mojo</groupId>
+      <artifactId>license-maven-plugin</artifactId>
+      <classifier>test-third-party</classifier>
+      <type>license.properties</type>
+      <version>@pom.version@</version>
+    </dependency>
+      <dependency>
+        <groupId>org.springframework.ws</groupId>
+        <artifactId>spring-oxm</artifactId>
+        <version>1.5.8</version>
+      </dependency>
+  </dependencies>
 </project>
 
 

@@ -154,7 +154,8 @@ public class AddThirdPartyMojo
     private String includedArtifacts;
 
     /**
-     * Include transitive dependencies when downloading license files.
+     * Include transitive dependencies when checking for missing licenses and downloading license files.
+     * If this is <tt>false</tt>, then only direct dependencies are examined.
      *
      * @since 1.1
      */

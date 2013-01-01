@@ -116,9 +116,8 @@ public class ThirdPartyReportMojo
     private String includedArtifacts;
 
     /**
-     * Include transitive dependencies when downloading license files.
+     * Include transitive dependencies when looking for missing licenses and downloading license files.
      *
-     * @parameter default-value="true"
      * @since 1.1
      */
     @Parameter( defaultValue = "true" )
@@ -216,7 +215,7 @@ public class ThirdPartyReportMojo
     }
 
     // ----------------------------------------------------------------------
-    // MavenProjectDependenciesConfigurator Implementaton
+    // MavenProjectDependenciesConfigurator Implementation
     // ----------------------------------------------------------------------
 
     /**
