@@ -35,6 +35,41 @@ Third-party
   your dependencies' licenses, through build warnings, errors, output files,
   or site plugin report content.
 
+  The simplest thing you can do is to get a report of third-party items.
+  Use the third-party-report report-set for that.
+
+  If you have dependencies that lack licenses, you can create your own metadata
+  to document their licenses. These are called <<missing>> files. <<missing>> file
+  is a Java properties file that maps from a specification for Maven coordinates
+  to a license description. For example:
+
++-----------------+
+org.codehaus.mojo.license.test--test-add-third-party-global-db-misc-dep--1=The Apache Software License, Version 2.0
++-----------------+
+
+  Note that this plugin assumes that all the artifacts from a single build have the same license.
+  After all, they share a POM. So these properties call out group, artifact, and version, but not
+  classifier or type.
+
+  The plugin can read a <<missing>> files from several locations:
+
+  * A file in the local build, specified by <<missingFile>>.
+
+  * One or more additional artifacts associated with your dependencies.
+  If you enable this feature, via the <<useRepositoryMissingFiles>> parameter,
+  the plugin will look for additional artifacts
+  with a classifier of <<third-party>> and a type of <<properties>> that correspond
+  to your dependencies, and add their contents to the <<missing>> data.
+
+  * One or more dependencies of type <<license.properties>> that you declare
+  in your build as dependencies. This allows you to create a shared repository
+  of license information.
+
+  []
+
+  There are two goals in the plugin that assist in creating <<missing>> files
+  and producing simple, plain-text, reports.
+
 * add-third-party goal
 
   This goal build the THIRD-PARTY.txt file and add it in the build.

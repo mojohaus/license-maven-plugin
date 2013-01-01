@@ -20,4 +20,9 @@
  * #L%
  */
 
+file = new File(basedir, 'consume-db/target/site/third-party-report.html');
+assert file.exists();
+content = file.text;
+assert content.contains('spring-oxm:1.5.8">org.springframework.ws:spring-oxm:1.5.8</a></td><td>compile</td><td></td><td>bundle</td><td>The Apache Software License, Version 2.0');
+
 return true;
