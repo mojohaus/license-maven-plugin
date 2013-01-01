@@ -82,8 +82,8 @@ public class AddThirdPartyMojo
 
     /**
      * Load files supplying information for missing third party licenses from repositories.
-     * The plugin looks for Maven artifacts with coordinates of the form G:A:V:T:C, where
-     * the group, artifact, and version are those of the artifact for which the license is missing,
+     * The plugin looks for Maven artifacts with coordinates of the form G:A:V:properties:third-party, where
+     * the group, artifact, and version are those for dependencies of your project,
      * while the type is 'properties' and the classifier is 'third-party'.
      *
      * @since 1.0
