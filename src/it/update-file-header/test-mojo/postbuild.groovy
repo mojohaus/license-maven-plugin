@@ -60,6 +60,17 @@ def assertNotContains(file, content, expected)
   return true
 }
 
+Calendar cal = Calendar.getInstance();
+cal.setTime(new Date());
+int currentYear = cal.get(Calendar.YEAR);
+dateRange = "2012";
+if ( currentYear > 2012 )
+{
+  dateRange += " - " + currentYear;
+}
+println("Current year: " + currentYear)
+println("Date range to use: " + dateRange)
+
 //
 //TEST Java files
 //
@@ -68,14 +79,14 @@ file = new File(basedir, 'src/main/java/org/codehaus/mojo/license/java-info.java
 assertExistsFile(file);
 
 content = file.text;
-assert assertContains(file, content, 'Copyright (C) 2012 License Test');
+assert assertContains( file, content, 'Copyright (C) ' + dateRange + ' License Test' );
 
 
 file = new File(basedir, 'src/main/java/org/codehaus/mojo/license/MyBean.java');
 assertExistsFile(file);
 
 content = file.text;
-assert assertContains(file, content, 'Copyright (C) 2012 License Test');
+assert assertContains(file, content, 'Copyright (C) ' + dateRange + ' License Test');
 
 file = new File(basedir, 'src/main/java/org/codehaus/mojo/license/MyBean2.java');
 assertExistsFile(file);
@@ -97,7 +108,7 @@ file = new File(basedir, 'src/main/java/org/codehaus/mojo/license/MyBean.java2')
 assertExistsFile(file);
 
 content = file.text;
-assert assertContains(file, content, 'Copyright (C) 2012 License Test');
+assert assertContains(file, content, 'Copyright (C) ' + dateRange + ' License Test');
 
 file = new File(basedir, 'src/main/java/org/codehaus/mojo/license/MyBean2.java2');
 assertExistsFile(file);
@@ -527,7 +538,7 @@ file = new File(basedir, 'child1/src/main/java/org/codehaus/mojo2/license/MyBean
 assertExistsFile(file);
 
 content = file.text;
-assert assertContains(file, content, 'Copyright (C) 2012 License Test');
+assert assertContains(file, content, 'Copyright (C) ' + dateRange + ' License Test');
 
 file = new File(basedir, 'child1/src/main/java/org/codehaus/mojo2/license/MyBean2.java');
 assertExistsFile(file);
