@@ -173,19 +173,19 @@ public abstract class AbstractLicenseReportRenderer
     protected void sinkHeaderCellText( String width, String text )
     {
 
-        SinkEventAttributes attrs = new SinkEventAttributeSet(  );
+        SinkEventAttributes attrs = new SinkEventAttributeSet();
         attrs.addAttribute( SinkEventAttributes.WIDTH, width );
 
-        sink.tableHeaderCell( attrs);
+        sink.tableHeaderCell( attrs );
         sink.text( text );
         sink.tableHeaderCell_();
     }
 
     protected void sinkCellText( String width, String text )
     {
-        SinkEventAttributes attrs = new SinkEventAttributeSet(  );
+        SinkEventAttributes attrs = new SinkEventAttributeSet();
         attrs.addAttribute( SinkEventAttributes.WIDTH, width );
-        sink.tableCell( attrs);
+        sink.tableCell( attrs );
         sink.text( text );
         sink.tableCell_();
     }
@@ -321,7 +321,7 @@ public abstract class AbstractLicenseReportRenderer
         sink.tableRows( new int[]{ Sink.JUSTIFY_RIGHT, Sink.JUSTIFY_LEFT }, false );
         sink.tableRow();
         sinkHeaderCellText( headerWidth, getText( "report.status" ) );
-        SinkEventAttributes attrs = new SinkEventAttributeSet(  );
+        SinkEventAttributes attrs = new SinkEventAttributeSet();
         attrs.addAttribute( SinkEventAttributes.WIDTH, cellWidth );
         sink.tableCell( attrs );
         if ( details.hasPomLicenses() )

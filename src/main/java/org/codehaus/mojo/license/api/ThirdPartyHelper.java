@@ -60,9 +60,9 @@ public interface ThirdPartyHelper
      * return it.
      *
      * @param topLevelDependencies project dependencies to scan for .license.properties files.
-     * @param projects           all projects where to read third parties descriptors
-     * @param unsafeDependencies all unsafe dependencies
-     * @param licenseMap         license map where to store new licenses
+     * @param projects             all projects where to read third parties descriptors
+     * @param unsafeDependencies   all unsafe dependencies
+     * @param licenseMap           license map where to store new licenses
      * @return the map of loaded missing from the remote missing third party files
      * @throws ThirdPartyToolException if any
      * @throws IOException             if any
@@ -122,11 +122,11 @@ public interface ThirdPartyHelper
      * <br/>
      * There are three sources of this data:
      * <ul>
-     *     <li>the 'missing' file.</li>
-     *     <li>additional property files attached to artifacts; these have classifier=third-party and are expected
-     *     to contain the license information the base artifact's dependencies. These are controlled by a parameter,</li>
-     *     <li>declared dependencies of type <tt>license.properties</tt>. These are in the same format, and
-     *     provide global information.</li>
+     * <li>the 'missing' file.</li>
+     * <li>additional property files attached to artifacts; these have classifier=third-party and are expected
+     * to contain the license information the base artifact's dependencies. These are controlled by a parameter,</li>
+     * <li>declared dependencies of type <tt>license.properties</tt>. These are in the same format, and
+     * provide global information.</li>
      * </ul>
      *
      * @param licenseMap                license map to read

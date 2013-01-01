@@ -25,8 +25,6 @@ package org.codehaus.mojo.license;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -343,9 +341,9 @@ public abstract class AbstractAddThirdPartyMojo
 
         unsafeDependencies = getHelper().getProjectsWithNoLicense( licenseMap );
 
-        if ( !CollectionUtils.isEmpty( unsafeDependencies )  )
+        if ( !CollectionUtils.isEmpty( unsafeDependencies ) )
         {
-            if (isUseMissingFile() && isDoGenerate() )
+            if ( isUseMissingFile() && isDoGenerate() )
             {
                 // load unsafeMapping from local file and/or third-party classified items.
                 unsafeMappings = createUnsafeMapping();

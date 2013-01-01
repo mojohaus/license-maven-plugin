@@ -24,8 +24,6 @@ package org.codehaus.mojo.license.api;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.model.License;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.mojo.license.model.LicenseMap;
@@ -35,7 +33,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
@@ -70,8 +67,8 @@ public interface ThirdPartyTool
      * @throws ThirdPartyToolException if any
      * @throws IOException             if any
      */
-    SortedProperties loadThirdPartyDescriptorsForUnsafeMapping( Set<Artifact> dependencies,
-                                                                String encoding, Collection<MavenProject> projects,
+    SortedProperties loadThirdPartyDescriptorsForUnsafeMapping( Set<Artifact> dependencies, String encoding,
+                                                                Collection<MavenProject> projects,
                                                                 SortedSet<MavenProject> unsafeProjects,
                                                                 LicenseMap licenseMap,
                                                                 ArtifactRepository localRepository,

@@ -130,7 +130,7 @@ public class DefaultDependenciesTool
         {
             Artifact artifact = (Artifact) o;
 
-            if ( DefaultThirdPartyTool.LICENSE_DB_TYPE.equals( artifact.getType( ) ) )
+            if ( DefaultThirdPartyTool.LICENSE_DB_TYPE.equals( artifact.getType() ) )
             {
                 // the special dependencies for license databases don't count.
                 continue;

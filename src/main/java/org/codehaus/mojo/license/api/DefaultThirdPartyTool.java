@@ -23,6 +23,7 @@ package org.codehaus.mojo.license.api;
  */
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -39,14 +40,11 @@ import org.codehaus.mojo.license.utils.MojoHelper;
 import org.codehaus.mojo.license.utils.SortedProperties;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
-import org.apache.commons.io.IOUtils;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -54,7 +52,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
@@ -202,7 +199,7 @@ public class DefaultThirdPartyTool
                 break;
             }
 
-            File thirdPartyDescriptor = resolvThirdPartyDescriptor(mavenProject, localRepository, remoteRepositories);
+            File thirdPartyDescriptor = resolvThirdPartyDescriptor( mavenProject, localRepository, remoteRepositories );
 
             if ( thirdPartyDescriptor != null && thirdPartyDescriptor.exists() && thirdPartyDescriptor.length() > 0 )
             {
@@ -229,19 +226,23 @@ public class DefaultThirdPartyTool
         }
         try
         {
-            loadGlobalLicenses( topLevelDependencies, localRepository, remoteRepositories,
-                    unsafeDependencies, licenseMap, unsafeProjects, result );
-        } catch (ArtifactNotFoundException e)
+            loadGlobalLicenses( topLevelDependencies, localRepository, remoteRepositories, unsafeDependencies,
+                                licenseMap, unsafeProjects, result );
+        }
+        catch ( ArtifactNotFoundException e )
         {
             throw new ThirdPartyToolException( "Failed to load global licenses", e );
-        } catch (ArtifactResolutionException e) {
+        }
+        catch ( ArtifactResolutionException e )
+        {
             throw new ThirdPartyToolException( "Failed to load global licenses", e );
         }
         return result;
     }
 
     private void resolveUnsafe( SortedSet<MavenProject> unsafeDependencies, LicenseMap licenseMap,
-                               Map<String, MavenProject> unsafeProjects, SortedProperties unsafeMappings, SortedProperties result )
+                                Map<String, MavenProject> unsafeProjects, SortedProperties unsafeMappings,
+                                SortedProperties result )
     {
         for ( String id : unsafeProjects.keySet() )
         {
@@ -250,7 +251,7 @@ public class DefaultThirdPartyTool
             {
 
                 String license = (String) unsafeMappings.get( id );
-                if ( StringUtils.isEmpty(license) )
+                if ( StringUtils.isEmpty( license ) )
                 {
 
                     // empty license means not fill, skip it
@@ -568,37 +569,32 @@ public class DefaultThirdPartyTool
         FileUtil.copyFile( thirdPartyFile, bundleTarget );
     }
 
-    public void loadGlobalLicenses( Set<Artifact> dependencies,
-                                                   ArtifactRepository localRepository,
-                                                   List<ArtifactRepository> repositories,
-                                                   SortedSet<MavenProject> unsafeDependencies,
-                                                   LicenseMap licenseMap,
-                                                   Map<String, MavenProject> unsafeProjects,
-                                                   SortedProperties result )
-            throws IOException, ArtifactNotFoundException, ArtifactResolutionException {
+    public void loadGlobalLicenses( Set<Artifact> dependencies, ArtifactRepository localRepository,
+                                    List<ArtifactRepository> repositories, SortedSet<MavenProject> unsafeDependencies,
+                                    LicenseMap licenseMap, Map<String, MavenProject> unsafeProjects,
+                                    SortedProperties result )
+        throws IOException, ArtifactNotFoundException, ArtifactResolutionException
+    {
         for ( Artifact dep : dependencies )
         {
-            if (LICENSE_DB_TYPE.equals(dep.getType()) )
+            if ( LICENSE_DB_TYPE.equals( dep.getType() ) )
             {
-                loadOneGlobalSet( unsafeDependencies, licenseMap,
-                        unsafeProjects, dep, localRepository, repositories,
-                        result );
+                loadOneGlobalSet( unsafeDependencies, licenseMap, unsafeProjects, dep, localRepository, repositories,
+                                  result );
             }
         }
     }
 
-    private void loadOneGlobalSet( SortedSet<MavenProject> unsafeDependencies,
-                                   LicenseMap licenseMap,
-                                   Map<String, MavenProject> unsafeProjects,
-                                   Artifact dep,
-                                   ArtifactRepository localRepository,
-                                   List<ArtifactRepository> repositories,
+    private void loadOneGlobalSet( SortedSet<MavenProject> unsafeDependencies, LicenseMap licenseMap,
+                                   Map<String, MavenProject> unsafeProjects, Artifact dep,
+                                   ArtifactRepository localRepository, List<ArtifactRepository> repositories,
                                    SortedProperties result )
-            throws IOException, ArtifactNotFoundException, ArtifactResolutionException
+        throws IOException, ArtifactNotFoundException, ArtifactResolutionException
     {
         artifactResolver.resolve( dep, repositories, localRepository );
         File propFile = dep.getFile();
-        getLogger().info( String.format( "Loading global license map from %s: %s", dep.toString( ), propFile.getAbsolutePath() ));
+        getLogger().info(
+            String.format( "Loading global license map from %s: %s", dep.toString(), propFile.getAbsolutePath() ) );
         SortedProperties props = new SortedProperties( "utf-8" );
         InputStream propStream = null;
 
