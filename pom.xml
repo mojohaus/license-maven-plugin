@@ -209,6 +209,14 @@
           <groupId>org.codehaus.plexus</groupId>
           <artifactId>plexus-component-api</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>dom4j</groupId>
+          <artifactId>dom4j</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>antlr</groupId>
+          <artifactId>antlr</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
 
