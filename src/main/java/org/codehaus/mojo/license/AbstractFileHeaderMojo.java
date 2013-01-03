@@ -816,8 +816,11 @@ public abstract class AbstractFileHeaderMojo
         // obtain license from definition
         License license = getLicense( getLicenseName(), true );
 
-        getLog().info( "Process header '" + commentStyle + "'" );
-        getLog().info( " - using " + license.getDescription() );
+        if ( isVerbose() )
+        {
+            getLog().info( "Process header '" + commentStyle + "'" );
+            getLog().info( " - using " + license.getDescription() );
+        }
 
         // use header transformer according to comment style given in header
         this.transformer = getTransformer( commentStyle );
