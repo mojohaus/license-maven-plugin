@@ -113,6 +113,7 @@
     <mojo.java.target>1.5</mojo.java.target>
     <mavenVersion>2.2.1</mavenVersion>
     <processorVersion>1.3</processorVersion>
+    <pomExclude221Pattern>nothing-to-see-here</pomExclude221Pattern>
 
     <doxiaVersion>1.3</doxiaVersion>
     <doxia-sitetoolsVersion>1.3</doxia-sitetoolsVersion>
@@ -395,6 +396,12 @@
 
   <profiles>
     <profile>
+      <id>disable-2.2.1-its</id>
+      <properties>
+        <pomExclude221Pattern>aggregate-add-third-party/global-db/pom.xml</pomExclude221Pattern>
+      </properties>
+    </profile>
+    <profile>
       <id>run-its</id>
       <activation>
         <property>
@@ -434,6 +441,7 @@
                   </pomIncludes>
                   <pomExcludes>
                     <pomExclude>download-licenses/MLICENSE-4/pom.xml</pomExclude>
+                    <pomExclude>${pomExclude221Pattern}</pomExclude>
                   </pomExcludes>
                 </configuration>
               </execution>
