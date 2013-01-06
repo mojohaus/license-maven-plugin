@@ -34,8 +34,6 @@
   <name>License Test :: MLICENSE-53</name>
 
   <properties>
-    <!--<licenseVersion>@pom.version@</licenseVersion>-->
-    <licenseVersion>1.4-SNAPSHOT</licenseVersion>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <license.verbose>true</license.verbose>
   </properties>
@@ -115,7 +113,7 @@
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>license-maven-plugin</artifactId>
-          <version>${licenseVersion}</version>
+          <version>@pom.version@</version>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -134,8 +132,7 @@
     <dependency>
       <groupId>org.nuiton.processor</groupId>
       <artifactId>nuiton-processor</artifactId>
-      <!--<version>@processorVersion@</version>-->
-      <version>1.3</version>
+      <version>@processorVersion@</version>
     </dependency>
 
     <!--dependency>
