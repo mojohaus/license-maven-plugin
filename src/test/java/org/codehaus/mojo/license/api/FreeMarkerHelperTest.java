@@ -22,18 +22,17 @@ package org.codehaus.mojo.license.api;
  * #L%
  */
 
-import org.junit.Assert;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.mojo.license.model.LicenseMap;
-import org.codehaus.plexus.util.IOUtil;
+import org.junit.Assert;
 import org.junit.Test;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Tests the {@link FreeMarkerHelper} and given templates.
