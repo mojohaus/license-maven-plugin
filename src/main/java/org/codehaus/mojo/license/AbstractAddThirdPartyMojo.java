@@ -39,10 +39,10 @@ import org.codehaus.mojo.license.model.LicenseMap;
 import org.codehaus.mojo.license.utils.FileUtil;
 import org.codehaus.mojo.license.utils.MojoHelper;
 import org.codehaus.mojo.license.utils.SortedProperties;
+import org.codehaus.mojo.license.utils.StringToList;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -118,26 +118,56 @@ public abstract class AbstractAddThirdPartyMojo
     private List<String> licenseMerges;
 
     /**
-     * To specify some licenses to include (separated by {@code |}).
+     * To specify some licenses to include.
      * <p/>
      * If this parameter is filled and a license is not in this {@code whitelist} then build will failed when property
      * {@link #failIfWarning} is <tt>true</tt>.
+     * <p/>
+     * Since version {@code 1.4}, there is two ways to fill this parameter :
+     * <ul>
+     * <li>A simple string (separated by {@code |}), the way to use by property configuration:
+     * <pre>&lt;includedLicenses&gt;licenseA|licenseB&lt;/includedLicenses&gt;</pre> or
+     * <pre>-Dlicense.includedLicenses=licenseA|licenseB</pre>
+     * </li>
+     * <li>A list of string (can only be used in plugin configuration, not via property configuration)
+     * <pre>
+     * &lt;includedLicenses&gt;
+     *   &lt;includedLicense&gt;licenseA&lt;/includedLicense&gt;
+     *   &lt;includedLicenses&gt;licenseB&lt;/includedLicense&gt;
+     * &lt;/includedLicenses&gt;</pre>
+     * </li>
+     * </ul>
      *
      * @since 1.1
      */
     @Parameter( property = "license.includedLicenses", defaultValue = "" )
-    private String includedLicenses;
+    private IncludedLicenses includedLicenses;
 
     /**
-     * To specify some licenses to exclude (separated by {@code |}).
+     * To specify some licenses to exclude.
      * <p/>
      * If a such license is found then build will failed when property
      * {@link #failIfWarning} is <tt>true</tt>.
+     * <p/>
+     * Since version {@code 1.4}, there is two ways to fill this parameter :
+     * <ul>
+     * <li>A simple string (separated by {@code |}), the way to use by property configuration:
+     * <pre>&lt;excludedLicenses&gt;licenseA|licenseB&lt;/excludedLicenses&gt;</pre> or
+     * <pre>-Dlicense.excludedLicenses=licenseA|licenseB</pre>
+     * </li>
+     * <li>A list of string (can only be used in plugin configuration, not via property configuration)
+     * <pre>
+     * &lt;excludedLicenses&gt;
+     *   &lt;excludedLicense&gt;licenseA&lt;/excludedLicense&gt;
+     *   &lt;excludedLicense&gt;licenseB&lt;/excludedLicense&gt;
+     * &lt;/excludedLicenses&gt;</pre>
+     * </li>
+     * </ul>
      *
      * @since 1.1
      */
     @Parameter( property = "license.excludedLicenses", defaultValue = "" )
-    private String excludedLicenses;
+    private ExcludedLicenses excludedLicenses;
 
     /**
      * The path of the bundled third party file to produce when
@@ -207,7 +237,7 @@ public abstract class AbstractAddThirdPartyMojo
     /**
      * The set of dependencies for the current project, used to locate license databases.
      */
-    @Parameter( property = "project.artifacts", required = true, readonly = true)
+    @Parameter( property = "project.artifacts", required = true, readonly = true )
     private Set<Artifact> dependencies;
 
     // ----------------------------------------------------------------------
@@ -412,6 +442,42 @@ public abstract class AbstractAddThirdPartyMojo
         return doGenerateBundle;
     }
 
+    /**
+     * @return list of license to exclude.
+     */
+    public List<String> getExcludedLicenses()
+    {
+        return excludedLicenses.getData();
+    }
+
+    /**
+     * @return list of license to include.
+     */
+    public List<String> getIncludedLicenses()
+    {
+        return includedLicenses.getData();
+    }
+
+    /**
+     * Fill the {@link #includedLicenses} parameter from a simple string to split.
+     *
+     * @param includedLicenses license to excludes separated by a {@code |}.
+     */
+    public void setIncludedLicenses( String includedLicenses )
+    {
+        this.includedLicenses = new IncludedLicenses( includedLicenses );
+    }
+
+    /**
+     * Fill the {@link #excludedLicenses} parameter from a simple string to split.
+     *
+     * @param excludedLicenses license to excludes separated by a {@code |}.
+     */
+    public void setExcludedLicenses( String excludedLicenses )
+    {
+        this.excludedLicenses = new ExcludedLicenses( excludedLicenses );
+    }
+
     // ----------------------------------------------------------------------
     // Protected Methods
     // ----------------------------------------------------------------------
@@ -425,18 +491,6 @@ public abstract class AbstractAddThirdPartyMojo
                                              localRepository, remoteRepositories, getLog() );
         }
         return helper;
-    }
-
-    public List<String> getExcludedLicenses()
-    {
-        String[] split = excludedLicenses == null ? new String[0] : excludedLicenses.split( "\\s*\\|\\s*" );
-        return Arrays.asList( split );
-    }
-
-    public List<String> getIncludedLicenses()
-    {
-        String[] split = includedLicenses == null ? new String[0] : includedLicenses.split( "\\s*\\|\\s*" );
-        return Arrays.asList( split );
     }
 
     protected boolean checkUnsafeDependencies()
@@ -531,6 +585,84 @@ public abstract class AbstractAddThirdPartyMojo
         {
 
             thirdPartyTool.writeBundleThirdPartyFile( thirdPartyFile, outputDirectory, bundleThirdPartyPath );
+        }
+    }
+
+    /**
+     * Class to fill the {@link #includedLicenses} parameter, from a simple string to split, or a list of string.
+     * <p/>
+     * TODO-tchemit We should find a way to create a plexus convertor.
+     *
+     * @since 1.4
+     */
+    public static class IncludedLicenses
+        extends StringToList
+    {
+
+        /**
+         * Default constructor used when {@link #includedLicenses} parameter is configured by a list.
+         */
+        public IncludedLicenses()
+        {
+        }
+
+        /**
+         * Constructor used when {@link #includedLicenses} parameter is configured by a string to split.
+         *
+         * @param data the string to split to fill the list of data of the object.
+         */
+        public IncludedLicenses( String data )
+        {
+            super( data );
+        }
+
+        /**
+         * Add a simple a include license to the list.
+         *
+         * @param includeLicense the include license to add.
+         */
+        public void setIncludedLicense( String includeLicense )
+        {
+            addEntryToList( includeLicense );
+        }
+    }
+
+    /**
+     * Class to fill the {@link #excludedLicenses} parameter, from a simple string to split, or a list of string.
+     * <p/>
+     * TODO-tchemit We should find a way to create a plexus convertor.
+     *
+     * @since 1.4
+     */
+    public static class ExcludedLicenses
+        extends StringToList
+    {
+
+        /**
+         * Default constructor used when {@link #excludedLicenses} parameter is configured by a list.
+         */
+        public ExcludedLicenses()
+        {
+        }
+
+        /**
+         * Constructor used when {@link #excludedLicenses} parameter is configured by a string to split.
+         *
+         * @param data the string to split to fill the list of data of the object.
+         */
+        public ExcludedLicenses( String data )
+        {
+            super( data );
+        }
+
+        /**
+         * Add a simple exclude License to the list.
+         *
+         * @param excludeLicense the excludelicense to add.
+         */
+        public void setExcludedLicense( String excludeLicense )
+        {
+            addEntryToList( excludeLicense );
         }
     }
 

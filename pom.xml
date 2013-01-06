@@ -130,6 +130,9 @@
     <invokerPluginVersion>1.8</invokerPluginVersion>
     <javadocPluginVersion>2.9</javadocPluginVersion>
 
+    <!-- By default exclude this pom in IT, will be removed for maven-3 (see MLICENSE-60)-->
+    <pomExclude221Pattern>aggregate-add-third-party/global-db/pom.xml</pomExclude221Pattern>
+
   </properties>
 
   <dependencies>
@@ -404,11 +407,25 @@
 
   <profiles>
     <profile>
+    <id>maven-3</id>
+    <activation>
+      <file>
+        <!-- This employs that the basedir expression is only recognized by Maven 3.x (see MNG-2363) -->
+        <exists>${basedir}</exists>
+      </file>
+    </activation>
+    <properties>
+      <!-- No pom to exclude for MLICENSE-60 when maven 3 -->
+      <pomExclude221Pattern>aggregate-add-third-party/global-db/pom.xml</pomExclude221Pattern>
+    </properties>
+    </profile>
+
+    <!--profile>
       <id>disable-2.2.1-its</id>
       <properties>
         <pomExclude221Pattern>aggregate-add-third-party/global-db/pom.xml</pomExclude221Pattern>
       </properties>
-    </profile>
+    </profile-->
     <profile>
       <id>run-its</id>
       <activation>
