@@ -50,8 +50,10 @@ public class LicenseListMojo
     // ----------------------------------------------------------------------
 
     /**
-     * the url of an extra license repository.
-     *
+     * The url of an extra license repository.
+     * <p>
+     * <strong>Note: </strong>If you want to refer to a file within this project, start the expression with <code>${project.baseUri}</code>
+     * </p>
      * @since 1.0
      */
     @Parameter( property = "extraResolver" )

@@ -122,7 +122,7 @@ Public License instead of this License.  But first, please read
     <artifactId>license-maven-plugin</artifactId>
     <configuration>
         <licenseName>my_license</licenseName>
-        <licenseResolver>file://${basedir}/src/license</licenseResolver>
+        <licenseResolver>${project.baseUri}/src/license</licenseResolver>
     </configuration>
     <executions>
         <execution>
@@ -143,7 +143,7 @@ Public License instead of this License.  But first, please read
 
 <properties>
     <license.licenseName>my_license</license.licenseName>
-    <license.licenseResolver>file://${basedir}/src/license</license.licenseResolver>
+    <license.licenseResolver>${project.baseUri}/src/license</license.licenseResolver>
 </properties>
 
 <plugin>

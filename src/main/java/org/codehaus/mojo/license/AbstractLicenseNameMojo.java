@@ -47,6 +47,10 @@ public abstract class AbstractLicenseNameMojo
     /**
      * To specify an external extra licenses repository resolver (says the base
      * url of the repository where the {@code license.properties} is present).
+     * 
+     * <p>
+     * <strong>Note: </strong>If you want to refer to a file within this project, start the expression with <code>${project.baseUri}</code>
+     * </p>
      *
      * @since 1.0
      */

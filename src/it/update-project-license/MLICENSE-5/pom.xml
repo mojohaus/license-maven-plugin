@@ -75,7 +75,7 @@
           <verbose>true</verbose>
 
           <licenseName>my_license</licenseName>
-          <licenseResolver>file://${basedir}/src/license</licenseResolver>
+          <licenseResolver>${project.baseUri}/src/license</licenseResolver>
           <licenseFile>LICENSE.html</licenseFile>
           <bundleLicensePath>META-INF/bundleLicense.html</bundleLicensePath>
         </configuration>
