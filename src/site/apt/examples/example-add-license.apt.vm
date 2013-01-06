@@ -92,20 +92,16 @@ Public License instead of this License.  But first, please read
   src/license/licenses.properties. One license per line like :
 
 -------------------------------------------------------------------------------
-
     my_license=My license
-    
 -------------------------------------------------------------------------------
 
   The default (convention) configuration use <<header.txt>> and <<license.txt>> as file names for the header and license file.
 
   This can be changed using this syntax in the license repository definition file like this
 
--------------------------------------------------------------------------------
-
+--------------------------------------------------------------------------------
     my_license=My license~~license:licenseFileName.html~~header:headerFileName.html
-
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
   In this example, you have then to define a <<licenseFileName.html>> and <<headerFileName.html>> file in the
   <<my_license>> directory.
@@ -115,11 +111,11 @@ Public License instead of this License.  But first, please read
 
   You need to specify the name of your license and where to find it.
 
--------------------------------------------------------------------------------
-
++-------------------------------------------------------------------------------
 <plugin>
     <groupId>org.codehaus.mojo</groupId>
     <artifactId>license-maven-plugin</artifactId>
+    <version>${project.version}</version>
     <configuration>
         <licenseName>my_license</licenseName>
         <licenseResolver>${project.baseUri}/src/license</licenseResolver>
@@ -134,13 +130,11 @@ Public License instead of this License.  But first, please read
         </execution>
     </executions>
 </plugin>
-
--------------------------------------------------------------------------------
++-------------------------------------------------------------------------------
 
   or
 
--------------------------------------------------------------------------------
-
++-------------------------------------------------------------------------------
 <properties>
     <license.licenseName>my_license</license.licenseName>
     <license.licenseResolver>${project.baseUri}/src/license</license.licenseResolver>
@@ -149,6 +143,7 @@ Public License instead of this License.  But first, please read
 <plugin>
     <groupId>org.codehaus.mojo</groupId>
     <artifactId>license-maven-plugin</artifactId>
+    <version>${project.version}</version>
     <executions>
         <execution>
             <id>first</id>
@@ -159,8 +154,7 @@ Public License instead of this License.  But first, please read
         </execution>
     </executions>
 </plugin>
-
--------------------------------------------------------------------------------
++-------------------------------------------------------------------------------
 
 * Using a license resolver from classpath
 
@@ -173,11 +167,11 @@ Public License instead of this License.  But first, please read
 
   Next example show how to use this license resolver from classpath:
 
--------------------------------------------------------------------------------
-
++-------------------------------------------------------------------------------
 <plugin>
   <groupId>org.codehaus.mojo</groupId>
   <artifactId>license-maven-plugin</artifactId>
+  <version>${project.version}</version>
   <configuration>
       <licenseName>my_license</licenseName>
       <licenseResolver>classpath://foo/bar</licenseResolver>
@@ -198,6 +192,5 @@ Public License instead of this License.  But first, please read
       </dependency>
   </dependencies>
 </plugin>
-
--------------------------------------------------------------------------------
++-------------------------------------------------------------------------------
 
