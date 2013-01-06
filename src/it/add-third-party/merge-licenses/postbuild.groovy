@@ -20,20 +20,53 @@
  * #L%
  */
 
-file = new File(basedir, 'target/generated-sources/license/THIRD-PARTY.txt');
-assert file.exists();
-content = file.text;
-assert !content.contains('the project has no dependencies.');
-assert content.contains('(The Apache Software License, Version 2.0) Commons Logging (commons-logging:commons-logging:1.1.1 - http://commons.apache.org/logging)');
-assert !content.contains('(Apache License, Version 2.0) JHLabs Image Processing Filters (com.jhlabs:filters:2.0.235 - http://www.jhlabs.com/ip/index.html)');
-assert content.contains('(The Apache Software License, Version 2.0) JHLabs Image Processing Filters (com.jhlabs:filters:2.0.235 - http://www.jhlabs.com/ip/index.html)');
+def assertExistsFile(file)
+{
+  if ( !file.exists() || file.isDirectory() )
+  {
+    println(file.getAbsolutePath() + " file is missing or a directory.")
+    return false
+  }
+  return true
+}
 
-file = new File(basedir, 'target/generated-sources/license/META-INF/test-add-third-party-merge-license-THIRD-PARTY.txt');
-assert file.exists();
-content = file.text;
-assert !content.contains('the project has no dependencies.');
-assert content.contains('(The Apache Software License, Version 2.0) Commons Logging (commons-logging:commons-logging:1.1.1 - http://commons.apache.org/logging)');
-assert !content.contains('(Apache License, Version 2.0) JHLabs Image Processing Filters (com.jhlabs:filters:2.0.235 - http://www.jhlabs.com/ip/index.html)');
-assert content.contains('(The Apache Software License, Version 2.0) JHLabs Image Processing Filters (com.jhlabs:filters:2.0.235 - http://www.jhlabs.com/ip/index.html)');
+def assertContent(file, content, wantedText)
+{
+  if ( !content.contains(wantedText) )
+  {
+    println(file.getAbsolutePath() + " should contains content " + wantedText)
+    return false
+  }
+  return true
+}
+
+def assertNotContent(file, content, wantedText)
+{
+  if ( content.contains(wantedText) )
+  {
+    println(file.getAbsolutePath() + " should not contains content " + wantedText)
+    return false
+  }
+  return true
+}
+
+def checkThirdPartyFile(filePath) {
+  file = new File(basedir, filePath);
+  assertExistsFile(file);
+
+  content = file.text;
+  assert assertNotContent(file, content, 'the project has no dependencies.');
+  assert assertNotContent(file, content, '(Apache License, Version 2.0)');
+  assert assertNotContent(file, content, '(Apache Public License 2.0)');
+  assert assertContent(file, content, '(The Apache Software License, Version 2.0)');
+  assert assertContent(file, content, '(The Apache Software License, Version 2.0) Commons Logging (commons-logging:commons-logging:1.1.1 - http://commons.apache.org/logging)');
+  assert assertContent(file, content, '(The Apache Software License, Version 2.0) JHLabs Image Processing Filters (com.jhlabs:filters:2.0.235 - http://www.jhlabs.com/ip/index.html)');
+  assert assertContent(file, content, '(The Apache Software License, Version 2.0) Plexus Cipher: encryption/decryption Component (org.sonatype.plexus:plexus-cipher:1.4 - http://spice.sonatype.org/plexus-cipher)');
+}
+
+checkThirdPartyFile('target/generated-sources/license/THIRD-PARTY-singleList.txt');
+checkThirdPartyFile('target/generated-sources/license/THIRD-PARTY-singleListSplit.txt');
+checkThirdPartyFile('target/generated-sources/license/THIRD-PARTY-twoList.txt');
+checkThirdPartyFile('target/generated-sources/license/THIRD-PARTY-twoListSplit.txt');
 
 return true;

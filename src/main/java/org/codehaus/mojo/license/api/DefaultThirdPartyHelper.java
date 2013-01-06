@@ -35,9 +35,9 @@ import org.codehaus.mojo.license.utils.SortedProperties;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -129,6 +129,7 @@ public class DefaultThirdPartyHelper
         this.localRepository = localRepository;
         this.remoteRepositories = remoteRepositories;
         this.log = log;
+        this.thirdPartyTool.setVerbose( verbose );
     }
 
     /**
@@ -211,7 +212,7 @@ public class DefaultThirdPartyHelper
     /**
      * {@inheritDoc}
      */
-    @SuppressWarnings( "unchecked" ) // project.getArtifacts()
+    @SuppressWarnings("unchecked") // project.getArtifacts()
     public SortedProperties createUnsafeMapping( LicenseMap licenseMap, File missingFile,
                                                  boolean useRepositoryMissingFiles,
                                                  SortedSet<MavenProject> unsafeDependencies,
@@ -257,39 +258,69 @@ public class DefaultThirdPartyHelper
         if ( !CollectionUtils.isEmpty( licenseMerges ) )
         {
 
-            // check where is not multi licenses merged main licenses (see OJO-1723)
-            Map<String, String[]> mergedLicenses = new HashMap<String, String[]>();
+            // check where is not multi licenses merged main licenses (see MLICENSE-23)
+            Map<String, Set<String>> mergedLicenses = new HashMap<String, Set<String>>();
 
             for ( String merge : licenseMerges )
             {
                 merge = merge.trim();
-                String[] split = merge.split( "\\|" );
+                String[] split = merge.split( "\\s*\\|\\s*" );
 
                 String mainLicense = split[0];
+
+                Set<String> mergeList;
 
                 if ( mergedLicenses.containsKey( mainLicense ) )
                 {
 
-                    // this license was already describe, fail the build...
-
-                    throw new MojoFailureException(
-                        "The merge main license " + mainLicense + " was already registred in the " +
-                            "configuration, please use only one such entry as describe in example " +
-                            "http://mojo.codehaus.org/license-maven-plugin/examples/example-thirdparty.html#Merge_licenses." );
+                    mergeList = mergedLicenses.get( mainLicense );
                 }
-                mergedLicenses.put( mainLicense, split );
+                else
+                {
+                    mergeList = new HashSet<String>();
+                }
+
+                for ( int i = 0; i < split.length; i++ )
+                {
+                    String licenseToAdd = split[i];
+                    if ( i == 0 )
+                    {
+                        // mainLicense will not be merged (to itself)
+                        continue;
+                    }
+
+                    // check license not already described to be merged
+                    if ( mergeList.contains( licenseToAdd ) )
+                    {
+
+                        // this license to merge was already described, fail the build...
+
+                        throw new MojoFailureException(
+                            "The merge main license " + mainLicense + " was already registred in the " +
+                                "configuration, please use only one such entry as describe in example " +
+                                "http://mojo.codehaus.org/license-maven-plugin/examples/example-thirdparty.html#Merge_licenses." );
+                    }
+
+                    // can add this license for merge
+                    mergeList.add( licenseToAdd );
+                }
+
+                // push back licenses to merge for this main license
+                mergedLicenses.put( mainLicense, mergeList );
             }
 
             // merge licenses in license map
 
-            for ( String[] mergedLicense : mergedLicenses.values() )
+            for ( Map.Entry<String, Set<String>> entry : mergedLicenses.entrySet() )
             {
+                String mainLicense = entry.getKey();
+                Set<String> mergedLicense = entry.getValue();
                 if ( verbose )
                 {
-                    log.info( "Will merge " + Arrays.toString( mergedLicense ) + "" );
+                    log.info( "Will merge to *" + mainLicense + "*, licenses: " + mergedLicense );
                 }
 
-                thirdPartyTool.mergeLicenses( licenseMap, mergedLicense );
+                thirdPartyTool.mergeLicenses( licenseMap, mainLicense, mergedLicense );
             }
         }
     }

@@ -54,6 +54,22 @@ public interface ThirdPartyTool
     String ROLE = ThirdPartyTool.class.getName();
 
     /**
+     * Is log should be verbose?
+     *
+     * @return {@code true} if verbose log should be produced, {@code false} otherwise.
+     * @since 1.4
+     */
+    boolean isVerbose();
+
+    /**
+     * Sets the verbose mode.
+     *
+     * @param verbose new verbose mode to set
+     * @since 1.4
+     */
+    void setVerbose( boolean verbose );
+
+    /**
      * Collect license information from property file, 'third-party' classified artifacts, and .license.properties dependencies.
      *
      * @param dependencies       top-level dependencies to scan for .license.properties files.
@@ -157,10 +173,11 @@ public interface ThirdPartyTool
      * The first value of the {@code licenses} is the license to keep and all other values will be merged into the
      * first one.
      *
-     * @param licenseMap the license map to merge
-     * @param licenses   all the licenses to merge (the first license will be the unique one to kkep)
+     * @param licenseMap      the license map to merge
+     * @param mainLicense     the main license to keep
+     * @param licensesToMerge all the licenses to merge
      */
-    void mergeLicenses( LicenseMap licenseMap, String... licenses );
+    void mergeLicenses( LicenseMap licenseMap, String mainLicense, Set<String> licensesToMerge );
 
     /**
      * Write the content of the third-party file.

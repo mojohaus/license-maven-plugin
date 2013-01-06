@@ -48,24 +48,31 @@
   <properties>
 
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <license.generateBundle>true</license.generateBundle>
     <license.verbose>true</license.verbose>
   </properties>
 
   <dependencies>
 
+    <!-- use license 'The Apache Software License, Version 2.0' -->
     <dependency>
       <groupId>commons-logging</groupId>
       <artifactId>commons-logging</artifactId>
       <version>1.1.1</version>
     </dependency>
 
+    <!-- use license 'Apache License, Version 2.0' -->
     <dependency>
       <groupId>com.jhlabs</groupId>
       <artifactId>filters</artifactId>
       <version>2.0.235</version>
     </dependency>
 
+    <!-- use license 'Apache Public License 2.0' -->
+    <dependency>
+      <groupId>org.sonatype.plexus</groupId>
+      <artifactId>plexus-cipher</artifactId>
+      <version>1.4</version>
+    </dependency>
   </dependencies>
   <build>
 
@@ -75,14 +82,73 @@
         <artifactId>license-maven-plugin</artifactId>
         <executions>
           <execution>
-            <!--<id>default-cli</id>-->
+            <id>singleList</id>
             <phase>generate-resources</phase>
             <goals>
               <goal>add-third-party</goal>
             </goals>
             <configuration>
+              <thirdPartyFilename>THIRD-PARTY-singleList.txt</thirdPartyFilename>
               <licenseMerges>
-                <licenseMerge>The Apache Software License, Version 2.0|Apache License, Version 2.0
+                <licenseMerge>The Apache Software License, Version 2.0|Apache License, Version 2.0|Apache Public License 2.0
+                </licenseMerge>
+              </licenseMerges>
+            </configuration>
+          </execution>
+          <execution>
+            <id>singleListSplit</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>add-third-party</goal>
+            </goals>
+            <configuration>
+              <thirdPartyFilename>THIRD-PARTY-singleListSplit.txt</thirdPartyFilename>
+              <licenseMerges>
+                <licenseMerge>    The Apache Software License, Version 2.0
+
+
+                  |
+                    Apache License, Version 2.0
+
+                  |
+                                                     Apache Public License 2.0
+
+
+                </licenseMerge>
+              </licenseMerges>
+            </configuration>
+          </execution>
+          <execution>
+          <id>twoList</id>
+          <phase>generate-resources</phase>
+          <goals>
+            <goal>add-third-party</goal>
+          </goals>
+          <configuration>
+            <thirdPartyFilename>THIRD-PARTY-twoList.txt</thirdPartyFilename>
+            <licenseMerges>
+              <licenseMerge>The Apache Software License, Version 2.0|Apache License, Version 2.0</licenseMerge>
+              <licenseMerge>The Apache Software License, Version 2.0|Apache Public License 2.0</licenseMerge>
+            </licenseMerges>
+          </configuration>
+          </execution>
+          <execution>
+            <id>twoListSplit</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>add-third-party</goal>
+            </goals>
+            <configuration>
+              <thirdPartyFilename>THIRD-PARTY-twoListSplit.txt</thirdPartyFilename>
+              <licenseMerges>
+                <licenseMerge>    The Apache Software License, Version 2.0
+
+
+                  |     Apache License, Version 2.0       </licenseMerge>
+                <licenseMerge> The Apache Software License, Version 2.0 |
+
+                  Apache Public License 2.0
+
                 </licenseMerge>
               </licenseMerges>
             </configuration>

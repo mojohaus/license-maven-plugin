@@ -280,13 +280,21 @@ public abstract class AbstractAddThirdPartyMojo
 
     private SortedProperties unsafeMappings;
 
+    /**
+     * Flag computed in the {@link #init()} method to know if there is something has to be generated.
+     */
     private boolean doGenerate;
 
+    /**
+     * Flag computed in the {@link #init()} method to know if a bundle version has to be generated.
+     */
     private boolean doGenerateBundle;
 
     /**
      * Map from G/A/V as string to license key, obtained from global dependencies of type=.ld.properties.
      * This could probably be refactored to have more in common with the classifier-based loader.
+     *
+     * @since 1.4
      */
     private Map<String, String> globalKnownLicenses;
 

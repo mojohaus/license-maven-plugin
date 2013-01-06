@@ -128,6 +128,24 @@ public class DefaultThirdPartyTool
      */
     private final Comparator<MavenProject> projectComparator = MojoHelper.newMavenProjectComparator();
 
+    private boolean verbose;
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isVerbose()
+    {
+        return verbose;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setVerbose( boolean verbose )
+    {
+        this.verbose = verbose;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -382,32 +400,42 @@ public class DefaultThirdPartyTool
     /**
      * {@inheritDoc}
      */
-    public void mergeLicenses( LicenseMap licenseMap, String... licenses )
+    public void mergeLicenses( LicenseMap licenseMap, String mainLicense, Set<String> licenses )
     {
-        if ( licenses.length == 0 )
+
+        if ( licenses.isEmpty() )
         {
+
+            // nothing to merge, is this can really happen ?
             return;
         }
 
-        String mainLicense = licenses[0].trim();
         SortedSet<MavenProject> mainSet = licenseMap.get( mainLicense );
         if ( mainSet == null )
         {
-            getLogger().warn( "No license [" + mainLicense + "] found, will create it." );
+            if ( isVerbose() )
+            {
+                getLogger().warn( "No license [" + mainLicense + "] found, will create it." );
+            }
             mainSet = new TreeSet<MavenProject>( projectComparator );
             licenseMap.put( mainLicense, mainSet );
         }
-        int size = licenses.length;
-        for ( int i = 1; i < size; i++ )
+        for ( String license : licenses )
         {
-            String license = licenses[i].trim();
             SortedSet<MavenProject> set = licenseMap.get( license );
             if ( set == null )
             {
-                getLogger().warn( "No license [" + license + "] found, skip this merge." );
+                if ( isVerbose() )
+                {
+                    getLogger().warn( "No license [" + license + "] found, skip the merge to [" + mainLicense + "]" );
+                }
                 continue;
             }
-            getLogger().info( "Merge license [" + license + "] (" + set.size() + " dependencies)." );
+            if ( isVerbose() )
+            {
+                getLogger().info(
+                    "Merge license [" + license + "] to [" + mainLicense + "] (" + set.size() + " dependencies)." );
+            }
             mainSet.addAll( set );
             set.clear();
             licenseMap.remove( license );

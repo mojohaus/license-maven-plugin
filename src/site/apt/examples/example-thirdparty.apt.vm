@@ -210,16 +210,25 @@ List of 2 third-party dependencies.
 
   <dependencies>
 
+    <!-- use license 'The Apache Software License, Version 2.0' -->
     <dependency>
       <groupId>commons-logging</groupId>
       <artifactId>commons-logging</artifactId>
       <version>1.1.1</version>
     </dependency>
 
+    <!-- use license 'Apache License, Version 2.0' -->
     <dependency>
       <groupId>com.jhlabs</groupId>
       <artifactId>filters</artifactId>
       <version>2.0.235</version>
+    </dependency>
+
+    <!-- use license 'Apache Public License 2.0' -->
+    <dependency>
+      <groupId>org.sonatype.plexus</groupId>
+      <artifactId>plexus-cipher</artifactId>
+      <version>1.4</version>
     </dependency>
 
   </dependencies>
@@ -232,6 +241,7 @@ List of 2 third-party dependencies.
 
  (Apache License, Version 2.0) JHLabs Image Processing Filters (com.jhlabs:filters:2.0.235 - http://www.jhlabs.com/ip/index.html)
  (The Apache Software License, Version 2.0) Commons Logging (commons-logging:commons-logging:1.1.1 - http://commons.apache.org/logging)
+ (Apache Public License 2.0) Plexus Cipher: encryption/decryption Component (org.sonatype.plexus:plexus-cipher:1.4 - http://spice.sonatype.org/plexus-cipher)
 -------------------------------------------------------------------------------
 
   Now, adds this configuration in your pom
@@ -248,7 +258,7 @@ List of 2 third-party dependencies.
               <id>default-cli</id>
               <configuration>
                 <licenseMerges>
-                  <licenseMerge>The Apache Software License, Version 2.0|Apache License, Version 2.0</licenseMerge>
+                  <licenseMerge>The Apache Software License, Version 2.0|Apache License, Version 2.0|Apache Public License 2.0</licenseMerge>
                 </licenseMerges>
               </configuration>
             </execution>
@@ -266,10 +276,69 @@ List of 2 third-party dependencies.
 
  (The Apache Software License, Version 2.0) Commons Logging (commons-logging:commons-logging:1.1.1 - http://commons.apache.org/logging)
  (The Apache Software License, Version 2.0) JHLabs Image Processing Filters (com.jhlabs:filters:2.0.235 - http://www.jhlabs.com/ip/index.html)
+ (The Apache Software License, Version 2.0) Plexus Cipher: encryption/decryption Component (org.sonatype.plexus:plexus-cipher:1.4 - http://spice.sonatype.org/plexus-cipher)
 -------------------------------------------------------------------------------
 
-  Note: licenseMerge have to be unique, eg. you cannot have two licenseMerge
-  options for the same destination license.
+  Note: From version <1.4>, you can have split a license merge into some entries (before a destination license
+  should be unique), you can now write:
+
+-------------------------------------------------------------------------------
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>license-maven-plugin</artifactId>
+          <version>${project.version}</version>
+          <executions>
+            <execution>
+              <id>default-cli</id>
+              <configuration>
+                <licenseMerges>
+                  <licenseMerge>The Apache Software License, Version 2.0|Apache License, Version 2.0</licenseMerge>
+                  <licenseMerge>The Apache Software License, Version 2.0|Apache Public License 2.0</licenseMerge>
+                </licenseMerges>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+        ...
+      </plugins>
+    </pluginManagement>
+-------------------------------------------------------------------------------
+
+  Note': From version <1.4> extra space before and after a license are ignored so you can have also this configuration:
+
+-------------------------------------------------------------------------------
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>license-maven-plugin</artifactId>
+          <version>${project.version}</version>
+          <executions>
+            <execution>
+              <id>default-cli</id>
+              <configuration>
+                <licenseMerges>
+                  <licenseMerge>  The Apache Software License, Version 2.0  |
+
+                  Apache License, Version 2.0  </licenseMerge>
+                  <licenseMerge>
+
+                  The Apache Software License, Version 2.0  |
+
+                  Apache Public License 2.0
+
+                  </licenseMerge>
+                </licenseMerges>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+        ...
+      </plugins>
+    </pluginManagement>
+-------------------------------------------------------------------------------
 
 ** Attach missing files to build
 
@@ -286,7 +355,33 @@ List of 2 third-party dependencies.
 
   Use the <<includedLicenses>> (whitelist of licenses) or/and <<excludedLicenses>> (blacklist of licenses).
 
-  These parameters contains licenses separated by <<|>>.
+  These parameters contains licenses separated by <<|>>:
+-------------------------------------------------------------------------------
+  <configuration>
+    ...
+    <includedLicenses>The Apache Software License, Version 2.0|BSD License</includedLicenses>
+    <excludedLicenses>Bad license 1|Bad license 2</excludedLicenses>
+    ...
+    </configuration>
+-------------------------------------------------------------------------------
+
+  Since version <1.4>, you can also use a list format:
+-------------------------------------------------------------------------------
+  <configuration>
+    ...
+    <includedLicenses>
+      <includedLicense>The Apache Software License, Version 2.0</includedLicense>
+      <includedLicense>BSD License</includedLicense>
+    </includedLicenses>
+    <excludedLicenses>
+      <excludedLicense>Bad license 1</excludedLicense>
+      <excludedLicense>Bad license 2</excludedLicense>
+    </excludedLicenses>
+    ...
+    </configuration>
+-------------------------------------------------------------------------------
+
+  Note that any extra space at the start or end of a license will be removed.
 
   If parameter <<failIfWarning>> is set to <true>, then build will fail if one license is not in whiltelist or is in
   blacklist.
