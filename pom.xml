@@ -26,7 +26,7 @@
   <parent>
     <groupId>org.codehaus.mojo</groupId>
     <artifactId>mojo-parent</artifactId>
-    <version>31-SNAPSHOT</version>
+    <version>30</version>
     <relativePath>../mojo-parent/pom.xml</relativePath>
   </parent>
   <modelVersion>4.0.0</modelVersion>
@@ -431,18 +431,8 @@
                   <extraArtifacts>
                     <extraArtifact>${project.groupId}:${project.artifactId}:${project.version}:license.properties:test-third-party</extraArtifact>
                   </extraArtifacts>
-                  <pomIncludes>
-                    <!--<pomInclude>update-file-header/test-mojo/pom.xml</pomInclude>-->
-                    <pomInclude>third-party-report/*/pom.xml</pomInclude>
-                    <pomInclude>add-third-party/*/pom.xml</pomInclude>
-                    <pomInclude>add-third-party/MLICENSE-37/*/pom.xml</pomInclude>
-                    <pomInclude>aggregate-add-third-party/*/pom.xml</pomInclude>
-                    <pomInclude>update-file-header/*/pom.xml</pomInclude>
-                    <pomInclude>update-project-license/*/pom.xml</pomInclude>
-                    <pomInclude>download-licenses/*/pom.xml</pomInclude>
-                  </pomIncludes>
                   <pomExcludes>
-                    <pomExclude>download-licenses/MLICENSE-4/pom.xml</pomExclude>
+                    <pomExclude>MLICENSE-4/pom.xml</pomExclude>
                   </pomExcludes>
                 </configuration>
               </execution>
@@ -454,7 +444,7 @@
                 </goals>
                 <configuration>
                   <pomIncludes>
-                    <pomInclude>download-licenses/MLICENSE-4/pom.xml</pomInclude>
+                    <pomInclude>MLICENSE-4/pom.xml</pomInclude>
                   </pomIncludes>
                 </configuration>
               </execution>
