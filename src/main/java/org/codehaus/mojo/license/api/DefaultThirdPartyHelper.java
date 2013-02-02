@@ -255,6 +255,8 @@ public class DefaultThirdPartyHelper
         throws MojoFailureException
     {
 
+        Set<String> licenseFound = new HashSet<String>(  );
+
         if ( !CollectionUtils.isEmpty( licenseMerges ) )
         {
 
@@ -290,19 +292,20 @@ public class DefaultThirdPartyHelper
                     }
 
                     // check license not already described to be merged
-                    if ( mergeList.contains( licenseToAdd ) )
+                    if ( mergeList.contains( licenseToAdd ) || licenseFound.contains( licenseToAdd ) )
                     {
 
                         // this license to merge was already described, fail the build...
 
                         throw new MojoFailureException(
-                            "The merge main license " + mainLicense + " was already registred in the " +
+                            "The license " + licenseToAdd + " was already registred in the " +
                                 "configuration, please use only one such entry as describe in example " +
                                 "http://mojo.codehaus.org/license-maven-plugin/examples/example-thirdparty.html#Merge_licenses." );
                     }
 
                     // can add this license for merge
                     mergeList.add( licenseToAdd );
+                    licenseFound.add( licenseToAdd );
                 }
 
                 // push back licenses to merge for this main license
