@@ -398,7 +398,10 @@ public class DownloadLicensesMojo
             System.getProperties().put( "proxySet", "true" );
             System.setProperty( "proxyHost", proxyToUse.getHost() );
             System.setProperty( "proxyPort", String.valueOf( proxyToUse.getPort() ) );
-            System.setProperty( "nonProxyHosts", proxyToUse.getNonProxyHosts() );
+            if(proxyToUse.getNonProxyHosts() != null)
+            {
+                System.setProperty( "nonProxyHosts", proxyToUse.getNonProxyHosts() );
+            }
             if ( proxyToUse.getUsername() != null )
             {
                 String loginPassword = proxyToUse.getUsername() + ":" + proxyToUse.getPassword();
