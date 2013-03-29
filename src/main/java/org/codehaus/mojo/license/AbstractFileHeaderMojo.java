@@ -1153,12 +1153,20 @@ public abstract class AbstractFileHeaderMojo
         String licenseContent = license.getHeaderContent( encoding );
         defaultFileHeader.setLicense( licenseContent );
 
-        Integer firstYear = Integer.valueOf( inceptionYear );
-        defaultFileHeader.setCopyrightFirstYear( firstYear );
-
         Calendar cal = Calendar.getInstance();
         cal.setTime( new Date() );
         Integer lastYear = cal.get( Calendar.YEAR );
+        Integer firstYear;
+        if ( inceptionYear == null )
+        {
+            getLog().warn( "No inceptionYear defined (will use current year)" );
+            firstYear = lastYear;
+        }
+        else
+        {
+            firstYear = Integer.valueOf( inceptionYear );
+        }
+        defaultFileHeader.setCopyrightFirstYear( firstYear );
         if ( firstYear < lastYear )
         {
             defaultFileHeader.setCopyrightLastYear( lastYear );
