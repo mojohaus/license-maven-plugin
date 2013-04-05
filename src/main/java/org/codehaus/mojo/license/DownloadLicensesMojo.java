@@ -169,6 +169,8 @@ public class DownloadLicensesMojo
 
     /**
      * A flag to skip the goal.
+     *
+     * @since 1.5
      */
     @Parameter( property = "license.skipDownloadLicenses", defaultValue = "false")
     protected boolean skipDownloadLicenses;
@@ -229,7 +231,7 @@ public class DownloadLicensesMojo
             getLog().warn( "Offline flag is on, download-licenses goal is skip." );
             return;
         }
-        if ( isSkipDownloadLicenses() )
+        if ( skipDownloadLicenses )
         {
             getLog().info( "skip flag is on, will skip goal." );
             return;
@@ -370,24 +372,6 @@ public class DownloadLicensesMojo
     {
         return getLog().isDebugEnabled();
     }
-
-    /**
-     * Tells if the mojo execution should be skipped.
-     *
-     * @return {@code false} if the mojo should not be executed.
-     */
-    public boolean isSkipDownloadLicenses() {
-        return skipDownloadLicenses;
-    }
-    /**
-     * Changes internal state {@code skipDownloadLicenses} to execute (or not) goal.
-     *
-     * @param skip new state value
-     */
-    public void setSkipDownloadLicenses(boolean skip) {
-        this.skipDownloadLicenses = skip;
-    }
-
 
     // ----------------------------------------------------------------------
     // Private Methods
