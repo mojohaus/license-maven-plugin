@@ -1,0 +1,26 @@
+import java.io.*;
+import java.util.*;
+
+try
+{
+    File licenseFile = new File( basedir, "licenseout/the apache software license, version 2.0 - license-2.0.txt" );
+    if ( !licenseFile.isFile() )
+    {
+        System.err.println( "Could not find license file: " + licenseFile );
+        return false;
+    }
+
+    File summaryFile = new File( basedir, "licensesout.xml" );
+    if ( !summaryFile.isFile() )
+    {
+        System.err.println( "Could not find license file: " + summaryFile );
+        return false;
+    }
+}
+catch( Throwable t )
+{
+    t.printStackTrace();
+    return false;
+}
+
+return true;
