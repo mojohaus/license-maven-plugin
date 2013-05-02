@@ -89,43 +89,8 @@ public abstract class AbstractLicenseNameMojo
     private LicenseStore licenseStore;
 
     // ----------------------------------------------------------------------
-    // Abstract Methods
-    // ----------------------------------------------------------------------
-
-    /**
-     * When is sets to {@code true}, will skip execution.
-     * <p/>
-     * This will take effects in method {@link #checkSkip()}.
-     * So the method {@link #doAction()} will never be invoked.
-     *
-     * @return {@code true} if goal will not be executed
-     */
-    public abstract boolean isSkip();
-
-    /**
-     * Changes internal state {@code skip} to execute (or not) goal.
-     *
-     * @param skip new state value
-     */
-    public abstract void setSkip( boolean skip );
-
-    // ----------------------------------------------------------------------
     // AbstractLicenseMojo Implementaton
     // ----------------------------------------------------------------------
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected boolean checkSkip()
-    {
-        if ( isSkip() )
-        {
-            getLog().info( "skip flag is on, will skip goal." );
-            return false;
-        }
-        return super.checkSkip();
-    }
 
     /**
      * {@inheritDoc}
@@ -134,11 +99,6 @@ public abstract class AbstractLicenseNameMojo
     protected void init()
         throws Exception
     {
-
-        if ( isSkip() )
-        {
-            return;
-        }
 
         // init licenses store
         licenseStore = LicenseStore.createLicenseStore( getLog(), getLicenseResolver() );

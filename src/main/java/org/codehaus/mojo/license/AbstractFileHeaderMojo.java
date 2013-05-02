@@ -420,11 +420,6 @@ public abstract class AbstractFileHeaderMojo
         throws Exception
     {
 
-        if ( isSkip() )
-        {
-            return;
-        }
-
         if ( StringUtils.isEmpty( ignoreTag ) )
         {
 

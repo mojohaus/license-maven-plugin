@@ -85,7 +85,7 @@ public class UpdateFileHeaderMojo
     protected boolean dryRun;
 
     // ----------------------------------------------------------------------
-    // AbstractLicenceNameMojo Implementation
+    // AbstractLicenceMojo Implementation
     // ----------------------------------------------------------------------
 
     /**
@@ -95,15 +95,6 @@ public class UpdateFileHeaderMojo
     public boolean isSkip()
     {
         return skipUpdateLicense;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setSkip( boolean skip )
-    {
-        this.skipUpdateLicense = skip;
     }
 
     // ----------------------------------------------------------------------

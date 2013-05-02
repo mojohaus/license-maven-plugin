@@ -162,6 +162,14 @@ public class AddThirdPartyMojo
     @Parameter( defaultValue = "true" )
     private boolean includeTransitiveDependencies;
 
+    /**
+     * To skip execution of this mojo.
+     *
+     * @since 1.5
+     */
+    @Parameter( property = "license.skipAddThirdParty", defaultValue = "false" )
+    private boolean skipAddThirdParty;
+
     // ----------------------------------------------------------------------
     // Private Fields
     // ----------------------------------------------------------------------
@@ -174,6 +182,15 @@ public class AddThirdPartyMojo
     // ----------------------------------------------------------------------
     // AbstractLicenseMojo Implementaton
     // ----------------------------------------------------------------------
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isSkip()
+    {
+        return skipAddThirdParty;
+    }
 
     /**
      * {@inheritDoc}

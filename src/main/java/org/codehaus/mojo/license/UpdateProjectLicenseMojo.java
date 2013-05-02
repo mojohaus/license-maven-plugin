@@ -130,15 +130,18 @@ public class UpdateProjectLicenseMojo
      * {@inheritDoc}
      */
     @Override
+    public boolean isSkip()
+    {
+        return skipUpdateProjectLicense;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected void init()
         throws Exception
     {
-
-        if ( isSkip() )
-        {
-            return;
-        }
-
         super.init();
 
         // must generate if file does not exist or pom never thant license file
@@ -214,27 +217,4 @@ public class UpdateProjectLicenseMojo
             }
         }
     }
-
-    // ----------------------------------------------------------------------
-    // AbstractLicenceNameMojo Implementation
-    // ----------------------------------------------------------------------
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isSkip()
-    {
-        return skipUpdateProjectLicense;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setSkip( boolean skip )
-    {
-        this.skipUpdateProjectLicense = skip;
-    }
-
 }

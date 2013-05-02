@@ -96,6 +96,16 @@ public abstract class AbstractLicenseMojo
     // ----------------------------------------------------------------------
 
     /**
+     * When is sets to {@code true}, will skip execution.
+     * <p/>
+     * This will take effect in at the very begin of the {@link #execute()}
+     * before any initialisation of goal.
+     *
+     * @return {@code true} if goal will not be executed
+     */
+    public abstract boolean isSkip();
+
+    /**
      * Method to initialize the mojo before doing any concrete actions.
      * <p/>
      * <b>Note:</b> The method is invoked before the {@link #doAction()} method.
@@ -127,60 +137,82 @@ public abstract class AbstractLicenseMojo
     public final void execute()
             throws MojoExecutionException, MojoFailureException {
         try {
-            if (getLog().isDebugEnabled()) {
-
+            if ( getLog().isDebugEnabled() )
+            {
                 // always be verbose in debug mode
-                setVerbose(true);
+                setVerbose( true );
+            }
+
+            boolean mustSkip = isSkip();
+
+            if ( mustSkip )
+            {
+                getLog().info( "skip flag is on, will skip goal." );
+                return;
             }
 
             // check if project packaging is compatible with the mojo
 
             boolean canContinue = checkPackaging();
-            if (!canContinue) {
-                getLog().warn("The goal is skip due to packaging '" + getProject().getPackaging() + "'");
+            if ( !canContinue )
+            {
+                getLog().warn( "The goal is skip due to packaging '" + getProject().getPackaging() + "'" );
                 return;
             }
 
             // init the mojo
 
-            try {
-
+            try
+            {
                 checkEncoding();
 
                 init();
 
-            } catch (MojoFailureException e) {
+            }
+            catch ( MojoFailureException e )
+            {
                 throw e;
-            } catch (MojoExecutionException e) {
+            }
+            catch ( MojoExecutionException e )
+            {
                 throw e;
-            } catch (Exception e) {
+            }
+            catch ( Exception e )
+            {
                 throw new MojoExecutionException(
-                        "could not init goal " + getClass().getSimpleName() + " for reason : " + e.getMessage(), e);
+                    "could not init goal " + getClass().getSimpleName() + " for reason : " + e.getMessage(), e );
             }
 
             // check if mojo can be skipped
 
             canContinue = checkSkip();
-            if (!canContinue) {
-                if (isVerbose()) {
-                    getLog().info("Goal will not be executed.");
+            if ( !canContinue )
+            {
+                if ( isVerbose() )
+                {
+                    getLog().info( "Goal will not be executed." );
                 }
                 return;
             }
 
             // can really execute the mojo
 
-            try {
-
+            try
+            {
                 doAction();
-
-            } catch (MojoFailureException e) {
+            }
+            catch ( MojoFailureException e )
+            {
                 throw e;
-            } catch (MojoExecutionException e) {
+            }
+            catch ( MojoExecutionException e )
+            {
                 throw e;
-            } catch (Exception e) {
+            }
+            catch ( Exception e )
+            {
                 throw new MojoExecutionException(
-                        "could not execute goal " + getClass().getSimpleName() + " for reason : " + e.getMessage(), e);
+                    "could not execute goal " + getClass().getSimpleName() + " for reason : " + e.getMessage(), e );
             }
         } finally {
             afterExecute();

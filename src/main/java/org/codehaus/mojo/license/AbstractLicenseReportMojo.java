@@ -77,15 +77,6 @@ public abstract class AbstractLicenseReportMojo
     @Parameter( property = "license.verbose", defaultValue = "${maven.verbose}" )
     private boolean verbose;
 
-
-    /**
-     * Skip to generate the report.
-     *
-     * @since 1.1
-     */
-    @Parameter( property = "license.skip" )
-    private Boolean skip;
-
     /**
      * Encoding used to read and writes files.
      * <p/>
@@ -128,7 +119,6 @@ public abstract class AbstractLicenseReportMojo
     /**
      * Doxia Site Renderer component.
      *
-     * @component
      * @since 1.1
      */
     @Component
@@ -137,7 +127,6 @@ public abstract class AbstractLicenseReportMojo
     /**
      * Internationalization component.
      *
-     * @component
      * @since 1.1
      */
     @Component
@@ -146,8 +135,6 @@ public abstract class AbstractLicenseReportMojo
     /**
      * dependencies tool.
      *
-     * @component
-     * @readonly
      * @since 1.1
      */
     @Component
@@ -156,8 +143,6 @@ public abstract class AbstractLicenseReportMojo
     /**
      * third party tool.
      *
-     * @component
-     * @readonly
      * @since 1.1
      */
     @Component
@@ -171,6 +156,16 @@ public abstract class AbstractLicenseReportMojo
     // ----------------------------------------------------------------------
     // Abstract Methods
     // ----------------------------------------------------------------------
+
+    /**
+     * When is sets to {@code true}, will skip execution.
+     * <p/>
+     * This will take effect in at the very begin of the {@link #execute()}
+     * before any initialisation of goal.
+     *
+     * @return {@code true} if goal will not be executed
+     */
+    public abstract boolean isSkip();
 
     /**
      * Generates the report.
@@ -208,20 +203,24 @@ public abstract class AbstractLicenseReportMojo
         throws MavenReportException
     {
 
-        if ( !Boolean.TRUE.equals( skip ) )
+        boolean mustSkip = isSkip();
+
+        if ( mustSkip )
         {
-            try
-            {
-                doGenerateReport( locale, getSink() );
-            }
-            catch ( MojoExecutionException e )
-            {
-                throw new MavenReportException( e.getMessage(), e );
-            }
-            catch ( MojoFailureException e )
-            {
-                throw new MavenReportException( e.getMessage(), e );
-            }
+            getLog().info( "skip flag is on, will skip goal." );
+            return;
+        }
+        try
+        {
+            doGenerateReport( locale, getSink() );
+        }
+        catch ( MojoExecutionException e )
+        {
+            throw new MavenReportException( e.getMessage(), e );
+        }
+        catch ( MojoFailureException e )
+        {
+            throw new MavenReportException( e.getMessage(), e );
         }
     }
 

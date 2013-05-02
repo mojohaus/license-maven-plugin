@@ -166,6 +166,14 @@ public class ThirdPartyReportMojo
     @Parameter
     private List<String> licenseMerges;
 
+    /**
+     * Skip to generate the report.
+     *
+     * @since 1.1
+     */
+    @Parameter( property = "license.skipThirdPartyReport" , defaultValue = "false")
+    private boolean skipThirdPartyReport;
+
     // ----------------------------------------------------------------------
     // MavenReport Implementaton
     // ----------------------------------------------------------------------
@@ -181,6 +189,15 @@ public class ThirdPartyReportMojo
     // ----------------------------------------------------------------------
     // AbstractLicenseReportMojo Implementation
     // ----------------------------------------------------------------------
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isSkip()
+    {
+        return skipThirdPartyReport;
+    }
 
     /**
      * {@inheritDoc}

@@ -78,14 +78,14 @@ public class CheckFileHeaderMojo
         return skipCheckLicense;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setSkip( boolean skip )
-    {
-        this.skipCheckLicense = skip;
-    }
+//    /**
+//     * {@inheritDoc}
+//     */
+//    @Override
+//    public void setSkip( boolean skip )
+//    {
+//        this.skipCheckLicense = skip;
+//    }
 
     // ----------------------------------------------------------------------
     // AbstractFileHeaderMojo Implementation

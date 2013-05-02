@@ -84,6 +84,15 @@ public class LicenseListMojo
      * {@inheritDoc}
      */
     @Override
+    public boolean isSkip() {
+        // can't skip this goal since direct invocation is required
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected void init()
         throws Exception
     {

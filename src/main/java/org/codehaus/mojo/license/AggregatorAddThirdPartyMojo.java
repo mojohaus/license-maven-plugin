@@ -71,9 +71,26 @@ public class AggregatorAddThirdPartyMojo
     @Parameter( property = "reactorProjects", readonly = true, required = true )
     protected List<?> reactorProjects;
 
+    /**
+     * To skip execution of this mojo.
+     *
+     * @since 1.5
+     */
+    @Parameter( property = "license.skipAggregateAddThirdParty", defaultValue = "false" )
+    private boolean skipAggregateAddThirdParty;
+
     // ----------------------------------------------------------------------
     // AbstractLicenseMojo Implementaton
     // ----------------------------------------------------------------------
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isSkip()
+    {
+        return skipAggregateAddThirdParty;
+    }
 
     /**
      * {@inheritDoc}
