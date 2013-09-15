@@ -74,7 +74,7 @@ Usage
   mvn license:comment-style-list -Ddetail
 -------------------------------------------------------------------------------
 
-  For more information, see the {{{./examples/example-license-list.html}examples}} and
+  For more information, see the {{{./examples/example-comment-style-list.html}examples}} and
   for full detail see {{{./comment-style-list-mojo.html}detail page}}.
 
 ** help goal
@@ -105,16 +105,14 @@ Usage
   It can also generate a bundle License file to avoid name collision in a final
   application.
 
-  for full detail see {{{./update-project-license-mojo.html}detail page}}.
+  For full detail see {{{./update-project-license-mojo.html}detail page}}.
 
 ** update-file-header goal
 
   This goal adds or updates the license header based on the configuration.
 
   For more information, see the {{{./examples/update-file-header-config.html}examples}} and
-  for full detail see {{{./update-file-header-mojo.html}detail page}}.
-
-  for full detail on the configuration see {{{./update-file-header-config.html}detail page}}.
+  for full detail on the configuration see {{{./update-file-header-mojo.html}detail page}}.
 
 ** check-file-header goal
 
@@ -122,7 +120,7 @@ Usage
 
   For full detail see {{{./check-file-header-mojo.html}detail page}}.
 
-  This goal has same behaviour that the update-file-header with <dryRun> option.
+  This goal has same behaviour as the update-file-header with <dryRun> option.
 
 
 * Getting Dependency License Information
@@ -131,10 +129,10 @@ Usage
 
   This goal builds the THIRD-PARTY.txt file and adds it in the build.
 
-  We also are able to consolidate the generated file by filling another
+  We are also able to consolidate the generated file by filling another
   file (the <<missing file>>) for dependencies without license.
 
-  <Note:> This mojo has not effect on a <<pom>> project.
+  <Note:> This mojo has no effect on a <<pom>> project.
 
   For more information, see the {{{./examples/example-thirdparty.html}examples}} and for
   full details see {{{./add-third-party-mojo.html}the add third party mojo page}}.
@@ -144,7 +142,7 @@ Usage
   This goal builds the THIRD-PARTY.txt file on a multi-module project from
   the dependencies of all its modules.
 
-  <Note:> This mojo has only effect on a <<pom>> project.
+  <Note:> This mojo only has effect on a <<pom>> project.
 
   For more information, see the {{{./examples/example-thirdparty.html}examples}} and for
   full detail see {{{./aggregate-add-third-party-mojo.html}the aggregate add third party mojo 
@@ -156,8 +154,7 @@ Usage
   licenses.  Example configuration is listed below, and more information is available in the 
   {{{./examples/example-download-licenses.html}examples page}}.
 
-  By default the plugin attaches to the <<<generate-resources>>> phase of the build lifecycle.  An 
-  example configuration is supplied below.
+  By default the plugin attaches to the <<<generate-resources>>> phase of the build lifecycle.
 
 -------------------
 <project>

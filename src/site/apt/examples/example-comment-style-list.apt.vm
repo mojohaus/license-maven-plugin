@@ -39,7 +39,7 @@ Comment style List Examples
   mvn license:comment-style-list
 -------------------------------------------------------------------------------
 
-  To display the example, use the <<detail>> parameter :
+  To display example comments, use the <<detail>> parameter :
 
 -------------------------------------------------------------------------------
   mvn license:comment-style-list -Ddetail

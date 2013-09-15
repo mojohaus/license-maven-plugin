@@ -59,7 +59,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 /**
- * Abstract mojo for file-header operations (chekc, update, report,...).
+ * Abstract mojo for file-header operations (check, update, report,...).
  * <p/>
  *
  * @author tchemit <chemit@codelutin.com>
@@ -220,9 +220,9 @@ public abstract class AbstractFileHeaderMojo
     /**
      * A flag to add the license header in java files after the package statement.
      * <p/>
-     * This is a pratice used by many people (apache, codehaus, ...).
+     * This is a practice used by many people (apache, codehaus, ...).
      * <p/>
-     * <b>Note:</b> By default this property is then to {@code true} since it is a good pratice.
+     * <b>Note:</b> By default this property is then to {@code true} since it is a good practice.
      *
      * @since 1.2
      */
@@ -249,7 +249,7 @@ public abstract class AbstractFileHeaderMojo
     /**
      * Specific files to includes, separated by a comma. By default, it is "** /*".
      * <p/>
-     * <b>Note:</b> This parameter is not useable if you are still using a project file descriptor.
+     * <b>Note:</b> This parameter is not usable if you are still using a project file descriptor.
      *
      * @since 1.0
      */
@@ -274,10 +274,10 @@ public abstract class AbstractFileHeaderMojo
     /**
      * To associate extra extension files to an existing comment style.
      * <p/>
-     * Keys of the map are the extension of extra files to treate, and the value
+     * Keys of the map are the extension of extra files to treat, and the value
      * is the comment style you want to associate.
      * <p/>
-     * For example, to treate file with extensions {@code java2} and {@code jdata}
+     * For example, to treat file with extensions {@code java2} and {@code jdata}
      * as {@code java} files (says using the {@code java} comment style, declare this
      * in your plugin configuration :
      * <pre>
@@ -296,7 +296,7 @@ public abstract class AbstractFileHeaderMojo
     protected Map<String, String> extraExtensions;
 
     /**
-     * Template used to build the description scetion of the license header.
+     * Template used to build the description section of the license header.
      * <p/>
      * (This template use freemarker).
      *
@@ -360,7 +360,7 @@ public abstract class AbstractFileHeaderMojo
     private long timestamp;
 
     /**
-     * The dictionnary of extension indexed by their associated comment style.
+     * The dictionary of extension indexed by their associated comment style.
      *
      * @since 1.0
      */
@@ -379,12 +379,12 @@ public abstract class AbstractFileHeaderMojo
     private Set<File> processedFiles;
 
     /**
-     * Dictionnary of treated files indexed by their state.
+     * Dictionary of treated files indexed by their state.
      */
     private EnumMap<FileState, Set<File>> result;
 
     /**
-     * Dictonnary of files to treate indexed by their CommentStyle.
+     * Dictionary of files to treat indexed by their CommentStyle.
      */
     private Map<String, List<File>> filesToTreateByCommentStyle;
 
@@ -574,7 +574,7 @@ public abstract class AbstractFileHeaderMojo
             }
         }
 
-        // get all files to treate indexed by their comment style
+        // get all files to treat indexed by their comment style
         filesToTreateByCommentStyle = obtainFilesToProcessByCommentStyle();
 
         // build the description template
@@ -724,7 +724,7 @@ public abstract class AbstractFileHeaderMojo
             }
         }
 
-        // Obtain all files to treate
+        // Obtain all files to treat
         Map<File, String[]> allFiles = new HashMap<File, String[]>();
         getFilesToTreateForRoots( includes, excludes, rootsList, allFiles );
 
@@ -743,7 +743,7 @@ public abstract class AbstractFileHeaderMojo
                 if ( StringUtils.isEmpty( commentStyle ) )
                 {
 
-                    // unknown extension, do not treate this file
+                    // unknown extension, do not treat this file
                     continue;
                 }
                 //
@@ -1264,7 +1264,7 @@ public abstract class AbstractFileHeaderMojo
      *
      * @param includes includes
      * @param excludes excludes
-     * @param roots    root directories to treate
+     * @param roots    root directories to treat
      * @param files    cache of file detected indexed by their root directory
      */
     protected void getFilesToTreateForRoots( String[] includes, String[] excludes, List<String> roots,

@@ -50,7 +50,7 @@ public interface ThirdPartyHelper
      * Load all dependencies given the configuration as {@link MavenProject}.
      *
      * @param configuration the configuration of the project and include/exclude to do on his dependencies
-     * @return the dictionnary of loaded dependencies as {@link MavenProject} indexed by their gav.
+     * @return the dictionary of loaded dependencies as {@link MavenProject} indexed by their gav.
      */
     SortedMap<String, MavenProject> loadDependencies( MavenProjectDependenciesConfigurator configuration );
 
@@ -75,7 +75,7 @@ public interface ThirdPartyHelper
 
     /**
      * Load unsafe mapping for all dependencies with no license in their pom, we will load the missing file
-     * if it exists and alos add all dependencies from licenseMap with no license known.
+     * if it exists and also add all dependencies from licenseMap with no license known.
      *
      * @param licenseMap  the license map of all dependencies.
      * @param missingFile location of an optional missing fille (says where you fix missing license).

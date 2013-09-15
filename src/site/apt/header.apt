@@ -63,7 +63,7 @@ Header model
 
 * Configuration
 
-  You can configure those things :
+  You can configure these things:
 
   * start process tag (using the {{{./update-file-header-mojo.html#processStartTag}processStartTag}} parameter)
 
@@ -71,12 +71,14 @@ Header model
   
   * end process tag (using the {{{./update-file-header-mojo.html#processEndTag}processEndTag}} parameter)
 
+  []
+
   <<Note:>>
 
   * The plugin won't be able to migrate from a header configuration to another one, so prepare this
     configuration before the first execution of the goal (and never change it :().
 
-  * As the configuration has a special meaning for the goal to treat a file and should not be eable to be found more
+  * As the configuration has a special meaning for the goal to treat a file and should not be able to be found more
     than once in a file, we can use special space separator, the goal will remove then. In that way the exact
     configuration won't be found twice in your pom.xml.
 
@@ -97,7 +99,7 @@ Header model
   Copyright (C) firstYear[ - lastYear] holder
 --------------------------------------------------------------------------------
 
-  If *firstYear* and *lastYear* are the same then lastYear is omitted.
+  If <firstYear> and <lastYear> are the same then <lastYear> is omitted.
 
 * Comment box
 
@@ -106,7 +108,7 @@ Header model
 
 Available comment styles
 
-  Here is the available comment styles.
+  Here are the available comment styles.
 
   Using the goal {{{./comment-style-list-mojo.html}comment-style-list}}
   you can find all of them.
@@ -212,5 +214,5 @@ Ignore a header
   %%Ignore-License
 --------------------------------------------------------------------------------
 
-  Note : Don't use start (1) and end (7 in exemple) balise
+  Note : Don't use start (1) and end (7 in example) balise
   You can change it with <<ignoreTag>> property.

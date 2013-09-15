@@ -29,13 +29,13 @@ Update File Header Examples
     * roots : it is a list of the main directories from which we apply the
     license on files. The default roots is <src, target/generated-sources, target/processed-source>,
 
-    * includes : List of files to include, gived by a regexp (for example: <*Dao.java>).
+    * includes : List of files to include, given by a regexp (for example: <*Dao.java>).
     The default include is **/*,
 
-    * excludes: List of files to exclude, gived by a regexp (for example: <*Test.java>).
-    there is no default excludes files.
+    * excludes: List of files to exclude, given by a regexp (for example: <*Test.java>).
+    No files are excludes by default.
 
-    * extraExtensions: Dictionnary of extensions to map to existing comment style.
+    * extraExtensions: Dictionary of extensions to map to existing comment style.
 
     * customize description section: Define a template to change the description section of a file header.
 
@@ -235,7 +235,7 @@ Customize the description section
 
   In the template you can use these variables:
 
-  * {{{../update-file-header-mojo.html#project}project}}
+  * project (current Maven project)
 
   * {{{../update-file-header-mojo.html#addSvnKeyWords}addSvnKeyWords}}
 
@@ -262,7 +262,7 @@ Customize the description section
     </plugins>
 -------------------------------------------------------------------------------
 
-  With this freemarker template located in <${basedir}/src/license/myDescriptionTemplate.ftl>:
+  With this freemarker template located in <$\{basedir\}/src/license/myDescriptionTemplate.ftl>:
 
 -------------------------------------------------------------------------------
 <#-- To render the description of a license file header.
