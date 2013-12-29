@@ -44,11 +44,13 @@ List of third-party dependencies grouped by their license type.
     <#list licenseMap as e>
         <#assign license = e.getKey()/>
         <#assign projects = e.getValue()/>
+        <#if projects?size &gt; 0>
 
     ${license}:
 
         <#list projects as project>
         * ${artifactFormat(project)}
         </#list>
+        </#if>
     </#list>
 </#if>
