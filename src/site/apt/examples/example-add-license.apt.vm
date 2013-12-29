@@ -194,3 +194,24 @@ Public License instead of this License.  But first, please read
 </plugin>
 +-------------------------------------------------------------------------------
 
+* Using templates in license files
+
+  <<Since version 1.6>>, license and header content files can be parametrized
+  using FreeMarker template engine.
+
+  To do so, just add <<.ftl>> extension to license or header file, you don't need to
+  change the licenseRepository definition, the plugin will always try (if not found
+  with default file name to search with an extra <<.ftl>> extension).
+
+  Here is the list of all available properties in such templates:
+
++----------
+  all system properties with prefix env_
+  all project properties with prefix project_
+  project (maven project)
+  projectName (plugin projectName parameter)
+  organizationName (plugin organizationName parameter)
+  copyrightYear (plugin inceptionYear parameter)
+  copyrightOwners (plugin copyrightOwners parameter)
+  extraTemplateParameters (plugin extraTemplateParameters parameter with prefix extra_)
++----------

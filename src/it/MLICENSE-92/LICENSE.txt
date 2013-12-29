@@ -1,0 +1,2 @@
+;; This line will be removed!
+My license!

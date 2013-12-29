@@ -73,10 +73,6 @@ public class LicenseRepository
      */
     protected boolean init;
 
-    public LicenseRepository()
-    {
-    }
-
     public URL getBaseURL()
     {
         return baseURL;
@@ -134,9 +130,9 @@ public class LicenseRepository
 
                 if ( matcher.matches() )
                 {
-                    licenseDescription = matcher.group( 1 );
-                    licenseFile = matcher.group( 2 );
-                    headerFile = matcher.group( 3 );
+                    licenseDescription = matcher.group( 1 ).trim();
+                    licenseFile = matcher.group( 2 ).trim();
+                    headerFile = matcher.group( 3 ).trim();
                 }
                 else
                 {
@@ -144,23 +140,10 @@ public class LicenseRepository
                     headerFile = License.LICENSE_HEADER_FILE;
                 }
 
-                URL licenseURL = MojoHelper.getUrl( licenseBaseURL, licenseFile );
-                if ( !checkExists( licenseURL ) )
-                {
-                    throw new IllegalArgumentException(
-                        "Could not find license (" + license + ") content file at [" + licenseURL + "] for resolver " +
-                            this );
-                }
-                license.setLicenseURL( licenseURL );
-
-                URL headerURL = MojoHelper.getUrl( licenseBaseURL, headerFile );
-                if ( !checkExists( headerURL ) )
-                {
-                    throw new IllegalArgumentException(
-                        "Could not find license (" + license + ") header file at [" + headerURL + "] for resolver " +
-                            this );
-                }
-                license.setHeaderURL( headerURL );
+                URL licenseFileURL = getFileURL( license, licenseFile );
+                license.setLicenseURL( licenseFileURL );
+                URL headerFileURL = getFileURL( license, headerFile );
+                license.setHeaderURL( headerFileURL );
 
                 license.setDescription( licenseDescription );
 
@@ -255,4 +238,29 @@ public class LicenseRepository
         }
     }
 
+    protected URL getFileURL( License license, String filename )
+        throws IOException
+    {
+
+        URL licenseBaseURL = license.getBaseURL();
+        URL result = MojoHelper.getUrl( licenseBaseURL, filename );
+        if ( !checkExists( result ) )
+        {
+            // let's try with a .ftl suffix
+            URL resultWithFtlSuffix = MojoHelper.getUrl( licenseBaseURL, filename + License.TEMPLATE_SUFFIX );
+
+            if ( checkExists( resultWithFtlSuffix ) )
+            {
+                result = resultWithFtlSuffix;
+            }
+            else
+            {
+                throw new IllegalArgumentException(
+                    "Could not find license (" + license + ") content file at [" + result + "], nor at [" +
+                        resultWithFtlSuffix + "] for resolver " +
+                        this );
+            }
+        }
+        return result;
+    }
 }

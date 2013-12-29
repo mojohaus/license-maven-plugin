@@ -46,6 +46,8 @@ public class License
 
     public static final String LICENSE_CONTENT_FILE = "license.txt";
 
+    public static final String TEMPLATE_SUFFIX = ".ftl";
+
     /**
      * base url of license (directory where to find license files).
      */
@@ -106,6 +108,14 @@ public class License
     public URL getBaseURL()
     {
         return baseURL;
+    }
+
+    public boolean isHeaderContentTemplateAware() {
+        return getHeaderURL().toString().endsWith( TEMPLATE_SUFFIX );
+    }
+
+    public boolean isLicenseContentTemplateAware() {
+        return getLicenseURL().toString().endsWith( TEMPLATE_SUFFIX );
     }
 
     public String getLicenseContent( String encoding )

@@ -24,6 +24,7 @@ package org.codehaus.mojo.license.api;
 
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.cache.FileTemplateLoader;
+import freemarker.cache.StringTemplateLoader;
 import freemarker.cache.TemplateLoader;
 import freemarker.ext.beans.BeansWrapper;
 import freemarker.template.Configuration;
@@ -40,11 +41,12 @@ import java.util.Map;
  * A helper to deal with freemarker templating.
  *
  * @author tchemit <chemit@codelutin.com>
- * @plexus.component role="org.codehaus.mojo.license.api.FreeMarkerHelper" role-hint="default"
  * @since 1.1
  */
 public class FreeMarkerHelper
 {
+
+    public static final String TEMPLATE = "template";
 
     /**
      * Shared freemarker configuration.
@@ -53,14 +55,39 @@ public class FreeMarkerHelper
      */
     protected final Configuration freemarkerConfiguration;
 
-    protected final TemplateLoader classLoader;
+    protected final TemplateLoader templateLoader;
 
-    public FreeMarkerHelper()
+    /**
+     * @return a default helper, if template is a file, then will use it as it, otherwise will have a look into
+     * classloader in current package.
+     */
+    public static FreeMarkerHelper newDefaultHelper()
     {
-        freemarkerConfiguration = new Configuration();
+        ClassTemplateLoader templateLoader = new ClassTemplateLoader( FreeMarkerHelper.class, "/" );
+        FreeMarkerHelper result = new FreeMarkerHelper( templateLoader );
+        return result;
+    }
 
-        classLoader = new ClassTemplateLoader( getClass(), "/" );
-        freemarkerConfiguration.setTemplateLoader( classLoader );
+    /**
+     *
+     * @param stringTemplate
+     * @return a helper, if template is a file, then will use it as it, otherwise will use the given template
+     */
+    public static FreeMarkerHelper newHelperFromContent( String stringTemplate )
+    {
+
+        StringTemplateLoader templateLoader = new StringTemplateLoader();
+        templateLoader.putTemplate( TEMPLATE, stringTemplate );
+
+        FreeMarkerHelper result = new FreeMarkerHelper( templateLoader );
+        return result;
+    }
+
+    protected FreeMarkerHelper( TemplateLoader templateLoader )
+    {
+        this.templateLoader = templateLoader;
+        freemarkerConfiguration = new Configuration();
+        freemarkerConfiguration.setTemplateLoader( templateLoader );
         BeansWrapper objectWrapper = new DefaultObjectWrapper();
         freemarkerConfiguration.setObjectWrapper( objectWrapper );
     }
@@ -81,7 +108,7 @@ public class FreeMarkerHelper
         {
 
             // just use the classloader
-            freemarkerConfiguration.setTemplateLoader( classLoader );
+            freemarkerConfiguration.setTemplateLoader( templateLoader );
         }
         Template template = freemarkerConfiguration.getTemplate( templateName );
 

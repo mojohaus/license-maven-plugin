@@ -24,10 +24,14 @@ package org.codehaus.mojo.license;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.codehaus.mojo.license.api.FreeMarkerHelper;
 import org.codehaus.mojo.license.model.License;
 import org.codehaus.mojo.license.model.LicenseStore;
 
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Abstract mojo which using a {@link #licenseName} and owns a
@@ -74,6 +78,57 @@ public abstract class AbstractLicenseNameMojo
     @Parameter( property = "license.licenseName" )
     private String licenseName;
 
+    /**
+     * Name of project (or module).
+     * <p/>
+     * Will be used as description section of new header.
+     *
+     * @since 1.0
+     */
+    @Parameter( property = "license.projectName", defaultValue = "${project.name}", required = true )
+    protected String projectName;
+
+    /**
+     * Name of project's organization.
+     * <p/>
+     * Will be used as copyrigth's holder in new header.
+     *
+     * @since 1.0
+     */
+    @Parameter( property = "license.organizationName", defaultValue = "${project.organization.name}", required = true )
+    protected String organizationName;
+
+    /**
+     * Inception year of the project.
+     * <p/>
+     * Will be used as first year of copyright section in new header.
+     *
+     * @since 1.0
+     */
+    @Parameter( property = "license.inceptionYear", defaultValue = "${project.inceptionYear}", required = true )
+    protected String inceptionYear;
+
+    /**
+     * optional copyright owners.
+     * <p/>
+     * If not set, organizationName paramter will be used instead.
+     *
+     * @since 1.6
+     */
+    @Parameter( property = "license.copyrightOwners" )
+    protected String copyrightOwners;
+
+    /**
+     * optional extra templates parameters.
+     * <p/>
+     * If filled, they are available with prefix extra_ to process license content
+     * (says the header and license content).
+     *
+     * @since 1.6
+     */
+    @Parameter( property = "license.extraTemplateParameters" )
+    protected Map<String, String> extraTemplateParameters;
+
     // ----------------------------------------------------------------------
     // Private Fields
     // ----------------------------------------------------------------------
@@ -101,59 +156,94 @@ public abstract class AbstractLicenseNameMojo
     {
 
         // init licenses store
-        licenseStore = LicenseStore.createLicenseStore( getLog(), getLicenseResolver() );
+        licenseStore = LicenseStore.createLicenseStore( getLog(), licenseResolver );
 
         // check licenseName exists
         license = getLicense( licenseName, true );
+
+        if ( StringUtils.isBlank( copyrightOwners ) )
+        {
+            copyrightOwners = organizationName;
+        }
     }
 
     // ----------------------------------------------------------------------
-    // Public Methods
+    // Protected Methods
     // ----------------------------------------------------------------------
 
-    public License getLicense( String licenseName, boolean checkIfExists )
+    protected License getLicense( String licenseName, boolean checkIfExists )
     {
         if ( StringUtils.isEmpty( licenseName ) )
         {
             throw new IllegalArgumentException( "licenseName can not be null, nor empty" );
         }
-        LicenseStore licenseStore = getLicenseStore();
         if ( licenseStore == null )
         {
             throw new IllegalStateException( "No license store initialized!" );
         }
-        License license = licenseStore.getLicense( licenseName );
-        if ( checkIfExists && license == null )
+        License result = licenseStore.getLicense( licenseName );
+        if ( checkIfExists && result == null )
         {
             throw new IllegalArgumentException( "License named '" + licenseName + "' is unknown, use one of " +
                                                     Arrays.toString( licenseStore.getLicenseNames() ) );
         }
-        return license;
+        return result;
     }
 
-    public boolean isKeepBackup()
+    protected boolean isKeepBackup()
     {
         return keepBackup;
     }
 
-    public String getLicenseName()
+    protected String getLicenseName()
     {
         return licenseName;
     }
 
-    public String getLicenseResolver()
-    {
-        return licenseResolver;
-    }
-
-    public LicenseStore getLicenseStore()
-    {
-        return licenseStore;
-    }
-
-    public License getLicense()
+    protected License getLicense()
     {
         return license;
     }
 
+    protected String processLicenseContext( String licenseContent )
+        throws IOException
+    {
+        FreeMarkerHelper licenseFreeMarkerHelper = FreeMarkerHelper.newHelperFromContent( licenseContent );
+
+        Map<String, Object> templateParameters = new HashMap<String, Object>();
+
+        addPropertiesToContext( System.getProperties(), "env_", templateParameters );
+        addPropertiesToContext( getProject().getProperties(), "project_", templateParameters );
+
+        templateParameters.put( "project", getProject().getModel() );
+
+        templateParameters.put( "organizationName", organizationName );
+        templateParameters.put( "copyrightYear", inceptionYear );
+        templateParameters.put( "copyrightOwners", copyrightOwners );
+        templateParameters.put( "projectName", projectName );
+
+        if ( extraTemplateParameters != null )
+        {
+            addPropertiesToContext( extraTemplateParameters, "extra_", templateParameters );
+        }
+        String result = licenseFreeMarkerHelper.renderTemplate( FreeMarkerHelper.TEMPLATE, templateParameters );
+        return result;
+    }
+
+    // ----------------------------------------------------------------------
+    // Private Methods
+    // ----------------------------------------------------------------------
+
+    private void addPropertiesToContext( Map properties, String prefix, Map<String, Object> context )
+    {
+        if ( properties != null )
+        {
+            for ( Object o : properties.keySet() )
+            {
+                String nextKey = (String) o;
+                Object nextValue = properties.get( nextKey );
+                context.put( prefix + nextKey, nextValue.toString() );
+            }
+        }
+    }
 }

@@ -88,35 +88,35 @@ public abstract class AbstractFileHeaderMojo
     // Mojo Parameters
     // ----------------------------------------------------------------------
 
-    /**
-     * Name of project (or module).
-     * <p/>
-     * Will be used as description section of new header.
-     *
-     * @since 1.0
-     */
-    @Parameter( property = "license.projectName", defaultValue = "${project.name}", required = true )
-    protected String projectName;
+//    /**
+//     * Name of project (or module).
+//     * <p/>
+//     * Will be used as description section of new header.
+//     *
+//     * @since 1.0
+//     */
+//    @Parameter( property = "license.projectName", defaultValue = "${project.name}", required = true )
+//    protected String projectName;
 
-    /**
-     * Name of project's organization.
-     * <p/>
-     * Will be used as copyrigth's holder in new header.
-     *
-     * @since 1.0
-     */
-    @Parameter( property = "license.organizationName", defaultValue = "${project.organization.name}", required = true )
-    protected String organizationName;
-
-    /**
-     * Inception year of the project.
-     * <p/>
-     * Will be used as first year of copyright section in new header.
-     *
-     * @since 1.0
-     */
-    @Parameter( property = "license.inceptionYear", defaultValue = "${project.inceptionYear}", required = true )
-    protected String inceptionYear;
+//    /**
+//     * Name of project's organization.
+//     * <p/>
+//     * Will be used as copyrigth's holder in new header.
+//     *
+//     * @since 1.0
+//     */
+//    @Parameter( property = "license.organizationName", defaultValue = "${project.organization.name}", required = true )
+//    protected String organizationName;
+//
+//    /**
+//     * Inception year of the project.
+//     * <p/>
+//     * Will be used as first year of copyright section in new header.
+//     *
+//     * @since 1.0
+//     */
+//    @Parameter( property = "license.inceptionYear", defaultValue = "${project.inceptionYear}", required = true )
+//    protected String inceptionYear;
 
     /**
      * To overwrite the processStartTag used to build header model.
@@ -332,14 +332,6 @@ public abstract class AbstractFileHeaderMojo
     @Component( role = FileHeaderTransformer.class )
     private Map<String, FileHeaderTransformer> transformers;
 
-    /**
-     * Freemarker helper component.
-     *
-     * @since 1.0
-     */
-    @Component( role = FreeMarkerHelper.class )
-    private FreeMarkerHelper freeMarkerHelper;
-
     // ----------------------------------------------------------------------
     // Private fields
     // ----------------------------------------------------------------------
@@ -388,13 +380,20 @@ public abstract class AbstractFileHeaderMojo
      */
     private Map<String, List<File>> filesToTreateByCommentStyle;
 
+    /**
+     * Freemarker helper component.
+     *
+     * @since 1.0
+     */
+    private FreeMarkerHelper freeMarkerHelper = FreeMarkerHelper.newDefaultHelper();
+
     // ----------------------------------------------------------------------
     // Abstract Methods
     // ----------------------------------------------------------------------
 
     /**
      * @return {@code true} if mojo must be a simple dry run (says do not modifiy any scanned files),
-     *         {@code false} otherise.
+     * {@code false} otherise.
      */
     protected abstract boolean isDryRun();
 
@@ -1145,9 +1144,6 @@ public abstract class AbstractFileHeaderMojo
     {
         FileHeader defaultFileHeader = new FileHeader();
 
-        String licenseContent = license.getHeaderContent( encoding );
-        defaultFileHeader.setLicense( licenseContent );
-
         Calendar cal = Calendar.getInstance();
         cal.setTime( new Date() );
         Integer lastYear = cal.get( Calendar.YEAR );
@@ -1167,6 +1163,13 @@ public abstract class AbstractFileHeaderMojo
             defaultFileHeader.setCopyrightLastYear( lastYear );
         }
         defaultFileHeader.setCopyrightHolder( organizationName );
+
+        String licenseContent = license.getHeaderContent( encoding );
+        if ( license.isHeaderContentTemplateAware() )
+        {
+            licenseContent = processLicenseContext( licenseContent );
+        }
+        defaultFileHeader.setLicense( licenseContent );
         return defaultFileHeader;
     }
 

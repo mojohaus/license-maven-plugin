@@ -186,6 +186,10 @@ public class UpdateProjectLicenseMojo
         // obtain license content
         String licenseContent = license.getLicenseContent( getEncoding() );
 
+        if (license.isLicenseContentTemplateAware()) {
+
+            licenseContent = processLicenseContext( licenseContent );
+        }
         if ( doGenerate )
         {
 

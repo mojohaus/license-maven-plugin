@@ -54,7 +54,7 @@ public class FreeMarkerHelperTest
         throws Exception
     {
 
-        FreeMarkerHelper helper = new FreeMarkerHelper();
+        FreeMarkerHelper helper = FreeMarkerHelper.newDefaultHelper();
 
         LicenseMap licenseMap = new LicenseMap();
 
@@ -92,7 +92,7 @@ public class FreeMarkerHelperTest
         throws Exception
     {
 
-        FreeMarkerHelper helper = new FreeMarkerHelper();
+        FreeMarkerHelper helper = FreeMarkerHelper.newDefaultHelper();
 
         LicenseMap licenseMap = new LicenseMap();
 
@@ -131,7 +131,7 @@ public class FreeMarkerHelperTest
         throws Exception
     {
 
-        FreeMarkerHelper helper = new FreeMarkerHelper();
+        FreeMarkerHelper helper = FreeMarkerHelper.newDefaultHelper();
 
         MavenProject project = new MavenProject();
         project.setArtifact(

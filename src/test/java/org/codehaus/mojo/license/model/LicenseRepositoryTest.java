@@ -64,11 +64,41 @@ public class LicenseRepositoryTest
         {
             License license = repository.getLicense( licenseName );
             Assert.assertNotNull( license );
+            Assert.assertNotNull( license.getHeaderURL() );
+            Assert.assertNotNull( license.getLicenseURL() );
         }
 
         for ( String licenseName : repository.getLicenseNames() )
         {
             Assert.assertTrue( LicenseStoreTest.DEFAULT_LICENSES.contains( licenseName ) );
+        }
+    }
+
+    @Test
+    public void testUserRepository()
+        throws IOException
+    {
+
+        repository = new LicenseRepository();
+        URL baseURL = getClass().getResource( "/newRepository" );
+        repository.setBaseURL( baseURL );
+        repository.load();
+
+        License[] licenses = repository.getLicenses();
+        Assert.assertNotNull( licenses );
+        Assert.assertEquals( LicenseStoreTest.NEW_LICENSES.size(), licenses.length );
+
+        for ( String licenseName : LicenseStoreTest.NEW_LICENSES )
+        {
+            License license = repository.getLicense( licenseName );
+            Assert.assertNotNull( license );
+            Assert.assertNotNull( license.getHeaderURL() );
+            Assert.assertNotNull( license.getLicenseURL() );
+        }
+
+        for ( String licenseName : repository.getLicenseNames() )
+        {
+            Assert.assertTrue( LicenseStoreTest.NEW_LICENSES.contains( licenseName ) );
         }
     }
 }

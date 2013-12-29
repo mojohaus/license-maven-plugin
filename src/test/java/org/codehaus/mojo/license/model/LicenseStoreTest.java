@@ -44,7 +44,7 @@ public class LicenseStoreTest
         Arrays.asList( "agpl_v3", "apache_v2", "cddl_v1", "eupl_v1_1", "fdl_v1_3", "gpl_v1", "gpl_v2", "gpl_v3", "lgpl_v2_1",
                        "lgpl_v3", "mit" );
 
-    public static final List<String> NEW_LICENSES = Arrays.asList( "license1", "license2" );
+    public static final List<String> NEW_LICENSES = Arrays.asList( "license1", "license2", "license3", "license4" );
 
     protected LicenseStore store;
 
@@ -90,7 +90,7 @@ public class LicenseStoreTest
     }
 
     @Test
-    public void testOtherJarRepository()
+    public void testUserRepository()
         throws IOException
     {
 
@@ -110,7 +110,7 @@ public class LicenseStoreTest
         License[] licenses = store.getLicenses();
         Assert.assertNotNull( licenses );
         Assert.assertNotNull( licenses1 );
-        Assert.assertEquals( licenses1.length, 2 );
+        Assert.assertEquals( licenses1.length, 4 );
         Assert.assertEquals( licenses1.length, licenses.length );
 
         for ( String licenseName : NEW_LICENSES )
