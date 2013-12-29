@@ -2,8 +2,8 @@
 -- #%L
 -- License Test :: update-file-header
 --
--- $Id: test2.mysql 14735 2011-09-19 17:39:34Z tchemit $
--- $HeadURL: https://svn.codehaus.org/mojo/trunk/mojo/license-maven-plugin/src/it/update-file-header/test-mojo/child1/src/files/mysql/test2.mysql $
+-- $Id$
+-- $HeadURL$
 -- %%
 -- Copyright (C) 2012 License Test
 -- %%

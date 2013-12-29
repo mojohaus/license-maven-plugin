@@ -413,6 +413,7 @@
         </property>
       </activation>
       <build>
+        <defaultGoal>verify</defaultGoal>
         <plugins>
           <plugin>
             <artifactId>maven-invoker-plugin</artifactId>
