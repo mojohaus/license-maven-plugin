@@ -211,7 +211,7 @@ public abstract class AbstractAddThirdPartyMojo
     /**
      * A flag to sort artifact by name in the generated third-party file.
      *
-     * If not then artifacts are sorted by <pre>groupId:artifactId:version</pre>t
+     * If not then artifacts are sorted by <pre>groupId:artifactId:version</pre>
      *
      * @since 1.6
      */
