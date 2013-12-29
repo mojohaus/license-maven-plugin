@@ -126,7 +126,7 @@ public abstract class AbstractLicenseNameMojo
      *
      * @since 1.6
      */
-    @Parameter( property = "license.extraTemplateParameters" )
+    @Parameter
     protected Map<String, String> extraTemplateParameters;
 
     // ----------------------------------------------------------------------
@@ -222,10 +222,7 @@ public abstract class AbstractLicenseNameMojo
         templateParameters.put( "copyrightOwners", copyrightOwners );
         templateParameters.put( "projectName", projectName );
 
-        if ( extraTemplateParameters != null )
-        {
-            addPropertiesToContext( extraTemplateParameters, "extra_", templateParameters );
-        }
+        addPropertiesToContext( extraTemplateParameters, "extra_", templateParameters );
         String result = licenseFreeMarkerHelper.renderTemplate( FreeMarkerHelper.TEMPLATE, templateParameters );
         return result;
     }
