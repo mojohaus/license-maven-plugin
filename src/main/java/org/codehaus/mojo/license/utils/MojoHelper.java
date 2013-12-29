@@ -122,6 +122,24 @@ public class MojoHelper
 
     }
 
+    public static Comparator<MavenProject> newMavenProjectComparatorByName()
+    {
+        return new Comparator<MavenProject>()
+        {
+            /**
+             * {@inheritDoc}
+             */
+            public int compare( MavenProject o1, MavenProject o2 )
+            {
+
+                String id1 = getProjectName( o1 );
+                String id2 = getProjectName( o2 );
+                return id1.compareTo( id2 );
+            }
+        };
+
+    }
+
     protected static final double[] TIME_FACTORS = { 1000000, 1000, 60, 60, 24 };
 
     protected static final String[] TIME_UNITES = { "ns", "ms", "s", "m", "h", "d" };
@@ -203,6 +221,23 @@ public class MojoHelper
         sb.append( ")" );
 
         return sb.toString();
+    }
+
+    public static String getProjectName( MavenProject project )
+    {
+        String sb;
+        if ( project.getName().startsWith( "Unnamed" ) )
+        {
+
+            // as in Maven 3, let's use the artifact id
+            sb = project.getArtifactId();
+        }
+        else
+        {
+            sb = project.getName();
+        }
+
+        return sb;
     }
 
     public static List<String> getParams( String params )

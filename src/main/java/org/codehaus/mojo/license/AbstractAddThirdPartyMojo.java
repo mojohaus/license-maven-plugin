@@ -209,6 +209,16 @@ public abstract class AbstractAddThirdPartyMojo
     private boolean failIfWarning;
 
     /**
+     * A flag to sort artifact by name in the generated third-party file.
+     *
+     * If not then artifacts are sorted by <pre>groupId:artifactId:version</pre>t
+     *
+     * @since 1.6
+     */
+    @Parameter( property = "license.sortArtifactByName", defaultValue = "false" )
+    private boolean sortArtifactByName;
+
+    /**
      * Template used to build the third-party file.
      * <p/>
      * (This template use freemarker).
@@ -585,8 +595,12 @@ public abstract class AbstractAddThirdPartyMojo
         if ( doGenerate )
         {
 
-            thirdPartyTool.writeThirdPartyFile( getLicenseMap(), thirdPartyFile, isVerbose(), getEncoding(),
-                                                fileTemplate );
+            LicenseMap licenseMap1 = getLicenseMap();
+            if ( sortArtifactByName )
+            {
+                licenseMap1 = licenseMap.toLicenseMapOrderByName();
+            }
+            thirdPartyTool.writeThirdPartyFile( licenseMap1, thirdPartyFile, isVerbose(), getEncoding(), fileTemplate );
         }
 
         if ( doGenerateBundle )

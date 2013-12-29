@@ -119,4 +119,20 @@ public class LicenseMap
         tmp.clear();
         return result;
     }
+
+    public LicenseMap toLicenseMapOrderByName()
+    {
+        LicenseMap result = new LicenseMap();
+
+        Comparator<MavenProject> mavenProjectComparator = MojoHelper.newMavenProjectComparatorByName();
+        for ( Map.Entry<String, SortedSet<MavenProject>> entry : entrySet() )
+        {
+            String licenseKey = entry.getKey();
+            SortedSet<MavenProject> projects =
+                new TreeSet<MavenProject>( mavenProjectComparator );
+            projects.addAll( entry.getValue() );
+            result.put( licenseKey, projects );
+        }
+        return result;
+    }
 }

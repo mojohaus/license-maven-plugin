@@ -96,11 +96,20 @@ org.codehaus.mojo.license.test--test-add-third-party-global-db-misc-dep--1=The A
 
 * Change the format of the third-party file
 
-  Since version 1.1, it is possible to give a freemarker template (fill the
+  Since <<version 1.1>>, it is possible to give a freemarker template (fill the
   <<fileTemplate>> property of the mojo) to says how to generate the file.
 
   Have a look on existing templates :
   https://fisheye.codehaus.org/browse/mojo/trunk/mojo/license-maven-plugin/src/main/resources/org/codehaus/mojo/license
+
+* Change artifacts order
+
+  Since <<version 1.6>>, you can let artifacts order by the groupId:artifactId:version,
+  or choose to sort them by their name (set for that property <<sortArtifactByName>> to <<true>><)
+
++-----------------+
+  <sortArtifactByName>true</sortArtifactByName>
++-----------------+
 
 * How to consolidate the THIRD-PARTY file
 
