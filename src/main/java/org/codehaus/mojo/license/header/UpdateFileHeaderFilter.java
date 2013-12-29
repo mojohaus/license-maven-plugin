@@ -23,14 +23,15 @@ package org.codehaus.mojo.license.header;
  */
 
 import org.codehaus.mojo.license.header.transformer.FileHeaderTransformer;
+import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * Implementation of {@link FileHeaderFilter} to update an incoming header.
  *
  * @author tchemit <chemit@codelutin.com>
- * @plexus.component role="org.codehaus.mojo.license.header.FileHeaderFilter" role-hint="update-file-header"
  * @since 1.0
  */
+@Component( role= FileHeaderFilter.class, hint = "update-file-header" )
 public class UpdateFileHeaderFilter
     extends FileHeaderFilter
 {

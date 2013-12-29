@@ -38,6 +38,8 @@ import org.codehaus.mojo.license.model.LicenseMap;
 import org.codehaus.mojo.license.utils.FileUtil;
 import org.codehaus.mojo.license.utils.MojoHelper;
 import org.codehaus.mojo.license.utils.SortedProperties;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
 
@@ -64,8 +66,8 @@ import java.util.regex.Pattern;
  *
  * @author <a href="mailto:tchemit@codelutin.com">Tony Chemit</a>
  * @version $Id$
- * @plexus.component role="org.codehaus.mojo.license.api.ThirdPartyTool" role-hint="default"
  */
+@Component( role = ThirdPartyTool.class, hint = "default" )
 public class DefaultThirdPartyTool
     extends AbstractLogEnabled
     implements ThirdPartyTool
@@ -99,23 +101,20 @@ public class DefaultThirdPartyTool
 
     /**
      * The component that is used to resolve additional artifacts required.
-     *
-     * @plexus.requirement
      */
+    @Requirement
     private ArtifactResolver artifactResolver;
 
     /**
      * The component used for creating artifact instances.
-     *
-     * @plexus.requirement
      */
+    @Requirement
     private ArtifactFactory artifactFactory;
 
     /**
      * Maven ProjectHelper.
-     *
-     * @plexus.requirement
      */
+    @Requirement
     private MavenProjectHelper projectHelper;
 
     /**

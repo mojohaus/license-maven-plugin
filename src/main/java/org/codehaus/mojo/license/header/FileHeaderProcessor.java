@@ -23,6 +23,7 @@ package org.codehaus.mojo.license.header;
  */
 
 import org.codehaus.mojo.license.header.transformer.FileHeaderTransformer;
+import org.codehaus.plexus.component.annotations.Component;
 import org.nuiton.processor.Processor;
 
 import java.io.File;
@@ -34,9 +35,9 @@ import java.io.IOException;
  * File header processor.
  *
  * @author tchemit <chemit@codelutin.com>
- * @plexus.component role="org.nuiton.processor.Processor" role-hint="file-header"
  * @since 1.0
  */
+@Component( role = Processor.class, hint = "file-header" )
 public class FileHeaderProcessor
     extends Processor
 {

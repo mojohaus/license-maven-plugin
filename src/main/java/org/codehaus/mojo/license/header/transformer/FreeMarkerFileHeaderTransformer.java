@@ -22,13 +22,15 @@ package org.codehaus.mojo.license.header.transformer;
  * #L%
  */
 
+import org.codehaus.plexus.component.annotations.Component;
+
 /**
  * Implementation of {@link FileHeaderTransformer} for freemarker format.
  *
  * @author tchemit <chemit@codelutin.com>
- * @plexus.component role-hint="ftl"
  * @since 1.0
  */
+@Component( role = FileHeaderTransformer.class, hint = "ftl" )
 public class FreeMarkerFileHeaderTransformer
     extends AbstractFileHeaderTransformer
 {

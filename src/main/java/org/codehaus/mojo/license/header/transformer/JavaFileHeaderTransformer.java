@@ -22,13 +22,15 @@ package org.codehaus.mojo.license.header.transformer;
  * #L%
  */
 
+import org.codehaus.plexus.component.annotations.Component;
+
 /**
  * Implementation of {@link FileHeaderTransformer} for java format.
  *
  * @author tchemit <chemit@codelutin.com>
- * @plexus.component role-hint="java"
  * @since 1.0
  */
+@Component( role = FileHeaderTransformer.class, hint = "java" )
 public class JavaFileHeaderTransformer
     extends AbstractFileHeaderTransformer
 {

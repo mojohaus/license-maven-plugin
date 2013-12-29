@@ -22,13 +22,15 @@ package org.codehaus.mojo.license.header.transformer;
  * #L%
  */
 
+import org.codehaus.plexus.component.annotations.Component;
+
 /**
  * Implementation of {@link FileHeaderTransformer} for jsp format.
  *
  * @author tchemit <chemit@codelutin.com>
- * @plexus.component role-hint="jsp"
  * @since 1.0
  */
+@Component( role = FileHeaderTransformer.class, hint = "jsp" )
 public class JspFileHeaderTransformer
     extends AbstractFileHeaderTransformer
 {

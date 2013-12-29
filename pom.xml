@@ -30,7 +30,6 @@
     <relativePath>../mojo-parent/pom.xml</relativePath>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.codehaus.mojo</groupId>
   <artifactId>license-maven-plugin</artifactId>
   <packaging>maven-plugin</packaging>
   <name>License Maven Plugin</name>
@@ -127,10 +126,11 @@
     <licensePluginVersion>1.6-SNAPSHOT</licensePluginVersion>
 
     <pluginPluginVersion>3.2</pluginPluginVersion>
-    <sitePluginVersion>3.2</sitePluginVersion>
+    <sitePluginVersion>3.3</sitePluginVersion>
     <invokerPluginVersion>1.8</invokerPluginVersion>
     <javadocPluginVersion>2.9</javadocPluginVersion>
 
+    <plexusComponentVersion>1.5.5</plexusComponentVersion>
   </properties>
 
   <dependencies>
@@ -231,6 +231,12 @@
 
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-component-annotations</artifactId>
+      <version>${plexusComponentVersion}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
       <version>3.0.10</version>
     </dependency>
@@ -305,18 +311,7 @@
           </execution>
         </executions>
       </plugin>
-      <plugin>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>create-component-descriptor</id>
-            <goals>
-              <goal>descriptor</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
+
       <plugin>
         <artifactId>maven-plugin-plugin</artifactId>
         <executions>
@@ -370,7 +365,7 @@
         <plugin>
           <groupId>org.codehaus.plexus</groupId>
           <artifactId>plexus-component-metadata</artifactId>
-          <version>1.5.5</version>
+          <version>${plexusComponentVersion}</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -387,7 +382,7 @@
               <tagletArtifact>
                 <groupId>org.codehaus.plexus</groupId>
                 <artifactId>plexus-component-javadoc</artifactId>
-                <version>1.5.5</version>
+                <version>${plexusComponentVersion}</version>
               </tagletArtifact>
             </tagletArtifacts>
           </configuration>
@@ -514,7 +509,7 @@
                 <tagletArtifact>
                   <groupId>org.codehaus.plexus</groupId>
                   <artifactId>plexus-component-javadoc</artifactId>
-                  <version>1.5.5</version>
+                  <version>${plexusComponentVersion}</version>
                 </tagletArtifact>
               </tagletArtifacts>
             </configuration>

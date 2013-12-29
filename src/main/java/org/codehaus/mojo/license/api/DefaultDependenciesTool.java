@@ -30,6 +30,8 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.codehaus.mojo.license.utils.MojoHelper;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
 
@@ -46,9 +48,9 @@ import java.util.regex.PatternSyntaxException;
  *
  * @author tchemit <chemit@codelutin.com>
  * @version $Id$
- * @plexus.component role="org.codehaus.mojo.license.api.DependenciesTool" role-hint="default"
  * @since 1.0
  */
+@Component( role = DependenciesTool.class, hint = "default" )
 public class DefaultDependenciesTool
     extends AbstractLogEnabled
     implements DependenciesTool
@@ -62,9 +64,8 @@ public class DefaultDependenciesTool
 
     /**
      * Project builder.
-     *
-     * @plexus.requirement
      */
+    @Requirement
     private MavenProjectBuilder mavenProjectBuilder;
 
     /**

@@ -22,13 +22,15 @@ package org.codehaus.mojo.license.header.transformer;
  * #L%
  */
 
+import org.codehaus.plexus.component.annotations.Component;
+
 /**
  * Implementation of {@link FileHeaderTransformer} for xml format.
  *
  * @author tchemit <chemit@codelutin.com>
- * @plexus.component role-hint="xml"
  * @since 1.0
  */
+@Component( role = FileHeaderTransformer.class, hint = "xml" )
 public class XmlFileHeaderTransformer
     extends AbstractFileHeaderTransformer
 {

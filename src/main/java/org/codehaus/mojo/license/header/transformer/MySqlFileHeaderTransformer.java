@@ -1,5 +1,7 @@
 package org.codehaus.mojo.license.header.transformer;
 
+import org.codehaus.plexus.component.annotations.Component;
+
 /**
  * Implementation of {@link FileHeaderTransformer} for mysql format.
  * <p/>
@@ -7,9 +9,9 @@ package org.codehaus.mojo.license.header.transformer;
  * (see http://jira.codehaus.org/browse/MLICENSE-56) for more informations about the problem.
  *
  * @author tchemit <chemit@codelutin.com>
- * @plexus.component role-hint="mysql"
  * @since 1.4
  */
+@Component( role = FileHeaderTransformer.class, hint = "mysql" )
 public class MySqlFileHeaderTransformer
     extends AbstractFileHeaderTransformer
 {
