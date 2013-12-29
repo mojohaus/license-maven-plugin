@@ -119,9 +119,9 @@ public class DefaultThirdPartyTool
     private MavenProjectHelper projectHelper;
 
     /**
-     * @plexus.requirement
+     * freeMarker helper.
      */
-    private FreeMarkerHelper freeMarkerHelper;
+    private FreeMarkerHelper freeMarkerHelper = FreeMarkerHelper.newDefaultHelper();
 
     /**
      * Maven project comparator.
