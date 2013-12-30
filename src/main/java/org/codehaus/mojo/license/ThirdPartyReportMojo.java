@@ -120,7 +120,7 @@ public class ThirdPartyReportMojo
      *
      * @since 1.1
      */
-    @Parameter( defaultValue = "true" )
+    @Parameter( property = "license.includeTransitiveDependencies", defaultValue = "true" )
     private boolean includeTransitiveDependencies;
 
     /**
