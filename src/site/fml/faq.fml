@@ -61,5 +61,44 @@
             </p>
           </answer>
         </faq>
+    <faq id="properties_files">
+    <question>How to deal with hardcoded encoding ISO-8859-1 for properties files when 
+    updating file headers?</question>
+    <answer>
+    <p>
+    Even if in modern JDK (since 1.6), there is a support for UTF-8 encoding on properties files,
+    encoding ISO-8859-1 is still used on thoses files.
+    </p>
+    To keep this encoding for thoses files, you need then to execute twice the update-file-header plugin like this:
+    <pre>
+      &lt;plugin&gt;
+        &lt;groupId&gt;org.codehaus.mojo&lt;/groupId&gt;
+        &lt;artifactId&gt;license-maven-plugin&lt;/artifactId&gt;
+        &lt;executions&gt;
+          &lt;execution&gt;
+            &lt;id&gt;update-file-header-UTF-8&lt;/id&gt;
+            &lt;goals&gt;&lt;goal&gt;update-file-header&lt;/goal&gt;&lt;/goals&gt;
+            &lt;configuration&gt;
+              &lt;excludes&gt;
+                &lt;exclude&gt;**/*.properties&lt;/exclude&gt;
+              &lt;/excludes&gt;
+              &lt;encoding&gt;UTF-8&lt;/encoding&gt;
+            &lt;/configuration&gt;
+          &lt;/execution&gt;
+          &lt;execution&gt;
+            &lt;id&gt;update-file-header-ISO-8859-1&lt;/id&gt;
+            &lt;goals&gt;&lt;goal&gt;update-file-header&lt;/goal&gt;&lt;/goals&gt;
+            &lt;configuration&gt;
+              &lt;includes&gt;
+                &lt;include&gt;**/*.properties&lt;/include&gt;
+              &lt;/includes&gt;
+              &lt;encoding&gt;UTF-8&lt;/encoding&gt;
+            &lt;/configuration&gt;
+          &lt;/execution&gt;
+        &lt;/executions&gt;
+      &lt;/plugin&gt;
+    </pre>
+    </answer>
+    </faq>
   </part>
 </faqs>
