@@ -105,7 +105,7 @@ org.codehaus.mojo.license.test--test-add-third-party-global-db-misc-dep--1=The A
 * Change artifacts order
 
   Since <<version 1.6>>, you can let artifacts order by the groupId:artifactId:version,
-  or choose to sort them by their name (set for that property <<sortArtifactByName>> to <<true>><)
+  or choose to sort them by their name (set for that property <<sortArtifactByName>> to <<true>>)
 
 +-----------------+
   <sortArtifactByName>true</sortArtifactByName>
