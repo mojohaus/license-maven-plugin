@@ -43,7 +43,8 @@ import java.util.Arrays;
  * @since 1.0
  */
 public abstract class AbstractLicenseMojo
-        extends AbstractMojo {
+    extends AbstractMojo
+{
 
     // ----------------------------------------------------------------------
     // Mojo Parameters
@@ -57,7 +58,7 @@ public abstract class AbstractLicenseMojo
      *
      * @since 1.0
      */
-    @Parameter(property = "license.verbose", defaultValue = "${maven.verbose}")
+    @Parameter( property = "license.verbose", defaultValue = "${maven.verbose}" )
     private boolean verbose;
 
     /**
@@ -68,7 +69,7 @@ public abstract class AbstractLicenseMojo
      *
      * @since 1.0
      */
-    @Parameter(property = "license.encoding", defaultValue = "${project.build.sourceEncoding}")
+    @Parameter( property = "license.encoding", defaultValue = "${project.build.sourceEncoding}" )
     private String encoding;
 
     // ----------------------------------------------------------------------
@@ -113,7 +114,7 @@ public abstract class AbstractLicenseMojo
      * @throws Exception if any
      */
     protected abstract void init()
-            throws Exception;
+        throws Exception;
 
     /**
      * Do plugin action.
@@ -127,16 +128,20 @@ public abstract class AbstractLicenseMojo
      * @throws Exception if any
      */
     protected abstract void doAction()
-            throws Exception;
+        throws Exception;
 
     // ----------------------------------------------------------------------
     // Mojo Implementation
     // ----------------------------------------------------------------------
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public final void execute()
-            throws MojoExecutionException, MojoFailureException {
-        try {
+        throws MojoExecutionException, MojoFailureException
+    {
+        try
+        {
             if ( getLog().isDebugEnabled() )
             {
                 // always be verbose in debug mode
@@ -214,7 +219,9 @@ public abstract class AbstractLicenseMojo
                 throw new MojoExecutionException(
                     "could not execute goal " + getClass().getSimpleName() + " for reason : " + e.getMessage(), e );
             }
-        } finally {
+        }
+        finally
+        {
             afterExecute();
         }
     }
@@ -223,8 +230,11 @@ public abstract class AbstractLicenseMojo
     // Public Methods
     // ----------------------------------------------------------------------
 
-    /** @return the enconding used to read and write files. */
-    public final String getEncoding() {
+    /**
+     * @return the enconding used to read and write files.
+     */
+    public final String getEncoding()
+    {
         return encoding;
     }
 
@@ -233,17 +243,24 @@ public abstract class AbstractLicenseMojo
      *
      * @param encoding new encodnignt ing to use
      */
-    public final void setEncoding(String encoding) {
+    public final void setEncoding( String encoding )
+    {
         this.encoding = encoding;
     }
 
-    /** @return the current maven project */
-    public final MavenProject getProject() {
+    /**
+     * @return the current maven project
+     */
+    public final MavenProject getProject()
+    {
         return project;
     }
 
-    /** @return {@code true} if verbose flag is on, {@code false} otherwise */
-    public final boolean isVerbose() {
+    /**
+     * @return {@code true} if verbose flag is on, {@code false} otherwise
+     */
+    public final boolean isVerbose()
+    {
         return verbose;
     }
 
@@ -252,17 +269,24 @@ public abstract class AbstractLicenseMojo
      *
      * @param verbose new value to set
      */
-    public final void setVerbose(boolean verbose) {
+    public final void setVerbose( boolean verbose )
+    {
         this.verbose = verbose;
     }
 
-    /** @return the {@link MavenSession}. */
-    public final MavenSession getSession() {
+    /**
+     * @return the {@link MavenSession}.
+     */
+    public final MavenSession getSession()
+    {
         return session;
     }
 
-    /** @return the build timestamp (used to have a unique timestamp all over a build). */
-    public final long getBuildTimestamp() {
+    /**
+     * @return the build timestamp (used to have a unique timestamp all over a build).
+     */
+    public final long getBuildTimestamp()
+    {
         return session.getStartTime().getTime();
     }
 
@@ -270,8 +294,11 @@ public abstract class AbstractLicenseMojo
     // Protected Methods
     // ----------------------------------------------------------------------
 
-    /** A call back to execute after the {@link #execute()} is done. */
-    protected void afterExecute() {
+    /**
+     * A call back to execute after the {@link #execute()} is done.
+     */
+    protected void afterExecute()
+    {
         // by default do nothing
     }
 
@@ -292,9 +319,10 @@ public abstract class AbstractLicenseMojo
      * {@link #rejectPackaging(String...)}
      *
      * @return {@code true} if can execute the goal for the packaging of the
-     *         project, {@code false} otherwise.
+     * project, {@code false} otherwise.
      */
-    protected boolean checkPackaging() {
+    protected boolean checkPackaging()
+    {
         // by default, accept every type of packaging
         return true;
     }
@@ -304,7 +332,8 @@ public abstract class AbstractLicenseMojo
      *
      * @return {@code false} if the mojo should not be executed.
      */
-    protected boolean checkSkip() {
+    protected boolean checkSkip()
+    {
         // by default, never skip goal
         return true;
     }
@@ -315,11 +344,14 @@ public abstract class AbstractLicenseMojo
      * @param packages the accepted packaging
      * @return {@code true} if the project's packaging is one of the given ones.
      */
-    protected boolean acceptPackaging(String... packages) {
+    protected boolean acceptPackaging( String... packages )
+    {
         String projectPackaging = getProject().getPackaging();
 
-        for (String p : packages) {
-            if (p.equals(projectPackaging)) {
+        for ( String p : packages )
+        {
+            if ( p.equals( projectPackaging ) )
+            {
                 // accept packaging
                 return true;
             }
@@ -334,11 +366,14 @@ public abstract class AbstractLicenseMojo
      * @param packages the rejecting packagings
      * @return {@code true} if the project's packaging is not in the given ones.
      */
-    protected boolean rejectPackaging(String... packages) {
+    protected boolean rejectPackaging( String... packages )
+    {
         String projectPackaging = getProject().getPackaging();
 
-        for (String p : packages) {
-            if (p.equals(projectPackaging)) {
+        for ( String p : packages )
+        {
+            if ( p.equals( projectPackaging ) )
+            {
                 // reject this packaging
                 return false;
             }
@@ -353,15 +388,18 @@ public abstract class AbstractLicenseMojo
      * If no encoding was filled, then use the default for system
      * (via {@code file.encoding} environement property).
      */
-    protected void checkEncoding() {
+    protected void checkEncoding()
+    {
 
-        if (isVerbose()) {
-            getLog().info("Will check encoding : " + getEncoding());
+        if ( isVerbose() )
+        {
+            getLog().info( "Will check encoding : " + getEncoding() );
         }
-        if (StringUtils.isEmpty(getEncoding())) {
-            getLog().warn("File encoding has not been set, using platform encoding " + ReaderFactory.FILE_ENCODING +
-                          ", i.e. build is platform dependent!");
-            setEncoding(ReaderFactory.FILE_ENCODING);
+        if ( StringUtils.isEmpty( getEncoding() ) )
+        {
+            getLog().warn( "File encoding has not been set, using platform encoding " + ReaderFactory.FILE_ENCODING +
+                               ", i.e. build is platform dependent!" );
+            setEncoding( ReaderFactory.FILE_ENCODING );
         }
     }
 
@@ -372,16 +410,21 @@ public abstract class AbstractLicenseMojo
      * @param dir      the new resource location to add
      * @param includes files to include
      */
-    protected void addResourceDir(File dir, String... includes) {
-        boolean added = MojoHelper.addResourceDir(dir, getProject(), includes);
-        if (added && isVerbose()) {
-            getLog().info("add resource " + dir + " with includes " + Arrays.toString(includes));
+    protected void addResourceDir( File dir, String... includes )
+    {
+        boolean added = MojoHelper.addResourceDir( dir, getProject(), includes );
+        if ( added && isVerbose() )
+        {
+            getLog().info( "add resource " + dir + " with includes " + Arrays.toString( includes ) );
         }
     }
 
-    /** @return {@code true} if project is not a pom, {@code false} otherwise. */
-    protected boolean hasClassPath() {
-        return rejectPackaging("pom");
+    /**
+     * @return {@code true} if project is not a pom, {@code false} otherwise.
+     */
+    protected boolean hasClassPath()
+    {
+        return rejectPackaging( "pom" );
     }
 
 }
