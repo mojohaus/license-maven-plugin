@@ -22,6 +22,8 @@ package org.codehaus.mojo.license.header;
  * #L%
  */
 
+import org.codehaus.mojo.license.model.Copyright;
+
 /**
  * Contract of a file header.
  * <p/>
@@ -42,30 +44,14 @@ public class FileHeader
 {
 
     /**
-     * Copyright to string format.
-     */
-    protected static final String COPYRIGHT_TO_STRING_FORMAT = "Copyright (C) %1$s %2$s";
-
-    /**
      * Description of the project or module to add in header.
      */
     protected String description;
 
     /**
-     * Copyright holder.
+     * Copyright model.
      */
-    protected String copyrightHolder;
-
-    /**
-     * Copyright first year of application.
-     */
-    protected Integer copyrightFirstYear;
-
-    /**
-     * Copyright last year of application (can be nullif copyright is
-     * only on one year).
-     */
-    protected Integer copyrightLastYear;
+    protected Copyright copyright = new Copyright();
 
     /**
      * License used in the header.
@@ -74,7 +60,7 @@ public class FileHeader
 
     /**
      * @return the project name, or nay other common informations for all
-     *         files of a project (or module)
+     * files of a project (or module)
      */
     public String getDescription()
     {
@@ -82,92 +68,30 @@ public class FileHeader
     }
 
     /**
-     * @return the copyright holder
+     * @return the copyright model.
      */
-    public String getCopyrightHolder()
+    public Copyright getCopyright()
     {
-        return copyrightHolder;
-    }
-
-    /**
-     * @return the first year of the copyright
-     */
-    public Integer getCopyrightFirstYear()
-    {
-        return copyrightFirstYear;
-    }
-
-    /**
-     * @return the last year of the copyright (if copyright affects only one
-     *         year, can be equals to the {@link #getCopyrightFirstYear()}).
-     */
-    public Integer getCopyrightLastYear()
-    {
-        return copyrightLastYear;
-    }
-
-    /**
-     * Produces a string representation of the copyright.
-     * <p/>
-     * If copyright acts on one year :
-     * <pre>
-     * Copyright (C) 2010 Holder
-     * </pre>
-     * <p/>
-     * If copyright acts on more than one year :
-     * <pre>
-     * Copyright (C) 2010 - 2012 Holder
-     * </pre>
-     *
-     * @return the String representation of the copyright
-     */
-    public String getCopyright()
-    {
-        String copyright;
-        if ( getCopyrightLastYear() == null )
-        {
-
-            // copyright on one year
-            copyright = String.format( COPYRIGHT_TO_STRING_FORMAT, getCopyrightFirstYear(), getCopyrightHolder() );
-        }
-        else
-        {
-
-            // copyright on more than one year
-            copyright =
-                String.format( COPYRIGHT_TO_STRING_FORMAT, getCopyrightFirstYear() + " - " + getCopyrightLastYear(),
-                               getCopyrightHolder() );
-        }
         return copyright;
     }
 
     /**
      * @return the license content (this is not the fully license content,
-     *         but just a per file license resume)
+     * but just a per file license resume)
      */
     public String getLicense()
     {
         return license;
     }
 
+    public void setCopyright( Copyright copyright )
+    {
+        this.copyright = copyright;
+    }
+
     public void setDescription( String description )
     {
         this.description = description;
-    }
-
-    public void setCopyrightHolder( String copyrightHolder )
-    {
-        this.copyrightHolder = copyrightHolder;
-    }
-
-    public void setCopyrightFirstYear( Integer copyrightFirstYear )
-    {
-        this.copyrightFirstYear = copyrightFirstYear;
-    }
-
-    public void setCopyrightLastYear( Integer copyrightLastYear )
-    {
-        this.copyrightLastYear = copyrightLastYear;
     }
 
     public void setLicense( String license )

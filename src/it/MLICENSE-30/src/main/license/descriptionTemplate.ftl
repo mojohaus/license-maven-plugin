@@ -7,7 +7,7 @@
  - inceptionYear
  - file current file to treat
 -->
-${file.name} - ${projectName} - ${organizationName} - ${inceptionYear}
+${file.name} - ${projectName} - ${organizationName} - ${inceptionYear?c}
 ${project.groupId}-${project.artifactId}-${project.version}
 <#if addSvnKeyWords>
 <#--Add svn Keywords-->

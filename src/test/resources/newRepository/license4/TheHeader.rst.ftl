@@ -1,1 +1,1 @@
-The header4! ${organizationName} ${copyrightYear}, ${copyrightOwners}
+The header4! ${organizationName} ${copyright.years}, ${copyright.holder}

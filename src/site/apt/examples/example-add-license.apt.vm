@@ -211,7 +211,11 @@ Public License instead of this License.  But first, please read
   project (maven project)
   projectName (plugin projectName parameter)
   organizationName (plugin organizationName parameter)
-  copyrightYear (plugin inceptionYear parameter)
-  copyrightOwners (plugin copyrightOwners parameter)
+  copyright.firstYear (plugin inceptionYear parameter) (*)
+  copyright.lastYear (computed currentYear (or null if equals to firstYear)) (*)
+  copyright.years (computed years range (if lastYear different from firstYear))
+  copyright.holder (plugin copyrightOwners or organizationName parameter)
   extraTemplateParameters (plugin extraTemplateParameters parameter with prefix extra_)
 +----------
+
+ (*) This are numbers, so use the <?c> to not have a localized representation of the number.

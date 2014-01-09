@@ -36,6 +36,7 @@ import org.codehaus.mojo.license.header.InvalideFileHeaderException;
 import org.codehaus.mojo.license.header.UpdateFileHeaderFilter;
 import org.codehaus.mojo.license.header.transformer.FileHeaderTransformer;
 import org.codehaus.mojo.license.header.transformer.JavaFileHeaderTransformer;
+import org.codehaus.mojo.license.model.Copyright;
 import org.codehaus.mojo.license.model.License;
 import org.codehaus.mojo.license.utils.FileUtil;
 import org.codehaus.mojo.license.utils.MojoHelper;
@@ -47,9 +48,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -87,36 +86,6 @@ public abstract class AbstractFileHeaderMojo
     // ----------------------------------------------------------------------
     // Mojo Parameters
     // ----------------------------------------------------------------------
-
-//    /**
-//     * Name of project (or module).
-//     * <p/>
-//     * Will be used as description section of new header.
-//     *
-//     * @since 1.0
-//     */
-//    @Parameter( property = "license.projectName", defaultValue = "${project.name}", required = true )
-//    protected String projectName;
-
-//    /**
-//     * Name of project's organization.
-//     * <p/>
-//     * Will be used as copyrigth's holder in new header.
-//     *
-//     * @since 1.0
-//     */
-//    @Parameter( property = "license.organizationName", defaultValue = "${project.organization.name}", required = true )
-//    protected String organizationName;
-//
-//    /**
-//     * Inception year of the project.
-//     * <p/>
-//     * Will be used as first year of copyright section in new header.
-//     *
-//     * @since 1.0
-//     */
-//    @Parameter( property = "license.inceptionYear", defaultValue = "${project.inceptionYear}", required = true )
-//    protected String inceptionYear;
 
     /**
      * To overwrite the processStartTag used to build header model.
@@ -1144,25 +1113,33 @@ public abstract class AbstractFileHeaderMojo
     {
         FileHeader defaultFileHeader = new FileHeader();
 
-        Calendar cal = Calendar.getInstance();
-        cal.setTime( new Date() );
-        Integer lastYear = cal.get( Calendar.YEAR );
-        Integer firstYear;
         if ( inceptionYear == null )
         {
             getLog().warn( "No inceptionYear defined (will use current year)" );
-            firstYear = lastYear;
         }
-        else
-        {
-            firstYear = Integer.valueOf( inceptionYear );
-        }
-        defaultFileHeader.setCopyrightFirstYear( firstYear );
-        if ( firstYear < lastYear )
-        {
-            defaultFileHeader.setCopyrightLastYear( lastYear );
-        }
-        defaultFileHeader.setCopyrightHolder( organizationName );
+
+        Copyright copyright = getCopyright( organizationName );
+        defaultFileHeader.setCopyright( copyright );
+
+//        Calendar cal = Calendar.getInstance();
+//        cal.setTime( new Date() );
+//        Integer lastYear = cal.get( Calendar.YEAR );
+//        Integer firstYear;
+//        if ( inceptionYear == null )
+//        {
+//            getLog().warn( "No inceptionYear defined (will use current year)" );
+//            firstYear = lastYear;
+//        }
+//        else
+//        {
+//            firstYear = Integer.valueOf( inceptionYear );
+//        }
+//        defaultFileHeader.setCopyrightFirstYear( firstYear );
+//        if ( firstYear < lastYear )
+//        {
+//            defaultFileHeader.setCopyrightLastYear( lastYear );
+//        }
+//        defaultFileHeader.setCopyrightHolder( organizationName );
 
         String licenseContent = license.getHeaderContent( encoding );
         if ( license.isHeaderContentTemplateAware() )
@@ -1191,8 +1168,11 @@ public abstract class AbstractFileHeaderMojo
         descriptionParameters.put( "organizationName", organizationName );
         descriptionParameters.put( "file", file );
 
+        getLog().debug( "Description parameters:" + descriptionParameters );
+
         String description = freeMarkerHelper.renderTemplate( descriptionTemplate0, descriptionParameters );
         header.setDescription( description );
+        getLog().debug( "Computed description: " + description );
         filter.resetContent();
 
         if ( getLog().isDebugEnabled() )

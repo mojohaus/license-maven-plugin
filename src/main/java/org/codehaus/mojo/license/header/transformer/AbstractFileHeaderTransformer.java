@@ -24,6 +24,7 @@ package org.codehaus.mojo.license.header.transformer;
 
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.mojo.license.header.FileHeader;
+import org.codehaus.mojo.license.model.Copyright;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -272,21 +273,19 @@ public abstract class AbstractFileHeaderTransformer
         model.setDescription( description );
 
         // second section is the copyright
-        String copyright = sections[1].trim();
-        Matcher matcher = COPYRIGHT_PATTERN.matcher( copyright );
+        String copyrightModel = sections[1].trim();
+        Matcher matcher = COPYRIGHT_PATTERN.matcher( copyrightModel );
         if ( !matcher.matches() )
         {
-            throw new IllegalStateException( "copyright [" + copyright + "] is not valid" );
+            throw new IllegalStateException( "copyright [" + copyrightModel + "] is not valid" );
         }
         String firstYear = matcher.group( 2 );
         String lastYear = matcher.group( 4 );
         String holder = matcher.group( 5 );
-        model.setCopyrightFirstYear( Integer.valueOf( firstYear.trim() ) );
-        if ( lastYear != null )
-        {
-            model.setCopyrightLastYear( Integer.valueOf( lastYear.trim() ) );
-        }
-        model.setCopyrightHolder( holder.trim() );
+        Copyright copyright1 =
+            Copyright.newCopyright( Integer.valueOf( firstYear ), lastYear == null ? null : Integer.valueOf( lastYear.trim() ),
+                           holder.trim() );
+        model.setCopyright( copyright1 );
 
         // third section is the license
         String license = sections[2].trim();
@@ -312,7 +311,7 @@ public abstract class AbstractFileHeaderTransformer
         buffer.append( sectionDelimiter );
 
         // add copyright section
-        buffer.append( model.getCopyright().trim() );
+        buffer.append( model.getCopyright().getText().trim() );
         buffer.append( sectionDelimiter );
 
         // add license section

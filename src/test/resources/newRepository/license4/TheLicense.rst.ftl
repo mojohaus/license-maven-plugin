@@ -1,1 +1,1 @@
-The license4! ${organizationName} ${copyrightYear}, ${copyrightOwners}
+The license4! ${organizationName} ${copyright.years}, ${copyright.holder}

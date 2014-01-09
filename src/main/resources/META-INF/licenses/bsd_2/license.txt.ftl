@@ -1,4 +1,4 @@
-Copyright (c) ${copyrightYear}, ${copyrightOwners}
+Copyright (c) ${copyright.years}, ${copyright.holder}
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,

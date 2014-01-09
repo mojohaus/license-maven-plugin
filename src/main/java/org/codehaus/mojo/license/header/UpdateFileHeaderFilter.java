@@ -23,6 +23,7 @@ package org.codehaus.mojo.license.header;
  */
 
 import org.codehaus.mojo.license.header.transformer.FileHeaderTransformer;
+import org.codehaus.mojo.license.model.Copyright;
 import org.codehaus.plexus.component.annotations.Component;
 
 /**
@@ -75,9 +76,7 @@ public class UpdateFileHeaderFilter
 
         // by default, reuse the old header
         result.setDescription( oldHeader.getDescription() );
-        result.setCopyrightFirstYear( oldHeader.getCopyrightFirstYear() );
-        result.setCopyrightLastYear( oldHeader.getCopyrightLastYear() );
-        result.setCopyrightHolder( oldHeader.getCopyrightHolder() );
+        result.setCopyright( new Copyright( oldHeader.getCopyright() ) );
         result.setLicense( oldHeader.getLicense() );
 
         if ( isUpdateDescription() && !transformer.isDescriptionEquals( oldHeader, newHeader ) )
@@ -114,9 +113,7 @@ public class UpdateFileHeaderFilter
             modified = true;
 
             // use the new copyright
-            result.setCopyrightFirstYear( newHeader.getCopyrightFirstYear() );
-            result.setCopyrightLastYear( newHeader.getCopyrightLastYear() );
-            result.setCopyrightHolder( newHeader.getCopyrightHolder() );
+            result.setCopyright( new Copyright( newHeader.getCopyright() ) );
         }
 
         if ( isUpdateLicense() && !transformer.isLicenseEquals( oldHeader, newHeader ) )

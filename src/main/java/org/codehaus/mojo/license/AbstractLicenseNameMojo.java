@@ -25,6 +25,7 @@ package org.codehaus.mojo.license;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.codehaus.mojo.license.api.FreeMarkerHelper;
+import org.codehaus.mojo.license.model.Copyright;
 import org.codehaus.mojo.license.model.License;
 import org.codehaus.mojo.license.model.LicenseStore;
 
@@ -51,7 +52,7 @@ public abstract class AbstractLicenseNameMojo
     /**
      * To specify an external extra licenses repository resolver (says the base
      * url of the repository where the {@code license.properties} is present).
-     * 
+     * <p/>
      * <p>
      * <strong>Note: </strong>If you want to refer to a file within this project, start the expression with <code>${project.baseUri}</code>
      * </p>
@@ -106,12 +107,12 @@ public abstract class AbstractLicenseNameMojo
      * @since 1.0
      */
     @Parameter( property = "license.inceptionYear", defaultValue = "${project.inceptionYear}", required = true )
-    protected String inceptionYear;
+    protected Integer inceptionYear;
 
     /**
      * optional copyright owners.
      * <p/>
-     * If not set, organizationName paramter will be used instead.
+     * If not set, {@code organizationName} parameter will be used instead.
      *
      * @since 1.6
      */
@@ -205,6 +206,18 @@ public abstract class AbstractLicenseNameMojo
         return license;
     }
 
+    protected String getCopyrightOwners()
+    {
+
+        String holder = copyrightOwners;
+
+        if ( holder == null )
+        {
+            holder = organizationName;
+        }
+        return holder;
+    }
+
     protected String processLicenseContext( String licenseContent )
         throws IOException
     {
@@ -218,13 +231,18 @@ public abstract class AbstractLicenseNameMojo
         templateParameters.put( "project", getProject().getModel() );
 
         templateParameters.put( "organizationName", organizationName );
-        templateParameters.put( "copyrightYear", inceptionYear );
-        templateParameters.put( "copyrightOwners", copyrightOwners );
+        templateParameters.put( "inceptionYear", inceptionYear  );
+        templateParameters.put( "copyright", getCopyright( getCopyrightOwners() ) );
         templateParameters.put( "projectName", projectName );
 
         addPropertiesToContext( extraTemplateParameters, "extra_", templateParameters );
         String result = licenseFreeMarkerHelper.renderTemplate( FreeMarkerHelper.TEMPLATE, templateParameters );
         return result;
+    }
+
+    protected Copyright getCopyright( String holder )
+    {
+        return Copyright.newCopyright( inceptionYear, holder );
     }
 
     // ----------------------------------------------------------------------

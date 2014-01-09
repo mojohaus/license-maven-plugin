@@ -23,6 +23,7 @@ package org.codehaus.mojo.license.header.transformer;
  */
 
 import org.codehaus.mojo.license.header.FileHeader;
+import org.codehaus.mojo.license.model.Copyright;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -54,16 +55,12 @@ public class AbstractFileHeaderTransformerTest
 
         model1 = new FileHeader();
         model1.setDescription( "Description" );
-        model1.setCopyrightFirstYear( 2010 );
-        model1.setCopyrightLastYear( null );
-        model1.setCopyrightHolder( "Tony" );
+        model1.setCopyright( Copyright.newCopyright( 2010, null, "Tony" ) );
         model1.setLicense( "License" );
 
         model2 = new FileHeader();
         model2.setDescription( "Description2" );
-        model2.setCopyrightFirstYear( 2010 );
-        model2.setCopyrightLastYear( 2012 );
-        model2.setCopyrightHolder( "Tony2" );
+        model2.setCopyright( Copyright.newCopyright( 2010, 2012, "Tony2" ) );
         model2.setLicense( "License2" );
     }
 
@@ -312,9 +309,7 @@ public class AbstractFileHeaderTransformerTest
     public static void assertEquals( FileHeader model, FileHeader model2 )
     {
         Assert.assertEquals( model.getDescription(), model2.getDescription() );
-        Assert.assertEquals( model.getCopyrightFirstYear(), model2.getCopyrightFirstYear() );
-        Assert.assertEquals( model.getCopyrightLastYear(), model2.getCopyrightLastYear() );
-        Assert.assertEquals( model.getCopyrightHolder(), model2.getCopyrightHolder() );
+        Assert.assertEquals( model.getCopyright(), model2.getCopyright() );
         Assert.assertEquals( model.getLicense(), model2.getLicense() );
     }
 }
