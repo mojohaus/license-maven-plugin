@@ -53,14 +53,14 @@ Comment style List Examples
 [INFO] --- license-maven-plugin:${project.version}:comment-style-list (default-cli) @ license-maven-plugin ---
 [INFO] List of available comment styles:
 
-  - apt        : header transformer with apt comment style            , extensions : [apt]
-  - ftl        : header transformer with free marker comment style    , extensions : [ftl]
-  - java       : header transformer with java comment style           , extensions : [java, groovy, css, cs, as, aj, c, h, cpp, js, json]
-  - jsp        : header transformer with jsp comment style            , extensions : [jsp, jspx]
-  - php        : header transformer with php comment style            , extensions : [php]
-  - properties : header transformer with properties file comment style, extensions : [properties, sh, py, rb, pl, pm]
-  - rst        : header transformer with rst comment style            , extensions : [rst]
-  - mysql      : header transformer with mysql comment style          , extensions : [mysql]
-  - sql        : header transformer with sql comment style            , extensions : [sql]
-  - xml        : header transformer with xml comment style            , extensions : [pom, xml, xhtml, mxlm, dtd, fml, xsl, html, htm, jaxx, kml, gsp, tml]
+  * apt        : header transformer with apt comment style            , extensions : [apt]
+  * ftl        : header transformer with free marker comment style    , extensions : [ftl]
+  * java       : header transformer with java comment style           , extensions : [java, groovy, css, cs, as, aj, c, h, cpp, js, json]
+  * jsp        : header transformer with jsp comment style            , extensions : [jsp, jspx]
+  * php        : header transformer with php comment style            , extensions : [php]
+  * properties : header transformer with properties file comment style, extensions : [properties, sh, py, rb, pl, pm]
+  * rst        : header transformer with rst comment style            , extensions : [rst]
+  * mysql      : header transformer with mysql comment style          , extensions : [mysql]
+  * sql        : header transformer with sql comment style            , extensions : [sql]
+  * xml        : header transformer with xml comment style            , extensions : [pom, xml, xhtml, mxlm, dtd, fml, xsl, html, htm, jaxx, kml, gsp, tml]
 -------------------------------------------------------------------------------

@@ -126,9 +126,9 @@ public class CommentStyleListMojo
             }
         }
 
-        String pattern = "  - %1$-" + maxLength + "s : %2$-" + maxDLength + "s, extensions : %3$s\n";
+        String pattern = " * %1$-" + maxLength + "s : %2$-" + maxDLength + "s, extensions : %3$s\n";
 
-        buffer.append( "List of available comment styles:\n\n" );
+        buffer.append( "Available comment styles:\n\n" );
         for ( String transformerName : names )
         {
             FileHeaderTransformer transformer = transformers.get( transformerName );
