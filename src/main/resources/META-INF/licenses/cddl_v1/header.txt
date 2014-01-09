@@ -13,4 +13,3 @@ GNU General Lesser Public License for more details.
 You should have received a copy of the Common Development and Distrubtion
 License along with this program.  If not, see
 <http://www.gnu.org/licenses/gpl-1.0.html>.
-
