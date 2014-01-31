@@ -79,10 +79,11 @@ public interface ThirdPartyHelper
      *
      * @param licenseMap  the license map of all dependencies.
      * @param missingFile location of an optional missing fille (says where you fix missing license).
+     * @param projectDependencies project dependencies used to detect which dependencies in the missing file are unknown to the project.
      * @return the map of all unsafe mapping
      * @throws IOException if could not load missing file
      */
-    SortedProperties loadUnsafeMapping( LicenseMap licenseMap, File missingFile )
+    SortedProperties loadUnsafeMapping( LicenseMap licenseMap, File missingFile, SortedMap<String, MavenProject> projectDependencies )
         throws IOException;
 
     /**
@@ -141,7 +142,7 @@ public interface ThirdPartyHelper
      */
     SortedProperties createUnsafeMapping( LicenseMap licenseMap, File missingFile, boolean useRepositoryMissingFiles,
                                           SortedSet<MavenProject> unsafeDependencies,
-                                          Collection<MavenProject> projectDependencies )
+                                          SortedMap<String, MavenProject> projectDependencies )
         throws ProjectBuildingException, IOException, ThirdPartyToolException;
 
     /**

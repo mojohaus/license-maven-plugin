@@ -300,7 +300,7 @@ public class AddThirdPartyMojo
 
         SortedProperties unsafeMappings =
             getHelper().createUnsafeMapping( getLicenseMap(), getMissingFile(), useRepositoryMissingFiles,
-                                             unsafeDependencies, getProjectDependencies().values() );
+                                             unsafeDependencies, getProjectDependencies() );
         if ( isVerbose() )
         {
             getLog().info( "found " + unsafeMappings.size() + " unsafe mappings" );

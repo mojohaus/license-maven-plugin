@@ -129,18 +129,18 @@ public class AggregatorAddThirdPartyMojo
         {
             log.info( "After executing on " + reactorProjects.size() + " project(s)" );
         }
-        SortedMap<String, MavenProject> artifacts = getHelper().getArtifactCache();
+//        SortedMap<String, MavenProject> aatifacts = getHelper().getArtifactCache();
 
         LicenseMap licenseMap = getLicenseMap();
 
-        getLog().info( artifacts.size() + " detected artifact(s)." );
-        if ( isVerbose() )
-        {
-            for ( String id : artifacts.keySet() )
-            {
-                getLog().info( " - " + id );
-            }
-        }
+//        getLog().info( artifacts.size() + " detected artifact(s)." );
+//        if ( isVerbose() )
+//        {
+//            for ( String id : artifacts.keySet() )
+//            {
+//                getLog().info( " - " + id );
+//            }
+//        }
         getLog().info( licenseMap.size() + " detected license(s)." );
         if ( isVerbose() )
         {
@@ -208,7 +208,7 @@ public class AggregatorAddThirdPartyMojo
             if ( file.exists() )
             {
 
-                SortedProperties tmp = getHelper().loadUnsafeMapping( licenseMap, file );
+                SortedProperties tmp = getHelper().loadUnsafeMapping( licenseMap, file, getProjectDependencies() );
                 unsafeMappings.putAll( tmp );
             }
 

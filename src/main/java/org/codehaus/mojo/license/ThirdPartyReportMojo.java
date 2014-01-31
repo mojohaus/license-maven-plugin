@@ -322,7 +322,7 @@ public class ThirdPartyReportMojo
             {
                 // Resolve unsafe dependencies using missing files, this will update licenseMap and unsafeDependencies
                 getHelper().createUnsafeMapping( licenseMap, missingFile, useRepositoryMissingFiles,
-                                                 dependenciesWithNoLicense, projectDependencies.values() );
+                                                 dependenciesWithNoLicense, projectDependencies );
             }
         }
 

@@ -170,10 +170,10 @@ public class DefaultThirdPartyHelper
     /**
      * {@inheritDoc}
      */
-    public SortedProperties loadUnsafeMapping( LicenseMap licenseMap, File missingFile )
+    public SortedProperties loadUnsafeMapping( LicenseMap licenseMap, File missingFile, SortedMap<String, MavenProject> projectDependencies )
         throws IOException
     {
-        return thirdPartyTool.loadUnsafeMapping( licenseMap, getArtifactCache(), encoding, missingFile );
+        return thirdPartyTool.loadUnsafeMapping( licenseMap, projectDependencies, encoding, missingFile );
     }
 
     /**
@@ -216,11 +216,11 @@ public class DefaultThirdPartyHelper
     public SortedProperties createUnsafeMapping( LicenseMap licenseMap, File missingFile,
                                                  boolean useRepositoryMissingFiles,
                                                  SortedSet<MavenProject> unsafeDependencies,
-                                                 Collection<MavenProject> projectDependencies )
+                                                 SortedMap<String, MavenProject> projectDependencies )
         throws ProjectBuildingException, IOException, ThirdPartyToolException
     {
 
-        SortedProperties unsafeMappings = loadUnsafeMapping( licenseMap, missingFile );
+        SortedProperties unsafeMappings = loadUnsafeMapping( licenseMap, missingFile, projectDependencies );
 
         if ( CollectionUtils.isNotEmpty( unsafeDependencies ) )
         {
@@ -232,7 +232,7 @@ public class DefaultThirdPartyHelper
 
                 // try to load missing third party files from dependencies
 
-                Collection<MavenProject> projects = new ArrayList<MavenProject>( projectDependencies );
+                Collection<MavenProject> projects = new ArrayList<MavenProject>( projectDependencies.values() );
                 projects.remove( project );
                 projects.removeAll( unsafeDependencies );
 
