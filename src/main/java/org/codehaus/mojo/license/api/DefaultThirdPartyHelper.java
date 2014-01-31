@@ -170,7 +170,8 @@ public class DefaultThirdPartyHelper
     /**
      * {@inheritDoc}
      */
-    public SortedProperties loadUnsafeMapping( LicenseMap licenseMap, File missingFile, SortedMap<String, MavenProject> projectDependencies )
+    public SortedProperties loadUnsafeMapping( LicenseMap licenseMap, File missingFile,
+                                               SortedMap<String, MavenProject> projectDependencies )
         throws IOException
     {
         return thirdPartyTool.loadUnsafeMapping( licenseMap, projectDependencies, encoding, missingFile );
@@ -255,7 +256,7 @@ public class DefaultThirdPartyHelper
         throws MojoFailureException
     {
 
-        Set<String> licenseFound = new HashSet<String>(  );
+        Set<String> licenseFound = new HashSet<String>();
 
         if ( !CollectionUtils.isEmpty( licenseMerges ) )
         {
