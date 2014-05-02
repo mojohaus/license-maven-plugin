@@ -371,6 +371,7 @@ public abstract class AbstractFileHeaderMojo
      */
     protected abstract boolean isFailOnMissingHeader();
 
+
     /**
      * @return {@code true} if mojo should fails if dryRun and there is some obsolete license header, {@code false} otherwise.
      */
@@ -954,8 +955,10 @@ public abstract class AbstractFileHeaderMojo
         }
 
         // no header at all, add a new header
-
-        getLog().info( " - adding license header on file " + file );
+        if ( isVerbose() )
+        {
+            getLog().info( " - adding license header on file " + file );
+        }
 
         //FIXME tchemit 20100409 xml files must add header after a xml prolog line
         content = getTransformer().addHeader( filter.getFullHeaderContent(), content );
