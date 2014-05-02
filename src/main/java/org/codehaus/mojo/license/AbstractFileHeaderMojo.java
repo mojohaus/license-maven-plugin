@@ -741,7 +741,7 @@ public abstract class AbstractFileHeaderMojo
         {
             List<File> files = FileUtil.orderFiles( result.get( FileState.add ) );
 
-            builder.append( "There is " ).append( files.size() ).append( " file(s) with no header :" );
+            builder.append( "There are " ).append( files.size() ).append( " file(s) with no header :" );
             for ( File file : files )
             {
                 builder.append( "\n" ).append( file );
@@ -752,7 +752,7 @@ public abstract class AbstractFileHeaderMojo
         {
             List<File> files = FileUtil.orderFiles( result.get( FileState.update ) );
 
-            builder.append( "\nThere is " ).append( files.size() ).append( " file(s) with header to update:" );
+            builder.append( "\nThere are " ).append( files.size() ).append( " file(s) with header to update:" );
             for ( File file : files )
             {
                 builder.append( "\n" ).append( file );
