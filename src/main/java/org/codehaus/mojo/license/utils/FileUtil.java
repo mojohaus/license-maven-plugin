@@ -29,6 +29,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -153,10 +154,16 @@ public class FileUtil
     public static void renameFile( File file, File destination )
         throws IOException
     {
-        boolean b = file.renameTo( destination );
-        if ( !b )
-        {
-            throw new IOException( "could not rename " + file + " to " + destination );
+        try {
+            try {
+                org.apache.commons.io.FileUtils.forceDelete( destination );
+            } catch (FileNotFoundException ex) {
+                //Just do nothing
+            }
+
+            org.apache.commons.io.FileUtils.moveFile( file, destination );
+        } catch (IOException ex) {
+            throw new IOException(String.format( "could not rename '%s' to '%s'", file, destination ));
         }
     }
 

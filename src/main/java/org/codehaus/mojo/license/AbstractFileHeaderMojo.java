@@ -1017,15 +1017,7 @@ public abstract class AbstractFileHeaderMojo
             }
             catch ( IOException e )
             {
-
-                // workaround windows problem to rename  files
                 getLog().warn( e.getMessage() );
-
-                // try to copy content (fail on windows xp...)
-                FileUtils.copyFile( processFile, file );
-
-                // then delete process file
-                FileUtil.deleteFile( processFile );
             }
         }
     }
