@@ -155,13 +155,13 @@ public class AggregatorAddThirdPartyMojo
 
         if ( !safeLicense && isFailIfWarning() )
         {
-            throw new MojoFailureException( "There is some forbidden licenses used, please check your dependencies." );
+            throw new MojoFailureException( "There are some forbidden licenses used, please check your dependencies." );
         }
         writeThirdPartyFile();
 
         if ( unsafe && isFailIfWarning() )
         {
-            throw new MojoFailureException( "There is some dependencies with no license, please review the modules." );
+            throw new MojoFailureException( "There are some dependencies with no license, please review the modules." );
         }
     }
 

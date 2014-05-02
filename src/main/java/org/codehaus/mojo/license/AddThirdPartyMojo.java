@@ -238,7 +238,7 @@ public class AddThirdPartyMojo
 
         if ( !safeLicense && isFailIfWarning() )
         {
-            throw new MojoFailureException( "There is some forbidden licenses used, please check your dependencies." );
+            throw new MojoFailureException( "There are some forbidden licenses used, please check your dependencies." );
         }
         writeThirdPartyFile();
 
@@ -251,7 +251,7 @@ public class AddThirdPartyMojo
         if ( unsafe && isFailIfWarning() )
         {
             throw new MojoFailureException(
-                "There is some dependencies with no license, please fill the file " + getMissingFile() );
+                "There are some dependencies with no license, please fill the file " + getMissingFile() );
         }
 
         if ( !unsafe && isUseMissingFile() && MapUtils.isEmpty( getUnsafeMappings() ) && getMissingFile().exists() )

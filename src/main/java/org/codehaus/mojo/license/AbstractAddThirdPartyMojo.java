@@ -569,13 +569,13 @@ public abstract class AbstractAddThirdPartyMojo
         if ( !safe )
         {
             Log log = getLog();
-            log.warn( "There is " + unsafeLicenses.size() + " forbidden licenses used:" );
+            log.warn( "There are " + unsafeLicenses.size() + " forbidden licenses used:" );
             for ( String unsafeLicense : unsafeLicenses )
             {
 
                 SortedSet<MavenProject> deps = getLicenseMap().get( unsafeLicense );
                 StringBuilder sb = new StringBuilder();
-                sb.append( "License " ).append( unsafeLicense ).append( "used by " ).append( deps.size() ).append(
+                sb.append( "License " ).append( unsafeLicense ).append( " used by " ).append( deps.size() ).append(
                     " dependencies:" );
                 for ( MavenProject dep : deps )
                 {
