@@ -322,10 +322,10 @@
           <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
         </configuration>
       </plugin>
-      <!-- 
+      <!--
            To test reading third party data from an artifact, we need an artifact.
            In the aggregate case, we can't depend on it in the reactor, since
-           there's no way to get any other reactor execution to create it 
+           there's no way to get any other reactor execution to create it
            in the forked execution of aggregate-add-third-party, not unless
            we want involved in a custom lifecycle. So this barnicle exists
            so that the tests can use it. It's a pity it will end up on Central.
@@ -336,7 +336,7 @@
         <executions>
           <execution>
             <id>attach-artifacts</id>
-            <phase>generate-resources</phase>
+            <phase>package</phase>
             <goals>
               <goal>attach-artifact</goal>
             </goals>
