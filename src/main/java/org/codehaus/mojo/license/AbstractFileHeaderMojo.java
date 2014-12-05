@@ -1113,7 +1113,7 @@ public abstract class AbstractFileHeaderMojo
             getLog().warn( "No inceptionYear defined (will use current year)" );
         }
 
-        Copyright copyright = getCopyright( organizationName );
+        Copyright copyright = getCopyright( getCopyrightOwners() );
         defaultFileHeader.setCopyright( copyright );
 
 //        Calendar cal = Calendar.getInstance();
