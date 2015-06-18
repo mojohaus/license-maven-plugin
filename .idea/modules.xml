@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/../keytool/keytool.iml" filepath="$PROJECT_DIR$/../keytool/keytool.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../keytool/keytool-api/keytool-api.iml" filepath="$PROJECT_DIR$/../keytool/keytool-api/keytool-api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../keytool/keytool-api-1.5/keytool-api-1.5.iml" filepath="$PROJECT_DIR$/../keytool/keytool-api-1.5/keytool-api-1.5.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../keytool/keytool-api-1.6/keytool-api-1.6.iml" filepath="$PROJECT_DIR$/../keytool/keytool-api-1.6/keytool-api-1.6.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../keytool/keytool-api-1.7/keytool-api-1.7.iml" filepath="$PROJECT_DIR$/../keytool/keytool-api-1.7/keytool-api-1.7.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../keytool/keytool-api-test/keytool-api-test.iml" filepath="$PROJECT_DIR$/../keytool/keytool-api-test/keytool-api-test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../keytool/keytool-maven-plugin/keytool-maven-plugin.iml" filepath="$PROJECT_DIR$/../keytool/keytool-maven-plugin/keytool-maven-plugin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/license-maven-plugin.iml" filepath="$PROJECT_DIR$/license-maven-plugin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../webstart/webstart.iml" filepath="$PROJECT_DIR$/../webstart/webstart.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../webstart/webstart-jnlp-servlet/webstart-jnlp-servlet.iml" filepath="$PROJECT_DIR$/../webstart/webstart-jnlp-servlet/webstart-jnlp-servlet.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../webstart/webstart-maven-plugin/webstart-maven-plugin.iml" filepath="$PROJECT_DIR$/../webstart/webstart-maven-plugin/webstart-maven-plugin.iml" />
+    </modules>
+  </component>
+</project>
