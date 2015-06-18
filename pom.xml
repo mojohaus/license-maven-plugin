@@ -23,34 +23,23 @@
 -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
   <parent>
     <groupId>org.codehaus.mojo</groupId>
     <artifactId>mojo-parent</artifactId>
     <version>33</version>
     <relativePath>../mojo-parent/pom.xml</relativePath>
   </parent>
-  <modelVersion>4.0.0</modelVersion>
+
   <artifactId>license-maven-plugin</artifactId>
-  <packaging>maven-plugin</packaging>
-  <name>License Maven Plugin</name>
   <version>1.9-SNAPSHOT</version>
+  <packaging>maven-plugin</packaging>
+
+  <name>License Maven Plugin</name>
   <description>Maven plugin to download and collect license files from project dependencies.</description>
-
-  <scm>
-    <connection>scm:git:git@github.com:mojohaus/license-maven-plugin.git</connection>
-    <developerConnection>scm:git:git@github.com:mojohaus/license-maven-plugin.git</developerConnection>
-    <url>https://github.com/mojohaus/license-maven-plugin</url>
-  </scm>
-  <issueManagement>
-    <system>github</system>
-    <url>https://github.com/mojohaus/license-maven-plugin/issues/</url>
-  </issueManagement>
-
-  <ciManagement>
-    <system>bamboo</system>
-    <url>http://bamboo.ci.codehaus.org/browse/MOJO-LICENSECI</url>
-  </ciManagement>
-
+  <!-- tchemit-20120620 Do not remove this, it is used to deploy SNAPSHOT site -->
+  <url>http://mojo.codehaus.org/license-maven-plugin</url>
   <inceptionYear>2010</inceptionYear>
   <licenses>
     <license>
@@ -77,7 +66,6 @@
       </roles>
     </developer>
   </developers>
-
   <contributors>
     <contributor>
       <name>Curtis Rueden</name>
@@ -101,8 +89,19 @@
     <maven>${mavenVersion}</maven>
   </prerequisites>
 
-  <!-- tchemit-20120620 Do not remove this, it is used to deploy SNAPSHOT site -->
-  <url>http://mojo.codehaus.org/license-maven-plugin</url>
+  <scm>
+    <connection>scm:git:git@github.com:mojohaus/license-maven-plugin.git</connection>
+    <developerConnection>scm:git:git@github.com:mojohaus/license-maven-plugin.git</developerConnection>
+    <url>https://github.com/mojohaus/license-maven-plugin</url>
+  </scm>
+  <issueManagement>
+    <system>github</system>
+    <url>https://github.com/mojohaus/license-maven-plugin/issues/</url>
+  </issueManagement>
+  <ciManagement>
+    <system>bamboo</system>
+    <url>http://bamboo.ci.codehaus.org/browse/MOJO-LICENSECI</url>
+  </ciManagement>
   <distributionManagement>
     <site>
       <id>codehaus.org</id>
@@ -293,6 +292,45 @@
   </dependencies>
 
   <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>build-helper-maven-plugin</artifactId>
+          <version>1.8</version>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-component-metadata</artifactId>
+          <version>${plexusComponentVersion}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <configuration>
+            <quiet>true</quiet>
+            <tagletArtifacts>
+              <tagletArtifact>
+                <groupId>org.apache.maven.plugin-tools</groupId>
+                <artifactId>maven-plugin-tools-javadoc</artifactId>
+                <version>${pluginPluginVersion}</version>
+              </tagletArtifact>
+              <tagletArtifact>
+                <groupId>org.codehaus.plexus</groupId>
+                <artifactId>plexus-component-javadoc</artifactId>
+                <version>${plexusComponentVersion}</version>
+              </tagletArtifact>
+            </tagletArtifacts>
+          </configuration>
+        </plugin>
+        <plugin>
+          <artifactId>maven-plugin-plugin</artifactId>
+          <configuration>
+            <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
     <plugins>
 
       <!-- expose new plexus components -->
@@ -354,46 +392,6 @@
       </plugin>
 
     </plugins>
-
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>build-helper-maven-plugin</artifactId>
-          <version>1.8</version>
-        </plugin>
-        <plugin>
-          <groupId>org.codehaus.plexus</groupId>
-          <artifactId>plexus-component-metadata</artifactId>
-          <version>${plexusComponentVersion}</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-javadoc-plugin</artifactId>
-          <configuration>
-            <quiet>true</quiet>
-            <tagletArtifacts>
-              <tagletArtifact>
-                <groupId>org.apache.maven.plugin-tools</groupId>
-                <artifactId>maven-plugin-tools-javadoc</artifactId>
-                <version>${pluginPluginVersion}</version>
-              </tagletArtifact>
-              <tagletArtifact>
-                <groupId>org.codehaus.plexus</groupId>
-                <artifactId>plexus-component-javadoc</artifactId>
-                <version>${plexusComponentVersion}</version>
-              </tagletArtifact>
-            </tagletArtifacts>
-          </configuration>
-        </plugin>
-        <plugin>
-          <artifactId>maven-plugin-plugin</artifactId>
-          <configuration>
-            <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
   </build>
 
   <profiles>
