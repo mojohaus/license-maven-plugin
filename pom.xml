@@ -37,15 +37,15 @@
   <description>Maven plugin to download and collect license files from project dependencies.</description>
 
   <scm>
-    <connection>scm:svn:http://svn.codehaus.org/mojo/trunk/mojo/license-maven-plugin</connection>
-    <developerConnection>scm:svn:https://svn.codehaus.org/mojo/trunk/mojo/license-maven-plugin</developerConnection>
-    <url>http://fisheye.codehaus.org/browse/mojo/trunk/mojo/license-maven-plugin</url>
+    <connection>scm:git:git@github.com:mojohaus/license-maven-plugin.git</connection>
+    <developerConnection>scm:git:git@github.com:mojohaus/license-maven-plugin.git</developerConnection>
+    <url>https://github.com/mojohaus/license-maven-plugin</url>
   </scm>
-
   <issueManagement>
-    <system>JIRA</system>
-    <url>http://jira.codehaus.org/browse/MLICENSE</url>
+    <system>github</system>
+    <url>https://github.com/mojohaus/license-maven-plugin/issues/</url>
   </issueManagement>
+
   <ciManagement>
     <system>bamboo</system>
     <url>http://bamboo.ci.codehaus.org/browse/MOJO-LICENSECI</url>
