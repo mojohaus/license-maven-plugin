@@ -39,7 +39,7 @@
   <name>License Maven Plugin</name>
   <description>Maven plugin to download and collect license files from project dependencies.</description>
   <!-- tchemit-20120620 Do not remove this, it is used to deploy SNAPSHOT site -->
-  <url>http://mojo.codehaus.org/license-maven-plugin</url>
+  <url>http://www.mojohaus.org/license-maven-plugin</url>
   <inceptionYear>2010</inceptionYear>
   <licenses>
     <license>
