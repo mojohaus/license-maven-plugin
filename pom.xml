@@ -99,8 +99,8 @@
     <url>https://github.com/mojohaus/license-maven-plugin/issues/</url>
   </issueManagement>
   <ciManagement>
-    <system>bamboo</system>
-    <url>http://bamboo.ci.codehaus.org/browse/MOJO-LICENSECI</url>
+    <system>Travis CI</system>
+    <url>http://https://travis-ci.org/mojohaus/license-maven-plugin</url>
   </ciManagement>
   <distributionManagement>
     <site>
