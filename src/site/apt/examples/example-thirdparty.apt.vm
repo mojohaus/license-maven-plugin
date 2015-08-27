@@ -126,7 +126,7 @@ org.codehaus.mojo.license.test--test-add-third-party-global-db-misc-dep--1=The A
    (by default <<src/license/THIRD-PARTY.properties>>).
 
    In this file, we find dependencies with no license, you just have to fill
-   correct licenses.
+   correct licenses. You can add multipe licenses by using | as separator char.
 
    Once the file filled, just relaunch the goal to integrate your modifications
    in the generated <<THIRD-PARTY>> file.
