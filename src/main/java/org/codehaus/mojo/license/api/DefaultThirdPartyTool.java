@@ -24,6 +24,7 @@ package org.codehaus.mojo.license.api;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -331,12 +332,17 @@ public class DefaultThirdPartyTool
     /**
      * {@inheritDoc}
      */
-    public void addLicense( LicenseMap licenseMap, MavenProject project, String licenseName )
+    public void addLicense( LicenseMap licenseMap, MavenProject project, String... licenseNames )
     {
-        License license = new License();
-        license.setName( licenseName.trim() );
-        license.setUrl( licenseName.trim() );
-        addLicense( licenseMap, project, license );
+    	List<License> licenses = new ArrayList<License>();
+    	for (String licenseName : licenseNames)
+    	{
+	        License license = new License();
+	        license.setName( licenseName.trim() );
+	        license.setUrl( licenseName.trim() );
+	        licenses.add(license);
+    	}
+        addLicense( licenseMap, project, licenses );
     }
 
     /**
@@ -521,7 +527,10 @@ public class DefaultThirdPartyTool
             }
 
             String license = (String) unsafeMappings.get( id );
-            if ( StringUtils.isEmpty( license ) )
+            
+            String[] licenses = StringUtils.split(license, '|');
+            
+            if ( ArrayUtils.isEmpty( licenses ) )
             {
 
                 // empty license means not fill, skip it
@@ -529,7 +538,7 @@ public class DefaultThirdPartyTool
             }
 
             // add license in map
-            addLicense( licenseMap, project, license );
+            addLicense( licenseMap, project, licenses );
 
             // remove unknown license
             unsafeDependencies.remove( project );
