@@ -147,7 +147,7 @@ public interface ThirdPartyTool
      * @param project     the project
      * @param licenseName the name of the license
      */
-    void addLicense( LicenseMap licenseMap, MavenProject project, String licenseName );
+    void addLicense( LicenseMap licenseMap, MavenProject project, String... licenseName );
 
     /**
      * Add a given {@code license} to the given {@code licenseMap} for the given {@code project}.
