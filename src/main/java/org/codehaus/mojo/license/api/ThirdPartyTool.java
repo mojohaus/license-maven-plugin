@@ -140,7 +140,7 @@ public interface ThirdPartyTool
         throws IOException;
 
     /**
-     * Add one or more licenses (name and url are {@code licenseName}) to the given {@code licenseMap} for the given
+     * Add one or more licenses (name and url are {@code licenseNames}) to the given {@code licenseMap} for the given
      * {@code project}.
      *
      * @param licenseMap   the license map where to add the license
