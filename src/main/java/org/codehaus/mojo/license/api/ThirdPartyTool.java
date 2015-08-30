@@ -140,14 +140,14 @@ public interface ThirdPartyTool
         throws IOException;
 
     /**
-     * Add a license (name and url are {@code licenseName}) to the given {@code licenseMap} for the given
+     * Add one or more licenses (name and url are {@code licenseNames}) to the given {@code licenseMap} for the given
      * {@code project}.
      *
-     * @param licenseMap  the license map where to add the license
-     * @param project     the project
-     * @param licenseName the name of the license
+     * @param licenseMap   the license map where to add the license
+     * @param project      the project
+     * @param licenseNames the names of the licenses
      */
-    void addLicense( LicenseMap licenseMap, MavenProject project, String licenseName );
+    void addLicense( LicenseMap licenseMap, MavenProject project, String... licenseNames );
 
     /**
      * Add a given {@code license} to the given {@code licenseMap} for the given {@code project}.
