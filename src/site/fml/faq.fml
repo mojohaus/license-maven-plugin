@@ -92,7 +92,7 @@
               &lt;includes&gt;
                 &lt;include&gt;**/*.properties&lt;/include&gt;
               &lt;/includes&gt;
-              &lt;encoding&gt;UTF-8&lt;/encoding&gt;
+              &lt;encoding&gt;ISO-8859-1&lt;/encoding&gt;
             &lt;/configuration&gt;
           &lt;/execution&gt;
         &lt;/executions&gt;
