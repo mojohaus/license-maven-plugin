@@ -199,6 +199,20 @@ public abstract class AbstractFileHeaderMojo
     protected boolean addJavaLicenseAfterPackage;
 
     /**
+     * A flag to ignore no files to scan.
+     *
+     * <p>
+     * This flag will suppress the "No file to scan" warning. This will allow you to set the plug-in in the root pom of
+     * your project without getting a lot of warnings for aggregation modules / artifacts.
+     * </p>
+     * <b>Note:</b> By default this property is set to {@code false} to keep old behavior.
+     *
+     * @since 1.9
+     */
+    @Parameter( property = "license.ignoreNoFileToScan", defaultValue = "false" )
+    protected boolean ignoreNoFileToScan;
+
+    /**
      * To specify the base dir from which we apply the license.
      * <p/>
      * Should be on form "root1,root2,rootn".
@@ -587,7 +601,7 @@ public abstract class AbstractFileHeaderMojo
             checkResults( result );
 
             int nbFiles = processedFiles.size();
-            if ( nbFiles == 0 )
+            if ( nbFiles == 0 && !ignoreNoFileToScan )
             {
                 getLog().warn( "No file to scan." );
             }
