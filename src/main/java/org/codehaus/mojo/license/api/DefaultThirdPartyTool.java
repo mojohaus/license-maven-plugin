@@ -454,6 +454,23 @@ public class DefaultThirdPartyTool
                                                String encoding, File missingFile )
         throws IOException
     {
+	    final Map<String, MavenProject> snapshots = new HashMap<String, MavenProject>();
+
+        // find snapshot dependencies
+        for (final Entry<String, MavenProject> entry : artifactCache.entrySet()) {
+            if (entry.getValue().getVersion().contains("SNAPSHOT")) {
+
+                snapshots.put(entry.getKey(), entry.getValue());
+            }
+        }
+
+        for (final Entry<String, MavenProject> snapshot : snapshots.entrySet()) {
+            // remove invalid entries, which contain timestamps in key
+            artifactCache.remove(snapshot.getKey());
+            // put corrected keys/entries into artifact cache
+            artifactCache.put(snapshot.getValue().getGroupId() + "--" + snapshot.getValue().getArtifactId() + "--"
+                + snapshot.getValue().getVersion(), snapshot.getValue());
+        }
         SortedSet<MavenProject> unsafeDependencies = getProjectsWithNoLicense( licenseMap, false );
 
         SortedProperties unsafeMappings = new SortedProperties( encoding );
