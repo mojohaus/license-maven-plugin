@@ -78,6 +78,11 @@ public abstract class FileHeaderFilter
     protected String fullHeaderContent;
 
     /**
+     * Flag sets to {@code true} if an empty line should be added after the header.
+     */
+    protected boolean emptyLineAfterHeader;
+
+    /**
      * maven logger.
      */
     protected Log log;
@@ -243,9 +248,11 @@ public abstract class FileHeaderFilter
     {
         if ( fullHeaderContent == null )
         {
-
             // box with comment
             fullHeaderContent = getTransformer().boxComment( getProcessTagHeaderContent(), true );
+            if (emptyLineAfterHeader) {
+                fullHeaderContent += '\n';
+            }
         }
         return fullHeaderContent;
     }
@@ -298,5 +305,13 @@ public abstract class FileHeaderFilter
         headerContent = null;
         processTagHeaderContent = null;
         fullHeaderContent = null;
+    }
+
+    public boolean isEmptyLineAfterHeader() {
+        return emptyLineAfterHeader;
+    }
+
+    public void setEmptyLineAfterHeader( boolean emptyLineAfterHeader ) {
+        this.emptyLineAfterHeader = emptyLineAfterHeader;
     }
 }

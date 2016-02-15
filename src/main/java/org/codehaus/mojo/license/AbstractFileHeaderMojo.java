@@ -199,6 +199,20 @@ public abstract class AbstractFileHeaderMojo
     protected boolean addJavaLicenseAfterPackage;
 
     /**
+     * A flag to add an empty line after the header.
+     *
+     * <p>
+     * Checkstyle requires empty line between license header and package statement.
+     * If you are using addJavaLicenseAfterPackage=false it could make sense to set this to true.
+     * </p>
+     * <b>Note:</b> By default this property is set to {@code false} to keep old behavior.
+     *
+     * @since 1.9
+     */
+    @Parameter( property = "license.addEmptyLineAfterHeader", defaultValue = "false" )
+    protected boolean addEmptyLineAfterHeader;
+
+    /**
      * A flag to ignore no files to scan.
      *
      * <p>
@@ -449,6 +463,7 @@ public abstract class AbstractFileHeaderMojo
         filter.setUpdateCopyright( canUpdateCopyright );
         filter.setUpdateDescription( canUpdateDescription );
         filter.setUpdateLicense( canUpdateLicense );
+        filter.setEmptyLineAfterHeader( addEmptyLineAfterHeader );
 
         filter.setLog( getLog() );
         processor.setConfiguration( this );
