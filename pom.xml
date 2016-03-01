@@ -29,7 +29,6 @@
     <groupId>org.codehaus.mojo</groupId>
     <artifactId>mojo-parent</artifactId>
     <version>33</version>
-    <relativePath>../mojo-parent/pom.xml</relativePath>
   </parent>
 
   <artifactId>license-maven-plugin</artifactId>
