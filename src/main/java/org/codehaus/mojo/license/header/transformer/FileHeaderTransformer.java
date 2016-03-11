@@ -138,6 +138,13 @@ public interface FileHeaderTransformer
     String getCommentLinePrefix();
 
     /**
+     * Get flag if there should be an empty line after the header.
+     *
+     * @return if there should be an empty line after the header
+     */
+    boolean isEmptyLineAfterHeader();
+
+    /**
      * Adds the header.
      *
      * @param header  header to add
@@ -292,4 +299,11 @@ public interface FileHeaderTransformer
      * @param commentLinePrefix the new comment prefix line
      */
     void setCommentLinePrefix( String commentLinePrefix );
+
+    /**
+     * Set flag if there should be an empty line after the header.
+     *
+     * @param emptyLine flag if there should be an empty line after the header
+     */
+    void setEmptyLineAfterHeader( boolean emptyLine );
 }

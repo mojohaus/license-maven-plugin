@@ -94,6 +94,11 @@ public abstract class AbstractFileHeaderTransformer
      */
     protected String commentLinePrefix;
 
+    /**
+     * Flag if there should be an empty line after the header.
+     */
+    protected boolean emptyLineAfterHeader;
+
     protected AbstractFileHeaderTransformer( String name, String description, String commentStartTag,
                                              String commentEndTag, String commentLinePrefix )
     {
@@ -244,6 +249,18 @@ public abstract class AbstractFileHeaderTransformer
      */
     public String addHeader( String header, String content )
     {
+        if ( emptyLineAfterHeader )
+        {
+            String[] contentSplit = content.split( "\\r?\\n", 2 );
+            if ( contentSplit.length > 0 )
+            {
+                final String line = contentSplit[0].trim();
+                if ( line.length() > 0 )
+                {
+                    return header + '\n' + content;
+                }
+            }
+        }
         return header + content;
     }
 
@@ -253,6 +270,16 @@ public abstract class AbstractFileHeaderTransformer
     public void setCommentLinePrefix( String commentLinePrefix )
     {
         this.commentLinePrefix = commentLinePrefix;
+    }
+
+    public boolean isEmptyLineAfterHeader()
+    {
+        return emptyLineAfterHeader;
+    }
+
+    public void setEmptyLineAfterHeader( boolean emptyLine )
+    {
+        this.emptyLineAfterHeader = emptyLine;
     }
 
     /**
