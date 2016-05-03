@@ -67,7 +67,7 @@ import java.util.SortedMap;
  * @since 1.0
  */
 @Mojo( name = "download-licenses", requiresDependencyResolution = ResolutionScope.TEST,
-       defaultPhase = LifecyclePhase.PACKAGE )
+    defaultPhase = LifecyclePhase.PACKAGE )
 public class DownloadLicensesMojo
     extends AbstractMojo
     implements MavenProjectDependenciesConfigurator
@@ -107,7 +107,7 @@ public class DownloadLicensesMojo
      * @since 1.0
      */
     @Parameter( property = "licensesOutputDirectory",
-                defaultValue = "${project.build.directory}/generated-resources/licenses" )
+        defaultValue = "${project.build.directory}/generated-resources/licenses" )
     private File licensesOutputDirectory;
 
     /**
@@ -116,7 +116,7 @@ public class DownloadLicensesMojo
      * @since 1.0
      */
     @Parameter( property = "licensesOutputFile",
-                defaultValue = "${project.build.directory}/generated-resources/licenses.xml" )
+        defaultValue = "${project.build.directory}/generated-resources/licenses.xml" )
     private File licensesOutputFile;
 
     /**
@@ -172,8 +172,17 @@ public class DownloadLicensesMojo
      *
      * @since 1.5
      */
-    @Parameter( property = "license.skipDownloadLicenses", defaultValue = "false")
+    @Parameter( property = "license.skipDownloadLicenses", defaultValue = "false" )
     protected boolean skipDownloadLicenses;
+
+    /**
+     * A flag to organize the licenses by dependencies. When this is done, each dependency will
+     * get its full license file, even if already downloaded for another dependency.
+     *
+     * @since 1.9
+     */
+    @Parameter( defaultValue = "false" )
+    protected boolean organizeLicensesByDependencies;
 
     // ----------------------------------------------------------------------
     // Plexus Components
@@ -410,7 +419,7 @@ public class DownloadLicensesMojo
             System.getProperties().put( "proxySet", "true" );
             System.setProperty( "proxyHost", proxyToUse.getHost() );
             System.setProperty( "proxyPort", String.valueOf( proxyToUse.getPort() ) );
-            if(proxyToUse.getNonProxyHosts() != null)
+            if ( proxyToUse.getNonProxyHosts() != null )
             {
                 System.setProperty( "nonProxyHosts", proxyToUse.getNonProxyHosts() );
             }
@@ -497,34 +506,48 @@ public class DownloadLicensesMojo
      * Determine filename to use for downloaded license file. The file name is based on the configured name of the
      * license (if available) and the remote filename of the license.
      *
-     * @param license the license
+     * @param depProject the project containing the license
+     * @param license    the license
      * @return A filename to be used for the downloaded license file
      * @throws MalformedURLException if the license url is malformed
      */
-    private String getLicenseFileName( License license )
+    private String getLicenseFileName( ProjectLicenseInfo depProject, License license )
         throws MalformedURLException
     {
+        String defaultExtension = ".txt";
+
         URL licenseUrl = new URL( license.getUrl() );
         File licenseUrlFile = new File( licenseUrl.getPath() );
-        String licenseFileName = licenseUrlFile.getName();
 
-        if ( license.getName() != null )
+        String licenseFileName;
+
+        if ( organizeLicensesByDependencies )
         {
-            licenseFileName = license.getName() + " - " + licenseUrlFile.getName();
+            licenseFileName = String.format( "%s.%s%s", depProject.getGroupId(), depProject.getArtifactId(),
+                                             license.getName() != null
+                                                 ? "_" + license.getName()
+                                                 : "" ).toLowerCase().replaceAll( "\\s+", "_" );
         }
-
-        // Check if the file has a valid file extention
-        final String defaultExtension = ".txt";
-        int extensionIndex = licenseFileName.lastIndexOf( "." );
-        if ( extensionIndex == -1 || extensionIndex > ( licenseFileName.length() - 3 ) )
+        else
         {
-            // This means it isn't a valid file extension, so append the default
-            licenseFileName = licenseFileName + defaultExtension;
+            licenseFileName = licenseUrlFile.getName();
+
+            if ( license.getName() != null )
+            {
+                licenseFileName = license.getName() + " - " + licenseUrlFile.getName();
+            }
+
+            // Check if the file has a valid file extention
+            int extensionIndex = licenseFileName.lastIndexOf( "." );
+            if ( extensionIndex == -1 || extensionIndex > ( licenseFileName.length() - 3 ) )
+            {
+                // This means it isn't a valid file extension, so append the default
+                licenseFileName = licenseFileName + defaultExtension;
+            }
+
+            // Force lower case so we don't end up with multiple copies of the same license
+            licenseFileName = licenseFileName.toLowerCase();
         }
-
-        // Force lower case so we don't end up with multiple copies of the same license
-        licenseFileName = licenseFileName.toLowerCase();
-
         return licenseFileName;
     }
 
@@ -535,7 +558,6 @@ public class DownloadLicensesMojo
      */
     private void downloadLicenses( ProjectLicenseInfo depProject )
     {
-
         getLog().debug( "Downloading license(s) for project " + depProject );
 
         List<License> licenses = depProject.getLicenses();
@@ -553,7 +575,7 @@ public class DownloadLicensesMojo
         {
             try
             {
-                String licenseFileName = getLicenseFileName( license );
+                String licenseFileName = getLicenseFileName( depProject, license );
 
                 File licenseOutputFile = new File( licensesOutputDirectory, licenseFileName );
                 if ( licenseOutputFile.exists() )
@@ -561,10 +583,12 @@ public class DownloadLicensesMojo
                     continue;
                 }
 
-                if ( !downloadedLicenseURLs.contains( license.getUrl() ) )
+                String licenseUrl = license.getUrl();
+
+                if ( !downloadedLicenseURLs.contains( licenseUrl ) || organizeLicensesByDependencies )
                 {
-                    LicenseDownloader.downloadLicense( license.getUrl(), proxyLoginPasswordEncoded, licenseOutputFile );
-                    downloadedLicenseURLs.add( license.getUrl() );
+                    LicenseDownloader.downloadLicense( licenseUrl, proxyLoginPasswordEncoded, licenseOutputFile );
+                    downloadedLicenseURLs.add( licenseUrl );
                 }
             }
             catch ( MalformedURLException e )
