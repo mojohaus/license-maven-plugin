@@ -27,6 +27,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -47,6 +48,9 @@ public class LicenseDownloader
     public static void downloadLicense( String licenseUrlString, String loginPassword, File outputFile )
         throws IOException
     {
+    	if ( licenseUrlString == null || licenseUrlString.length() == 0 )
+    		return;
+    	
         InputStream licenseInputStream = null;
         FileOutputStream fos = null;
 
@@ -61,8 +65,40 @@ public class LicenseDownloader
             }
             connection.setConnectTimeout( DEFAULT_CONNECTION_TIMEOUT );
             connection.setReadTimeout( DEFAULT_CONNECTION_TIMEOUT );
+            
+            boolean redirect = false;
+            if ( connection instanceof HttpURLConnection ) 
+            {
+            	int status = ((HttpURLConnection)connection).getResponseCode();
+
+            	if ( status != HttpURLConnection.HTTP_OK ) 
+            	{
+            		if ( status == HttpURLConnection.HTTP_MOVED_TEMP
+            				|| status == HttpURLConnection.HTTP_MOVED_PERM
+            				|| status == HttpURLConnection.HTTP_SEE_OTHER )
+            		{
+            			redirect = true;
+            		}
+            	}
+            }
+            
+            if ( redirect ) {
+
+        		// get redirect url from "location" header field
+        		String newUrl = connection.getHeaderField( "Location" );
+        		
+        		// open the new connnection again
+        		connection = new URL( newUrl ).openConnection();
+        		if ( loginPassword != null )
+                {
+                    connection.setRequestProperty( "Proxy-Authorization", loginPassword );
+                }
+                connection.setConnectTimeout( DEFAULT_CONNECTION_TIMEOUT );
+                connection.setReadTimeout( DEFAULT_CONNECTION_TIMEOUT );
+        	}
+
             licenseInputStream = connection.getInputStream();
-            fos = new FileOutputStream( outputFile );
+            fos = new FileOutputStream( updateFileExtension( outputFile, connection.getContentType() ) );
             copyStream( licenseInputStream, fos );
             licenseInputStream.close();
             fos.close();
@@ -91,6 +127,38 @@ public class LicenseDownloader
         {
             outStream.write( buf, 0, len );
         }
+    }
+    
+    private static File updateFileExtension ( final File outputFile, final String mimeType )
+    {
+    	final String realExtension = getFileExtension(mimeType);
+    	
+    	if ( realExtension != null )
+    	{
+    		if ( !outputFile.getName().endsWith(realExtension) ) 
+    		{
+    			return new File( outputFile.getAbsolutePath() + realExtension );
+    		}
+    	}
+    	return outputFile;
+    }
+    
+    private static String getFileExtension( final String mimeType ) 
+    {
+    	if ( mimeType == null )
+    		return null;
+    	
+    	final String lowerMimeType = mimeType.toLowerCase();
+    	if ( lowerMimeType.contains( "plain" ) )
+    		return ".txt";
+    	
+    	if ( lowerMimeType.contains( "html" ) )
+    		return ".html";
+    	
+    	if ( lowerMimeType.contains( "pdf" ) )
+    		return ".pdf";
+    	
+    	return null;
     }
 
 }
