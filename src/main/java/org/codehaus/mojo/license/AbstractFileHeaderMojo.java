@@ -430,13 +430,13 @@ public abstract class AbstractFileHeaderMojo
             if ( isFailOnMissingHeader() )
             {
 
-                getLog().warn( "The failOnMissingHeader has no effect if the property dryRun is not setted." );
+                getLog().warn( "The failOnMissingHeader has no effect if the property dryRun is not set." );
             }
 
             if ( isFailOnNotUptodateHeader() )
             {
 
-                getLog().warn( "The failOnNotUptodateHeader has no effect if the property dryRun is not setted." );
+                getLog().warn( "The failOnNotUptodateHeader has no effect if the property dryRun is not set." );
             }
         }
 
