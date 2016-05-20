@@ -334,14 +334,14 @@ public class DefaultThirdPartyTool
      */
     public void addLicense( LicenseMap licenseMap, MavenProject project, String... licenseNames )
     {
-    	List<License> licenses = new ArrayList<License>();
-    	for (String licenseName : licenseNames)
-    	{
-	        License license = new License();
-	        license.setName( licenseName.trim() );
-	        license.setUrl( licenseName.trim() );
-	        licenses.add(license);
-    	}
+        List<License> licenses = new ArrayList<License>();
+        for ( String licenseName : licenseNames )
+        {
+            License license = new License();
+            license.setName( licenseName.trim() );
+            license.setUrl( licenseName.trim() );
+            licenses.add( license );
+        }
         addLicense( licenseMap, project, licenses );
     }
 
@@ -454,6 +454,29 @@ public class DefaultThirdPartyTool
                                                String encoding, File missingFile )
         throws IOException
     {
+        Map<String, MavenProject> snapshots = new HashMap<String, MavenProject>();
+
+        //find snapshot dependencies
+        for ( Map.Entry<String, MavenProject> entry : artifactCache.entrySet() )
+        {
+            MavenProject mavenProject = entry.getValue();
+            if ( mavenProject.getVersion().endsWith( Artifact.SNAPSHOT_VERSION ) )
+            {
+                snapshots.put( entry.getKey(), mavenProject );
+            }
+        }
+
+        for ( Map.Entry<String, MavenProject> snapshot : snapshots.entrySet() )
+        {
+            // remove invalid entries, which contain timestamps in key
+            artifactCache.remove( snapshot.getKey() );
+            // put corrected keys/entries into artifact cache
+            MavenProject mavenProject = snapshot.getValue();
+
+            String id = MojoHelper.getArtifactId( mavenProject.getArtifact() );
+            artifactCache.put( id, mavenProject );
+
+        }
         SortedSet<MavenProject> unsafeDependencies = getProjectsWithNoLicense( licenseMap, false );
 
         SortedProperties unsafeMappings = new SortedProperties( encoding );
@@ -527,9 +550,9 @@ public class DefaultThirdPartyTool
             }
 
             String license = (String) unsafeMappings.get( id );
-            
-            String[] licenses = StringUtils.split(license, '|');
-            
+
+            String[] licenses = StringUtils.split( license, '|' );
+
             if ( ArrayUtils.isEmpty( licenses ) )
             {
 
