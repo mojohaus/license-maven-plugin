@@ -55,7 +55,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
@@ -335,14 +334,14 @@ public class DefaultThirdPartyTool
      */
     public void addLicense( LicenseMap licenseMap, MavenProject project, String... licenseNames )
     {
-    	List<License> licenses = new ArrayList<License>();
-    	for (String licenseName : licenseNames)
-    	{
-	        License license = new License();
-	        license.setName( licenseName.trim() );
-	        license.setUrl( licenseName.trim() );
-	        licenses.add(license);
-    	}
+        List<License> licenses = new ArrayList<License>();
+        for ( String licenseName : licenseNames )
+        {
+            License license = new License();
+            license.setName( licenseName.trim() );
+            license.setUrl( licenseName.trim() );
+            licenses.add( license );
+        }
         addLicense( licenseMap, project, licenses );
     }
 
@@ -455,22 +454,28 @@ public class DefaultThirdPartyTool
                                                String encoding, File missingFile )
         throws IOException
     {
-	    final Map<String, MavenProject> snapshots = new HashMap<String, MavenProject>();
+        Map<String, MavenProject> snapshots = new HashMap<String, MavenProject>();
 
-        // find snapshot dependencies
-        for (final Entry<String, MavenProject> entry : artifactCache.entrySet()) {
-            if (entry.getValue().getVersion().contains("SNAPSHOT")) {
-
-                snapshots.put(entry.getKey(), entry.getValue());
+        //find snapshot dependencies
+        for ( Map.Entry<String, MavenProject> entry : artifactCache.entrySet() )
+        {
+            MavenProject mavenProject = entry.getValue();
+            if ( mavenProject.getVersion().endsWith( Artifact.SNAPSHOT_VERSION ) )
+            {
+                snapshots.put( entry.getKey(), mavenProject );
             }
         }
 
-        for (final Entry<String, MavenProject> snapshot : snapshots.entrySet()) {
+        for ( Map.Entry<String, MavenProject> snapshot : snapshots.entrySet() )
+        {
             // remove invalid entries, which contain timestamps in key
-            artifactCache.remove(snapshot.getKey());
+            artifactCache.remove( snapshot.getKey() );
             // put corrected keys/entries into artifact cache
-            artifactCache.put(snapshot.getValue().getGroupId() + "--" + snapshot.getValue().getArtifactId() + "--"
-                + snapshot.getValue().getVersion(), snapshot.getValue());
+            MavenProject mavenProject = snapshot.getValue();
+
+            String id = MojoHelper.getArtifactId( mavenProject.getArtifact() );
+            artifactCache.put( id, mavenProject );
+
         }
         SortedSet<MavenProject> unsafeDependencies = getProjectsWithNoLicense( licenseMap, false );
 
@@ -545,9 +550,9 @@ public class DefaultThirdPartyTool
             }
 
             String license = (String) unsafeMappings.get( id );
-            
-            String[] licenses = StringUtils.split(license, '|');
-            
+
+            String[] licenses = StringUtils.split( license, '|' );
+
             if ( ArrayUtils.isEmpty( licenses ) )
             {
 
