@@ -45,6 +45,10 @@ public class LicenseSummaryTest
 
     /**
      * Test reading the license summary xml file into ProjectLicenseInfo objects
+     *
+     * @throws IOException                  if any
+     * @throws ParserConfigurationException if any
+     * @throws SAXException                 if any
      */
     @Test
     public void testReadLicenseSummary()
@@ -65,6 +69,12 @@ public class LicenseSummaryTest
     /**
      * Test writing license information to a license.xml file and then read this file
      * back in to make sure it's ok.
+     *
+     * @throws IOException                          if any
+     * @throws ParserConfigurationException         if any
+     * @throws TransformerFactoryConfigurationError if any
+     * @throws TransformerException                 if any
+     * @throws SAXException                         if any
      */
     @Test
     public void testWriteReadLicenseSummary()
