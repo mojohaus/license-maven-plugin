@@ -53,7 +53,7 @@ import java.util.SortedSet;
 /**
  * Abstract mojo for all third-party mojos.
  *
- * @author tchemit <chemit@codelutin.com>
+ * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
 public abstract class AbstractAddThirdPartyMojo
@@ -67,8 +67,6 @@ public abstract class AbstractAddThirdPartyMojo
     /**
      * Directory where to generate files.
      *
-     * @parameter property="license.outputDirectory" default-value="${project.build.directory}/generated-sources/license"
-     * @required
      * @since 1.0
      */
     @Parameter( property = "license.outputDirectory",
@@ -101,11 +99,11 @@ public abstract class AbstractAddThirdPartyMojo
 
     /**
      * To merge licenses in final file.
-     * <p/>
+     *
      * Each entry represents a merge (first license is main license to keep), licenses are separated by {@code |}.
-     * <p/>
+     *
      * Example :
-     * <p/>
+     *
      * <pre>
      * &lt;licenseMerges&gt;
      * &lt;licenseMerge&gt;The Apache Software License|Version 2.0,Apache License, Version 2.0&lt;/licenseMerge&gt;
@@ -119,10 +117,10 @@ public abstract class AbstractAddThirdPartyMojo
 
     /**
      * To specify some licenses to include.
-     * <p/>
+     *
      * If this parameter is filled and a license is not in this {@code whitelist} then build will failed when property
      * {@link #failIfWarning} is <tt>true</tt>.
-     * <p/>
+     *
      * Since version {@code 1.4}, there is two ways to fill this parameter :
      * <ul>
      * <li>A simple string (separated by {@code |}), the way to use by property configuration:
@@ -145,10 +143,10 @@ public abstract class AbstractAddThirdPartyMojo
 
     /**
      * To specify some licenses to exclude.
-     * <p/>
+     *
      * If a such license is found then build will failed when property
      * {@link #failIfWarning} is <tt>true</tt>.
-     * <p/>
+     *
      * Since version {@code 1.4}, there is two ways to fill this parameter :
      * <ul>
      * <li>A simple string (separated by {@code |}), the way to use by property configuration:
@@ -172,7 +170,7 @@ public abstract class AbstractAddThirdPartyMojo
     /**
      * The path of the bundled third party file to produce when
      * {@link #generateBundle} is on.
-     * <p/>
+     *
      * <b>Note:</b> This option is not available for {@code pom} module types.
      *
      * @since 1.0
@@ -184,7 +182,7 @@ public abstract class AbstractAddThirdPartyMojo
     /**
      * A flag to copy a bundled version of the third-party file. This is useful
      * to avoid for a final application collision name of third party file.
-     * <p/>
+     *
      * The file will be copied at the {@link #bundleThirdPartyPath} location.
      *
      * @since 1.0
@@ -220,7 +218,7 @@ public abstract class AbstractAddThirdPartyMojo
 
     /**
      * Template used to build the third-party file.
-     * <p/>
+     *
      * (This template use freemarker).
      *
      * @since 1.1
@@ -321,7 +319,7 @@ public abstract class AbstractAddThirdPartyMojo
 
     /**
      * Creates the unsafe mapping (says dependencies with no license given by their pom).
-     * <p/>
+     *
      * Can come from loaded missing file or from dependencies with no license at all.
      *
      * @return the map of usafe mapping indexed by their gav.
@@ -612,7 +610,7 @@ public abstract class AbstractAddThirdPartyMojo
 
     /**
      * Class to fill the {@link #includedLicenses} parameter, from a simple string to split, or a list of string.
-     * <p/>
+     *
      * TODO-tchemit We should find a way to create a plexus convertor.
      *
      * @since 1.4
@@ -651,7 +649,7 @@ public abstract class AbstractAddThirdPartyMojo
 
     /**
      * Class to fill the {@link #excludedLicenses} parameter, from a simple string to split, or a list of string.
-     * <p/>
+     *
      * TODO-tchemit We should find a way to create a plexus convertor.
      *
      * @since 1.4

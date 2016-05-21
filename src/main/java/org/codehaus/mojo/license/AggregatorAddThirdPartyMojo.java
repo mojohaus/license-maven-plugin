@@ -50,7 +50,7 @@ import java.util.SortedSet;
  * the POM to set options, you have to name the execution 'add-third-party',
  * not 'default-cli'.
  *
- * @author tchemit <chemit@codelutin.com>
+ * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
 @Mojo( name = "aggregate-add-third-party", requiresProject = true, aggregator = true,

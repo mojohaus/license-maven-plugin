@@ -27,10 +27,10 @@ import java.util.List;
 
 /**
  * Object to convert in mojo a parameter from a some simple String to a List.
- * <p/>
+ *
  * See (http://jira.codehaus.org/browse/MLICENSE-53).
  *
- * @author tchemit <chemit@codelutin.com>
+ * @author tchemit dev@tchemit.fr
  * @since 1.4
  */
 public class StringToList

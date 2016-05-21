@@ -37,7 +37,7 @@ import static org.codehaus.mojo.license.header.transformer.FileHeaderTransformer
 /**
  * Tests the {@link AbstractFileHeaderTransformer}.
  *
- * @author tchemit <chemit@codelutin.com>
+ * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
 public class AbstractFileHeaderTransformerTest

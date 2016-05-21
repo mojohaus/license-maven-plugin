@@ -27,14 +27,14 @@ import org.apache.maven.plugins.annotations.Parameter;
 
 /**
  * The goal to update (or add) the header on project source files.
- * <p/>
+ *
  * This goal replace the {@code update-header} goal which can not deal with
  * Copyright.
- * <p/>
+ *
  * This goal use a specific project file descriptor {@code project.xml} to
  * describe all files to update for a whole project.
  *
- * @author tchemit <chemit@codelutin.com>
+ * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
 @Mojo( name = "update-file-header", requiresProject = true )
@@ -49,7 +49,7 @@ public class UpdateFileHeaderMojo
     /**
      * A flag to fail the build if {@link #dryRun} flag is on and some files with
      * no header are detected.
-     * <p/>
+     *
      * <strong>Note:</strong> If {@link #dryRun} flag is not set, there is no effect.
      *
      * @since 1.2
@@ -60,7 +60,7 @@ public class UpdateFileHeaderMojo
     /**
      * A flag to fail the build if {@link #dryRun} flag is on and some files with headers
      * to update.
-     * <p/>
+     *
      * <strong>Note:</strong> If {@link #dryRun} flag is not set, there is no effect.
      *
      * @since 1.2

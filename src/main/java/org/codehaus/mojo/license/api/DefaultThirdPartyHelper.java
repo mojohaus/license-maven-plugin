@@ -48,7 +48,7 @@ import java.util.TreeMap;
 /**
  * Default implementation of the {@link org.codehaus.mojo.license.api.ThirdPartyHelper}.
  *
- * @author tchemit <chemit@codelutin.com>
+ * @author tchemit dev@tchemit.fr
  * @since 1.1
  */
 public class DefaultThirdPartyHelper

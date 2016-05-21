@@ -37,7 +37,7 @@ import java.util.List;
 /**
  * Display all available licenses.
  *
- * @author tchemit <chemit@codelutin.com>
+ * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
 @Mojo( name = "license-list", requiresProject = false, requiresDirectInvocation = true )

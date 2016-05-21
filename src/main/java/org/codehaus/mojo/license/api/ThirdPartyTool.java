@@ -39,10 +39,10 @@ import java.util.SortedSet;
 
 /**
  * A tool to load third party files missing files.
- * <p/>
+ *
  * We should put here all the logic code written in some mojo and licenseMap...
  *
- * @author tchemit <chemit@codelutin.com>
+ * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
 public interface ThirdPartyTool
@@ -93,7 +93,7 @@ public interface ThirdPartyTool
 
     /**
      * For the given {@code project}, attach the given {@code file} as a third-party file.
-     * <p/>
+     *
      * The file will be attached as with a classifier {@code third-parties} and a type {@code properties}.
      *
      * @param project the project on which to attch the third-party file
@@ -103,7 +103,7 @@ public interface ThirdPartyTool
 
     /**
      * Obtain the third party file from the repository.
-     * <p/>
+     *
      * Will first search in the local repository, then into the remote repositories and will resolv it.
      *
      * @param project         the project
@@ -169,7 +169,7 @@ public interface ThirdPartyTool
 
     /**
      * For a given {@code licenseMap}, merge all {@code licenses}.
-     * <p/>
+     *
      * The first value of the {@code licenses} is the license to keep and all other values will be merged into the
      * first one.
      *

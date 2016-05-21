@@ -27,10 +27,10 @@ import java.util.Date;
 
 /**
  * Model of a copyright.
- * <p/>
+ *
  * Created on 1/8/14.
  *
- * @author Tony Chemit <chemit@codelutin.com>
+ * @author tchemit dev@tchemit.fr
  * @since 1.6
  */
 public class Copyright
@@ -121,12 +121,12 @@ public class Copyright
 
     /**
      * Produces a string representation of the copyright year range.
-     * <p/>
+     *
      * If copyright acts on one year :
      * <pre>
      * 2010
      * </pre>
-     * <p/>
+     *
      * If copyright acts on more than one year :
      * <pre>
      * 2010 - 2012
@@ -154,12 +154,12 @@ public class Copyright
 
     /**
      * Produces a string representation of the copyright.
-     * <p/>
+     *
      * If copyright acts on one year :
      * <pre>
      * Copyright (C) 2010 Holder
      * </pre>
-     * <p/>
+     *
      * If copyright acts on more than one year :
      * <pre>
      * Copyright (C) 2010 - 2012 Holder

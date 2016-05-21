@@ -30,7 +30,7 @@ import org.junit.Test;
 /**
  * Tests the {@link XmlFileHeaderTransformer}.
  *
- * @author tchemit <chemit@codelutin.com>
+ * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
 public class XmlFileHeaderTransformerTest

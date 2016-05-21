@@ -34,7 +34,7 @@ import java.io.IOException;
 /**
  * File header processor.
  *
- * @author tchemit <chemit@codelutin.com>
+ * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
 @Component( role = Processor.class, hint = "file-header" )

@@ -27,8 +27,8 @@ import org.codehaus.plexus.component.annotations.Component;
 /**
  * Implementation of {@link FileHeaderTransformer} for PHP format.
  *
- * @author tchemit <chemit@codelutin.com>
- * @author kmorin <kmorin@codelutin.com>
+ * @author tchemit dev@tchemit.fr
+ * @author kmorin kmorin@codelutin.com
  * @since 1.0
  */
 @Component( role = FileHeaderTransformer.class, hint = "php" )

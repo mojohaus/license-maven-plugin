@@ -33,12 +33,12 @@ import java.io.File;
 /**
  * Updates (or creates) the main project license file according to the given
  * license defines as {@link #licenseName}.
- * <p/>
+ *
  * Can also generate a bundled license file (to avoid collision names in
  * class-path). This file is by default generated in
  * {@code META-INF class-path directory}.
  *
- * @author tchemit <chemit@codelutin.com>
+ * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
 @Mojo( name = "update-project-license", requiresProject = true, defaultPhase = LifecyclePhase.GENERATE_RESOURCES )
@@ -62,7 +62,7 @@ public class UpdateProjectLicenseMojo
 
     /**
      * The directory where to generate license resources.
-     * <p/>
+     *
      * <b>Note:</b> This option is not available for {@code pom} module types.
      *
      * @since 1.0
@@ -72,13 +72,13 @@ public class UpdateProjectLicenseMojo
 
     /**
      * A flag to copy the main license file in a bundled place.
-     * <p/>
+     *
      * This is usefull for final application to have a none confusing location
      * to seek for the application license.
-     * <p/>
+     *
      * If Sets to {@code true}, will copy the license file to the
      * {@link #bundleLicensePath} to {@link #outputDirectory}.
-     * <p/>
+     *
      * <b>Note:</b> This option is not available for {@code pom} module types.
      *
      * @since 1.0
@@ -89,7 +89,7 @@ public class UpdateProjectLicenseMojo
     /**
      * The path of the bundled license file to produce when
      * {@link #generateBundle} is on.
-     * <p/>
+     *
      * <b>Note:</b> This option is not available for {@code pom} module types.
      *
      * @since 1.0

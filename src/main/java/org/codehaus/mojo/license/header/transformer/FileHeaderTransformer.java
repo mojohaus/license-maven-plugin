@@ -26,14 +26,14 @@ import org.codehaus.mojo.license.header.FileHeader;
 
 /**
  * Contract to transform a file header to {@link FileHeader} in both way :
- * <p/>
+ *
  * <ul>
  * <li>Obtain a object representation of a file header from a existing file
  * (String to FileHeader).</li>
  * <li>Obtain the file header to inject in a file from a FileHeader (to update
  * or create a file header from the file header model).
  * </ul>
- * <p/>
+ *
  * Moreover the contract offers two methods to box and unbox a String
  * representation of a header content :
  * <ul>
@@ -41,7 +41,7 @@ import org.codehaus.mojo.license.header.FileHeader;
  * <li>{@link #unboxComent(String)}</li>
  * </ul>
  *
- * @author tchemit <chemit@codelutin.com>
+ * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
 public interface FileHeaderTransformer
@@ -91,7 +91,7 @@ public interface FileHeaderTransformer
 
     /**
      * Obtains the process tag which indicates the begin of the header content.
-     * <p/>
+     *
      * By default, (says if you do not explicitly invoke the
      * {@link #setProcessStartTag(String)} method), will use the
      * {@link #DEFAULT_PROCESS_START_TAG}
@@ -102,7 +102,7 @@ public interface FileHeaderTransformer
 
     /**
      * Obtain the process tag which indiciates the end of the header content.
-     * <p/>
+     *
      * By default, (says if you do not explicitly invoke the
      * {@link #setProcessEndTag(String)} method), will use the
      * {@link #DEFAULT_PROCESS_END_TAG}.
@@ -113,7 +113,7 @@ public interface FileHeaderTransformer
 
     /**
      * The pattern used to separate sections of the header.
-     * <p/>
+     *
      * By default, (says if you do not explicitly invoke the
      * {@link #setSectionDelimiter(String)} method), will use the
      * {@link #DEFAULT_SECTION_DELIMITER}.
@@ -258,7 +258,7 @@ public interface FileHeaderTransformer
 
     /**
      * Sets the header section delimiter.
-     * <p/>
+     *
      * By default, will use the {@link #DEFAULT_SECTION_DELIMITER}.
      *
      * @param headerSectionDelimiter the new delimiter

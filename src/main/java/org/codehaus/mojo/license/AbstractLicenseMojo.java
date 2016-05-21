@@ -38,7 +38,7 @@ import java.util.Arrays;
 /**
  * Abstract license mojo.
  *
- * @author tchemit <chemit@codelutin.com>
+ * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
 public abstract class AbstractLicenseMojo
@@ -51,7 +51,7 @@ public abstract class AbstractLicenseMojo
 
     /**
      * Flag to activate verbose mode.
-     * <p/>
+     *
      * <b>Note:</b> Verbose mode is always on if you starts a debug maven instance
      * (says via {@code -X}).
      *
@@ -62,7 +62,7 @@ public abstract class AbstractLicenseMojo
 
     /**
      * Encoding used to read and writes files.
-     * <p/>
+     *
      * <b>Note:</b> If nothing is filled here, we will use the system
      * property {@code file.encoding}.
      *
@@ -93,7 +93,7 @@ public abstract class AbstractLicenseMojo
 
     /**
      * When is sets to {@code true}, will skip execution.
-     * <p/>
+     *
      * This will take effect in at the very begin of the {@link #execute()}
      * before any initialisation of goal.
      *
@@ -103,7 +103,7 @@ public abstract class AbstractLicenseMojo
 
     /**
      * Method to initialize the mojo before doing any concrete actions.
-     * <p/>
+     *
      * <b>Note:</b> The method is invoked before the {@link #doAction()} method.
      *
      * @throws Exception if any
@@ -113,7 +113,7 @@ public abstract class AbstractLicenseMojo
 
     /**
      * Do plugin action.
-     * <p/>
+     *
      * The method {@link #execute()} invoke this method only and only if :
      * <ul>
      * <li>{@link #checkPackaging()} returns {@code true}.</li>
@@ -299,18 +299,18 @@ public abstract class AbstractLicenseMojo
 
     /**
      * Check if the project packaging is acceptable for the mojo.
-     * <p/>
+     *
      * By default, accept all packaging types.
-     * <p/>
+     *
      * <b>Note:</b> This method is the first instruction to be executed in
      * the {@link #execute()}.
-     * <p/>
+     *
      * <b>Tip:</b> There is two method to simplify the packaging check :
-     * <p/>
+     *
      * {@link #acceptPackaging(String...)}
-     * <p/>
+     *
      * and
-     * <p/>
+     *
      * {@link #rejectPackaging(String...)}
      *
      * @return {@code true} if can execute the goal for the packaging of the
@@ -379,7 +379,7 @@ public abstract class AbstractLicenseMojo
 
     /**
      * Method to be invoked in init phase to check sanity of {@link #getEncoding()}.
-     * <p/>
+     *
      * If no encoding was filled, then use the default for system
      * (via {@code file.encoding} environement property).
      */

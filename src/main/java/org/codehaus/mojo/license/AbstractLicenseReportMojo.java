@@ -45,7 +45,7 @@ import java.util.Locale;
 /**
  * Base class for all license reports.
  *
- * @author tchemit <chemit@codelutin.com>
+ * @author tchemit dev@tchemit.fr
  * @since 1.1
  */
 public abstract class AbstractLicenseReportMojo
@@ -68,7 +68,7 @@ public abstract class AbstractLicenseReportMojo
 
     /**
      * Flag to activate verbose mode.
-     * <p/>
+     *
      * <b>Note:</b> Verbose mode is always on if you starts a debug maven instance
      * (says via {@code -X}).
      *
@@ -79,7 +79,7 @@ public abstract class AbstractLicenseReportMojo
 
     /**
      * Encoding used to read and writes files.
-     * <p/>
+     *
      * <b>Note:</b> If nothing is filled here, we will use the system
      * property {@code file.encoding}.
      *
@@ -159,7 +159,7 @@ public abstract class AbstractLicenseReportMojo
 
     /**
      * When is sets to {@code true}, will skip execution.
-     * <p/>
+     *
      * This will take effect in at the very begin of the {@link #execute()}
      * before any initialisation of goal.
      *

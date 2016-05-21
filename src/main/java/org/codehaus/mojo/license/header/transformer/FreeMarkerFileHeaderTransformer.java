@@ -27,7 +27,7 @@ import org.codehaus.plexus.component.annotations.Component;
 /**
  * Implementation of {@link FileHeaderTransformer} for freemarker format.
  *
- * @author tchemit <chemit@codelutin.com>
+ * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
 @Component( role = FileHeaderTransformer.class, hint = "ftl" )

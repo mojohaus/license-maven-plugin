@@ -28,7 +28,7 @@ import java.io.IOException;
  * Exception to be thrown when a file header could not be read or transformed
  * back to a {@link FileHeader}
  *
- * @author tchemit <chemit@codelutin.com>
+ * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
 public class InvalideFileHeaderException

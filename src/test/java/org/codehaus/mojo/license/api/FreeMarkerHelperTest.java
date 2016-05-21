@@ -37,7 +37,7 @@ import org.junit.Test;
 /**
  * Tests the {@link FreeMarkerHelper} and given templates.
  *
- * @author tchemit <chemit@codelutin.com>
+ * @author tchemit dev@tchemit.fr
  * @since 1.1
  */
 public class FreeMarkerHelperTest

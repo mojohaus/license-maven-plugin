@@ -32,7 +32,7 @@ import java.net.URL;
 /**
  * Tests {@link LicenseRepository}.
  *
- * @author tchemit <chemit@codelutin.com>
+ * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
 public class LicenseRepositoryTest

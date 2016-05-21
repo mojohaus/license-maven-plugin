@@ -9,7 +9,7 @@
 /**
  * this class owns a ignore license header and will not be updated.
  *
- * @author tchemit <chemit@codelutin.com>
+ * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
 package org.codehaus.mojo.license;

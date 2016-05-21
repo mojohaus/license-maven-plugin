@@ -34,7 +34,7 @@ import java.util.List;
 /**
  * Tests {@link LicenseStore}.
  *
- * @author tchemit <chemit@codelutin.com>
+ * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
 public class LicenseStoreTest

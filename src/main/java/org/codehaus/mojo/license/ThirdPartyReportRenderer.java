@@ -34,7 +34,7 @@ import java.util.Locale;
 /**
  * Generates a report of third parties of the project.
  *
- * @author tchemit <chemit@codelutin.com>
+ * @author tchemit dev@tchemit.fr
  * @since 1.1
  */
 public class ThirdPartyReportRenderer

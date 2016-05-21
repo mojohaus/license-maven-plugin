@@ -37,7 +37,7 @@ import java.util.List;
 /**
  * Mojo helper methods.
  *
- * @author tchemit <chemit@codelutin.com>
+ * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
 public class MojoHelper

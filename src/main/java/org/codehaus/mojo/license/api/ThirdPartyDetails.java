@@ -25,7 +25,7 @@ package org.codehaus.mojo.license.api;
 /**
  * Details of a artifact about his third-parties stuff.
  *
- * @author tchemit <chemit@codelutin.com>
+ * @author tchemit dev@tchemit.fr
  * @since 1.1
  */
 public interface ThirdPartyDetails

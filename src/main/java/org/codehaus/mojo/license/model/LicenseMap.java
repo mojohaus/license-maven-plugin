@@ -40,7 +40,7 @@ import java.util.TreeSet;
 /**
  * Map of artifacts (stub in mavenproject) group by their license.
  *
- * @author tchemit <chemit@codelutin.com>
+ * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
 public class LicenseMap

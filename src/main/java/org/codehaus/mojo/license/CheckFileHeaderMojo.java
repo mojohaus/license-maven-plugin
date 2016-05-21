@@ -27,9 +27,9 @@ import org.apache.maven.plugins.annotations.Parameter;
 
 /**
  * The goal to check if the state of header on project source files.
- * <p/>
  *
- * @author tchemit <chemit@codelutin.com>
+ *
+ * @author tchemit dev@tchemit.fr
  * @since 1.2
  */
 @Mojo( name = "check-file-header", requiresProject = true )

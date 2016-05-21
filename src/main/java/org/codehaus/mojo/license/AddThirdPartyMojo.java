@@ -50,15 +50,15 @@ import java.util.SortedSet;
 
 /**
  * Goal to generate the third-party license file.
- * <p/>
+ *
  * This file contains a list of the dependencies and their licenses.  Each dependency and its
- * license is displayed on a single line in the format <br/>
+ * license is displayed on a single line in the format
  * <pre>
  *   (&lt;license-name&gt;) &lt;project-name&gt; &lt;groupId&gt;:&lt;artifactId&gt;:&lt;version&gt; - &lt;project-url&gt;
  * </pre>
  * The directory containing the license database file is added to the classpath as an additional resource.
  *
- * @author tchemit <chemit@codelutin.com>
+ * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
 @Mojo( name = "add-third-party", requiresProject = true, requiresDependencyResolution = ResolutionScope.TEST,
@@ -93,7 +93,7 @@ public class AddThirdPartyMojo
 
     /**
      * To execute or not this mojo if project packaging is pom.
-     * <p/>
+     *
      * <strong>Note:</strong> The default value is {@code false}.
      *
      * @since 1.1

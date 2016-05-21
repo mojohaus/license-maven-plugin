@@ -37,7 +37,7 @@ import java.util.List;
  * The {@code LicenseStore} offers {@link License} coming from different {@link
  * LicenseRepository}.
  *
- * @author tchemit <chemit@codelutin.com>
+ * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
 public class LicenseStore

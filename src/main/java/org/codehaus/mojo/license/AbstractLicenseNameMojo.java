@@ -38,7 +38,7 @@ import java.util.Map;
  * Abstract mojo which using a {@link #licenseName} and owns a
  * {@link #licenseStore}.
  *
- * @author tchemit <chemit@codelutin.com>
+ * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
 public abstract class AbstractLicenseNameMojo
@@ -52,7 +52,7 @@ public abstract class AbstractLicenseNameMojo
     /**
      * To specify an external extra licenses repository resolver (says the base
      * url of the repository where the {@code license.properties} is present).
-     * <p/>
+     *
      * <p>
      * <strong>Note: </strong>If you want to refer to a file within this project, start the expression with <code>${project.baseUri}</code>
      * </p>
@@ -81,7 +81,7 @@ public abstract class AbstractLicenseNameMojo
 
     /**
      * Name of project (or module).
-     * <p/>
+     *
      * Will be used as description section of new header.
      *
      * @since 1.0
@@ -91,7 +91,7 @@ public abstract class AbstractLicenseNameMojo
 
     /**
      * Name of project's organization.
-     * <p/>
+     *
      * Will be used as copyrigth's holder in new header.
      *
      * @since 1.0
@@ -101,7 +101,7 @@ public abstract class AbstractLicenseNameMojo
 
     /**
      * Inception year of the project.
-     * <p/>
+     *
      * Will be used as first year of copyright section in new header.
      *
      * @since 1.0
@@ -111,7 +111,7 @@ public abstract class AbstractLicenseNameMojo
 
     /**
      * optional copyright owners.
-     * <p/>
+     *
      * If not set, {@code organizationName} parameter will be used instead.
      *
      * @since 1.6
@@ -121,7 +121,7 @@ public abstract class AbstractLicenseNameMojo
 
     /**
      * optional extra templates parameters.
-     * <p/>
+     *
      * If filled, they are available with prefix extra_ to process license content
      * (says the header and license content).
      *

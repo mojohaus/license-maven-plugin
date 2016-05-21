@@ -40,7 +40,7 @@ import java.util.Map;
 /**
  * A helper to deal with freemarker templating.
  *
- * @author tchemit <chemit@codelutin.com>
+ * @author tchemit dev@tchemit.fr
  * @since 1.1
  */
 public class FreeMarkerHelper
@@ -50,7 +50,7 @@ public class FreeMarkerHelper
 
     /**
      * Shared freemarker configuration.
-     * <p/>
+     *
      * <b>Note: </b> The configuration is auto loading as needed.
      */
     protected final Configuration freemarkerConfiguration;
@@ -70,7 +70,7 @@ public class FreeMarkerHelper
 
     /**
      *
-     * @param stringTemplate
+     * @param stringTemplate template
      * @return a helper, if template is a file, then will use it as it, otherwise will use the given template
      */
     public static FreeMarkerHelper newHelperFromContent( String stringTemplate )

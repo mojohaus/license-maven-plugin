@@ -36,8 +36,8 @@ import java.util.Vector;
 /**
  * Permet d'avoir les fichiers de proprietes tries.
  *
- * @author ruchaud <ruchaud@codelutin.com>
- * @author tchemit <chemit@codelutin.com>
+ * @author ruchaud ruchaud@codelutin.com
+ * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
 public class SortedProperties
@@ -142,11 +142,11 @@ public class SortedProperties
 
     /**
      * Permet de convertir une liste non typee, en une liste typee.
-     * <p/>
+     *
      * La liste en entree en juste bien castee.
-     * <p/>
+     *
      * On effectue une verification sur le typage des elements de la liste.
-     * <p/>
+     *
      * Note : <b>Aucune liste n'est creee, ni recopiee</b>
      *
      * @param <O>  le type des objets de la liste

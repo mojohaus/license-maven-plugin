@@ -26,9 +26,9 @@ import org.codehaus.mojo.license.model.Copyright;
 
 /**
  * Contract of a file header.
- * <p/>
+ *
  * A header has three sections like in this example :
- * <p/>
+ *
  * <pre>
  * Description
  * %--
@@ -37,7 +37,7 @@ import org.codehaus.mojo.license.model.Copyright;
  * License
  * </pre>
  *
- * @author tchemit <chemit@codelutin.com>
+ * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
 public class FileHeader

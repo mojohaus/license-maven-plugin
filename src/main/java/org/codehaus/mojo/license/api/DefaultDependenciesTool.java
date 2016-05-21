@@ -46,7 +46,7 @@ import java.util.regex.PatternSyntaxException;
 /**
  * Default implementation of the {@link DependenciesTool}.
  *
- * @author tchemit <chemit@codelutin.com>
+ * @author tchemit dev@tchemit.fr
  * @version $Id$
  * @since 1.0
  */

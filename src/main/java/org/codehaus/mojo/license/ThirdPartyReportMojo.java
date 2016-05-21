@@ -54,7 +54,7 @@ import java.util.TreeSet;
 /**
  * Generates a report of all third-parties detected in the module.
  *
- * @author tchemit <chemit@codelutin.com>
+ * @author tchemit dev@tchemit.fr
  * @since 1.1
  */
 @Mojo( name = "third-party-report", requiresProject = true, requiresDependencyResolution = ResolutionScope.RUNTIME )
@@ -149,11 +149,11 @@ public class ThirdPartyReportMojo
 
     /**
      * To merge licenses in final file.
-     * <p/>
+     *
      * Each entry represents a merge (first license is main license to keep), licenses are separated by {@code |}.
-     * <p/>
+     *
      * Example :
-     * <p/>
+     *
      * <pre>
      * &lt;licenseMerges&gt;
      * &lt;licenseMerge&gt;The Apache Software License|Version 2.0,Apache License, Version 2.0&lt;/licenseMerge&gt;

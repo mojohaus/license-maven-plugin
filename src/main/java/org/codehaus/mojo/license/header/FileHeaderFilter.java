@@ -29,7 +29,7 @@ import org.nuiton.processor.filters.DefaultFilter;
 /**
  * File Header filter.
  *
- * @author tchemit <chemit@codelutin.com>
+ * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
 public abstract class FileHeaderFilter
@@ -84,7 +84,7 @@ public abstract class FileHeaderFilter
 
     /**
      * Obtains the new header to use according to the old one.
-     * <p/>
+     *
      * <b>Note:</b> If the new header should not be updated, then the result is {@code null}.
      *
      * @param oldHeader the old header found in file.

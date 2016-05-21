@@ -29,7 +29,7 @@ import org.codehaus.plexus.component.annotations.Component;
 /**
  * Implementation of {@link FileHeaderFilter} to update an incoming header.
  *
- * @author tchemit <chemit@codelutin.com>
+ * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
 @Component( role= FileHeaderFilter.class, hint = "update-file-header" )

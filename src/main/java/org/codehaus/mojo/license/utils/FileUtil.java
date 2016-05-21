@@ -46,7 +46,7 @@ import java.util.List;
  * Some basic file io utilities
  *
  * @author pgier
- * @author tchemit <chemit@codelutin.com>
+ * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
 public class FileUtil

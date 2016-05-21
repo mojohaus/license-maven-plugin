@@ -40,7 +40,7 @@ import java.util.SortedSet;
 /**
  * Helper class that provides common functionality required by both the mojos and the reports.
  *
- * @author tchemit <chemit@codelutin.com>
+ * @author tchemit dev@tchemit.fr
  * @since 1.1
  */
 public interface ThirdPartyHelper
@@ -121,7 +121,7 @@ public interface ThirdPartyHelper
      * Loads unsafe mappings. Unsafe mappings are files that supply license metadata
      * for artifacts that lack it in their POM models. It's called 'unsafe' because its
      * safer to see actual metadata.
-     * <br/>
+     *
      * There are three sources of this data:
      * <ul>
      * <li>the 'missing' file.</li>

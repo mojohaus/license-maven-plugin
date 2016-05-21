@@ -38,7 +38,7 @@ import java.util.Map;
 /**
  * Displays all the available comment style to box file headers.
  *
- * @author tchemit <chemit@codelutin.com>
+ * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
 @Mojo( name = "comment-style-list", requiresProject = false, requiresDirectInvocation = true )

@@ -31,7 +31,7 @@ import java.util.SortedMap;
 /**
  * A tool to deal with dependencies of a project.
  *
- * @author tchemit <chemit@codelutin.com>
+ * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
 public interface DependenciesTool
@@ -40,7 +40,7 @@ public interface DependenciesTool
     /**
      * For a given {@code project}, obtain the universe of its dependencies after applying transitivity and
      * filtering rules given in the {@code configuration} object.
-     * <p/>
+     *
      * Result is given in a map where keys are unique artifact id
      *
      * @param project            the project to scann

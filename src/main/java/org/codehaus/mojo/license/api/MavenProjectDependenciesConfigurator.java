@@ -28,7 +28,7 @@ import java.util.List;
  * Contract to configure which dependencies will be loaded by the dependency tool via the method
  * {@link DependenciesTool#loadProjectDependencies(org.apache.maven.project.MavenProject, MavenProjectDependenciesConfigurator, org.apache.maven.artifact.repository.ArtifactRepository, List, java.util.SortedMap)}
  *
- * @author tchemit <chemit@codelutin.com>
+ * @author tchemit dev@tchemit.fr
  * @see DependenciesTool
  * @since 1.0
  */

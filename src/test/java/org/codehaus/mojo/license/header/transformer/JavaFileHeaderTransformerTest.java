@@ -28,7 +28,7 @@ import org.junit.Test;
 /**
  * Tests the {@link JavaFileHeaderTransformer}.
  *
- * @author tchemit <chemit@codelutin.com>
+ * @author tchemit dev@tchemit.fr
  * @since 1.2
  */
 public class JavaFileHeaderTransformerTest

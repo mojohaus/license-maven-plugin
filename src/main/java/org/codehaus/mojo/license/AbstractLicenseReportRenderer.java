@@ -36,7 +36,7 @@ import java.util.Locale;
 /**
  * Base class for report renderers.
  *
- * @author tchemit <chemit@codelutin.com>
+ * @author tchemit dev@tchemit.fr
  * @since 1.1
  */
 public abstract class AbstractLicenseReportRenderer

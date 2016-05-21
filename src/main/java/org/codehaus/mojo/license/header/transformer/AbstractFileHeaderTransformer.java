@@ -31,10 +31,10 @@ import java.util.regex.Pattern;
 
 /**
  * Abstract implementation of {@link FileHeaderTransformer}.
- * <p/>
+ *
  * Concrete implementation should only have to give comment configuration.
  *
- * @author tchemit <chemit@codelutin.com>
+ * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
 public abstract class AbstractFileHeaderTransformer
