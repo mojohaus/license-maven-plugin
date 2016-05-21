@@ -184,21 +184,26 @@ public class LicenseStore
     public void addRepository( String extraResolver )
         throws IOException
     {
-        URL baseURL;
-        if ( extraResolver.startsWith( CLASSPATH_PROTOCOL ) )
+
+        if ( extraResolver.equals( CLASSPATH_PROTOCOL ) )
+        {
+            addRootPackageClassPathRepository();
+        }
+        else if ( extraResolver.startsWith( CLASSPATH_PROTOCOL ) )
         {
             extraResolver = extraResolver.substring( CLASSPATH_PROTOCOL.length() );
             if ( LOG.isDebugEnabled() )
             {
                 LOG.info( "Using classpath extraresolver: " + extraResolver );
             }
-            baseURL = getClass().getClassLoader().getResource( extraResolver );
+            URL baseURL = getClass().getClassLoader().getResource( extraResolver );
+            addRepository( baseURL );
         }
         else
         {
-            baseURL = new URL( extraResolver );
+            URL baseURL = new URL( extraResolver );
+            addRepository( baseURL );
         }
-        addRepository( baseURL );
     }
 
     public void addRepository( URL baseURL )
@@ -226,6 +231,17 @@ public class LicenseStore
             LOG.debug( "Adding a jar license repository " + repository );
         }
         addRepository( repository );
+    }
+
+    public void addRootPackageClassPathRepository()
+        throws IOException
+    {
+        checkNotInit( "addRootPackageClassPathRepository" );
+        if ( LOG.isDebugEnabled() )
+        {
+            LOG.debug( "Adding a no package class path license repository " );
+        }
+        addRepository( new RootPackageClassPathLicenseRepository() );
     }
 
     /**

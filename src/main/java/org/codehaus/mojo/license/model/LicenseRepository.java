@@ -84,18 +84,31 @@ public class LicenseRepository
         this.baseURL = baseURL;
     }
 
+    protected URL getDefinitionURL()
+    {
+        if ( baseURL == null || StringUtils.isEmpty( baseURL.toString() ) )
+        {
+            throw new IllegalStateException( "no baseURL defined in " + this );
+        }
+
+        URL definitionURL = MojoHelper.getUrl( getBaseURL(), REPOSITORY_DEFINITION_FILE );
+        return definitionURL;
+    }
+
+    protected URL getLicenseBaseURL(String licenseName)
+    {
+        URL licenseBaseURL = MojoHelper.getUrl( baseURL, licenseName );
+        return licenseBaseURL;
+    }
+
     public void load()
         throws IOException
     {
         checkNotInit( "load" );
         try
         {
-            if ( baseURL == null || StringUtils.isEmpty( baseURL.toString() ) )
-            {
-                throw new IllegalStateException( "no baseURL defined in " + this );
-            }
 
-            URL definitionURL = MojoHelper.getUrl( getBaseURL(), REPOSITORY_DEFINITION_FILE );
+            URL definitionURL = getDefinitionURL();
             if ( licenses != null )
             {
                 licenses.clear();
@@ -117,7 +130,7 @@ public class LicenseRepository
             {
                 String licenseName = (String) entry.getKey();
                 licenseName = licenseName.trim().toLowerCase();
-                URL licenseBaseURL = MojoHelper.getUrl( baseURL, licenseName );
+                URL licenseBaseURL = getLicenseBaseURL( licenseName );
 
                 License license = new License();
                 license.setName( licenseName );
