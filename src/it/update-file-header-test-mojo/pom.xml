@@ -92,9 +92,9 @@
                 <sql2>sql</sql2>
                 <mysql2>mysql</mysql2>
               </extraExtensions>
-              <!--<excludes>-->
-              <!--<param>**/*.rst</param>-->
-              <!--</excludes>-->
+              <excludes>
+              <exclude>**/rst2/*.rst</exclude>
+              </excludes>
             </configuration>
           </execution>
         </executions>

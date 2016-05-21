@@ -184,6 +184,12 @@ assert assertContains(file, content, '.. * #L%');
 assert assertContains(file, content, '$Id');
 assert assertNotContains(file, content, '.. * .. *');
 
+file = new File(basedir, 'src/files/rst/rst2/test.rst');
+assertExistsFile(file);
+
+content = file.text;
+assert assertNotContains(file, content, 'Copyright (C)');
+
 file = new File(basedir, 'src/files/rst/test2.rst');
 assertExistsFile(file);
 
