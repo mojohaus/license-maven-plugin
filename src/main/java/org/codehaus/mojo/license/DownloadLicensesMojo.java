@@ -181,7 +181,7 @@ public class DownloadLicensesMojo
      *
      * @since 1.9
      */
-    @Parameter( defaultValue = "false" )
+    @Parameter( property = "license.organizeLicensesByDependencies", defaultValue = "false" )
     protected boolean organizeLicensesByDependencies;
 
     // ----------------------------------------------------------------------
