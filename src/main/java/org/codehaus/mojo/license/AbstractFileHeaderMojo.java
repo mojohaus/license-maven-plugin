@@ -199,14 +199,14 @@ public abstract class AbstractFileHeaderMojo
     protected boolean addJavaLicenseAfterPackage;
 
     /**
-     * A flag to use for java comment start with no reformat syntax {@code /*-}.
+     * A flag to use for java comment start tag with no reformat syntax {@code /*-}.
      * <p>
      * See http://www.oracle.com/technetwork/java/javase/documentation/codeconventions-141999.html#350
      *
      * @since 1.9
      */
-    @Parameter( property = "license.useNoReformatCommentStartTag", defaultValue = "true" )
-    protected boolean useNoReformatCommentStartTag;
+    @Parameter( property = "license.useJavaNoReformatCommentStartTag", defaultValue = "true" )
+    protected boolean useJavaNoReformatCommentStartTag;
 
     /**
      * A flag to indicate if there should be an empty line after the header.
@@ -542,7 +542,7 @@ public abstract class AbstractFileHeaderMojo
                 JavaFileHeaderTransformer javaFileHeaderTransformer = (JavaFileHeaderTransformer) aTransformer;
 
                 javaFileHeaderTransformer.setAddJavaLicenseAfterPackage( addJavaLicenseAfterPackage );
-                javaFileHeaderTransformer.setUseNoReformatCommentStartTag( useNoReformatCommentStartTag );
+                javaFileHeaderTransformer.setUseNoReformatCommentStartTag( useJavaNoReformatCommentStartTag );
             }
 
             String[] extensions = aTransformer.getDefaultAcceptedExtensions();

@@ -24,7 +24,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <license.useNoReformatCommentStartTag>true</license.useNoReformatCommentStartTag>
+    <license.useJavaNoReformatCommentStartTag>true</license.useJavaNoReformatCommentStartTag>
     <license.licenseName>gpl_v3</license.licenseName>
   </properties>
 
