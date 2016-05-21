@@ -104,17 +104,17 @@ public abstract class AbstractLicenseReportMojo
     @Parameter( property = "project.remoteArtifactRepositories", required = true, readonly = true )
     private List remoteRepositories;
 
-    // ----------------------------------------------------------------------
-    // Plexus Components
-    // ----------------------------------------------------------------------
-
     /**
      * The Maven Project.
      *
      * @since 1.1
      */
-    @Component
+    @Parameter( defaultValue = "${project}", readonly = true )
     private MavenProject project;
+
+    // ----------------------------------------------------------------------
+    // Plexus Components
+    // ----------------------------------------------------------------------
 
     /**
      * Doxia Site Renderer component.

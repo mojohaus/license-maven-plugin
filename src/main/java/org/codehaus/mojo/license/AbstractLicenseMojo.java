@@ -27,7 +27,6 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.mojo.license.utils.MojoHelper;
@@ -72,16 +71,12 @@ public abstract class AbstractLicenseMojo
     @Parameter( property = "license.encoding", defaultValue = "${project.build.sourceEncoding}" )
     private String encoding;
 
-    // ----------------------------------------------------------------------
-    // Plexus Components
-    // ----------------------------------------------------------------------
-
     /**
      * Current maven session. (used to launch certain mojo once by build).
      *
      * @since 1.0
      */
-    @Component
+    @Parameter( defaultValue = "${session}", readonly = true )
     private MavenSession session;
 
     /**
@@ -89,7 +84,7 @@ public abstract class AbstractLicenseMojo
      *
      * @since 1.0
      */
-    @Component
+    @Parameter( defaultValue = "${project}", readonly = true )
     private MavenProject project;
 
     // ----------------------------------------------------------------------

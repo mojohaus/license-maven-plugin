@@ -184,17 +184,17 @@ public class DownloadLicensesMojo
     @Parameter( property = "license.organizeLicensesByDependencies", defaultValue = "false" )
     protected boolean organizeLicensesByDependencies;
 
-    // ----------------------------------------------------------------------
-    // Plexus Components
-    // ----------------------------------------------------------------------
-
     /**
      * The Maven Project Object
      *
      * @since 1.0
      */
-    @Component
+    @Parameter( defaultValue = "${project}", readonly = true )
     private MavenProject project;
+
+    // ----------------------------------------------------------------------
+    // Plexus Components
+    // ----------------------------------------------------------------------
 
     /**
      * Dependencies tool.
