@@ -43,6 +43,15 @@ public class JavaFileHeaderTransformer
     protected boolean addJavaLicenseAfterPackage;
 
     /**
+     * Flag to use comment start tag with a no reformat syntax {@code /*-}.
+     *
+     * See http://www.oracle.com/technetwork/java/javase/documentation/codeconventions-141999.html#350
+     *
+     * @since 1.9
+     */
+    protected boolean useNoReformatCommentStartTag;
+
+    /**
      * Default constructor.
      */
     public JavaFileHeaderTransformer()
@@ -69,6 +78,23 @@ public class JavaFileHeaderTransformer
     public void setAddJavaLicenseAfterPackage( boolean addJavaLicenseAfterPackage )
     {
         this.addJavaLicenseAfterPackage = addJavaLicenseAfterPackage;
+    }
+
+    /**
+     * Sets the value of the property {@link #useNoReformatCommentStartTag}.
+     *
+     * @param useNoReformatCommentStartTag the new value to set
+     * @since 1.9
+     */
+    public void setUseNoReformatCommentStartTag( boolean useNoReformatCommentStartTag )
+    {
+        this.useNoReformatCommentStartTag = useNoReformatCommentStartTag;
+    }
+
+    @Override
+    public String getCommentStartTag()
+    {
+        return useNoReformatCommentStartTag ? "/*-" : super.getCommentStartTag();
     }
 
     /**

@@ -199,8 +199,17 @@ public abstract class AbstractFileHeaderMojo
     protected boolean addJavaLicenseAfterPackage;
 
     /**
-     * A flag to indicate if there should be an empty line after the header.
+     * A flag to use for java comment start with no reformat syntax {@code /*-}.
+     * <p>
+     * See http://www.oracle.com/technetwork/java/javase/documentation/codeconventions-141999.html#350
      *
+     * @since 1.9
+     */
+    @Parameter( property = "license.useNoReformatCommentStartTag", defaultValue = "true" )
+    protected boolean useNoReformatCommentStartTag;
+
+    /**
+     * A flag to indicate if there should be an empty line after the header.
      * <p>
      * Checkstyle requires empty line between license header and package statement.
      * If you are using addJavaLicenseAfterPackage=false it could make sense to set this to true.
@@ -214,7 +223,7 @@ public abstract class AbstractFileHeaderMojo
 
     /**
      * A flag to ignore no files to scan.
-     *
+     * <p>
      * <p>
      * This flag will suppress the "No file to scan" warning. This will allow you to set the plug-in in the root pom of
      * your project without getting a lot of warnings for aggregation modules / artifacts.
@@ -300,7 +309,7 @@ public abstract class AbstractFileHeaderMojo
      * @since 1.1
      */
     @Parameter( property = "license.descriptionTemplate",
-                defaultValue = "/org/codehaus/mojo/license/default-file-header-description.ftl" )
+        defaultValue = "/org/codehaus/mojo/license/default-file-header-description.ftl" )
     protected String descriptionTemplate;
 
     // ----------------------------------------------------------------------
@@ -530,8 +539,10 @@ public abstract class AbstractFileHeaderMojo
 
             if ( aTransformer instanceof JavaFileHeaderTransformer )
             {
-                ( (JavaFileHeaderTransformer) aTransformer ).setAddJavaLicenseAfterPackage(
-                    addJavaLicenseAfterPackage );
+                JavaFileHeaderTransformer javaFileHeaderTransformer = (JavaFileHeaderTransformer) aTransformer;
+
+                javaFileHeaderTransformer.setAddJavaLicenseAfterPackage( addJavaLicenseAfterPackage );
+                javaFileHeaderTransformer.setUseNoReformatCommentStartTag( useNoReformatCommentStartTag );
             }
 
             String[] extensions = aTransformer.getDefaultAcceptedExtensions();
