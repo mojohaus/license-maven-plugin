@@ -48,54 +48,36 @@ public class LicenseDownloader
     public static void downloadLicense( String licenseUrlString, String loginPassword, File outputFile )
         throws IOException
     {
-    	if ( licenseUrlString == null || licenseUrlString.length() == 0 )
-    		return;
-    	
+        if ( licenseUrlString == null || licenseUrlString.length() == 0 )
+        {
+            return;
+        }
+
         InputStream licenseInputStream = null;
         FileOutputStream fos = null;
 
         try
         {
-            URL licenseUrl = new URL( licenseUrlString );
-            URLConnection connection = licenseUrl.openConnection();
+            URLConnection connection = newConnection( licenseUrlString, loginPassword );
 
-            if ( loginPassword != null )
-            {
-                connection.setRequestProperty( "Proxy-Authorization", loginPassword );
-            }
-            connection.setConnectTimeout( DEFAULT_CONNECTION_TIMEOUT );
-            connection.setReadTimeout( DEFAULT_CONNECTION_TIMEOUT );
-            
             boolean redirect = false;
-            if ( connection instanceof HttpURLConnection ) 
+            if ( connection instanceof HttpURLConnection )
             {
-            	int status = ((HttpURLConnection)connection).getResponseCode();
+                int status = ( (HttpURLConnection) connection ).getResponseCode();
 
-            	if ( status != HttpURLConnection.HTTP_OK ) 
-            	{
-            		if ( status == HttpURLConnection.HTTP_MOVED_TEMP
-            				|| status == HttpURLConnection.HTTP_MOVED_PERM
-            				|| status == HttpURLConnection.HTTP_SEE_OTHER )
-            		{
-            			redirect = true;
-            		}
-            	}
+                redirect = HttpURLConnection.HTTP_MOVED_TEMP == status || HttpURLConnection.HTTP_MOVED_PERM == status ||
+                    HttpURLConnection.HTTP_SEE_OTHER == status;
             }
-            
-            if ( redirect ) {
 
-        		// get redirect url from "location" header field
-        		String newUrl = connection.getHeaderField( "Location" );
-        		
-        		// open the new connnection again
-        		connection = new URL( newUrl ).openConnection();
-        		if ( loginPassword != null )
-                {
-                    connection.setRequestProperty( "Proxy-Authorization", loginPassword );
-                }
-                connection.setConnectTimeout( DEFAULT_CONNECTION_TIMEOUT );
-                connection.setReadTimeout( DEFAULT_CONNECTION_TIMEOUT );
-        	}
+            if ( redirect )
+            {
+                // get redirect url from "location" header field
+                String newUrl = connection.getHeaderField( "Location" );
+
+                // open the new connnection again
+                connection = newConnection( newUrl, loginPassword );
+
+            }
 
             licenseInputStream = connection.getInputStream();
             fos = new FileOutputStream( updateFileExtension( outputFile, connection.getContentType() ) );
@@ -128,37 +110,63 @@ public class LicenseDownloader
             outStream.write( buf, 0, len );
         }
     }
-    
-    private static File updateFileExtension ( final File outputFile, final String mimeType )
+
+    private static URLConnection newConnection( String url, String loginPassword )
+        throws IOException
     {
-    	final String realExtension = getFileExtension(mimeType);
-    	
-    	if ( realExtension != null )
-    	{
-    		if ( !outputFile.getName().endsWith(realExtension) ) 
-    		{
-    			return new File( outputFile.getAbsolutePath() + realExtension );
-    		}
-    	}
-    	return outputFile;
+
+        URL licenseUrl = new URL( url );
+        URLConnection connection = licenseUrl.openConnection();
+
+        if ( loginPassword != null )
+        {
+            connection.setRequestProperty( "Proxy-Authorization", loginPassword );
+        }
+        connection.setConnectTimeout( DEFAULT_CONNECTION_TIMEOUT );
+        connection.setReadTimeout( DEFAULT_CONNECTION_TIMEOUT );
+
+        return connection;
+
     }
-    
-    private static String getFileExtension( final String mimeType ) 
+
+    private static File updateFileExtension( File outputFile, String mimeType )
     {
-    	if ( mimeType == null )
-    		return null;
-    	
-    	final String lowerMimeType = mimeType.toLowerCase();
-    	if ( lowerMimeType.contains( "plain" ) )
-    		return ".txt";
-    	
-    	if ( lowerMimeType.contains( "html" ) )
-    		return ".html";
-    	
-    	if ( lowerMimeType.contains( "pdf" ) )
-    		return ".pdf";
-    	
-    	return null;
+        final String realExtension = getFileExtension( mimeType );
+
+        if ( realExtension != null )
+        {
+            if ( !outputFile.getName().endsWith( realExtension ) )
+            {
+                return new File( outputFile.getAbsolutePath() + realExtension );
+            }
+        }
+        return outputFile;
+    }
+
+    private static String getFileExtension( String mimeType )
+    {
+        if ( mimeType == null )
+        {
+            return null;
+        }
+
+        final String lowerMimeType = mimeType.toLowerCase();
+        if ( lowerMimeType.contains( "plain" ) )
+        {
+            return ".txt";
+        }
+
+        if ( lowerMimeType.contains( "html" ) )
+        {
+            return ".html";
+        }
+
+        if ( lowerMimeType.contains( "pdf" ) )
+        {
+            return ".pdf";
+        }
+
+        return null;
     }
 
 }
