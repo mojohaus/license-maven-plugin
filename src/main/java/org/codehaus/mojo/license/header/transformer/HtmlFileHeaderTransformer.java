@@ -25,22 +25,22 @@ package org.codehaus.mojo.license.header.transformer;
 import org.codehaus.plexus.component.annotations.Component;
 
 /**
- * Implementation of {@link FileHeaderTransformer} for xml format.
+ * Implementation of {@link FileHeaderTransformer} for html format.
  *
- * @author tchemit <chemit@codelutin.com>
- * @since 1.0
+ * @author tchemit dev@tchemit.fr
+ * @since 1.9
  */
-@Component( role = FileHeaderTransformer.class, hint = "xml" )
-public class XmlFileHeaderTransformer
+@Component( role = FileHeaderTransformer.class, hint = "html" )
+public class HtmlFileHeaderTransformer
     extends AbstractFileHeaderTransformer
 {
 
     /**
      * Default constructor.
      */
-    public XmlFileHeaderTransformer()
+    public HtmlFileHeaderTransformer()
     {
-        super( "xml", "header transformer with xml comment style", "<!--", "  -->", "  " );
+        super( "xml", "header transformer with html comment style", "<!--", "  -->", "  " );
     }
 
     /**
@@ -48,8 +48,7 @@ public class XmlFileHeaderTransformer
      */
     public String[] getDefaultAcceptedExtensions()
     {
-        return new String[]{ "pom", "xml", "mxlm", "dtd", "fml", "xsl", "jaxx", "kml", "gsp",
-            "tml" };
+        return new String[]{ "xhtml", "html", "htm" };
     }
 
     /**
@@ -62,18 +61,18 @@ public class XmlFileHeaderTransformer
         String result;
 
         String prolog = null;
-        int startProlog = content.indexOf( "<?xml" );
+        int startProlog = content.indexOf( "<!DOCTYPE" );
         if ( startProlog > -1 )
         {
 
             // prolog start was detected
-            int endProlog = content.indexOf( "?>", startProlog );
+            int endProlog = content.indexOf( ">", startProlog );
 
             if ( endProlog > -1 )
             {
 
                 // prolog end was detected
-                prolog = content.substring( 0, endProlog + 2 );
+                prolog = content.substring( 0, endProlog + 1 );
             }
         }
 
