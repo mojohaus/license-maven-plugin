@@ -28,7 +28,7 @@
   <parent>
     <groupId>org.codehaus.mojo</groupId>
     <artifactId>mojo-parent</artifactId>
-    <version>33</version>
+    <version>38</version>
   </parent>
 
   <artifactId>license-maven-plugin</artifactId>
@@ -37,7 +37,6 @@
 
   <name>License Maven Plugin</name>
   <description>Maven plugin to download and collect license files from project dependencies.</description>
-  <!-- tchemit-20120620 Do not remove this, it is used to deploy SNAPSHOT site -->
   <url>http://www.mojohaus.org/license-maven-plugin</url>
   <inceptionYear>2010</inceptionYear>
   <licenses>
@@ -89,9 +88,10 @@
   </prerequisites>
 
   <scm>
-    <connection>scm:git:git@github.com:mojohaus/license-maven-plugin.git</connection>
-    <developerConnection>scm:git:git@github.com:mojohaus/license-maven-plugin.git</developerConnection>
+    <connection>scm:git:https://github.com/mojohaus/license-maven-plugin.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/mojohaus/license-maven-plugin.git</developerConnection>
     <url>https://github.com/mojohaus/license-maven-plugin</url>
+    <tag>HEAD</tag>
   </scm>
   <issueManagement>
     <system>github</system>
@@ -109,7 +109,9 @@
   </distributionManagement>
 
   <properties>
-    <mavenVersion>2.0.6</mavenVersion>
+    <mavenVersion>2.2.1</mavenVersion>
+    <mojo.java.target>1.5</mojo.java.target>
+
     <processorVersion>1.3</processorVersion>
 
     <doxiaVersion>1.5</doxiaVersion>
@@ -122,7 +124,7 @@
     <licensePluginVersion>1.5</licensePluginVersion>
 
     <pluginPluginVersion>3.2</pluginPluginVersion>
-    <plexusComponentVersion>1.5.5</plexusComponentVersion>
+    <plexusComponentVersion>1.6</plexusComponentVersion>
   </properties>
 
   <dependencies>
@@ -292,9 +294,18 @@
     <pluginManagement>
       <plugins>
         <plugin>
+          <artifactId>maven-gpg-plugin</artifactId>
+          <version>1.6</version>
+          <configuration>
+            <!-- Temporary solution to get a release out using gpg version 1 -->
+            <useAgent>false</useAgent>
+          </configuration>
+        </plugin>
+
+        <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>build-helper-maven-plugin</artifactId>
-          <version>1.8</version>
+          <version>1.10</version>
         </plugin>
         <plugin>
           <groupId>org.codehaus.plexus</groupId>
@@ -320,33 +331,28 @@
             </tagletArtifacts>
           </configuration>
         </plugin>
-        <plugin>
-          <artifactId>maven-plugin-plugin</artifactId>
-          <configuration>
-            <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
-          </configuration>
-        </plugin>
-        <!-- TODO Move this to mojo-parent ? -->
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-site-plugin</artifactId>
-          <version>3.4</version>
-          <configuration>
-            <topSiteURL>${project.distributionManagement.site.url}</topSiteURL>
-            <skipDeploy>true</skipDeploy><!-- don't deploy site with maven-site-plugin -->
-          </configuration>
-        </plugin>
-        <!-- TODO Move this to mojo-parent ? -->
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-scm-publish-plugin</artifactId>
-          <version>1.1</version>
-        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>
 
-      <!-- expose new plexus components -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>animal-sniffer-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <signature>
+            <groupId>org.codehaus.mojo.signature</groupId>
+            <artifactId>java15</artifactId>
+            <version>1.0</version>
+          </signature>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-component-metadata</artifactId>
@@ -361,18 +367,20 @@
 
       <plugin>
         <artifactId>maven-plugin-plugin</artifactId>
+        <configuration>
+          <goalPrefix>license</goalPrefix>
+          <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
+        </configuration>
         <executions>
           <execution>
-            <id>generate-descriptor</id>
+            <id>mojo-descriptor</id>
             <goals>
               <goal>descriptor</goal>
             </goals>
           </execution>
         </executions>
-        <configuration>
-          <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
-        </configuration>
       </plugin>
+
       <!--
            To test reading third party data from an artifact, we need an artifact.
            In the aggregate case, we can't depend on it in the reactor, since
@@ -399,25 +407,6 @@
                   <classifier>test-third-party</classifier>
                 </artifact>
               </artifacts>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-      <!-- to publish site on branch gh-pages -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-scm-publish-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>scm-publish</id>
-            <phase>site-deploy</phase><!-- deploy site with maven-scm-publish-plugin -->
-            <goals>
-              <goal>publish-scm</goal>
-            </goals>
-            <configuration>
-              <content>${project.build.directory}/site</content><!-- mono-module doesn't require site:stage -->
-              <scmBranch>gh-pages</scmBranch> <!-- branch where to deploy -->
             </configuration>
           </execution>
         </executions>
@@ -517,7 +506,7 @@
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>license-maven-plugin</artifactId>
-            <version>1.5</version>
+            <version>1.8</version>
             <executions>
               <execution>
                 <goals>
@@ -542,64 +531,13 @@
         <plugins>
           <plugin>
             <artifactId>maven-invoker-plugin</artifactId>
-            <version>1.8</version>
-          </plugin>
-
-          <plugin>
-            <artifactId>maven-checkstyle-plugin</artifactId>
-            <version>2.11</version>
-            <configuration>
-              <headerLocation>config/checkstyle-header.txt</headerLocation>
-            </configuration>
-          </plugin>
-
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-javadoc-plugin</artifactId>
-            <version>2.9.1</version>
-            <configuration>
-              <quiet>true</quiet>
-              <tagletArtifacts>
-                <tagletArtifact>
-                  <groupId>org.apache.maven.plugin-tools</groupId>
-                  <artifactId>maven-plugin-tools-javadoc</artifactId>
-                  <version>${pluginPluginVersion}</version>
-                </tagletArtifact>
-                <tagletArtifact>
-                  <groupId>org.codehaus.plexus</groupId>
-                  <artifactId>plexus-component-javadoc</artifactId>
-                  <version>${plexusComponentVersion}</version>
-                </tagletArtifact>
-              </tagletArtifacts>
-            </configuration>
-            <reportSets>
-              <reportSet>
-                <reports>
-                  <report>javadoc</report>
-                  <report>test-javadoc</report>
-                </reports>
-              </reportSet>
-            </reportSets>
-          </plugin>
-
-          <plugin>
-            <artifactId>maven-plugin-plugin</artifactId>
-            <version>${pluginPluginVersion}</version>
-            <configuration>
-              <requirements>
-                <!--
-                NOTE: Maven 2.x does not interpolate properties of the form project.*|pom.* so the Maven Plugin Plugin
-                gets garbage when manually examining the config of the Maven Compiler Plugin.
-                -->
-                <jdk>${mojo.java.target}</jdk>
-              </requirements>
-            </configuration>
+            <version>2.0.0</version>
           </plugin>
 
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>license-maven-plugin</artifactId>
-            <version>1.5</version>
+            <version>1.8</version>
             <reportSets>
               <reportSet>
                 <reports>
