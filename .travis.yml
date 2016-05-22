@@ -4,7 +4,7 @@ install: true
 
 jdk: 
   - openjdk7
-  - openjdk6
+  - openjdk8
   - oraclejdk7
   - oraclejdk8
 
@@ -20,4 +20,4 @@ branches:
         - gh-pages
 
 notifications:
-  email: false
+  email: true
