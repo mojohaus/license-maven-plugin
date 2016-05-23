@@ -61,6 +61,16 @@ ${project.name}
   * <<<{{{./update-project-license-mojo.html}license:update-project-license}}>>>\
     Updates (or creates) the main project license file according to the license defined in the licenseName parameter.
 
+* {Reports} Overview
+
+  The following goals are meant to participate in the site build lifecycle as reports:
+
+  * <<<{{{./third-party-report-mojo.html}license:third-party-report}}>>>\
+    Generates the third-party report of the given maven project.
+
+  * <<<{{{./aggregate-third-party-report-mojo.html}license:aggregate-third-party-report}}>>>\
+    Generates the aggregate third-party report of the given maven project (collect dependencies of all his childs).
+
 * {Usage}
   
   General instructions on how to use the License Plugin can be found on the {{{./usage.html}usage page}}. Some more
