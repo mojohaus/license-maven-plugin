@@ -1,1 +1,0 @@
-clean license:aggregate-add-third-party
