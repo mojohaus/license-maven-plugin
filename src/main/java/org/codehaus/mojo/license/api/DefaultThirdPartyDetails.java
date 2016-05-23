@@ -22,6 +22,8 @@ package org.codehaus.mojo.license.api;
  * #L%
  */
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.maven.project.MavenProject;
 
 /**
@@ -164,5 +166,38 @@ public class DefaultThirdPartyDetails
     public void setThirdPartyLicenses( String[] thirdPartyLicenses )
     {
         this.thirdPartyLicenses = thirdPartyLicenses;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals( Object o )
+    {
+        if ( this == o )
+        {
+            return true;
+        }
+
+        if ( o == null || getClass() != o.getClass() )
+        {
+            return false;
+        }
+
+        DefaultThirdPartyDetails that = (DefaultThirdPartyDetails) o;
+
+        return new EqualsBuilder().append( getGroupId(), that.getGroupId() ).append( getArtifactId(),
+                                                                                             that.getArtifactId() ).append(
+            getVersion(), that.getVersion()).append(getClassifier(), that.getClassifier()).isEquals();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder( 17, 37 ).append( getGroupId() ).append( getArtifactId() ).append(
+            getVersion() ).append( getClassifier() ).toHashCode();
     }
 }
