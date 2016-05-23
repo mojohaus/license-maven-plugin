@@ -56,4 +56,15 @@ public interface DependenciesTool
                                                              ArtifactRepository localRepository,
                                                              List<ArtifactRepository> remoteRepositories,
                                                              SortedMap<String, MavenProject> cache );
+
+    /**
+     * Load project artifacts.
+     *
+     * @param project            the project to scann
+     * @param localRepository    local repository used to resolv dependencies
+     * @param remoteRepositories remote repositories used to resolv dependencies
+     * @throws DependenciesToolException if could not load project dependencies
+     */
+    void loadProjectArtifacts( ArtifactRepository localRepository, List remoteRepositories, MavenProject project )
+        throws DependenciesToolException;
 }
