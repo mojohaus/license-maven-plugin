@@ -25,10 +25,18 @@ package org.codehaus.mojo.license.api;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.project.artifact.InvalidDependencyVersionException;
+import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.codehaus.mojo.license.utils.MojoHelper;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -67,6 +75,15 @@ public class DefaultDependenciesTool
      */
     @Requirement
     private MavenProjectBuilder mavenProjectBuilder;
+
+    @Requirement
+    private ArtifactFactory artifactFactory;
+
+    @Requirement
+    private ArtifactResolver artifactResolver;
+
+    @Requirement
+    private ArtifactMetadataSource artifactMetadataSource;
 
     /**
      * {@inheritDoc}
@@ -229,6 +246,54 @@ public class DefaultDependenciesTool
             result.put( id, depMavenProject );
         }
         return result;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void loadProjectArtifacts( ArtifactRepository localRepository, List remoteRepositories,
+                                      MavenProject project )
+        throws DependenciesToolException
+
+    {
+
+        if ( CollectionUtils.isEmpty( project.getDependencyArtifacts() ) )
+        {
+
+            Set dependenciesArtifacts;
+            try
+            {
+                dependenciesArtifacts =
+                    MavenMetadataSource.createArtifacts( artifactFactory, project.getDependencies(), null, null,
+                                                         project );
+            }
+            catch ( InvalidDependencyVersionException e )
+            {
+                throw new DependenciesToolException( e );
+            }
+            project.setDependencyArtifacts( dependenciesArtifacts );
+
+            Artifact artifact = project.getArtifact();
+
+            ArtifactResolutionResult result;
+            try
+            {
+                result = artifactResolver.resolveTransitively( dependenciesArtifacts, artifact, remoteRepositories,
+                                                               localRepository, artifactMetadataSource );
+            }
+            catch ( ArtifactResolutionException e )
+            {
+                throw new DependenciesToolException( e );
+            }
+            catch ( ArtifactNotFoundException e )
+            {
+                throw new DependenciesToolException( e );
+            }
+
+            project.setArtifacts( result.getArtifacts() );
+
+        }
+
     }
 
     /**
