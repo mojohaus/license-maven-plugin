@@ -1,12 +1,8 @@
 package org.codehaus.mojo.license;
 
-import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
@@ -64,19 +60,6 @@ public class AggregatorThirdPartyReportMojo
      */
     @Parameter( property = "reactorProjects", readonly = true, required = true )
     private List<MavenProject> reactorProjects;
-
-    // ----------------------------------------------------------------------
-    // Plexus Components
-    // ----------------------------------------------------------------------
-
-    @Component
-    private ArtifactFactory artifactFactory;
-
-    @Component
-    private ArtifactResolver artifactResolver;
-
-    @Component
-    private ArtifactMetadataSource artifactMetadataSource;
 
     // ----------------------------------------------------------------------
     // MavenReport Implementaton
