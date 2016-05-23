@@ -189,6 +189,47 @@ mvn package
     
   For the <<<download-licenses>>> goal, licenses will by default be downloaded into the directory 
   <<<target/licenses>>>.  This can be configured using the <<<licensesOutputDirectory>>> parameter.
+
+** aggregate-download-licenses goal
+
+  The aggregate version of the download-licenses goal.
+
+  By default the plugin attaches to the <<<generate-resources>>> phase of the build lifecycle and is only executed for
+  the root module collecting dependencies of all reactor projects.
+
+-------------------
+<project>
+  ...
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>${project.version}</version>
+        <executions>
+          <execution>
+            <id>aggregate-download-licenses</id>
+            <goals>
+              <goal>aggregate-download-licenses</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+    ...
+  </build>
+  ...
+</project>
+-------------------
+
+  Next run your build:
+
++-----+
+mvn package
++-----+
+
+  For the <<<download-licenses>>> goal, licenses will by default be downloaded into the directory
+  <<<target/licenses>>>.  This can be configured using the <<<licensesOutputDirectory>>> parameter.
   
 
    

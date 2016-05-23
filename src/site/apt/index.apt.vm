@@ -49,6 +49,9 @@ ${project.name}
   * <<<{{{./download-licenses-mojo.html}license:download-licenses}}>>>\
     Downloads the license files associated with each dependency.
   
+  * <<<{{{./aggregate-download-licenses-mojo.html}license:aggregate-download-licenses}}>>>\
+    Downloads the license files associated with each dependency for a multi-modules build.
+
   * <<<{{{./license-list-mojo.html}license:license-list}}>>>\
     Display all available licenses.
   
