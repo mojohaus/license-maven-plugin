@@ -549,15 +549,46 @@ public abstract class AbstractAddThirdPartyMojo
 
         if ( CollectionUtils.isNotEmpty( whiteLicenses ) )
         {
-            Set<String> licenses = getLicenseMap().keySet();
+            Set<String> dependencyLicenses = getLicenseMap().keySet();
             getLog().info( "Included licenses (whitelist): " + whiteLicenses );
 
-            for ( String license : licenses )
+            for ( String dependencyLicense : dependencyLicenses )
             {
-                if ( !whiteLicenses.contains( license ) )
+                getLog().info("Testing license '" + dependencyLicense + "'");
+                if ( !whiteLicenses.contains( dependencyLicense ) )
                 {
-                    //bad license found
-                    unsafeLicenses.add( license );
+                    getLog().info("Testing dependency license '" + dependencyLicense + "' against all other licenses");
+
+                    for (MavenProject dependency : getLicenseMap().get(dependencyLicense)) {
+                        getLog().debug("  testing dependency " + dependency);
+
+                        boolean forbiddenLicenseUsed = true;
+
+                        for (String otherLicense : dependencyLicenses) {
+                            // skip this license if it is the same as the dependency license
+                            if (otherLicense.equals(dependencyLicense)) {
+                                continue;
+                            }
+
+                            // skip this license if it isn't one of the whitelisted
+                            if (!whiteLicenses.contains(otherLicense)) {
+                                continue;
+                            }
+
+                            if (getLicenseMap().get(otherLicense).contains(dependency)) {
+                                getLog().info("License '" + dependencyLicense + "' for '" + dependency + "'is OK since it is also licensed under '" + otherLicense + "'");
+                                // this dependency is licensed under another license from white list
+                                forbiddenLicenseUsed = false;
+                                break;
+                            }
+                        }
+
+                        //bad license found
+                        if (forbiddenLicenseUsed) {
+                            unsafeLicenses.add(dependencyLicense);
+                            break;
+                        }
+                    }
                 }
             }
         }
