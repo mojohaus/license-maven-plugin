@@ -566,7 +566,8 @@ public abstract class AbstractAddThirdPartyMojo
 
                         for (String otherLicense : dependencyLicenses) {
                             // skip this license if it is the same as the dependency license
-                            if (otherLicense.equals(dependencyLicense)) {
+                            // skip this license if it has no projects assigned
+                            if (otherLicense.equals(dependencyLicense) || getLicenseMap().get(dependencyLicense).isEmpty()) {
                                 continue;
                             }
 
