@@ -242,7 +242,12 @@ public class DefaultThirdPartyHelper
                                                               licenseMap );
 
                 // push back resolved unsafe mappings
-                unsafeMappings.putAll( resolvedUnsafeMapping );
+                for (Object coord : resolvedUnsafeMapping.keySet()) {
+                    String s = (String) coord;
+                    if (projectDependencies.containsKey(s)){
+                        unsafeMappings.put(s, resolvedUnsafeMapping.get(s));
+                    }
+                }
             }
         }
 
