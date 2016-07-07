@@ -554,10 +554,10 @@ public abstract class AbstractAddThirdPartyMojo
 
             for ( String dependencyLicense : dependencyLicenses )
             {
-                getLog().info("Testing license '" + dependencyLicense + "'");
+                getLog().debug("Testing license '" + dependencyLicense + "'");
                 if ( !whiteLicenses.contains( dependencyLicense ) )
                 {
-                    getLog().info("Testing dependency license '" + dependencyLicense + "' against all other licenses");
+                    getLog().debug("Testing dependency license '" + dependencyLicense + "' against all other licenses");
 
                     for (MavenProject dependency : getLicenseMap().get(dependencyLicense)) {
                         getLog().debug("  testing dependency " + dependency);
