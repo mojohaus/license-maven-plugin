@@ -36,6 +36,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -239,25 +241,33 @@ public class FileUtil
     }
 
     /**
-     * Sauvegarde un contenu dans un fichier.
+     * Print content to file. This method ensures that a platform specific line ending is used.
      *
-     * @param file     le fichier a ecrire
-     * @param content  le contenu du fichier
-     * @param encoding l'encoding d'ecriture
+     * @param file     the file to write to
+     * @param content  the content to write
+     * @param encoding the encoding to write in
      * @throws IOException if IO pb
      */
-    public static void writeString( File file, String content, String encoding )
+    public static void printString(File file, String content, String encoding )
         throws IOException
     {
         createDirectoryIfNecessary( file.getParentFile() );
-        BufferedWriter out;
-        out = new BufferedWriter( new OutputStreamWriter( new FileOutputStream( file ), encoding ) );
+
+        BufferedReader in;
+        PrintWriter out;
+        in =  new BufferedReader(new StringReader(content));
+        out = new PrintWriter( new BufferedWriter( new OutputStreamWriter( new FileOutputStream( file ), encoding ) ));
         try
         {
-            IOUtil.copy( content, out );
+            String line;
+            while( ( line = in.readLine() ) != null )
+            {
+                out.println( line );
+            }
         }
         finally
         {
+            in.close();
             out.close();
         }
     }
