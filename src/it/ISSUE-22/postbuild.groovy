@@ -39,32 +39,34 @@ def assertContains(file, content, expected)
     return true
 }
 
+def newLine = System.getProperty("line.separator")
+
 file = new File(basedir, 'src/main/resources/HelloWorld.html');
 assertExistsFile(file);
 
 content = file.text;
-assert assertContains(file, content, '<!DOCTYPE html>\n' +
+assert assertContains(file, content, '<!DOCTYPE html>' + newLine +
         '<!--');
 
 file = new File(basedir, 'src/main/resources/HelloWorld2.html');
 assertExistsFile(file);
 
 content = file.text;
-assert assertContains(file, content, '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">\n' +
+assert assertContains(file, content, '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">' + newLine +
         '<!--');
 
 file = new File(basedir, 'src/main/resources/HelloWorld3.html');
 assertExistsFile(file);
 
 content = file.text;
-assert assertContains(file, content, '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">\n' +
+assert assertContains(file, content, '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">' + newLine +
         '<!--');
 
 file = new File(basedir, 'src/main/resources/HelloWorld4.xhtml');
 assertExistsFile(file);
 
 content = file.text;
-assert assertContains(file, content, '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">\n' +
+assert assertContains(file, content, '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">' + newLine +
         '<!--');
 
 return true;
