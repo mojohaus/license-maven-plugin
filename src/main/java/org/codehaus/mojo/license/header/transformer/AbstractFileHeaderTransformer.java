@@ -424,10 +424,7 @@ public abstract class AbstractFileHeaderTransformer
                 String s = getCommentLinePrefix().trim();
                 if ( line.startsWith( s ) )
                 {
-                    if ( line.length() <= s.length() )
-                    {
-                        line = line.substring( s.length() );
-                    }
+                    line = line.substring( s.length() );
                 }
                 else
                 {
