@@ -241,8 +241,13 @@ public class DefaultThirdPartyHelper
                     loadThirdPartyDescriptorForUnsafeMapping( project.getArtifacts(), unsafeDependencies, projects,
                                                               licenseMap );
 
-                // push back resolved unsafe mappings
-                unsafeMappings.putAll( resolvedUnsafeMapping );
+                // push back resolved unsafe mappings (only for project dependencies)
+                for (Object coord : resolvedUnsafeMapping.keySet()) {
+                    String s = (String) coord;
+                    if (projectDependencies.containsKey(s)){
+                        unsafeMappings.put(s, resolvedUnsafeMapping.get(s));
+                    }
+                }
             }
         }
 
