@@ -426,12 +426,12 @@ public abstract class AbstractFileHeaderTransformer
                 {
                     if ( line.length() <= s.length() )
                     {
-                        line = "";
+                        line = line.substring( s.length() );
                     }
                 }
                 else
                 {
-                    line = line.substring( s.length() );
+                    line = "";
                 }
             }
             buffer.append( line ).append( LINE_SEPARATOR );
