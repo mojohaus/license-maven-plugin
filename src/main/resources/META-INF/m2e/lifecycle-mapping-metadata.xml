@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<lifecycleMappingMetadata>
+  <pluginExecutions>
+    <pluginExecution>
+      <pluginExecutionFilter>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <goals>
+          <goal>add-third-party</goal>
+          <goal>aggregate-add-third-party</goal>
+          <goal>check-file-header</goal>
+          <goal>comment-style-list</goal>
+          <goal>download-licenses</goal>
+          <goal>license-list</goal>
+          <goal>update-file-header</goal>
+          <goal>update-project-license</goal>
+        </goals>
+      </pluginExecutionFilter>
+      <action>
+        <ignore />
+      </action>
+    </pluginExecution>
+  </pluginExecutions>
+</lifecycleMappingMetadata>
