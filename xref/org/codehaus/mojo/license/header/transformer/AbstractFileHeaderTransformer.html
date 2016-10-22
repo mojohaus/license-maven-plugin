@@ -432,96 +432,93 @@
 <a class="jxr_linenumber" name="L424" href="#L424">424</a>                 String s = getCommentLinePrefix().trim();
 <a class="jxr_linenumber" name="L425" href="#L425">425</a>                 <strong class="jxr_keyword">if</strong> ( line.startsWith( s ) )
 <a class="jxr_linenumber" name="L426" href="#L426">426</a>                 {
-<a class="jxr_linenumber" name="L427" href="#L427">427</a>                     <strong class="jxr_keyword">if</strong> ( line.length() &lt;= s.length() )
-<a class="jxr_linenumber" name="L428" href="#L428">428</a>                     {
-<a class="jxr_linenumber" name="L429" href="#L429">429</a>                         line = <span class="jxr_string">""</span>;
-<a class="jxr_linenumber" name="L430" href="#L430">430</a>                     }
-<a class="jxr_linenumber" name="L431" href="#L431">431</a>                 }
-<a class="jxr_linenumber" name="L432" href="#L432">432</a>                 <strong class="jxr_keyword">else</strong>
-<a class="jxr_linenumber" name="L433" href="#L433">433</a>                 {
-<a class="jxr_linenumber" name="L434" href="#L434">434</a>                     line = line.substring( s.length() );
-<a class="jxr_linenumber" name="L435" href="#L435">435</a>                 }
-<a class="jxr_linenumber" name="L436" href="#L436">436</a>             }
-<a class="jxr_linenumber" name="L437" href="#L437">437</a>             buffer.append( line ).append( LINE_SEPARATOR );
-<a class="jxr_linenumber" name="L438" href="#L438">438</a>         }
-<a class="jxr_linenumber" name="L439" href="#L439">439</a>         <strong class="jxr_keyword">return</strong> buffer.toString();
-<a class="jxr_linenumber" name="L440" href="#L440">440</a>     }
-<a class="jxr_linenumber" name="L441" href="#L441">441</a> 
-<a class="jxr_linenumber" name="L442" href="#L442">442</a>     <em class="jxr_javadoccomment">/**</em>
-<a class="jxr_linenumber" name="L443" href="#L443">443</a> <em class="jxr_javadoccomment">     * {@inheritDoc}</em>
-<a class="jxr_linenumber" name="L444" href="#L444">444</a> <em class="jxr_javadoccomment">     */</em>
-<a class="jxr_linenumber" name="L445" href="#L445">445</a>     <strong class="jxr_keyword">public</strong> String boxProcessTag( String header )
-<a class="jxr_linenumber" name="L446" href="#L446">446</a>     {
-<a class="jxr_linenumber" name="L447" href="#L447">447</a>         StringBuilder buffer = <strong class="jxr_keyword">new</strong> StringBuilder();
-<a class="jxr_linenumber" name="L448" href="#L448">448</a>         buffer.append( getProcessStartTag() ).append( LINE_SEPARATOR );
-<a class="jxr_linenumber" name="L449" href="#L449">449</a>         buffer.append( header.trim() ).append( LINE_SEPARATOR );
-<a class="jxr_linenumber" name="L450" href="#L450">450</a>         buffer.append( getProcessEndTag() ).append( LINE_SEPARATOR );
-<a class="jxr_linenumber" name="L451" href="#L451">451</a>         <strong class="jxr_keyword">return</strong> buffer.toString();
-<a class="jxr_linenumber" name="L452" href="#L452">452</a>     }
-<a class="jxr_linenumber" name="L453" href="#L453">453</a> 
-<a class="jxr_linenumber" name="L454" href="#L454">454</a>     <em class="jxr_javadoccomment">/**</em>
-<a class="jxr_linenumber" name="L455" href="#L455">455</a> <em class="jxr_javadoccomment">     * {@inheritDoc}</em>
-<a class="jxr_linenumber" name="L456" href="#L456">456</a> <em class="jxr_javadoccomment">     */</em>
-<a class="jxr_linenumber" name="L457" href="#L457">457</a>     <strong class="jxr_keyword">public</strong> String unboxProcessTag( String boxedHeader )
-<a class="jxr_linenumber" name="L458" href="#L458">458</a>     {
-<a class="jxr_linenumber" name="L459" href="#L459">459</a>         StringBuilder buffer = <strong class="jxr_keyword">new</strong> StringBuilder();
-<a class="jxr_linenumber" name="L460" href="#L460">460</a>         <strong class="jxr_keyword">for</strong> ( String line : boxedHeader.split( LINE_SEPARATOR + <span class="jxr_string">""</span> ) )
-<a class="jxr_linenumber" name="L461" href="#L461">461</a>         {
-<a class="jxr_linenumber" name="L462" href="#L462">462</a>             <strong class="jxr_keyword">if</strong> ( StringUtils.isEmpty( line ) || line.contains( getProcessStartTag() ) ||
-<a class="jxr_linenumber" name="L463" href="#L463">463</a>                 line.contains( getProcessEndTag() ) )
-<a class="jxr_linenumber" name="L464" href="#L464">464</a>             {
-<a class="jxr_linenumber" name="L465" href="#L465">465</a> 
-<a class="jxr_linenumber" name="L466" href="#L466">466</a>                 <em class="jxr_comment">// not be unboxed, but just skipped</em>
-<a class="jxr_linenumber" name="L467" href="#L467">467</a>                 <strong class="jxr_keyword">continue</strong>;
-<a class="jxr_linenumber" name="L468" href="#L468">468</a>             }
-<a class="jxr_linenumber" name="L469" href="#L469">469</a>             buffer.append( line ).append( LINE_SEPARATOR );
-<a class="jxr_linenumber" name="L470" href="#L470">470</a>         }
-<a class="jxr_linenumber" name="L471" href="#L471">471</a>         <strong class="jxr_keyword">return</strong> buffer.toString();
-<a class="jxr_linenumber" name="L472" href="#L472">472</a>     }
-<a class="jxr_linenumber" name="L473" href="#L473">473</a> 
-<a class="jxr_linenumber" name="L474" href="#L474">474</a>     <em class="jxr_javadoccomment">/**</em>
-<a class="jxr_linenumber" name="L475" href="#L475">475</a> <em class="jxr_javadoccomment">     * {@inheritDoc}</em>
-<a class="jxr_linenumber" name="L476" href="#L476">476</a> <em class="jxr_javadoccomment">     */</em>
-<a class="jxr_linenumber" name="L477" href="#L477">477</a>     <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">boolean</strong> isDescriptionEquals( FileHeader header1, FileHeader header2 )
-<a class="jxr_linenumber" name="L478" href="#L478">478</a>     {
-<a class="jxr_linenumber" name="L479" href="#L479">479</a>         <strong class="jxr_keyword">return</strong> header1.getDescription().equals( header2.getDescription() );
-<a class="jxr_linenumber" name="L480" href="#L480">480</a>     }
-<a class="jxr_linenumber" name="L481" href="#L481">481</a> 
-<a class="jxr_linenumber" name="L482" href="#L482">482</a>     <em class="jxr_javadoccomment">/**</em>
-<a class="jxr_linenumber" name="L483" href="#L483">483</a> <em class="jxr_javadoccomment">     * {@inheritDoc}</em>
-<a class="jxr_linenumber" name="L484" href="#L484">484</a> <em class="jxr_javadoccomment">     */</em>
-<a class="jxr_linenumber" name="L485" href="#L485">485</a>     <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">boolean</strong> isCopyrightEquals( FileHeader header1, FileHeader header2 )
-<a class="jxr_linenumber" name="L486" href="#L486">486</a>     {
-<a class="jxr_linenumber" name="L487" href="#L487">487</a>         <strong class="jxr_keyword">return</strong> header1.getCopyright().equals( header2.getCopyright() );
-<a class="jxr_linenumber" name="L488" href="#L488">488</a>     }
-<a class="jxr_linenumber" name="L489" href="#L489">489</a> 
-<a class="jxr_linenumber" name="L490" href="#L490">490</a>     <em class="jxr_javadoccomment">/**</em>
-<a class="jxr_linenumber" name="L491" href="#L491">491</a> <em class="jxr_javadoccomment">     * {@inheritDoc}</em>
-<a class="jxr_linenumber" name="L492" href="#L492">492</a> <em class="jxr_javadoccomment">     */</em>
-<a class="jxr_linenumber" name="L493" href="#L493">493</a>     <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">boolean</strong> isLicenseEquals( FileHeader header1, FileHeader header2 )
-<a class="jxr_linenumber" name="L494" href="#L494">494</a>     {
-<a class="jxr_linenumber" name="L495" href="#L495">495</a>         String license1 = removeSpaces( header1.getLicense() );
-<a class="jxr_linenumber" name="L496" href="#L496">496</a>         String license2 = removeSpaces( header2.getLicense() );
-<a class="jxr_linenumber" name="L497" href="#L497">497</a>         <strong class="jxr_keyword">return</strong> license1.equals( license2 );
-<a class="jxr_linenumber" name="L498" href="#L498">498</a>     }
-<a class="jxr_linenumber" name="L499" href="#L499">499</a> 
-<a class="jxr_linenumber" name="L500" href="#L500">500</a>     <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">final</strong> Pattern REMOVE_SPACE_PATTERN = Pattern.compile( <span class="jxr_string">"(&#92;&#92;s+)"</span> );
-<a class="jxr_linenumber" name="L501" href="#L501">501</a> 
-<a class="jxr_linenumber" name="L502" href="#L502">502</a>     <strong class="jxr_keyword">protected</strong> String removeSpaces( String str )
-<a class="jxr_linenumber" name="L503" href="#L503">503</a>     {
-<a class="jxr_linenumber" name="L504" href="#L504">504</a>         Matcher matcher = REMOVE_SPACE_PATTERN.matcher( str );
-<a class="jxr_linenumber" name="L505" href="#L505">505</a>         String result;
-<a class="jxr_linenumber" name="L506" href="#L506">506</a>         <strong class="jxr_keyword">if</strong> ( matcher.find() )
-<a class="jxr_linenumber" name="L507" href="#L507">507</a>         {
-<a class="jxr_linenumber" name="L508" href="#L508">508</a>             result = matcher.replaceAll( <span class="jxr_string">""</span> );
-<a class="jxr_linenumber" name="L509" href="#L509">509</a>         }
-<a class="jxr_linenumber" name="L510" href="#L510">510</a>         <strong class="jxr_keyword">else</strong>
-<a class="jxr_linenumber" name="L511" href="#L511">511</a>         {
-<a class="jxr_linenumber" name="L512" href="#L512">512</a>             result = str;
-<a class="jxr_linenumber" name="L513" href="#L513">513</a>         }
-<a class="jxr_linenumber" name="L514" href="#L514">514</a>         <strong class="jxr_keyword">return</strong> result;
-<a class="jxr_linenumber" name="L515" href="#L515">515</a>     }
-<a class="jxr_linenumber" name="L516" href="#L516">516</a> }
+<a class="jxr_linenumber" name="L427" href="#L427">427</a>                     line = line.substring( s.length() );
+<a class="jxr_linenumber" name="L428" href="#L428">428</a>                 }
+<a class="jxr_linenumber" name="L429" href="#L429">429</a>                 <strong class="jxr_keyword">else</strong>
+<a class="jxr_linenumber" name="L430" href="#L430">430</a>                 {
+<a class="jxr_linenumber" name="L431" href="#L431">431</a>                     line = <span class="jxr_string">""</span>;
+<a class="jxr_linenumber" name="L432" href="#L432">432</a>                 }
+<a class="jxr_linenumber" name="L433" href="#L433">433</a>             }
+<a class="jxr_linenumber" name="L434" href="#L434">434</a>             buffer.append( line ).append( LINE_SEPARATOR );
+<a class="jxr_linenumber" name="L435" href="#L435">435</a>         }
+<a class="jxr_linenumber" name="L436" href="#L436">436</a>         <strong class="jxr_keyword">return</strong> buffer.toString();
+<a class="jxr_linenumber" name="L437" href="#L437">437</a>     }
+<a class="jxr_linenumber" name="L438" href="#L438">438</a> 
+<a class="jxr_linenumber" name="L439" href="#L439">439</a>     <em class="jxr_javadoccomment">/**</em>
+<a class="jxr_linenumber" name="L440" href="#L440">440</a> <em class="jxr_javadoccomment">     * {@inheritDoc}</em>
+<a class="jxr_linenumber" name="L441" href="#L441">441</a> <em class="jxr_javadoccomment">     */</em>
+<a class="jxr_linenumber" name="L442" href="#L442">442</a>     <strong class="jxr_keyword">public</strong> String boxProcessTag( String header )
+<a class="jxr_linenumber" name="L443" href="#L443">443</a>     {
+<a class="jxr_linenumber" name="L444" href="#L444">444</a>         StringBuilder buffer = <strong class="jxr_keyword">new</strong> StringBuilder();
+<a class="jxr_linenumber" name="L445" href="#L445">445</a>         buffer.append( getProcessStartTag() ).append( LINE_SEPARATOR );
+<a class="jxr_linenumber" name="L446" href="#L446">446</a>         buffer.append( header.trim() ).append( LINE_SEPARATOR );
+<a class="jxr_linenumber" name="L447" href="#L447">447</a>         buffer.append( getProcessEndTag() ).append( LINE_SEPARATOR );
+<a class="jxr_linenumber" name="L448" href="#L448">448</a>         <strong class="jxr_keyword">return</strong> buffer.toString();
+<a class="jxr_linenumber" name="L449" href="#L449">449</a>     }
+<a class="jxr_linenumber" name="L450" href="#L450">450</a> 
+<a class="jxr_linenumber" name="L451" href="#L451">451</a>     <em class="jxr_javadoccomment">/**</em>
+<a class="jxr_linenumber" name="L452" href="#L452">452</a> <em class="jxr_javadoccomment">     * {@inheritDoc}</em>
+<a class="jxr_linenumber" name="L453" href="#L453">453</a> <em class="jxr_javadoccomment">     */</em>
+<a class="jxr_linenumber" name="L454" href="#L454">454</a>     <strong class="jxr_keyword">public</strong> String unboxProcessTag( String boxedHeader )
+<a class="jxr_linenumber" name="L455" href="#L455">455</a>     {
+<a class="jxr_linenumber" name="L456" href="#L456">456</a>         StringBuilder buffer = <strong class="jxr_keyword">new</strong> StringBuilder();
+<a class="jxr_linenumber" name="L457" href="#L457">457</a>         <strong class="jxr_keyword">for</strong> ( String line : boxedHeader.split( LINE_SEPARATOR + <span class="jxr_string">""</span> ) )
+<a class="jxr_linenumber" name="L458" href="#L458">458</a>         {
+<a class="jxr_linenumber" name="L459" href="#L459">459</a>             <strong class="jxr_keyword">if</strong> ( StringUtils.isEmpty( line ) || line.contains( getProcessStartTag() ) ||
+<a class="jxr_linenumber" name="L460" href="#L460">460</a>                 line.contains( getProcessEndTag() ) )
+<a class="jxr_linenumber" name="L461" href="#L461">461</a>             {
+<a class="jxr_linenumber" name="L462" href="#L462">462</a> 
+<a class="jxr_linenumber" name="L463" href="#L463">463</a>                 <em class="jxr_comment">// not be unboxed, but just skipped</em>
+<a class="jxr_linenumber" name="L464" href="#L464">464</a>                 <strong class="jxr_keyword">continue</strong>;
+<a class="jxr_linenumber" name="L465" href="#L465">465</a>             }
+<a class="jxr_linenumber" name="L466" href="#L466">466</a>             buffer.append( line ).append( LINE_SEPARATOR );
+<a class="jxr_linenumber" name="L467" href="#L467">467</a>         }
+<a class="jxr_linenumber" name="L468" href="#L468">468</a>         <strong class="jxr_keyword">return</strong> buffer.toString();
+<a class="jxr_linenumber" name="L469" href="#L469">469</a>     }
+<a class="jxr_linenumber" name="L470" href="#L470">470</a> 
+<a class="jxr_linenumber" name="L471" href="#L471">471</a>     <em class="jxr_javadoccomment">/**</em>
+<a class="jxr_linenumber" name="L472" href="#L472">472</a> <em class="jxr_javadoccomment">     * {@inheritDoc}</em>
+<a class="jxr_linenumber" name="L473" href="#L473">473</a> <em class="jxr_javadoccomment">     */</em>
+<a class="jxr_linenumber" name="L474" href="#L474">474</a>     <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">boolean</strong> isDescriptionEquals( FileHeader header1, FileHeader header2 )
+<a class="jxr_linenumber" name="L475" href="#L475">475</a>     {
+<a class="jxr_linenumber" name="L476" href="#L476">476</a>         <strong class="jxr_keyword">return</strong> header1.getDescription().equals( header2.getDescription() );
+<a class="jxr_linenumber" name="L477" href="#L477">477</a>     }
+<a class="jxr_linenumber" name="L478" href="#L478">478</a> 
+<a class="jxr_linenumber" name="L479" href="#L479">479</a>     <em class="jxr_javadoccomment">/**</em>
+<a class="jxr_linenumber" name="L480" href="#L480">480</a> <em class="jxr_javadoccomment">     * {@inheritDoc}</em>
+<a class="jxr_linenumber" name="L481" href="#L481">481</a> <em class="jxr_javadoccomment">     */</em>
+<a class="jxr_linenumber" name="L482" href="#L482">482</a>     <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">boolean</strong> isCopyrightEquals( FileHeader header1, FileHeader header2 )
+<a class="jxr_linenumber" name="L483" href="#L483">483</a>     {
+<a class="jxr_linenumber" name="L484" href="#L484">484</a>         <strong class="jxr_keyword">return</strong> header1.getCopyright().equals( header2.getCopyright() );
+<a class="jxr_linenumber" name="L485" href="#L485">485</a>     }
+<a class="jxr_linenumber" name="L486" href="#L486">486</a> 
+<a class="jxr_linenumber" name="L487" href="#L487">487</a>     <em class="jxr_javadoccomment">/**</em>
+<a class="jxr_linenumber" name="L488" href="#L488">488</a> <em class="jxr_javadoccomment">     * {@inheritDoc}</em>
+<a class="jxr_linenumber" name="L489" href="#L489">489</a> <em class="jxr_javadoccomment">     */</em>
+<a class="jxr_linenumber" name="L490" href="#L490">490</a>     <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">boolean</strong> isLicenseEquals( FileHeader header1, FileHeader header2 )
+<a class="jxr_linenumber" name="L491" href="#L491">491</a>     {
+<a class="jxr_linenumber" name="L492" href="#L492">492</a>         String license1 = removeSpaces( header1.getLicense() );
+<a class="jxr_linenumber" name="L493" href="#L493">493</a>         String license2 = removeSpaces( header2.getLicense() );
+<a class="jxr_linenumber" name="L494" href="#L494">494</a>         <strong class="jxr_keyword">return</strong> license1.equals( license2 );
+<a class="jxr_linenumber" name="L495" href="#L495">495</a>     }
+<a class="jxr_linenumber" name="L496" href="#L496">496</a> 
+<a class="jxr_linenumber" name="L497" href="#L497">497</a>     <strong class="jxr_keyword">protected</strong> <strong class="jxr_keyword">static</strong> <strong class="jxr_keyword">final</strong> Pattern REMOVE_SPACE_PATTERN = Pattern.compile( <span class="jxr_string">"(&#92;&#92;s+)"</span> );
+<a class="jxr_linenumber" name="L498" href="#L498">498</a> 
+<a class="jxr_linenumber" name="L499" href="#L499">499</a>     <strong class="jxr_keyword">protected</strong> String removeSpaces( String str )
+<a class="jxr_linenumber" name="L500" href="#L500">500</a>     {
+<a class="jxr_linenumber" name="L501" href="#L501">501</a>         Matcher matcher = REMOVE_SPACE_PATTERN.matcher( str );
+<a class="jxr_linenumber" name="L502" href="#L502">502</a>         String result;
+<a class="jxr_linenumber" name="L503" href="#L503">503</a>         <strong class="jxr_keyword">if</strong> ( matcher.find() )
+<a class="jxr_linenumber" name="L504" href="#L504">504</a>         {
+<a class="jxr_linenumber" name="L505" href="#L505">505</a>             result = matcher.replaceAll( <span class="jxr_string">""</span> );
+<a class="jxr_linenumber" name="L506" href="#L506">506</a>         }
+<a class="jxr_linenumber" name="L507" href="#L507">507</a>         <strong class="jxr_keyword">else</strong>
+<a class="jxr_linenumber" name="L508" href="#L508">508</a>         {
+<a class="jxr_linenumber" name="L509" href="#L509">509</a>             result = str;
+<a class="jxr_linenumber" name="L510" href="#L510">510</a>         }
+<a class="jxr_linenumber" name="L511" href="#L511">511</a>         <strong class="jxr_keyword">return</strong> result;
+<a class="jxr_linenumber" name="L512" href="#L512">512</a>     }
+<a class="jxr_linenumber" name="L513" href="#L513">513</a> }
 </pre>
 <hr/>
 <div id="footer">Copyright &#169; 2010&#x2013;2016 <a href="http://www.mojohaus.org">MojoHaus</a>. All rights reserved.</div>
