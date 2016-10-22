@@ -539,7 +539,8 @@ public abstract class AbstractAddThirdPartyMojo
 
             for ( String excludeLicense : blackLicenses )
             {
-                if ( licenses.contains( excludeLicense ) && !getLicenseMap().get(excludeLicense).isEmpty() )
+                if ( licenses.contains( excludeLicense ) &&
+                        CollectionUtils.isNotEmpty( getLicenseMap().get( excludeLicense ) ) )
                 {
                     //bad license found
                     unsafeLicenses.add( excludeLicense );
@@ -554,7 +555,8 @@ public abstract class AbstractAddThirdPartyMojo
 
             for ( String license : licenses )
             {
-                if ( !whiteLicenses.contains( license ) && !getLicenseMap().get(license).isEmpty())
+                if ( !whiteLicenses.contains( license ) &&
+                        CollectionUtils.isNotEmpty( getLicenseMap().get( license ) ) )
                 {
                     //bad license found
                     unsafeLicenses.add( license );
