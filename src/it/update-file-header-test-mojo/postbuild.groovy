@@ -60,6 +60,8 @@ def assertNotContains(file, content, expected)
   return true
 }
 
+def newLine = System.getProperty("line.separator")
+
 Calendar cal = Calendar.getInstance();
 cal.setTime(new Date());
 int currentYear = cal.get(Calendar.YEAR);
@@ -319,7 +321,7 @@ content = file.text;
 assert assertContains(file, content, 'Copyright (C)');
 assert assertContains(file, content, '# #%L');
 assert assertContains(file, content, '# #L%');
-assert assertNotContains(file, content, '# # \n');
+assert assertNotContains(file, content, '# # ' + newLine);
 assert assertContains(file, content, '$Id');
 
 file = new File(basedir, 'src/files/properties/test2.properties');
@@ -330,7 +332,7 @@ assert assertContains(file, content, 'Copyright (C)');
 assert assertContains(file, content, '# #%L');
 assert assertContains(file, content, '# #L%');
 assert assertContains(file, content, '# #%L');
-assert assertNotContains(file, content, '# # \n');
+assert assertNotContains(file, content, '# # ' + newLine);
 assert assertContains(file, content, '$Id');
 
 
@@ -341,7 +343,7 @@ content = file.text;
 assert assertContains(file, content, 'Copyright (C)');
 assert assertContains(file, content, '# #%L');
 assert assertContains(file, content, '# #L%');
-assert assertNotContains(file, content, '# # \n');
+assert assertNotContains(file, content, '# # ' + newLine);
 assert assertContains(file, content, '$Id');
 
 
@@ -353,7 +355,7 @@ assert assertContains(file, content, 'Copyright (C)');
 assert assertContains(file, content, '# #%L');
 assert assertContains(file, content, '# #L%');
 assert assertContains(file, content, '# #%L');
-assert assertNotContains(file, content, '# # \n');
+assert assertNotContains(file, content, '# # ' + newLine);
 assert assertContains(file, content, '$Id');
 
 //
@@ -368,7 +370,7 @@ assert content.startsWith('#!/bin/sh');
 assert assertContains(file, content, 'Copyright (C)');
 assert assertContains(file, content, '# #%L');
 assert assertContains(file, content, '# #L%');
-assert assertNotContains(file, content, '# # \n');
+assert assertNotContains(file, content, '# # ' + newLine);
 assert assertContains(file, content, '$Id');
 
 file = new File(basedir, 'src/files/properties/test2.sh');
@@ -379,7 +381,7 @@ assert content.startsWith('#!/bin/sh');
 assert assertContains(file, content, 'Copyright (C)');
 assert assertContains(file, content, '# #%L');
 assert assertContains(file, content, '# #L%');
-assert assertNotContains(file, content, '# # \n');
+assert assertNotContains(file, content, '# # ' + newLine);
 assert assertContains(file, content, '$Id');
 
 file = new File(basedir, 'src/files/properties/test.sh2');
@@ -390,7 +392,7 @@ assert content.startsWith('#!/bin/sh');
 assert assertContains(file, content, 'Copyright (C)');
 assert assertContains(file, content, '# #%L');
 assert assertContains(file, content, '# #L%');
-assert assertNotContains(file, content, '# # \n');
+assert assertNotContains(file, content, '# # ' + newLine);
 assert assertContains(file, content, '$Id');
 
 file = new File(basedir, 'src/files/properties/test2.sh2');
@@ -401,7 +403,7 @@ assert content.startsWith('#!/bin/sh');
 assert assertContains(file, content, 'Copyright (C)');
 assert assertContains(file, content, '# #%L');
 assert assertContains(file, content, '# #L%');
-assert assertNotContains(file, content, '# # \n');
+assert assertNotContains(file, content, '# # ' + newLine);
 assert assertContains(file, content, '$Id');
 
 //
@@ -669,7 +671,7 @@ content = file.text;
 assert assertContains(file, content, 'Copyright (C)');
 assert assertContains(file, content, '# #%L');
 assert assertContains(file, content, '# #L%');
-assert assertNotContains(file, content, '# # \n');
+assert assertNotContains(file, content, '# # ' + newLine);
 assert assertContains(file, content, '$Id');
 
 file = new File(basedir, 'child1/src/files/properties/test2.properties');
@@ -680,7 +682,7 @@ assert assertContains(file, content, 'Copyright (C)');
 assert assertContains(file, content, '# #%L');
 assert assertContains(file, content, '# #L%');
 assert assertContains(file, content, '# #%L');
-assert assertNotContains(file, content, '# # \n');
+assert assertNotContains(file, content, '# # ' + newLine);
 assert assertContains(file, content, '$Id');
 
 //
@@ -695,7 +697,7 @@ assert content.startsWith('#!/bin/sh');
 assert assertContains(file, content, 'Copyright (C)');
 assert assertContains(file, content, '# #%L');
 assert assertContains(file, content, '# #L%');
-assert assertNotContains(file, content, '# # \n');
+assert assertNotContains(file, content, '# # ' + newLine);
 assert assertContains(file, content, '$Id');
 
 file = new File(basedir, 'child1/src/files/properties/test2.sh');
@@ -706,7 +708,7 @@ assert content.startsWith('#!/bin/sh');
 assert assertContains(file, content, 'Copyright (C)');
 assert assertContains(file, content, '# #%L');
 assert assertContains(file, content, '# #L%');
-assert assertNotContains(file, content, '# # \n');
+assert assertNotContains(file, content, '# # ' + newLine);
 assert assertContains(file, content, '$Id');
 
 //

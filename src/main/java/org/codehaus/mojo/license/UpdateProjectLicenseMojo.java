@@ -194,7 +194,7 @@ public class UpdateProjectLicenseMojo
         {
 
             // writes it root main license file
-            FileUtil.writeString( licenseFile, licenseContent, getEncoding() );
+            FileUtil.printString( licenseFile, licenseContent, getEncoding() );
         }
 
         if ( hasClassPath() )

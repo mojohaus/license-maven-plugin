@@ -1003,7 +1003,7 @@ public abstract class AbstractFileHeaderMojo
 
         if ( !isDryRun() )
         {
-            FileUtil.writeString( processFile, content, getEncoding() );
+            FileUtil.printString( processFile, content, getEncoding() );
         }
 
         FileState.add.addFile( file, result );

@@ -611,7 +611,7 @@ public class DefaultThirdPartyTool
             log.info( content );
         }
 
-        FileUtil.writeString( thirdPartyFile, content, encoding );
+        FileUtil.printString( thirdPartyFile, content, encoding );
 
     }
 
