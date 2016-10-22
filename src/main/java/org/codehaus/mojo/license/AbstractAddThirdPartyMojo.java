@@ -539,7 +539,8 @@ public abstract class AbstractAddThirdPartyMojo
 
             for ( String excludeLicense : blackLicenses )
             {
-                if ( licenses.contains( excludeLicense ) )
+                if ( licenses.contains( excludeLicense ) &&
+                        CollectionUtils.isNotEmpty( getLicenseMap().get( excludeLicense ) ) )
                 {
                     //bad license found
                     unsafeLicenses.add( excludeLicense );
@@ -554,7 +555,8 @@ public abstract class AbstractAddThirdPartyMojo
 
             for ( String license : licenses )
             {
-                if ( !whiteLicenses.contains( license ) )
+                if ( !whiteLicenses.contains( license ) &&
+                        CollectionUtils.isNotEmpty( getLicenseMap().get( license ) ) )
                 {
                     //bad license found
                     unsafeLicenses.add( license );
@@ -572,15 +574,15 @@ public abstract class AbstractAddThirdPartyMojo
             {
 
                 SortedSet<MavenProject> deps = getLicenseMap().get( unsafeLicense );
-                StringBuilder sb = new StringBuilder();
-                sb.append( "License " ).append( unsafeLicense ).append( " used by " ).append( deps.size() ).append(
-                    " dependencies:" );
-                for ( MavenProject dep : deps )
-                {
-                    sb.append( "\n -" ).append( MojoHelper.getArtifactName( dep ) );
+                if (!deps.isEmpty()) {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("License ").append(unsafeLicense).append(" used by ").append(deps.size()).append(
+                            " dependencies:");
+                    for (MavenProject dep : deps) {
+                        sb.append("\n -").append(MojoHelper.getArtifactName(dep));
+                    }
+                    log.warn(sb.toString());
                 }
-
-                log.warn( sb.toString() );
             }
         }
         return safe;
