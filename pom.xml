@@ -99,7 +99,7 @@
   </issueManagement>
   <ciManagement>
     <system>Travis CI</system>
-    <url>http://https://travis-ci.org/mojohaus/license-maven-plugin</url>
+    <url>https://travis-ci.org/mojohaus/license-maven-plugin</url>
   </ciManagement>
   <distributionManagement>
     <site>
