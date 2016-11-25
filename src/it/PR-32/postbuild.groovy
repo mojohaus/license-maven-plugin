@@ -49,6 +49,6 @@ file = new File(basedir, 'child2/target/generated-resources/licenses.xml');
 assertExistsFile(file);
 
 content = file.text;
-assert assertContains(file, content, '<url>https://jaxx.nuiton.org/v/latest/license.html</url>');
+assert assertContains(file, content, '<url>http://jaxx.nuiton.org/v/latest/license.html</url>');
 
 return true;
