@@ -23,18 +23,17 @@ package org.codehaus.mojo.license;
  */
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
-import org.codehaus.mojo.license.api.DefaultThirdPartyHelper;
-import org.codehaus.mojo.license.api.DependenciesTool;
-import org.codehaus.mojo.license.api.ThirdPartyHelper;
-import org.codehaus.mojo.license.api.ThirdPartyTool;
-import org.codehaus.mojo.license.api.ThirdPartyToolException;
+import org.codehaus.mojo.license.api.*;
 import org.codehaus.mojo.license.model.LicenseMap;
 import org.codehaus.mojo.license.utils.FileUtil;
 import org.codehaus.mojo.license.utils.MojoHelper;
@@ -43,12 +42,7 @@ import org.codehaus.mojo.license.utils.StringToList;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.SortedSet;
+import java.util.*;
 
 /**
  * Abstract mojo for all third-party mojos.
@@ -507,6 +501,41 @@ public abstract class AbstractAddThirdPartyMojo
                                              localRepository, remoteRepositories, getLog() );
         }
         return helper;
+    }
+
+    protected void resolveUnsafeDependenciesFromArtifact(String groupId, String artifactId, String version)
+            throws ArtifactNotFoundException, IOException, ArtifactResolutionException {
+        File missingLicensesFromArtifact = thirdPartyTool.resolveMissingLicensesDescriptor(groupId, artifactId, version, localRepository, remoteRepositories);
+        resolveUnsafeDependenciesFromFile(missingLicensesFromArtifact);
+    }
+
+    protected void resolveUnsafeDependenciesFromFile(File missingLicenses) throws IOException {
+        SortedSet<MavenProject> unsafeDeps = getUnsafeDependencies();
+        if (missingLicenses != null && missingLicenses.exists() && missingLicenses.length() > 0) {
+            // there are missing licenses available from the artifact
+            SortedProperties unsafeMappings = new SortedProperties(getEncoding());
+
+            if (missingLicenses.exists()) {
+                // load the missing file
+                unsafeMappings.load(missingLicenses);
+            }
+
+            Set resolvedDependencies = new HashSet();
+            for (MavenProject unsafeDependency : unsafeDeps) {
+                String id = MojoHelper.getArtifactId(unsafeDependency.getArtifact());
+
+                if (unsafeMappings.containsKey(id) && StringUtils.isNotBlank(unsafeMappings.getProperty(id))) {
+                    // update license map
+                    thirdPartyTool.addLicense(licenseMap, unsafeDependency, unsafeMappings.getProperty(id));
+
+                    // remove
+                    resolvedDependencies.add(unsafeDependency);
+                }
+            }
+
+            // remove resolvedDependencies from unsafeDeps;
+            unsafeDeps.removeAll(resolvedDependencies);
+        }
     }
 
     protected boolean checkUnsafeDependencies()
