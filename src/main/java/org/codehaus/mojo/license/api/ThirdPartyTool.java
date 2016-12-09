@@ -24,6 +24,8 @@ package org.codehaus.mojo.license.api;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.model.License;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.mojo.license.model.LicenseMap;
@@ -115,6 +117,10 @@ public interface ThirdPartyTool
     File resolvThirdPartyDescriptor( MavenProject project, ArtifactRepository localRepository,
                                      List<ArtifactRepository> repositories )
         throws ThirdPartyToolException;
+
+    File resolveMissingLicensesDescriptor(String groupId, String artifactId, String version,
+                                          ArtifactRepository localRepository, List<ArtifactRepository> repositories)
+            throws IOException, ArtifactResolutionException, ArtifactNotFoundException;
 
     /**
      * From the given {@code licenseMap}, obtain all the projects with no license.
