@@ -49,7 +49,7 @@ public class XmlFileHeaderTransformer
     public String[] getDefaultAcceptedExtensions()
     {
         return new String[]{ "pom", "xml", "mxlm", "dtd", "fml", "xsl", "jaxx", "kml", "gsp",
-            "tml" };
+            "tml", "svg" };
     }
 
     /**
