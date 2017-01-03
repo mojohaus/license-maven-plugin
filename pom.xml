@@ -442,6 +442,7 @@
                   <goal>run</goal>
                 </goals>
                 <configuration>
+                  <skipInvocation></skipInvocation>
                   <extraArtifacts>
                     <extraArtifact>${project.groupId}:${project.artifactId}:${project.version}:license.properties:test-third-party</extraArtifact>
                   </extraArtifacts>

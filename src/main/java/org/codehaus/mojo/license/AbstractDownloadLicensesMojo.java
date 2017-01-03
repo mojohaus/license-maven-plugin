@@ -16,6 +16,7 @@ import org.codehaus.mojo.license.utils.FileUtil;
 import org.codehaus.mojo.license.utils.LicenseDownloader;
 import org.codehaus.mojo.license.utils.LicenseSummaryReader;
 import org.codehaus.mojo.license.utils.LicenseSummaryWriter;
+import org.codehaus.mojo.license.utils.MojoHelper;
 import org.codehaus.plexus.util.Base64;
 
 import java.io.File;
@@ -25,7 +26,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -145,6 +145,42 @@ public abstract class AbstractDownloadLicensesMojo
      */
     @Parameter( property = "license.organizeLicensesByDependencies", defaultValue = "false" )
     protected boolean organizeLicensesByDependencies;
+
+    /**
+     * A filter to exclude some GroupIds
+     * This is a regular expression that is applied to groupIds (not an ant pattern).
+     *
+     * @since 1.11
+     */
+    @Parameter( property = "license.excludedGroups", defaultValue = "" )
+    private String excludedGroups;
+
+    /**
+     * A filter to include only some GroupIds
+     * This is a regular expression applied to artifactIds.
+     *
+     * @since 1.11
+     */
+    @Parameter( property = "license.includedGroups", defaultValue = "" )
+    private String includedGroups;
+
+    /**
+     * A filter to exclude some ArtifactsIds
+     * This is a regular expression applied to artifactIds.
+     *
+     * @since 1.11
+     */
+    @Parameter( property = "license.excludedArtifacts", defaultValue = "" )
+    private String excludedArtifacts;
+
+    /**
+     * A filter to include only some ArtifactsIds
+     * This is a regular expression applied to artifactIds.
+     *
+     * @since 1.11
+     */
+    @Parameter( property = "license.includedArtifacts", defaultValue = "" )
+    private String includedArtifacts;
 
     /**
      * The Maven Project Object
@@ -289,8 +325,7 @@ public abstract class AbstractDownloadLicensesMojo
      */
     public List<String> getExcludedScopes()
     {
-        String[] split = excludedScopes == null ? new String[0] : excludedScopes.split( "," );
-        return Arrays.asList( split );
+        return MojoHelper.getParams( excludedScopes );
     }
 
     public void setExcludedScopes( String excludedScopes )
@@ -303,8 +338,7 @@ public abstract class AbstractDownloadLicensesMojo
      */
     public List<String> getIncludedScopes()
     {
-        String[] split = includedScopes == null ? new String[0] : includedScopes.split( "," );
-        return Arrays.asList( split );
+        return MojoHelper.getParams( includedScopes );
     }
 
     // not used at the moment
@@ -314,7 +348,7 @@ public abstract class AbstractDownloadLicensesMojo
      */
     public String getIncludedArtifacts()
     {
-        return null;
+        return includedArtifacts;
     }
 
     // not used at the moment
@@ -324,7 +358,7 @@ public abstract class AbstractDownloadLicensesMojo
      */
     public String getIncludedGroups()
     {
-        return null;
+        return includedGroups;
     }
 
     // not used at the moment
@@ -334,7 +368,7 @@ public abstract class AbstractDownloadLicensesMojo
      */
     public String getExcludedGroups()
     {
-        return null;
+        return excludedGroups;
     }
 
     // not used at the moment
@@ -344,7 +378,7 @@ public abstract class AbstractDownloadLicensesMojo
      */
     public String getExcludedArtifacts()
     {
-        return null;
+        return excludedArtifacts;
     }
 
     /**
