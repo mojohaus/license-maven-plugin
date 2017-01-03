@@ -33,7 +33,11 @@ import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
-import org.codehaus.mojo.license.api.*;
+import org.codehaus.mojo.license.api.DefaultThirdPartyHelper;
+import org.codehaus.mojo.license.api.DependenciesTool;
+import org.codehaus.mojo.license.api.ThirdPartyHelper;
+import org.codehaus.mojo.license.api.ThirdPartyTool;
+import org.codehaus.mojo.license.api.ThirdPartyToolException;
 import org.codehaus.mojo.license.model.LicenseMap;
 import org.codehaus.mojo.license.utils.FileUtil;
 import org.codehaus.mojo.license.utils.MojoHelper;
@@ -42,7 +46,12 @@ import org.codehaus.mojo.license.utils.StringToList;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
 
 /**
  * Abstract mojo for all third-party mojos.
@@ -51,7 +60,7 @@ import java.util.*;
  * @since 1.0
  */
 public abstract class AbstractAddThirdPartyMojo
-    extends AbstractLicenseMojo
+        extends AbstractLicenseMojo
 {
 
     // ----------------------------------------------------------------------
@@ -64,7 +73,7 @@ public abstract class AbstractAddThirdPartyMojo
      * @since 1.0
      */
     @Parameter( property = "license.outputDirectory",
-                defaultValue = "${project.build.directory}/generated-sources/license", required = true )
+            defaultValue = "${project.build.directory}/generated-sources/license", required = true )
     private File outputDirectory;
 
     /**
@@ -93,11 +102,11 @@ public abstract class AbstractAddThirdPartyMojo
 
     /**
      * To merge licenses in final file.
-     *
+     * <p>
      * Each entry represents a merge (first license is main license to keep), licenses are separated by {@code |}.
-     *
+     * <p>
      * Example :
-     *
+     * <p>
      * <pre>
      * &lt;licenseMerges&gt;
      * &lt;licenseMerge&gt;The Apache Software License|Version 2.0,Apache License, Version 2.0&lt;/licenseMerge&gt;
@@ -111,10 +120,10 @@ public abstract class AbstractAddThirdPartyMojo
 
     /**
      * To specify some licenses to include.
-     *
+     * <p>
      * If this parameter is filled and a license is not in this {@code whitelist} then build will failed when property
      * {@link #failIfWarning} is <tt>true</tt>.
-     *
+     * <p>
      * Since version {@code 1.4}, there is two ways to fill this parameter :
      * <ul>
      * <li>A simple string (separated by {@code |}), the way to use by property configuration:
@@ -137,10 +146,10 @@ public abstract class AbstractAddThirdPartyMojo
 
     /**
      * To specify some licenses to exclude.
-     *
+     * <p>
      * If a such license is found then build will failed when property
      * {@link #failIfWarning} is <tt>true</tt>.
-     *
+     * <p>
      * Since version {@code 1.4}, there is two ways to fill this parameter :
      * <ul>
      * <li>A simple string (separated by {@code |}), the way to use by property configuration:
@@ -164,19 +173,19 @@ public abstract class AbstractAddThirdPartyMojo
     /**
      * The path of the bundled third party file to produce when
      * {@link #generateBundle} is on.
-     *
+     * <p>
      * <b>Note:</b> This option is not available for {@code pom} module types.
      *
      * @since 1.0
      */
     @Parameter( property = "license.bundleThirdPartyPath",
-                defaultValue = "META-INF/${project.artifactId}-THIRD-PARTY.txt" )
+            defaultValue = "META-INF/${project.artifactId}-THIRD-PARTY.txt" )
     private String bundleThirdPartyPath;
 
     /**
      * A flag to copy a bundled version of the third-party file. This is useful
      * to avoid for a final application collision name of third party file.
-     *
+     * <p>
      * The file will be copied at the {@link #bundleThirdPartyPath} location.
      *
      * @since 1.0
@@ -202,7 +211,7 @@ public abstract class AbstractAddThirdPartyMojo
 
     /**
      * A flag to sort artifact by name in the generated third-party file.
-     *
+     * <p>
      * If not then artifacts are sorted by <pre>groupId:artifactId:version</pre>
      *
      * @since 1.6
@@ -212,7 +221,7 @@ public abstract class AbstractAddThirdPartyMojo
 
     /**
      * Template used to build the third-party file.
-     *
+     * <p>
      * (This template use freemarker).
      *
      * @since 1.1
@@ -313,7 +322,7 @@ public abstract class AbstractAddThirdPartyMojo
 
     /**
      * Creates the unsafe mapping (says dependencies with no license given by their pom).
-     *
+     * <p>
      * Can come from loaded missing file or from dependencies with no license at all.
      *
      * @return the map of usafe mapping indexed by their gav.
@@ -322,7 +331,7 @@ public abstract class AbstractAddThirdPartyMojo
      * @throws ThirdPartyToolException  for third party tool error
      */
     protected abstract SortedProperties createUnsafeMapping()
-        throws ProjectBuildingException, IOException, ThirdPartyToolException;
+            throws ProjectBuildingException, IOException, ThirdPartyToolException;
 
     // ----------------------------------------------------------------------
     // AbstractLicenseMojo Implementaton
@@ -333,7 +342,7 @@ public abstract class AbstractAddThirdPartyMojo
      */
     @Override
     protected void init()
-        throws Exception
+            throws Exception
     {
 
         Log log = getLog();
@@ -497,44 +506,50 @@ public abstract class AbstractAddThirdPartyMojo
         if ( helper == null )
         {
             helper =
-                new DefaultThirdPartyHelper( getProject(), getEncoding(), isVerbose(), dependenciesTool, thirdPartyTool,
-                                             localRepository, remoteRepositories, getLog() );
+                    new DefaultThirdPartyHelper( getProject(), getEncoding(), isVerbose(), dependenciesTool, thirdPartyTool,
+                                                 localRepository, remoteRepositories, getLog() );
         }
         return helper;
     }
 
-    protected void resolveUnsafeDependenciesFromArtifact(String groupId, String artifactId, String version)
-            throws ArtifactNotFoundException, IOException, ArtifactResolutionException {
-        File missingLicensesFromArtifact = thirdPartyTool.resolveMissingLicensesDescriptor(groupId, artifactId, version, localRepository, remoteRepositories);
-        resolveUnsafeDependenciesFromFile(missingLicensesFromArtifact);
+    protected void resolveUnsafeDependenciesFromArtifact( String groupId, String artifactId, String version )
+            throws ArtifactNotFoundException, IOException, ArtifactResolutionException
+    {
+        File missingLicensesFromArtifact = thirdPartyTool.resolveMissingLicensesDescriptor( groupId, artifactId, version, localRepository, remoteRepositories );
+        resolveUnsafeDependenciesFromFile( missingLicensesFromArtifact );
     }
 
-    protected void resolveUnsafeDependenciesFromFile(File missingLicenses) throws IOException {
+    protected void resolveUnsafeDependenciesFromFile( File missingLicenses ) throws IOException
+    {
         SortedSet<MavenProject> unsafeDeps = getUnsafeDependencies();
-        if (missingLicenses != null && missingLicenses.exists() && missingLicenses.length() > 0) {
+        if ( missingLicenses != null && missingLicenses.exists() && missingLicenses.length() > 0 )
+        {
             // there are missing licenses available from the artifact
-            SortedProperties unsafeMappings = new SortedProperties(getEncoding());
+            SortedProperties unsafeMappings = new SortedProperties( getEncoding() );
 
-            if (missingLicenses.exists()) {
+            if ( missingLicenses.exists() )
+            {
                 // load the missing file
-                unsafeMappings.load(missingLicenses);
+                unsafeMappings.load( missingLicenses );
             }
 
             Set resolvedDependencies = new HashSet();
-            for (MavenProject unsafeDependency : unsafeDeps) {
-                String id = MojoHelper.getArtifactId(unsafeDependency.getArtifact());
+            for ( MavenProject unsafeDependency : unsafeDeps )
+            {
+                String id = MojoHelper.getArtifactId( unsafeDependency.getArtifact() );
 
-                if (unsafeMappings.containsKey(id) && StringUtils.isNotBlank(unsafeMappings.getProperty(id))) {
+                if ( unsafeMappings.containsKey( id ) && StringUtils.isNotBlank( unsafeMappings.getProperty( id ) ) )
+                {
                     // update license map
-                    thirdPartyTool.addLicense(licenseMap, unsafeDependency, unsafeMappings.getProperty(id));
+                    thirdPartyTool.addLicense( licenseMap, unsafeDependency, unsafeMappings.getProperty( id ) );
 
                     // remove
-                    resolvedDependencies.add(unsafeDependency);
+                    resolvedDependencies.add( unsafeDependency );
                 }
             }
 
             // remove resolvedDependencies from unsafeDeps;
-            unsafeDeps.removeAll(resolvedDependencies);
+            unsafeDeps.removeAll( resolvedDependencies );
         }
     }
 
@@ -584,31 +599,36 @@ public abstract class AbstractAddThirdPartyMojo
 
             for ( String dependencyLicense : dependencyLicenses )
             {
-                getLog().debug("Testing license '" + dependencyLicense + "'");
+                getLog().debug( "Testing license '" + dependencyLicense + "'" );
                 if ( !whiteLicenses.contains( dependencyLicense ) &&
                         CollectionUtils.isNotEmpty( getLicenseMap().get( dependencyLicense ) ) )
                 {
-                    getLog().debug("Testing dependency license '" + dependencyLicense + "' against all other licenses");
+                    getLog().debug( "Testing dependency license '" + dependencyLicense + "' against all other licenses" );
 
-                    for (MavenProject dependency : getLicenseMap().get(dependencyLicense)) {
-                        getLog().debug("  testing dependency " + dependency);
+                    for ( MavenProject dependency : getLicenseMap().get( dependencyLicense ) )
+                    {
+                        getLog().debug( "  testing dependency " + dependency );
 
                         boolean forbiddenLicenseUsed = true;
 
-                        for (String otherLicense : dependencyLicenses) {
+                        for ( String otherLicense : dependencyLicenses )
+                        {
                             // skip this license if it is the same as the dependency license
                             // skip this license if it has no projects assigned
-                            if (otherLicense.equals(dependencyLicense) || getLicenseMap().get(dependencyLicense).isEmpty()) {
+                            if ( otherLicense.equals( dependencyLicense ) || getLicenseMap().get( dependencyLicense ).isEmpty() )
+                            {
                                 continue;
                             }
 
                             // skip this license if it isn't one of the whitelisted
-                            if (!whiteLicenses.contains(otherLicense)) {
+                            if ( !whiteLicenses.contains( otherLicense ) )
+                            {
                                 continue;
                             }
 
-                            if (getLicenseMap().get(otherLicense).contains(dependency)) {
-                                getLog().info("License '" + dependencyLicense + "' for '" + dependency + "'is OK since it is also licensed under '" + otherLicense + "'");
+                            if ( getLicenseMap().get( otherLicense ).contains( dependency ) )
+                            {
+                                getLog().info( "License '" + dependencyLicense + "' for '" + dependency + "'is OK since it is also licensed under '" + otherLicense + "'" );
                                 // this dependency is licensed under another license from white list
                                 forbiddenLicenseUsed = false;
                                 break;
@@ -616,8 +636,9 @@ public abstract class AbstractAddThirdPartyMojo
                         }
 
                         //bad license found
-                        if (forbiddenLicenseUsed) {
-                            unsafeLicenses.add(dependencyLicense);
+                        if ( forbiddenLicenseUsed )
+                        {
+                            unsafeLicenses.add( dependencyLicense );
                             break;
                         }
                     }
@@ -635,14 +656,16 @@ public abstract class AbstractAddThirdPartyMojo
             {
 
                 SortedSet<MavenProject> deps = getLicenseMap().get( unsafeLicense );
-                if (!deps.isEmpty()) {
+                if ( !deps.isEmpty() )
+                {
                     StringBuilder sb = new StringBuilder();
-                    sb.append("License ").append(unsafeLicense).append(" used by ").append(deps.size()).append(
-                            " dependencies:");
-                    for (MavenProject dep : deps) {
-                        sb.append("\n -").append(MojoHelper.getArtifactName(dep));
+                    sb.append( "License " ).append( unsafeLicense ).append( " used by " ).append( deps.size() ).append(
+                            " dependencies:" );
+                    for ( MavenProject dep : deps )
+                    {
+                        sb.append( "\n -" ).append( MojoHelper.getArtifactName( dep ) );
                     }
-                    log.warn(sb.toString());
+                    log.warn( sb.toString() );
                 }
             }
         }
@@ -650,7 +673,7 @@ public abstract class AbstractAddThirdPartyMojo
     }
 
     protected void writeThirdPartyFile()
-        throws IOException
+            throws IOException
     {
 
         if ( doGenerate )
@@ -673,13 +696,13 @@ public abstract class AbstractAddThirdPartyMojo
 
     /**
      * Class to fill the {@link #includedLicenses} parameter, from a simple string to split, or a list of string.
-     *
+     * <p>
      * TODO-tchemit We should find a way to create a plexus convertor.
      *
      * @since 1.4
      */
     public static class IncludedLicenses
-        extends StringToList
+            extends StringToList
     {
 
         /**
@@ -712,13 +735,13 @@ public abstract class AbstractAddThirdPartyMojo
 
     /**
      * Class to fill the {@link #excludedLicenses} parameter, from a simple string to split, or a list of string.
-     *
+     * <p>
      * TODO-tchemit We should find a way to create a plexus convertor.
      *
      * @since 1.4
      */
     public static class ExcludedLicenses
-        extends StringToList
+            extends StringToList
     {
 
         /**

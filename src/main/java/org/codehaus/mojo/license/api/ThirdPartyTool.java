@@ -41,7 +41,7 @@ import java.util.SortedSet;
 
 /**
  * A tool to load third party files missing files.
- *
+ * <p>
  * We should put here all the logic code written in some mojo and licenseMap...
  *
  * @author tchemit dev@tchemit.fr
@@ -91,11 +91,11 @@ public interface ThirdPartyTool
                                                                 LicenseMap licenseMap,
                                                                 ArtifactRepository localRepository,
                                                                 List<ArtifactRepository> remoteRepositories )
-        throws ThirdPartyToolException, IOException;
+            throws ThirdPartyToolException, IOException;
 
     /**
      * For the given {@code project}, attach the given {@code file} as a third-party file.
-     *
+     * <p>
      * The file will be attached as with a classifier {@code third-parties} and a type {@code properties}.
      *
      * @param project the project on which to attch the third-party file
@@ -105,7 +105,7 @@ public interface ThirdPartyTool
 
     /**
      * Obtain the third party file from the repository.
-     *
+     * <p>
      * Will first search in the local repository, then into the remote repositories and will resolv it.
      *
      * @param project         the project
@@ -116,10 +116,10 @@ public interface ThirdPartyTool
      */
     File resolvThirdPartyDescriptor( MavenProject project, ArtifactRepository localRepository,
                                      List<ArtifactRepository> repositories )
-        throws ThirdPartyToolException;
+            throws ThirdPartyToolException;
 
-    File resolveMissingLicensesDescriptor(String groupId, String artifactId, String version,
-                                          ArtifactRepository localRepository, List<ArtifactRepository> repositories)
+    File resolveMissingLicensesDescriptor( String groupId, String artifactId, String version,
+                                           ArtifactRepository localRepository, List<ArtifactRepository> repositories )
             throws IOException, ArtifactResolutionException, ArtifactNotFoundException;
 
     /**
@@ -143,7 +143,7 @@ public interface ThirdPartyTool
      */
     SortedProperties loadUnsafeMapping( LicenseMap licenseMap, SortedMap<String, MavenProject> artifactCache,
                                         String encoding, File missingFile )
-        throws IOException;
+            throws IOException;
 
     /**
      * Add one or more licenses (name and url are {@code licenseNames}) to the given {@code licenseMap} for the given
@@ -175,7 +175,7 @@ public interface ThirdPartyTool
 
     /**
      * For a given {@code licenseMap}, merge all {@code licenses}.
-     *
+     * <p>
      * The first value of the {@code licenses} is the license to keep and all other values will be merged into the
      * first one.
      *
@@ -197,7 +197,7 @@ public interface ThirdPartyTool
      */
     void writeThirdPartyFile( LicenseMap licenseMap, File thirdPartyFile, boolean verbose, String encoding,
                               String template )
-        throws IOException;
+            throws IOException;
 
     /**
      * Writes the bundled version of the third-party file.
@@ -208,5 +208,5 @@ public interface ThirdPartyTool
      * @throws IOException if any problem while writing file
      */
     void writeBundleThirdPartyFile( File thirdPartyFile, File outputDirectory, String bundleThirdPartyPath )
-        throws IOException;
+            throws IOException;
 }

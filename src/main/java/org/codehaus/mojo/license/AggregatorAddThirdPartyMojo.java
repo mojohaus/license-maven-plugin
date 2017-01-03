@@ -167,22 +167,25 @@ public class AggregatorAddThirdPartyMojo
             }
         }
 
-        if(checkUnsafeDependencies()){
-            resolveUnsafeDependenciesFromFile(aggregateMissingLicensesFile);
+        if ( checkUnsafeDependencies() )
+        {
+            resolveUnsafeDependenciesFromFile( aggregateMissingLicensesFile );
         }
 
-        if (!StringUtils.isBlank(aggregateMissingLicensesFileArtifact) && checkUnsafeDependencies()) {
-            String[] tokens = StringUtils.split(aggregateMissingLicensesFileArtifact, ":");
-            if (tokens.length != 3) {
+        if ( !StringUtils.isBlank( aggregateMissingLicensesFileArtifact ) && checkUnsafeDependencies() )
+        {
+            String[] tokens = StringUtils.split( aggregateMissingLicensesFileArtifact, ":" );
+            if ( tokens.length != 3 )
+            {
                 throw new MojoFailureException(
                         "Invalid missing licenses artifact, you must specify groupId:artifactId:version "
-                                + aggregateMissingLicensesFileArtifact);
+                                + aggregateMissingLicensesFileArtifact );
             }
             String groupId = tokens[0];
             String artifactId = tokens[1];
             String version = tokens[2];
 
-            resolveUnsafeDependenciesFromArtifact(groupId, artifactId, version);
+            resolveUnsafeDependenciesFromArtifact( groupId, artifactId, version );
         }
 
 

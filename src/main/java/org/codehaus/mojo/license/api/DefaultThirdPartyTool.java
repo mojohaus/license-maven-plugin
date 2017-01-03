@@ -632,7 +632,7 @@ public class DefaultThirdPartyTool
                                     List<ArtifactRepository> repositories, SortedSet<MavenProject> unsafeDependencies,
                                     LicenseMap licenseMap, Map<String, MavenProject> unsafeProjects,
                                     SortedProperties result )
-        throws IOException, ArtifactNotFoundException, ArtifactResolutionException
+            throws IOException, ArtifactNotFoundException, ArtifactResolutionException
     {
         for ( Artifact dep : dependencies )
         {
@@ -692,13 +692,13 @@ public class DefaultThirdPartyTool
      */
     private File resolveThirdPartyDescriptor( MavenProject project, ArtifactRepository localRepository,
                                               List<ArtifactRepository> repositories )
-        throws IOException, ArtifactResolutionException, ArtifactNotFoundException
+            throws IOException, ArtifactResolutionException, ArtifactNotFoundException
     {
         File result;
         try
         {
-            result = resolveArtifact(project.getGroupId(), project.getArtifactId(), project.getVersion(),
-                    DESCRIPTOR_TYPE, DESCRIPTOR_CLASSIFIER, localRepository, repositories);
+            result = resolveArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion(),
+                                      DESCRIPTOR_TYPE, DESCRIPTOR_CLASSIFIER, localRepository, repositories );
 
             // we use zero length files to avoid re-resolution (see below)
             if ( result.length() == 0 )
@@ -712,7 +712,7 @@ public class DefaultThirdPartyTool
 
             // we can afford to write an empty descriptor here as we don't expect it to turn up later in the remote
             // repository, because the parent was already released (and snapshots are updated automatically if changed)
-            result = new File(localRepository.getBasedir(), localRepository.pathOf(e.getArtifact()));
+            result = new File( localRepository.getBasedir(), localRepository.pathOf( e.getArtifact() ) );
 
             FileUtil.createNewFile( result );
         }
@@ -720,19 +720,21 @@ public class DefaultThirdPartyTool
         return result;
     }
 
-    public File resolveMissingLicensesDescriptor(String groupId, String artifactId, String version,
-            ArtifactRepository localRepository, List<ArtifactRepository> repositories)
-            throws IOException, ArtifactResolutionException, ArtifactNotFoundException {
-        return resolveArtifact(groupId, artifactId, version, DESCRIPTOR_TYPE, DESCRIPTOR_CLASSIFIER, localRepository, repositories);
+    public File resolveMissingLicensesDescriptor( String groupId, String artifactId, String version,
+                                                  ArtifactRepository localRepository, List<ArtifactRepository> repositories )
+            throws IOException, ArtifactResolutionException, ArtifactNotFoundException
+    {
+        return resolveArtifact( groupId, artifactId, version, DESCRIPTOR_TYPE, DESCRIPTOR_CLASSIFIER, localRepository, repositories );
     }
 
-    private File resolveArtifact(String groupId, String artifactId, String version,
-            String type, String classifier, ArtifactRepository localRepository, List<ArtifactRepository> repositories) throws ArtifactResolutionException, IOException, ArtifactNotFoundException {
+    private File resolveArtifact( String groupId, String artifactId, String version,
+                                  String type, String classifier, ArtifactRepository localRepository, List<ArtifactRepository> repositories ) throws ArtifactResolutionException, IOException, ArtifactNotFoundException
+    {
         // TODO: this is a bit crude - proper type, or proper handling as metadata rather than an artifact in 2.1?
-        Artifact artifact = artifactFactory.createArtifactWithClassifier(groupId, artifactId, version, type,
-                classifier);
+        Artifact artifact = artifactFactory.createArtifactWithClassifier( groupId, artifactId, version, type,
+                                                                          classifier );
 
-        artifactResolver.resolve(artifact, repositories, localRepository);
+        artifactResolver.resolve( artifact, repositories, localRepository );
 
         return artifact.getFile();
     }
