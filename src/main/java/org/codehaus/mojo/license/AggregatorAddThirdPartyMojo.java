@@ -23,6 +23,7 @@ package org.codehaus.mojo.license;
  */
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Execute;
@@ -78,6 +79,22 @@ public class AggregatorAddThirdPartyMojo
      */
     @Parameter( property = "license.skipAggregateAddThirdParty", defaultValue = "false" )
     private boolean skipAggregateAddThirdParty;
+
+    /**
+     * To resolve third party licenses from an artifact.
+     *
+     * @since 1.11
+     */
+    @Parameter( property = "license.aggregateMissingLicensesFileArtifact" )
+    private String aggregateMissingLicensesFileArtifact;
+
+    /**
+     * To resolve third party licenses from a file.
+     *
+     * @since 1.11
+     */
+    @Parameter( property = "license.aggregateMissingLicensesFile", defaultValue = "${project.basedir}/THIRD-PARTY.properties")
+    private File aggregateMissingLicensesFile;
 
     // ----------------------------------------------------------------------
     // AbstractLicenseMojo Implementaton
@@ -149,6 +166,26 @@ public class AggregatorAddThirdPartyMojo
                 getLog().info( " - " + id );
             }
         }
+
+        if(checkUnsafeDependencies()){
+            resolveUnsafeDependenciesFromFile(aggregateMissingLicensesFile);
+        }
+
+        if (!StringUtils.isBlank(aggregateMissingLicensesFileArtifact) && checkUnsafeDependencies()) {
+            String[] tokens = StringUtils.split(aggregateMissingLicensesFileArtifact, ":");
+            if (tokens.length != 3) {
+                throw new MojoFailureException(
+                        "Invalid missing licenses artifact, you must specify groupId:artifactId:version "
+                                + aggregateMissingLicensesFileArtifact);
+            }
+            String groupId = tokens[0];
+            String artifactId = tokens[1];
+            String version = tokens[2];
+
+            resolveUnsafeDependenciesFromArtifact(groupId, artifactId, version);
+        }
+
+
         boolean unsafe = checkUnsafeDependencies();
 
         boolean safeLicense = checkForbiddenLicenses();

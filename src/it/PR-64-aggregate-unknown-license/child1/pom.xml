@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+
+  <groupId>org.codehaus.mojo.license.test</groupId>
+  <artifactId>PR-64-unknown-license-64-child1</artifactId>
+  <version>1.0</version>
+
+  <licenses>
+    <license>
+      <name>LGPL 3.0</name>
+      <url>http://jaxx.nuiton.org/v/latest/license.html</url>
+    </license>
+  </licenses>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.codehaus.jettison</groupId>
+      <artifactId>jettison</artifactId>
+      <version>1.1</version>
+    </dependency>
+  </dependencies>
+
+</project>
