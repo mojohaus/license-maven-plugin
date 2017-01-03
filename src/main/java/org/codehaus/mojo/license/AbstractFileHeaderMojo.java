@@ -64,23 +64,23 @@ import java.util.TreeMap;
  * @since 1.2
  */
 public abstract class AbstractFileHeaderMojo
-    extends AbstractLicenseNameMojo
-    implements FileHeaderProcessorConfiguration
+        extends AbstractLicenseNameMojo
+        implements FileHeaderProcessorConfiguration
 {
 
     // ----------------------------------------------------------------------
     // Constants
     // ----------------------------------------------------------------------
 
-    public static final String[] DEFAULT_INCLUDES = new String[]{ "**/*" };
+    public static final String[] DEFAULT_INCLUDES = new String[]{"**/*"};
 
     public static final String[] DEFAULT_EXCLUDES =
-        new String[]{ "**/*.zargo", "**/*.uml", "**/*.umldi", "**/*.xmi", /* modelisation */
-            "**/*.img", "**/*.png", "**/*.jpg", "**/*.jpeg", "**/*.gif", /* images */
-            "**/*.zip", "**/*.jar", "**/*.war", "**/*.ear", "**/*.tgz", "**/*.gz" };
+            new String[]{"**/*.zargo", "**/*.uml", "**/*.umldi", "**/*.xmi", /* modelisation */
+                    "**/*.img", "**/*.png", "**/*.jpg", "**/*.jpeg", "**/*.gif", /* images */
+                    "**/*.zip", "**/*.jar", "**/*.war", "**/*.ear", "**/*.tgz", "**/*.gz"};
 
     public static final String[] DEFAULT_ROOTS =
-        new String[]{ "src", "target/generated-sources", "target/processed-sources" };
+            new String[]{"src", "target/generated-sources", "target/processed-sources"};
 
     // ----------------------------------------------------------------------
     // Mojo Parameters
@@ -199,7 +199,7 @@ public abstract class AbstractFileHeaderMojo
 
     /**
      * A flag to use for java comment start tag with no reformat syntax {@code /*-}.
-     * <p>
+     *
      * See http://www.oracle.com/technetwork/java/javase/documentation/codeconventions-141999.html#350
      *
      * @since 1.9
@@ -209,7 +209,7 @@ public abstract class AbstractFileHeaderMojo
 
     /**
      * A flag to indicate if there should be an empty line after the header.
-     * <p>
+     *
      * Checkstyle requires empty line between license header and package statement.
      * If you are using addJavaLicenseAfterPackage=false it could make sense to set this to true.
      * </p>
@@ -222,7 +222,7 @@ public abstract class AbstractFileHeaderMojo
 
     /**
      * A flag to ignore no files to scan.
-     * <p>
+     *
      * This flag will suppress the "No file to scan" warning. This will allow you to set the plug-in in the root pom of
      * your project without getting a lot of warnings for aggregation modules / artifacts.
      * </p>
@@ -268,8 +268,6 @@ public abstract class AbstractFileHeaderMojo
      * <li>images</li>
      * </ul>
      *
-     * <b>Note:</b> This parameter is not useable if you are still using a project file descriptor.
-     *
      * @since 1.0
      */
     @Parameter( property = "license.excludes" )
@@ -291,13 +289,29 @@ public abstract class AbstractFileHeaderMojo
      * &lt;/extraExtensions&gt;
      * </pre>
      *
-     * <b>Note:</b> This parameter is not useable if you are still using a project file descriptor.
-     *
-     * @parameter
      * @since 1.0
      */
     @Parameter
     protected Map<String, String> extraExtensions;
+
+    /**
+     * To associate extra files to an existing comment style.
+     *
+     * Keys of the map are the name of extra files to treat, and the value
+     * is the comment style you want to associate.
+     *
+     * For example, to treat a file named {@code DockerFile} as {@code properties} files
+     * (says using the {@code properties} comment style, declare this in your plugin configuration :
+     * <pre>
+     * &lt;extraFiles&gt;
+     * &lt;DockerFile&gt;properties&lt;/DockerFile&gt;
+     * &lt;/extraFiles&gt;
+     * </pre>
+     *
+     * @since 1.11
+     */
+    @Parameter
+    protected Map<String, String> extraFiles;
 
     /**
      * Template used to build the description section of the license header.
@@ -307,7 +321,7 @@ public abstract class AbstractFileHeaderMojo
      * @since 1.1
      */
     @Parameter( property = "license.descriptionTemplate",
-        defaultValue = "/org/codehaus/mojo/license/default-file-header-description.ftl" )
+            defaultValue = "/org/codehaus/mojo/license/default-file-header-description.ftl" )
     protected String descriptionTemplate;
 
     // ----------------------------------------------------------------------
@@ -421,7 +435,7 @@ public abstract class AbstractFileHeaderMojo
      */
     @Override
     public void init()
-        throws Exception
+            throws Exception
     {
 
         if ( StringUtils.isEmpty( ignoreTag ) )
@@ -516,8 +530,7 @@ public abstract class AbstractFileHeaderMojo
         {
             getLog().info( "Will use processEndTag: " + processEndTag );
         }
-        sectionDelimiter =
-            cleanHeaderConfiguration( sectionDelimiter, FileHeaderTransformer.DEFAULT_SECTION_DELIMITER );
+        sectionDelimiter = cleanHeaderConfiguration( sectionDelimiter, FileHeaderTransformer.DEFAULT_SECTION_DELIMITER );
 
         if ( isVerbose() )
         {
@@ -566,7 +579,7 @@ public abstract class AbstractFileHeaderMojo
 
                     // override existing extension mapping
                     getLog().warn( "The extension " + extension + " is already accepted for comment style " +
-                                       extensionToCommentStyle.get( extension ) );
+                                           extensionToCommentStyle.get( extension ) );
                 }
                 String commentStyle = entry.getValue();
 
@@ -597,7 +610,7 @@ public abstract class AbstractFileHeaderMojo
      */
     @Override
     public void doAction()
-        throws Exception
+            throws Exception
     {
 
         long t0 = System.nanoTime();
@@ -633,7 +646,7 @@ public abstract class AbstractFileHeaderMojo
             {
                 String delay = MojoHelper.convertTime( System.nanoTime() - t0 );
                 String message =
-                    String.format( "Scan %s file%s header done in %s.", nbFiles, nbFiles > 1 ? "s" : "", delay );
+                        String.format( "Scan %s file%s header done in %s.", nbFiles, nbFiles > 1 ? "s" : "", delay );
                 getLog().info( message );
             }
             Set<FileState> states = result.keySet();
@@ -695,6 +708,11 @@ public abstract class AbstractFileHeaderMojo
     protected Map<String, List<File>> obtainFilesToProcessByCommentStyle()
     {
 
+        if ( extraFiles == null )
+        {
+            extraFiles = Collections.emptyMap();
+        }
+
         Map<String, List<File>> results = new HashMap<String, List<File>>();
 
         // add for all known comment style (says transformer) a empty list
@@ -750,8 +768,14 @@ public abstract class AbstractFileHeaderMojo
                 if ( StringUtils.isEmpty( commentStyle ) )
                 {
 
-                    // unknown extension, do not treat this file
-                    continue;
+                    // unknown extension, try with extra files
+                    File file = new File( root, path );
+                    commentStyle = extraFiles.get( file.getName() );
+                    if ( StringUtils.isEmpty( commentStyle ) )
+                    {
+                        // do not treat this file
+                        continue;
+                    }
                 }
                 //
                 File file = new File( root, path );
@@ -770,7 +794,7 @@ public abstract class AbstractFileHeaderMojo
      * @throws MojoFailureException if check is not ok (some file with no header or to update)
      */
     protected void checkResults( EnumMap<FileState, Set<File>> result )
-        throws MojoFailureException
+            throws MojoFailureException
     {
         Set<FileState> states = result.keySet();
 
@@ -812,7 +836,7 @@ public abstract class AbstractFileHeaderMojo
      * @throws IOException if any IO error while processing files
      */
     protected void processCommentStyle( String commentStyle, List<File> filesToTreat )
-        throws IOException
+            throws IOException
     {
 
         // obtain license from definition
@@ -847,7 +871,7 @@ public abstract class AbstractFileHeaderMojo
      * @throws IOException if any IO error while processing this file
      */
     protected void processFile( File file )
-        throws IOException
+            throws IOException
     {
 
         if ( processedFiles.contains( file ) )
@@ -866,7 +890,7 @@ public abstract class AbstractFileHeaderMojo
         catch ( Exception e )
         {
             getLog().warn( "skip failed file : " + e.getMessage() +
-                               ( e.getCause() == null ? "" : " Cause : " + e.getCause().getMessage() ), e );
+                                   ( e.getCause() == null ? "" : " Cause : " + e.getCause().getMessage() ), e );
             FileState.fail.addFile( file, result );
             doFinalize = false;
         }
@@ -900,7 +924,7 @@ public abstract class AbstractFileHeaderMojo
      * @throws java.io.IOException if any pb while treatment
      */
     protected boolean processFile( File file, File processFile )
-        throws IOException
+            throws IOException
     {
 
         if ( getLog().isDebugEnabled() )
@@ -949,7 +973,7 @@ public abstract class AbstractFileHeaderMojo
         {
             // could not obtain existing header
             throw new InvalideFileHeaderException(
-                "Could not extract header on file " + file + " for reason " + e.getMessage() );
+                    "Could not extract header on file " + file + " for reason " + e.getMessage() );
         }
         catch ( Exception e )
         {
@@ -1020,7 +1044,7 @@ public abstract class AbstractFileHeaderMojo
      * @throws IOException if any IO error while finalizing file
      */
     protected void finalizeFile( File file, File processFile )
-        throws IOException
+            throws IOException
     {
 
         if ( isKeepBackup() && !isDryRun() )
@@ -1068,7 +1092,7 @@ public abstract class AbstractFileHeaderMojo
      */
     @Override
     protected void finalize()
-        throws Throwable
+            throws Throwable
     {
         super.finalize();
         clear();
@@ -1142,7 +1166,7 @@ public abstract class AbstractFileHeaderMojo
      * @throws java.io.IOException if any problem while creating file header
      */
     protected FileHeader buildDefaultFileHeader( License license, String encoding )
-        throws IOException
+            throws IOException
     {
         FileHeader defaultFileHeader = new FileHeader();
 
@@ -1190,7 +1214,7 @@ public abstract class AbstractFileHeaderMojo
      * @throws java.io.IOException if any problem while creating file header
      */
     protected void updateFileHeaderDescription( File file )
-        throws IOException
+            throws IOException
     {
 
         Map<String, Object> descriptionParameters = new HashMap<String, Object>();
@@ -1234,7 +1258,7 @@ public abstract class AbstractFileHeaderMojo
         if ( transformer == null )
         {
             throw new IllegalArgumentException(
-                "transformerName " + transformerName + " is unknow, use one this one : " + transformers.keySet() );
+                    "transformerName " + transformerName + " is unknow, use one this one : " + transformers.keySet() );
         }
         return transformer;
     }
