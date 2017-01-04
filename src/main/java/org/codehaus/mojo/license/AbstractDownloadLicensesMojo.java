@@ -543,7 +543,7 @@ public abstract class AbstractDownloadLicensesMojo
 
             if ( license.getName() != null )
             {
-                licenseFileName = license.getName() + " - " + licenseUrlFile.getName();
+                licenseFileName = license.getName().replaceAll( "/", "_" ) + " - " + licenseUrlFile.getName();
             }
 
             // Check if the file has a valid file extention
