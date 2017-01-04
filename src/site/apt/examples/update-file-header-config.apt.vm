@@ -37,6 +37,8 @@ Update File Header Examples
 
     * extraExtensions: Dictionary of extensions to map to existing comment style.
 
+    * extraFiles: Dictionary of files to existing comment style.
+
     * customize description section: Define a template to change the description section of a file header.
 
   To see all extensions accepted run the <<comment-style-list>> goal.
@@ -226,6 +228,34 @@ ExtraExtensions
 -------------------------------------------------------------------------------
 
   Files with extension <<myProprietaryExtension>> will be treated as java files (says using the comment style named java).
+
+ExtraFiles
+
+  To match exact files, add a mapped parameter where keys are name of files and values are the comment style type to use.
+
+
+* Example
+
+  Given a pom with this plugin configuration:
+
+-------------------------------------------------------------------------------
+
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>${project.version}</version>
+        <configuration>
+          <extraFiles>
+            <DockerFile>properties</DockerFile>
+          </extraFiles>
+        </configuration>
+      </plugin>
+    </plugins>
+
+-------------------------------------------------------------------------------
+
+  Files named <<DockerFile>> will be treated as properties files (says using the comment style named properties).
 
 Customize the description section
 
