@@ -640,7 +640,7 @@
 <a class="jxr_linenumber" name="L632" href="#L632">632</a>                                     List&lt;ArtifactRepository&gt; repositories, SortedSet&lt;MavenProject&gt; unsafeDependencies,
 <a class="jxr_linenumber" name="L633" href="#L633">633</a>                                     <a href="../../../../../org/codehaus/mojo/license/model/LicenseMap.html">LicenseMap</a> licenseMap, Map&lt;String, MavenProject&gt; unsafeProjects,
 <a class="jxr_linenumber" name="L634" href="#L634">634</a>                                     <a href="../../../../../org/codehaus/mojo/license/utils/SortedProperties.html">SortedProperties</a> result )
-<a class="jxr_linenumber" name="L635" href="#L635">635</a>         <strong class="jxr_keyword">throws</strong> IOException, ArtifactNotFoundException, ArtifactResolutionException
+<a class="jxr_linenumber" name="L635" href="#L635">635</a>             <strong class="jxr_keyword">throws</strong> IOException, ArtifactNotFoundException, ArtifactResolutionException
 <a class="jxr_linenumber" name="L636" href="#L636">636</a>     {
 <a class="jxr_linenumber" name="L637" href="#L637">637</a>         <strong class="jxr_keyword">for</strong> ( Artifact dep : dependencies )
 <a class="jxr_linenumber" name="L638" href="#L638">638</a>         {
@@ -700,71 +700,84 @@
 <a class="jxr_linenumber" name="L692" href="#L692">692</a> <em class="jxr_javadoccomment">     */</em>
 <a class="jxr_linenumber" name="L693" href="#L693">693</a>     <strong class="jxr_keyword">private</strong> File resolveThirdPartyDescriptor( MavenProject project, ArtifactRepository localRepository,
 <a class="jxr_linenumber" name="L694" href="#L694">694</a>                                               List&lt;ArtifactRepository&gt; repositories )
-<a class="jxr_linenumber" name="L695" href="#L695">695</a>         <strong class="jxr_keyword">throws</strong> IOException, ArtifactResolutionException, ArtifactNotFoundException
+<a class="jxr_linenumber" name="L695" href="#L695">695</a>             <strong class="jxr_keyword">throws</strong> IOException, ArtifactResolutionException, ArtifactNotFoundException
 <a class="jxr_linenumber" name="L696" href="#L696">696</a>     {
 <a class="jxr_linenumber" name="L697" href="#L697">697</a>         File result;
-<a class="jxr_linenumber" name="L698" href="#L698">698</a> 
-<a class="jxr_linenumber" name="L699" href="#L699">699</a>         <em class="jxr_comment">// TODO: this is a bit crude - proper type, or proper handling as metadata rather than an artifact in 2.1?</em>
-<a class="jxr_linenumber" name="L700" href="#L700">700</a>         Artifact artifact = artifactFactory.createArtifactWithClassifier( project.getGroupId(), project.getArtifactId(),
-<a class="jxr_linenumber" name="L701" href="#L701">701</a>                                                                           project.getVersion(), DESCRIPTOR_TYPE,
-<a class="jxr_linenumber" name="L702" href="#L702">702</a>                                                                           DESCRIPTOR_CLASSIFIER );
-<a class="jxr_linenumber" name="L703" href="#L703">703</a>         <strong class="jxr_keyword">try</strong>
-<a class="jxr_linenumber" name="L704" href="#L704">704</a>         {
-<a class="jxr_linenumber" name="L705" href="#L705">705</a>             artifactResolver.resolve( artifact, repositories, localRepository );
-<a class="jxr_linenumber" name="L706" href="#L706">706</a> 
-<a class="jxr_linenumber" name="L707" href="#L707">707</a>             result = artifact.getFile();
-<a class="jxr_linenumber" name="L708" href="#L708">708</a> 
-<a class="jxr_linenumber" name="L709" href="#L709">709</a>             <em class="jxr_comment">// we use zero length files to avoid re-resolution (see below)</em>
-<a class="jxr_linenumber" name="L710" href="#L710">710</a>             <strong class="jxr_keyword">if</strong> ( result.length() == 0 )
-<a class="jxr_linenumber" name="L711" href="#L711">711</a>             {
-<a class="jxr_linenumber" name="L712" href="#L712">712</a>                 getLogger().debug( <span class="jxr_string">"Skipped third party descriptor"</span> );
-<a class="jxr_linenumber" name="L713" href="#L713">713</a>             }
-<a class="jxr_linenumber" name="L714" href="#L714">714</a>         }
-<a class="jxr_linenumber" name="L715" href="#L715">715</a>         <strong class="jxr_keyword">catch</strong> ( ArtifactNotFoundException e )
-<a class="jxr_linenumber" name="L716" href="#L716">716</a>         {
-<a class="jxr_linenumber" name="L717" href="#L717">717</a>             getLogger().debug( <span class="jxr_string">"Unable to locate third party files descriptor : "</span> + e );
-<a class="jxr_linenumber" name="L718" href="#L718">718</a> 
-<a class="jxr_linenumber" name="L719" href="#L719">719</a>             <em class="jxr_comment">// we can afford to write an empty descriptor here as we don't expect it to turn up later in the remote</em>
-<a class="jxr_linenumber" name="L720" href="#L720">720</a>             <em class="jxr_comment">// repository, because the parent was already released (and snapshots are updated automatically if changed)</em>
-<a class="jxr_linenumber" name="L721" href="#L721">721</a>             result = <strong class="jxr_keyword">new</strong> File( localRepository.getBasedir(), localRepository.pathOf( artifact ) );
+<a class="jxr_linenumber" name="L698" href="#L698">698</a>         <strong class="jxr_keyword">try</strong>
+<a class="jxr_linenumber" name="L699" href="#L699">699</a>         {
+<a class="jxr_linenumber" name="L700" href="#L700">700</a>             result = resolveArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion(),
+<a class="jxr_linenumber" name="L701" href="#L701">701</a>                                       DESCRIPTOR_TYPE, DESCRIPTOR_CLASSIFIER, localRepository, repositories );
+<a class="jxr_linenumber" name="L702" href="#L702">702</a> 
+<a class="jxr_linenumber" name="L703" href="#L703">703</a>             <em class="jxr_comment">// we use zero length files to avoid re-resolution (see below)</em>
+<a class="jxr_linenumber" name="L704" href="#L704">704</a>             <strong class="jxr_keyword">if</strong> ( result.length() == 0 )
+<a class="jxr_linenumber" name="L705" href="#L705">705</a>             {
+<a class="jxr_linenumber" name="L706" href="#L706">706</a>                 getLogger().debug( <span class="jxr_string">"Skipped third party descriptor"</span> );
+<a class="jxr_linenumber" name="L707" href="#L707">707</a>             }
+<a class="jxr_linenumber" name="L708" href="#L708">708</a>         }
+<a class="jxr_linenumber" name="L709" href="#L709">709</a>         <strong class="jxr_keyword">catch</strong> ( ArtifactNotFoundException e )
+<a class="jxr_linenumber" name="L710" href="#L710">710</a>         {
+<a class="jxr_linenumber" name="L711" href="#L711">711</a>             getLogger().debug( <span class="jxr_string">"Unable to locate third party files descriptor : "</span> + e );
+<a class="jxr_linenumber" name="L712" href="#L712">712</a> 
+<a class="jxr_linenumber" name="L713" href="#L713">713</a>             <em class="jxr_comment">// we can afford to write an empty descriptor here as we don't expect it to turn up later in the remote</em>
+<a class="jxr_linenumber" name="L714" href="#L714">714</a>             <em class="jxr_comment">// repository, because the parent was already released (and snapshots are updated automatically if changed)</em>
+<a class="jxr_linenumber" name="L715" href="#L715">715</a>             result = <strong class="jxr_keyword">new</strong> File( localRepository.getBasedir(), localRepository.pathOf( e.getArtifact() ) );
+<a class="jxr_linenumber" name="L716" href="#L716">716</a> 
+<a class="jxr_linenumber" name="L717" href="#L717">717</a>             FileUtil.createNewFile( result );
+<a class="jxr_linenumber" name="L718" href="#L718">718</a>         }
+<a class="jxr_linenumber" name="L719" href="#L719">719</a> 
+<a class="jxr_linenumber" name="L720" href="#L720">720</a>         <strong class="jxr_keyword">return</strong> result;
+<a class="jxr_linenumber" name="L721" href="#L721">721</a>     }
 <a class="jxr_linenumber" name="L722" href="#L722">722</a> 
-<a class="jxr_linenumber" name="L723" href="#L723">723</a>             FileUtil.createNewFile( result );
-<a class="jxr_linenumber" name="L724" href="#L724">724</a>         }
-<a class="jxr_linenumber" name="L725" href="#L725">725</a> 
-<a class="jxr_linenumber" name="L726" href="#L726">726</a>         <strong class="jxr_keyword">return</strong> result;
-<a class="jxr_linenumber" name="L727" href="#L727">727</a>     }
-<a class="jxr_linenumber" name="L728" href="#L728">728</a> 
-<a class="jxr_linenumber" name="L729" href="#L729">729</a>     <strong class="jxr_keyword">private</strong> Map&lt;String, String&gt; migrateMissingFileKeys( Set&lt;Object&gt; missingFileKeys )
-<a class="jxr_linenumber" name="L730" href="#L730">730</a>     {
-<a class="jxr_linenumber" name="L731" href="#L731">731</a>         Map&lt;String, String&gt; migrateKeys = <strong class="jxr_keyword">new</strong> HashMap&lt;String, String&gt;();
-<a class="jxr_linenumber" name="L732" href="#L732">732</a>         <strong class="jxr_keyword">for</strong> ( Object object : missingFileKeys )
-<a class="jxr_linenumber" name="L733" href="#L733">733</a>         {
-<a class="jxr_linenumber" name="L734" href="#L734">734</a>             String id = (String) object;
-<a class="jxr_linenumber" name="L735" href="#L735">735</a>             Matcher matcher;
+<a class="jxr_linenumber" name="L723" href="#L723">723</a>     <strong class="jxr_keyword">public</strong> File resolveMissingLicensesDescriptor( String groupId, String artifactId, String version,
+<a class="jxr_linenumber" name="L724" href="#L724">724</a>                                                   ArtifactRepository localRepository, List&lt;ArtifactRepository&gt; repositories )
+<a class="jxr_linenumber" name="L725" href="#L725">725</a>             <strong class="jxr_keyword">throws</strong> IOException, ArtifactResolutionException, ArtifactNotFoundException
+<a class="jxr_linenumber" name="L726" href="#L726">726</a>     {
+<a class="jxr_linenumber" name="L727" href="#L727">727</a>         <strong class="jxr_keyword">return</strong> resolveArtifact( groupId, artifactId, version, DESCRIPTOR_TYPE, DESCRIPTOR_CLASSIFIER, localRepository, repositories );
+<a class="jxr_linenumber" name="L728" href="#L728">728</a>     }
+<a class="jxr_linenumber" name="L729" href="#L729">729</a> 
+<a class="jxr_linenumber" name="L730" href="#L730">730</a>     <strong class="jxr_keyword">private</strong> File resolveArtifact( String groupId, String artifactId, String version,
+<a class="jxr_linenumber" name="L731" href="#L731">731</a>                                   String type, String classifier, ArtifactRepository localRepository, List&lt;ArtifactRepository&gt; repositories ) <strong class="jxr_keyword">throws</strong> ArtifactResolutionException, IOException, ArtifactNotFoundException
+<a class="jxr_linenumber" name="L732" href="#L732">732</a>     {
+<a class="jxr_linenumber" name="L733" href="#L733">733</a>         <em class="jxr_comment">// TODO: this is a bit crude - proper type, or proper handling as metadata rather than an artifact in 2.1?</em>
+<a class="jxr_linenumber" name="L734" href="#L734">734</a>         Artifact artifact = artifactFactory.createArtifactWithClassifier( groupId, artifactId, version, type,
+<a class="jxr_linenumber" name="L735" href="#L735">735</a>                                                                           classifier );
 <a class="jxr_linenumber" name="L736" href="#L736">736</a> 
-<a class="jxr_linenumber" name="L737" href="#L737">737</a>             String newId = id;
-<a class="jxr_linenumber" name="L738" href="#L738">738</a>             matcher = GAV_PLUS_TYPE_AND_CLASSIFIER_PATTERN.matcher( id );
-<a class="jxr_linenumber" name="L739" href="#L739">739</a>             <strong class="jxr_keyword">if</strong> ( matcher.matches() )
-<a class="jxr_linenumber" name="L740" href="#L740">740</a>             {
-<a class="jxr_linenumber" name="L741" href="#L741">741</a>                 newId = matcher.group( 1 ) + <span class="jxr_string">"--"</span> + matcher.group( 2 ) + <span class="jxr_string">"--"</span> + matcher.group( 3 );
-<a class="jxr_linenumber" name="L742" href="#L742">742</a> 
-<a class="jxr_linenumber" name="L743" href="#L743">743</a>             }
-<a class="jxr_linenumber" name="L744" href="#L744">744</a>             <strong class="jxr_keyword">else</strong>
-<a class="jxr_linenumber" name="L745" href="#L745">745</a>             {
-<a class="jxr_linenumber" name="L746" href="#L746">746</a>                 matcher = GAV_PLUS_TYPE_PATTERN.matcher( id );
-<a class="jxr_linenumber" name="L747" href="#L747">747</a>                 <strong class="jxr_keyword">if</strong> ( matcher.matches() )
-<a class="jxr_linenumber" name="L748" href="#L748">748</a>                 {
-<a class="jxr_linenumber" name="L749" href="#L749">749</a>                     newId = matcher.group( 1 ) + <span class="jxr_string">"--"</span> + matcher.group( 2 ) + <span class="jxr_string">"--"</span> + matcher.group( 3 );
-<a class="jxr_linenumber" name="L750" href="#L750">750</a> 
-<a class="jxr_linenumber" name="L751" href="#L751">751</a>                 }
-<a class="jxr_linenumber" name="L752" href="#L752">752</a>             }
-<a class="jxr_linenumber" name="L753" href="#L753">753</a>             migrateKeys.put( id, newId );
-<a class="jxr_linenumber" name="L754" href="#L754">754</a>         }
-<a class="jxr_linenumber" name="L755" href="#L755">755</a>         <strong class="jxr_keyword">return</strong> migrateKeys;
-<a class="jxr_linenumber" name="L756" href="#L756">756</a>     }
-<a class="jxr_linenumber" name="L757" href="#L757">757</a> }
+<a class="jxr_linenumber" name="L737" href="#L737">737</a>         artifactResolver.resolve( artifact, repositories, localRepository );
+<a class="jxr_linenumber" name="L738" href="#L738">738</a> 
+<a class="jxr_linenumber" name="L739" href="#L739">739</a>         <strong class="jxr_keyword">return</strong> artifact.getFile();
+<a class="jxr_linenumber" name="L740" href="#L740">740</a>     }
+<a class="jxr_linenumber" name="L741" href="#L741">741</a> 
+<a class="jxr_linenumber" name="L742" href="#L742">742</a>     <strong class="jxr_keyword">private</strong> Map&lt;String, String&gt; migrateMissingFileKeys( Set&lt;Object&gt; missingFileKeys )
+<a class="jxr_linenumber" name="L743" href="#L743">743</a>     {
+<a class="jxr_linenumber" name="L744" href="#L744">744</a>         Map&lt;String, String&gt; migrateKeys = <strong class="jxr_keyword">new</strong> HashMap&lt;String, String&gt;();
+<a class="jxr_linenumber" name="L745" href="#L745">745</a>         <strong class="jxr_keyword">for</strong> ( Object object : missingFileKeys )
+<a class="jxr_linenumber" name="L746" href="#L746">746</a>         {
+<a class="jxr_linenumber" name="L747" href="#L747">747</a>             String id = (String) object;
+<a class="jxr_linenumber" name="L748" href="#L748">748</a>             Matcher matcher;
+<a class="jxr_linenumber" name="L749" href="#L749">749</a> 
+<a class="jxr_linenumber" name="L750" href="#L750">750</a>             String newId = id;
+<a class="jxr_linenumber" name="L751" href="#L751">751</a>             matcher = GAV_PLUS_TYPE_AND_CLASSIFIER_PATTERN.matcher( id );
+<a class="jxr_linenumber" name="L752" href="#L752">752</a>             <strong class="jxr_keyword">if</strong> ( matcher.matches() )
+<a class="jxr_linenumber" name="L753" href="#L753">753</a>             {
+<a class="jxr_linenumber" name="L754" href="#L754">754</a>                 newId = matcher.group( 1 ) + <span class="jxr_string">"--"</span> + matcher.group( 2 ) + <span class="jxr_string">"--"</span> + matcher.group( 3 );
+<a class="jxr_linenumber" name="L755" href="#L755">755</a> 
+<a class="jxr_linenumber" name="L756" href="#L756">756</a>             }
+<a class="jxr_linenumber" name="L757" href="#L757">757</a>             <strong class="jxr_keyword">else</strong>
+<a class="jxr_linenumber" name="L758" href="#L758">758</a>             {
+<a class="jxr_linenumber" name="L759" href="#L759">759</a>                 matcher = GAV_PLUS_TYPE_PATTERN.matcher( id );
+<a class="jxr_linenumber" name="L760" href="#L760">760</a>                 <strong class="jxr_keyword">if</strong> ( matcher.matches() )
+<a class="jxr_linenumber" name="L761" href="#L761">761</a>                 {
+<a class="jxr_linenumber" name="L762" href="#L762">762</a>                     newId = matcher.group( 1 ) + <span class="jxr_string">"--"</span> + matcher.group( 2 ) + <span class="jxr_string">"--"</span> + matcher.group( 3 );
+<a class="jxr_linenumber" name="L763" href="#L763">763</a> 
+<a class="jxr_linenumber" name="L764" href="#L764">764</a>                 }
+<a class="jxr_linenumber" name="L765" href="#L765">765</a>             }
+<a class="jxr_linenumber" name="L766" href="#L766">766</a>             migrateKeys.put( id, newId );
+<a class="jxr_linenumber" name="L767" href="#L767">767</a>         }
+<a class="jxr_linenumber" name="L768" href="#L768">768</a>         <strong class="jxr_keyword">return</strong> migrateKeys;
+<a class="jxr_linenumber" name="L769" href="#L769">769</a>     }
+<a class="jxr_linenumber" name="L770" href="#L770">770</a> }
 </pre>
 <hr/>
-<div id="footer">Copyright &#169; 2010&#x2013;2016 <a href="http://www.mojohaus.org">MojoHaus</a>. All rights reserved.</div>
+<div id="footer">Copyright &#169; 2010&#x2013;2017 <a href="http://www.mojohaus.org">MojoHaus</a>. All rights reserved.</div>
 </body>
 </html>
