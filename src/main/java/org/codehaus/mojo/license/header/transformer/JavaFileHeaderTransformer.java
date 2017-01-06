@@ -129,13 +129,13 @@ public class JavaFileHeaderTransformer
                 prolog = content.substring( 0, lastIndex );
 
                 // prolog goes to next line
-                prolog += "\n";
+                prolog += LINE_SEPARATOR;
 
                 if ( lastIndex == content.length() )
                 {
 
                     // adding a new empty end line to the content
-                    content += "\n";
+                    content += LINE_SEPARATOR;
                 }
 
 
@@ -153,7 +153,7 @@ public class JavaFileHeaderTransformer
 
             // prolog detected
             content = content.substring( prolog.length() );
-            result = super.addHeader( prolog + "\n" + header, content );
+            result = super.addHeader( prolog + LINE_SEPARATOR + header, content );
         }
         return result;
     }

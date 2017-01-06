@@ -70,7 +70,7 @@ public interface FileHeaderTransformer
     /**
      * File separator.
      */
-    char LINE_SEPARATOR = '\n';
+    String LINE_SEPARATOR = System.getProperty("line.separator");
 
     /**
      * @return the name of the transformer

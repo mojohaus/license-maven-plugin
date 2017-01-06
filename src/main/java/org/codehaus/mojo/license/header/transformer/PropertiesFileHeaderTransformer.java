@@ -94,7 +94,7 @@ public class PropertiesFileHeaderTransformer
 
             // shebang detected
             content = content.substring( prolog.length() );
-            result = super.addHeader( prolog + '\n' + header, content );
+            result = super.addHeader( prolog + LINE_SEPARATOR + header, content );
         }
         return result;
     }
