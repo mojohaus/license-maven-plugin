@@ -257,7 +257,7 @@ public abstract class AbstractFileHeaderTransformer
                 final String line = contentSplit[0].trim();
                 if ( line.length() > 0 )
                 {
-                    return header + '\n' + content;
+                    return header + LINE_SEPARATOR + content;
                 }
             }
         }
