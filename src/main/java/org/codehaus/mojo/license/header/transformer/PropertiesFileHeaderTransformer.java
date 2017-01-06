@@ -36,17 +36,11 @@ public class PropertiesFileHeaderTransformer
 {
 
     /**
-     * Line separator caracter.
-     */
-    protected final String linesep;
-
-    /**
      * Default constructor.
      */
     public PropertiesFileHeaderTransformer()
     {
         super( "properties", "header transformer with properties file comment style", "###", "###", "# " );
-        linesep = System.getProperty( "line.separator" );
     }
 
     /**
@@ -73,13 +67,13 @@ public class PropertiesFileHeaderTransformer
 
             // shebang was detected
 
-            int endProlog = content.indexOf( linesep );
+            int endProlog = content.indexOf( LINE_SEPARATOR );
 
             if ( endProlog > -1 )
             {
 
                 // prolog end was detected
-                prolog = content.substring( 0, endProlog + linesep.length() );
+                prolog = content.substring( 0, endProlog + LINE_SEPARATOR.length() );
             }
         }
 
