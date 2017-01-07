@@ -249,7 +249,7 @@ public abstract class AbstractFileHeaderTransformer
      */
     public String addHeader( String header, String content )
     {
-        if ( emptyLineAfterHeader )
+        if ( isEmptyLineAfterHeader() )
         {
             String[] contentSplit = content.split( "\\r?\\n", 2 );
             if ( contentSplit.length > 0 )

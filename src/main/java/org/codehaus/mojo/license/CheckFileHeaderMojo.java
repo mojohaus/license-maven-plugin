@@ -28,13 +28,11 @@ import org.apache.maven.plugins.annotations.Parameter;
 /**
  * The goal to check if the state of header on project source files.
  *
- *
  * @author tchemit dev@tchemit.fr
  * @since 1.2
  */
-@Mojo( name = "check-file-header", requiresProject = true )
-public class CheckFileHeaderMojo
-    extends AbstractFileHeaderMojo
+@Mojo( name = "check-file-header", threadSafe = true )
+public class CheckFileHeaderMojo extends AbstractFileHeaderMojo
 {
 
     // ----------------------------------------------------------------------
@@ -47,7 +45,7 @@ public class CheckFileHeaderMojo
      * @since 1.2
      */
     @Parameter( property = "license.failOnMissingHeader", defaultValue = "false" )
-    protected boolean failOnMissingHeader;
+    private boolean failOnMissingHeader;
 
     /**
      * A flag to fail the build if there is some files with headers to update.
@@ -55,7 +53,7 @@ public class CheckFileHeaderMojo
      * @since 1.2
      */
     @Parameter( property = "license.failOnNotUptodateHeader", defaultValue = "false" )
-    protected boolean failOnNotUptodateHeader;
+    private boolean failOnNotUptodateHeader;
 
     /**
      * A flag to skip the goal.
@@ -63,15 +61,12 @@ public class CheckFileHeaderMojo
      * @since 1.2
      */
     @Parameter( property = "license.skipCheckLicense", defaultValue = "false" )
-    protected boolean skipCheckLicense;
+    private boolean skipCheckLicense;
 
     // ----------------------------------------------------------------------
     // AbstractLicenseFileNameMojo Implementation
     // ----------------------------------------------------------------------
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isSkip()
     {
@@ -82,9 +77,6 @@ public class CheckFileHeaderMojo
     // AbstractFileHeaderMojo Implementation
     // ----------------------------------------------------------------------
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected boolean isDryRun()
     {
@@ -92,18 +84,12 @@ public class CheckFileHeaderMojo
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected boolean isFailOnMissingHeader()
     {
         return failOnMissingHeader;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected boolean isFailOnNotUptodateHeader()
     {

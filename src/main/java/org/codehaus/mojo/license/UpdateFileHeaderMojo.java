@@ -27,19 +27,18 @@ import org.apache.maven.plugins.annotations.Parameter;
 
 /**
  * The goal to update (or add) the header on project source files.
- *
+ * <p>
  * This goal replace the {@code update-header} goal which can not deal with
  * Copyright.
- *
+ * <p>
  * This goal use a specific project file descriptor {@code project.xml} to
  * describe all files to update for a whole project.
  *
  * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
-@Mojo( name = "update-file-header", requiresProject = true )
-public class UpdateFileHeaderMojo
-    extends AbstractFileHeaderMojo
+@Mojo( name = "update-file-header", threadSafe = true )
+public class UpdateFileHeaderMojo extends AbstractFileHeaderMojo
 {
 
     // ----------------------------------------------------------------------
@@ -49,24 +48,24 @@ public class UpdateFileHeaderMojo
     /**
      * A flag to fail the build if {@link #dryRun} flag is on and some files with
      * no header are detected.
-     *
+     * <p>
      * <strong>Note:</strong> If {@link #dryRun} flag is not set, there is no effect.
      *
      * @since 1.2
      */
     @Parameter( property = "license.failOnMissingHeader", defaultValue = "false" )
-    protected boolean failOnMissingHeader;
+    private boolean failOnMissingHeader;
 
     /**
      * A flag to fail the build if {@link #dryRun} flag is on and some files with headers
      * to update.
-     *
+     * <p>
      * <strong>Note:</strong> If {@link #dryRun} flag is not set, there is no effect.
      *
      * @since 1.2
      */
     @Parameter( property = "license.failOnNotUptodateHeader", defaultValue = "false" )
-    protected boolean failOnNotUptodateHeader;
+    private boolean failOnNotUptodateHeader;
 
     /**
      * A flag to skip the goal.
@@ -74,7 +73,7 @@ public class UpdateFileHeaderMojo
      * @since 1.0
      */
     @Parameter( property = "license.skipUpdateLicense", defaultValue = "false" )
-    protected boolean skipUpdateLicense;
+    private boolean skipUpdateLicense;
 
     /**
      * A flag to test plugin but modify no file.
@@ -82,15 +81,12 @@ public class UpdateFileHeaderMojo
      * @since 1.0
      */
     @Parameter( property = "dryRun", defaultValue = "false" )
-    protected boolean dryRun;
+    private boolean dryRun;
 
     // ----------------------------------------------------------------------
     // AbstractLicenceMojo Implementation
     // ----------------------------------------------------------------------
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isSkip()
     {
@@ -101,27 +97,18 @@ public class UpdateFileHeaderMojo
     // AbstractFileHeaderMojo Implementation
     // ----------------------------------------------------------------------
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected boolean isDryRun()
     {
         return dryRun;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected boolean isFailOnMissingHeader()
     {
         return failOnMissingHeader;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected boolean isFailOnNotUptodateHeader()
     {

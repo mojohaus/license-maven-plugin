@@ -48,11 +48,6 @@ public interface FileHeaderTransformer
 {
 
     /**
-     * Plexus component role.
-     */
-    String ROLE_NAME = FileHeaderTransformer.class.getName();
-
-    /**
      * default section delimiter.
      */
     String DEFAULT_SECTION_DELIMITER = "%" + "%";
@@ -68,7 +63,7 @@ public interface FileHeaderTransformer
     String DEFAULT_PROCESS_END_TAG = "#" + "L" + "%";
 
     /**
-     * File separator.
+     * Line separator.
      */
     String LINE_SEPARATOR = System.getProperty("line.separator");
 

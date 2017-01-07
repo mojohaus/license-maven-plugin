@@ -23,13 +23,12 @@ package org.codehaus.mojo.license.header;
  */
 
 import org.codehaus.mojo.license.header.transformer.FileHeaderTransformer;
-import org.codehaus.plexus.component.annotations.Component;
 import org.nuiton.processor.Processor;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.StringReader;
 
 /**
  * File header processor.
@@ -37,53 +36,57 @@ import java.io.IOException;
  * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
-@Component( role = Processor.class, hint = "file-header" )
-public class FileHeaderProcessor
-    extends Processor
+public class FileHeaderProcessor extends Processor
 {
-
-    /**
-     * processor configuration.
-     */
-    protected FileHeaderProcessorConfiguration configuration;
-
     /**
      * internal file header filter.
      */
-    protected FileHeaderFilter filter;
+    private final FileHeaderFilter filter;
 
-    public FileHeaderProcessor()
+    public FileHeaderProcessor( FileHeaderFilter filter, FileHeader fileHeader, FileHeaderTransformer transformer )
     {
+        if ( filter == null )
+        {
+            throw new IllegalStateException( "no file header filter set." );
+        }
+        if ( fileHeader == null )
+        {
+            throw new IllegalStateException( "no file header set." );
+        }
+        if ( transformer == null )
+        {
+            throw new IllegalStateException( "no file header transformer set." );
+        }
+        this.filter = filter;
+        setInputFilter( filter );
+        filter.setFileHeader( fileHeader );
+        filter.setTransformer( transformer );
+        filter.resetContent();
     }
 
-    public FileHeaderProcessorConfiguration getConfiguration()
+    public String addHeader( String content )
     {
-        return configuration;
-    }
-
-    public FileHeaderFilter getFilter()
-    {
-        return filter;
+        return filter.getTransformer().addHeader( filter.getFullHeaderContent(), content );
     }
 
     /**
      * @return {@code true} if processed file was touched (says the header was
-     *         fully found), {@code false} otherwise
+     * fully found), {@code false} otherwise
      * @see FileHeaderFilter#isTouched()
      */
     public boolean isTouched()
     {
-        return getFilter() != null && getFilter().isTouched();
+        return filter.isTouched();
     }
 
     /**
      * @return {@code true} if processed file was modified (says the header was
-     *         fully found and content changed), {@code false} otherwise
+     * fully found and content changed), {@code false} otherwise
      * @see FileHeaderFilter#isModified()
      */
     public boolean isModified()
     {
-        return getFilter() != null && getFilter().isModified();
+        return filter.isModified();
     }
 
     /**
@@ -92,20 +95,18 @@ public class FileHeaderProcessor
      */
     public boolean isDetectHeader()
     {
-        return getFilter() != null && getFilter().isDetectHeader();
+        return filter.isDetectHeader();
     }
 
-    public void process( File filein, File fileout )
-        throws IOException
+    public synchronized void process( String inputContent, File outputFile ) throws IOException
     {
 
-        checkInit();
-        reset();
+        filter.reset();
 
-        FileReader input = new FileReader( filein );
+        StringReader input = new StringReader( inputContent );
         try
         {
-            FileWriter output = new FileWriter( fileout );
+            FileWriter output = new FileWriter( outputFile );
             try
             {
                 process( input, output );
@@ -121,82 +122,14 @@ public class FileHeaderProcessor
         }
     }
 
-    public void populateFilter()
+    public String getFileHeaderDescription()
     {
-        FileHeader fileHeader = getConfiguration().getFileHeader();
-        boolean change = false;
-
-        if ( !fileHeader.equals( filter.getFileHeader() ) )
-        {
-
-            // change file header
-
-            filter.setFileHeader( fileHeader );
-            change = true;
-        }
-        FileHeaderTransformer transformer = getConfiguration().getTransformer();
-        if ( !transformer.equals( filter.getTransformer() ) )
-        {
-
-            // change file transformer
-
-            filter.setTransformer( transformer );
-            change = true;
-        }
-        if ( change )
-        {
-
-            // something has changed, must reset content cache
-            filter.resetContent();
-        }
+        return filter.getFileHeader().getDescription();
     }
 
-    public void setConfiguration( FileHeaderProcessorConfiguration configuration )
+    public void updateDescription( String description )
     {
-        this.configuration = configuration;
-    }
-
-    public void setFilter( FileHeaderFilter filter )
-    {
-        this.filter = filter;
-        setInputFilter( filter );
-    }
-
-    public void reset()
-    {
-        if ( filter != null )
-        {
-            filter.reset();
-        }
-    }
-
-    protected FileHeader getFileHeader()
-    {
-        return getConfiguration().getFileHeader();
-    }
-
-    protected FileHeaderTransformer getTransformer()
-    {
-        return getConfiguration().getTransformer();
-    }
-
-    protected void checkInit()
-    {
-        if ( getConfiguration() == null )
-        {
-            throw new IllegalStateException( "no configuration set." );
-        }
-        if ( getFileHeader() == null )
-        {
-            throw new IllegalStateException( "no file header set." );
-        }
-        if ( getTransformer() == null )
-        {
-            throw new IllegalStateException( "no file header transformer set." );
-        }
-        if ( getFilter() == null )
-        {
-            throw new IllegalStateException( "no file header filter set." );
-        }
+        filter.getFileHeader().setDescription( description );
+        filter.resetContent();
     }
 }
