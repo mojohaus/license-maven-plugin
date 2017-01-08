@@ -24,7 +24,6 @@ package org.codehaus.mojo.license.header;
 
 import org.codehaus.mojo.license.header.transformer.FileHeaderTransformer;
 import org.codehaus.mojo.license.model.Copyright;
-import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * Implementation of {@link FileHeaderFilter} to update an incoming header.
@@ -32,36 +31,24 @@ import org.codehaus.plexus.component.annotations.Component;
  * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
-@Component( role= FileHeaderFilter.class, hint = "update-file-header" )
-public class UpdateFileHeaderFilter
-    extends FileHeaderFilter
+public class UpdateFileHeaderFilter extends FileHeaderFilter
 {
 
     /**
      * Flag sets to {@code true} if description can be updated.
      */
-    protected boolean updateDescription;
+    private boolean updateDescription;
 
     /**
      * Flag set to {@code true} if license can be updated.
      */
-    protected boolean updateLicense;
+    private boolean updateLicense;
 
     /**
      * Flag sets to {@code true} if copyright can be updated.
      */
-    protected boolean updateCopyright;
+    private boolean updateCopyright;
 
-    /**
-     * Default constructor.
-     */
-    public UpdateFileHeaderFilter()
-    {
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected FileHeader getNewHeader( FileHeader oldHeader )
     {
@@ -87,7 +74,7 @@ public class UpdateFileHeaderFilter
             if ( log.isDebugEnabled() )
             {
                 log.debug( "description has changed from [" + oldHeader.getDescription() + "] to [" +
-                               newHeader.getDescription() + "]" );
+                                   newHeader.getDescription() + "]" );
             }
 
             // description has changed, mark header to be updated
@@ -105,8 +92,8 @@ public class UpdateFileHeaderFilter
             if ( log.isDebugEnabled() )
             {
                 log.debug(
-                    "copyright has changed from [" + oldHeader.getCopyright() + "] to [" + newHeader.getCopyright() +
-                        "]" );
+                        "copyright has changed from [" + oldHeader.getCopyright() + "] to [" + newHeader.getCopyright() +
+                                "]" );
             }
 
             // description has changed, mark header to be updated
@@ -124,7 +111,7 @@ public class UpdateFileHeaderFilter
             if ( log.isDebugEnabled() )
             {
                 log.debug(
-                    "license has changed from [" + oldHeader.getLicense() + "] to [" + newHeader.getLicense() + "]" );
+                        "license has changed from [" + oldHeader.getLicense() + "] to [" + newHeader.getLicense() + "]" );
             }
 
             // description has changed, mark header to be updated
@@ -144,7 +131,7 @@ public class UpdateFileHeaderFilter
         return result;
     }
 
-    public boolean isUpdateCopyright()
+    private boolean isUpdateCopyright()
     {
         return updateCopyright;
     }
@@ -154,7 +141,7 @@ public class UpdateFileHeaderFilter
         this.updateCopyright = updateCopyright;
     }
 
-    public boolean isUpdateDescription()
+    private boolean isUpdateDescription()
     {
         return updateDescription;
     }
@@ -164,7 +151,7 @@ public class UpdateFileHeaderFilter
         this.updateDescription = updateDescription;
     }
 
-    public boolean isUpdateLicense()
+    private boolean isUpdateLicense()
     {
         return updateLicense;
     }

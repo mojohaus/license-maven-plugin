@@ -51,53 +51,53 @@ public abstract class AbstractFileHeaderTransformer
      * <li>group(5) is Copyright holder</li>
      * </ul>
      */
-    protected static final Pattern COPYRIGHT_PATTERN =
+    static final Pattern COPYRIGHT_PATTERN =
         Pattern.compile( "(.[^\\d]+)?\\s(\\d{4})?(\\s+-\\s+(\\d{4})?){0,1}\\s+(.+)?", Pattern.DOTALL );
 
     /**
      * name of transformer.
      */
-    protected String name;
+    private String name;
 
     /**
      * description of transfomer.
      */
-    protected String description;
+    private String description;
 
     /**
      * section delimiter.
      */
-    protected String sectionDelimiter = DEFAULT_SECTION_DELIMITER;
+    private String sectionDelimiter = DEFAULT_SECTION_DELIMITER;
 
     /**
      * start process tag.
      */
-    protected String processStartTag = DEFAULT_PROCESS_START_TAG;
+    private String processStartTag = DEFAULT_PROCESS_START_TAG;
 
     /**
      * end process tag.
      */
-    protected String processEndTag = DEFAULT_PROCESS_END_TAG;
+    private String processEndTag = DEFAULT_PROCESS_END_TAG;
 
     /**
      * comment start tag.
      */
-    protected String commentStartTag;
+    private String commentStartTag;
 
     /**
      * comment end tag.
      */
-    protected String commentEndTag;
+    private String commentEndTag;
 
     /**
      * comment line prefix (to add for header content).
      */
-    protected String commentLinePrefix;
+    private String commentLinePrefix;
 
     /**
      * Flag if there should be an empty line after the header.
      */
-    protected boolean emptyLineAfterHeader;
+    private boolean emptyLineAfterHeader;
 
     protected AbstractFileHeaderTransformer( String name, String description, String commentStartTag,
                                              String commentEndTag, String commentLinePrefix )
@@ -272,11 +272,17 @@ public abstract class AbstractFileHeaderTransformer
         this.commentLinePrefix = commentLinePrefix;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean isEmptyLineAfterHeader()
     {
         return emptyLineAfterHeader;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void setEmptyLineAfterHeader( boolean emptyLine )
     {
         this.emptyLineAfterHeader = emptyLine;
@@ -494,9 +500,9 @@ public abstract class AbstractFileHeaderTransformer
         return license1.equals( license2 );
     }
 
-    protected static final Pattern REMOVE_SPACE_PATTERN = Pattern.compile( "(\\s+)" );
+    private static final Pattern REMOVE_SPACE_PATTERN = Pattern.compile( "(\\s+)" );
 
-    protected String removeSpaces( String str )
+    private String removeSpaces( String str )
     {
         Matcher matcher = REMOVE_SPACE_PATTERN.matcher( str );
         String result;
