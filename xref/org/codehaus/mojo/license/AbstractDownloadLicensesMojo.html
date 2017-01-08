@@ -551,7 +551,7 @@
 <a class="jxr_linenumber" name="L543" href="#L543">543</a> 
 <a class="jxr_linenumber" name="L544" href="#L544">544</a>             <strong class="jxr_keyword">if</strong> ( license.getName() != <strong class="jxr_keyword">null</strong> )
 <a class="jxr_linenumber" name="L545" href="#L545">545</a>             {
-<a class="jxr_linenumber" name="L546" href="#L546">546</a>                 licenseFileName = license.getName() + <span class="jxr_string">" - "</span> + licenseUrlFile.getName();
+<a class="jxr_linenumber" name="L546" href="#L546">546</a>                 licenseFileName = license.getName().replaceAll( <span class="jxr_string">"/"</span>, <span class="jxr_string">"_"</span> ) + <span class="jxr_string">" - "</span> + licenseUrlFile.getName();
 <a class="jxr_linenumber" name="L547" href="#L547">547</a>             }
 <a class="jxr_linenumber" name="L548" href="#L548">548</a> 
 <a class="jxr_linenumber" name="L549" href="#L549">549</a>             <em class="jxr_comment">// Check if the file has a valid file extention</em>

@@ -79,7 +79,7 @@
 <a class="jxr_linenumber" name="L71" href="#L71">71</a>                                                                 SortedSet&lt;MavenProject&gt; unsafeDependencies,
 <a class="jxr_linenumber" name="L72" href="#L72">72</a>                                                                 Collection&lt;MavenProject&gt; projects,
 <a class="jxr_linenumber" name="L73" href="#L73">73</a>                                                                 <a href="../../../../../org/codehaus/mojo/license/model/LicenseMap.html">LicenseMap</a> licenseMap )
-<a class="jxr_linenumber" name="L74" href="#L74">74</a>          <strong class="jxr_keyword">throws</strong> ThirdPartyToolException, IOException;
+<a class="jxr_linenumber" name="L74" href="#L74">74</a>              <strong class="jxr_keyword">throws</strong> ThirdPartyToolException, IOException;
 <a class="jxr_linenumber" name="L75" href="#L75">75</a>  
 <a class="jxr_linenumber" name="L76" href="#L76">76</a>      <em class="jxr_javadoccomment">/**</em>
 <a class="jxr_linenumber" name="L77" href="#L77">77</a>  <em class="jxr_javadoccomment">     * Load unsafe mapping for all dependencies with no license in their pom, we will load the missing file</em>
@@ -91,68 +91,68 @@
 <a class="jxr_linenumber" name="L83" href="#L83">83</a>  <em class="jxr_javadoccomment">     * @return the map of all unsafe mapping</em>
 <a class="jxr_linenumber" name="L84" href="#L84">84</a>  <em class="jxr_javadoccomment">     * @throws IOException if could not load missing file</em>
 <a class="jxr_linenumber" name="L85" href="#L85">85</a>  <em class="jxr_javadoccomment">     */</em>
-<a class="jxr_linenumber" name="L86" href="#L86">86</a>      <a href="../../../../../org/codehaus/mojo/license/utils/SortedProperties.html">SortedProperties</a> loadUnsafeMapping( LicenseMap licenseMap, File missingFile,
-<a class="jxr_linenumber" name="L87" href="#L87">87</a>                                          SortedMap&lt;String, MavenProject&gt; projectDependencies )
-<a class="jxr_linenumber" name="L88" href="#L88">88</a>          <strong class="jxr_keyword">throws</strong> IOException;
-<a class="jxr_linenumber" name="L89" href="#L89">89</a>  
-<a class="jxr_linenumber" name="L90" href="#L90">90</a>      <em class="jxr_javadoccomment">/**</em>
-<a class="jxr_linenumber" name="L91" href="#L91">91</a>  <em class="jxr_javadoccomment">     * Creates a license map from given dependencies.</em>
-<a class="jxr_linenumber" name="L92" href="#L92">92</a>  <em class="jxr_javadoccomment">     *</em>
-<a class="jxr_linenumber" name="L93" href="#L93">93</a>  <em class="jxr_javadoccomment">     * @param dependencies dependencies to store in the license map</em>
-<a class="jxr_linenumber" name="L94" href="#L94">94</a>  <em class="jxr_javadoccomment">     * @return the created license map fro the given dependencies</em>
-<a class="jxr_linenumber" name="L95" href="#L95">95</a>  <em class="jxr_javadoccomment">     */</em>
-<a class="jxr_linenumber" name="L96" href="#L96">96</a>      <a href="../../../../../org/codehaus/mojo/license/model/LicenseMap.html">LicenseMap</a> createLicenseMap( SortedMap&lt;String, MavenProject&gt; dependencies );
-<a class="jxr_linenumber" name="L97" href="#L97">97</a>  
-<a class="jxr_linenumber" name="L98" href="#L98">98</a>      <em class="jxr_javadoccomment">/**</em>
-<a class="jxr_linenumber" name="L99" href="#L99">99</a>  <em class="jxr_javadoccomment">     * Attach the third-party descriptor to the build.</em>
-<a class="jxr_linenumber" name="L100" href="#L100">100</a> <em class="jxr_javadoccomment">     *</em>
-<a class="jxr_linenumber" name="L101" href="#L101">101</a> <em class="jxr_javadoccomment">     * @param file location of the third-party descriptor</em>
-<a class="jxr_linenumber" name="L102" href="#L102">102</a> <em class="jxr_javadoccomment">     */</em>
-<a class="jxr_linenumber" name="L103" href="#L103">103</a>     <strong class="jxr_keyword">void</strong> attachThirdPartyDescriptor( File file );
-<a class="jxr_linenumber" name="L104" href="#L104">104</a> 
-<a class="jxr_linenumber" name="L105" href="#L105">105</a>     <em class="jxr_javadoccomment">/**</em>
-<a class="jxr_linenumber" name="L106" href="#L106">106</a> <em class="jxr_javadoccomment">     * Obtains all dependencies with no license form the given license map.</em>
-<a class="jxr_linenumber" name="L107" href="#L107">107</a> <em class="jxr_javadoccomment">     *</em>
-<a class="jxr_linenumber" name="L108" href="#L108">108</a> <em class="jxr_javadoccomment">     * @param licenseMap license map where to find</em>
-<a class="jxr_linenumber" name="L109" href="#L109">109</a> <em class="jxr_javadoccomment">     * @return all dependencies with no license</em>
-<a class="jxr_linenumber" name="L110" href="#L110">110</a> <em class="jxr_javadoccomment">     */</em>
-<a class="jxr_linenumber" name="L111" href="#L111">111</a>     SortedSet&lt;MavenProject&gt; getProjectsWithNoLicense( LicenseMap licenseMap );
-<a class="jxr_linenumber" name="L112" href="#L112">112</a> 
-<a class="jxr_linenumber" name="L113" href="#L113">113</a>     <em class="jxr_javadoccomment">/**</em>
-<a class="jxr_linenumber" name="L114" href="#L114">114</a> <em class="jxr_javadoccomment">     * Obtains the cache of loaded dependencies indexed by their gav.</em>
-<a class="jxr_linenumber" name="L115" href="#L115">115</a> <em class="jxr_javadoccomment">     *</em>
-<a class="jxr_linenumber" name="L116" href="#L116">116</a> <em class="jxr_javadoccomment">     * @return the cache of loaded dependencies indexed by their gav</em>
-<a class="jxr_linenumber" name="L117" href="#L117">117</a> <em class="jxr_javadoccomment">     */</em>
-<a class="jxr_linenumber" name="L118" href="#L118">118</a>     SortedMap&lt;String, MavenProject&gt; getArtifactCache();
-<a class="jxr_linenumber" name="L119" href="#L119">119</a> 
-<a class="jxr_linenumber" name="L120" href="#L120">120</a>     <em class="jxr_javadoccomment">/**</em>
-<a class="jxr_linenumber" name="L121" href="#L121">121</a> <em class="jxr_javadoccomment">     * Loads unsafe mappings. Unsafe mappings are files that supply license metadata</em>
-<a class="jxr_linenumber" name="L122" href="#L122">122</a> <em class="jxr_javadoccomment">     * for artifacts that lack it in their POM models. It's called 'unsafe' because its</em>
-<a class="jxr_linenumber" name="L123" href="#L123">123</a> <em class="jxr_javadoccomment">     * safer to see actual metadata.</em>
-<a class="jxr_linenumber" name="L124" href="#L124">124</a> <em class="jxr_javadoccomment">     *</em>
-<a class="jxr_linenumber" name="L125" href="#L125">125</a> <em class="jxr_javadoccomment">     * There are three sources of this data:</em>
-<a class="jxr_linenumber" name="L126" href="#L126">126</a> <em class="jxr_javadoccomment">     * &lt;ul&gt;</em>
-<a class="jxr_linenumber" name="L127" href="#L127">127</a> <em class="jxr_javadoccomment">     * &lt;li&gt;the 'missing' file.&lt;/li&gt;</em>
-<a class="jxr_linenumber" name="L128" href="#L128">128</a> <em class="jxr_javadoccomment">     * &lt;li&gt;additional property files attached to artifacts; these have classifier=third-party and are expected</em>
-<a class="jxr_linenumber" name="L129" href="#L129">129</a> <em class="jxr_javadoccomment">     * to contain the license information the base artifact's dependencies. These are controlled by a parameter,&lt;/li&gt;</em>
-<a class="jxr_linenumber" name="L130" href="#L130">130</a> <em class="jxr_javadoccomment">     * &lt;li&gt;declared dependencies of type &lt;tt&gt;license.properties&lt;/tt&gt;. These are in the same format, and</em>
-<a class="jxr_linenumber" name="L131" href="#L131">131</a> <em class="jxr_javadoccomment">     * provide global information.&lt;/li&gt;</em>
-<a class="jxr_linenumber" name="L132" href="#L132">132</a> <em class="jxr_javadoccomment">     * &lt;/ul&gt;</em>
-<a class="jxr_linenumber" name="L133" href="#L133">133</a> <em class="jxr_javadoccomment">     *</em>
-<a class="jxr_linenumber" name="L134" href="#L134">134</a> <em class="jxr_javadoccomment">     * @param licenseMap                license map to read</em>
-<a class="jxr_linenumber" name="L135" href="#L135">135</a> <em class="jxr_javadoccomment">     * @param missingFile               location of an optional missing file</em>
-<a class="jxr_linenumber" name="L136" href="#L136">136</a> <em class="jxr_javadoccomment">     * @param useRepositoryMissingFiles flag to use or not third-party descriptors via the 'third-party' classifier from maven repositories</em>
-<a class="jxr_linenumber" name="L137" href="#L137">137</a> <em class="jxr_javadoccomment">     * @param unsafeDependencies        all unsafe dependencies</em>
-<a class="jxr_linenumber" name="L138" href="#L138">138</a> <em class="jxr_javadoccomment">     * @param projectDependencies       all project dependencies</em>
-<a class="jxr_linenumber" name="L139" href="#L139">139</a> <em class="jxr_javadoccomment">     * @return the loaded unsafe mapping</em>
-<a class="jxr_linenumber" name="L140" href="#L140">140</a> <em class="jxr_javadoccomment">     * @throws ProjectBuildingException if could not build some dependencies maven project</em>
-<a class="jxr_linenumber" name="L141" href="#L141">141</a> <em class="jxr_javadoccomment">     * @throws IOException              if could not load missing file</em>
-<a class="jxr_linenumber" name="L142" href="#L142">142</a> <em class="jxr_javadoccomment">     * @throws ThirdPartyToolException  if pb with third-party tool</em>
-<a class="jxr_linenumber" name="L143" href="#L143">143</a> <em class="jxr_javadoccomment">     */</em>
-<a class="jxr_linenumber" name="L144" href="#L144">144</a>     <a href="../../../../../org/codehaus/mojo/license/utils/SortedProperties.html">SortedProperties</a> createUnsafeMapping( LicenseMap licenseMap, File missingFile, <strong class="jxr_keyword">boolean</strong> useRepositoryMissingFiles,
+<a class="jxr_linenumber" name="L86" href="#L86">86</a>      <a href="../../../../../org/codehaus/mojo/license/utils/SortedProperties.html">SortedProperties</a> loadUnsafeMapping( LicenseMap licenseMap, File missingFile, SortedMap&lt;String, MavenProject&gt; projectDependencies )
+<a class="jxr_linenumber" name="L87" href="#L87">87</a>              <strong class="jxr_keyword">throws</strong> IOException;
+<a class="jxr_linenumber" name="L88" href="#L88">88</a>  
+<a class="jxr_linenumber" name="L89" href="#L89">89</a>      <em class="jxr_javadoccomment">/**</em>
+<a class="jxr_linenumber" name="L90" href="#L90">90</a>  <em class="jxr_javadoccomment">     * Creates a license map from given dependencies.</em>
+<a class="jxr_linenumber" name="L91" href="#L91">91</a>  <em class="jxr_javadoccomment">     *</em>
+<a class="jxr_linenumber" name="L92" href="#L92">92</a>  <em class="jxr_javadoccomment">     * @param dependencies dependencies to store in the license map</em>
+<a class="jxr_linenumber" name="L93" href="#L93">93</a>  <em class="jxr_javadoccomment">     * @return the created license map fro the given dependencies</em>
+<a class="jxr_linenumber" name="L94" href="#L94">94</a>  <em class="jxr_javadoccomment">     */</em>
+<a class="jxr_linenumber" name="L95" href="#L95">95</a>      <a href="../../../../../org/codehaus/mojo/license/model/LicenseMap.html">LicenseMap</a> createLicenseMap( SortedMap&lt;String, MavenProject&gt; dependencies );
+<a class="jxr_linenumber" name="L96" href="#L96">96</a>  
+<a class="jxr_linenumber" name="L97" href="#L97">97</a>      <em class="jxr_javadoccomment">/**</em>
+<a class="jxr_linenumber" name="L98" href="#L98">98</a>  <em class="jxr_javadoccomment">     * Attach the third-party descriptor to the build.</em>
+<a class="jxr_linenumber" name="L99" href="#L99">99</a>  <em class="jxr_javadoccomment">     *</em>
+<a class="jxr_linenumber" name="L100" href="#L100">100</a> <em class="jxr_javadoccomment">     * @param file location of the third-party descriptor</em>
+<a class="jxr_linenumber" name="L101" href="#L101">101</a> <em class="jxr_javadoccomment">     */</em>
+<a class="jxr_linenumber" name="L102" href="#L102">102</a>     <strong class="jxr_keyword">void</strong> attachThirdPartyDescriptor( File file );
+<a class="jxr_linenumber" name="L103" href="#L103">103</a> 
+<a class="jxr_linenumber" name="L104" href="#L104">104</a>     <em class="jxr_javadoccomment">/**</em>
+<a class="jxr_linenumber" name="L105" href="#L105">105</a> <em class="jxr_javadoccomment">     * Obtains all dependencies with no license form the given license map.</em>
+<a class="jxr_linenumber" name="L106" href="#L106">106</a> <em class="jxr_javadoccomment">     *</em>
+<a class="jxr_linenumber" name="L107" href="#L107">107</a> <em class="jxr_javadoccomment">     * @param licenseMap license map where to find</em>
+<a class="jxr_linenumber" name="L108" href="#L108">108</a> <em class="jxr_javadoccomment">     * @return all dependencies with no license</em>
+<a class="jxr_linenumber" name="L109" href="#L109">109</a> <em class="jxr_javadoccomment">     */</em>
+<a class="jxr_linenumber" name="L110" href="#L110">110</a>     SortedSet&lt;MavenProject&gt; getProjectsWithNoLicense( LicenseMap licenseMap );
+<a class="jxr_linenumber" name="L111" href="#L111">111</a> 
+<a class="jxr_linenumber" name="L112" href="#L112">112</a>     <em class="jxr_javadoccomment">/**</em>
+<a class="jxr_linenumber" name="L113" href="#L113">113</a> <em class="jxr_javadoccomment">     * Obtains the cache of loaded dependencies indexed by their gav.</em>
+<a class="jxr_linenumber" name="L114" href="#L114">114</a> <em class="jxr_javadoccomment">     *</em>
+<a class="jxr_linenumber" name="L115" href="#L115">115</a> <em class="jxr_javadoccomment">     * @return the cache of loaded dependencies indexed by their gav</em>
+<a class="jxr_linenumber" name="L116" href="#L116">116</a> <em class="jxr_javadoccomment">     */</em>
+<a class="jxr_linenumber" name="L117" href="#L117">117</a>     SortedMap&lt;String, MavenProject&gt; getArtifactCache();
+<a class="jxr_linenumber" name="L118" href="#L118">118</a> 
+<a class="jxr_linenumber" name="L119" href="#L119">119</a>     <em class="jxr_javadoccomment">/**</em>
+<a class="jxr_linenumber" name="L120" href="#L120">120</a> <em class="jxr_javadoccomment">     * Loads unsafe mappings. Unsafe mappings are files that supply license metadata</em>
+<a class="jxr_linenumber" name="L121" href="#L121">121</a> <em class="jxr_javadoccomment">     * for artifacts that lack it in their POM models. It's called 'unsafe' because its</em>
+<a class="jxr_linenumber" name="L122" href="#L122">122</a> <em class="jxr_javadoccomment">     * safer to see actual metadata.</em>
+<a class="jxr_linenumber" name="L123" href="#L123">123</a> <em class="jxr_javadoccomment">     * &lt;p&gt;</em>
+<a class="jxr_linenumber" name="L124" href="#L124">124</a> <em class="jxr_javadoccomment">     * There are three sources of this data:</em>
+<a class="jxr_linenumber" name="L125" href="#L125">125</a> <em class="jxr_javadoccomment">     * &lt;ul&gt;</em>
+<a class="jxr_linenumber" name="L126" href="#L126">126</a> <em class="jxr_javadoccomment">     * &lt;li&gt;the 'missing' file.&lt;/li&gt;</em>
+<a class="jxr_linenumber" name="L127" href="#L127">127</a> <em class="jxr_javadoccomment">     * &lt;li&gt;additional property files attached to artifacts; these have classifier=third-party and are expected</em>
+<a class="jxr_linenumber" name="L128" href="#L128">128</a> <em class="jxr_javadoccomment">     * to contain the license information the base artifact's dependencies. These are controlled by a parameter,&lt;/li&gt;</em>
+<a class="jxr_linenumber" name="L129" href="#L129">129</a> <em class="jxr_javadoccomment">     * &lt;li&gt;declared dependencies of type &lt;tt&gt;license.properties&lt;/tt&gt;. These are in the same format, and</em>
+<a class="jxr_linenumber" name="L130" href="#L130">130</a> <em class="jxr_javadoccomment">     * provide global information.&lt;/li&gt;</em>
+<a class="jxr_linenumber" name="L131" href="#L131">131</a> <em class="jxr_javadoccomment">     * &lt;/ul&gt;</em>
+<a class="jxr_linenumber" name="L132" href="#L132">132</a> <em class="jxr_javadoccomment">     *</em>
+<a class="jxr_linenumber" name="L133" href="#L133">133</a> <em class="jxr_javadoccomment">     * @param licenseMap                license map to read</em>
+<a class="jxr_linenumber" name="L134" href="#L134">134</a> <em class="jxr_javadoccomment">     * @param missingFile               location of an optional missing file</em>
+<a class="jxr_linenumber" name="L135" href="#L135">135</a> <em class="jxr_javadoccomment">     * @param useRepositoryMissingFiles flag to use or not third-party descriptors via the 'third-party' classifier from maven repositories</em>
+<a class="jxr_linenumber" name="L136" href="#L136">136</a> <em class="jxr_javadoccomment">     * @param unsafeDependencies        all unsafe dependencies</em>
+<a class="jxr_linenumber" name="L137" href="#L137">137</a> <em class="jxr_javadoccomment">     * @param projectDependencies       all project dependencies</em>
+<a class="jxr_linenumber" name="L138" href="#L138">138</a> <em class="jxr_javadoccomment">     * @return the loaded unsafe mapping</em>
+<a class="jxr_linenumber" name="L139" href="#L139">139</a> <em class="jxr_javadoccomment">     * @throws ProjectBuildingException if could not build some dependencies maven project</em>
+<a class="jxr_linenumber" name="L140" href="#L140">140</a> <em class="jxr_javadoccomment">     * @throws IOException              if could not load missing file</em>
+<a class="jxr_linenumber" name="L141" href="#L141">141</a> <em class="jxr_javadoccomment">     * @throws ThirdPartyToolException  if pb with third-party tool</em>
+<a class="jxr_linenumber" name="L142" href="#L142">142</a> <em class="jxr_javadoccomment">     */</em>
+<a class="jxr_linenumber" name="L143" href="#L143">143</a>     <a href="../../../../../org/codehaus/mojo/license/utils/SortedProperties.html">SortedProperties</a> createUnsafeMapping( LicenseMap licenseMap, File missingFile,
+<a class="jxr_linenumber" name="L144" href="#L144">144</a>                                           <strong class="jxr_keyword">boolean</strong> useRepositoryMissingFiles,
 <a class="jxr_linenumber" name="L145" href="#L145">145</a>                                           SortedSet&lt;MavenProject&gt; unsafeDependencies,
 <a class="jxr_linenumber" name="L146" href="#L146">146</a>                                           SortedMap&lt;String, MavenProject&gt; projectDependencies )
-<a class="jxr_linenumber" name="L147" href="#L147">147</a>         <strong class="jxr_keyword">throws</strong> ProjectBuildingException, IOException, ThirdPartyToolException;
+<a class="jxr_linenumber" name="L147" href="#L147">147</a>             <strong class="jxr_keyword">throws</strong> ProjectBuildingException, IOException, ThirdPartyToolException;
 <a class="jxr_linenumber" name="L148" href="#L148">148</a> 
 <a class="jxr_linenumber" name="L149" href="#L149">149</a>     <em class="jxr_javadoccomment">/**</em>
 <a class="jxr_linenumber" name="L150" href="#L150">150</a> <em class="jxr_javadoccomment">     * Merges licenses.</em>
@@ -163,9 +163,8 @@
 <a class="jxr_linenumber" name="L155" href="#L155">155</a> <em class="jxr_javadoccomment">     * @throws MojoFailureException if there is a bad license merge definition (says for example two license with</em>
 <a class="jxr_linenumber" name="L156" href="#L156">156</a> <em class="jxr_javadoccomment">     *                              same name)</em>
 <a class="jxr_linenumber" name="L157" href="#L157">157</a> <em class="jxr_javadoccomment">     */</em>
-<a class="jxr_linenumber" name="L158" href="#L158">158</a>     <strong class="jxr_keyword">void</strong> mergeLicenses( List&lt;String&gt; licenseMerges, LicenseMap licenseMap )
-<a class="jxr_linenumber" name="L159" href="#L159">159</a>         <strong class="jxr_keyword">throws</strong> MojoFailureException;
-<a class="jxr_linenumber" name="L160" href="#L160">160</a> }
+<a class="jxr_linenumber" name="L158" href="#L158">158</a>     <strong class="jxr_keyword">void</strong> mergeLicenses( List&lt;String&gt; licenseMerges, LicenseMap licenseMap ) <strong class="jxr_keyword">throws</strong> MojoFailureException;
+<a class="jxr_linenumber" name="L159" href="#L159">159</a> }
 </pre>
 <hr/>
 <div id="footer">Copyright &#169; 2010&#x2013;2017 <a href="http://www.mojohaus.org">MojoHaus</a>. All rights reserved.</div>
