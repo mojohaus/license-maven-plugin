@@ -38,12 +38,9 @@ import org.codehaus.mojo.license.model.Copyright;
 import org.codehaus.mojo.license.model.License;
 import org.codehaus.mojo.license.utils.FileUtil;
 import org.codehaus.mojo.license.utils.MojoHelper;
-import org.codehaus.plexus.util.DirectoryScanner;
-import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
@@ -62,20 +59,6 @@ import java.util.TreeMap;
  */
 public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
 {
-
-    // ----------------------------------------------------------------------
-    // Constants
-    // ----------------------------------------------------------------------
-
-    private static final String[] DEFAULT_INCLUDES = new String[]{"**/*"};
-
-    private static final String[] DEFAULT_EXCLUDES =
-            new String[]{"**/*.zargo", "**/*.uml", "**/*.umldi", "**/*.xmi", /* modelisation */
-                    "**/*.img", "**/*.png", "**/*.jpg", "**/*.jpeg", "**/*.gif", /* images */
-                    "**/*.zip", "**/*.jar", "**/*.war", "**/*.ear", "**/*.tgz", "**/*.gz"};
-
-    private static final String[] DEFAULT_ROOTS =
-            new String[]{"src", "target/generated-sources", "target/processed-sources"};
 
     // ----------------------------------------------------------------------
     // Mojo Parameters
@@ -168,7 +151,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
      * @since 1.0
      */
     @Parameter( property = "license.ignoreTag" )
-    private String ignoreTag;
+    String ignoreTag;
 
     /**
      * A flag to add the license header in java files after the package statement.
@@ -352,7 +335,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
     /**
      * Dictionary of treated files indexed by their state.
      */
-    private EnumMap<FileState, Set<File>> result;
+    EnumMap<FileState, Set<File>> result;
 
     /**
      * Dictionary of files to treat indexed by their CommentStyle.
@@ -426,7 +409,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
             String commentFormat = "\n  * %1$s (%2$s)";
             for ( String transformerName : transformers.keySet() )
             {
-                FileHeaderTransformer aTransformer = getTransformer( transformerName );
+                FileHeaderTransformer aTransformer = getTransformer( transformers, transformerName );
                 String str = String.format( commentFormat, aTransformer.getName(), aTransformer.getDescription() );
                 buffer.append( str );
             }
@@ -531,7 +514,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
                 String commentStyle = entry.getValue();
 
                 // check transformer exists
-                getTransformer( commentStyle );
+                getTransformer( transformers, commentStyle );
 
                 if ( isVerbose() )
                 {
@@ -541,8 +524,13 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
             }
         }
 
+        if ( extraFiles == null )
+        {
+            extraFiles = Collections.emptyMap();
+        }
+
         // get all files to treat indexed by their comment style
-        filesToTreatByCommentStyle = obtainFilesToProcessByCommentStyle();
+        filesToTreatByCommentStyle = obtainFilesToProcessByCommentStyle( extraFiles, roots, includes, excludes, extensionToCommentStyle, transformers );
 
         // build the description template
         if ( isVerbose() )
@@ -603,7 +591,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
                 for ( FileState state : FileState.values() )
                 {
 
-                    reportType( state, buffer );
+                    reportType( result, state, buffer );
                 }
 
                 getLog().info( buffer.toString() );
@@ -615,92 +603,6 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
     // ----------------------------------------------------------------------
     // Private Methods
     // ----------------------------------------------------------------------
-
-    /**
-     * Gets all files to process indexed by their comment style.
-     *
-     * @return for each comment style, list of files to process
-     */
-    private Map<String, List<File>> obtainFilesToProcessByCommentStyle()
-    {
-
-        if ( extraFiles == null )
-        {
-            extraFiles = Collections.emptyMap();
-        }
-
-        Map<String, List<File>> results = new HashMap<String, List<File>>();
-
-        // add for all known comment style (says transformer) a empty list
-        // this permits not to have to test if there is an already list each time
-        // we wants to add a new file...
-        for ( String commentStyle : transformers.keySet() )
-        {
-            results.put( commentStyle, new ArrayList<File>() );
-        }
-
-        List<String> rootsList = new ArrayList<String>( roots.length );
-        for ( String root : roots )
-        {
-            File f = new File( root );
-            if ( f.isAbsolute() )
-            {
-                rootsList.add( f.getAbsolutePath() );
-            }
-            else
-            {
-                f = new File( getProject().getBasedir(), root );
-            }
-            if ( f.exists() )
-            {
-                getLog().info( "Will search files to update from root " + f );
-                rootsList.add( f.getAbsolutePath() );
-            }
-            else
-            {
-                if ( isVerbose() )
-                {
-                    getLog().info( "Skip not found root " + f );
-                }
-            }
-        }
-
-        // Obtain all files to treat
-        Map<File, String[]> allFiles = new HashMap<File, String[]>();
-        getFilesToTreatForRoots( includes, excludes, rootsList, allFiles );
-
-        // filter all these files according to their extension
-
-        for ( Map.Entry<File, String[]> entry : allFiles.entrySet() )
-        {
-            File root = entry.getKey();
-            String[] filesPath = entry.getValue();
-
-            // sort them by the associated comment style to their extension
-            for ( String path : filesPath )
-            {
-                String extension = FileUtils.extension( path );
-                String commentStyle = extensionToCommentStyle.get( extension );
-                if ( StringUtils.isEmpty( commentStyle ) )
-                {
-
-                    // unknown extension, try with extra files
-                    File file = new File( root, path );
-                    commentStyle = extraFiles.get( file.getName() );
-                    if ( StringUtils.isEmpty( commentStyle ) )
-                    {
-                        // do not treat this file
-                        continue;
-                    }
-                }
-                //
-                File file = new File( root, path );
-                List<File> files = results.get( commentStyle );
-                files.add( file );
-            }
-        }
-        return results;
-    }
 
     /**
      * Checks the results of the mojo execution using the {@link #isFailOnMissingHeader()} and
@@ -763,8 +665,19 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
         }
 
         // use header transformer according to comment style given in header
-        FileHeaderTransformer transformer = getTransformer( commentStyle );
+        FileHeaderTransformer transformer = getTransformer( transformers, commentStyle );
+        FileHeaderProcessor processor = getFileHeaderProcessor( license, transformer );
 
+
+        for ( File file : filesToTreat )
+        {
+            processFile( processor, file );
+        }
+        filesToTreat.clear();
+    }
+
+    private FileHeaderProcessor getFileHeaderProcessor( License license, FileHeaderTransformer transformer ) throws IOException
+    {
         // file header to use if no header is found on a file
         FileHeader header = new FileHeader();
 
@@ -790,13 +703,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
 
         filter.setLog( getLog() );
         // update processor filter
-        FileHeaderProcessor processor = new FileHeaderProcessor( filter, header, transformer );
-
-        for ( File file : filesToTreat )
-        {
-            processFile( processor, file );
-        }
-        filesToTreat.clear();
+        return new FileHeaderProcessor( filter, header, transformer );
     }
 
     /**
@@ -1033,217 +940,4 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
         }
     }
 
-    /**
-     * Reports into the given {@code buffer} stats for the given {@code state}.
-     *
-     * @param state  state of file to report
-     * @param buffer where to report
-     */
-    private void reportType( FileState state, StringBuilder buffer )
-    {
-        String operation = state.name();
-
-        Set<File> set = getFiles( state );
-        if ( set == null || set.isEmpty() )
-        {
-            if ( isVerbose() )
-            {
-                buffer.append( "\n * no header to " );
-                buffer.append( operation );
-                buffer.append( "." );
-            }
-            return;
-        }
-        buffer.append( "\n * " ).append( operation ).append( " header on " );
-        buffer.append( set.size() );
-        if ( set.size() == 1 )
-        {
-            buffer.append( " file." );
-        }
-        else
-        {
-            buffer.append( " files." );
-        }
-        if ( isVerbose() )
-        {
-            for ( File file : set )
-            {
-                buffer.append( "\n   - " ).append( file );
-            }
-        }
-    }
-
-    /**
-     * Obtains the {@link FileHeaderTransformer} given his name.
-     *
-     * @param transformerName the name of the transformer to find
-     * @return the transformer for the givne tramsformer name
-     */
-    private FileHeaderTransformer getTransformer( String transformerName )
-    {
-        if ( StringUtils.isEmpty( transformerName ) )
-        {
-            throw new IllegalArgumentException( "transformerName can not be null, nor empty!" );
-        }
-        if ( transformers == null )
-        {
-            throw new IllegalStateException( "No transformers initialized!" );
-        }
-        FileHeaderTransformer transformer = transformers.get( transformerName );
-        if ( transformer == null )
-        {
-            throw new IllegalArgumentException(
-                    "transformerName " + transformerName + " is unknow, use one this one : " + transformers.keySet() );
-        }
-        return transformer;
-    }
-
-    /**
-     * Obtain for a given value, a trim version of it. If value is empty then use the given default value
-     *
-     * @param value        the value to trim (if not empty)
-     * @param defaultValue the default value to use if value is empty
-     * @return the trim value (or default value if value is empty)
-     */
-    private String cleanHeaderConfiguration( String value, String defaultValue )
-    {
-        String resultHeader;
-        if ( StringUtils.isEmpty( value ) )
-        {
-
-            // use default value
-            resultHeader = defaultValue;
-        }
-        else
-        {
-
-            // clean all spaces of it
-            resultHeader = value.replaceAll( "\\s", "" );
-        }
-        return resultHeader;
-    }
-
-    /**
-     * Gets all files for the given {@code state}.
-     *
-     * @param state state of files to get
-     * @return all files of the given state
-     */
-    private Set<File> getFiles( FileState state )
-    {
-        return result.get( state );
-    }
-
-    /**
-     * Collects some files.
-     *
-     * @param includes includes
-     * @param excludes excludes
-     * @param roots    root directories to treat
-     * @param files    cache of file detected indexed by their root directory
-     */
-    private void getFilesToTreatForRoots( String[] includes, String[] excludes, List<String> roots,
-                                          Map<File, String[]> files )
-    {
-
-        DirectoryScanner ds = new DirectoryScanner();
-        ds.setIncludes( includes );
-        if ( excludes != null )
-        {
-            ds.setExcludes( excludes );
-        }
-        for ( String src : roots )
-        {
-
-            File f = new File( src );
-            if ( !f.exists() )
-            {
-                // do nothing on a non-existent
-                continue;
-            }
-
-            if ( getLog().isDebugEnabled() )
-            {
-                getLog().debug( "discovering source files in " + src );
-            }
-
-            ds.setBasedir( f );
-            // scan
-            ds.scan();
-
-            // get files
-            String[] tmp = ds.getIncludedFiles();
-
-            if ( tmp.length < 1 )
-            {
-                // no files found
-                continue;
-            }
-
-            List<String> toTreate = new ArrayList<String>();
-
-            Collections.addAll( toTreate, tmp );
-
-            if ( toTreate.isEmpty() )
-            {
-                // no file or all are up-to-date
-                continue;
-            }
-
-            // register files
-            files.put( f, toTreate.toArray( new String[toTreate.size()] ) );
-        }
-    }
-
-    /**
-     * Defines state of a file after process.
-     *
-     * @author tchemit dev@tchemit.fr
-     * @since 1.0
-     */
-    public enum FileState
-    {
-
-        /**
-         * file was updated
-         */
-        update,
-
-        /**
-         * file was up to date
-         */
-        uptodate,
-
-        /**
-         * something was added on file
-         */
-        add,
-
-        /**
-         * file was ignored
-         */
-        ignore,
-
-        /**
-         * treatment failed for file
-         */
-        fail;
-
-        /**
-         * Register a file for this state on result dictionary.
-         *
-         * @param file    file to add
-         * @param results dictionary to update
-         */
-        public void addFile( File file, EnumMap<FileState, Set<File>> results )
-        {
-            Set<File> fileSet = results.get( this );
-            if ( fileSet == null )
-            {
-                fileSet = new HashSet<File>();
-                results.put( this, fileSet );
-            }
-            fileSet.add( file );
-        }
-    }
 }
