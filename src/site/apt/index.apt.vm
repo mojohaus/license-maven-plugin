@@ -61,6 +61,9 @@ ${project.name}
   * <<<{{{./check-file-header-mojo.html}license:check-file-header}}>>>\
     Checks the license header of the current project source files.
 
+  * <<<{{{./remove-file-header-mojo.html}license:remove-file-header}}>>>\
+    Remove any license header of the current project source files.
+
   * <<<{{{./update-project-license-mojo.html}license:update-project-license}}>>>\
     Updates (or creates) the main project license file according to the license defined in the licenseName parameter.
 
