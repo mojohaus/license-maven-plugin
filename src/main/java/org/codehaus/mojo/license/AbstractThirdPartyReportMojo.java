@@ -66,9 +66,7 @@ import java.util.TreeSet;
  * @author tchemit dev@tchemit.fr
  * @since 1.1
  */
-public abstract class AbstractThirdPartyReportMojo
-    extends AbstractMavenReport
-    implements MavenProjectDependenciesConfigurator
+public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport implements MavenProjectDependenciesConfigurator
 {
 
     // ----------------------------------------------------------------------
@@ -148,6 +146,14 @@ public abstract class AbstractThirdPartyReportMojo
     private File missingFile;
 
     /**
+     * The file where to fill the override license for dependencies.
+     *
+     * @since 1.11
+     */
+    @Parameter( property = "license.overrideFile", defaultValue = "src/license/override-THIRD-PARTY.properties" )
+    private File overrideFile;
+
+    /**
      * Load from repositories third party missing files.
      *
      * @since 1.0
@@ -168,7 +174,6 @@ public abstract class AbstractThirdPartyReportMojo
      * &lt;/licenseMerges&gt;
      * &lt;/pre&gt;
      *
-     * @parameter
      * @since 1.0
      */
     @Parameter
@@ -186,7 +191,7 @@ public abstract class AbstractThirdPartyReportMojo
 
     /**
      * Flag to activate verbose mode.
-     *
+     * <p>
      * <b>Note:</b> Verbose mode is always on if you starts a debug maven instance
      * (says via {@code -X}).
      *
@@ -197,7 +202,7 @@ public abstract class AbstractThirdPartyReportMojo
 
     /**
      * Encoding used to read and writes files.
-     *
+     * <p>
      * <b>Note:</b> If nothing is filled here, we will use the system
      * property {@code file.encoding}.
      *
@@ -271,9 +276,9 @@ public abstract class AbstractThirdPartyReportMojo
     // ----------------------------------------------------------------------
 
     protected abstract Collection<ThirdPartyDetails> createThirdPartyDetails()
-        throws IOException, ThirdPartyToolException, ProjectBuildingException, MojoFailureException,
-        InvalidDependencyVersionException, ArtifactNotFoundException, ArtifactResolutionException,
-        DependenciesToolException;
+            throws IOException, ThirdPartyToolException, ProjectBuildingException, MojoFailureException,
+                   InvalidDependencyVersionException, ArtifactNotFoundException, ArtifactResolutionException,
+                   DependenciesToolException;
 
     // ----------------------------------------------------------------------
     // AbstractMavenReport Implementation
@@ -283,7 +288,7 @@ public abstract class AbstractThirdPartyReportMojo
      * {@inheritDoc}
      */
     protected void executeReport( Locale locale )
-        throws MavenReportException
+            throws MavenReportException
     {
 
         Collection<ThirdPartyDetails> details;
@@ -326,7 +331,7 @@ public abstract class AbstractThirdPartyReportMojo
         }
 
         ThirdPartyReportRenderer renderer =
-            new ThirdPartyReportRenderer( getSink(), i18n, getOutputName(), locale, details );
+                new ThirdPartyReportRenderer( getSink(), i18n, getOutputName(), locale, details );
         renderer.render();
 
     }
@@ -448,18 +453,19 @@ public abstract class AbstractThirdPartyReportMojo
     // Protected Methods
     // ----------------------------------------------------------------------
 
-    protected Collection<ThirdPartyDetails> createThirdPartyDetails( MavenProject project, boolean loadArtifacts )
-        throws IOException, ThirdPartyToolException, ProjectBuildingException, MojoFailureException,
-        DependenciesToolException
+    Collection<ThirdPartyDetails> createThirdPartyDetails( MavenProject project, boolean loadArtifacts )
+            throws IOException, ThirdPartyToolException, ProjectBuildingException, MojoFailureException,
+                   DependenciesToolException
     {
 
-        if (loadArtifacts) {
+        if ( loadArtifacts )
+        {
             dependenciesTool.loadProjectArtifacts( localRepository, remoteRepositories, project );
         }
 
         ThirdPartyHelper thirdPartyHelper =
-            new DefaultThirdPartyHelper( project, encoding, verbose, dependenciesTool, thirdPartyTool, localRepository,
-                                         remoteRepositories, getLog() );
+                new DefaultThirdPartyHelper( project, encoding, verbose, dependenciesTool, thirdPartyTool, localRepository,
+                                             remoteRepositories, getLog() );
         // load dependencies of the project
         SortedMap<String, MavenProject> projectDependencies = thirdPartyHelper.loadDependencies( this );
 
@@ -471,7 +477,7 @@ public abstract class AbstractThirdPartyReportMojo
 
         // compute safe dependencies (with pom licenses)
         Set<MavenProject> dependenciesWithPomLicense =
-            new TreeSet<MavenProject>( MojoHelper.newMavenProjectComparator() );
+                new TreeSet<MavenProject>( MojoHelper.newMavenProjectComparator() );
         dependenciesWithPomLicense.addAll( projectDependencies.values() );
 
         if ( CollectionUtils.isNotEmpty( dependenciesWithNoLicense ) )
@@ -490,7 +496,10 @@ public abstract class AbstractThirdPartyReportMojo
         // LicenseMap is now complete, let's merge licenses if necessary
         thirdPartyHelper.mergeLicenses( licenseMerges, licenseMap );
 
-        // let's build thirdparty details for each dependencies
+        // Add override licenses
+        thirdPartyTool.overrideLicenses( licenseMap, projectDependencies, encoding, overrideFile );
+
+        // let's build third party details for each dependencies
         Collection<ThirdPartyDetails> details = new ArrayList<ThirdPartyDetails>();
 
         for ( Map.Entry<MavenProject, String[]> entry : licenseMap.toDependencyMap().entrySet() )

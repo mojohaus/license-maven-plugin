@@ -49,8 +49,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -70,18 +70,18 @@ import java.util.regex.Pattern;
  */
 @Component( role = ThirdPartyTool.class, hint = "default" )
 public class DefaultThirdPartyTool
-    extends AbstractLogEnabled
-    implements ThirdPartyTool
+        extends AbstractLogEnabled
+        implements ThirdPartyTool
 {
     /**
      * Classifier of the third-parties descriptor attached to a maven module.
      */
-    public static final String DESCRIPTOR_CLASSIFIER = "third-party";
+    private static final String DESCRIPTOR_CLASSIFIER = "third-party";
 
     /**
      * Type of the the third-parties descriptor attached to a maven module.
      */
-    public static final String DESCRIPTOR_TYPE = "properties";
+    private static final String DESCRIPTOR_TYPE = "properties";
 
     /**
      * Pattern of a GAV plus a type.
@@ -92,7 +92,7 @@ public class DefaultThirdPartyTool
      * Pattern of a GAV plus a type plus a classifier.
      */
     private static final Pattern GAV_PLUS_TYPE_AND_CLASSIFIER_PATTERN =
-        Pattern.compile( "(.+)--(.+)--(.+)--(.+)--(.+)" );
+            Pattern.compile( "(.+)--(.+)--(.+)--(.+)--(.+)" );
 
     static final String LICENSE_DB_TYPE = "license.properties";
 
@@ -196,7 +196,7 @@ public class DefaultThirdPartyTool
                                                                        LicenseMap licenseMap,
                                                                        ArtifactRepository localRepository,
                                                                        List<ArtifactRepository> remoteRepositories )
-        throws ThirdPartyToolException, IOException
+            throws ThirdPartyToolException, IOException
     {
 
         SortedProperties result = new SortedProperties( encoding );
@@ -293,7 +293,7 @@ public class DefaultThirdPartyTool
      */
     public File resolvThirdPartyDescriptor( MavenProject project, ArtifactRepository localRepository,
                                             List<ArtifactRepository> repositories )
-        throws ThirdPartyToolException
+            throws ThirdPartyToolException
     {
         if ( project == null )
         {
@@ -320,12 +320,12 @@ public class DefaultThirdPartyTool
         catch ( ArtifactResolutionException e )
         {
             throw new ThirdPartyToolException(
-                "ArtifactResolutionException: Unable to locate third party descriptor: " + e.getMessage(), e );
+                    "ArtifactResolutionException: Unable to locate third party descriptor: " + e.getMessage(), e );
         }
         catch ( IOException e )
         {
             throw new ThirdPartyToolException(
-                "IOException: Unable to locate third party descriptor: " + e.getMessage(), e );
+                    "IOException: Unable to locate third party descriptor: " + e.getMessage(), e );
         }
     }
 
@@ -350,7 +350,7 @@ public class DefaultThirdPartyTool
      */
     public void addLicense( LicenseMap licenseMap, MavenProject project, License license )
     {
-        addLicense( licenseMap, project, Arrays.asList( license ) );
+        addLicense( licenseMap, project, Collections.singletonList( license ) );
     }
 
     /**
@@ -439,7 +439,7 @@ public class DefaultThirdPartyTool
             if ( isVerbose() )
             {
                 getLogger().info(
-                    "Merge license [" + license + "] to [" + mainLicense + "] (" + set.size() + " dependencies)." );
+                        "Merge license [" + license + "] to [" + mainLicense + "] (" + set.size() + " dependencies)." );
             }
             mainSet.addAll( set );
             set.clear();
@@ -451,8 +451,7 @@ public class DefaultThirdPartyTool
      * {@inheritDoc}
      */
     public SortedProperties loadUnsafeMapping( LicenseMap licenseMap, SortedMap<String, MavenProject> artifactCache,
-                                               String encoding, File missingFile )
-        throws IOException
+                                               String encoding, File missingFile ) throws IOException
     {
         Map<String, MavenProject> snapshots = new HashMap<String, MavenProject>();
 
@@ -530,7 +529,7 @@ public class DefaultThirdPartyTool
             for ( String id : unknownDependenciesId )
             {
                 getLogger().warn(
-                    "dependency [" + id + "] does not exist in project, remove it from the missing file." );
+                        "dependency [" + id + "] does not exist in project, remove it from the missing file." );
                 unsafeMappings.remove( id );
             }
 
@@ -593,9 +592,59 @@ public class DefaultThirdPartyTool
     /**
      * {@inheritDoc}
      */
+    public void overrideLicenses( LicenseMap licenseMap, SortedMap<String, MavenProject> artifactCache, String encoding, File overrideFile ) throws IOException
+    {
+
+        SortedProperties overrideMappings = new SortedProperties( encoding );
+
+        if ( overrideFile.exists() )
+        {
+            // there is some unsafe dependencies
+
+            getLogger().info( "Load override file " + overrideFile );
+
+            // load the missing file
+            overrideMappings.load( overrideFile );
+        }
+
+        for ( Object o : overrideMappings.keySet() )
+        {
+            String id = (String) o;
+
+            MavenProject project = artifactCache.get( id );
+            if ( project == null )
+            {
+                getLogger().warn( "dependency [" + id + "] does not exist in project." );
+                continue;
+            }
+
+            String license = (String) overrideMappings.get( id );
+
+            String[] licenses = StringUtils.split( license, '|' );
+
+            if ( ArrayUtils.isEmpty( licenses ) )
+            {
+
+                // empty license means not fill, skip it
+                continue;
+            }
+
+            licenseMap.removeProject( project );
+
+            // add license in map
+            addLicense( licenseMap, project, licenses );
+
+        }
+
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public void writeThirdPartyFile( LicenseMap licenseMap, File thirdPartyFile, boolean verbose, String encoding,
                                      String lineFormat )
-        throws IOException
+            throws IOException
     {
 
         Logger log = getLogger();
@@ -619,7 +668,7 @@ public class DefaultThirdPartyTool
      * {@inheritDoc}
      */
     public void writeBundleThirdPartyFile( File thirdPartyFile, File outputDirectory, String bundleThirdPartyPath )
-        throws IOException
+            throws IOException
     {
 
         // creates the bundled license file
@@ -628,10 +677,10 @@ public class DefaultThirdPartyTool
         FileUtil.copyFile( thirdPartyFile, bundleTarget );
     }
 
-    public void loadGlobalLicenses( Set<Artifact> dependencies, ArtifactRepository localRepository,
-                                    List<ArtifactRepository> repositories, SortedSet<MavenProject> unsafeDependencies,
-                                    LicenseMap licenseMap, Map<String, MavenProject> unsafeProjects,
-                                    SortedProperties result )
+    private void loadGlobalLicenses( Set<Artifact> dependencies, ArtifactRepository localRepository,
+                                     List<ArtifactRepository> repositories, SortedSet<MavenProject> unsafeDependencies,
+                                     LicenseMap licenseMap, Map<String, MavenProject> unsafeProjects,
+                                     SortedProperties result )
             throws IOException, ArtifactNotFoundException, ArtifactResolutionException
     {
         for ( Artifact dep : dependencies )
@@ -648,12 +697,12 @@ public class DefaultThirdPartyTool
                                    Map<String, MavenProject> unsafeProjects, Artifact dep,
                                    ArtifactRepository localRepository, List<ArtifactRepository> repositories,
                                    SortedProperties result )
-        throws IOException, ArtifactNotFoundException, ArtifactResolutionException
+            throws IOException, ArtifactNotFoundException, ArtifactResolutionException
     {
         artifactResolver.resolve( dep, repositories, localRepository );
         File propFile = dep.getFile();
         getLogger().info(
-            String.format( "Loading global license map from %s: %s", dep.toString(), propFile.getAbsolutePath() ) );
+                String.format( "Loading global license map from %s: %s", dep.toString(), propFile.getAbsolutePath() ) );
         SortedProperties props = new SortedProperties( "utf-8" );
         InputStream propStream = null;
 

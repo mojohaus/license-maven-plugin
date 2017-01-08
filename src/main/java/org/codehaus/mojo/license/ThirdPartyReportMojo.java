@@ -41,8 +41,7 @@ import java.util.Collection;
  * @since 1.1
  */
 @Mojo( name = "third-party-report", requiresDependencyResolution = ResolutionScope.RUNTIME )
-public class ThirdPartyReportMojo
-    extends AbstractThirdPartyReportMojo
+public class ThirdPartyReportMojo extends AbstractThirdPartyReportMojo
 {
 
     // ----------------------------------------------------------------------

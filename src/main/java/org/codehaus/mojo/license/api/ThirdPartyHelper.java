@@ -71,7 +71,7 @@ public interface ThirdPartyHelper
                                                                SortedSet<MavenProject> unsafeDependencies,
                                                                Collection<MavenProject> projects,
                                                                LicenseMap licenseMap )
-        throws ThirdPartyToolException, IOException;
+            throws ThirdPartyToolException, IOException;
 
     /**
      * Load unsafe mapping for all dependencies with no license in their pom, we will load the missing file
@@ -83,9 +83,8 @@ public interface ThirdPartyHelper
      * @return the map of all unsafe mapping
      * @throws IOException if could not load missing file
      */
-    SortedProperties loadUnsafeMapping( LicenseMap licenseMap, File missingFile,
-                                        SortedMap<String, MavenProject> projectDependencies )
-        throws IOException;
+    SortedProperties loadUnsafeMapping( LicenseMap licenseMap, File missingFile, SortedMap<String, MavenProject> projectDependencies )
+            throws IOException;
 
     /**
      * Creates a license map from given dependencies.
@@ -121,7 +120,7 @@ public interface ThirdPartyHelper
      * Loads unsafe mappings. Unsafe mappings are files that supply license metadata
      * for artifacts that lack it in their POM models. It's called 'unsafe' because its
      * safer to see actual metadata.
-     *
+     * <p>
      * There are three sources of this data:
      * <ul>
      * <li>the 'missing' file.</li>
@@ -141,10 +140,11 @@ public interface ThirdPartyHelper
      * @throws IOException              if could not load missing file
      * @throws ThirdPartyToolException  if pb with third-party tool
      */
-    SortedProperties createUnsafeMapping( LicenseMap licenseMap, File missingFile, boolean useRepositoryMissingFiles,
+    SortedProperties createUnsafeMapping( LicenseMap licenseMap, File missingFile,
+                                          boolean useRepositoryMissingFiles,
                                           SortedSet<MavenProject> unsafeDependencies,
                                           SortedMap<String, MavenProject> projectDependencies )
-        throws ProjectBuildingException, IOException, ThirdPartyToolException;
+            throws ProjectBuildingException, IOException, ThirdPartyToolException;
 
     /**
      * Merges licenses.
@@ -155,6 +155,5 @@ public interface ThirdPartyHelper
      * @throws MojoFailureException if there is a bad license merge definition (says for example two license with
      *                              same name)
      */
-    void mergeLicenses( List<String> licenseMerges, LicenseMap licenseMap )
-        throws MojoFailureException;
+    void mergeLicenses( List<String> licenseMerges, LicenseMap licenseMap ) throws MojoFailureException;
 }

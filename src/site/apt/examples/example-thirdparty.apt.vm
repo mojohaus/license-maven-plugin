@@ -100,7 +100,7 @@ org.codehaus.mojo.license.test--test-add-third-party-global-db-misc-dep--1=The A
   <<fileTemplate>> property of the mojo) to says how to generate the file.
 
   Have a look on existing templates :
-  https://fisheye.codehaus.org/browse/mojo/trunk/mojo/license-maven-plugin/src/main/resources/org/codehaus/mojo/license
+  https://github.com/mojohaus/license-maven-plugin/tree/master/src/main/resources/org/codehaus/mojo/license
 
 * Change artifacts order
 
@@ -348,6 +348,18 @@ List of 2 third-party dependencies.
       </plugins>
     </pluginManagement>
 -------------------------------------------------------------------------------
+
+** Override identified licenses (Since 1.12)
+
+  Sometimes, identified licenses are wrong, using the <<overrideFile>> permits to fix them.
+
+  For each dependency you want to fix, just add in this properties file a line
+
+-------------------------------------------------------------------------------
+org.jboss.xnio--xnio-api--3.3.6.Final=The Apache Software License, Version 2.0
+-------------------------------------------------------------------------------
+
+  The default location of the override file is <<src/main/license/override-THIRD-PARTY.properties>>.
 
 ** Attach missing files to build
 

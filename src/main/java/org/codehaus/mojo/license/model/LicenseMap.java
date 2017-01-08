@@ -135,4 +135,19 @@ public class LicenseMap
         }
         return result;
     }
+
+    public void removeProject( MavenProject project )
+    {
+        for ( Map.Entry<String, SortedSet<MavenProject>> entry : entrySet() )
+        {
+            SortedSet<MavenProject> projects = entry.getValue();
+            for ( MavenProject mavenProject : projects )
+            {
+                if (project.equals( mavenProject )) {
+                    get(entry.getKey()).remove( project);
+                    return;
+                }
+            }
+        }
+    }
 }

@@ -54,11 +54,9 @@ import java.util.SortedSet;
  * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
-@Mojo( name = "aggregate-add-third-party", requiresProject = true, aggregator = true,
-       defaultPhase = LifecyclePhase.GENERATE_RESOURCES )
+@Mojo( name = "aggregate-add-third-party", aggregator = true, defaultPhase = LifecyclePhase.GENERATE_RESOURCES )
 @Execute( goal = "add-third-party" )
-public class AggregatorAddThirdPartyMojo
-    extends AbstractAddThirdPartyMojo
+public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo
 {
     // ----------------------------------------------------------------------
     // Mojo Parameters
@@ -70,7 +68,7 @@ public class AggregatorAddThirdPartyMojo
      * @since 1.0
      */
     @Parameter( property = "reactorProjects", readonly = true, required = true )
-    protected List<?> reactorProjects;
+    private List<?> reactorProjects;
 
     /**
      * To skip execution of this mojo.
@@ -93,7 +91,7 @@ public class AggregatorAddThirdPartyMojo
      *
      * @since 1.11
      */
-    @Parameter( property = "license.aggregateMissingLicensesFile", defaultValue = "${project.basedir}/THIRD-PARTY.properties")
+    @Parameter( property = "license.aggregateMissingLicensesFile", defaultValue = "${project.basedir}/THIRD-PARTY.properties" )
     private File aggregateMissingLicensesFile;
 
     // ----------------------------------------------------------------------
@@ -138,7 +136,7 @@ public class AggregatorAddThirdPartyMojo
      */
     @Override
     protected void doAction()
-        throws Exception
+            throws Exception
     {
         Log log = getLog();
 
@@ -146,18 +144,9 @@ public class AggregatorAddThirdPartyMojo
         {
             log.info( "After executing on " + reactorProjects.size() + " project(s)" );
         }
-//        SortedMap<String, MavenProject> aatifacts = getHelper().getArtifactCache();
 
         LicenseMap licenseMap = getLicenseMap();
 
-//        getLog().info( artifacts.size() + " detected artifact(s)." );
-//        if ( isVerbose() )
-//        {
-//            for ( String id : artifacts.keySet() )
-//            {
-//                getLog().info( " - " + id );
-//            }
-//        }
         getLog().info( licenseMap.size() + " detected license(s)." );
         if ( isVerbose() )
         {
@@ -223,8 +212,7 @@ public class AggregatorAddThirdPartyMojo
      * {@inheritDoc}
      */
     @Override
-    protected SortedProperties createUnsafeMapping()
-        throws ProjectBuildingException, IOException
+    protected SortedProperties createUnsafeMapping() throws ProjectBuildingException, IOException
     {
 
         String path =

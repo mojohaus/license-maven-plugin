@@ -50,7 +50,7 @@ import java.util.SortedSet;
 
 /**
  * Goal to generate the third-party license file.
- *
+ * <p>
  * This file contains a list of the dependencies and their licenses.  Each dependency and its
  * license is displayed on a single line in the format
  * <pre>
@@ -61,11 +61,8 @@ import java.util.SortedSet;
  * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
-@Mojo( name = "add-third-party", requiresProject = true, requiresDependencyResolution = ResolutionScope.TEST,
-       defaultPhase = LifecyclePhase.GENERATE_RESOURCES )
-public class AddThirdPartyMojo
-    extends AbstractAddThirdPartyMojo
-    implements MavenProjectDependenciesConfigurator
+@Mojo( name = "add-third-party", requiresDependencyResolution = ResolutionScope.TEST, defaultPhase = LifecyclePhase.GENERATE_RESOURCES )
+public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements MavenProjectDependenciesConfigurator
 {
 
     // ----------------------------------------------------------------------
@@ -93,7 +90,7 @@ public class AddThirdPartyMojo
 
     /**
      * To execute or not this mojo if project packaging is pom.
-     *
+     * <p>
      * <strong>Note:</strong> The default value is {@code false}.
      *
      * @since 1.1
@@ -229,7 +226,7 @@ public class AddThirdPartyMojo
      */
     @Override
     protected void doAction()
-        throws Exception
+            throws Exception
     {
 
         boolean unsafe = checkUnsafeDependencies();
@@ -251,7 +248,7 @@ public class AddThirdPartyMojo
         if ( unsafe && isFailIfWarning() )
         {
             throw new MojoFailureException(
-                "There are some dependencies with no license, please fill the file " + getMissingFile() );
+                    "There are some dependencies with no license, please fill the file " + getMissingFile() );
         }
 
         if ( !unsafe && isUseMissingFile() && MapUtils.isEmpty( getUnsafeMappings() ) && getMissingFile().exists() )
@@ -293,14 +290,14 @@ public class AddThirdPartyMojo
      */
     @Override
     protected SortedProperties createUnsafeMapping()
-        throws ProjectBuildingException, IOException, ThirdPartyToolException
+            throws ProjectBuildingException, IOException, ThirdPartyToolException
     {
 
         SortedSet<MavenProject> unsafeDependencies = getUnsafeDependencies();
 
         SortedProperties unsafeMappings =
-            getHelper().createUnsafeMapping( getLicenseMap(), getMissingFile(), useRepositoryMissingFiles,
-                                             unsafeDependencies, getProjectDependencies() );
+                getHelper().createUnsafeMapping( getLicenseMap(), getMissingFile(), useRepositoryMissingFiles,
+                                                 unsafeDependencies, getProjectDependencies() );
         if ( isVerbose() )
         {
             getLog().info( "found " + unsafeMappings.size() + " unsafe mappings" );
@@ -405,8 +402,7 @@ public class AddThirdPartyMojo
      * @since 1.0
      */
     private boolean computeDoGenerateMissingFile( SortedProperties unsafeMappings,
-                                                  SortedSet<MavenProject> unsafeDependencies )
-        throws IOException
+                                                  SortedSet<MavenProject> unsafeDependencies ) throws IOException
     {
 
         if ( !isUseMissingFile() )
@@ -453,7 +449,7 @@ public class AddThirdPartyMojo
      * @throws IOException if error while writing missing file
      */
     private void writeMissingFile()
-        throws IOException
+            throws IOException
     {
 
         Log log = getLog();

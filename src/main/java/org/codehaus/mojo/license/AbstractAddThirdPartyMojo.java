@@ -101,6 +101,14 @@ public abstract class AbstractAddThirdPartyMojo
     private File missingFile;
 
     /**
+     * The file to write with a license information template for dependencies to override.
+     *
+     * @since 1.12
+     */
+    @Parameter( property = "license.overrideFile", defaultValue = "src/license/override-THIRD-PARTY.properties" )
+    private File overrideFile;
+
+    /**
      * To merge licenses in final file.
      * <p>
      * Each entry represents a merge (first license is main license to keep), licenses are separated by {@code |}.
@@ -436,9 +444,14 @@ public abstract class AbstractAddThirdPartyMojo
         return useMissingFile;
     }
 
-    public File getMissingFile()
+    File getMissingFile()
     {
         return missingFile;
+    }
+
+    File getOverrideFile()
+    {
+        return overrideFile;
     }
 
     public SortedProperties getUnsafeMappings()
@@ -680,6 +693,7 @@ public abstract class AbstractAddThirdPartyMojo
         {
 
             LicenseMap licenseMap1 = getLicenseMap();
+            thirdPartyTool.overrideLicenses( licenseMap1, projectDependencies, getEncoding(), overrideFile );
             if ( sortArtifactByName )
             {
                 licenseMap1 = licenseMap.toLicenseMapOrderByName();

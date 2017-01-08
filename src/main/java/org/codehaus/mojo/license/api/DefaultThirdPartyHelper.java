@@ -52,7 +52,7 @@ import java.util.TreeMap;
  * @since 1.1
  */
 public class DefaultThirdPartyHelper
-    implements ThirdPartyHelper
+        implements ThirdPartyHelper
 {
 
     /**
@@ -160,7 +160,7 @@ public class DefaultThirdPartyHelper
                                                                       SortedSet<MavenProject> unsafeDependencies,
                                                                       Collection<MavenProject> projects,
                                                                       LicenseMap licenseMap )
-        throws ThirdPartyToolException, IOException
+            throws ThirdPartyToolException, IOException
     {
         return thirdPartyTool.loadThirdPartyDescriptorsForUnsafeMapping( topLevelDependencies, encoding, projects,
                                                                          unsafeDependencies, licenseMap,
@@ -172,9 +172,9 @@ public class DefaultThirdPartyHelper
      */
     public SortedProperties loadUnsafeMapping( LicenseMap licenseMap, File missingFile,
                                                SortedMap<String, MavenProject> projectDependencies )
-        throws IOException
+            throws IOException
     {
-        return thirdPartyTool.loadUnsafeMapping( licenseMap, projectDependencies, encoding, missingFile );
+        return thirdPartyTool.loadUnsafeMapping( licenseMap, projectDependencies, encoding, missingFile);
     }
 
     /**
@@ -213,12 +213,12 @@ public class DefaultThirdPartyHelper
     /**
      * {@inheritDoc}
      */
-    @SuppressWarnings("unchecked") // project.getArtifacts()
+    @SuppressWarnings( "unchecked" ) // project.getArtifacts()
     public SortedProperties createUnsafeMapping( LicenseMap licenseMap, File missingFile,
                                                  boolean useRepositoryMissingFiles,
                                                  SortedSet<MavenProject> unsafeDependencies,
                                                  SortedMap<String, MavenProject> projectDependencies )
-        throws ProjectBuildingException, IOException, ThirdPartyToolException
+            throws ProjectBuildingException, IOException, ThirdPartyToolException
     {
 
         SortedProperties unsafeMappings = loadUnsafeMapping( licenseMap, missingFile, projectDependencies );
@@ -238,14 +238,16 @@ public class DefaultThirdPartyHelper
                 projects.removeAll( unsafeDependencies );
 
                 SortedProperties resolvedUnsafeMapping =
-                    loadThirdPartyDescriptorForUnsafeMapping( project.getArtifacts(), unsafeDependencies, projects,
-                                                              licenseMap );
+                        loadThirdPartyDescriptorForUnsafeMapping( project.getArtifacts(), unsafeDependencies, projects,
+                                                                  licenseMap );
 
                 // push back resolved unsafe mappings (only for project dependencies)
-                for (Object coord : resolvedUnsafeMapping.keySet()) {
+                for ( Object coord : resolvedUnsafeMapping.keySet() )
+                {
                     String s = (String) coord;
-                    if (projectDependencies.containsKey(s)){
-                        unsafeMappings.put(s, resolvedUnsafeMapping.get(s));
+                    if ( projectDependencies.containsKey( s ) )
+                    {
+                        unsafeMappings.put( s, resolvedUnsafeMapping.get( s ) );
                     }
                 }
             }
@@ -258,7 +260,7 @@ public class DefaultThirdPartyHelper
      * {@inheritDoc}
      */
     public void mergeLicenses( List<String> licenseMerges, LicenseMap licenseMap )
-        throws MojoFailureException
+            throws MojoFailureException
     {
 
         Set<String> licenseFound = new HashSet<String>();
@@ -304,9 +306,9 @@ public class DefaultThirdPartyHelper
                         // this license to merge was already described, fail the build...
 
                         throw new MojoFailureException(
-                            "The license " + licenseToAdd + " was already registred in the " +
-                                "configuration, please use only one such entry as describe in example " +
-                                "http://mojo.codehaus.org/license-maven-plugin/examples/example-thirdparty.html#Merge_licenses." );
+                                "The license " + licenseToAdd + " was already registred in the " +
+                                        "configuration, please use only one such entry as describe in example " +
+                                        "http://mojo.codehaus.org/license-maven-plugin/examples/example-thirdparty.html#Merge_licenses." );
                     }
 
                     // can add this license for merge
