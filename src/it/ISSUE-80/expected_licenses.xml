@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<licenseSummary>
+  <dependencies>
+    <dependency>
+      <groupId>aopalliance</groupId>
+      <artifactId>aopalliance</artifactId>
+      <version>1.0</version>
+      <licenses>
+        <license>
+          <name>Public Domain</name>
+        </license>
+      </licenses>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.xnio</groupId>
+      <artifactId>xnio-api</artifactId>
+      <version>3.3.6.Final</version>
+      <licenses>
+        <license>
+          <name>Public Domain</name>
+          <url>http://repository.jboss.org/licenses/cc0-1.0.txt</url>
+          <distribution>repo</distribution>
+        </license>
+      </licenses>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.xnio</groupId>
+      <artifactId>xnio-nio</artifactId>
+      <version>3.3.6.Final</version>
+      <licenses>
+        <license>
+          <name>Public Domain</name>
+          <url>http://repository.jboss.org/licenses/cc0-1.0.txt</url>
+          <distribution>repo</distribution>
+        </license>
+      </licenses>
+    </dependency>
+  </dependencies>
+</licenseSummary>

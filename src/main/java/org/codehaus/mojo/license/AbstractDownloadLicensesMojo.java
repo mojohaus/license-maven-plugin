@@ -26,6 +26,8 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -145,6 +147,9 @@ public abstract class AbstractDownloadLicensesMojo
      */
     @Parameter( property = "license.organizeLicensesByDependencies", defaultValue = "false" )
     protected boolean organizeLicensesByDependencies;
+
+    @Parameter( property = "license.sortByGroupIdAndArtifactId", defaultValue = "false" )
+    private boolean sortByGroupIdAndArtifactId;
 
     /**
      * A filter to exclude some GroupIds
@@ -300,12 +305,27 @@ public abstract class AbstractDownloadLicensesMojo
 
         try
         {
+            if (sortByGroupIdAndArtifactId) {
+                depProjectLicenses = sortByGroupIdAndArtifactId(depProjectLicenses);
+            }
             LicenseSummaryWriter.writeLicenseSummary( depProjectLicenses, licensesOutputFile );
         }
         catch ( Exception e )
         {
             throw new MojoExecutionException( "Unable to write license summary file: " + licensesOutputFile, e );
         }
+    }
+
+    private List<ProjectLicenseInfo> sortByGroupIdAndArtifactId(List<ProjectLicenseInfo> depProjectLicenses) {
+        List sorted = new ArrayList(depProjectLicenses);
+        Comparator<? super ProjectLicenseInfo> comparator = new Comparator<ProjectLicenseInfo>() {
+            public int compare(ProjectLicenseInfo info1, ProjectLicenseInfo info2) {
+                //ProjectLicenseInfo::getId() can not be used because . is before : thus a:b.c would be after a.b:c
+                return (info1.getGroupId() + "+" + info1.getArtifactId()).compareTo(info2.getGroupId() + "+" + info2.getArtifactId());
+            }
+        };
+        Collections.sort(sorted, comparator);
+        return sorted;
     }
 
     // ----------------------------------------------------------------------
