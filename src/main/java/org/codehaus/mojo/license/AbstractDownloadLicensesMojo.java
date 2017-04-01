@@ -130,6 +130,14 @@ public abstract class AbstractDownloadLicensesMojo
     private boolean includeTransitiveDependencies;
 
     /**
+     * Exclude transitive dependencies from excluded artifacts.
+     *
+     * @since 1.13
+     */
+    @Parameter( property = "license.excludeTransitiveDependencies", defaultValue = "false" )
+    private boolean excludeTransitiveDependencies;
+
+    /**
      * Get declared proxies from the {@code settings.xml} file.
      *
      * @since 1.4
@@ -318,6 +326,14 @@ public abstract class AbstractDownloadLicensesMojo
     public boolean isIncludeTransitiveDependencies()
     {
         return includeTransitiveDependencies;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isExcludeTransitiveDependencies()
+    {
+        return excludeTransitiveDependencies;
     }
 
     /**

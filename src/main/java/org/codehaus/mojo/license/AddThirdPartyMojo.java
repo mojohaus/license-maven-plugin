@@ -160,6 +160,14 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
     private boolean includeTransitiveDependencies;
 
     /**
+     * Exclude transitive dependencies from excluded Artifacts
+     *
+     * @since 1.13
+     */
+    @Parameter( property = "license.excludeTransitiveDependencies", defaultValue = "false" )
+    private boolean excludeTransitiveDependencies;
+
+    /**
      * To skip execution of this mojo.
      *
      * @since 1.5
@@ -389,6 +397,16 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
     {
         return includeTransitiveDependencies;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isExcludeTransitiveDependencies()
+    {
+        return excludeTransitiveDependencies;
+    }
+
+
 
     // ----------------------------------------------------------------------
     // Private Methods
