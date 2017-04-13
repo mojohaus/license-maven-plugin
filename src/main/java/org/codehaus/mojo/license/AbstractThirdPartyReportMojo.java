@@ -220,14 +220,6 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport i
     private ArtifactRepository localRepository;
 
     /**
-     * Remote repositories used for the project.
-     *
-     * @since 1.1
-     */
-    @Parameter( property = "project.remoteArtifactRepositories", required = true, readonly = true )
-    private List remoteRepositories;
-
-    /**
      * The Maven Project.
      *
      * @since 1.1
@@ -460,12 +452,12 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport i
 
         if ( loadArtifacts )
         {
-            dependenciesTool.loadProjectArtifacts( localRepository, remoteRepositories, project );
+            dependenciesTool.loadProjectArtifacts( localRepository, project.getRemoteArtifactRepositories(), project );
         }
 
         ThirdPartyHelper thirdPartyHelper =
                 new DefaultThirdPartyHelper( project, encoding, verbose, dependenciesTool, thirdPartyTool, localRepository,
-                                             remoteRepositories, getLog() );
+                                             project.getRemoteArtifactRepositories(), getLog() );
         // load dependencies of the project
         SortedMap<String, MavenProject> projectDependencies = thirdPartyHelper.loadDependencies( this );
 
