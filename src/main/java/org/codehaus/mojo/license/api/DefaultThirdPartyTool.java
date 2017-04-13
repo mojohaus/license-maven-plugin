@@ -28,6 +28,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.factory.DefaultArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
@@ -761,8 +762,11 @@ public class DefaultThirdPartyTool
 
             // we can afford to write an empty descriptor here as we don't expect it to turn up later in the remote
             // repository, because the parent was already released (and snapshots are updated automatically if changed)
-            result = new File( localRepository.getBasedir(), localRepository.pathOf( e.getArtifact() ) );
-
+            if (e.getArtifact()==null) {
+                result = File.createTempFile(e.getGroupId(), e.getArtifactId());
+            } else {
+                result = new File(localRepository.getBasedir(), localRepository.pathOf(e.getArtifact()));
+            }
             FileUtil.createNewFile( result );
         }
 
