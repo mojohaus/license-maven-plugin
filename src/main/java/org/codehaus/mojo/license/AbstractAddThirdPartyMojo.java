@@ -230,7 +230,12 @@ public abstract class AbstractAddThirdPartyMojo
     /**
      * Template used to build the third-party file.
      * <p>
-     * (This template use freemarker).
+     * (This template uses freemarker).
+     * <p>
+     * <b>Note:</b> This property can either point to a file or a resource on
+     * the classpath. In case it points to a file and this plugin is used within
+     * a sub-module as part of a multi-module build, you need to make this path
+     * resolvable, e.g. by prepending {@code basedir}.
      *
      * @since 1.1
      */
