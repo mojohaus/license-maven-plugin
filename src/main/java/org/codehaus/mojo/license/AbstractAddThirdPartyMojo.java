@@ -407,8 +407,6 @@ public abstract class AbstractAddThirdPartyMojo
             }
         }
 
-        overrideLicenses();
-
         getHelper().mergeLicenses( licenseMerges, licenseMap );
     }
 
