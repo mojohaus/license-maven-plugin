@@ -1,5 +1,14 @@
 package org.codehaus.mojo.license;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
+
 /*
  * #%L
  * License Maven Plugin
@@ -7,16 +16,16 @@ package org.codehaus.mojo.license;
  * Copyright (C) 2008 - 2011 CodeLutin, Codehaus, Tony Chemit
  * %%
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as 
- * published by the Free Software Foundation, either version 3 of the 
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Lesser Public License for more details.
- * 
- * You should have received a copy of the GNU General Lesser Public 
+ *
+ * You should have received a copy of the GNU General Lesser Public
  * License along with this program.  If not, see
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
@@ -43,15 +52,6 @@ import org.codehaus.mojo.license.utils.FileUtil;
 import org.codehaus.mojo.license.utils.MojoHelper;
 import org.codehaus.mojo.license.utils.SortedProperties;
 import org.codehaus.mojo.license.utils.StringToList;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.SortedSet;
 
 /**
  * Abstract mojo for all third-party mojos.
@@ -407,6 +407,8 @@ public abstract class AbstractAddThirdPartyMojo
             }
         }
 
+        overrideLicenses();
+
         getHelper().mergeLicenses( licenseMerges, licenseMap );
     }
 
@@ -685,6 +687,12 @@ public abstract class AbstractAddThirdPartyMojo
         return safe;
     }
 
+    protected void overrideLicenses() throws IOException
+    {
+            LicenseMap licenseMap1 = getLicenseMap();
+            thirdPartyTool.overrideLicenses( licenseMap1, projectDependencies, getEncoding(), overrideFile );
+    }
+
     protected void writeThirdPartyFile()
             throws IOException
     {
@@ -693,7 +701,7 @@ public abstract class AbstractAddThirdPartyMojo
         {
 
             LicenseMap licenseMap1 = getLicenseMap();
-            thirdPartyTool.overrideLicenses( licenseMap1, projectDependencies, getEncoding(), overrideFile );
+
             if ( sortArtifactByName )
             {
                 licenseMap1 = licenseMap.toLicenseMapOrderByName();
