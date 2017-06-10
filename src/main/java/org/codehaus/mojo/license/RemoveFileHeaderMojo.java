@@ -471,7 +471,7 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo
         }
 
         char lastchar = ' ';
-        while ( lastchar != '\n' )
+        while ( lastchar != '\n' && firstIndex > 0 )
         {
             lastchar = content.charAt( ( --firstIndex ) );
         }
