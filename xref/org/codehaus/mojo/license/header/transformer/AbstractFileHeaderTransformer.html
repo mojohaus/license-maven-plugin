@@ -397,7 +397,7 @@
 <a class="jxr_linenumber" name="L389" href="#L389">389</a>         {
 <a class="jxr_linenumber" name="L390" href="#L390">390</a>             buffer.append( getCommentStartTag() ).append( LINE_SEPARATOR );
 <a class="jxr_linenumber" name="L391" href="#L391">391</a>         }
-<a class="jxr_linenumber" name="L392" href="#L392">392</a>         <strong class="jxr_keyword">for</strong> ( String line : header.split( LINE_SEPARATOR + <span class="jxr_string">""</span> ) )
+<a class="jxr_linenumber" name="L392" href="#L392">392</a>         <strong class="jxr_keyword">for</strong> ( String line : header.split( <span class="jxr_string">"&#92;&#92;r?&#92;&#92;n"</span> ) )
 <a class="jxr_linenumber" name="L393" href="#L393">393</a>         {
 <a class="jxr_linenumber" name="L394" href="#L394">394</a>             buffer.append( getCommentLinePrefix() );
 <a class="jxr_linenumber" name="L395" href="#L395">395</a>             buffer.append( line );

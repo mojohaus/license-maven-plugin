@@ -479,7 +479,7 @@
 <a class="jxr_linenumber" name="L471" href="#L471">471</a>         }
 <a class="jxr_linenumber" name="L472" href="#L472">472</a> 
 <a class="jxr_linenumber" name="L473" href="#L473">473</a>         <strong class="jxr_keyword">char</strong> lastchar = ' ';
-<a class="jxr_linenumber" name="L474" href="#L474">474</a>         <strong class="jxr_keyword">while</strong> ( lastchar != '\n' )
+<a class="jxr_linenumber" name="L474" href="#L474">474</a>         <strong class="jxr_keyword">while</strong> ( lastchar != '\n' &amp;&amp; firstIndex &gt; 0 )
 <a class="jxr_linenumber" name="L475" href="#L475">475</a>         {
 <a class="jxr_linenumber" name="L476" href="#L476">476</a>             lastchar = content.charAt( ( --firstIndex ) );
 <a class="jxr_linenumber" name="L477" href="#L477">477</a>         }
