@@ -19,17 +19,17 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
-def assertNotExistsFile(file)
+def assertExistsFile(file)
 {
-    if ( file.exists() )
+    if ( !file.exists() )
     {
-        println(file.getAbsolutePath() + " file should not exist.")
+        println(file.getAbsolutePath() + " file should exist.")
         assert false
     }
     assert true
 }
 
 file = new File(basedir, 'target/generated-resources/licenses.xml');
-assertNotExistsFile(file);
+assertExistsFile(file);
 
 return true;
