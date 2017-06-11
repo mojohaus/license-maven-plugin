@@ -42,6 +42,11 @@ public interface MavenProjectDependenciesConfigurator
     boolean isIncludeTransitiveDependencies();
 
     /**
+     * @return {@code true} if should exclude transitive dependencies from excluded artifacts, else {@code false}.
+     */
+    boolean isExcludeTransitiveDependencies();
+
+    /**
      * @return list of scopes to include while loading dependencies, if {@code null} is setted, then include all scopes.
      */
     List<String> getIncludedScopes();

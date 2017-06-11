@@ -28,10 +28,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
-import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.artifact.resolver.*;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
@@ -43,10 +40,7 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
 
-import java.util.List;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -97,6 +91,7 @@ public class DefaultDependenciesTool
 
         boolean haveNoIncludedGroups = StringUtils.isEmpty( configuration.getIncludedGroups() );
         boolean haveNoIncludedArtifacts = StringUtils.isEmpty( configuration.getIncludedArtifacts() );
+        boolean excludeTransitiveDependencies = configuration.isExcludeTransitiveDependencies();
 
         boolean haveExcludedGroups = StringUtils.isNotEmpty( configuration.getExcludedGroups() );
         boolean haveExcludedArtifacts = StringUtils.isNotEmpty( configuration.getExcludedArtifacts() );
@@ -144,9 +139,17 @@ public class DefaultDependenciesTool
 
         SortedMap<String, MavenProject> result = new TreeMap<String, MavenProject>();
 
+        Map<String, Artifact> excludeArtifacts = new HashMap<String, Artifact>();
+        Map<String, Artifact> includeArtifacts = new HashMap<String, Artifact>();
+
+        SortedMap<String, MavenProject> localCache = new TreeMap<String, MavenProject>();
+        localCache.putAll(cache);
+
         for ( Object o : depArtifacts )
         {
             Artifact artifact = (Artifact) o;
+
+            excludeArtifacts.put(artifact.getId(), artifact);
 
             if ( DefaultThirdPartyTool.LICENSE_DB_TYPE.equals( artifact.getType() ) )
             {
@@ -200,12 +203,8 @@ public class DefaultDependenciesTool
 
             MavenProject depMavenProject = null;
 
-            if ( cache != null )
-            {
-
-                // try to get project from cache
-                depMavenProject = cache.get( id );
-            }
+            // try to get project from cache
+            depMavenProject = localCache.get( id );
 
             if ( depMavenProject != null )
             {
@@ -234,17 +233,42 @@ public class DefaultDependenciesTool
                 {
                     log.info( "add dependency [" + id + "]" );
                 }
-                if ( cache != null )
-                {
 
-                    // store it also in cache
-                    cache.put( id, depMavenProject );
-                }
+                // store it also in cache
+                localCache.put(id, depMavenProject);
             }
 
             // keep the project
-            result.put( id, depMavenProject );
+            result.put(id, depMavenProject);
+
+            excludeArtifacts.remove(artifact.getId());
+            includeArtifacts.put(artifact.getId(), artifact);
         }
+
+        // exclude artifacts from the result that contain excluded artifacts in the dependency trail
+        if (excludeTransitiveDependencies) {
+            for (Map.Entry<String, Artifact> entry : includeArtifacts.entrySet()) {
+                List<String> dependencyTrail = entry.getValue().getDependencyTrail();
+
+                boolean remove = false;
+
+                for (int i = 1; i < dependencyTrail.size() - 1; i++) {
+                    if (excludeArtifacts.containsKey(dependencyTrail.get(i))) {
+                        remove = true;
+                        break;
+                    }
+                }
+
+                if (remove) {
+                    result.remove(MojoHelper.getArtifactId(entry.getValue()));
+                }
+            }
+        }
+
+        if (cache != null) {
+            cache.putAll(result);
+        }
+
         return result;
     }
 

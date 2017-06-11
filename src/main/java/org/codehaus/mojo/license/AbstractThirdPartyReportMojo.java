@@ -130,6 +130,14 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport i
     private boolean includeTransitiveDependencies;
 
     /**
+     * A filter to exclude transitive dependencies from excluded artifacts.
+     *
+     * @since 1.13
+     */
+    @Parameter( property = "license.excludeTransitiveDependencies", defaultValue = "false" )
+    private boolean excludeTransitiveDependencies;
+
+    /**
      * A flag to use the missing licenses file to consolidate the THID-PARTY file.
      *
      * @since 1.1
@@ -431,6 +439,14 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport i
     public boolean isIncludeTransitiveDependencies()
     {
         return includeTransitiveDependencies;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isExcludeTransitiveDependencies()
+    {
+        return excludeTransitiveDependencies;
     }
 
     /**
