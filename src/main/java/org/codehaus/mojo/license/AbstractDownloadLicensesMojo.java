@@ -257,12 +257,6 @@ public abstract class AbstractDownloadLicensesMojo
         throws MojoExecutionException
     {
 
-        if ( offline )
-        {
-
-            getLog().warn( "Offline flag is on, download-licenses goal is skip." );
-            return;
-        }
         if ( isSkip() )
         {
             getLog().info( "skip flag is on, will skip goal." );
@@ -307,7 +301,10 @@ public abstract class AbstractDownloadLicensesMojo
             {
                 depProject = createDependencyProject( project );
             }
-            downloadLicenses( depProject );
+            if ( !offline )
+            {
+                downloadLicenses( depProject );
+            }
             depProjectLicenses.add( depProject );
         }
 
