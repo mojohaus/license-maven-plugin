@@ -22,13 +22,25 @@ package org.codehaus.mojo.license.api;
  * #L%
  */
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.*;
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
@@ -39,11 +51,6 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
-
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 /**
  * Default implementation of the {@link DependenciesTool}.
@@ -143,7 +150,10 @@ public class DefaultDependenciesTool
         Map<String, Artifact> includeArtifacts = new HashMap<String, Artifact>();
 
         SortedMap<String, MavenProject> localCache = new TreeMap<String, MavenProject>();
-        localCache.putAll(cache);
+        if (cache != null)
+        {
+            localCache.putAll(cache);
+        }
 
         for ( Object o : depArtifacts )
         {
@@ -201,7 +211,7 @@ public class DefaultDependenciesTool
                 continue;
             }
 
-            MavenProject depMavenProject = null;
+            MavenProject depMavenProject;
 
             // try to get project from cache
             depMavenProject = localCache.get( id );
