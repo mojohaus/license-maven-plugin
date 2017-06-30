@@ -54,7 +54,7 @@ import org.codehaus.mojo.license.utils.SortedProperties;
  * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
-@Mojo( name = "aggregate-add-third-party", aggregator = true, defaultPhase = LifecyclePhase.GENERATE_RESOURCES )
+@Mojo( name = "aggregate-add-third-party", aggregator = true, defaultPhase = LifecyclePhase.GENERATE_RESOURCES, threadSafe = true )
 @Execute( goal = "add-third-party" )
 public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo
 {
