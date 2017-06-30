@@ -388,7 +388,7 @@ public class DefaultThirdPartyTool
 
             if ( StringUtils.isEmpty( license.getName() ) )
             {
-                getLogger().warn( "No license name defined for " + id );
+                getLogger().warn( "The license for " + id + " has no name (but exist)" );
                 licenseKey = license.getUrl();
             }
 
