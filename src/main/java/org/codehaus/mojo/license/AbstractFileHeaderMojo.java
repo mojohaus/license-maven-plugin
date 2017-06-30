@@ -821,7 +821,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
 
         try
         {
-            processor.process( content, processFile );
+            processor.process( content, processFile, getEncoding() );
         }
         catch ( IllegalStateException e )
         {

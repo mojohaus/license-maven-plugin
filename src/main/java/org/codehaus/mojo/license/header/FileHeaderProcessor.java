@@ -22,13 +22,16 @@ package org.codehaus.mojo.license.header;
  * #L%
  */
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.Writer;
 import org.codehaus.mojo.license.header.transformer.FileHeaderTransformer;
 import org.nuiton.processor.Processor;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.StringReader;
 
 /**
  * File header processor.
@@ -98,15 +101,15 @@ public class FileHeaderProcessor extends Processor
         return filter.isDetectHeader();
     }
 
-    public synchronized void process( String inputContent, File outputFile ) throws IOException
+    public synchronized void process( String inputContent, File outputFile, String encoding ) throws IOException
     {
 
         filter.reset();
 
-        StringReader input = new StringReader( inputContent );
+        Reader input = new InputStreamReader(new ByteArrayInputStream(inputContent.getBytes()), encoding);
         try
         {
-            FileWriter output = new FileWriter( outputFile );
+            Writer output = new OutputStreamWriter(new FileOutputStream(outputFile), encoding);
             try
             {
                 process( input, output );
