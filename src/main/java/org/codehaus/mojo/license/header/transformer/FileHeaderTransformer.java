@@ -140,6 +140,13 @@ public interface FileHeaderTransformer
     boolean isEmptyLineAfterHeader();
 
     /**
+     * Get flag if header line should be right trimmed when written.
+     *
+     * @return if header line should be right trimmed when written
+     */
+    boolean isTrimHeaderLine();
+
+    /**
      * Adds the header.
      *
      * @param header  header to add
@@ -301,4 +308,11 @@ public interface FileHeaderTransformer
      * @param emptyLine flag if there should be an empty line after the header
      */
     void setEmptyLineAfterHeader( boolean emptyLine );
+
+    /**
+     * Set flag if header line should be right trimmed when written.
+     *
+     * @param trimLine flag if header line should be right trimmed when written
+     */
+    void setTrimHeaderLine( boolean trimLine );
 }

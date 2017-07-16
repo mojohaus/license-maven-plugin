@@ -99,6 +99,11 @@ public abstract class AbstractFileHeaderTransformer
      */
     private boolean emptyLineAfterHeader;
 
+    /**
+     * Flag if line should be trimmed when boxed
+     */
+    private boolean trimHeaderLine;
+
     protected AbstractFileHeaderTransformer( String name, String description, String commentStartTag,
                                              String commentEndTag, String commentLinePrefix )
     {
@@ -283,9 +288,25 @@ public abstract class AbstractFileHeaderTransformer
     /**
      * {@inheritDoc}
      */
-    public void setEmptyLineAfterHeader( boolean emptyLine )
+    public void setEmptyLineAfterHeader( boolean trimLine )
     {
-        this.emptyLineAfterHeader = emptyLine;
+        this.emptyLineAfterHeader = trimLine;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isTrimHeaderLine()
+    {
+        return trimHeaderLine;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setTrimHeaderLine( boolean trimLine )
+    {
+        this.emptyLineAfterHeader = trimLine;
     }
 
     /**
@@ -391,8 +412,17 @@ public abstract class AbstractFileHeaderTransformer
         }
         for ( String line : header.split( "\\r?\\n" ) )
         {
-            buffer.append( getCommentLinePrefix() );
-            buffer.append( line );
+            if ( trimHeaderLine )
+            {
+              StringBuilder lineBuffer = new StringBuilder();
+              lineBuffer.append( getCommentLinePrefix() );
+              lineBuffer.append( line );
+              buffer.append(StringUtils.stripEnd(lineBuffer.toString(), null));
+            }
+            else {
+               buffer.append( getCommentLinePrefix() );
+               buffer.append( line );
+            }
             buffer.append( LINE_SEPARATOR );
         }
         if ( withTags )
