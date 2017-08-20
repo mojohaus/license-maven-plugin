@@ -37,6 +37,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -204,9 +205,27 @@ public abstract class AbstractAddThirdPartyMojo
      * A flag to fail the build if at least one dependency was detected without a license.
      *
      * @since 1.0
+     * @deprecated since 1.14, use now {@link #failOnMissing} or {@link #failOnBlacklist}.
      */
+    @Deprecated
     @Parameter( property = "license.failIfWarning", defaultValue = "false" )
     private boolean failIfWarning;
+
+    /**
+     * A flag to fail the build if at least one dependency was detected without a license.
+     *
+     * @since 1.14
+     */
+    @Parameter( property = "license.failOnMissing", defaultValue = "false" )
+    private boolean failOnMissing;
+
+    /**
+     * A flag to fail the build if at least one dependency was blacklisted.
+     *
+     * @since 1.14
+     */
+    @Parameter( property = "license.failOnBlacklist", defaultValue = "false" )
+    private boolean failOnBlacklist;
 
     /**
      * A flag to sort artifact by name in the generated third-party file.
@@ -704,6 +723,30 @@ public abstract class AbstractAddThirdPartyMojo
         {
 
             thirdPartyTool.writeBundleThirdPartyFile( thirdPartyFile, getOutputDirectory(), bundleThirdPartyPath );
+        }
+    }
+
+    boolean isFailOnMissing() {
+        return failOnMissing;
+    }
+
+    boolean isFailOnBlacklist() {
+        return failOnBlacklist;
+    }
+
+    void checkMissing(boolean unsafe) throws MojoFailureException {
+
+        if ( unsafe && (isFailOnMissing() || isFailIfWarning()) )
+        {
+            throw new MojoFailureException(
+                    "There are some dependencies with no license, please fill the file " + getMissingFile() );
+        }
+    }
+
+    void checkBlacklist(boolean safeLicense ) throws MojoFailureException {
+        if ( !safeLicense && (isFailOnBlacklist() || isFailIfWarning()) )
+        {
+            throw new MojoFailureException( "There are some forbidden licenses used, please check your dependencies." );
         }
     }
 

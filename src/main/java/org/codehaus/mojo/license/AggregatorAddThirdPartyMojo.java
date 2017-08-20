@@ -192,16 +192,11 @@ public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo
 
         boolean safeLicense = checkForbiddenLicenses();
 
-        if ( !safeLicense && isFailIfWarning() )
-        {
-            throw new MojoFailureException( "There are some forbidden licenses used, please check your dependencies." );
-        }
+        checkBlacklist(safeLicense);
+
         writeThirdPartyFile();
 
-        if ( unsafe && isFailIfWarning() )
-        {
-            throw new MojoFailureException( "There are some dependencies with no license, please review the modules." );
-        }
+        checkMissing(unsafe);
     }
 
     // ----------------------------------------------------------------------

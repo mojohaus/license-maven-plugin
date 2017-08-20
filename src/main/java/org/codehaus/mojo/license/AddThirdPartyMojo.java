@@ -251,10 +251,8 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
 
         boolean safeLicense = checkForbiddenLicenses();
 
-        if ( !safeLicense && isFailIfWarning() )
-        {
-            throw new MojoFailureException( "There are some forbidden licenses used, please check your dependencies." );
-        }
+        checkBlacklist(safeLicense);
+
         writeThirdPartyFile();
 
         if ( doGenerateMissing )
@@ -263,11 +261,7 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
             writeMissingFile();
         }
 
-        if ( unsafe && isFailIfWarning() )
-        {
-            throw new MojoFailureException(
-                    "There are some dependencies with no license, please fill the file " + getMissingFile() );
-        }
+        checkMissing(unsafe);
 
         if ( !unsafe && isUseMissingFile() && MapUtils.isEmpty( getUnsafeMappings() ) && getMissingFile().exists() )
         {
