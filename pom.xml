@@ -421,7 +421,7 @@
       <id>run-its</id>
       <activation>
         <property>
-          <name>maven.test.skip</name>
+          <name>skipITs</name>
           <value>!true</value>
         </property>
       </activation>
