@@ -70,6 +70,15 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
     // ----------------------------------------------------------------------
 
     /**
+     * Directory where to generate files.
+     *
+     * @since 1.0
+     */
+    @Parameter( property = "license.outputDirectory",
+            defaultValue = "${project.build.directory}/generated-sources/license", required = true )
+    private File outputDirectory;
+
+    /**
      * Attach the 'missing' file as an additional artifact so that it is deployed in the deploy phase.
      *
      * @since 1.0
@@ -284,6 +293,10 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
     // ----------------------------------------------------------------------
     // AbstractAddThirdPartyMojo Implementation
     // ----------------------------------------------------------------------
+
+    public File getOutputDirectory() {
+        return outputDirectory;
+    }
 
     /**
      * {@inheritDoc}

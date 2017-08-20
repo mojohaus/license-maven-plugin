@@ -94,6 +94,15 @@ public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo
     @Parameter( property = "license.aggregateMissingLicensesFile", defaultValue = "${project.basedir}/THIRD-PARTY.properties" )
     private File aggregateMissingLicensesFile;
 
+    /**
+     * Directory where to generate aggregated files.
+     *
+     * @since 1.0
+     */
+    @Parameter( property = "license.aggregateOutputDirectory",
+            defaultValue = "${project.build.directory}/generated-sources/license", required = true )
+    private File aggregateOutputDirectory;
+
     // ----------------------------------------------------------------------
     // AbstractLicenseMojo Implementaton
     // ----------------------------------------------------------------------
@@ -252,4 +261,8 @@ public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo
         return unsafeMappings;
     }
 
+    @Override
+    public File getOutputDirectory() {
+        return aggregateOutputDirectory;
+    }
 }

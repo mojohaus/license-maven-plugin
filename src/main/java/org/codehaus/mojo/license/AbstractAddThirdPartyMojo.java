@@ -68,15 +68,6 @@ public abstract class AbstractAddThirdPartyMojo
     // ----------------------------------------------------------------------
 
     /**
-     * Directory where to generate files.
-     *
-     * @since 1.0
-     */
-    @Parameter( property = "license.outputDirectory",
-            defaultValue = "${project.build.directory}/generated-sources/license", required = true )
-    private File outputDirectory;
-
-    /**
      * File where to write the third-party file.
      *
      * @since 1.0
@@ -419,10 +410,7 @@ public abstract class AbstractAddThirdPartyMojo
     // Public Methods
     // ----------------------------------------------------------------------
 
-    public File getOutputDirectory()
-    {
-        return outputDirectory;
-    }
+    public abstract File getOutputDirectory();
 
     public boolean isFailIfWarning()
     {
@@ -715,7 +703,7 @@ public abstract class AbstractAddThirdPartyMojo
         if ( doGenerateBundle )
         {
 
-            thirdPartyTool.writeBundleThirdPartyFile( thirdPartyFile, outputDirectory, bundleThirdPartyPath );
+            thirdPartyTool.writeBundleThirdPartyFile( thirdPartyFile, getOutputDirectory(), bundleThirdPartyPath );
         }
     }
 
