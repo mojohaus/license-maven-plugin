@@ -58,7 +58,7 @@ public abstract class AbstractLicenseMojo
      * @since 1.0
      */
     @Parameter( property = "license.verbose", defaultValue = "${maven.verbose}" )
-    private boolean verbose;
+    boolean verbose;
 
     /**
      * Encoding used to read and writes files.
@@ -69,7 +69,7 @@ public abstract class AbstractLicenseMojo
      * @since 1.0
      */
     @Parameter( property = "license.encoding", defaultValue = "${project.build.sourceEncoding}" )
-    private String encoding;
+    String encoding;
 
     /**
      * Current maven session. (used to launch certain mojo once by build).
@@ -77,7 +77,7 @@ public abstract class AbstractLicenseMojo
      * @since 1.0
      */
     @Parameter( defaultValue = "${session}", readonly = true )
-    private MavenSession session;
+    MavenSession session;
 
     /**
      * The reacted project.
@@ -85,7 +85,7 @@ public abstract class AbstractLicenseMojo
      * @since 1.0
      */
     @Parameter( defaultValue = "${project}", readonly = true )
-    private MavenProject project;
+    MavenProject project;
 
     // ----------------------------------------------------------------------
     // Abstract methods

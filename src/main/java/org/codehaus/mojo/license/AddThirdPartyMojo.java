@@ -4,10 +4,28 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.SortedSet;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.model.Dependency;
+import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.ProjectBuildingException;
+import org.codehaus.mojo.license.api.MavenProjectDependenciesConfigurator;
+import org.codehaus.mojo.license.api.ThirdPartyToolException;
+import org.codehaus.mojo.license.model.LicenseMap;
+import org.codehaus.mojo.license.utils.FileUtil;
+import org.codehaus.mojo.license.utils.MojoHelper;
+import org.codehaus.mojo.license.utils.SortedProperties;
 
 /*
  * #%L
@@ -31,23 +49,6 @@ import java.util.SortedSet;
  * #L%
  */
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.MapUtils;
-import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugin.logging.Log;
-import org.apache.maven.plugins.annotations.LifecyclePhase;
-import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.plugins.annotations.ResolutionScope;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.ProjectBuildingException;
-import org.codehaus.mojo.license.api.MavenProjectDependenciesConfigurator;
-import org.codehaus.mojo.license.api.ThirdPartyToolException;
-import org.codehaus.mojo.license.model.LicenseMap;
-import org.codehaus.mojo.license.utils.FileUtil;
-import org.codehaus.mojo.license.utils.MojoHelper;
-import org.codehaus.mojo.license.utils.SortedProperties;
-
 /**
  * Goal to generate the third-party license file.
  * <p>
@@ -68,113 +69,6 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
     // ----------------------------------------------------------------------
     // Mojo Parameters
     // ----------------------------------------------------------------------
-
-    /**
-     * Directory where to generate files.
-     *
-     * @since 1.0
-     */
-    @Parameter( property = "license.outputDirectory",
-            defaultValue = "${project.build.directory}/generated-sources/license", required = true )
-    private File outputDirectory;
-
-    /**
-     * Attach the 'missing' file as an additional artifact so that it is deployed in the deploy phase.
-     *
-     * @since 1.0
-     */
-    @Parameter( property = "license.deployMissingFile", defaultValue = "true" )
-    private boolean deployMissingFile;
-
-    /**
-     * Load files supplying information for missing third party licenses from repositories.
-     * The plugin looks for Maven artifacts with coordinates of the form G:A:V:properties:third-party, where
-     * the group, artifact, and version are those for dependencies of your project,
-     * while the type is 'properties' and the classifier is 'third-party'.
-     *
-     * @since 1.0
-     */
-    @Parameter( property = "license.useRepositoryMissingFiles", defaultValue = "true" )
-    private boolean useRepositoryMissingFiles;
-
-    /**
-     * To execute or not this mojo if project packaging is pom.
-     * <p>
-     * <strong>Note:</strong> The default value is {@code false}.
-     *
-     * @since 1.1
-     */
-    @Parameter( property = "license.acceptPomPackaging", defaultValue = "false" )
-    private boolean acceptPomPackaging;
-
-    /**
-     * A filter to exclude some scopes.
-     *
-     * @since 1.1
-     */
-    @Parameter( property = "license.excludedScopes", defaultValue = "system" )
-    private String excludedScopes;
-
-    /**
-     * A filter to include only some scopes, if let empty then all scopes will be used (no filter).
-     *
-     * @since 1.1
-     */
-    @Parameter( property = "license.includedScopes", defaultValue = "" )
-    private String includedScopes;
-
-    /**
-     * A filter to exclude some GroupIds
-     * This is a regular expression that is applied to groupIds (not an ant pattern).
-     *
-     * @since 1.1
-     */
-    @Parameter( property = "license.excludedGroups", defaultValue = "" )
-    private String excludedGroups;
-
-    /**
-     * A filter to include only some GroupIds
-     * This is a regular expression applied to artifactIds.
-     *
-     * @since 1.1
-     */
-    @Parameter( property = "license.includedGroups", defaultValue = "" )
-    private String includedGroups;
-
-    /**
-     * A filter to exclude some ArtifactsIds
-     * This is a regular expression applied to artifactIds.
-     *
-     * @since 1.1
-     */
-    @Parameter( property = "license.excludedArtifacts", defaultValue = "" )
-    private String excludedArtifacts;
-
-    /**
-     * A filter to include only some ArtifactsIds
-     * This is a regular expression applied to artifactIds.
-     *
-     * @since 1.1
-     */
-    @Parameter( property = "license.includedArtifacts", defaultValue = "" )
-    private String includedArtifacts;
-
-    /**
-     * Include transitive dependencies when checking for missing licenses and downloading license files.
-     * If this is <tt>false</tt>, then only direct dependencies are examined.
-     *
-     * @since 1.1
-     */
-    @Parameter( property = "license.includeTransitiveDependencies", defaultValue = "true" )
-    private boolean includeTransitiveDependencies;
-
-    /**
-     * Exclude transitive dependencies from excluded Artifacts
-     *
-     * @since 1.13
-     */
-    @Parameter( property = "license.excludeTransitiveDependencies", defaultValue = "false" )
-    private boolean excludeTransitiveDependencies;
 
     /**
      * To skip execution of this mojo.
@@ -287,10 +181,6 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
     // ----------------------------------------------------------------------
     // AbstractAddThirdPartyMojo Implementation
     // ----------------------------------------------------------------------
-
-    public File getOutputDirectory() {
-        return outputDirectory;
-    }
 
     /**
      * {@inheritDoc}
@@ -508,5 +398,49 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
         {
             writer.close();
         }
+    }
+
+    void initFromMojo(AggregatorAddThirdPartyMojo mojo, MavenProject mavenProject, Map<String, List<Dependency>> reactorProjects) throws Exception {
+        project = mavenProject;
+        deployMissingFile = mojo.deployMissingFile;
+        useRepositoryMissingFiles = mojo.useRepositoryMissingFiles;
+        acceptPomPackaging = mojo.acceptPomPackaging;
+        excludedScopes = mojo.excludedScopes;
+        includedScopes = mojo.includedScopes;
+        excludedGroups = mojo.excludedGroups;
+        includedGroups = mojo.includedGroups;
+        excludedArtifacts = mojo.excludedArtifacts;
+        includedArtifacts = mojo.includedArtifacts;
+        includeTransitiveDependencies = mojo.includeTransitiveDependencies;
+        excludeTransitiveDependencies = mojo.excludeTransitiveDependencies;
+        thirdPartyFilename = mojo.thirdPartyFilename;
+        useMissingFile = mojo.useMissingFile;
+        missingFile = mojo.missingFile;
+        missingLicensesFileArtifact = mojo.missingLicensesFileArtifact;
+        overrideFile = mojo.overrideFile;
+        localRepository = mojo.localRepository;
+        remoteRepositories = mojo.remoteRepositories;
+        dependencies = new HashSet<Artifact>(mavenProject.getDependencies());
+        licenseMerges = mojo.licenseMerges;
+        includedLicenses = mojo.includedLicenses;
+        excludedLicenses = mojo.excludedLicenses;
+        bundleThirdPartyPath = mojo.bundleThirdPartyPath;
+        generateBundle = mojo.generateBundle;
+        force = mojo.force;
+        failIfWarning = mojo.failIfWarning;
+        failOnMissing = mojo.failOnMissing;
+        failOnBlacklist = mojo.failOnBlacklist;
+        sortArtifactByName = mojo.sortArtifactByName;
+        fileTemplate = mojo.fileTemplate;
+        session = mojo.session;
+        verbose = mojo.verbose;
+        encoding = mojo.encoding;
+
+        setLog(mojo.getLog());
+
+        dependenciesTool.loadProjectArtifacts( localRepository, project.getRemoteArtifactRepositories(), mavenProject ,reactorProjects);
+
+        init();
+
     }
 }

@@ -468,7 +468,7 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport i
 
         if ( loadArtifacts )
         {
-            dependenciesTool.loadProjectArtifacts( localRepository, project.getRemoteArtifactRepositories(), project );
+            dependenciesTool.loadProjectArtifacts( localRepository, project.getRemoteArtifactRepositories(), project , null);
         }
 
         ThirdPartyHelper thirdPartyHelper =

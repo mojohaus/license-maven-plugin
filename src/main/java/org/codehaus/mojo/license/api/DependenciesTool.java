@@ -22,7 +22,9 @@ package org.codehaus.mojo.license.api;
  * #L%
  */
 
+import java.util.Map;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
 
 import java.util.List;
@@ -60,11 +62,12 @@ public interface DependenciesTool
     /**
      * Load project artifacts.
      *
-     * @param project            the project to scann
      * @param localRepository    local repository used to resolv dependencies
      * @param remoteRepositories remote repositories used to resolv dependencies
+     * @param project            the project to scann
+     * @param reactorProjectDependencies optional reactor projects dependencies indexed by their gav to resolve artifacts without fork mode (means artifacts may not exist)
      * @throws DependenciesToolException if could not load project dependencies
      */
-    void loadProjectArtifacts( ArtifactRepository localRepository, List remoteRepositories, MavenProject project )
+    void loadProjectArtifacts(ArtifactRepository localRepository, List remoteRepositories, MavenProject project , Map<String, List<Dependency>> reactorProjectDependencies )
         throws DependenciesToolException;
 }

@@ -22,7 +22,11 @@ package org.codehaus.mojo.license.api;
  * #L%
  */
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -41,6 +45,7 @@ import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
@@ -286,7 +291,7 @@ public class DefaultDependenciesTool
      * {@inheritDoc}
      */
     public void loadProjectArtifacts( ArtifactRepository localRepository, List remoteRepositories,
-                                      MavenProject project )
+                                      MavenProject project , Map<String,List<Dependency>> reactorProjectDependencies )
         throws DependenciesToolException
 
     {
@@ -297,9 +302,21 @@ public class DefaultDependenciesTool
             Set dependenciesArtifacts;
             try
             {
+                List<Dependency> dependencies = new ArrayList<Dependency>(project.getDependencies());
+                if (reactorProjectDependencies!=null) {
+
+                    for (Dependency dependency : new ArrayList<Dependency>(dependencies)) {
+                        String id = String.format("%s:%s", dependency.getGroupId(), dependency.getArtifactId());
+                        List<Dependency> projectDependencies = reactorProjectDependencies.get(id);
+                        if (projectDependencies!=null) {
+                            dependencies.remove(dependency);
+                            dependencies.addAll(projectDependencies);
+                        }
+                    }
+                }
                 dependenciesArtifacts =
-                    MavenMetadataSource.createArtifacts( artifactFactory, project.getDependencies(), null, null,
-                                                         project );
+                    MavenMetadataSource.createArtifacts(artifactFactory, dependencies, null, null,
+                                                        project );
             }
             catch ( InvalidDependencyVersionException e )
             {
