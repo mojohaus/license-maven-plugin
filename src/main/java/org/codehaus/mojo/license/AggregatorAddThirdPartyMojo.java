@@ -8,7 +8,11 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -93,7 +97,7 @@ public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo
      * @deprecated since 1.14, please use now {@link #missingFile}.
      */
     @Deprecated
-    @Parameter( property = "license.aggregateMissingLicensesFile", defaultValue = "${project.basedir}/THIRD-PARTY.properties" )
+    @Parameter( property = "license.aggregateMissingLicensesFile", defaultValue = "${project.basedir}/src/license/THIRD-PARTY.properties" )
     private File aggregateMissingLicensesFile;
 
     // ----------------------------------------------------------------------
@@ -136,14 +140,14 @@ public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo
     @Override
     protected void init() throws Exception {
 
-        if (aggregateMissingLicensesFile!=null) {
+        if (aggregateMissingLicensesFile!=null&& !aggregateMissingLicensesFile.equals(missingFile)) {
             getLog().warn("");
             getLog().warn("You should use *missingFile* parameter instead of deprecated *aggregateMissingLicensesFile*.");
             getLog().warn("");
             missingFile = aggregateMissingLicensesFile;
         }
 
-        if (aggregateMissingLicensesFileArtifact!=null) {
+        if (aggregateMissingLicensesFileArtifact!=null && !aggregateMissingLicensesFileArtifact.equals(missingLicensesFileArtifact)) {
             getLog().warn("");
             getLog().warn("You should use *missingLicensesFileArtifact* parameter instead of deprecated *aggregateMissingLicensesFileArtifact*.");
             getLog().warn("");
@@ -169,28 +173,42 @@ public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo
 
         licenseMap = new LicenseMap();
 
+        Artifact pluginArtifact = (Artifact) project.getPluginArtifactMap().get("org.codehaus.mojo:license-maven-plugin");
+
+        String groupId=null;
+        String artifactId=null;
+        String version=null;
+        if (pluginArtifact==null) {
+            Plugin plugin = (Plugin) project.getPluginManagement().getPluginsAsMap().get("org.codehaus.mojo:license-maven-plugin");
+            if (plugin!=null) {
+                groupId = plugin.getGroupId();
+                artifactId = plugin.getArtifactId();
+                version = plugin.getVersion();
+            }
+        } else {
+            groupId = pluginArtifact.getGroupId();
+            artifactId = pluginArtifact.getArtifactId();
+            version = pluginArtifact.getVersion();
+        }
+        if (groupId==null) {
+            throw new IllegalStateException("Can't find license-maven-plugin");
+        }
+
+        String addThirdPartyRoleHint = groupId + ":" + artifactId + ":" + version + ":" + "add-third-party";
         Map<String, List<Dependency>> reactorProjectDependencies = new TreeMap<String, List<Dependency>>();
         for (MavenProject reactorProject : this.reactorProjects) {
             reactorProjectDependencies.put(String.format("%s:%s", reactorProject.getGroupId(), reactorProject.getArtifactId()), reactorProject.getDependencies());
         }
+
         for (Object reactorProject : reactorProjects) {
             if (getProject().equals(reactorProject)) {
                 // do not process pom
                 continue;
             }
 
-            List list = getSession().lookupList(AddThirdPartyMojo.ROLE);
 
-            AddThirdPartyMojo mojo = null;
-            for (Object o : list) {
-                if (o instanceof AddThirdPartyMojo) {
-                    mojo = (AddThirdPartyMojo) o;
-                    break;
-                }
-            }
-            if (mojo == null) {
-                throw new IllegalStateException("Can't find add-third-party mojo...");
-            }
+            AddThirdPartyMojo mojo = (AddThirdPartyMojo) getSession().lookup(AddThirdPartyMojo.ROLE, addThirdPartyRoleHint);
+
             mojo.initFromMojo(this, (MavenProject) reactorProject, reactorProjectDependencies);
 
             LicenseMap childLicenseMap = mojo.getLicenseMap();
@@ -198,39 +216,19 @@ public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo
                 getLog().info(String.format("Found %d license(s) in module %s:%s", childLicenseMap.size(), mojo.project.getGroupId(), mojo.project.getArtifactId()));
             }
             licenseMap.putAll(childLicenseMap);
+
         }
 
         getLog().info( licenseMap.size() + " detected license(s)." );
         if ( isVerbose() )
         {
-            for ( String id : licenseMap.keySet() )
+            for ( Map.Entry<String, SortedSet<MavenProject>> entry: licenseMap.entrySet() )
             {
-                getLog().info( " - " + id );
+                getLog().info( " - " + entry.getKey()+" for "+entry.getValue().size()+" artifact(s).");
             }
         }
 
-//        if ( checkUnsafeDependencies() )
-//        {
-//            resolveUnsafeDependenciesFromFile( missingFile );
-//        }
-
-//        if ( !StringUtils.isBlank( aggregateMissingLicensesFileArtifact ) && checkUnsafeDependencies() )
-//        {
-//            String[] tokens = StringUtils.split( aggregateMissingLicensesFileArtifact, ":" );
-//            if ( tokens.length != 3 )
-//            {
-//                throw new MojoFailureException(
-//                        "Invalid missing licenses artifact, you must specify groupId:artifactId:version "
-//                                + aggregateMissingLicensesFileArtifact );
-//            }
-//            String groupId = tokens[0];
-//            String artifactId = tokens[1];
-//            String version = tokens[2];
-//
-//            resolveUnsafeDependenciesFromArtifact( groupId, artifactId, version );
-//        }
-
-        overrideLicenses();
+        consolidate();
 
         boolean unsafe = checkUnsafeDependencies();
 
@@ -289,8 +287,8 @@ public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo
                 unsafeMappings.putAll( tmp );
             }
 
-            SortedSet<MavenProject> unsafes = getHelper().getProjectsWithNoLicense( licenseMap );
-            if ( CollectionUtils.isEmpty( unsafes ) )
+            SortedSet<MavenProject> unsafe = getHelper().getProjectsWithNoLicense( licenseMap );
+            if ( CollectionUtils.isEmpty( unsafe ) )
             {
 
                 // no more unsafe dependencies, can break

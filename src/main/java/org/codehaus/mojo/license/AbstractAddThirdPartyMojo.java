@@ -423,11 +423,11 @@ public abstract class AbstractAddThirdPartyMojo
 
     LicenseMap licenseMap;
 
-    private SortedSet<MavenProject> unsafeDependencies;
+    SortedSet<MavenProject> unsafeDependencies;
 
     private File thirdPartyFile;
 
-    private SortedProperties unsafeMappings;
+    SortedProperties unsafeMappings;
 
     /**
      * Flag computed in the {@link #init()} method to know if there is something has to be generated.
@@ -526,6 +526,10 @@ public abstract class AbstractAddThirdPartyMojo
 
         licenseMap = getHelper().createLicenseMap( projectDependencies );
 
+    }
+
+    void consolidate() throws IOException, ArtifactNotFoundException, ArtifactResolutionException, MojoFailureException, ProjectBuildingException, ThirdPartyToolException {
+
         unsafeDependencies = getHelper().getProjectsWithNoLicense( licenseMap );
 
         if ( !CollectionUtils.isEmpty( unsafeDependencies ) )
@@ -559,6 +563,8 @@ public abstract class AbstractAddThirdPartyMojo
 
             resolveUnsafeDependenciesFromArtifact( groupId, artifactId, version );
         }
+
+        overrideLicenses();
     }
 
     // ----------------------------------------------------------------------
@@ -835,12 +841,6 @@ public abstract class AbstractAddThirdPartyMojo
         return safe;
     }
 
-    void overrideLicenses() throws IOException
-    {
-            LicenseMap licenseMap1 = getLicenseMap();
-            thirdPartyTool.overrideLicenses( licenseMap1, projectDependencies, getEncoding(), overrideFile );
-    }
-
     void writeThirdPartyFile()
             throws IOException
     {
@@ -862,6 +862,12 @@ public abstract class AbstractAddThirdPartyMojo
 
             thirdPartyTool.writeBundleThirdPartyFile( thirdPartyFile, getOutputDirectory(), bundleThirdPartyPath );
         }
+    }
+
+    void overrideLicenses() throws IOException
+    {
+        LicenseMap licenseMap1 = getLicenseMap();
+        thirdPartyTool.overrideLicenses( licenseMap1, projectDependencies, getEncoding(), overrideFile );
     }
 
     private boolean isFailOnMissing() {

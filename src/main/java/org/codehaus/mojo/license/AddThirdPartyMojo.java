@@ -139,7 +139,8 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
     protected void doAction()
             throws Exception
     {
-        overrideLicenses();
+
+        consolidate();
 
         boolean unsafe = checkUnsafeDependencies();
 
@@ -415,9 +416,11 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
         excludeTransitiveDependencies = mojo.excludeTransitiveDependencies;
         thirdPartyFilename = mojo.thirdPartyFilename;
         useMissingFile = mojo.useMissingFile;
-        missingFile = mojo.missingFile;
+        String absolutePath = mojo.getProject().getBasedir().getAbsolutePath();
+
+        missingFile = new File(project.getBasedir(),mojo.missingFile.getAbsolutePath().substring(absolutePath.length()));
+        overrideFile  = new File(project.getBasedir(),mojo.overrideFile.getAbsolutePath().substring(absolutePath.length()));
         missingLicensesFileArtifact = mojo.missingLicensesFileArtifact;
-        overrideFile = mojo.overrideFile;
         localRepository = mojo.localRepository;
         remoteRepositories = mojo.remoteRepositories;
         dependencies = new HashSet<Artifact>(mavenProject.getDependencies());
@@ -438,9 +441,10 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
 
         setLog(mojo.getLog());
 
-        dependenciesTool.loadProjectArtifacts( localRepository, project.getRemoteArtifactRepositories(), mavenProject ,reactorProjects);
+        dependenciesTool.loadProjectArtifacts( localRepository, project.getRemoteArtifactRepositories(), project ,reactorProjects);
 
         init();
 
+        consolidate();
     }
 }

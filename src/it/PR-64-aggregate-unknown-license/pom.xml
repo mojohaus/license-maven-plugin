@@ -31,6 +31,9 @@
               <goal>aggregate-add-third-party</goal>
             </goals>
             <phase>process-resources</phase>
+            <configuration>
+              <useMissingFile>true</useMissingFile>
+            </configuration>
           </execution>
         </executions>
       </plugin>

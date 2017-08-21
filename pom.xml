@@ -28,7 +28,7 @@
   <parent>
     <groupId>org.codehaus.mojo</groupId>
     <artifactId>mojo-parent</artifactId>
-    <version>39</version>
+    <version>40</version>
   </parent>
 
   <artifactId>license-maven-plugin</artifactId>
@@ -123,7 +123,7 @@
     <license.licenseName>lgpl_v3</license.licenseName>
     <licensePluginVersion>1.5</licensePluginVersion>
 
-    <pluginPluginVersion>3.2</pluginPluginVersion>
+    <pluginPluginVersion>3.5</pluginPluginVersion>
     <plexusComponentVersion>1.6</plexusComponentVersion>
   </properties>
 
@@ -170,12 +170,12 @@
     <dependency>
       <groupId>org.apache.maven.reporting</groupId>
       <artifactId>maven-reporting-api</artifactId>
-      <version>${mavenVersion}</version>
+      <version>3.0</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.reporting</groupId>
       <artifactId>maven-reporting-impl</artifactId>
-      <version>2.2</version>
+      <version>3.0.0</version>
     </dependency>
 
     <!-- Doxia -->
@@ -332,6 +332,20 @@
             </tagletArtifacts>
           </configuration>
         </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-site-plugin</artifactId>
+          <version>3.6</version>
+        </plugin>
+        <plugin>
+        <artifactId>maven-plugin-plugin</artifactId>
+        <version>${pluginPluginVersion}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-invoker-plugin</artifactId>
+          <version>3.0.0</version>
+        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>
@@ -437,7 +451,7 @@
             </configuration>
             <executions>
               <execution>
-                <id>integration-test</id>
+                <id>all-integration-test</id>
                 <goals>
                   <goal>install</goal>
                   <goal>run</goal>
@@ -484,7 +498,7 @@
             </configuration>
             <executions>
               <execution>
-                <id>integration-test</id>
+                <id>one-integration-test</id>
                 <goals>
                   <goal>install</goal>
                   <goal>run</goal>
@@ -496,6 +510,9 @@
                 </configuration>
               </execution>
             </executions>
+            <dependencies>
+
+            </dependencies>
           </plugin>
         </plugins>
       </build>
@@ -508,7 +525,7 @@
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>license-maven-plugin</artifactId>
-            <version>1.8</version>
+            <version>1.13</version>
             <executions>
               <execution>
                 <goals>
@@ -539,7 +556,7 @@
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>license-maven-plugin</artifactId>
-            <version>1.8</version>
+            <version>1.13</version>
             <reportSets>
               <reportSet>
                 <reports>

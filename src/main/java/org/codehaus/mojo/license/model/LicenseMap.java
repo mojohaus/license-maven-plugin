@@ -22,6 +22,7 @@ package org.codehaus.mojo.license.model;
  * #L%
  */
 
+import java.util.Collection;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.mojo.license.utils.MojoHelper;
 
@@ -81,6 +82,31 @@ public class LicenseMap
 
         valueList.add( value );
         return put( key, valueList );
+    }
+
+    /**
+     * Store in the license other licenseMap.
+     *
+     * @param licenseMap license map to put
+     */
+    public void putAll( LicenseMap licenseMap)
+    {
+        for (Map.Entry<String, SortedSet<MavenProject>> entry : licenseMap.entrySet()) {
+
+            String key = entry.getKey();
+
+            // handle multiple values as a set to avoid duplicates
+            SortedSet<MavenProject> valueList = get( key );
+            if ( valueList == null )
+            {
+
+                valueList = new TreeSet<MavenProject>( projectComparator );
+            }
+
+            valueList.addAll( entry.getValue() );
+            put( key, valueList );
+        }
+
     }
 
     /**

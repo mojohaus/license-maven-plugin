@@ -324,26 +324,27 @@ public class DefaultDependenciesTool
             }
             project.setDependencyArtifacts( dependenciesArtifacts );
 
-            Artifact artifact = project.getArtifact();
-
-            ArtifactResolutionResult result;
-            try
-            {
-                result = artifactResolver.resolveTransitively( dependenciesArtifacts, artifact, remoteRepositories,
-                                                               localRepository, artifactMetadataSource );
-            }
-            catch ( ArtifactResolutionException e )
-            {
-                throw new DependenciesToolException( e );
-            }
-            catch ( ArtifactNotFoundException e )
-            {
-                throw new DependenciesToolException( e );
-            }
-
-            project.setArtifacts( result.getArtifacts() );
 
         }
+
+        Artifact artifact = project.getArtifact();
+
+        ArtifactResolutionResult result;
+        try
+        {
+            result = artifactResolver.resolveTransitively( project.getDependencyArtifacts(), artifact, remoteRepositories,
+                                                           localRepository, artifactMetadataSource );
+        }
+        catch ( ArtifactResolutionException e )
+        {
+            throw new DependenciesToolException( e );
+        }
+        catch ( ArtifactNotFoundException e )
+        {
+            throw new DependenciesToolException( e );
+        }
+
+        project.setArtifacts( result.getArtifacts() );
 
     }
 

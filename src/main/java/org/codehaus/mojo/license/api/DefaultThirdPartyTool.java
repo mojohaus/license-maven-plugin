@@ -596,7 +596,7 @@ public class DefaultThirdPartyTool
 
         SortedProperties overrideMappings = new SortedProperties( encoding );
 
-        if ( overrideFile.exists() )
+        if ( overrideFile!=null && overrideFile.exists() )
         {
             // there is some unsafe dependencies
 

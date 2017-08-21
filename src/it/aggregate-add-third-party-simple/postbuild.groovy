@@ -35,31 +35,15 @@ assert content.contains('(Common Public License Version 1.0) JUnit (junit:junit:
 assert content.contains('(The Apache Software License, Version 2.0) Commons Logging (commons-logging:commons-logging:1.1.1 - http://commons.apache.org/logging)');
 
 file = new File(basedir, 'child1/target/generated-sources/license/THIRD-PARTY.txt');
-assert file.exists();
-content = file.text;
-assert !content.contains('the project has no dependencies.');
-assert content.contains('(The Apache Software License, Version 2.0) Commons Logging (commons-logging:commons-logging:1.1.1 - http://commons.apache.org/logging)');
-assert !content.contains('(Common Public License Version 1.0) JUnit (junit:junit:4.8.1 - http://junit.org)');
+assert !file.exists();
 
 file = new File(basedir, 'child1/target/generated-sources/license/META-INF/test-aggregate-add-third-party-child1-THIRD-PARTY.txt');
-assert file.exists();
-content = file.text;
-assert !content.contains('the project has no dependencies.');
-assert content.contains('(The Apache Software License, Version 2.0) Commons Logging (commons-logging:commons-logging:1.1.1 - http://commons.apache.org/logging)');
-assert !content.contains('(Common Public License Version 1.0) JUnit (junit:junit:4.8.1 - http://junit.org)');
+assert !file.exists();
 
 file = new File(basedir, 'child2/target/generated-sources/license/THIRD-PARTY.txt');
-assert file.exists();
-content = file.text;
-assert !content.contains('the project has no dependencies.');
-assert content.contains('(Common Public License Version 1.0) JUnit (junit:junit:4.8.1 - http://junit.org)');
-assert !content.contains('(The Apache Software License, Version 2.0) Commons Logging (commons-logging:commons-logging:1.1.1 - http://commons.apache.org/logging)');
+assert !file.exists();
 
 file = new File(basedir, 'child2/target/generated-sources/license/META-INF/test-aggregate-add-third-party-child2-THIRD-PARTY.txt');
-assert file.exists();
-content = file.text;
-assert !content.contains('the project has no dependencies.');
-assert content.contains('(Common Public License Version 1.0) JUnit (junit:junit:4.8.1 - http://junit.org)');
-assert !content.contains('(The Apache Software License, Version 2.0) Commons Logging (commons-logging:commons-logging:1.1.1 - http://commons.apache.org/logging)');
+assert !file.exists();
 
 return true;
