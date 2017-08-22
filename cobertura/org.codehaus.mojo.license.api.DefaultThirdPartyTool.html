@@ -12,7 +12,7 @@
 <div class="separator">&nbsp;</div>
 <table class="report">
 <thead><tr>  <td class="heading">Classes in this File</td>  <td class="heading"><a class="dfn" href="help.html" onclick="popupwindow('help.html'); return false;">Line Coverage</a></td>  <td class="heading"><a class="dfn" href="help.html" onclick="popupwindow('help.html'); return false;">Branch Coverage</a></td>  <td class="heading"><a class="dfn" href="help.html" onclick="popupwindow('help.html'); return false;">Complexity</a></td></tr></thead>
-  <tr><td><a href="org.codehaus.mojo.license.api.DefaultThirdPartyTool.html">DefaultThirdPartyTool</a></td><td><table cellpadding="0px" cellspacing="0px" class="percentgraph"><tr class="percentgraph"><td align="right" class="percentgraph" width="40">0 %</td><td class="percentgraph"><div class="percentgraph"><div class="greenbar" style="width:0px"><span class="text">0/269</span></div></div></td></tr></table></td><td><table cellpadding="0px" cellspacing="0px" class="percentgraph"><tr class="percentgraph"><td align="right" class="percentgraph" width="40">0 %</td><td class="percentgraph"><div class="percentgraph"><div class="greenbar" style="width:0px"><span class="text">0/118</span></div></div></td></tr></table></td><td class="value"><span class="hidden">4.666666666666667;</span>4,667</td></tr>
+  <tr><td><a href="org.codehaus.mojo.license.api.DefaultThirdPartyTool.html">DefaultThirdPartyTool</a></td><td><table cellpadding="0px" cellspacing="0px" class="percentgraph"><tr class="percentgraph"><td align="right" class="percentgraph" width="40">0 %</td><td class="percentgraph"><div class="percentgraph"><div class="greenbar" style="width:0px"><span class="text">0/269</span></div></div></td></tr></table></td><td><table cellpadding="0px" cellspacing="0px" class="percentgraph"><tr class="percentgraph"><td align="right" class="percentgraph" width="40">0 %</td><td class="percentgraph"><div class="percentgraph"><div class="greenbar" style="width:0px"><span class="text">0/120</span></div></div></td></tr></table></td><td class="value"><span class="hidden">4.714285714285714;</span>4,714</td></tr>
 
 </table>
 <div class="separator">&nbsp;</div>
@@ -700,7 +700,7 @@
 <tr>  <td class="numLineCover">&nbsp;389</td>  <td class="nbHitsUncovered"><a title="Line 389: Conditional coverage 0 % (0/2).">&nbsp;0</a></td>  <td class="src"><pre class="src"><span class="srcUncovered">&nbsp;<a title="Line 389: Conditional coverage 0 % (0/2).">            <span class="keyword">if</span> ( StringUtils.isEmpty( license.getName() ) )</a></span></pre></td></tr>
 <tr>  <td class="numLine">&nbsp;390</td>  <td class="nbHits">&nbsp;</td>
   <td class="src"><pre class="src">&nbsp;            {</pre></td></tr>
-<tr>  <td class="numLineCover">&nbsp;391</td>  <td class="nbHitsUncovered">&nbsp;0</td>  <td class="src"><pre class="src"><span class="srcUncovered">&nbsp;                getLogger().warn( <span class="string">"No license name defined for "</span> + id );</span></pre></td></tr>
+<tr>  <td class="numLineCover">&nbsp;391</td>  <td class="nbHitsUncovered">&nbsp;0</td>  <td class="src"><pre class="src"><span class="srcUncovered">&nbsp;                getLogger().warn( <span class="string">"The license for "</span> + id + <span class="string">" has no name (but exist)"</span> );</span></pre></td></tr>
 <tr>  <td class="numLineCover">&nbsp;392</td>  <td class="nbHitsUncovered">&nbsp;0</td>  <td class="src"><pre class="src"><span class="srcUncovered">&nbsp;                licenseKey = license.getUrl();</span></pre></td></tr>
 <tr>  <td class="numLine">&nbsp;393</td>  <td class="nbHits">&nbsp;</td>
   <td class="src"><pre class="src">&nbsp;            }</pre></td></tr>
@@ -1027,7 +1027,7 @@
 <tr>  <td class="numLineCover">&nbsp;597</td>  <td class="nbHitsUncovered">&nbsp;0</td>  <td class="src"><pre class="src"><span class="srcUncovered">&nbsp;        SortedProperties overrideMappings = <span class="keyword">new</span> SortedProperties( encoding );</span></pre></td></tr>
 <tr>  <td class="numLine">&nbsp;598</td>  <td class="nbHits">&nbsp;</td>
   <td class="src"><pre class="src">&nbsp;</pre></td></tr>
-<tr>  <td class="numLineCover">&nbsp;599</td>  <td class="nbHitsUncovered"><a title="Line 599: Conditional coverage 0 % (0/2).">&nbsp;0</a></td>  <td class="src"><pre class="src"><span class="srcUncovered">&nbsp;<a title="Line 599: Conditional coverage 0 % (0/2).">        <span class="keyword">if</span> ( overrideFile.exists() )</a></span></pre></td></tr>
+<tr>  <td class="numLineCover">&nbsp;599</td>  <td class="nbHitsUncovered"><a title="Line 599: Conditional coverage 0 % (0/4) [each condition: 0 %, 0 %].">&nbsp;0</a></td>  <td class="src"><pre class="src"><span class="srcUncovered">&nbsp;<a title="Line 599: Conditional coverage 0 % (0/4) [each condition: 0 %, 0 %].">        <span class="keyword">if</span> ( overrideFile!=<span class="keyword">null</span> &amp;&amp; overrideFile.exists() )</a></span></pre></td></tr>
 <tr>  <td class="numLine">&nbsp;600</td>  <td class="nbHits">&nbsp;</td>
   <td class="src"><pre class="src">&nbsp;        {</pre></td></tr>
 <tr>  <td class="numLine">&nbsp;601</td>  <td class="nbHits">&nbsp;</td>
@@ -1394,6 +1394,6 @@
   <td class="src"><pre class="src">&nbsp;}</pre></td></tr>
 </table>
 
-<div class="footer">Report generated by <a href="http://cobertura.sourceforge.net/" target="_top">Cobertura</a> 2.0.3 on 11/06/17 09:37.</div>
+<div class="footer">Report generated by <a href="http://cobertura.sourceforge.net/" target="_top">Cobertura</a> 2.0.3 on 22/08/17 12:49.</div>
 </body>
 </html>
