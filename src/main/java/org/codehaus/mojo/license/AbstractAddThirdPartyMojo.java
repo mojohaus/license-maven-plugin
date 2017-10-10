@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.io.FileUtils;
 
 /*
  * #%L
@@ -104,7 +106,7 @@ public abstract class AbstractAddThirdPartyMojo
      * @since 1.1
      */
     @Parameter( property = "license.acceptPomPackaging", defaultValue = "false" )
- boolean acceptPomPackaging;
+    boolean acceptPomPackaging;
 
     /**
      * A filter to exclude some scopes.
@@ -228,10 +230,20 @@ public abstract class AbstractAddThirdPartyMojo
      * &lt;/licenseMerges&gt;
      * &lt;/pre&gt;
      *
+     * <b>Note:</b> This option will be overridden by {@link #licenseMergesFile} if it is used by command line.
      * @since 1.0
      */
     @Parameter
     List<String> licenseMerges;
+
+    /**
+     * The file with the merge licenses in order to be used by command line.
+     * <b>Note:</b> This option overrides {@link #licenseMerges}.
+     *
+     * @since 1.15
+     */
+    @Parameter( property = "license.licenseMergesFile" )
+    String licenseMergesFile;
 
     /**
      * To specify some licenses to include.
@@ -526,6 +538,12 @@ public abstract class AbstractAddThirdPartyMojo
 
         licenseMap = getHelper().createLicenseMap( projectDependencies );
 
+        if (licenseMergesFile != null) {
+            getLog().warn("");
+            getLog().warn("licenseMerges will be overridden by licenseMergesFile.");
+            getLog().warn("");
+            licenseMerges = FileUtils.readLines(new File(licenseMergesFile), "utf-8");
+        }
     }
 
     void consolidate() throws IOException, ArtifactNotFoundException, ArtifactResolutionException, MojoFailureException, ProjectBuildingException, ThirdPartyToolException {
@@ -608,6 +626,11 @@ public abstract class AbstractAddThirdPartyMojo
     File getOverrideFile()
     {
         return overrideFile;
+    }
+
+    String getLicenseMergesFile()
+    {
+        return licenseMergesFile;
     }
 
     SortedProperties getUnsafeMappings()
