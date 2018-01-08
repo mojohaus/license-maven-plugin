@@ -108,6 +108,22 @@ public abstract class AbstractDownloadLicensesMojo
     private String includedScopes;
 
     /**
+     * A filter to exclude some types.
+     *
+     * @since 1.15
+     */
+    @Parameter( property = "license.excludedTypes")
+    private String excludedTypes;
+
+    /**
+     * A filter to include only some types, if let empty then all types will be used (no filter).
+     *
+     * @since 1.15
+     */
+    @Parameter( property = "license.includedTypes", defaultValue = "" )
+    private String includedTypes;
+
+    /**
      * Settings offline flag (will not download anything if setted to true).
      *
      * @since 1.0
@@ -372,6 +388,22 @@ public abstract class AbstractDownloadLicensesMojo
     public List<String> getIncludedScopes()
     {
         return MojoHelper.getParams( includedScopes );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public List<String> getExcludedTypes()
+    {
+        return MojoHelper.getParams( excludedTypes );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public List<String> getIncludedTypes()
+    {
+        return MojoHelper.getParams( includedTypes );
     }
 
     // not used at the moment

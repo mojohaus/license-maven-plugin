@@ -123,6 +123,22 @@ public abstract class AbstractAddThirdPartyMojo
     String includedScopes;
 
     /**
+     * A filter to exclude some types.
+     *
+     * @since 1.15
+     */
+    @Parameter( property = "license.excludedTypes" )
+    String excludedTypes;
+
+    /**
+     * A filter to include only some types, if let empty then all types will be used (no filter).
+     *
+     * @since 1.15
+     */
+    @Parameter( property = "license.includedTypes")
+    String includedTypes;
+
+    /**
      * A filter to exclude some GroupIds
      * This is a regular expression that is applied to groupIds (not an ant pattern).
      *

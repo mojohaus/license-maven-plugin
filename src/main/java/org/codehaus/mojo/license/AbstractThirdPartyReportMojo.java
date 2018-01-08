@@ -90,6 +90,22 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport i
     private String includedScopes;
 
     /**
+     * A filter to exclude some types.
+     *
+     * @since 1.15
+     */
+    @Parameter( property = "license.excludedTypes")
+    private String excludedTypes;
+
+    /**
+     * A filter to include only some types, if let empty then all types will be used (no filter).
+     *
+     * @since 1.15
+     */
+    @Parameter( property = "license.includedTypes" )
+    private String includedTypes;
+
+    /**
      * A filter to exclude some GroupIds
      *
      * @since 1.1
@@ -399,6 +415,22 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport i
     public List<String> getIncludedScopes()
     {
         return MojoHelper.getParams( includedScopes );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public List<String> getExcludedTypes()
+    {
+        return MojoHelper.getParams( excludedTypes );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public List<String> getIncludedTypes()
+    {
+        return MojoHelper.getParams( includedTypes );
     }
 
     /**

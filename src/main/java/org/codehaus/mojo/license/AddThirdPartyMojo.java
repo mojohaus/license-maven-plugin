@@ -276,6 +276,22 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
     /**
      * {@inheritDoc}
      */
+    public List<String> getExcludedTypes()
+    {
+        return MojoHelper.getParams( excludedTypes );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public List<String> getIncludedTypes()
+    {
+        return MojoHelper.getParams( includedTypes );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public String getExcludedArtifacts()
     {
         return excludedArtifacts;
