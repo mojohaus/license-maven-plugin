@@ -117,6 +117,9 @@
     <doxiaVersion>1.5</doxiaVersion>
     <it.debug>true</it.debug>
 
+    <version.httpcomponents.httpclient>4.5.4</version.httpcomponents.httpclient>
+    <version.httpcomponents.httpcore>4.4.8</version.httpcomponents.httpcore>
+
     <!-- license configuration -->
     <license.useMissingFile>true</license.useMissingFile>
     <license.failIfWarning>true</license.failIfWarning>
@@ -126,6 +129,21 @@
     <pluginPluginVersion>3.5</pluginPluginVersion>
     <plexusComponentVersion>1.6</plexusComponentVersion>
   </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpclient</artifactId>
+        <version>${version.httpcomponents.httpclient}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpcore</artifactId>
+        <version>${version.httpcomponents.httpcore}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <dependencies>
     <dependency>

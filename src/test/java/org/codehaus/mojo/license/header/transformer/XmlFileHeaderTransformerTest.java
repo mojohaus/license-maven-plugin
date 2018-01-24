@@ -63,18 +63,18 @@ public class XmlFileHeaderTransformerTest
         Assert.assertEquals( header + content, result );
     }
 
-    @Test
-    public void testAddHeaderWithProlog()
-    {
+      @Test
+      public void testAddHeaderWithProlog()
+      {
         String header = HEADER;
         String prolog = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
         String content = prolog + CONTENT;
-        String result = transformer.addHeader( header, content );
-        Assert.assertEquals( prolog + '\n' + header + CONTENT, result );
+        String result = transformer.addHeader(header, content);
+        Assert.assertEquals(prolog + FileHeaderTransformer.LINE_SEPARATOR + header + CONTENT, result);
 
         header = HEADER;
         content = "  " + prolog + CONTENT;
-        result = transformer.addHeader( header, content );
-        Assert.assertEquals( "  " + prolog + '\n' + header + CONTENT, result );
-    }
+        result = transformer.addHeader(header, content);
+        Assert.assertEquals("  " + prolog + FileHeaderTransformer.LINE_SEPARATOR + header + CONTENT, result);
+      }
 }

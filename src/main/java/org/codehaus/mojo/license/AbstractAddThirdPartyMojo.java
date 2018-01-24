@@ -1,5 +1,29 @@
 package org.codehaus.mojo.license;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.ProjectBuildingException;
+import org.codehaus.mojo.license.api.DefaultThirdPartyHelper;
+import org.codehaus.mojo.license.api.DependenciesTool;
+import org.codehaus.mojo.license.api.ThirdPartyHelper;
+import org.codehaus.mojo.license.api.ThirdPartyTool;
+import org.codehaus.mojo.license.api.ThirdPartyToolException;
+import org.codehaus.mojo.license.model.LicenseMap;
+import org.codehaus.mojo.license.utils.FileUtil;
+import org.codehaus.mojo.license.utils.MojoHelper;
+import org.codehaus.mojo.license.utils.SortedProperties;
+import org.codehaus.mojo.license.utils.StringToList;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
@@ -30,29 +54,6 @@ import java.util.SortedSet;
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugin.logging.Log;
-import org.apache.maven.plugins.annotations.Component;
-import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.ProjectBuildingException;
-import org.codehaus.mojo.license.api.DefaultThirdPartyHelper;
-import org.codehaus.mojo.license.api.DependenciesTool;
-import org.codehaus.mojo.license.api.ThirdPartyHelper;
-import org.codehaus.mojo.license.api.ThirdPartyTool;
-import org.codehaus.mojo.license.api.ThirdPartyToolException;
-import org.codehaus.mojo.license.model.LicenseMap;
-import org.codehaus.mojo.license.utils.FileUtil;
-import org.codehaus.mojo.license.utils.MojoHelper;
-import org.codehaus.mojo.license.utils.SortedProperties;
-import org.codehaus.mojo.license.utils.StringToList;
 
 /**
  * Abstract mojo for all third-party mojos.
@@ -233,57 +234,112 @@ public abstract class AbstractAddThirdPartyMojo
     @Parameter
     List<String> licenseMerges;
 
-    /**
-     * To specify some licenses to include.
-     * <p>
-     * If this parameter is filled and a license is not in this {@code whitelist} then build will failed when property
-     * {@link #failIfWarning} is <tt>true</tt>.
-     * <p>
-     * Since version {@code 1.4}, there is two ways to fill this parameter :
-     * <ul>
-     * <li>A simple string (separated by {@code |}), the way to use by property configuration:
-     * <pre>&lt;includedLicenses&gt;licenseA|licenseB&lt;/includedLicenses&gt;</pre> or
-     * <pre>-Dlicense.includedLicenses=licenseA|licenseB</pre>
-     * </li>
-     * <li>A list of string (can only be used in plugin configuration, not via property configuration)
-     * <pre>
-     * &lt;includedLicenses&gt;
-     *   &lt;includedLicense&gt;licenseA&lt;/includedLicense&gt;
-     *   &lt;includedLicenses&gt;licenseB&lt;/includedLicense&gt;
-     * &lt;/includedLicenses&gt;</pre>
-     * </li>
-     * </ul>
-     *
-     * @since 1.1
-     */
-    @Parameter( property = "license.includedLicenses")
-    IncludedLicenses includedLicenses;
+  /**
+   * To specify some licenses to include.
+   * <p>
+   * If this parameter is filled and a license is not in this {@code whitelist} then build will fail when
+   * property {@link #failOnBlacklist} is <tt>true</tt>.
+   * <p>
+   * Since version {@code 1.4}, there are three ways to fill this parameter :
+   * <ul>
+   * <li>A simple string (separated by {@code |}), the way to use by property configuration:
+   *
+   * <pre>
+   * &lt;includedLicenses&gt;licenseA|licenseB&lt;/includedLicenses&gt;
+   * </pre>
+   *
+   * or
+   *
+   * <pre>
+   * -Dlicense.includedLicenses=licenseA|licenseB
+   * </pre>
+   *
+   * </li>
+   * <li>A list of string (can only be used in plugin configuration, not via property configuration)
+   *
+   * <pre>
+   * &lt;includedLicenses&gt;
+   *   &lt;includedLicense&gt;licenseA&lt;/includedLicense&gt;
+   *   &lt;includedLicenses&gt;licenseB&lt;/includedLicense&gt;
+   * &lt;/includedLicenses&gt;
+   * </pre>
+   *
+   * </li>
+   * <li>Since version {@code 1.15}<br>
+   * a URL that contains a set of license names at the target source (only a single URL is accepted as
+   * parameter)
+   *
+   * <pre>
+   *    &lt;includedLicenses&gt;http://my.license.host.com/my-whitelist&lt;/includedLicenses&gt;
+   * </pre>
+   *
+   * the license-list on the given URL is expected to be list with a line-break after every entry e.g.:
+   * <ul style="list-style-type:none;">
+   * <li>The Apache Software License, Version 2.0</li>
+   * <li>Apache License, Version 2.0</li>
+   * <li>Bouncy Castle Licence</li>
+   * <li>MIT License</li>
+   * </ul>
+   * empty lines will be ignored.</li>
+   * </ul>
+   *
+   * @since 1.1
+   */
+  @Parameter(property = "license.includedLicenses")
+  IncludedLicenses includedLicenses;
 
-    /**
-     * To specify some licenses to exclude.
-     * <p>
-     * If a such license is found then build will failed when property
-     * {@link #failIfWarning} is <tt>true</tt>.
-     * <p>
-     * Since version {@code 1.4}, there is two ways to fill this parameter :
-     * <ul>
-     * <li>A simple string (separated by {@code |}), the way to use by property configuration:
-     * <pre>&lt;excludedLicenses&gt;licenseA|licenseB&lt;/excludedLicenses&gt;</pre> or
-     * <pre>-Dlicense.excludedLicenses=licenseA|licenseB</pre>
-     * </li>
-     * <li>A list of string (can only be used in plugin configuration, not via property configuration)
-     * <pre>
-     * &lt;excludedLicenses&gt;
-     *   &lt;excludedLicense&gt;licenseA&lt;/excludedLicense&gt;
-     *   &lt;excludedLicense&gt;licenseB&lt;/excludedLicense&gt;
-     * &lt;/excludedLicenses&gt;</pre>
-     * </li>
-     * </ul>
-     *
-     * @since 1.1
-     */
-    @Parameter( property = "license.excludedLicenses")
-    ExcludedLicenses excludedLicenses;
+  /**
+   * To specify some licenses to exclude.
+   * <p>
+   * If a such license is found then build will fail when property {@link #failOnBlacklist} is <tt>true</tt>.
+   * <p>
+   * Since version {@code 1.4}, there are three ways to fill this parameter :
+   * <ul>
+   * <li>A simple string (separated by {@code |}), the way to use by property configuration:
+   *
+   * <pre>
+   * &lt;excludedLicenses&gt;licenseA|licenseB&lt;/excludedLicenses&gt;
+   * </pre>
+   *
+   * or
+   *
+   * <pre>
+   * -Dlicense.excludedLicenses=licenseA|licenseB
+   * </pre>
+   *
+   * </li>
+   * <li>A list of string (can only be used in plugin configuration, not via property configuration)
+   *
+   * <pre>
+   * &lt;excludedLicenses&gt;
+   *   &lt;excludedLicense&gt;licenseA&lt;/excludedLicense&gt;
+   *   &lt;excludedLicense&gt;licenseB&lt;/excludedLicense&gt;
+   * &lt;/excludedLicenses&gt;
+   * </pre>
+   *
+   * </li>
+   * <li>Since version {@code 1.15}<br>
+   * a URL that contains a set of license names at the target source (only a single URL is accepted as
+   * parameter)
+   *
+   * <pre>
+   *    &lt;includedLicenses&gt;http://my.license.host.com/my-blacklist&lt;/includedLicenses&gt;
+   * </pre>
+   *
+   * the license-list on the given URL is expected to be list with a line-break after every entry e.g.:
+   * <ul style="list-style-type:none;">
+   * <li>The Apache Software License, Version 2.0</li>
+   * <li>Apache License, Version 2.0</li>
+   * <li>Bouncy Castle Licence</li>
+   * <li>MIT License</li>
+   * </ul>
+   * empty lines will be ignored.</li>
+   * </ul>
+   *
+   * @since 1.1
+   */
+  @Parameter(property = "license.excludedLicenses")
+  ExcludedLicenses excludedLicenses;
 
     /**
      * The path of the bundled third party file to produce when
@@ -651,7 +707,7 @@ public abstract class AbstractAddThirdPartyMojo
      *
      * @param includedLicenses license to excludes separated by a {@code |}.
      */
-    public void setIncludedLicenses( String includedLicenses )
+    public void setIncludedLicenses( String includedLicenses ) throws MojoExecutionException
     {
         this.includedLicenses = new IncludedLicenses( includedLicenses );
     }
@@ -661,7 +717,7 @@ public abstract class AbstractAddThirdPartyMojo
      *
      * @param excludedLicenses license to excludes separated by a {@code |}.
      */
-    public void setExcludedLicenses( String excludedLicenses )
+    public void setExcludedLicenses( String excludedLicenses ) throws MojoExecutionException
     {
         this.excludedLicenses = new ExcludedLicenses( excludedLicenses );
     }
@@ -797,7 +853,8 @@ public abstract class AbstractAddThirdPartyMojo
 
                             if ( getLicenseMap().get( otherLicense ).contains( dependency ) )
                             {
-                                getLog().info( "License '" + dependencyLicense + "' for '" + dependency + "'is OK since it is also licensed under '" + otherLicense + "'" );
+                                getLog().info( "License: '" + dependencyLicense + "' for '" + dependency + "'is OK " +
+                                                 "since it is also licensed under '" + otherLicense + "'" );
                                 // this dependency is licensed under another license from white list
                                 forbiddenLicenseUsed = false;
                                 break;
@@ -828,7 +885,7 @@ public abstract class AbstractAddThirdPartyMojo
                 if ( !deps.isEmpty() )
                 {
                     StringBuilder sb = new StringBuilder();
-                    sb.append( "License " ).append( unsafeLicense ).append( " used by " ).append( deps.size() ).append(
+                    sb.append( "License: '" ).append( unsafeLicense ).append( "' used by " ).append( deps.size() ).append(
                             " dependencies:" );
                     for ( MavenProject dep : deps )
                     {
@@ -917,7 +974,7 @@ public abstract class AbstractAddThirdPartyMojo
          *
          * @param data the string to split to fill the list of data of the object.
          */
-        IncludedLicenses(String data)
+        IncludedLicenses(String data) throws MojoExecutionException
         {
             super( data );
         }
@@ -956,7 +1013,7 @@ public abstract class AbstractAddThirdPartyMojo
          *
          * @param data the string to split to fill the list of data of the object.
          */
-        ExcludedLicenses(String data)
+        ExcludedLicenses(String data) throws MojoExecutionException
         {
             super( data );
         }
