@@ -39,7 +39,7 @@ def assertNotExistsFile(file)
     assert true
 }
 
-file = new File(basedir, 'target/generated-resources/licenses/common public license version 1.0 - cpl1.0.txt.html');
+file = new File(basedir, 'target/generated-resources/licenses/eclipse public license 1.0 - epl-v10.html');
 assertExistsFile(file);
 
 file = new File(basedir, 'target/generated-resources/licenses/lesser general public license (lgpl) v 3.0 - lgpl-3.0.txt');

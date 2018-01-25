@@ -39,7 +39,7 @@ def assertContains(file, content, expected)
     assert true
 }
 
-file = new File(basedir, 'target/generated-resources/licenses/common public license version 1.0 - cpl1.0.txt.html');
+file = new File(basedir, 'target/generated-resources/licenses/eclipse public license 1.0 - epl-v10.html');
 assertExistsFile(file);
 
 file = new File(basedir, 'target/generated-resources/licenses.xml');
