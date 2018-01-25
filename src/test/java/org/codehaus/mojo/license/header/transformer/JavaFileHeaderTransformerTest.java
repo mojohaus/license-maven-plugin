@@ -45,7 +45,7 @@ public class JavaFileHeaderTransformerTest
     {
         JavaFileHeaderTransformer transformer = new JavaFileHeaderTransformer();
 
-        String content = PACKAGE + "\n" + CONTENT;
+    String content = PACKAGE + FileHeaderTransformer.LINE_SEPARATOR + CONTENT;
 
         transformer.setAddJavaLicenseAfterPackage( false );
 
@@ -54,8 +54,10 @@ public class JavaFileHeaderTransformerTest
 
         transformer.setAddJavaLicenseAfterPackage( true );
 
-        result = transformer.addHeader( HEADER, content );
-        Assert.assertEquals( PACKAGE + "\n\n" + HEADER + CONTENT, result );
+    result = transformer.addHeader(HEADER, content);
+    Assert.assertEquals(PACKAGE + FileHeaderTransformer.LINE_SEPARATOR + FileHeaderTransformer.LINE_SEPARATOR
+                        + HEADER + CONTENT,
+                        result);
 
     }
 
