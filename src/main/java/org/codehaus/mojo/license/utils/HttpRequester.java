@@ -20,7 +20,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 
 
 /**
- * project: autent-sdk <br>
+ * project: license-maven-plugin <br>
  * author: Pascal Knueppel <br>
  * created at: 25.01.2018 - 09:27 <br>
  * <br>
