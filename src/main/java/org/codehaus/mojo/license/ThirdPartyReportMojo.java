@@ -22,6 +22,7 @@ package org.codehaus.mojo.license;
  * #L%
  */
 
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -83,8 +84,8 @@ public class ThirdPartyReportMojo extends AbstractThirdPartyReportMojo
      */
     @Override
     protected Collection<ThirdPartyDetails> createThirdPartyDetails()
-        throws IOException, ThirdPartyToolException, ProjectBuildingException, MojoFailureException,
-        DependenciesToolException
+      throws IOException, ThirdPartyToolException, ProjectBuildingException, MojoFailureException,
+             DependenciesToolException, MojoExecutionException
     {
         return createThirdPartyDetails( getProject(), false );
     }

@@ -23,18 +23,8 @@ package org.codehaus.mojo.license.utils;
  */
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.maven.plugin.MojoExecutionException;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,7 +56,7 @@ public class StringToList
     public StringToList(String data) throws MojoExecutionException
     {
       this();
-      if (!isStringUrl(data))
+      if (!HttpRequester.isStringUrl(data))
       {
         for ( String s : data.split("\\s*\\|\\s*") )
         {
@@ -75,9 +65,9 @@ public class StringToList
       }
       else
       {
-        for ( String license : downloadLicenseList(data) )
+        for ( String license : HttpRequester.downloadList(data) )
         {
-          if (data != null && StringUtils.isNotBlank(license) && !data.contains(license))
+          if (data != null && StringUtils.isNotBlank(license) && !this.data.contains(license))
           {
             this.data.add(license);
           }
@@ -93,93 +83,6 @@ public class StringToList
     protected void addEntryToList( String data )
     {
         this.data.add( data );
-    }
-
-    /**
-     * checks if the input in the {@link org.codehaus.mojo.license.AbstractAddThirdPartyMojo#includedLicenses}
-     * is a URL value
-     *
-     * @param data the license string or a URL
-     * @return true if URL, false else
-     */
-    private boolean isStringUrl(String data)
-    {
-      try
-      {
-        new URL(data);
-        return true;
-      }
-      catch (MalformedURLException e)
-      {
-        return false;
-      }
-    }
-
-    /**
-     * will download a external resource and read the content of the file that will then be translated into a
-     * new list. <br>
-     * <br>
-     * <b>NOTE:</b><br>
-     * certificate checking for this request will be disabled because some resources might be present on some
-     * local servers in the internal network that do not use a safe connection
-     *
-     * @param url the URL to the external resource
-     * @return a new list with all license entries from the remote resource
-     */
-    private List<String> downloadLicenseList(String url) throws MojoExecutionException
-    {
-      List<String> licenses = new ArrayList<String>();
-      CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-      HttpGet get = new HttpGet(url);
-      CloseableHttpResponse response = null;
-      BufferedReader bufferedReader = null;
-      try
-      {
-        response = httpClient.execute(get);
-        bufferedReader = new BufferedReader(new InputStreamReader(response.getEntity().getContent(),
-                                                                  Charset.forName("UTF-8")));
-        String line;
-        while ((line = bufferedReader.readLine()) != null)
-        {
-          if (StringUtils.isNotBlank(line))
-          {
-            if (!licenses.contains(line))
-            {
-              licenses.add(line);
-            }
-          }
-        }
-      }
-      catch (IOException e)
-      {
-        throw new MojoExecutionException("could not open connection to URL: " + url, e);
-      }
-      finally
-      {
-        if (response != null)
-        {
-          try
-          {
-            response.close();
-          }
-          catch (IOException e)
-          {
-            throw new MojoExecutionException(e.getMessage(), e);
-          }
-        }
-        if (bufferedReader != null)
-        {
-          try
-          {
-            bufferedReader.close();
-          }
-          catch (IOException e)
-          {
-            throw new MojoExecutionException(e.getMessage(), e);
-          }
-        }
-      }
-      return licenses;
     }
 
 }

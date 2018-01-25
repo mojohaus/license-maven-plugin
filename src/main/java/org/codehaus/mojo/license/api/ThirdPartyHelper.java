@@ -23,6 +23,7 @@ package org.codehaus.mojo.license.api;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
@@ -79,12 +80,15 @@ public interface ThirdPartyHelper
      *
      * @param licenseMap          the license map of all dependencies.
      * @param missingFile         location of an optional missing fille (says where you fix missing license).
+     * @param missingFileUrl      location of an optional missing file extension that can be downloaded from some
+     *                            resource hoster and that will be merged with the content of the missing file.
      * @param projectDependencies project dependencies used to detect which dependencies in the missing file are unknown to the project.
      * @return the map of all unsafe mapping
      * @throws IOException if could not load missing file
      */
-    SortedProperties loadUnsafeMapping( LicenseMap licenseMap, File missingFile, SortedMap<String, MavenProject> projectDependencies )
-            throws IOException;
+    SortedProperties loadUnsafeMapping( LicenseMap licenseMap, File missingFile, String missingFileUrl,
+                                        SortedMap<String, MavenProject> projectDependencies )
+      throws IOException, MojoExecutionException;
 
     /**
      * Creates a license map from given dependencies.
@@ -132,6 +136,9 @@ public interface ThirdPartyHelper
      *
      * @param licenseMap                license map to read
      * @param missingFile               location of an optional missing file
+     * @param missingFileUrl            location of an optional missing file extension that can be downloaded from
+     *                                  some resource hoster and that will be merged with the content of the missing
+     *                                  file.
      * @param useRepositoryMissingFiles flag to use or not third-party descriptors via the 'third-party' classifier from maven repositories
      * @param unsafeDependencies        all unsafe dependencies
      * @param projectDependencies       all project dependencies
@@ -140,11 +147,11 @@ public interface ThirdPartyHelper
      * @throws IOException              if could not load missing file
      * @throws ThirdPartyToolException  if pb with third-party tool
      */
-    SortedProperties createUnsafeMapping( LicenseMap licenseMap, File missingFile,
+    SortedProperties createUnsafeMapping( LicenseMap licenseMap, File missingFile, String missingFileUrl,
                                           boolean useRepositoryMissingFiles,
                                           SortedSet<MavenProject> unsafeDependencies,
                                           SortedMap<String, MavenProject> projectDependencies )
-            throws ProjectBuildingException, IOException, ThirdPartyToolException;
+      throws ProjectBuildingException, IOException, ThirdPartyToolException, MojoExecutionException;
 
     /**
      * Merges licenses.

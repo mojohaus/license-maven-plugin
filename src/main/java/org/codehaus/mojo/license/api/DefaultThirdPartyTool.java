@@ -22,6 +22,7 @@ package org.codehaus.mojo.license.api;
  * #L%
  */
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -50,10 +51,12 @@ import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.model.License;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 import org.codehaus.mojo.license.model.LicenseMap;
 import org.codehaus.mojo.license.utils.FileUtil;
+import org.codehaus.mojo.license.utils.HttpRequester;
 import org.codehaus.mojo.license.utils.MojoHelper;
 import org.codehaus.mojo.license.utils.SortedProperties;
 import org.codehaus.plexus.component.annotations.Component;
@@ -449,9 +452,11 @@ public class DefaultThirdPartyTool
     /**
      * {@inheritDoc}
      */
-    public SortedProperties loadUnsafeMapping( LicenseMap licenseMap, SortedMap<String, MavenProject> artifactCache,
-                                               String encoding, File missingFile ) throws IOException
-    {
+    public SortedProperties loadUnsafeMapping( LicenseMap licenseMap,
+                                               SortedMap<String, MavenProject> artifactCache,
+                                               String encoding,
+                                               File missingFile,
+                                               String missingFileUrl ) throws IOException, MojoExecutionException {
         Map<String, MavenProject> snapshots = new HashMap<String, MavenProject>();
 
         //find snapshot dependencies
@@ -487,6 +492,11 @@ public class DefaultThirdPartyTool
 
             // load the missing file
             unsafeMappings.load( missingFile );
+        }
+        if (HttpRequester.isStringUrl(missingFileUrl))
+        {
+            String httpRequestResult = HttpRequester.getFromUrl(missingFileUrl);
+            unsafeMappings.load(new ByteArrayInputStream(httpRequestResult.getBytes()));
         }
 
         // get from the missing file, all unknown dependencies
