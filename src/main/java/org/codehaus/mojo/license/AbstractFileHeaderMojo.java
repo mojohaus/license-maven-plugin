@@ -189,6 +189,19 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
     private boolean emptyLineAfterHeader;
 
     /**
+     * A flag to indicate if there should be an empty line after the header.
+     * <p>
+     * Checkstyle usually requires no trailing whitespace.
+     * If it is the case it could make sense to set this to true
+     * </p>
+     * <b>Note:</b> By default this property is set to {@code false} to keep old behavior.
+     *
+     * @since 1.14
+     */
+    @Parameter( property = "license.trimHeaderLine", defaultValue = "false" )
+    private boolean trimHeaderLine;
+
+    /**
      * A flag to ignore no files to scan.
      * <p>
      * This flag will suppress the "No file to scan" warning. This will allow you to set the plug-in in the root pom of
@@ -477,6 +490,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
             aTransformer.setProcessEndTag( processEndTag );
             aTransformer.setSectionDelimiter( sectionDelimiter );
             aTransformer.setEmptyLineAfterHeader( emptyLineAfterHeader );
+            aTransformer.setTrimHeaderLine( trimHeaderLine );
 
             if ( aTransformer instanceof JavaFileHeaderTransformer )
             {
