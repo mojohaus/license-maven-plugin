@@ -1,6 +1,7 @@
 package org.codehaus.mojo.license;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -244,117 +245,127 @@ public abstract class AbstractAddThirdPartyMojo
      * &lt;/licenseMerges&gt;
      * &lt;/pre&gt;
      *
+     * <b>Note:</b> This option will be overridden by {@link #licenseMergesFile} if it is used by command line.
      * @since 1.0
      */
     @Parameter
     List<String> licenseMerges;
 
-    /**
-     * To specify some licenses to include.
-     * <p>
-     * If this parameter is filled and a license is not in this {@code whitelist} then build will fail when
-     * property {@link #failOnBlacklist} is <tt>true</tt>.
-     * <p>
-     * Since version {@code 1.4}, there are three ways to fill this parameter :
-     * <ul>
-     * <li>A simple string (separated by {@code |}), the way to use by property configuration:
+   /**
+     * The file with the merge licenses in order to be used by command line.
+     * <b>Note:</b> This option overrides {@link #licenseMerges}.
      *
-     * <pre>
-     * &lt;includedLicenses&gt;licenseA|licenseB&lt;/includedLicenses&gt;
-     * </pre>
-     *
-     * or
-     *
-     * <pre>
-     * -Dlicense.includedLicenses=licenseA|licenseB
-     * </pre>
-     *
-     * </li>
-     * <li>A list of string (can only be used in plugin configuration, not via property configuration)
-     *
-     * <pre>
-     * &lt;includedLicenses&gt;
-     *   &lt;includedLicense&gt;licenseA&lt;/includedLicense&gt;
-     *   &lt;includedLicenses&gt;licenseB&lt;/includedLicense&gt;
-     * &lt;/includedLicenses&gt;
-     * </pre>
-     *
-     * </li>
-     * <li>Since version {@code 1.15}<br>
-     * a URL that contains a set of license names at the target source (only a single URL is accepted as
-     * parameter)
-     *
-     * <pre>
-     *    &lt;includedLicenses&gt;http://my.license.host.com/my-whitelist&lt;/includedLicenses&gt;
-     * </pre>
-     *
-     * the license-list on the given URL is expected to be list with a line-break after every entry e.g.:
-     * <ul style="list-style-type:none;">
-     * <li>The Apache Software License, Version 2.0</li>
-     * <li>Apache License, Version 2.0</li>
-     * <li>Bouncy Castle Licence</li>
-     * <li>MIT License</li>
-     * </ul>
-     * empty lines will be ignored.</li>
-     * </ul>
-     *
-     * @since 1.1
+     * @since 1.15
      */
-    @Parameter(property = "license.includedLicenses")
-    IncludedLicenses includedLicenses;
+    @Parameter( property = "license.licenseMergesFile" )
+    String licenseMergesFile;
 
-    /**
-     * To specify some licenses to exclude.
-     * <p>
-     * If a such license is found then build will fail when property {@link #failOnBlacklist} is <tt>true</tt>.
-     * <p>
-     * Since version {@code 1.4}, there are three ways to fill this parameter :
-     * <ul>
-     * <li>A simple string (separated by {@code |}), the way to use by property configuration:
-     *
-     * <pre>
-     * &lt;excludedLicenses&gt;licenseA|licenseB&lt;/excludedLicenses&gt;
-     * </pre>
-     *
-     * or
-     *
-     * <pre>
-     * -Dlicense.excludedLicenses=licenseA|licenseB
-     * </pre>
-     *
-     * </li>
-     * <li>A list of string (can only be used in plugin configuration, not via property configuration)
-     *
-     * <pre>
-     * &lt;excludedLicenses&gt;
-     *   &lt;excludedLicense&gt;licenseA&lt;/excludedLicense&gt;
-     *   &lt;excludedLicense&gt;licenseB&lt;/excludedLicense&gt;
-     * &lt;/excludedLicenses&gt;
-     * </pre>
-     *
-     * </li>
-     * <li>Since version {@code 1.15}<br>
-     * a URL that contains a set of license names at the target source (only a single URL is accepted as
-     * parameter)
-     *
-     * <pre>
-     *    &lt;includedLicenses&gt;http://my.license.host.com/my-blacklist&lt;/includedLicenses&gt;
-     * </pre>
-     *
-     * the license-list on the given URL is expected to be list with a line-break after every entry e.g.:
-     * <ul style="list-style-type:none;">
-     * <li>The Apache Software License, Version 2.0</li>
-     * <li>Apache License, Version 2.0</li>
-     * <li>Bouncy Castle Licence</li>
-     * <li>MIT License</li>
-     * </ul>
-     * empty lines will be ignored.</li>
-     * </ul>
-     *
-     * @since 1.1
-     */
-    @Parameter(property = "license.excludedLicenses")
-    ExcludedLicenses excludedLicenses;
+  /**
+   * To specify some licenses to include.
+   * <p>
+   * If this parameter is filled and a license is not in this {@code whitelist} then build will fail when
+   * property {@link #failOnBlacklist} is <tt>true</tt>.
+   * <p>
+   * Since version {@code 1.4}, there are three ways to fill this parameter :
+   * <ul>
+   * <li>A simple string (separated by {@code |}), the way to use by property configuration:
+   *
+   * <pre>
+   * &lt;includedLicenses&gt;licenseA|licenseB&lt;/includedLicenses&gt;
+   * </pre>
+   *
+   * or
+   *
+   * <pre>
+   * -Dlicense.includedLicenses=licenseA|licenseB
+   * </pre>
+   *
+   * </li>
+   * <li>A list of string (can only be used in plugin configuration, not via property configuration)
+   *
+   * <pre>
+   * &lt;includedLicenses&gt;
+   *   &lt;includedLicense&gt;licenseA&lt;/includedLicense&gt;
+   *   &lt;includedLicenses&gt;licenseB&lt;/includedLicense&gt;
+   * &lt;/includedLicenses&gt;
+   * </pre>
+   *
+   * </li>
+   * <li>Since version {@code 1.15}<br>
+   * a URL that contains a set of license names at the target source (only a single URL is accepted as
+   * parameter)
+   *
+   * <pre>
+   *    &lt;includedLicenses&gt;http://my.license.host.com/my-whitelist&lt;/includedLicenses&gt;
+   * </pre>
+   *
+   * the license-list on the given URL is expected to be list with a line-break after every entry e.g.:
+   * <ul style="list-style-type:none;">
+   * <li>The Apache Software License, Version 2.0</li>
+   * <li>Apache License, Version 2.0</li>
+   * <li>Bouncy Castle Licence</li>
+   * <li>MIT License</li>
+   * </ul>
+   * empty lines will be ignored.</li>
+   * </ul>
+   *
+   * @since 1.1
+   */
+  @Parameter(property = "license.includedLicenses")
+  IncludedLicenses includedLicenses;
+
+  /**
+   * To specify some licenses to exclude.
+   * <p>
+   * If a such license is found then build will fail when property {@link #failOnBlacklist} is <tt>true</tt>.
+   * <p>
+   * Since version {@code 1.4}, there are three ways to fill this parameter :
+   * <ul>
+   * <li>A simple string (separated by {@code |}), the way to use by property configuration:
+   *
+   * <pre>
+   * &lt;excludedLicenses&gt;licenseA|licenseB&lt;/excludedLicenses&gt;
+   * </pre>
+   *
+   * or
+   *
+   * <pre>
+   * -Dlicense.excludedLicenses=licenseA|licenseB
+   * </pre>
+   *
+   * </li>
+   * <li>A list of string (can only be used in plugin configuration, not via property configuration)
+   *
+   * <pre>
+   * &lt;excludedLicenses&gt;
+   *   &lt;excludedLicense&gt;licenseA&lt;/excludedLicense&gt;
+   *   &lt;excludedLicense&gt;licenseB&lt;/excludedLicense&gt;
+   * &lt;/excludedLicenses&gt;
+   * </pre>
+   *
+   * </li>
+   * <li>Since version {@code 1.15}<br>
+   * a URL that contains a set of license names at the target source (only a single URL is accepted as
+   * parameter)
+   *
+   * <pre>
+   *    &lt;includedLicenses&gt;http://my.license.host.com/my-blacklist&lt;/includedLicenses&gt;
+   * </pre>
+   *
+   * the license-list on the given URL is expected to be list with a line-break after every entry e.g.:
+   * <ul style="list-style-type:none;">
+   * <li>The Apache Software License, Version 2.0</li>
+   * <li>Apache License, Version 2.0</li>
+   * <li>Bouncy Castle Licence</li>
+   * <li>MIT License</li>
+   * </ul>
+   * empty lines will be ignored.</li>
+   * </ul>
+   *
+   * @since 1.1
+   */
+  @Parameter(property = "license.excludedLicenses")
+  ExcludedLicenses excludedLicenses;
 
     /**
      * The path of the bundled third party file to produce when
@@ -597,6 +608,12 @@ public abstract class AbstractAddThirdPartyMojo
 
         licenseMap = getHelper().createLicenseMap( projectDependencies );
 
+        if (licenseMergesFile != null) {
+            getLog().warn("");
+            getLog().warn("licenseMerges will be overridden by licenseMergesFile.");
+            getLog().warn("");
+            licenseMerges = FileUtils.readLines(new File(licenseMergesFile), "utf-8");
+        }
     }
 
     void consolidate() throws IOException, ArtifactNotFoundException, ArtifactResolutionException, MojoFailureException,
@@ -681,6 +698,11 @@ public abstract class AbstractAddThirdPartyMojo
     File getOverrideFile()
     {
         return overrideFile;
+    }
+
+    String getLicenseMergesFile()
+    {
+        return licenseMergesFile;
     }
 
     SortedProperties getUnsafeMappings()
