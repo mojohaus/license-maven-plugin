@@ -27,6 +27,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.doxia.siterenderer.Renderer;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -154,6 +155,19 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport i
     private File missingFile;
 
     /**
+     * The Url that holds the missing license dependency entries. This is an extension to {@link #missingFile}.
+     * If set then the entries that will be found at this URL will be added additionally to the entries of the
+     * missing file.<br>
+     * <br>
+     * <b>NOTE:</b><br>
+     * the response of the URL endpoint must return content that matches the THIRD-PARTY.properties file!
+     *
+     * @since 1.15
+     */
+    @Parameter( property = "license.missingFileUrl" )
+    String missingFileUrl;
+
+    /**
      * The file where to fill the override license for dependencies.
      *
      * @since 1.11
@@ -276,9 +290,9 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport i
     // ----------------------------------------------------------------------
 
     protected abstract Collection<ThirdPartyDetails> createThirdPartyDetails()
-            throws IOException, ThirdPartyToolException, ProjectBuildingException, MojoFailureException,
-                   InvalidDependencyVersionException, ArtifactNotFoundException, ArtifactResolutionException,
-                   DependenciesToolException;
+      throws IOException, ThirdPartyToolException, ProjectBuildingException, MojoFailureException,
+             InvalidDependencyVersionException, ArtifactNotFoundException, ArtifactResolutionException,
+             DependenciesToolException, MojoExecutionException;
 
     // ----------------------------------------------------------------------
     // AbstractMavenReport Implementation
@@ -326,6 +340,10 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport i
             throw new MavenReportException( e.getMessage(), e );
         }
         catch ( DependenciesToolException e )
+        {
+            throw new MavenReportException( e.getMessage(), e );
+        }
+        catch (MojoExecutionException e)
         {
             throw new MavenReportException( e.getMessage(), e );
         }
@@ -462,8 +480,8 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport i
     // ----------------------------------------------------------------------
 
     Collection<ThirdPartyDetails> createThirdPartyDetails( MavenProject project, boolean loadArtifacts )
-            throws IOException, ThirdPartyToolException, ProjectBuildingException, MojoFailureException,
-                   DependenciesToolException
+      throws IOException, ThirdPartyToolException, ProjectBuildingException, MojoFailureException,
+             DependenciesToolException, MojoExecutionException
     {
 
         if ( loadArtifacts )
@@ -496,7 +514,7 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport i
             if ( useMissingFile )
             {
                 // Resolve unsafe dependencies using missing files, this will update licenseMap and unsafeDependencies
-                thirdPartyHelper.createUnsafeMapping( licenseMap, missingFile, useRepositoryMissingFiles,
+                thirdPartyHelper.createUnsafeMapping( licenseMap, missingFile, missingFileUrl, useRepositoryMissingFiles,
                                                       dependenciesWithNoLicense, projectDependencies );
             }
         }

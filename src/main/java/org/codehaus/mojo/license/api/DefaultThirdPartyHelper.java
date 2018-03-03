@@ -25,6 +25,7 @@ package org.codehaus.mojo.license.api;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
@@ -170,11 +171,11 @@ public class DefaultThirdPartyHelper
     /**
      * {@inheritDoc}
      */
-    public SortedProperties loadUnsafeMapping( LicenseMap licenseMap, File missingFile,
+    public SortedProperties loadUnsafeMapping( LicenseMap licenseMap, File missingFile, String missingFileUrl,
                                                SortedMap<String, MavenProject> projectDependencies )
-            throws IOException
+      throws IOException, MojoExecutionException
     {
-        return thirdPartyTool.loadUnsafeMapping( licenseMap, projectDependencies, encoding, missingFile);
+        return thirdPartyTool.loadUnsafeMapping( licenseMap, projectDependencies, encoding, missingFile, missingFileUrl);
     }
 
     /**
@@ -214,14 +215,15 @@ public class DefaultThirdPartyHelper
      * {@inheritDoc}
      */
     @SuppressWarnings( "unchecked" ) // project.getArtifacts()
-    public SortedProperties createUnsafeMapping( LicenseMap licenseMap, File missingFile,
+    public SortedProperties createUnsafeMapping( LicenseMap licenseMap, File missingFile, String missingFileUrl,
                                                  boolean useRepositoryMissingFiles,
                                                  SortedSet<MavenProject> unsafeDependencies,
                                                  SortedMap<String, MavenProject> projectDependencies )
-            throws ProjectBuildingException, IOException, ThirdPartyToolException
+      throws ProjectBuildingException, IOException, ThirdPartyToolException, MojoExecutionException
     {
 
-        SortedProperties unsafeMappings = loadUnsafeMapping( licenseMap, missingFile, projectDependencies );
+        SortedProperties unsafeMappings = loadUnsafeMapping( licenseMap, missingFile, missingFileUrl,
+                                                             projectDependencies );
 
         if ( CollectionUtils.isNotEmpty( unsafeDependencies ) )
         {

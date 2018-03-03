@@ -13,6 +13,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Dependency;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -197,14 +198,15 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
      */
     @Override
     protected SortedProperties createUnsafeMapping()
-            throws ProjectBuildingException, IOException, ThirdPartyToolException
+      throws ProjectBuildingException, IOException, ThirdPartyToolException, MojoExecutionException
     {
 
         SortedSet<MavenProject> unsafeDependencies = getUnsafeDependencies();
 
         SortedProperties unsafeMappings =
-                getHelper().createUnsafeMapping( getLicenseMap(), getMissingFile(), useRepositoryMissingFiles,
-                                                 unsafeDependencies, getProjectDependencies() );
+                getHelper().createUnsafeMapping( getLicenseMap(), getMissingFile(), missingFileUrl,
+                                                 useRepositoryMissingFiles, unsafeDependencies,
+                                                 getProjectDependencies() );
         if ( isVerbose() )
         {
             getLog().info( "found " + unsafeMappings.size() + " unsafe mappings" );

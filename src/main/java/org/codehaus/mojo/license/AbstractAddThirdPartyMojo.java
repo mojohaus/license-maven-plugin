@@ -21,10 +21,12 @@ import org.codehaus.mojo.license.api.ThirdPartyTool;
 import org.codehaus.mojo.license.api.ThirdPartyToolException;
 import org.codehaus.mojo.license.model.LicenseMap;
 import org.codehaus.mojo.license.utils.FileUtil;
+import org.codehaus.mojo.license.utils.HttpRequester;
 import org.codehaus.mojo.license.utils.MojoHelper;
 import org.codehaus.mojo.license.utils.SortedProperties;
 import org.codehaus.mojo.license.utils.StringToList;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
@@ -202,6 +204,19 @@ public abstract class AbstractAddThirdPartyMojo
     File missingFile;
 
     /**
+     * The Url that holds the missing license dependency entries. This is an extension to {@link #missingFile}.
+     * If set then the entries that will be found at this URL will be added additionally to the entries of the
+     * missing file.<br>
+     * <br>
+     * <b>NOTE:</b><br>
+     * the response of the URL endpoint must return content that matches the THIRD-PARTY.properties file!
+     *
+     * @since 1.15
+     */
+    @Parameter( property = "license.missingFileUrl" )
+    String missingFileUrl;
+
+    /**
      * To resolve third party licenses from an artifact.
      *
      * @since 1.14
@@ -236,7 +251,7 @@ public abstract class AbstractAddThirdPartyMojo
     @Parameter
     List<String> licenseMerges;
 
-    /**
+   /**
      * The file with the merge licenses in order to be used by command line.
      * <b>Note:</b> This option overrides {@link #licenseMerges}.
      *
@@ -536,7 +551,7 @@ public abstract class AbstractAddThirdPartyMojo
      * @throws ThirdPartyToolException  for third party tool error
      */
     protected abstract SortedProperties createUnsafeMapping()
-            throws ProjectBuildingException, IOException, ThirdPartyToolException;
+      throws ProjectBuildingException, IOException, ThirdPartyToolException, MojoExecutionException;
 
     // ----------------------------------------------------------------------
     // AbstractLicenseMojo Implementaton
@@ -601,7 +616,9 @@ public abstract class AbstractAddThirdPartyMojo
         }
     }
 
-    void consolidate() throws IOException, ArtifactNotFoundException, ArtifactResolutionException, MojoFailureException, ProjectBuildingException, ThirdPartyToolException {
+    void consolidate() throws IOException, ArtifactNotFoundException, ArtifactResolutionException, MojoFailureException,
+                              ProjectBuildingException, ThirdPartyToolException, MojoExecutionException
+    {
 
         unsafeDependencies = getHelper().getProjectsWithNoLicense( licenseMap );
 
@@ -760,14 +777,13 @@ public abstract class AbstractAddThirdPartyMojo
     }
 
     void resolveUnsafeDependenciesFromArtifact(String groupId, String artifactId, String version)
-            throws ArtifactNotFoundException, IOException, ArtifactResolutionException
+      throws ArtifactNotFoundException, IOException, ArtifactResolutionException, MojoExecutionException
     {
         File missingLicensesFromArtifact = thirdPartyTool.resolveMissingLicensesDescriptor( groupId, artifactId, version, localRepository, remoteRepositories );
         resolveUnsafeDependenciesFromFile( missingLicensesFromArtifact );
     }
 
-    void resolveUnsafeDependenciesFromFile(File missingLicenses) throws IOException
-    {
+    void resolveUnsafeDependenciesFromFile(File missingLicenses) throws IOException, MojoExecutionException {
         SortedSet<MavenProject> unsafeDeps = getUnsafeDependencies();
         if ( missingLicenses != null && missingLicenses.exists() && missingLicenses.length() > 0 )
         {
@@ -778,6 +794,11 @@ public abstract class AbstractAddThirdPartyMojo
             {
                 // load the missing file
                 unsafeMappings.load( missingLicenses );
+            }
+            if (HttpRequester.isStringUrl(missingFileUrl))
+            {
+                String httpRequestResult = HttpRequester.getFromUrl(missingFileUrl);
+                unsafeMappings.load(new ByteArrayInputStream(httpRequestResult.getBytes()));
             }
 
             Set<MavenProject> resolvedDependencies = new HashSet<MavenProject>();

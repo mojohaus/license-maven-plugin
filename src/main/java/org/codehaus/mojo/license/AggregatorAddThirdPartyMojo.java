@@ -12,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -259,7 +260,8 @@ public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo
      * {@inheritDoc}
      */
     @Override
-    protected SortedProperties createUnsafeMapping() throws ProjectBuildingException, IOException
+    protected SortedProperties createUnsafeMapping()
+      throws ProjectBuildingException, IOException, MojoExecutionException
     {
 
         String path =
@@ -283,7 +285,8 @@ public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo
             if ( file.exists() )
             {
 
-                SortedProperties tmp = getHelper().loadUnsafeMapping( licenseMap, file, getProjectDependencies() );
+                SortedProperties tmp = getHelper().loadUnsafeMapping( licenseMap, file, null,
+                                                                      getProjectDependencies() );
                 unsafeMappings.putAll( tmp );
             }
 

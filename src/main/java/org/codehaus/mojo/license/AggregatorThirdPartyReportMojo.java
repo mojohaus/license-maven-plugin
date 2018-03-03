@@ -2,6 +2,7 @@ package org.codehaus.mojo.license;
 
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -90,9 +91,9 @@ public class AggregatorThirdPartyReportMojo
      * {@inheritDoc}
      */
     protected Collection<ThirdPartyDetails> createThirdPartyDetails()
-        throws IOException, ThirdPartyToolException, ProjectBuildingException, MojoFailureException,
-        InvalidDependencyVersionException, ArtifactNotFoundException, ArtifactResolutionException,
-        DependenciesToolException
+      throws IOException, ThirdPartyToolException, ProjectBuildingException, MojoFailureException,
+             InvalidDependencyVersionException, ArtifactNotFoundException, ArtifactResolutionException,
+             DependenciesToolException, MojoExecutionException
     {
 
         Collection<ThirdPartyDetails> details = new LinkedHashSet<ThirdPartyDetails>();
