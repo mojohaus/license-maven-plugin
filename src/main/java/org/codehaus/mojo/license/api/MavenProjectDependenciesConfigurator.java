@@ -57,6 +57,16 @@ public interface MavenProjectDependenciesConfigurator
     List<String> getExcludedScopes();
 
     /**
+     * @return list of types to include while loading dependencies, if {@code null} is setted, then include all types.
+     */
+    List<String> getIncludedTypes();
+
+    /**
+     * @return list of types to exclude while loading dependencies, if {@code null} is setted, then include all types.
+     */
+    List<String> getExcludedTypes();
+
+    /**
      * @return a pattern to include dependencies by thier {@code artificatId}, if {@code null} is setted then include
      *         all artifacts.
      */

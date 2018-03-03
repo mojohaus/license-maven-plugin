@@ -146,6 +146,8 @@ public class DefaultDependenciesTool
 
         List<String> includedScopes = configuration.getIncludedScopes();
         List<String> excludeScopes = configuration.getExcludedScopes();
+        List<String> includedTypes = configuration.getIncludedTypes();
+        List<String> excludeTypes = configuration.getExcludedTypes();
 
         boolean verbose = configuration.isVerbose();
 
@@ -186,6 +188,21 @@ public class DefaultDependenciesTool
             {
 
                 // in excluded scopes
+                continue;
+            }
+
+            String type = artifact.getType();
+            if ( CollectionUtils.isNotEmpty( includedTypes ) && !includedTypes.contains( type ) )
+            {
+
+                // not in included scopes
+                continue;
+            }
+
+            if ( excludeTypes.contains( type ) )
+            {
+
+                // in excluded types
                 continue;
             }
 

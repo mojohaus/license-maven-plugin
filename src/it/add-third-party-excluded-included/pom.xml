@@ -63,6 +63,12 @@
       <version>4.8.2</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.wildfly</groupId>
+      <artifactId>wildfly-ejb-client-bom</artifactId>
+      <type>pom</type>
+      <version>9.0.1.Final</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -172,6 +178,30 @@
               <excludedGroups>org\.nuiton</excludedGroups>
               <excludedArtifacts>nuiton-i18n</excludedArtifacts>
               <thirdPartyFilename>thirdWithoutGroupWithoutArtifact.txt</thirdPartyFilename>
+            </configuration>
+          </execution>
+          <execution>
+            <id>exclude-pom</id>
+            <goals>
+              <goal>add-third-party</goal>
+            </goals>
+            <phase>validate</phase>
+            <configuration>
+              <excludedGroups>org\.wildfly\.checkstyle</excludedGroups>
+              <excludedTypes>pom</excludedTypes>
+              <thirdPartyFilename>thirdWithoutType.txt</thirdPartyFilename>
+            </configuration>
+          </execution>
+          <execution>
+            <id>include-pom</id>
+            <goals>
+              <goal>add-third-party</goal>
+            </goals>
+            <phase>validate</phase>
+            <configuration>
+              <excludedGroups>org\.wildfly\.checkstyle</excludedGroups>
+              <includedTypes>pom</includedTypes>
+              <thirdPartyFilename>thirdWithType.txt</thirdPartyFilename>
             </configuration>
           </execution>
         </executions>
