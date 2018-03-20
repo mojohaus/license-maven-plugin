@@ -53,7 +53,7 @@
 <a class="jxr_linenumber" name="L45" href="#L45">45</a>      {
 <a class="jxr_linenumber" name="L46" href="#L46">46</a>          JavaFileHeaderTransformer transformer = <strong class="jxr_keyword">new</strong> JavaFileHeaderTransformer();
 <a class="jxr_linenumber" name="L47" href="#L47">47</a>  
-<a class="jxr_linenumber" name="L48" href="#L48">48</a>          String content = PACKAGE + <span class="jxr_string">"\n"</span> + CONTENT;
+<a class="jxr_linenumber" name="L48" href="#L48">48</a>      String content = PACKAGE + FileHeaderTransformer.LINE_SEPARATOR + CONTENT;
 <a class="jxr_linenumber" name="L49" href="#L49">49</a>  
 <a class="jxr_linenumber" name="L50" href="#L50">50</a>          transformer.setAddJavaLicenseAfterPackage( false );
 <a class="jxr_linenumber" name="L51" href="#L51">51</a>  
@@ -62,14 +62,16 @@
 <a class="jxr_linenumber" name="L54" href="#L54">54</a>  
 <a class="jxr_linenumber" name="L55" href="#L55">55</a>          transformer.setAddJavaLicenseAfterPackage( <strong class="jxr_keyword">true</strong> );
 <a class="jxr_linenumber" name="L56" href="#L56">56</a>  
-<a class="jxr_linenumber" name="L57" href="#L57">57</a>          result = transformer.addHeader( HEADER, content );
-<a class="jxr_linenumber" name="L58" href="#L58">58</a>          Assert.assertEquals( PACKAGE + <span class="jxr_string">"\n\n"</span> + HEADER + CONTENT, result );
-<a class="jxr_linenumber" name="L59" href="#L59">59</a>  
-<a class="jxr_linenumber" name="L60" href="#L60">60</a>      }
+<a class="jxr_linenumber" name="L57" href="#L57">57</a>      result = transformer.addHeader(HEADER, content);
+<a class="jxr_linenumber" name="L58" href="#L58">58</a>      Assert.assertEquals(PACKAGE + FileHeaderTransformer.LINE_SEPARATOR + FileHeaderTransformer.LINE_SEPARATOR
+<a class="jxr_linenumber" name="L59" href="#L59">59</a>                          + HEADER + CONTENT,
+<a class="jxr_linenumber" name="L60" href="#L60">60</a>                          result);
 <a class="jxr_linenumber" name="L61" href="#L61">61</a>  
-<a class="jxr_linenumber" name="L62" href="#L62">62</a>  }
+<a class="jxr_linenumber" name="L62" href="#L62">62</a>      }
+<a class="jxr_linenumber" name="L63" href="#L63">63</a>  
+<a class="jxr_linenumber" name="L64" href="#L64">64</a>  }
 </pre>
 <hr/>
-<div id="footer">Copyright &#169; 2010&#x2013;2017 <a href="http://www.mojohaus.org">MojoHaus</a>. All rights reserved.</div>
+<div id="footer">Copyright &#169; 2010&#x2013;2018 <a href="http://www.mojohaus.org">MojoHaus</a>. All rights reserved.</div>
 </body>
 </html>
