@@ -25,8 +25,7 @@ package org.codehaus.mojo.license.api;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -345,7 +344,20 @@ public class DefaultDependenciesTool
         }
 
         Artifact artifact = project.getArtifact();
-
+        Set<Artifact> reactorArtifacts = new LinkedHashSet<Artifact>();
+        if (reactorProjectDependencies != null) {
+            // let's not include sibling dependencies, since artifact files may not be generated
+            // (aggregate mode without forking mode)
+            Iterator artifacts = project.getDependencyArtifacts().iterator();
+            while (artifacts.hasNext()) {
+                Artifact artifact1 = (Artifact) artifacts.next();
+                String artifactKey = artifact1.getGroupId() + ":" + artifact1.getArtifactId();
+                if (reactorProjectDependencies.containsKey(artifactKey)) {
+                    artifacts.remove();
+                    reactorArtifacts.add(artifact1);
+                }
+            }
+        }
         ArtifactResolutionResult result;
         try
         {
@@ -360,8 +372,9 @@ public class DefaultDependenciesTool
         {
             throw new DependenciesToolException( e );
         }
+        reactorArtifacts.addAll(result.getArtifacts());
 
-        project.setArtifacts( result.getArtifacts() );
+        project.setArtifacts( reactorArtifacts );
 
     }
 
