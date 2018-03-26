@@ -67,13 +67,13 @@ public class PropertiesFileHeaderTransformer
 
             // shebang was detected
 
-            int endProlog = content.indexOf( LINE_SEPARATOR );
+            int endProlog = content.indexOf( getLineSeparator() );
 
             if ( endProlog > -1 )
             {
 
                 // prolog end was detected
-                prolog = content.substring( 0, endProlog + LINE_SEPARATOR.length() );
+                prolog = content.substring( 0, endProlog + getLineSeparator().length() );
             }
         }
 
@@ -88,7 +88,7 @@ public class PropertiesFileHeaderTransformer
 
             // shebang detected
             content = content.substring( prolog.length() );
-            result = super.addHeader( prolog + LINE_SEPARATOR + header, content );
+            result = super.addHeader( prolog + getLineSeparator() + header, content );
         }
         return result;
     }

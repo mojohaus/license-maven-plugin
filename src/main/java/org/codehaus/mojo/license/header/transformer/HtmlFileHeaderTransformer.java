@@ -87,7 +87,7 @@ public class HtmlFileHeaderTransformer
 
             // prolog detected
             content = content.substring( prolog.length() );
-            result = super.addHeader( prolog + LINE_SEPARATOR + header, content );
+            result = super.addHeader( prolog + getLineSeparator() + header, content );
         }
         return result;
     }

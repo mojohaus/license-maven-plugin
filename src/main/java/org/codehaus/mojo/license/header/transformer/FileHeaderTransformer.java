@@ -132,6 +132,8 @@ public interface FileHeaderTransformer
      */
     String getCommentLinePrefix();
 
+    String getLineSeparator();
+
     /**
      * Get flag if there should be an empty line after the header.
      *
@@ -315,4 +317,6 @@ public interface FileHeaderTransformer
      * @param trimLine flag if header line should be right trimmed when written
      */
     void setTrimHeaderLine( boolean trimLine );
+
+    void setLineSeparator( String lineSeparator);
 }

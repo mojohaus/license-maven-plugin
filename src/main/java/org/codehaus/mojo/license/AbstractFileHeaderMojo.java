@@ -95,6 +95,14 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
     private String sectionDelimiter;
 
     /**
+     * To specify a line separator to use.
+     *
+     * If not set, will use system property {@code line.separator}.
+     */
+    @Parameter( property = "license.lineSeparator" )
+    private String lineSeparator;
+
+    /**
      * A flag to add svn:keywords on new header.
      * <p>
      * Will add svn keywords :
@@ -151,7 +159,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
      * @since 1.0
      */
     @Parameter( property = "license.ignoreTag" )
-    String ignoreTag;
+    private String ignoreTag;
 
     /**
      * A flag to add the license header in java files after the package statement.
@@ -491,6 +499,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
             aTransformer.setSectionDelimiter( sectionDelimiter );
             aTransformer.setEmptyLineAfterHeader( emptyLineAfterHeader );
             aTransformer.setTrimHeaderLine( trimHeaderLine );
+            aTransformer.setLineSeparator( lineSeparator);
 
             if ( aTransformer instanceof JavaFileHeaderTransformer )
             {

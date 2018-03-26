@@ -104,6 +104,11 @@ public abstract class AbstractFileHeaderTransformer
      */
     private boolean trimHeaderLine;
 
+    /**
+     * Line separator.
+     */
+    private String lineSeparator;
+
     protected AbstractFileHeaderTransformer( String name, String description, String commentStartTag,
                                              String commentEndTag, String commentLinePrefix )
     {
@@ -248,6 +253,18 @@ public abstract class AbstractFileHeaderTransformer
     {
         return commentLinePrefix;
     }
+    /**
+     * {@inheritDoc}
+     */
+    public String getLineSeparator() {
+        return lineSeparator == null ? lineSeparator = LINE_SEPARATOR : lineSeparator;
+    }
+    /**
+     * {@inheritDoc}
+     */
+    public void setLineSeparator(String lineSeparator) {
+        this.lineSeparator = lineSeparator;
+    }
 
     /**
      * {@inheritDoc}
@@ -262,7 +279,7 @@ public abstract class AbstractFileHeaderTransformer
                 final String line = contentSplit[0].trim();
                 if ( line.length() > 0 )
                 {
-                    return header + LINE_SEPARATOR + content;
+                    return header + getLineSeparator() + content;
                 }
             }
         }
@@ -358,7 +375,7 @@ public abstract class AbstractFileHeaderTransformer
         }
         StringBuilder buffer = new StringBuilder();
 
-        String sectionDelimiter = LINE_SEPARATOR + getSectionDelimiter() + LINE_SEPARATOR;
+        String sectionDelimiter = getLineSeparator() + getSectionDelimiter() + getLineSeparator();
 
         // add description section
         buffer.append( model.getDescription().trim() );
@@ -369,7 +386,7 @@ public abstract class AbstractFileHeaderTransformer
         buffer.append( sectionDelimiter );
 
         // add license section
-        buffer.append( model.getLicense().trim() ).append( LINE_SEPARATOR );
+        buffer.append( model.getLicense().trim() ).append( getLineSeparator() );
         return buffer.toString();
     }
 
@@ -408,7 +425,7 @@ public abstract class AbstractFileHeaderTransformer
         StringBuilder buffer = new StringBuilder();
         if ( withTags )
         {
-            buffer.append( getCommentStartTag() ).append( LINE_SEPARATOR );
+            buffer.append( getCommentStartTag() ).append( getLineSeparator() );
         }
         for ( String line : header.split( "\\r?\\n" ) )
         {
@@ -423,11 +440,11 @@ public abstract class AbstractFileHeaderTransformer
                buffer.append( getCommentLinePrefix() );
                buffer.append( line );
             }
-            buffer.append( LINE_SEPARATOR );
+            buffer.append( getLineSeparator() );
         }
         if ( withTags )
         {
-            buffer.append( getCommentEndTag() ).append( LINE_SEPARATOR );
+            buffer.append( getCommentEndTag() ).append( getLineSeparator() );
         }
         return buffer.toString();
     }
@@ -439,7 +456,7 @@ public abstract class AbstractFileHeaderTransformer
     {
         StringBuilder buffer = new StringBuilder();
         int prefixLength = getCommentLinePrefix().length();
-        for ( String line : header.split( LINE_SEPARATOR + "" ) )
+        for ( String line : header.split( getLineSeparator() + "" ) )
         {
             if ( StringUtils.isEmpty( line ) || line.contains( getCommentStartTag() ) ||
                 line.contains( getCommentEndTag() ) )
@@ -467,7 +484,7 @@ public abstract class AbstractFileHeaderTransformer
                     line = "";
                 }
             }
-            buffer.append( line ).append( LINE_SEPARATOR );
+            buffer.append( line ).append( getLineSeparator() );
         }
         return buffer.toString();
     }
@@ -478,9 +495,9 @@ public abstract class AbstractFileHeaderTransformer
     public String boxProcessTag( String header )
     {
         StringBuilder buffer = new StringBuilder();
-        buffer.append( getProcessStartTag() ).append( LINE_SEPARATOR );
-        buffer.append( header.trim() ).append( LINE_SEPARATOR );
-        buffer.append( getProcessEndTag() ).append( LINE_SEPARATOR );
+        buffer.append( getProcessStartTag() ).append( getLineSeparator() );
+        buffer.append( header.trim() ).append( getLineSeparator() );
+        buffer.append( getProcessEndTag() ).append( getLineSeparator() );
         return buffer.toString();
     }
 
@@ -490,7 +507,7 @@ public abstract class AbstractFileHeaderTransformer
     public String unboxProcessTag( String boxedHeader )
     {
         StringBuilder buffer = new StringBuilder();
-        for ( String line : boxedHeader.split( LINE_SEPARATOR + "" ) )
+        for ( String line : boxedHeader.split( getLineSeparator() + "" ) )
         {
             if ( StringUtils.isEmpty( line ) || line.contains( getProcessStartTag() ) ||
                 line.contains( getProcessEndTag() ) )
@@ -499,7 +516,7 @@ public abstract class AbstractFileHeaderTransformer
                 // not be unboxed, but just skipped
                 continue;
             }
-            buffer.append( line ).append( LINE_SEPARATOR );
+            buffer.append( line ).append( getLineSeparator() );
         }
         return buffer.toString();
     }
