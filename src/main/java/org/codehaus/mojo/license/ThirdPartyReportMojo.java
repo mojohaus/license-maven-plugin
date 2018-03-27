@@ -41,7 +41,7 @@ import java.util.Collection;
  * @author tchemit dev@tchemit.fr
  * @since 1.1
  */
-@Mojo( name = "third-party-report", requiresDependencyResolution = ResolutionScope.RUNTIME )
+@Mojo( name = "third-party-report", requiresDependencyResolution = ResolutionScope.TEST )
 public class ThirdPartyReportMojo extends AbstractThirdPartyReportMojo
 {
 

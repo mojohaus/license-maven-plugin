@@ -27,7 +27,7 @@ import java.util.List;
  * @author Tony Chemit - dev@tchemit.fr
  * @since 1.10
  */
-@Mojo( name = "aggregate-third-party-report", aggregator = true, requiresDependencyResolution = ResolutionScope.RUNTIME )
+@Mojo( name = "aggregate-third-party-report", aggregator = true, requiresDependencyResolution = ResolutionScope.TEST)
 public class AggregatorThirdPartyReportMojo
     extends AbstractThirdPartyReportMojo
 {

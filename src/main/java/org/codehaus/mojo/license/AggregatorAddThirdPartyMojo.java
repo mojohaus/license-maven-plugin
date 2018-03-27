@@ -18,6 +18,7 @@ import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
 import org.codehaus.mojo.license.model.LicenseMap;
@@ -58,7 +59,8 @@ import org.codehaus.mojo.license.utils.SortedProperties;
  * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
-@Mojo( name = "aggregate-add-third-party", aggregator = true, defaultPhase = LifecyclePhase.GENERATE_RESOURCES, threadSafe = true )
+@Mojo( name = "aggregate-add-third-party", aggregator = true, defaultPhase = LifecyclePhase.GENERATE_RESOURCES,
+        requiresDependencyResolution = ResolutionScope.TEST, threadSafe = true )
 public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo
 {
     // ----------------------------------------------------------------------
