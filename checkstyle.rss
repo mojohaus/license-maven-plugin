@@ -26,8 +26,8 @@ under the License.
     <copyright>&#169;2010 - 2018 MojoHaus</copyright>
     <item>
       <title>File: 75,
-             Errors: 598,
-             Warnings: 178,
+             Errors: 616,
+             Warnings: 180,
              Infos: 13
       </title>
             <link>http://www.mojohaus.org/license-maven-plugin/checkstyle.html</link>
@@ -139,7 +139,7 @@ under the License.
                   0
                 </td>
                 <td>
-                  109
+                  108
                 </td>
               </tr>
                           <tr>
@@ -178,10 +178,10 @@ under the License.
                   0
                 </td>
                 <td>
-                  0
+                  2
                 </td>
                 <td>
-                  3
+                  4
                 </td>
               </tr>
                           <tr>
@@ -475,7 +475,7 @@ under the License.
                   1
                 </td>
                 <td>
-                  10
+                  11
                 </td>
               </tr>
                           <tr>
@@ -783,7 +783,7 @@ under the License.
                   0
                 </td>
                 <td>
-                  78
+                  90
                 </td>
               </tr>
                           <tr>
@@ -937,7 +937,7 @@ under the License.
                   3
                 </td>
                 <td>
-                  9
+                  14
                 </td>
               </tr>
                           <tr>

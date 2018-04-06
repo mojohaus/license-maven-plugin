@@ -137,13 +137,13 @@
 <a class="jxr_linenumber" name="L129" href="#L129">129</a>                 prolog = content.substring( 0, lastIndex );
 <a class="jxr_linenumber" name="L130" href="#L130">130</a> 
 <a class="jxr_linenumber" name="L131" href="#L131">131</a>                 <em class="jxr_comment">// prolog goes to next line</em>
-<a class="jxr_linenumber" name="L132" href="#L132">132</a>                 prolog += LINE_SEPARATOR;
+<a class="jxr_linenumber" name="L132" href="#L132">132</a>                 prolog += getLineSeparator();
 <a class="jxr_linenumber" name="L133" href="#L133">133</a> 
 <a class="jxr_linenumber" name="L134" href="#L134">134</a>                 <strong class="jxr_keyword">if</strong> ( lastIndex == content.length() )
 <a class="jxr_linenumber" name="L135" href="#L135">135</a>                 {
 <a class="jxr_linenumber" name="L136" href="#L136">136</a> 
 <a class="jxr_linenumber" name="L137" href="#L137">137</a>                     <em class="jxr_comment">// adding a new empty end line to the content</em>
-<a class="jxr_linenumber" name="L138" href="#L138">138</a>                     content += LINE_SEPARATOR;
+<a class="jxr_linenumber" name="L138" href="#L138">138</a>                     content += getLineSeparator();
 <a class="jxr_linenumber" name="L139" href="#L139">139</a>                 }
 <a class="jxr_linenumber" name="L140" href="#L140">140</a> 
 <a class="jxr_linenumber" name="L141" href="#L141">141</a> 
@@ -161,7 +161,7 @@
 <a class="jxr_linenumber" name="L153" href="#L153">153</a> 
 <a class="jxr_linenumber" name="L154" href="#L154">154</a>             <em class="jxr_comment">// prolog detected</em>
 <a class="jxr_linenumber" name="L155" href="#L155">155</a>             content = content.substring( prolog.length() );
-<a class="jxr_linenumber" name="L156" href="#L156">156</a>             result = <strong class="jxr_keyword">super</strong>.addHeader( prolog + LINE_SEPARATOR + header, content );
+<a class="jxr_linenumber" name="L156" href="#L156">156</a>             result = <strong class="jxr_keyword">super</strong>.addHeader( prolog + getLineSeparator() + header, content );
 <a class="jxr_linenumber" name="L157" href="#L157">157</a>         }
 <a class="jxr_linenumber" name="L158" href="#L158">158</a>         <strong class="jxr_keyword">return</strong> result;
 <a class="jxr_linenumber" name="L159" href="#L159">159</a>     }
