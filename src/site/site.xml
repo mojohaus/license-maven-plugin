@@ -23,6 +23,16 @@
   -->
 
 <project xmlns="http://maven.apache.org/DECORATION/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/DECORATION/1.0.0 http://maven.apache.org/xsd/decoration-1.0.0.xsd">
+  <custom>
+    <fluidoSkin>
+      <gitHub>
+        <projectId>mojohaus/${this.artifactId}</projectId>
+        <ribbonOrientation>right</ribbonOrientation>
+        <ribbonColor>gray</ribbonColor>
+      </gitHub>
+    </fluidoSkin>
+  </custom>
+
   <body>
     <menu name="Overview">
       <item name="Introduction" href="index.html"/>
@@ -30,7 +40,6 @@
       <item name="Usage" href="usage.html"/>
       <item name="FAQ" href="faq.html"/>
       <item name="File header model" href="header.html"/>
-      <!--<item name="Site français" href="http://mojo.codehaus.org/license-maven-plugin/fr/index.html"/>-->
     </menu>
     <menu name="Examples">
       <item name="Add License" href="examples/example-add-license.html"/>
