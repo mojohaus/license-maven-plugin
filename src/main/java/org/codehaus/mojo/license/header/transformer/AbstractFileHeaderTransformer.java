@@ -305,9 +305,9 @@ public abstract class AbstractFileHeaderTransformer
     /**
      * {@inheritDoc}
      */
-    public void setEmptyLineAfterHeader( boolean trimLine )
+    public void setEmptyLineAfterHeader( boolean emptyLine )
     {
-        this.emptyLineAfterHeader = trimLine;
+        this.emptyLineAfterHeader = emptyLine;
     }
 
     /**
@@ -323,7 +323,7 @@ public abstract class AbstractFileHeaderTransformer
      */
     public void setTrimHeaderLine( boolean trimLine )
     {
-        this.emptyLineAfterHeader = trimLine;
+        this.trimHeaderLine = trimLine;
     }
 
     /**
@@ -429,7 +429,7 @@ public abstract class AbstractFileHeaderTransformer
         }
         for ( String line : header.split( "\\r?\\n" ) )
         {
-            if ( trimHeaderLine )
+            if ( isTrimHeaderLine() )
             {
               StringBuilder lineBuffer = new StringBuilder();
               lineBuffer.append( getCommentLinePrefix() );

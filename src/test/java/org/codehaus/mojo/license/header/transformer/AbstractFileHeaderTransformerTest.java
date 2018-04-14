@@ -306,6 +306,15 @@ public class AbstractFileHeaderTransformerTest
         Assert.assertEquals( header, unboxedHeader );
     }
 
+    @Test
+    public void testSetTrimHeaderLine()
+    {
+        Assert.assertFalse(transformer.isTrimHeaderLine());
+
+        transformer.setTrimHeaderLine(true);
+        Assert.assertTrue(transformer.isTrimHeaderLine());
+    }
+
     public static void assertEquals( FileHeader model, FileHeader model2 )
     {
         Assert.assertEquals( model.getDescription(), model2.getDescription() );
