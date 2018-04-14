@@ -493,7 +493,7 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo
             getLog().info( " - header was removed for " + file );
         }
 
-        String contentWithoutHeader = content.substring( 0, firstIndex ) + content.substring( lastIndex );
+        String contentWithoutHeader = content.substring( 0, firstIndex ) + content.substring( lastIndex + 1 );
 
         FileUtils.fileWrite( processFile, contentWithoutHeader );
         FileState.remove.addFile( file, result );
