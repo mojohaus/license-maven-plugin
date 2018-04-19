@@ -108,7 +108,7 @@ public class CommentStyleListMojo
             buffer.append( "                           license-maven-plugin\n" );
             buffer.append( "-------------------------------------------------------------------------------\n\n" );
         }
-        List<String> names = new ArrayList<String>( transformers.keySet() );
+        List<String> names = new ArrayList<>( transformers.keySet() );
         Collections.sort( names );
 
         int maxLength = 0;

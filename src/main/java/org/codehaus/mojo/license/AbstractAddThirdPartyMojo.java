@@ -853,7 +853,7 @@ public abstract class AbstractAddThirdPartyMojo
                 unsafeMappings.load(new ByteArrayInputStream(httpRequestResult.getBytes()));
             }
 
-            Set<MavenProject> resolvedDependencies = new HashSet<MavenProject>();
+            Set<MavenProject> resolvedDependencies = new HashSet<>();
             for ( MavenProject unsafeDependency : unsafeDeps )
             {
                 String id = MojoHelper.getArtifactId( unsafeDependency.getArtifact() );
@@ -895,7 +895,7 @@ public abstract class AbstractAddThirdPartyMojo
     {
         List<String> whiteLicenses = getIncludedLicenses();
         List<String> blackLicenses = getExcludedLicenses();
-        Set<String> unsafeLicenses = new HashSet<String>();
+        Set<String> unsafeLicenses = new HashSet<>();
         if ( CollectionUtils.isNotEmpty( blackLicenses ) )
         {
             Set<String> licenses = getLicenseMap().keySet();

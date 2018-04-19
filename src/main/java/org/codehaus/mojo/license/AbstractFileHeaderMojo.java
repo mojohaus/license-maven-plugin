@@ -469,7 +469,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
             }
         }
 
-        extensionToCommentStyle = new TreeMap<String, String>();
+        extensionToCommentStyle = new TreeMap<>();
 
         processStartTag = cleanHeaderConfiguration( processStartTag, FileHeaderTransformer.DEFAULT_PROCESS_START_TAG );
         if ( isVerbose() )
@@ -569,8 +569,8 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
 
         long t0 = System.nanoTime();
 
-        processedFiles = new HashSet<File>();
-        result = new EnumMap<FileState, Set<File>>( FileState.class );
+        processedFiles = new HashSet<>();
+        result = new EnumMap<>( FileState.class );
 
         try
         {
@@ -795,7 +795,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
         }
 
         // update the file header description
-        Map<String, Object> descriptionParameters = new HashMap<String, Object>();
+        Map<String, Object> descriptionParameters = new HashMap<>();
         descriptionParameters.put( "project", getProject() );
         descriptionParameters.put( "addSvnKeyWords", addSvnKeyWords );
         descriptionParameters.put( "projectName", projectName );

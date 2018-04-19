@@ -115,7 +115,7 @@ public class LicenseRepository
             }
             else
             {
-                licenses = new ArrayList<License>();
+                licenses = new ArrayList<>();
             }
 
             if ( !checkExists( definitionURL ) )
@@ -182,7 +182,7 @@ public class LicenseRepository
     public String[] getLicenseNames()
     {
         checkInit( "getLicenseNames" );
-        List<String> result = new ArrayList<String>( licenses.size() );
+        List<String> result = new ArrayList<>( licenses.size() );
         for ( License license : this )
         {
             result.add( license.getName() );

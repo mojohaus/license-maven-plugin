@@ -112,7 +112,7 @@ public class HttpRequester
    */
   public static List<String> downloadList(String url) throws MojoExecutionException
   {
-    List<String> list = new ArrayList<String>();
+    List<String> list = new ArrayList<>();
     BufferedReader bufferedReader = null;
     try
     {

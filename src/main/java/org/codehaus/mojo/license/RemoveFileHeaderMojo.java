@@ -290,7 +290,7 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo
             }
         }
 
-        Map<String, String> extensionToCommentStyle = new TreeMap<String, String>();
+        Map<String, String> extensionToCommentStyle = new TreeMap<>();
 
         // add default extensions from header transformers
         for ( Map.Entry<String, FileHeaderTransformer> entry : transformers.entrySet() )
@@ -350,8 +350,8 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo
 
         long t0 = System.nanoTime();
 
-        processedFiles = new HashSet<File>();
-        result = new EnumMap<FileState, Set<File>>( FileState.class );
+        processedFiles = new HashSet<>();
+        result = new EnumMap<>( FileState.class );
 
         try
         {

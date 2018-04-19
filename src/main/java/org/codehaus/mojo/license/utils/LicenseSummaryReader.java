@@ -60,7 +60,7 @@ public class LicenseSummaryReader
     public static List<ProjectLicenseInfo> parseLicenseSummary( InputStream licSummaryIS )
         throws IOException, ParserConfigurationException, SAXException
     {
-        List<ProjectLicenseInfo> dependencies = new ArrayList<ProjectLicenseInfo>();
+        List<ProjectLicenseInfo> dependencies = new ArrayList<>();
 
         DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();

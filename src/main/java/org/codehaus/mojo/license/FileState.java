@@ -54,7 +54,7 @@ public enum FileState
         Set<File> fileSet = results.get( this );
         if ( fileSet == null )
         {
-            fileSet = new HashSet<File>();
+            fileSet = new HashSet<>();
             results.put( this, fileSet );
         }
         fileSet.add( file );

@@ -72,7 +72,7 @@ public class DownloadLicensesMojo
     protected Set<MavenProject> getDependencies()
     {
         SortedMap<String, MavenProject> dependencies = getDependencies( getProject() );
-        return new HashSet<MavenProject>( dependencies.values() );
+        return new HashSet<>( dependencies.values() );
     }
 
 }

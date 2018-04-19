@@ -77,7 +77,7 @@ public class LicenseMap
         if ( valueList == null )
         {
 
-            valueList = new TreeSet<MavenProject>( projectComparator );
+            valueList = new TreeSet<>( projectComparator );
         }
 
         valueList.add( value );
@@ -100,7 +100,7 @@ public class LicenseMap
             if ( valueList == null )
             {
 
-                valueList = new TreeSet<MavenProject>( projectComparator );
+                valueList = new TreeSet<>( projectComparator );
             }
 
             valueList.addAll( entry.getValue() );
@@ -117,7 +117,7 @@ public class LicenseMap
      */
     public SortedMap<MavenProject, String[]> toDependencyMap()
     {
-        SortedMap<MavenProject, Set<String>> tmp = new TreeMap<MavenProject, Set<String>>( projectComparator );
+        SortedMap<MavenProject, Set<String>> tmp = new TreeMap<>( projectComparator );
 
         for ( Map.Entry<String, SortedSet<MavenProject>> entry : entrySet() )
         {
@@ -128,17 +128,17 @@ public class LicenseMap
                 Set<String> list = tmp.get( p );
                 if ( list == null )
                 {
-                    list = new HashSet<String>();
+                    list = new HashSet<>();
                     tmp.put( p, list );
                 }
                 list.add( license );
             }
         }
 
-        SortedMap<MavenProject, String[]> result = new TreeMap<MavenProject, String[]>( projectComparator );
+        SortedMap<MavenProject, String[]> result = new TreeMap<>( projectComparator );
         for ( Map.Entry<MavenProject, Set<String>> entry : tmp.entrySet() )
         {
-            List<String> value = new ArrayList<String>( entry.getValue() );
+            List<String> value = new ArrayList<>( entry.getValue() );
             Collections.sort( value );
             result.put( entry.getKey(), value.toArray( new String[value.size()] ) );
         }
@@ -155,7 +155,7 @@ public class LicenseMap
         {
             String licenseKey = entry.getKey();
             SortedSet<MavenProject> projects =
-                new TreeSet<MavenProject>( mavenProjectComparator );
+                    new TreeSet<>( mavenProjectComparator );
             projects.addAll( entry.getValue() );
             result.put( licenseKey, projects );
         }

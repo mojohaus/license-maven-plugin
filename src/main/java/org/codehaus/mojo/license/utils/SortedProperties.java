@@ -94,7 +94,7 @@ public class SortedProperties
         {
             // keys are not string !!!
             // can not sort keys
-            result = new Vector<Object>( objects );
+            result = new Vector<>( objects );
         }
         return result.elements();
     }

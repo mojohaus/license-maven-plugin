@@ -76,7 +76,7 @@ public class FreeMarkerHelperTest
         licenseMap.put( "license 1", deps );
         licenseMap.put( "license 1", deps2 );
         licenseMap.put( "license 2", deps2 );
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put( "licenseMap", licenseMap.entrySet() );
         properties.put( "dependencyMap", licenseMap.toDependencyMap().entrySet() );
 
@@ -114,7 +114,7 @@ public class FreeMarkerHelperTest
         licenseMap.put( "license 1", deps );
         licenseMap.put( "license 1", deps2 );
         licenseMap.put( "license 2", deps2 );
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put( "licenseMap", licenseMap.entrySet() );
         properties.put( "dependencyMap", licenseMap.toDependencyMap().entrySet() );
 
@@ -141,7 +141,7 @@ public class FreeMarkerHelperTest
         project.setArtifactId( "artifactId" );
         project.setVersion( "version" );
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put( "project", project );
         properties.put( "projectName", "projectName" );
         properties.put( "inceptionYear", "inceptionYear" );

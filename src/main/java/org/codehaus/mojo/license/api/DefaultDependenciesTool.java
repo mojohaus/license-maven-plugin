@@ -150,12 +150,12 @@ public class DefaultDependenciesTool
 
         boolean verbose = configuration.isVerbose();
 
-        SortedMap<String, MavenProject> result = new TreeMap<String, MavenProject>();
+        SortedMap<String, MavenProject> result = new TreeMap<>();
 
-        Map<String, Artifact> excludeArtifacts = new HashMap<String, Artifact>();
-        Map<String, Artifact> includeArtifacts = new HashMap<String, Artifact>();
+        Map<String, Artifact> excludeArtifacts = new HashMap<>();
+        Map<String, Artifact> includeArtifacts = new HashMap<>();
 
-        SortedMap<String, MavenProject> localCache = new TreeMap<String, MavenProject>();
+        SortedMap<String, MavenProject> localCache = new TreeMap<>();
         if (cache != null)
         {
             localCache.putAll(cache);
@@ -321,7 +321,7 @@ public class DefaultDependenciesTool
                 List<Dependency> dependencies = new ArrayList<Dependency>(project.getDependencies());
                 if (reactorProjectDependencies!=null) {
 
-                    for (Dependency dependency : new ArrayList<Dependency>(dependencies)) {
+                    for (Dependency dependency : new ArrayList<>( dependencies )) {
                         String id = String.format("%s:%s", dependency.getGroupId(), dependency.getArtifactId());
                         List<Dependency> projectDependencies = reactorProjectDependencies.get(id);
                         if (projectDependencies!=null) {
@@ -344,7 +344,7 @@ public class DefaultDependenciesTool
         }
 
         Artifact artifact = project.getArtifact();
-        Set<Artifact> reactorArtifacts = new LinkedHashSet<Artifact>();
+        Set<Artifact> reactorArtifacts = new LinkedHashSet<>();
         if (reactorProjectDependencies != null) {
             // let's not include sibling dependencies, since artifact files may not be generated
             // (aggregate mode without forking mode)

@@ -140,7 +140,7 @@ public class DefaultThirdPartyHelper
     {
         if ( artifactCache == null )
         {
-            artifactCache = new TreeMap<String, MavenProject>();
+            artifactCache = new TreeMap<>();
         }
         return artifactCache;
     }
@@ -235,7 +235,7 @@ public class DefaultThirdPartyHelper
 
                 // try to load missing third party files from dependencies
 
-                Collection<MavenProject> projects = new ArrayList<MavenProject>( projectDependencies.values() );
+                Collection<MavenProject> projects = new ArrayList<>( projectDependencies.values() );
                 projects.remove( project );
                 projects.removeAll( unsafeDependencies );
 
@@ -265,13 +265,13 @@ public class DefaultThirdPartyHelper
             throws MojoFailureException
     {
 
-        Set<String> licenseFound = new HashSet<String>();
+        Set<String> licenseFound = new HashSet<>();
 
         if ( !CollectionUtils.isEmpty( licenseMerges ) )
         {
 
             // check where is not multi licenses merged main licenses (see MLICENSE-23)
-            Map<String, Set<String>> mergedLicenses = new HashMap<String, Set<String>>();
+            Map<String, Set<String>> mergedLicenses = new HashMap<>();
 
             for ( String merge : licenseMerges )
             {
@@ -289,7 +289,7 @@ public class DefaultThirdPartyHelper
                 }
                 else
                 {
-                    mergeList = new HashSet<String>();
+                    mergeList = new HashSet<>();
                 }
 
                 for ( int i = 0; i < split.length; i++ )
