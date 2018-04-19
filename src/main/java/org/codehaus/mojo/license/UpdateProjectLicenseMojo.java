@@ -41,7 +41,7 @@ import java.io.File;
  * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
-@Mojo( name = "update-project-license", requiresProject = true, defaultPhase = LifecyclePhase.GENERATE_RESOURCES )
+@Mojo( name = "update-project-license", defaultPhase = LifecyclePhase.GENERATE_RESOURCES )
 public class UpdateProjectLicenseMojo
     extends AbstractLicenseNameMojo
 {

@@ -104,7 +104,7 @@ public abstract class AbstractDownloadLicensesMojo
      *
      * @since 1.0
      */
-    @Parameter( property = "license.includedScopes", defaultValue = "" )
+    @Parameter( property = "license.includedScopes")
     private String includedScopes;
 
     /**
@@ -120,7 +120,7 @@ public abstract class AbstractDownloadLicensesMojo
      *
      * @since 1.15
      */
-    @Parameter( property = "license.includedTypes", defaultValue = "" )
+    @Parameter( property = "license.includedTypes")
     private String includedTypes;
 
     /**
@@ -181,7 +181,7 @@ public abstract class AbstractDownloadLicensesMojo
      *
      * @since 1.11
      */
-    @Parameter( property = "license.excludedGroups", defaultValue = "" )
+    @Parameter( property = "license.excludedGroups")
     private String excludedGroups;
 
     /**
@@ -190,7 +190,7 @@ public abstract class AbstractDownloadLicensesMojo
      *
      * @since 1.11
      */
-    @Parameter( property = "license.includedGroups", defaultValue = "" )
+    @Parameter( property = "license.includedGroups")
     private String includedGroups;
 
     /**
@@ -199,7 +199,7 @@ public abstract class AbstractDownloadLicensesMojo
      *
      * @since 1.11
      */
-    @Parameter( property = "license.excludedArtifacts", defaultValue = "" )
+    @Parameter( property = "license.excludedArtifacts")
     private String excludedArtifacts;
 
     /**
@@ -208,7 +208,7 @@ public abstract class AbstractDownloadLicensesMojo
      *
      * @since 1.11
      */
-    @Parameter( property = "license.includedArtifacts", defaultValue = "" )
+    @Parameter( property = "license.includedArtifacts")
     private String includedArtifacts;
 
     /**
