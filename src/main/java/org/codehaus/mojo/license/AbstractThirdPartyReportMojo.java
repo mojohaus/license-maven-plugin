@@ -535,7 +535,7 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport i
 
         // compute safe dependencies (with pom licenses)
         Set<MavenProject> dependenciesWithPomLicense =
-                new TreeSet<MavenProject>( MojoHelper.newMavenProjectComparator() );
+                new TreeSet<>( MojoHelper.newMavenProjectComparator() );
         dependenciesWithPomLicense.addAll( projectDependencies.values() );
 
         if ( CollectionUtils.isNotEmpty( dependenciesWithNoLicense ) )
@@ -558,7 +558,7 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport i
         thirdPartyTool.overrideLicenses( licenseMap, projectDependencies, encoding, overrideFile );
 
         // let's build third party details for each dependencies
-        Collection<ThirdPartyDetails> details = new ArrayList<ThirdPartyDetails>();
+        Collection<ThirdPartyDetails> details = new ArrayList<>();
 
         for ( Map.Entry<MavenProject, String[]> entry : licenseMap.toDependencyMap().entrySet() )
         {

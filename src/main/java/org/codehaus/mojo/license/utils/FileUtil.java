@@ -274,7 +274,7 @@ public class FileUtil
 
     public static List<File> orderFiles( Collection<File> files )
     {
-        List<File> result = new ArrayList<File>( files );
+        List<File> result = new ArrayList<>( files );
         Collections.sort( result, new Comparator<File>()
         {
             public int compare( File o1, File o2 )

@@ -202,7 +202,7 @@ public class DefaultThirdPartyTool
     {
 
         SortedProperties result = new SortedProperties( encoding );
-        Map<String, MavenProject> unsafeProjects = new HashMap<String, MavenProject>();
+        Map<String, MavenProject> unsafeProjects = new HashMap<>();
         for ( MavenProject unsafeDependency : unsafeDependencies )
         {
             String id = MojoHelper.getArtifactId( unsafeDependency.getArtifact() );
@@ -336,7 +336,7 @@ public class DefaultThirdPartyTool
      */
     public void addLicense( LicenseMap licenseMap, MavenProject project, String... licenseNames )
     {
-        List<License> licenses = new ArrayList<License>();
+        List<License> licenses = new ArrayList<>();
         for ( String licenseName : licenseNames )
         {
             License license = new License();
@@ -424,7 +424,7 @@ public class DefaultThirdPartyTool
             {
                 getLogger().warn( "No license [" + mainLicense + "] found, will create it." );
             }
-            mainSet = new TreeSet<MavenProject>( projectComparator );
+            mainSet = new TreeSet<>( projectComparator );
             licenseMap.put( mainLicense, mainSet );
         }
         for ( String license : licenses )
@@ -457,7 +457,7 @@ public class DefaultThirdPartyTool
                                                String encoding,
                                                File missingFile,
                                                String missingFileUrl ) throws IOException, MojoExecutionException {
-        Map<String, MavenProject> snapshots = new HashMap<String, MavenProject>();
+        Map<String, MavenProject> snapshots = new HashMap<>();
 
         //find snapshot dependencies
         for ( Map.Entry<String, MavenProject> entry : artifactCache.entrySet() )
@@ -500,7 +500,7 @@ public class DefaultThirdPartyTool
         }
 
         // get from the missing file, all unknown dependencies
-        List<String> unknownDependenciesId = new ArrayList<String>();
+        List<String> unknownDependenciesId = new ArrayList<>();
 
         // coming from maven-license-plugin, we used the full g/a/v/c/t. Now we remove classifier and type
         // since GAV is good enough to qualify a license of any artifact of it...
@@ -658,7 +658,7 @@ public class DefaultThirdPartyTool
 
         Logger log = getLogger();
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put( "licenseMap", licenseMap.entrySet() );
         properties.put( "dependencyMap", licenseMap.toDependencyMap().entrySet() );
         String content = freeMarkerHelper.renderTemplate( lineFormat, properties );
@@ -803,7 +803,7 @@ public class DefaultThirdPartyTool
 
     private Map<String, String> migrateMissingFileKeys( Set<Object> missingFileKeys )
     {
-        Map<String, String> migrateKeys = new HashMap<String, String>();
+        Map<String, String> migrateKeys = new HashMap<>();
         for ( Object object : missingFileKeys )
         {
             String id = (String) object;

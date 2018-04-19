@@ -239,7 +239,7 @@ public abstract class AbstractDownloadLicensesMojo
      * Keeps a collection of the URLs of the licenses that have been downlaoded. This helps the plugin to avoid
      * downloading the same license multiple times.
      */
-    private Set<String> downloadedLicenseURLs = new HashSet<String>();
+    private Set<String> downloadedLicenseURLs = new HashSet<>();
 
     /**
      * Proxy Login/Password encoded(only if usgin a proxy with authentication).
@@ -283,7 +283,7 @@ public abstract class AbstractDownloadLicensesMojo
 
         initProxy();
 
-        Map<String, ProjectLicenseInfo> configuredDepLicensesMap = new HashMap<String, ProjectLicenseInfo>();
+        Map<String, ProjectLicenseInfo> configuredDepLicensesMap = new HashMap<>();
 
         // License info from previous build
         if ( licensesOutputFile.exists() )
@@ -300,7 +300,7 @@ public abstract class AbstractDownloadLicensesMojo
         Set<MavenProject> dependencies = getDependencies();
 
         // The resulting list of licenses after dependency resolution
-        List<ProjectLicenseInfo> depProjectLicenses = new ArrayList<ProjectLicenseInfo>();
+        List<ProjectLicenseInfo> depProjectLicenses = new ArrayList<>();
 
         for ( MavenProject project : dependencies )
         {

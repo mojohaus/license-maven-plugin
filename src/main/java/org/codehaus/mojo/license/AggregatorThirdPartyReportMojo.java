@@ -96,7 +96,7 @@ public class AggregatorThirdPartyReportMojo
              DependenciesToolException, MojoExecutionException
     {
 
-        Collection<ThirdPartyDetails> details = new LinkedHashSet<ThirdPartyDetails>();
+        Collection<ThirdPartyDetails> details = new LinkedHashSet<>();
 
         for ( MavenProject reactorProject : reactorProjects )
         {

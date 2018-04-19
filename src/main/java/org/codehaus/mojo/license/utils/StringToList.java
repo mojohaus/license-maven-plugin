@@ -47,7 +47,7 @@ public class StringToList
 
     public StringToList()
     {
-        data = new ArrayList<String>();
+        data = new ArrayList<>();
     }
 
    /**

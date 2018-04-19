@@ -81,7 +81,7 @@ public class LicenseSummaryTest
         throws IOException, SAXException, ParserConfigurationException, TransformerFactoryConfigurationError,
         TransformerException
     {
-        List<ProjectLicenseInfo> licSummary = new ArrayList<ProjectLicenseInfo>();
+        List<ProjectLicenseInfo> licSummary = new ArrayList<>();
         ProjectLicenseInfo dep1 = new ProjectLicenseInfo( "org.test", "test1", "1.0" );
         ProjectLicenseInfo dep2 = new ProjectLicenseInfo( "org.test", "test2", "2.0" );
 

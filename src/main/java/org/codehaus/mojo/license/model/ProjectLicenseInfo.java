@@ -42,7 +42,7 @@ public class ProjectLicenseInfo
 
     private String version;
 
-    private List<License> licenses = new ArrayList<License>();
+    private List<License> licenses = new ArrayList<>();
 
     private String licenseResolutionResult;
 

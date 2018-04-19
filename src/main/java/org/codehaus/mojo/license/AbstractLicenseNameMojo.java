@@ -247,7 +247,7 @@ public abstract class AbstractLicenseNameMojo
     {
         FreeMarkerHelper licenseFreeMarkerHelper = FreeMarkerHelper.newHelperFromContent( licenseContent );
 
-        Map<String, Object> templateParameters = new HashMap<String, Object>();
+        Map<String, Object> templateParameters = new HashMap<>();
 
         addPropertiesToContext( System.getProperties(), "env_", templateParameters );
         addPropertiesToContext( getProject().getProperties(), "project_", templateParameters );
@@ -313,7 +313,7 @@ public abstract class AbstractLicenseNameMojo
                 continue;
             }
 
-            List<String> toTreate = new ArrayList<String>();
+            List<String> toTreate = new ArrayList<>();
 
             Collections.addAll( toTreate, tmp );
 
@@ -433,7 +433,7 @@ public abstract class AbstractLicenseNameMojo
     Map<String, List<File>> obtainFilesToProcessByCommentStyle( Map<String, String> extraFiles, String[] roots, String[] includes, String[] excludes, Map<String, String> extensionToCommentStyle, Map<String, FileHeaderTransformer> transformers )
     {
 
-        Map<String, List<File>> results = new HashMap<String, List<File>>();
+        Map<String, List<File>> results = new HashMap<>();
 
         // add for all known comment style (says transformer) a empty list
         // this permits not to have to test if there is an already list each time
@@ -443,7 +443,7 @@ public abstract class AbstractLicenseNameMojo
             results.put( commentStyle, new ArrayList<File>() );
         }
 
-        List<String> rootsList = new ArrayList<String>( roots.length );
+        List<String> rootsList = new ArrayList<>( roots.length );
         for ( String root : roots )
         {
             File f = new File( root );
@@ -470,7 +470,7 @@ public abstract class AbstractLicenseNameMojo
         }
 
         // Obtain all files to treat
-        Map<File, String[]> allFiles = new HashMap<File, String[]>();
+        Map<File, String[]> allFiles = new HashMap<>();
         getFilesToTreatForRoots( includes, excludes, rootsList, allFiles );
 
         // filter all these files according to their extension

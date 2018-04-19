@@ -198,7 +198,7 @@ public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo
         }
 
         String addThirdPartyRoleHint = groupId + ":" + artifactId + ":" + version + ":" + "add-third-party";
-        Map<String, List<Dependency>> reactorProjectDependencies = new TreeMap<String, List<Dependency>>();
+        Map<String, List<Dependency>> reactorProjectDependencies = new TreeMap<>();
         for (MavenProject reactorProject : this.reactorProjects) {
             reactorProjectDependencies.put(String.format("%s:%s", reactorProject.getGroupId(), reactorProject.getArtifactId()), reactorProject.getDependencies());
         }

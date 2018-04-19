@@ -51,7 +51,7 @@ public class ThirdPartyReportRenderer
 
     protected Collection<ThirdPartyDetails> getThirdPartiesPomLicense()
     {
-        Collection<ThirdPartyDetails> result = new ArrayList<ThirdPartyDetails>();
+        Collection<ThirdPartyDetails> result = new ArrayList<>();
         for ( ThirdPartyDetails detail : details )
         {
             if ( detail.hasPomLicenses() )
@@ -64,7 +64,7 @@ public class ThirdPartyReportRenderer
 
     protected Collection<ThirdPartyDetails> getThirdPartiesThirdPartyLicense()
     {
-        Collection<ThirdPartyDetails> result = new ArrayList<ThirdPartyDetails>();
+        Collection<ThirdPartyDetails> result = new ArrayList<>();
         for ( ThirdPartyDetails detail : details )
         {
             if ( detail.hasThirdPartyLicenses() )
@@ -77,7 +77,7 @@ public class ThirdPartyReportRenderer
 
     protected Collection<ThirdPartyDetails> getThirdPartiesNoLicense()
     {
-        Collection<ThirdPartyDetails> result = new ArrayList<ThirdPartyDetails>();
+        Collection<ThirdPartyDetails> result = new ArrayList<>();
         for ( ThirdPartyDetails detail : details )
         {
             if ( !detail.hasLicenses() )

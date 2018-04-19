@@ -73,7 +73,7 @@ public class AggregateDownloadLicensesMojo
      */
     protected Set<MavenProject> getDependencies()
     {
-        Set<MavenProject> result = new HashSet<MavenProject>();
+        Set<MavenProject> result = new HashSet<>();
 
         for ( MavenProject reactorProject : reactorProjects )
         {

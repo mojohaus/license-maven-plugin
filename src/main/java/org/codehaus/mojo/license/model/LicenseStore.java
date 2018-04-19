@@ -131,7 +131,7 @@ public class LicenseStore
     public String[] getLicenseNames()
     {
         checkInit( "getLicenseNames" );
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         for ( LicenseRepository repository : this )
         {
             for ( License license : repository )
@@ -145,7 +145,7 @@ public class LicenseStore
     public License[] getLicenses()
     {
         checkInit( "getLicenses" );
-        List<License> result = new ArrayList<License>();
+        List<License> result = new ArrayList<>();
         if ( repositories != null )
         {
             for ( LicenseRepository repository : this )
@@ -257,7 +257,7 @@ public class LicenseStore
         checkNotInit( "addRepository" );
         if ( repositories == null )
         {
-            repositories = new ArrayList<LicenseRepository>();
+            repositories = new ArrayList<>();
 
         }
         if ( LOG.isInfoEnabled() )
