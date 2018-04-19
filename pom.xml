@@ -524,6 +524,7 @@
                   <goal>run</goal>
                 </goals>
                 <configuration>
+                  <streamLogs>true</streamLogs>
                   <pomIncludes>
                     <pomInclude>${itName}/pom.xml</pomInclude>
                   </pomIncludes>

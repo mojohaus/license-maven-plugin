@@ -25,10 +25,14 @@ import org.codehaus.mojo.license.utils.HttpRequester;
 import org.codehaus.mojo.license.utils.MojoHelper;
 import org.codehaus.mojo.license.utils.SortedProperties;
 import org.codehaus.mojo.license.utils.StringToList;
+import org.codehaus.plexus.util.IOUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -261,7 +265,7 @@ public abstract class AbstractAddThirdPartyMojo
      * &lt;/licenseMerges&gt;
      * &lt;/pre&gt;
      *
-     * <b>Note:</b> This option will be overridden by {@link #licenseMergesFile} if it is used by command line.
+     * <b>Note:</b> This option will be overridden by {@link #licenseMergesUrl} if it is used by command line.
      * @since 1.0
      */
     @Parameter
@@ -272,9 +276,20 @@ public abstract class AbstractAddThirdPartyMojo
      * <b>Note:</b> This option overrides {@link #licenseMerges}.
      *
      * @since 1.15
+    * @deprecated prefer use now {@link #licenseMergesUrl}
      */
+   @Deprecated
     @Parameter( property = "license.licenseMergesFile" )
     String licenseMergesFile;
+
+   /**
+     * Location of file with the merge licenses in order to be used by command line.
+     * <b>Note:</b> This option overrides {@link #licenseMerges}.
+     *
+     * @since 1.16
+     */
+    @Parameter( property = "license.licenseMergesUrl" )
+    String licenseMergesUrl;
 
   /**
    * To specify some licenses to include.
@@ -624,11 +639,28 @@ public abstract class AbstractAddThirdPartyMojo
 
         licenseMap = getHelper().createLicenseMap( projectDependencies );
 
-        if (licenseMergesFile != null) {
+        if (licenseMergesFile !=null ){
+            if (licenseMergesUrl != null) {
+                throw new MojoExecutionException("You can't use both licenseMergesFile and licenseMergesUrl");
+            }
+            getLog().warn("");
+            getLog().warn("!!! licenseMergesFile is deprecated, use now licenseMergesUrl !!!");
             getLog().warn("");
             getLog().warn("licenseMerges will be overridden by licenseMergesFile.");
             getLog().warn("");
             licenseMerges = FileUtils.readLines(new File(licenseMergesFile), "utf-8");
+        } else
+        if (licenseMergesUrl != null) {
+            getLog().warn("");
+            getLog().warn("licenseMerges will be overridden by licenseMergesUrl.");
+            getLog().warn("");
+            if (HttpRequester.isStringUrl(licenseMergesUrl))
+            {
+                InputStream input = new URL(licenseMergesUrl).openStream();
+                String httpRequestResult = IOUtil.toString(input);
+                licenseMerges = Arrays.asList(httpRequestResult.split("\n"));
+                input.close();
+            }
         }
     }
 
@@ -719,6 +751,10 @@ public abstract class AbstractAddThirdPartyMojo
     String getLicenseMergesFile()
     {
         return licenseMergesFile;
+    }
+
+    public String getLicenseMergesUrl() {
+        return licenseMergesUrl;
     }
 
     SortedProperties getUnsafeMappings()
