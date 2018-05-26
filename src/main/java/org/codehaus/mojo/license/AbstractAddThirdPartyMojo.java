@@ -681,12 +681,12 @@ public abstract class AbstractAddThirdPartyMojo
 
         getHelper().mergeLicenses( licenseMerges, licenseMap );
 
-        if ( checkUnsafeDependencies() )
+        if ( CollectionUtils.isNotEmpty( unsafeDependencies ) )
         {
             resolveUnsafeDependenciesFromFile( missingFile );
         }
 
-        if ( !StringUtils.isBlank( missingLicensesFileArtifact ) && checkUnsafeDependencies() )
+        if ( !StringUtils.isBlank( missingLicensesFileArtifact ) && CollectionUtils.isNotEmpty( unsafeDependencies ) )
         {
             String[] tokens = StringUtils.split( missingLicensesFileArtifact, ":" );
             if ( tokens.length != 3 )
@@ -872,12 +872,11 @@ public abstract class AbstractAddThirdPartyMojo
             unsafeDeps.removeAll( resolvedDependencies );
         }
     }
-
-    boolean checkUnsafeDependencies()
+    
+    void checkUnsafeDependencies()
     {
         SortedSet<MavenProject> unsafeDeps = getUnsafeDependencies();
-        boolean unsafe = !CollectionUtils.isEmpty( unsafeDeps );
-        if ( unsafe )
+        if ( CollectionUtils.isNotEmpty( unsafeDeps ) )
         {
             Log log = getLog();
             log.warn( "There is " + unsafeDeps.size() + " dependencies with no license :" );
@@ -888,7 +887,6 @@ public abstract class AbstractAddThirdPartyMojo
                 log.warn( " - " + MojoHelper.getArtifactId( dep.getArtifact() ) );
             }
         }
-        return unsafe;
     }
 
     boolean checkForbiddenLicenses()
