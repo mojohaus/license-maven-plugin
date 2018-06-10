@@ -143,7 +143,7 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
 
         consolidate();
 
-        boolean unsafe = checkUnsafeDependencies();
+        checkUnsafeDependencies();
 
         boolean safeLicense = checkForbiddenLicenses();
 
@@ -157,6 +157,8 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
             writeMissingFile();
         }
 
+        boolean unsafe = CollectionUtils.isNotEmpty( getUnsafeDependencies() );
+        
         checkMissing(unsafe);
 
         if ( !unsafe && isUseMissingFile() && MapUtils.isEmpty( getUnsafeMappings() ) && getMissingFile().exists() )

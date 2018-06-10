@@ -233,7 +233,7 @@ public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo
 
         consolidate();
 
-        boolean unsafe = checkUnsafeDependencies();
+        checkUnsafeDependencies();
 
         boolean safeLicense = checkForbiddenLicenses();
 
@@ -241,7 +241,7 @@ public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo
 
         writeThirdPartyFile();
 
-        checkMissing(unsafe);
+        checkMissing(CollectionUtils.isNotEmpty( getUnsafeDependencies() ));
     }
 
     // ----------------------------------------------------------------------
