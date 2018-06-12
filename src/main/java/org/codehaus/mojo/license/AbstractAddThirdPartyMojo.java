@@ -466,6 +466,12 @@ public abstract class AbstractAddThirdPartyMojo
     boolean sortArtifactByName;
 
     /**
+     * A flag to create the third-party file as a csv file
+     */
+    @Parameter( property = "license.createCSV", defaultValue = "false")
+    boolean createCSV;
+
+    /**
      * Template used to build the third-party file.
      * <p>
      * (This template uses freemarker).
@@ -1004,7 +1010,15 @@ public abstract class AbstractAddThirdPartyMojo
             {
                 licenseMap1 = licenseMap.toLicenseMapOrderByName();
             }
-            thirdPartyTool.writeThirdPartyFile( licenseMap1, thirdPartyFile, isVerbose(), getEncoding(), fileTemplate );
+            if ( createCSV )
+            {
+              getLog().info("Creating CSV file");
+              thirdPartyTool.writeThirdPartyFile( licenseMap1, thirdPartyFile, isVerbose(), getEncoding(), fileTemplate );
+            }
+            else
+            {
+              thirdPartyTool.writeThirdPartyFile( licenseMap1, thirdPartyFile, isVerbose(), getEncoding(), fileTemplate );
+            }
         }
 
         if ( doGenerateBundle )
