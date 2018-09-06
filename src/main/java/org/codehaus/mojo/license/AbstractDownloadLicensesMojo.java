@@ -219,6 +219,8 @@ public abstract class AbstractDownloadLicensesMojo
     @Parameter( defaultValue = "${project}", readonly = true )
     private MavenProject project;
 
+    @Parameter( property = "httpOnly", defaultValue = "false")
+    private boolean httpOnly;
     // ----------------------------------------------------------------------
     // Plexus Components
     // ----------------------------------------------------------------------
@@ -264,6 +266,18 @@ public abstract class AbstractDownloadLicensesMojo
     protected SortedMap<String, MavenProject> getDependencies( MavenProject project )
     {
         return dependenciesTool.loadProjectDependencies( project, this, localRepository, remoteRepositories, null );
+    }
+
+    protected static java.util.Properties systemProperties;
+    
+    protected void storeProperties()
+    {
+        systemProperties = (java.util.Properties) System.getProperties().clone();
+    }
+    protected void restoreProperties()
+    {
+        if (systemProperties != null)
+            System.setProperties(systemProperties);
     }
 
     /**
@@ -335,6 +349,8 @@ public abstract class AbstractDownloadLicensesMojo
         {
             throw new MojoExecutionException( "Unable to write license summary file: " + licensesOutputFile, e );
         }
+        //restore the system properties to what they where before the plugin execution
+        restoreProperties(); 
     }
 
     private List<ProjectLicenseInfo> sortByGroupIdAndArtifactId(List<ProjectLicenseInfo> depProjectLicenses) {
@@ -489,7 +505,8 @@ public abstract class AbstractDownloadLicensesMojo
         }
         if ( proxyToUse != null )
         {
-
+            //Save our system settings for restore after plugin run
+            storeProperties();
             System.getProperties().put( "proxySet", "true" );
             System.setProperty( "proxyHost", proxyToUse.getHost() );
             System.setProperty( "proxyPort", String.valueOf( proxyToUse.getPort() ) );
@@ -661,7 +678,7 @@ public abstract class AbstractDownloadLicensesMojo
 
                 if ( !downloadedLicenseURLs.contains( licenseUrl ) || organizeLicensesByDependencies )
                 {
-                    LicenseDownloader.downloadLicense( licenseUrl, proxyLoginPasswordEncoded, licenseOutputFile );
+                    LicenseDownloader.downloadLicense( licenseUrl, proxyLoginPasswordEncoded, licenseOutputFile, httpOnly );
                     downloadedLicenseURLs.add( licenseUrl );
                 }
             }

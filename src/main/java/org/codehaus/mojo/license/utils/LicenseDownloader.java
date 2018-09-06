@@ -45,7 +45,7 @@ public class LicenseDownloader
      */
     public static final int DEFAULT_CONNECTION_TIMEOUT = 5000;
 
-    public static void downloadLicense( String licenseUrlString, String loginPassword, File outputFile )
+    public static void downloadLicense( String licenseUrlString, String loginPassword, File outputFile, boolean httpOnly)
         throws IOException
     {
         if ( licenseUrlString == null || licenseUrlString.length() == 0 )
@@ -58,7 +58,7 @@ public class LicenseDownloader
 
         try
         {
-            URLConnection connection = newConnection( licenseUrlString, loginPassword );
+            URLConnection connection = newConnection( licenseUrlString, loginPassword, httpOnly );
 
             boolean redirect = false;
             if ( connection instanceof HttpURLConnection )
@@ -75,7 +75,7 @@ public class LicenseDownloader
                 String newUrl = connection.getHeaderField( "Location" );
 
                 // open the new connnection again
-                connection = newConnection( newUrl, loginPassword );
+                connection = newConnection( newUrl, loginPassword, httpOnly );
 
             }
 
@@ -111,16 +111,19 @@ public class LicenseDownloader
         }
     }
 
-    private static URLConnection newConnection( String url, String loginPassword )
+    private static URLConnection newConnection( String url, String loginPassword, boolean httpOnly )
         throws IOException
     {
+
+        if(httpOnly)
+            url = url.replaceFirst("https", "http");
 
         URL licenseUrl = new URL( url );
         URLConnection connection = licenseUrl.openConnection();
 
         if ( loginPassword != null )
         {
-            connection.setRequestProperty( "Proxy-Authorization", loginPassword );
+            connection.setRequestProperty( "Proxy-Authorization", "Basic " + loginPassword.trim() );
         }
         connection.setConnectTimeout( DEFAULT_CONNECTION_TIMEOUT );
         connection.setReadTimeout( DEFAULT_CONNECTION_TIMEOUT );
