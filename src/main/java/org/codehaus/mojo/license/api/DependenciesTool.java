@@ -22,9 +22,7 @@ package org.codehaus.mojo.license.api;
  * #L%
  */
 
-import java.util.Map;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
 
 import java.util.List;
@@ -45,7 +43,7 @@ public interface DependenciesTool
      *
      * Result is given in a map where keys are unique artifact id
      *
-     * @param project            the project to scann
+     * @param dependencies       the project dependencies
      * @param configuration      the configuration
      * @param localRepository    local repository used to resolv dependencies
      * @param remoteRepositories remote repositories used to resolv dependencies
@@ -53,7 +51,7 @@ public interface DependenciesTool
      * @return the map of resolved dependencies indexed by their unique id.
      * @see MavenProjectDependenciesConfigurator
      */
-    SortedMap<String, MavenProject> loadProjectDependencies( MavenProject project,
+    SortedMap<String, MavenProject> loadProjectDependencies( ResolvedProjectDependencies dependencies,
                                                              MavenProjectDependenciesConfigurator configuration,
                                                              ArtifactRepository localRepository,
                                                              List<ArtifactRepository> remoteRepositories,
@@ -64,12 +62,12 @@ public interface DependenciesTool
      *
      * @param localRepository    local repository used to resolv dependencies
      * @param remoteRepositories remote repositories used to resolv dependencies
-     * @param project            the project to scann
-     * @param reactorProjectDependencies optional reactor projects dependencies indexed by their gav to resolve
-     *        artifacts without fork mode (means artifacts may not exist)
+     * @param project            the project to scan
+     * @param reactorProjectDependencies reactor projects. Optional, only relevant if there is more than one)
+     * @return the loaded project dependency artifacts
      * @throws DependenciesToolException if could not load project dependencies
      */
-    void loadProjectArtifacts( ArtifactRepository localRepository, List remoteRepositories, MavenProject project ,
-            Map<String, List<Dependency>> reactorProjectDependencies )
+    ResolvedProjectDependencies loadProjectArtifacts( ArtifactRepository localRepository, List remoteRepositories,
+            MavenProject project, List<MavenProject> reactorProjectDependencies )
         throws DependenciesToolException;
 }

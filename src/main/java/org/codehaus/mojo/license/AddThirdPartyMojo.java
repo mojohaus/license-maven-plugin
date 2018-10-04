@@ -33,8 +33,6 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -43,7 +41,9 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
+import org.codehaus.mojo.license.api.DependenciesToolException;
 import org.codehaus.mojo.license.api.MavenProjectDependenciesConfigurator;
+import org.codehaus.mojo.license.api.ResolvedProjectDependencies;
 import org.codehaus.mojo.license.api.ThirdPartyToolException;
 import org.codehaus.mojo.license.model.LicenseMap;
 import org.codehaus.mojo.license.utils.FileUtil;
@@ -90,6 +90,32 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
      * Internal flag to know if missing file must be generated.
      */
     private boolean doGenerateMissing;
+
+    /**
+     * Whether this is an aggregate build, or a single-project goal. This setting determines which dependency artifacts
+     * will be examined by the plugin. AddThirdParty needs to load dependencies only for the single project it is run
+     * for, while AggregateAddThirdParty needs to load dependencies for the parent project, as well as all child
+     * projects in the reactor.
+     */
+    private boolean isAggregatorBuild = false;
+
+    /**
+     * The reactor projects. When resolving dependencies, the aggregator goal needs to do custom handling
+     * of sibling dependencies for projects in the reactor,
+     * to avoid trying to load artifacts for projects that haven't been built/published yet.
+     */
+    private List<MavenProject> reactorProjectDependencies;
+
+    /**
+     * Copies of the project's dependency sets. AddThirdParty needs to load dependencies only for the single project it
+     * is run for, while AggregateAddThirdParty needs to load dependencies for the parent project, as well as all child
+     * projects in the reactor.
+     *
+     * In cases where one child project A in a reactor depends on another project B in the same reactor,
+     * B is not necessarily built/published. The plugin needs to resolve B's dependencies manually.
+     * This field stores the result of that manual resolution.
+     */
+    private ResolvedProjectDependencies dependencyArtifacts;
 
     // ----------------------------------------------------------------------
     // AbstractLicenseMojo Implementaton
@@ -193,9 +219,34 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
      * {@inheritDoc}
      */
     @Override
-    protected SortedMap<String, MavenProject> loadDependencies()
+    protected SortedMap<String, MavenProject> loadDependencies() throws DependenciesToolException
     {
-        return getHelper().loadDependencies( this );
+        return getHelper().loadDependencies( this, resolveDependencyArtifacts() );
+    }
+
+    /**
+     * Resolves the transitive and direct dependency sets for this project.
+     *
+     * @return The set of all dependencies, and the set of only direct dependency artifacts.
+     * @throws org.codehaus.mojo.license.api.DependenciesToolException if the dependencies could not be resolved
+     */
+    protected ResolvedProjectDependencies resolveDependencyArtifacts() throws DependenciesToolException
+    {
+        if ( dependencyArtifacts != null )
+        {
+            return dependencyArtifacts;
+        }
+        if ( isAggregatorBuild )
+        {
+            dependencyArtifacts = dependenciesTool.loadProjectArtifacts( localRepository, remoteRepositories,
+                    project, reactorProjectDependencies );
+        }
+        else
+        {
+            dependencyArtifacts = new ResolvedProjectDependencies( project.getArtifacts(),
+                    project.getDependencyArtifacts() );
+        }
+        return dependencyArtifacts;
     }
 
     /**
@@ -203,7 +254,8 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
      */
     @Override
     protected SortedProperties createUnsafeMapping()
-      throws ProjectBuildingException, IOException, ThirdPartyToolException, MojoExecutionException
+      throws ProjectBuildingException, IOException, ThirdPartyToolException,
+            MojoExecutionException, DependenciesToolException
     {
 
         SortedSet<MavenProject> unsafeDependencies = getUnsafeDependencies();
@@ -211,7 +263,8 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
         SortedProperties unsafeMappings =
                 getHelper().createUnsafeMapping( getLicenseMap(), getMissingFile(), missingFileUrl,
                                                  useRepositoryMissingFiles, unsafeDependencies,
-                                                 getProjectDependencies() );
+                                                 getProjectDependencies(),
+                                                 resolveDependencyArtifacts().getAllDependencies() );
         if ( isVerbose() )
         {
             getLog().info( "found " + unsafeMappings.size() + " unsafe mappings" );
@@ -425,7 +478,7 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
     }
 
     void initFromMojo( AggregatorAddThirdPartyMojo mojo, MavenProject mavenProject,
-            Map<String, List<Dependency>> reactorProjects ) throws Exception
+            List<MavenProject> reactorProjects ) throws Exception
     {
         project = mavenProject;
         deployMissingFile = mojo.deployMissingFile;
@@ -449,8 +502,8 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
                 mojo.overrideFile.getAbsolutePath().substring( absolutePath.length() ) );
         missingLicensesFileArtifact = mojo.missingLicensesFileArtifact;
         localRepository = mojo.localRepository;
-        remoteRepositories = mojo.remoteRepositories;
-        dependencies = new HashSet<Artifact>( mavenProject.getDependencies() );
+        remoteRepositories = mavenProject.getRemoteArtifactRepositories();
+        dependencies = new HashSet<>( mavenProject.getDependencies() );
         licenseMerges = mojo.licenseMerges;
         licenseMergesFile = mojo.licenseMergesFile;
         includedLicenses = mojo.includedLicenses;
@@ -469,8 +522,8 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
 
         setLog( mojo.getLog() );
 
-        dependenciesTool.loadProjectArtifacts( localRepository, project.getRemoteArtifactRepositories(), project,
-                reactorProjects );
+        isAggregatorBuild = true;
+        reactorProjectDependencies = reactorProjects;
 
         init();
 

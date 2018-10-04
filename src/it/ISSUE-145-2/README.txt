@@ -1,0 +1,3 @@
+Demonstrates that the aggregateAddThirdParty goal can handle long sibling project dependency chains in the same reactor, and that it resolves dependencies based on the right remote repositories list.
+
+The project has parent A and children B, C, D, E with B depending on C, C dependending on D and D depending on E. The D dependency has a custom repository specified, and a dependency from that repo. When the plugin generates the license list, it should pick up the license for the dependency from the custom repo. E has a custom license specified, which should also be picked up.

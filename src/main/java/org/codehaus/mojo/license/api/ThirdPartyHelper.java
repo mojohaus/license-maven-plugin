@@ -50,10 +50,12 @@ public interface ThirdPartyHelper
     /**
      * Load all dependencies given the configuration as {@link MavenProject}.
      *
-     * @param configuration the configuration of the project and include/exclude to do on his dependencies
+     * @param configuration the configuration of the project and include/exclude to do on its dependencies
+     * @param dependencyArtifacts the dependency artifacts of the project
      * @return the dictionary of loaded dependencies as {@link MavenProject} indexed by their gav.
      */
-    SortedMap<String, MavenProject> loadDependencies( MavenProjectDependenciesConfigurator configuration );
+    SortedMap<String, MavenProject> loadDependencies( MavenProjectDependenciesConfigurator configuration,
+                                                      ResolvedProjectDependencies dependencyArtifacts );
 
 
     /**
@@ -82,8 +84,8 @@ public interface ThirdPartyHelper
      * @param missingFile         location of an optional missing fille (says where you fix missing license).
      * @param missingFileUrl      location of an optional missing file extension that can be downloaded from some
      *                            resource hoster and that will be merged with the content of the missing file.
-     * @param projectDependencies project dependencies used to detect which dependencies in the missing file are unknown
-     *                            to the project.
+     * @param projectDependencies project dependencies used to detect which dependencies in the missing file
+     *                            are unknown to the project.
      * @return the map of all unsafe mapping
      * @throws IOException if could not load missing file
      */
@@ -144,6 +146,7 @@ public interface ThirdPartyHelper
      *                                  maven repositories
      * @param unsafeDependencies        all unsafe dependencies
      * @param projectDependencies       all project dependencies
+     * @param dependencyArtifacts       all project dependency artifacts
      * @return the loaded unsafe mapping
      * @throws ProjectBuildingException if could not build some dependencies maven project
      * @throws IOException              if could not load missing file
@@ -152,7 +155,8 @@ public interface ThirdPartyHelper
     SortedProperties createUnsafeMapping( LicenseMap licenseMap, File missingFile, String missingFileUrl,
                                           boolean useRepositoryMissingFiles,
                                           SortedSet<MavenProject> unsafeDependencies,
-                                          SortedMap<String, MavenProject> projectDependencies )
+                                          SortedMap<String, MavenProject> projectDependencies,
+                                          Set<Artifact> dependencyArtifacts )
       throws ProjectBuildingException, IOException, ThirdPartyToolException, MojoExecutionException;
 
     /**

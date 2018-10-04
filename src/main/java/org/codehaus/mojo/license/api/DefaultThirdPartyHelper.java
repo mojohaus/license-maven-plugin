@@ -150,10 +150,11 @@ public class DefaultThirdPartyHelper
     /**
      * {@inheritDoc}
      */
-    public SortedMap<String, MavenProject> loadDependencies( MavenProjectDependenciesConfigurator configuration )
+    public SortedMap<String, MavenProject> loadDependencies( MavenProjectDependenciesConfigurator configuration,
+                                                             ResolvedProjectDependencies dependencyArtifacts )
     {
-        return dependenciesTool.loadProjectDependencies( project, configuration, localRepository, remoteRepositories,
-                                                         getArtifactCache() );
+        return dependenciesTool.loadProjectDependencies( dependencyArtifacts, configuration, localRepository,
+                remoteRepositories, getArtifactCache() );
     }
 
     /**
@@ -217,11 +218,11 @@ public class DefaultThirdPartyHelper
     /**
      * {@inheritDoc}
      */
-    @SuppressWarnings( "unchecked" ) // project.getArtifacts()
     public SortedProperties createUnsafeMapping( LicenseMap licenseMap, File missingFile, String missingFileUrl,
                                                  boolean useRepositoryMissingFiles,
                                                  SortedSet<MavenProject> unsafeDependencies,
-                                                 SortedMap<String, MavenProject> projectDependencies )
+                                                 SortedMap<String, MavenProject> projectDependencies,
+                                                 Set<Artifact> dependencyArtifacts )
       throws ProjectBuildingException, IOException, ThirdPartyToolException, MojoExecutionException
     {
 
@@ -243,7 +244,7 @@ public class DefaultThirdPartyHelper
                 projects.removeAll( unsafeDependencies );
 
                 SortedProperties resolvedUnsafeMapping =
-                        loadThirdPartyDescriptorForUnsafeMapping( project.getArtifacts(), unsafeDependencies, projects,
+                        loadThirdPartyDescriptorForUnsafeMapping( dependencyArtifacts, unsafeDependencies, projects,
                                                                   licenseMap );
 
                 // push back resolved unsafe mappings (only for project dependencies)
