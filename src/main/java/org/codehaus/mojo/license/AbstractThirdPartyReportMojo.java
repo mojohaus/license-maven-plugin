@@ -188,8 +188,18 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport i
      *
      * @since 1.11
      */
-    @Parameter( property = "license.overrideFile", defaultValue = "src/license/override-THIRD-PARTY.properties" )
+    @Deprecated
+    @Parameter( property = "license.overrideFile" )
     private File overrideFile;
+
+    /**
+     * Location of file with license information for dependencies to override.
+     * <b>Note:</b> This option overrides {@link #overrideFile}.
+     *
+     * @since 1.17
+     */
+    @Parameter( property = "license.overrideUrl" )
+    String overrideUrl;
 
     /**
      * Load from repositories third party missing files.
@@ -555,7 +565,7 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport i
         thirdPartyHelper.mergeLicenses( licenseMerges, licenseMap );
 
         // Add override licenses
-        thirdPartyTool.overrideLicenses( licenseMap, projectDependencies, encoding, overrideFile );
+        thirdPartyTool.overrideLicenses( licenseMap, projectDependencies, encoding, overrideFile, overrideUrl );
 
         // let's build third party details for each dependencies
         Collection<ThirdPartyDetails> details = new ArrayList<>();

@@ -351,15 +351,13 @@ List of 2 third-party dependencies.
 
 ** Override identified licenses (Since 1.12)
 
-  Sometimes, identified licenses are wrong, using the <<overrideFile>> permits to fix them.
+  Sometimes, identified licenses are wrong, using the <<overrideUrl>> permits to fix them.
 
   For each dependency you want to fix, just add in this properties file a line
 
 -------------------------------------------------------------------------------
 org.jboss.xnio--xnio-api--3.3.6.Final=The Apache Software License, Version 2.0
 -------------------------------------------------------------------------------
-
-  The default location of the override file is <<src/main/license/override-THIRD-PARTY.properties>>.
 
 ** Attach missing files to build
 

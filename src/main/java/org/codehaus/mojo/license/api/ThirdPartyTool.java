@@ -155,9 +155,10 @@ public interface ThirdPartyTool
      * @param artifactCache cache of dependencies (used for id migration from missing file)
      * @param encoding      encoding used to load override file
      * @param overrideFile  location of the optional override file
+     * @param overrideUrl   location of an optional override file extension that can be downloaded from some resource hoster
      * @throws IOException if pb while reading override file
      */
-    void overrideLicenses( LicenseMap licenseMap, SortedMap<String, MavenProject> artifactCache, String encoding, File overrideFile ) throws IOException;
+    void overrideLicenses( LicenseMap licenseMap, SortedMap<String, MavenProject> artifactCache, String encoding, File overrideFile, String overrideUrl ) throws IOException;
 
     /**
      * Add one or more licenses (name and url are {@code licenseNames}) to the given {@code licenseMap} for the given

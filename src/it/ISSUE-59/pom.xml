@@ -49,6 +49,7 @@
     <license.deployMissingFile>true</license.deployMissingFile>
     <license.useRepositoryMissingFiles>true</license.useRepositoryMissingFiles>
     <license.failIfWarning>true</license.failIfWarning>
+    <license.overrideUrl>file://${basedir}/src/license/override-THIRD-PARTY.properties</license.overrideUrl>
   </properties>
 
   <dependencies>

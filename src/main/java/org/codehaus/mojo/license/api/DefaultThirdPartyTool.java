@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -601,21 +602,9 @@ public class DefaultThirdPartyTool
     /**
      * {@inheritDoc}
      */
-    public void overrideLicenses( LicenseMap licenseMap, SortedMap<String, MavenProject> artifactCache, String encoding, File overrideFile ) throws IOException
+    public void overrideLicenses( LicenseMap licenseMap, SortedMap<String, MavenProject> artifactCache, String encoding, File overrideFile, String overrideUrl ) throws IOException
     {
-
-        SortedProperties overrideMappings = new SortedProperties( encoding );
-
-        if ( overrideFile!=null && overrideFile.exists() )
-        {
-            // there is some unsafe dependencies
-
-            getLogger().info( "Load override file " + overrideFile );
-
-            // load the missing file
-            overrideMappings.load( overrideFile );
-        }
-
+    	final SortedProperties overrideMappings = getOverrideMappings(encoding, overrideFile, overrideUrl);
         for ( Object o : overrideMappings.keySet() )
         {
             String id = (String) o;
@@ -644,8 +633,41 @@ public class DefaultThirdPartyTool
             addLicense( licenseMap, project, licenses );
 
         }
+    }
 
+    private SortedProperties getOverrideMappings(final String encoding, final File overrideFile, final String overrideUrl) throws IOException
+    {
+        if (overrideFile !=null && overrideUrl != null)
+        {
+            throw new IllegalArgumentException("You can't use both overrideFile and overrideUrl");
+        }
 
+        final SortedProperties overrideMappings = new SortedProperties(encoding);
+
+        if (overrideFile != null && overrideFile.exists())
+        {
+            // there is some unsafe dependencies
+            getLogger().warn("");
+            getLogger().warn("!!! overrideFile is deprecated, use now overrideUrl !!!");
+            getLogger().warn("");
+            getLogger().info("Load override file " + overrideFile);
+
+            // load the missing file
+            overrideMappings.load(overrideFile);
+        }
+
+        if (overrideUrl != null)
+        {
+        	getLogger().info("Load override Url " + overrideUrl);
+            if (HttpRequester.isStringUrl(overrideUrl))
+            {
+                InputStream input = new URL(overrideUrl).openStream();
+                overrideMappings.load(input);
+                input.close();
+            }
+        }
+
+        return overrideMappings;
     }
 
     /**

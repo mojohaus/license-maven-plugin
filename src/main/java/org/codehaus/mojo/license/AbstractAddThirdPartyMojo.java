@@ -249,8 +249,18 @@ public abstract class AbstractAddThirdPartyMojo
      *
      * @since 1.12
      */
-    @Parameter( property = "license.overrideFile", defaultValue = "src/license/override-THIRD-PARTY.properties" )
+    @Deprecated
+    @Parameter( property = "license.overrideFile" )
     File overrideFile;
+
+    /**
+     * Location of file with license information for dependencies to override.
+     * <b>Note:</b> This option overrides {@link #overrideFile}.
+     *
+     * @since 1.17
+     */
+    @Parameter( property = "license.overrideUrl" )
+    String overrideUrl;
 
     /**
      * To merge licenses in final file.
@@ -748,6 +758,10 @@ public abstract class AbstractAddThirdPartyMojo
         return overrideFile;
     }
 
+    public String getOverrideUrl() {
+        return overrideUrl;
+    }
+
     String getLicenseMergesFile()
     {
         return licenseMergesFile;
@@ -1017,7 +1031,7 @@ public abstract class AbstractAddThirdPartyMojo
     void overrideLicenses() throws IOException
     {
         LicenseMap licenseMap1 = getLicenseMap();
-        thirdPartyTool.overrideLicenses( licenseMap1, projectDependencies, getEncoding(), overrideFile );
+        thirdPartyTool.overrideLicenses( licenseMap1, projectDependencies, getEncoding(), overrideFile, overrideUrl );
     }
 
     private boolean isFailOnMissing() {

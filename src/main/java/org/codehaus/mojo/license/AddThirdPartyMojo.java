@@ -439,7 +439,7 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
         String absolutePath = mojo.getProject().getBasedir().getAbsolutePath();
 
         missingFile = new File(project.getBasedir(),mojo.missingFile.getAbsolutePath().substring(absolutePath.length()));
-        overrideFile  = new File(project.getBasedir(),mojo.overrideFile.getAbsolutePath().substring(absolutePath.length()));
+        overrideFile  = mojo.overrideFile == null ? null : new File(project.getBasedir(),mojo.overrideFile.getAbsolutePath().substring(absolutePath.length()));
         missingLicensesFileArtifact = mojo.missingLicensesFileArtifact;
         localRepository = mojo.localRepository;
         remoteRepositories = mojo.remoteRepositories;
