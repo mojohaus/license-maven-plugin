@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -611,21 +612,13 @@ public class DefaultThirdPartyTool
      * {@inheritDoc}
      */
     public void overrideLicenses( LicenseMap licenseMap, SortedMap<String, MavenProject> artifactCache, String encoding,
-            File overrideFile ) throws IOException
+            URL overrideUrl ) throws IOException
     {
-
-        SortedProperties overrideMappings = new SortedProperties( encoding );
-
-        if ( overrideFile != null && overrideFile.exists() )
+        final SortedProperties overrideMappings = new SortedProperties( encoding );
+        try ( InputStream input = overrideUrl.openStream() )
         {
-            // there is some unsafe dependencies
-
-            getLogger().info( "Load override file " + overrideFile );
-
-            // load the missing file
-            overrideMappings.load( overrideFile );
+            overrideMappings.load( input );
         }
-
         for ( Object o : overrideMappings.keySet() )
         {
             String id = (String) o;
@@ -654,8 +647,6 @@ public class DefaultThirdPartyTool
             addLicense( licenseMap, project, licenses );
 
         }
-
-
     }
 
     /**
