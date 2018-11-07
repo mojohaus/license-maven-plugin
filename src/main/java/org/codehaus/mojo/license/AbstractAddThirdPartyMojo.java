@@ -116,6 +116,9 @@ public abstract class AbstractAddThirdPartyMojo
 
     /**
      * A filter to exclude some scopes.
+     * <p>
+     * Multiple scopes can be delimited by comma, eg. {@code <excludedScopes>test,provided</excludedScopes>}
+     * or {@code -Dlicense.excludedScopes=test,provided}.
      *
      * @since 1.1
      */
@@ -124,6 +127,9 @@ public abstract class AbstractAddThirdPartyMojo
 
     /**
      * A filter to include only some scopes, if let empty then all scopes will be used (no filter).
+     * <p>
+     * Multiple scopes can be delimited by comma, eg. {@code <includedScopes>test,provided</includedScopes>}
+     * or {@code -Dlicense.includedScopes=test,provided}.
      *
      * @since 1.1
      */
