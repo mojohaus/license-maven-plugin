@@ -118,6 +118,42 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
         return rejectPackaging( "pom" );
     }
 
+    @Override
+    void checkUnsafeDependencies() {
+        super.checkUnsafeDependencies();
+
+        try
+        {
+            // compute if missing file should be (re)-generate
+            doGenerateMissing = computeDoGenerateMissingFile(unsafeMappings, unsafeDependencies);
+        }
+        catch (IOException ioex)
+        {
+            getLog().error(ioex);
+        }
+        if ( doGenerateMissing && isVerbose() )
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.append( "Will use from missing file " );
+            sb.append( unsafeMappings.size() );
+            sb.append( " dependencies :" );
+            for ( Map.Entry<Object, Object> entry : unsafeMappings.entrySet() )
+            {
+                String id = (String) entry.getKey();
+                String license = (String) entry.getValue();
+                sb.append( "\n - " ).append( id ).append( " - " ).append( license );
+            }
+            getLog().info( sb.toString() );
+        }
+        else
+        {
+            if ( isUseMissingFile() && !unsafeMappings.isEmpty() )
+            {
+                getLog().info( "Missing file " + getMissingFile() + " is up-to-date." );
+            }
+        }
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -214,30 +250,6 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
             getLog().info( "found " + unsafeMappings.size() + " unsafe mappings" );
         }
 
-        // compute if missing file should be (re)-generate
-        doGenerateMissing = computeDoGenerateMissingFile( unsafeMappings, unsafeDependencies );
-
-        if ( doGenerateMissing && isVerbose() )
-        {
-            StringBuilder sb = new StringBuilder();
-            sb.append( "Will use from missing file " );
-            sb.append( unsafeMappings.size() );
-            sb.append( " dependencies :" );
-            for ( Map.Entry<Object, Object> entry : unsafeMappings.entrySet() )
-            {
-                String id = (String) entry.getKey();
-                String license = (String) entry.getValue();
-                sb.append( "\n - " ).append( id ).append( " - " ).append( license );
-            }
-            getLog().info( sb.toString() );
-        }
-        else
-        {
-            if ( isUseMissingFile() && !unsafeMappings.isEmpty() )
-            {
-                getLog().info( "Missing file " + getMissingFile() + " is up-to-date." );
-            }
-        }
         return unsafeMappings;
     }
 

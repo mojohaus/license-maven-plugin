@@ -502,6 +502,15 @@ public abstract class AbstractAddThirdPartyMojo
     @Parameter( property = "project.artifacts", required = true, readonly = true )
     Set<Artifact> dependencies;
 
+    /**
+     * Map from G/A/V as string to license key, obtained from global dependencies of type=.ld.properties.
+     * This could probably be refactored to have more in common with the classifier-based loader.
+     *
+     * @since 1.4
+     */
+    @Parameter( property = "license.globalKnownLicenses")
+    Map<String, String> globalKnownLicenses;
+
     // ----------------------------------------------------------------------
     // Plexus components
     // ----------------------------------------------------------------------
@@ -551,14 +560,6 @@ public abstract class AbstractAddThirdPartyMojo
      * Flag computed in the {@link #init()} method to know if a bundle version has to be generated.
      */
     private boolean doGenerateBundle;
-
-    /**
-     * Map from G/A/V as string to license key, obtained from global dependencies of type=.ld.properties.
-     * This could probably be refactored to have more in common with the classifier-based loader.
-     *
-     * @since 1.4
-     */
-    private Map<String, String> globalKnownLicenses;
 
     // ----------------------------------------------------------------------
     // Abstract Methods
@@ -683,7 +684,7 @@ public abstract class AbstractAddThirdPartyMojo
 
         if ( CollectionUtils.isNotEmpty( unsafeDependencies ) )
         {
-            resolveUnsafeDependenciesFromFile( missingFile );
+            resolveUnsafeDependencies( missingFile );
         }
 
         if ( !StringUtils.isBlank( missingLicensesFileArtifact ) && CollectionUtils.isNotEmpty( unsafeDependencies ) )
@@ -832,47 +833,57 @@ public abstract class AbstractAddThirdPartyMojo
       throws ArtifactNotFoundException, IOException, ArtifactResolutionException, MojoExecutionException
     {
         File missingLicensesFromArtifact = thirdPartyTool.resolveMissingLicensesDescriptor( groupId, artifactId, version, localRepository, remoteRepositories );
-        resolveUnsafeDependenciesFromFile( missingLicensesFromArtifact );
+        resolveUnsafeDependencies( missingLicensesFromArtifact );
     }
 
-    void resolveUnsafeDependenciesFromFile(File missingLicenses) throws IOException, MojoExecutionException {
+    void resolveUnsafeDependencies(File missingLicenses) throws MojoExecutionException, IOException {
         SortedSet<MavenProject> unsafeDeps = getUnsafeDependencies();
-        if ( missingLicenses != null && missingLicenses.exists() && missingLicenses.length() > 0 )
-        {
-            // there are missing licenses available from the artifact
-            SortedProperties unsafeMappings = new SortedProperties( getEncoding() );
+        // there are missing licenses available from the artifact
+        SortedProperties unsafeMappings = new SortedProperties(getEncoding());
 
+        if (globalKnownLicenses != null)
+        {
+            for ( Map.Entry<String, String> entry : globalKnownLicenses.entrySet() )
+            {
+                unsafeMappings.put( entry.getKey(), entry.getValue() );
+            }
+        }
+
+        if ( missingLicenses != null && missingLicenses.exists() && missingLicenses.length() > 0 ) {
+            // there are missing licenses available from the artifact
             if ( missingLicenses.exists() )
             {
                 // load the missing file
                 unsafeMappings.load( missingLicenses );
             }
-            if (HttpRequester.isStringUrl(missingFileUrl))
-            {
-                String httpRequestResult = HttpRequester.getFromUrl(missingFileUrl);
-                unsafeMappings.load(new ByteArrayInputStream(httpRequestResult.getBytes()));
-            }
-
-            Set<MavenProject> resolvedDependencies = new HashSet<>();
-            for ( MavenProject unsafeDependency : unsafeDeps )
-            {
-                String id = MojoHelper.getArtifactId( unsafeDependency.getArtifact() );
-
-                if ( unsafeMappings.containsKey( id ) && StringUtils.isNotBlank( unsafeMappings.getProperty( id ) ) )
-                {
-                    // update license map
-                    thirdPartyTool.addLicense( licenseMap, unsafeDependency, unsafeMappings.getProperty( id ) );
-
-                    // remove
-                    resolvedDependencies.add( unsafeDependency );
-                }
-            }
-
-            // remove resolvedDependencies from unsafeDeps;
-            unsafeDeps.removeAll( resolvedDependencies );
         }
+
+        if (HttpRequester.isStringUrl(missingFileUrl))
+        {
+            String httpRequestResult = HttpRequester.getFromUrl(missingFileUrl);
+            unsafeMappings.load(new ByteArrayInputStream(httpRequestResult.getBytes()));
+        }
+
+        Set<MavenProject> resolvedDependencies = new HashSet<>();
+        for ( MavenProject unsafeDependency : unsafeDeps )
+        {
+            String id = MojoHelper.getArtifactId( unsafeDependency.getArtifact() );
+
+            if ( unsafeMappings.containsKey( id ) && StringUtils.isNotBlank( unsafeMappings.getProperty( id ) ) )
+            {
+                // update license map
+                thirdPartyTool.addLicense( licenseMap, unsafeDependency, unsafeMappings.getProperty( id ) );
+
+                // remove
+                resolvedDependencies.add( unsafeDependency );
+            }
+        }
+
+        // remove resolvedDependencies from unsafeDeps;
+        unsafeDeps.removeAll( resolvedDependencies );
+        unsafeDependencies = unsafeDeps;
     }
-    
+
     void checkUnsafeDependencies()
     {
         SortedSet<MavenProject> unsafeDeps = getUnsafeDependencies();
