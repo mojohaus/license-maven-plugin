@@ -286,7 +286,7 @@ public abstract class AbstractAddThirdPartyMojo
      * Location of file with the merge licenses in order to be used by command line.
      * <b>Note:</b> This option overrides {@link #licenseMerges}.
      *
-     * @since 1.16
+     * @since 1.17
      */
     @Parameter( property = "license.licenseMergesUrl" )
     String licenseMergesUrl;
