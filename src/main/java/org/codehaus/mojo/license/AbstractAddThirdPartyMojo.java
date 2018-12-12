@@ -879,12 +879,20 @@ public abstract class AbstractAddThirdPartyMojo
         if ( CollectionUtils.isNotEmpty( unsafeDeps ) )
         {
             Log log = getLog();
-            log.warn( "There is " + unsafeDeps.size() + " dependencies with no license :" );
-            for ( MavenProject dep : unsafeDeps )
+            if ( log.isWarnEnabled() )
             {
+                boolean plural = unsafeDeps.size() > 1;
+                String message = String.format( "There %s %d %s with no license :",
+                    plural ? "are" : "is",
+                    unsafeDeps.size(),
+                    plural ? "dependencies" : "dependency" );
+                log.warn( message );
+                for ( MavenProject dep : unsafeDeps )
+                {
 
-                // no license found for the dependency
-                log.warn( " - " + MojoHelper.getArtifactId( dep.getArtifact() ) );
+                    // no license found for the dependency
+                    log.warn( " - " + MojoHelper.getArtifactId( dep.getArtifact() ) );
+                }
             }
         }
     }

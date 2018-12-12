@@ -175,12 +175,20 @@ public class DefaultThirdPartyTool
             }
             else
             {
-                log.debug( "There is " + unsafeDependencies.size() + " dependencies with no license from poms : " );
-                for ( MavenProject dep : unsafeDependencies )
+                if ( log.isDebugEnabled() )
                 {
+                    boolean plural = unsafeDependencies.size() > 1;
+                    String message = String.format( "There %s %d %s with no license from poms :",
+                        plural ? "are" : "is",
+                        unsafeDependencies.size(),
+                        plural ? "dependencies" : "dependency" );
+                    log.debug( message );
+                    for ( MavenProject dep : unsafeDependencies )
+                    {
 
-                    // no license found for the dependency
-                    log.debug( " - " + MojoHelper.getArtifactId( dep.getArtifact() ) );
+                        // no license found for the dependency
+                        log.debug( " - " + MojoHelper.getArtifactId( dep.getArtifact() ) );
+                    }
                 }
             }
         }
