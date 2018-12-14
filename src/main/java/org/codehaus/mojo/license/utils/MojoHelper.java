@@ -33,6 +33,7 @@ import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Mojo helper methods.
@@ -134,7 +135,25 @@ public class MojoHelper
 
                 String id1 = getProjectName( o1 );
                 String id2 = getProjectName( o2 );
-                return id1.compareTo( id2 );
+                return id1.compareToIgnoreCase( id2 );
+            }
+        };
+
+    }
+
+    public static Comparator<Map.Entry<MavenProject, ?>> newMavenProjectEntryComparatorByName()
+    {
+        return new Comparator<Map.Entry<MavenProject, ?>>()
+        {
+            /**
+             * {@inheritDoc}
+             */
+            public int compare( Map.Entry<MavenProject, ?> o1, Map.Entry<MavenProject, ?> o2 )
+            {
+
+                String id1 = getProjectName( o1.getKey() );
+                String id2 = getProjectName( o2.getKey() );
+                return id1.compareToIgnoreCase( id2 );
             }
         };
 

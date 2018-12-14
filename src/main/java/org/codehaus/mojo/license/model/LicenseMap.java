@@ -22,7 +22,6 @@ package org.codehaus.mojo.license.model;
  * #L%
  */
 
-import java.util.Collection;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.mojo.license.utils.MojoHelper;
 
@@ -54,12 +53,24 @@ public class LicenseMap
 
     private final Comparator<MavenProject> projectComparator;
 
+    private boolean sortedByName = false;
+
     /**
      * Default contructor.
      */
     public LicenseMap()
     {
         projectComparator = MojoHelper.newMavenProjectComparator();
+    }
+
+    /**
+     * Defines whether this license map was marked as sorted by name.
+     * 
+     * @return flag
+     */
+    public boolean isSortedByName()
+    {
+        return sortedByName;
     }
 
     /**
@@ -149,6 +160,7 @@ public class LicenseMap
     public LicenseMap toLicenseMapOrderByName()
     {
         LicenseMap result = new LicenseMap();
+        result.sortedByName = true;
 
         Comparator<MavenProject> mavenProjectComparator = MojoHelper.newMavenProjectComparatorByName();
         for ( Map.Entry<String, SortedSet<MavenProject>> entry : entrySet() )
