@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<licenseSummary>
+  <dependencies>
+    <dependency>
+      <groupId>org.jboss.xnio</groupId>
+      <artifactId>xnio-api</artifactId>
+      <version>3.3.6.Final</version>
+      <licenses>
+        <license>
+          <name>Public Domain</name>
+          <url>http://repository.jboss.org/licenses/cc0-1.0.txt</url>
+          <distribution>repo</distribution>
+          <file>public domain - cc0-1.0.txt</file>
+        </license>
+      </licenses>
+    </dependency>
+  </dependencies>
+</licenseSummary>
