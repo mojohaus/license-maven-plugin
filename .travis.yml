@@ -1,5 +1,7 @@
 language: java
 sudo: false
+
+# Skip the Travis CI's default install command
 install: true
 
 jdk:
@@ -11,11 +13,12 @@ script:
   # The CA Certs are outdated in JDK 7. Let's copy the ones from JDK 8
   - sudo mv /usr/lib/jvm/java-7-openjdk-amd64/jre/lib/security/cacerts /usr/lib/jvm/java-7-openjdk-amd64/jre/lib/security/cacerts.orig
   - sudo cp -t /usr/lib/jvm/java-7-openjdk-amd64/jre/lib/security /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/security/cacerts
-  - mvn clean verify -B -e -V
+  - ./mvnw clean verify -B -e -V
 
 cache:
   directories:
     - '$HOME/.m2/repository'
+    - '$HOME/.m2/wrapper'
 
 branches:
     except:
