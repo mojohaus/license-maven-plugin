@@ -5,6 +5,7 @@ install: true
 jdk:
   - openjdk7
   - openjdk8
+  - openjdk11
 
 script:
   # The CA Certs are outdated in JDK 7. Let's copy the ones from JDK 8
