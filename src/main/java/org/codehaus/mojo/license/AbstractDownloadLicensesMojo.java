@@ -268,8 +268,8 @@ public abstract class AbstractDownloadLicensesMojo
         return dependenciesTool.loadProjectDependencies( project, this, localRepository, remoteRepositories, null );
     }
 
-    protected static java.util.Properties systemProperties;
-    
+    protected java.util.Properties systemProperties;
+
     protected void storeProperties()
     {
         systemProperties = (java.util.Properties) System.getProperties().clone();
