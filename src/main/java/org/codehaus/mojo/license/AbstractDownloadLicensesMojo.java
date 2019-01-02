@@ -219,7 +219,7 @@ public abstract class AbstractDownloadLicensesMojo
     @Parameter( defaultValue = "${project}", readonly = true )
     private MavenProject project;
 
-    @Parameter( property = "httpOnly", defaultValue = "false")
+    @Parameter( property = "license.httpOnly", defaultValue = "false")
     private boolean httpOnly;
     // ----------------------------------------------------------------------
     // Plexus Components
