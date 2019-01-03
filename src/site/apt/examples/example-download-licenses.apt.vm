@@ -34,7 +34,7 @@ Download Licenses Examples
   resolve the license of each project dependency.  These files will be downloaded to a local directory
   to be included in the final packaging of the project if desired.  The licenses are downloaded
   based on the url field of the dependency POM.
-  
+
   After downloading the license files, the plugin will create a summary file in XML format which describes
   the license(s) associated with each dependency.  Note that subsequent runs of the plugin will attempt
   to use the existing summary file if found instead of re-downloading the licenses every build.
@@ -44,7 +44,7 @@ Download Licenses Examples
 * Basic Example
 
   This example shows how to configure the <<<download-licenses>>> goal for basic usage.
-  
+
 -------------------
 <project>
   ...
@@ -71,24 +71,24 @@ Download Licenses Examples
 -------------------
 
   Next run your build:
-  
+
 +-----+
 mvn package
 +-----+
-    
-  For the <<<download-licenses>>> goal, licenses will by default be downloaded into the directory 
+
+  For the <<<download-licenses>>> goal, licenses will by default be downloaded into the directory
   <<<target/generated-resources/licenses>>>.  This can be configured using the <<<licensesOutputDirectory>>> parameter.
-  
+
 * Manual License Configuration
 
   By default the plugin will look at the POM of each dependency for license information.  However,
-  not all POMs have been configured with the correct license information.  In these cases, 
+  not all POMs have been configured with the correct license information.  In these cases,
   the required license information can be configured manually.  By default, the plugin will look
   for a file called <<src/license/licenses.xml>>.  This file contains manually configured license information
-  which will be merged with information from the dependency POMs to create the final license report.  
+  which will be merged with information from the dependency POMs to create the final license report.
   The location of this file can be configured using the <<licensesConfigFile>> parameter
   The following is an example license config file.
-  
+
 -------------------
 <?xml version="1.0"?>
 

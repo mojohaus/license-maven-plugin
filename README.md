@@ -1,7 +1,7 @@
 # license-maven-plugin
 
 This is the [license-maven-plugin](http://www.mojohaus.org/license-maven-plugin/).
- 
+
 [![Build Status](https://travis-ci.org/mojohaus/license-maven-plugin.svg?branch=master)](https://travis-ci.org/mojohaus/license-maven-plugin)
 [![Maven Central](https://img.shields.io/maven-central/v/org.codehaus.mojo/license-maven-plugin.svg?label=Maven%20Central)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.codehaus.mojo%22%20a%3A%license-maven-plugin%22)
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mojohaus/license-maven-plugin?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)

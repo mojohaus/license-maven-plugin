@@ -56,7 +56,7 @@
       <classifier>resources</classifier>
       <type>zip</type>
     </dependency>
-    
+
   </dependencies>
 
 </project>

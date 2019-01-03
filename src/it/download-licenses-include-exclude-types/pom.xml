@@ -12,7 +12,7 @@
   <description>
     Check default execution.
   </description>
-  
+
   <dependencies>
     <dependency>
       <groupId>org.wildfly</groupId>

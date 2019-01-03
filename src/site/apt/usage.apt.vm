@@ -30,10 +30,10 @@
 Usage
 
   The License Maven Plugin provides several goals related to licenses in a project.
-  This includes validating/updating license header information in source files, 
+  This includes validating/updating license header information in source files,
   updating the LICENSE.txt file, and retrieving license information from dependencies.
-  The information below should help you to get started. If you have problems using 
-  the plugin, please feel free to post your questions to the 
+  The information below should help you to get started. If you have problems using
+  the plugin, please feel free to post your questions to the
   {{{./mail-lists.html}user mailing list}}.
 
 * Getting Plugin Configuration Information
@@ -145,13 +145,13 @@ Usage
   <Note:> This mojo only has effect on a <<pom>> project.
 
   For more information, see the {{{./examples/example-thirdparty.html}examples}} and for
-  full detail see {{{./aggregate-add-third-party-mojo.html}the aggregate add third party mojo 
+  full detail see {{{./aggregate-add-third-party-mojo.html}the aggregate add third party mojo
   page}}.
 
 ** download-licenses goal
 
-  The License Maven Plugin can download dependency license files and generate an XML report of the 
-  licenses.  Example configuration is listed below, and more information is available in the 
+  The License Maven Plugin can download dependency license files and generate an XML report of the
+  licenses.  Example configuration is listed below, and more information is available in the
   {{{./examples/example-download-licenses.html}examples page}}.
 
   By default the plugin attaches to the <<<generate-resources>>> phase of the build lifecycle.
@@ -182,12 +182,12 @@ Usage
 -------------------
 
   Next run your build:
-  
+
 +-----+
 mvn package
 +-----+
-    
-  For the <<<download-licenses>>> goal, licenses will by default be downloaded into the directory 
+
+  For the <<<download-licenses>>> goal, licenses will by default be downloaded into the directory
   <<<target/licenses>>>.  This can be configured using the <<<licensesOutputDirectory>>> parameter.
 
 ** aggregate-download-licenses goal
@@ -230,6 +230,6 @@ mvn package
 
   For the <<<download-licenses>>> goal, licenses will by default be downloaded into the directory
   <<<target/licenses>>>.  This can be configured using the <<<licensesOutputDirectory>>> parameter.
-  
 
-   
+
+

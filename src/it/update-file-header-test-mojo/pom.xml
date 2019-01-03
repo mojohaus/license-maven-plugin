@@ -95,7 +95,7 @@
                 <mysql2>mysql</mysql2>
               </extraExtensions>
               <excludes>
-              <exclude>**/rst2/*.rst</exclude>
+                <exclude>**/rst2/*.rst</exclude>
               </excludes>
             </configuration>
           </execution>

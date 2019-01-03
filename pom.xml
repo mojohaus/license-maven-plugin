@@ -77,8 +77,8 @@
       <name>Jérôme Joslet</name>
     </contributor>
     <contributor>
-        <name>Benson Margulies</name>
-        <email>bimargulies at apache</email>
+      <name>Benson Margulies</name>
+      <email>bimargulies at apache</email>
     </contributor>
     <contributor>
       <name>Cedric Pronzato</name>
@@ -358,8 +358,8 @@
           <version>3.6</version>
         </plugin>
         <plugin>
-        <artifactId>maven-plugin-plugin</artifactId>
-        <version>${pluginPluginVersion}</version>
+          <artifactId>maven-plugin-plugin</artifactId>
+          <version>${pluginPluginVersion}</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>

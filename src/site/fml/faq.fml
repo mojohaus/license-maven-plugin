@@ -28,8 +28,8 @@
       <question>What is the difference between this plugin (the Codehaus license-maven-plugin) and the maven-license-plugin hosted at Google Code?</question>
       <answer>
         <p>
-          The Codehaus plugin and the <a href="">Google Code</a> plugin were developed separately but with similar goals.  
-          The two plugins have several overlapping features including verifying and updating license information in 
+          The Codehaus plugin and the <a href="">Google Code</a> plugin were developed separately but with similar goals.
+          The two plugins have several overlapping features including verifying and updating license information in
           source files.  The Codehaus plugin also provides the ability to download the licenses of third party dependencies
           and create and XML report listing each project dependency and its license.  If you are not sure which one to use
           you should try both to see which one best fits your needs.
@@ -40,7 +40,7 @@
       <question>What is the difference between this plugin (the Codehaus license-maven-plugin) and the maven-license-plugin hosted at Code Lutin?</question>
       <answer>
         <p>
-          The <a href="http://maven-site.nuiton.org/maven-license-plugin/">Code Lutin maven-license-plugin</a> is an older version of the Codehaus license-maven-plugin.  The source code 
+          The <a href="http://maven-site.nuiton.org/maven-license-plugin/">Code Lutin maven-license-plugin</a> is an older version of the Codehaus license-maven-plugin.  The source code
           of the Code Lutin plugin was donated to Codehaus and merged with some existing license plugin code.
           The original creator joined then the Codehaus team to continue the project development.
         </p>
@@ -62,7 +62,7 @@
           </answer>
         </faq>
     <faq id="properties_files">
-    <question>How to deal with hardcoded encoding ISO-8859-1 for properties files when 
+    <question>How to deal with hardcoded encoding ISO-8859-1 for properties files when
     updating file headers?</question>
     <answer>
     <p>
