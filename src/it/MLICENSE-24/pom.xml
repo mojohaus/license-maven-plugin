@@ -37,7 +37,7 @@
   <name>License Test :: MLICENSE-24</name>
 
   <url>no-url</url>
-  
+
   <properties>
 
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

@@ -872,7 +872,7 @@ public abstract class AbstractAddThirdPartyMojo
             unsafeDeps.removeAll( resolvedDependencies );
         }
     }
-    
+
     void checkUnsafeDependencies()
     {
         SortedSet<MavenProject> unsafeDeps = getUnsafeDependencies();

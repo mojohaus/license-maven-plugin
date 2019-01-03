@@ -6,16 +6,16 @@
   Copyright (C) 2008 - 2011 CodeLutin, Codehaus, Tony Chemit
   %%
   This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU Lesser General Public License as 
-  published by the Free Software Foundation, either version 3 of the 
+  it under the terms of the GNU Lesser General Public License as
+  published by the Free Software Foundation, either version 3 of the
   License, or (at your option) any later version.
-  
+
   This program is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Lesser Public License for more details.
-  
-  You should have received a copy of the GNU General Lesser Public 
+
+  You should have received a copy of the GNU General Lesser Public
   License along with this program.  If not, see
   <http://www.gnu.org/licenses/lgpl-3.0.html>.
   #L%
@@ -25,60 +25,60 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-    <modelVersion>4.0.0</modelVersion>
+  <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.codehaus.mojo.license.test</groupId>
-    <artifactId>dual-licensed-both-whitelisted</artifactId>
-    <version>1.0</version>
+  <groupId>org.codehaus.mojo.license.test</groupId>
+  <artifactId>dual-licensed-both-whitelisted</artifactId>
+  <version>1.0</version>
 
-    <name>License Test :: dual-licensed-both-whitelisted</name>
+  <name>License Test :: dual-licensed-both-whitelisted</name>
 
-    <url>no-url</url>
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <license.verbose>true</license.verbose>
-    </properties>
+  <url>no-url</url>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <license.verbose>true</license.verbose>
+  </properties>
 
 
-    <dependencies>
+  <dependencies>
         <!-- this one is dual-licensed under GPL and CDDL -->
-        <dependency>
-            <groupId>javax.xml.stream</groupId>
-            <artifactId>stax-api</artifactId>
-            <version>1.0-2</version>
-        </dependency>
-    </dependencies>
+    <dependency>
+      <groupId>javax.xml.stream</groupId>
+      <artifactId>stax-api</artifactId>
+      <version>1.0-2</version>
+    </dependency>
+  </dependencies>
 
-    <build>
+  <build>
 
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>license-maven-plugin</artifactId>
-                    <version>@pom.version@</version>
-                </plugin>
-            </plugins>
-        </pluginManagement>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>license-maven-plugin</artifactId>
+          <version>@pom.version@</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
 
-        <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>license-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>dual-license</id>
-                        <goals>
-                            <goal>add-third-party</goal>
-                        </goals>
-                        <phase>validate</phase>
-                        <configuration>
-                            <failIfWarning>true</failIfWarning>
-                            <includedLicenses>GNU General Public Library|COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0</includedLicenses>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>dual-license</id>
+            <goals>
+              <goal>add-third-party</goal>
+            </goals>
+            <phase>validate</phase>
+            <configuration>
+              <failIfWarning>true</failIfWarning>
+              <includedLicenses>GNU General Public Library|COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0</includedLicenses>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

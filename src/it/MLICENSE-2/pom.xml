@@ -58,14 +58,14 @@
   <dependencyManagement>
 
     <dependencies>
-      
+
       <!-- this dependency is a bundle type -->
       <dependency>
         <groupId>org.springframework.ws</groupId>
         <artifactId>spring-oxm</artifactId>
         <version>1.5.8</version>
       </dependency>
-      
+
       <!-- a -resources.zip dep -->
       <dependency>
         <groupId>net.sf.docbook</groupId>

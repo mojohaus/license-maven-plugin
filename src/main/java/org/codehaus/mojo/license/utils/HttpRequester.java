@@ -57,7 +57,7 @@ public class HttpRequester
   /**
    * this method will send a simple GET-request to the given destination and will return the result as a
    * string
-   * 
+   *
    * @param url the resource destination that is expected to contain pure text
    * @return the string representation of the resource at the given URL
    */

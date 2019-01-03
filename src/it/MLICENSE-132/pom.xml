@@ -21,41 +21,41 @@
   #L%
   -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>org.codehaus.mojo.license.test</groupId>
-    <artifactId>test-add-third-party-global-db</artifactId>
-    <version>@pom.version@</version>
-    <packaging>pom</packaging>
-    <name>License Test :: global-db</name>
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <license.verbose>true</license.verbose>
-    </properties>
-    <modules>
-      <module>consume-db</module>
-    </modules>
-    <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.codehaus.mojo</groupId>
-              <artifactId>license-maven-plugin</artifactId>
-              <version>@pom.version@</version>
-              <configuration>
-                <licenseMergesUrl>file://${project.basedir}/licenses.merge</licenseMergesUrl>
-                <useMissingFile>true</useMissingFile>
-                <includeTransitiveDependencies>false</includeTransitiveDependencies>
-                <licenseMerges>
-                    <licenseMerge>Apache Software Licenses|Apache Software License|ASL</licenseMerge>
-                </licenseMerges>
-              </configuration>
-            </plugin>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-site-plugin</artifactId>
-              <version>3.1</version>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-    </build>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.codehaus.mojo.license.test</groupId>
+  <artifactId>test-add-third-party-global-db</artifactId>
+  <version>@pom.version@</version>
+  <packaging>pom</packaging>
+  <name>License Test :: global-db</name>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <license.verbose>true</license.verbose>
+  </properties>
+  <modules>
+    <module>consume-db</module>
+  </modules>
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>license-maven-plugin</artifactId>
+          <version>@pom.version@</version>
+          <configuration>
+            <licenseMergesUrl>file://${project.basedir}/licenses.merge</licenseMergesUrl>
+            <useMissingFile>true</useMissingFile>
+            <includeTransitiveDependencies>false</includeTransitiveDependencies>
+            <licenseMerges>
+              <licenseMerge>Apache Software Licenses|Apache Software License|ASL</licenseMerge>
+            </licenseMerges>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-site-plugin</artifactId>
+          <version>3.1</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
 </project>

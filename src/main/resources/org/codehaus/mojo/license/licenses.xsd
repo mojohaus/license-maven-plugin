@@ -47,8 +47,8 @@
     <xs:documentation source="version">1.0+</xs:documentation>
     <xs:documentation source="description">
       This element describes all of the licenses for this project.  Each license is described by a
-      <code>license</code> element, which is then described by additional elements.  Projects should 
-      only list the license(s) that applies to the project and not the licenses that apply to 
+      <code>license</code> element, which is then described by additional elements.  Projects should
+      only list the license(s) that applies to the project and not the licenses that apply to
       dependencies.  If multiple licenses are listed, it is assumed that the user can select
       any of them, not that they must accept all.
     </xs:documentation>
@@ -68,7 +68,7 @@
       consideration in other reporting and
       validation. The licenses listed for the project are that of the project itself,
       and not of dependencies.
-      
+
     </xs:documentation>
   </xs:annotation>
   <xs:sequence>
