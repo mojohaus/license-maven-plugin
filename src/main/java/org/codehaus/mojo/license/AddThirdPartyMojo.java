@@ -1,5 +1,27 @@
 package org.codehaus.mojo.license;
 
+/*
+ * #%L
+ * License Maven Plugin
+ * %%
+ * Copyright (C) 2008 - 2011 CodeLutin, Codehaus, Tony Chemit
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Lesser Public License for more details.
+ *
+ * You should have received a copy of the GNU General Lesser Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/lgpl-3.0.html>.
+ * #L%
+ */
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -28,28 +50,7 @@ import org.codehaus.mojo.license.utils.FileUtil;
 import org.codehaus.mojo.license.utils.MojoHelper;
 import org.codehaus.mojo.license.utils.SortedProperties;
 
-/*
- * #%L
- * License Maven Plugin
- * %%
- * Copyright (C) 2008 - 2011 CodeLutin, Codehaus, Tony Chemit
- * %%
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Lesser Public License for more details.
- *
- * You should have received a copy of the GNU General Lesser Public
- * License along with this program.  If not, see
- * <http://www.gnu.org/licenses/lgpl-3.0.html>.
- * #L%
- */
-
+// CHECKSTYLE_OFF: LineLength
 /**
  * Goal to generate the third-party license file.
  * <p>
@@ -63,7 +64,9 @@ import org.codehaus.mojo.license.utils.SortedProperties;
  * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
-@Mojo( name = "add-third-party", requiresDependencyResolution = ResolutionScope.TEST, defaultPhase = LifecyclePhase.GENERATE_RESOURCES )
+// CHECKSTYLE_ON: LineLength
+@Mojo( name = "add-third-party", requiresDependencyResolution = ResolutionScope.TEST,
+       defaultPhase = LifecyclePhase.GENERATE_RESOURCES )
 public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements MavenProjectDependenciesConfigurator
 {
 
@@ -147,7 +150,7 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
 
         boolean safeLicense = checkForbiddenLicenses();
 
-        checkBlacklist(safeLicense);
+        checkBlacklist( safeLicense );
 
         writeThirdPartyFile();
 
@@ -159,7 +162,7 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
 
         boolean unsafe = CollectionUtils.isNotEmpty( getUnsafeDependencies() );
 
-        checkMissing(unsafe);
+        checkMissing( unsafe );
 
         if ( !unsafe && isUseMissingFile() && MapUtils.isEmpty( getUnsafeMappings() ) && getMissingFile().exists() )
         {
@@ -421,7 +424,9 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
         }
     }
 
-    void initFromMojo(AggregatorAddThirdPartyMojo mojo, MavenProject mavenProject, Map<String, List<Dependency>> reactorProjects) throws Exception {
+    void initFromMojo( AggregatorAddThirdPartyMojo mojo, MavenProject mavenProject,
+            Map<String, List<Dependency>> reactorProjects ) throws Exception
+    {
         project = mavenProject;
         deployMissingFile = mojo.deployMissingFile;
         useRepositoryMissingFiles = mojo.useRepositoryMissingFiles;
@@ -438,12 +443,14 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
         useMissingFile = mojo.useMissingFile;
         String absolutePath = mojo.getProject().getBasedir().getAbsolutePath();
 
-        missingFile = new File(project.getBasedir(),mojo.missingFile.getAbsolutePath().substring(absolutePath.length()));
-        overrideFile  = new File(project.getBasedir(),mojo.overrideFile.getAbsolutePath().substring(absolutePath.length()));
+        missingFile = new File( project.getBasedir(),
+                mojo.missingFile.getAbsolutePath().substring( absolutePath.length() ) );
+        overrideFile  = new File( project.getBasedir(),
+                mojo.overrideFile.getAbsolutePath().substring( absolutePath.length() ) );
         missingLicensesFileArtifact = mojo.missingLicensesFileArtifact;
         localRepository = mojo.localRepository;
         remoteRepositories = mojo.remoteRepositories;
-        dependencies = new HashSet<Artifact>(mavenProject.getDependencies());
+        dependencies = new HashSet<Artifact>( mavenProject.getDependencies() );
         licenseMerges = mojo.licenseMerges;
         licenseMergesFile = mojo.licenseMergesFile;
         includedLicenses = mojo.includedLicenses;
@@ -460,9 +467,10 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
         verbose = mojo.verbose;
         encoding = mojo.encoding;
 
-        setLog(mojo.getLog());
+        setLog( mojo.getLog() );
 
-        dependenciesTool.loadProjectArtifacts( localRepository, project.getRemoteArtifactRepositories(), project ,reactorProjects);
+        dependenciesTool.loadProjectArtifacts( localRepository, project.getRemoteArtifactRepositories(), project,
+                reactorProjects );
 
         init();
 

@@ -78,7 +78,8 @@ public class CommentStyleListMojo
      * {@inheritDoc}
      */
     @Override
-    public boolean isSkip() {
+    public boolean isSkip()
+    {
         // can't skip this goal since direct invocation is required
         return false;
     }

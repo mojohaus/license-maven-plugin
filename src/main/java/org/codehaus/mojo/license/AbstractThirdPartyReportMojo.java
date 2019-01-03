@@ -67,7 +67,8 @@ import java.util.TreeSet;
  * @author tchemit dev@tchemit.fr
  * @since 1.1
  */
-public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport implements MavenProjectDependenciesConfigurator
+public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
+    implements MavenProjectDependenciesConfigurator
 {
 
     // ----------------------------------------------------------------------
@@ -95,7 +96,7 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport i
      *
      * @since 1.15
      */
-    @Parameter( property = "license.excludedTypes")
+    @Parameter( property = "license.excludedTypes" )
     private String excludedTypes;
 
     /**
@@ -359,7 +360,7 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport i
         {
             throw new MavenReportException( e.getMessage(), e );
         }
-        catch (MojoExecutionException e)
+        catch ( MojoExecutionException e )
         {
             throw new MavenReportException( e.getMessage(), e );
         }
@@ -518,12 +519,13 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport i
 
         if ( loadArtifacts )
         {
-            dependenciesTool.loadProjectArtifacts( localRepository, project.getRemoteArtifactRepositories(), project , null);
+            dependenciesTool.loadProjectArtifacts( localRepository, project.getRemoteArtifactRepositories(), project,
+                    null );
         }
 
         ThirdPartyHelper thirdPartyHelper =
-                new DefaultThirdPartyHelper( project, encoding, verbose, dependenciesTool, thirdPartyTool, localRepository,
-                                             project.getRemoteArtifactRepositories(), getLog() );
+                new DefaultThirdPartyHelper( project, encoding, verbose, dependenciesTool, thirdPartyTool,
+                        localRepository, project.getRemoteArtifactRepositories(), getLog() );
         // load dependencies of the project
         SortedMap<String, MavenProject> projectDependencies = thirdPartyHelper.loadDependencies( this );
 
@@ -546,8 +548,8 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport i
             if ( useMissingFile )
             {
                 // Resolve unsafe dependencies using missing files, this will update licenseMap and unsafeDependencies
-                thirdPartyHelper.createUnsafeMapping( licenseMap, missingFile, missingFileUrl, useRepositoryMissingFiles,
-                                                      dependenciesWithNoLicense, projectDependencies );
+                thirdPartyHelper.createUnsafeMapping( licenseMap, missingFile, missingFileUrl,
+                        useRepositoryMissingFiles, dependenciesWithNoLicense, projectDependencies );
             }
         }
 

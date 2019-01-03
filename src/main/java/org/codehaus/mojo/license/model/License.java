@@ -110,11 +110,13 @@ public class License
         return baseURL;
     }
 
-    public boolean isHeaderContentTemplateAware() {
+    public boolean isHeaderContentTemplateAware()
+    {
         return getHeaderURL().toString().endsWith( TEMPLATE_SUFFIX );
     }
 
-    public boolean isLicenseContentTemplateAware() {
+    public boolean isLicenseContentTemplateAware()
+    {
         return getLicenseURL().toString().endsWith( TEMPLATE_SUFFIX );
     }
 

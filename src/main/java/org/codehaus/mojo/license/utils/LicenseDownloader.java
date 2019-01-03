@@ -65,8 +65,8 @@ public class LicenseDownloader
             {
                 int status = ( (HttpURLConnection) connection ).getResponseCode();
 
-                redirect = HttpURLConnection.HTTP_MOVED_TEMP == status || HttpURLConnection.HTTP_MOVED_PERM == status ||
-                    HttpURLConnection.HTTP_SEE_OTHER == status;
+                redirect = HttpURLConnection.HTTP_MOVED_TEMP == status || HttpURLConnection.HTTP_MOVED_PERM == status
+                        || HttpURLConnection.HTTP_SEE_OTHER == status;
             }
 
             if ( redirect )

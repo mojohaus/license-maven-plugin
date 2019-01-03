@@ -392,8 +392,8 @@ public abstract class AbstractLicenseMojo
         }
         if ( StringUtils.isEmpty( getEncoding() ) )
         {
-            getLog().warn( "File encoding has not been set, using platform encoding " + ReaderFactory.FILE_ENCODING +
-                               ", i.e. build is platform dependent!" );
+            getLog().warn( "File encoding has not been set, using platform encoding " + ReaderFactory.FILE_ENCODING
+                               + ", i.e. build is platform dependent!" );
             setEncoding( ReaderFactory.FILE_ENCODING );
         }
     }

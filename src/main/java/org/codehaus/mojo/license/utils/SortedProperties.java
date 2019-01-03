@@ -2,9 +2,9 @@ package org.codehaus.mojo.license.utils;
 
 /*
  * #%L
- * Maven helper plugin
+ * License Maven Plugin
  * %%
- * Copyright (C) 2009 - 2010 Tony Chemit, CodeLutin
+ * Copyright (C) 2009 - 2010 CodeLutin, Codehaus, Tony Chemit
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -22,11 +22,11 @@ package org.codehaus.mojo.license.utils;
  * #L%
  */
 
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collections;
 import java.util.Enumeration;

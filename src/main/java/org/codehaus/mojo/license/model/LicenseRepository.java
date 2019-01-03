@@ -95,7 +95,7 @@ public class LicenseRepository
         return definitionURL;
     }
 
-    protected URL getLicenseBaseURL(String licenseName)
+    protected URL getLicenseBaseURL( String licenseName )
     {
         URL licenseBaseURL = MojoHelper.getUrl( baseURL, licenseName );
         return licenseBaseURL;
@@ -269,9 +269,8 @@ public class LicenseRepository
             else
             {
                 throw new IllegalArgumentException(
-                    "Could not find license (" + license + ") content file at [" + result + "], nor at [" +
-                        resultWithFtlSuffix + "] for resolver " +
-                        this );
+                    "Could not find license (" + license + ") content file at [" + result + "], nor at ["
+                        + resultWithFtlSuffix + "] for resolver " + this );
             }
         }
         return result;

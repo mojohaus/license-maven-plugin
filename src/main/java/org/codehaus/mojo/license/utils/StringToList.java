@@ -53,23 +53,23 @@ public class StringToList
    /**
     * @param data a list of licenses or a URL
     */
-    public StringToList(String data) throws MojoExecutionException
+    public StringToList( String data ) throws MojoExecutionException
     {
       this();
-      if (!HttpRequester.isStringUrl(data))
+      if ( !HttpRequester.isStringUrl( data ) )
       {
-        for ( String s : data.split("\\s*\\|\\s*") )
+        for ( String s : data.split( "\\s*\\|\\s*" ) )
         {
-          addEntryToList(s);
+          addEntryToList( s );
         }
       }
       else
       {
-        for ( String license : HttpRequester.downloadList(data) )
+        for ( String license : HttpRequester.downloadList( data ) )
         {
-          if (data != null && StringUtils.isNotBlank(license) && !this.data.contains(license))
+          if ( data != null && StringUtils.isNotBlank( license ) && !this.data.contains( license ) )
           {
-            this.data.add(license);
+            this.data.add( license );
           }
         }
       }

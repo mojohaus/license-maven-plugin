@@ -1,29 +1,5 @@
 package org.codehaus.mojo.license;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.SortedSet;
-import java.util.TreeMap;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.model.Dependency;
-import org.apache.maven.model.Plugin;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugin.logging.Log;
-import org.apache.maven.plugins.annotations.LifecyclePhase;
-import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.plugins.annotations.ResolutionScope;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.ProjectBuildingException;
-import org.codehaus.mojo.license.model.LicenseMap;
-import org.codehaus.mojo.license.utils.SortedProperties;
-
 /*
  * #%L
  * License Maven Plugin
@@ -45,6 +21,28 @@ import org.codehaus.mojo.license.utils.SortedProperties;
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.ProjectBuildingException;
+import org.codehaus.mojo.license.model.LicenseMap;
+import org.codehaus.mojo.license.utils.SortedProperties;
 
 /**
  * This goal forks executions of the add-third-party goal for all the leaf projects
@@ -100,7 +98,8 @@ public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo
      * @deprecated since 1.14, please use now {@link #missingFile}.
      */
     @Deprecated
-    @Parameter( property = "license.aggregateMissingLicensesFile", defaultValue = "${project.basedir}/src/license/THIRD-PARTY.properties" )
+    @Parameter( property = "license.aggregateMissingLicensesFile",
+                defaultValue = "${project.basedir}/src/license/THIRD-PARTY.properties" )
     private File aggregateMissingLicensesFile;
 
     // ----------------------------------------------------------------------
@@ -141,22 +140,26 @@ public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo
     }
 
     @Override
-    protected void init() throws Exception {
-
-        if (aggregateMissingLicensesFile!=null&& !aggregateMissingLicensesFile.equals(missingFile)) {
-            getLog().warn("");
-            getLog().warn("You should use *missingFile* parameter instead of deprecated *aggregateMissingLicensesFile*.");
-            getLog().warn("");
+    protected void init() throws Exception
+    {
+        // CHECKSTYLE_OFF: LineLength
+        if ( aggregateMissingLicensesFile != null && !aggregateMissingLicensesFile.equals( missingFile ) )
+        {
+            getLog().warn( "" );
+            getLog().warn( "You should use *missingFile* parameter instead of deprecated *aggregateMissingLicensesFile*." );
+            getLog().warn( "" );
             missingFile = aggregateMissingLicensesFile;
         }
 
-        if (aggregateMissingLicensesFileArtifact!=null && !aggregateMissingLicensesFileArtifact.equals(missingLicensesFileArtifact)) {
-            getLog().warn("");
-            getLog().warn("You should use *missingLicensesFileArtifact* parameter instead of deprecated *aggregateMissingLicensesFileArtifact*.");
-            getLog().warn("");
+        if ( aggregateMissingLicensesFileArtifact != null
+                && !aggregateMissingLicensesFileArtifact.equals( missingLicensesFileArtifact ) )
+        {
+            getLog().warn( "" );
+            getLog().warn( "You should use *missingLicensesFileArtifact* parameter instead of deprecated *aggregateMissingLicensesFileArtifact*." );
+            getLog().warn( "" );
             missingLicensesFileArtifact = aggregateMissingLicensesFileArtifact;
         }
-
+        // CHECKSTYLE_ON: LineLength
         super.init();
     }
 
@@ -176,49 +179,63 @@ public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo
 
         licenseMap = new LicenseMap();
 
-        Artifact pluginArtifact = (Artifact) project.getPluginArtifactMap().get("org.codehaus.mojo:license-maven-plugin");
+        Artifact pluginArtifact = (Artifact) project.getPluginArtifactMap()
+                .get( "org.codehaus.mojo:license-maven-plugin" );
 
-        String groupId=null;
-        String artifactId=null;
-        String version=null;
-        if (pluginArtifact==null) {
-            Plugin plugin = (Plugin) project.getPluginManagement().getPluginsAsMap().get("org.codehaus.mojo:license-maven-plugin");
-            if (plugin!=null) {
+        String groupId = null;
+        String artifactId = null;
+        String version = null;
+        if ( pluginArtifact == null )
+        {
+            Plugin plugin = (Plugin) project.getPluginManagement().getPluginsAsMap()
+                    .get( "org.codehaus.mojo:license-maven-plugin" );
+            if ( plugin != null )
+            {
                 groupId = plugin.getGroupId();
                 artifactId = plugin.getArtifactId();
                 version = plugin.getVersion();
             }
-        } else {
+        }
+        else
+        {
             groupId = pluginArtifact.getGroupId();
             artifactId = pluginArtifact.getArtifactId();
             version = pluginArtifact.getVersion();
         }
-        if (groupId==null) {
-            throw new IllegalStateException("Can't find license-maven-plugin");
+        if ( groupId == null )
+        {
+            throw new IllegalStateException( "Can't find license-maven-plugin" );
         }
 
         String addThirdPartyRoleHint = groupId + ":" + artifactId + ":" + version + ":" + "add-third-party";
         Map<String, List<Dependency>> reactorProjectDependencies = new TreeMap<>();
-        for (MavenProject reactorProject : this.reactorProjects) {
-            reactorProjectDependencies.put(String.format("%s:%s", reactorProject.getGroupId(), reactorProject.getArtifactId()), reactorProject.getDependencies());
+        for ( MavenProject reactorProject : this.reactorProjects )
+        {
+            reactorProjectDependencies.put( String.format( "%s:%s", reactorProject.getGroupId(),
+                    reactorProject.getArtifactId() ), reactorProject.getDependencies() );
         }
 
-        for (Object reactorProject : reactorProjects) {
-            if (getProject().equals(reactorProject)) {
+        for ( Object reactorProject : reactorProjects )
+        {
+            if ( getProject().equals( reactorProject ) )
+            {
                 // do not process pom
                 continue;
             }
 
 
-            AddThirdPartyMojo mojo = (AddThirdPartyMojo) getSession().lookup(AddThirdPartyMojo.ROLE, addThirdPartyRoleHint);
+            AddThirdPartyMojo mojo = (AddThirdPartyMojo) getSession()
+                    .lookup( AddThirdPartyMojo.ROLE, addThirdPartyRoleHint );
 
-            mojo.initFromMojo(this, (MavenProject) reactorProject, reactorProjectDependencies);
+            mojo.initFromMojo( this, (MavenProject) reactorProject, reactorProjectDependencies );
 
             LicenseMap childLicenseMap = mojo.getLicenseMap();
-            if (isVerbose()) {
-                getLog().info(String.format("Found %d license(s) in module %s:%s", childLicenseMap.size(), mojo.project.getGroupId(), mojo.project.getArtifactId()));
+            if ( isVerbose() )
+            {
+                getLog().info( String.format( "Found %d license(s) in module %s:%s",
+                        childLicenseMap.size(), mojo.project.getGroupId(), mojo.project.getArtifactId() ) );
             }
-            licenseMap.putAll(childLicenseMap);
+            licenseMap.putAll( childLicenseMap );
 
         }
 
@@ -227,7 +244,7 @@ public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo
         {
             for ( Map.Entry<String, SortedSet<MavenProject>> entry: licenseMap.entrySet() )
             {
-                getLog().info( " - " + entry.getKey()+" for "+entry.getValue().size()+" artifact(s).");
+                getLog().info( " - " + entry.getKey() + " for " + entry.getValue().size() + " artifact(s)." );
             }
         }
 
@@ -237,11 +254,11 @@ public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo
 
         boolean safeLicense = checkForbiddenLicenses();
 
-        checkBlacklist(safeLicense);
+        checkBlacklist( safeLicense );
 
         writeThirdPartyFile();
 
-        checkMissing(CollectionUtils.isNotEmpty( getUnsafeDependencies() ));
+        checkMissing( CollectionUtils.isNotEmpty( getUnsafeDependencies() ) );
     }
 
     // ----------------------------------------------------------------------

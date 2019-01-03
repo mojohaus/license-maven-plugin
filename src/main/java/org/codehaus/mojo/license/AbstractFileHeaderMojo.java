@@ -375,18 +375,21 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
     // ----------------------------------------------------------------------
 
     /**
-     * @return {@code true} if mojo must be a simple dry run (says do not modifiy any scanned files), {@code false} otherise.
+     * @return {@code true} if mojo must be a simple dry run (says do not modifiy any scanned files), {@code false}
+     *      otherise.
      */
     protected abstract boolean isDryRun();
 
     /**
-     * @return {@code true} if mojo should fails if dryRun and there is some missing license header, {@code false} otherwise.
+     * @return {@code true} if mojo should fails if dryRun and there is some missing license header, {@code false}
+     *      otherwise.
      */
     protected abstract boolean isFailOnMissingHeader();
 
 
     /**
-     * @return {@code true} if mojo should fails if dryRun and there is some obsolete license header, {@code false} otherwise.
+     * @return {@code true} if mojo should fails if dryRun and there is some obsolete license header, {@code false}
+     *      otherwise.
      */
     protected abstract boolean isFailOnNotUptodateHeader();
 
@@ -397,33 +400,26 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
     @Override
     public void init() throws Exception
     {
-
         if ( StringUtils.isEmpty( ignoreTag ) )
         {
-
             // use default value
             this.ignoreTag = "%" + "%Ignore-License";
         }
-
         if ( !isDryRun() )
         {
-
             if ( isFailOnMissingHeader() )
             {
-
                 getLog().warn( "The failOnMissingHeader has no effect if the property dryRun is not set." );
             }
 
             if ( isFailOnNotUptodateHeader() )
             {
-
                 getLog().warn( "The failOnNotUptodateHeader has no effect if the property dryRun is not set." );
             }
         }
 
         if ( isVerbose() )
         {
-
             // print available comment styles (transformers)
             StringBuilder buffer = new StringBuilder();
             buffer.append( "config - available comment styles :" );
@@ -436,12 +432,9 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
             }
             getLog().info( buffer.toString() );
         }
-
         // set timestamp used for temporary files
         this.timestamp = System.nanoTime();
-
         super.init();
-
         if ( roots == null || roots.length == 0 )
         {
             roots = DEFAULT_ROOTS;
@@ -481,8 +474,8 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
         {
             getLog().info( "Will use processEndTag: " + processEndTag );
         }
-        sectionDelimiter = cleanHeaderConfiguration( sectionDelimiter, FileHeaderTransformer.DEFAULT_SECTION_DELIMITER );
-
+        sectionDelimiter = cleanHeaderConfiguration( sectionDelimiter,
+                FileHeaderTransformer.DEFAULT_SECTION_DELIMITER );
         if ( isVerbose() )
         {
             getLog().info( "Will use sectionDelimiter: " + sectionDelimiter );
@@ -499,7 +492,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
             aTransformer.setSectionDelimiter( sectionDelimiter );
             aTransformer.setEmptyLineAfterHeader( emptyLineAfterHeader );
             aTransformer.setTrimHeaderLine( trimHeaderLine );
-            aTransformer.setLineSeparator( lineSeparator);
+            aTransformer.setLineSeparator( lineSeparator );
 
             if ( aTransformer instanceof JavaFileHeaderTransformer )
             {
@@ -522,23 +515,19 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
 
         if ( extraExtensions != null )
         {
-
             // fill extra extensions for each transformer
             for ( Map.Entry<String, String> entry : extraExtensions.entrySet() )
             {
                 String extension = entry.getKey();
                 if ( extensionToCommentStyle.containsKey( extension ) )
                 {
-
                     // override existing extension mapping
-                    getLog().warn( "The extension " + extension + " is already accepted for comment style " +
-                                           extensionToCommentStyle.get( extension ) );
+                    getLog().warn( "The extension " + extension + " is already accepted for comment style "
+                                           + extensionToCommentStyle.get( extension ) );
                 }
                 String commentStyle = entry.getValue();
-
                 // check transformer exists
                 getTransformer( transformers, commentStyle );
-
                 if ( isVerbose() )
                 {
                     getLog().info( "Associate extension '" + extension + "' to comment style '" + commentStyle + "'" );
@@ -546,15 +535,13 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
                 extensionToCommentStyle.put( extension, commentStyle );
             }
         }
-
         if ( extraFiles == null )
         {
             extraFiles = Collections.emptyMap();
         }
-
         // get all files to treat indexed by their comment style
-        filesToTreatByCommentStyle = obtainFilesToProcessByCommentStyle( extraFiles, roots, includes, excludes, extensionToCommentStyle, transformers );
-
+        filesToTreatByCommentStyle = obtainFilesToProcessByCommentStyle( extraFiles, roots, includes, excludes,
+                extensionToCommentStyle, transformers );
         // build the description template
         if ( isVerbose() )
         {
@@ -699,7 +686,8 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
         filesToTreat.clear();
     }
 
-    private FileHeaderProcessor getFileHeaderProcessor( License license, FileHeaderTransformer transformer ) throws IOException
+    private FileHeaderProcessor getFileHeaderProcessor( License license, FileHeaderTransformer transformer )
+            throws IOException
     {
         // file header to use if no header is found on a file
         FileHeader header = new FileHeader();
@@ -754,8 +742,8 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
         }
         catch ( Exception e )
         {
-            getLog().warn( "skip failed file : " + e.getMessage() +
-                                   ( e.getCause() == null ? "" : " Cause : " + e.getCause().getMessage() ), e );
+            getLog().warn( "skip failed file : " + e.getMessage()
+                                   + ( e.getCause() == null ? "" : " Cause : " + e.getCause().getMessage() ), e );
             FileState.fail.addFile( file, result );
             doFinalize = false;
         }

@@ -464,7 +464,8 @@ public class DefaultThirdPartyTool
                                                SortedMap<String, MavenProject> artifactCache,
                                                String encoding,
                                                File missingFile,
-                                               String missingFileUrl ) throws IOException, MojoExecutionException {
+                                               String missingFileUrl ) throws IOException, MojoExecutionException
+    {
         Map<String, MavenProject> snapshots = new HashMap<>();
 
         //find snapshot dependencies
@@ -501,10 +502,10 @@ public class DefaultThirdPartyTool
             // load the missing file
             unsafeMappings.load( missingFile );
         }
-        if (HttpRequester.isStringUrl(missingFileUrl))
+        if ( HttpRequester.isStringUrl( missingFileUrl ) )
         {
-            String httpRequestResult = HttpRequester.getFromUrl(missingFileUrl);
-            unsafeMappings.load(new ByteArrayInputStream(httpRequestResult.getBytes()));
+            String httpRequestResult = HttpRequester.getFromUrl( missingFileUrl );
+            unsafeMappings.load( new ByteArrayInputStream( httpRequestResult.getBytes() ) );
         }
 
         // get from the missing file, all unknown dependencies
@@ -609,12 +610,13 @@ public class DefaultThirdPartyTool
     /**
      * {@inheritDoc}
      */
-    public void overrideLicenses( LicenseMap licenseMap, SortedMap<String, MavenProject> artifactCache, String encoding, File overrideFile ) throws IOException
+    public void overrideLicenses( LicenseMap licenseMap, SortedMap<String, MavenProject> artifactCache, String encoding,
+            File overrideFile ) throws IOException
     {
 
         SortedProperties overrideMappings = new SortedProperties( encoding );
 
-        if ( overrideFile!=null && overrideFile.exists() )
+        if ( overrideFile != null && overrideFile.exists() )
         {
             // there is some unsafe dependencies
 
@@ -779,26 +781,28 @@ public class DefaultThirdPartyTool
             Artifact artifact = e.getArtifact() == null
                     ? artifactFactory.createArtifactWithClassifier(
                     project.getGroupId(), project.getArtifactId(), project.getVersion(),
-                    DESCRIPTOR_TYPE, DESCRIPTOR_CLASSIFIER)
+                    DESCRIPTOR_TYPE, DESCRIPTOR_CLASSIFIER )
                     : e.getArtifact();
 
             // we can afford to write an empty descriptor here as we don't expect it to turn up later in the remote
             // repository, because the parent was already released (and snapshots are updated automatically if changed)
-            result = new File(localRepository.getBasedir(), localRepository.pathOf(artifact));
+            result = new File( localRepository.getBasedir(), localRepository.pathOf( artifact ) );
         }
 
         return result;
     }
 
     public File resolveMissingLicensesDescriptor( String groupId, String artifactId, String version,
-                                                  ArtifactRepository localRepository, List<ArtifactRepository> repositories )
+            ArtifactRepository localRepository, List<ArtifactRepository> repositories )
             throws IOException, ArtifactResolutionException, ArtifactNotFoundException
     {
-        return resolveArtifact( groupId, artifactId, version, DESCRIPTOR_TYPE, DESCRIPTOR_CLASSIFIER, localRepository, repositories );
+        return resolveArtifact( groupId, artifactId, version, DESCRIPTOR_TYPE, DESCRIPTOR_CLASSIFIER, localRepository,
+                repositories );
     }
 
     private File resolveArtifact( String groupId, String artifactId, String version,
-                                  String type, String classifier, ArtifactRepository localRepository, List<ArtifactRepository> repositories ) throws ArtifactResolutionException, IOException, ArtifactNotFoundException
+            String type, String classifier, ArtifactRepository localRepository, List<ArtifactRepository> repositories )
+                    throws ArtifactResolutionException, IOException, ArtifactNotFoundException
     {
         // TODO: this is a bit crude - proper type, or proper handling as metadata rather than an artifact in 2.1?
         Artifact artifact = artifactFactory.createArtifactWithClassifier( groupId, artifactId, version, type,
