@@ -319,8 +319,8 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo
                 {
 
                     // override existing extension mapping
-                    getLog().warn( "The extension " + extension + " is already accepted for comment style " +
-                                           extensionToCommentStyle.get( extension ) );
+                    getLog().warn( "The extension " + extension + " is already accepted for comment style "
+                                           + extensionToCommentStyle.get( extension ) );
                 }
                 String commentStyle = entry.getValue();
 
@@ -341,7 +341,8 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo
         }
 
         // get all files to treat indexed by their comment style
-        filesToTreatByCommentStyle = obtainFilesToProcessByCommentStyle( extraFiles, roots, includes, excludes, extensionToCommentStyle, transformers );
+        filesToTreatByCommentStyle = obtainFilesToProcessByCommentStyle( extraFiles, roots, includes, excludes,
+                extensionToCommentStyle, transformers );
     }
 
     @Override
@@ -525,8 +526,8 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo
         }
         catch ( Exception e )
         {
-            getLog().warn( "skip failed file : " + e.getMessage() +
-                                   ( e.getCause() == null ? "" : " Cause : " + e.getCause().getMessage() ), e );
+            getLog().warn( "skip failed file : " + e.getMessage()
+                                   + ( e.getCause() == null ? "" : " Cause : " + e.getCause().getMessage() ), e );
             FileState.fail.addFile( file, result );
             doFinalize = false;
         }

@@ -73,8 +73,8 @@ public class UpdateFileHeaderFilter extends FileHeaderFilter
 
             if ( log.isDebugEnabled() )
             {
-                log.debug( "description has changed from [" + oldHeader.getDescription() + "] to [" +
-                                   newHeader.getDescription() + "]" );
+                log.debug( "description has changed from [" + oldHeader.getDescription() + "] to ["
+                                   + newHeader.getDescription() + "]" );
             }
 
             // description has changed, mark header to be updated
@@ -91,9 +91,8 @@ public class UpdateFileHeaderFilter extends FileHeaderFilter
 
             if ( log.isDebugEnabled() )
             {
-                log.debug(
-                        "copyright has changed from [" + oldHeader.getCopyright() + "] to [" + newHeader.getCopyright() +
-                                "]" );
+                log.debug( "copyright has changed from [" + oldHeader.getCopyright() + "] to ["
+                        + newHeader.getCopyright() + "]" );
             }
 
             // description has changed, mark header to be updated
@@ -110,8 +109,8 @@ public class UpdateFileHeaderFilter extends FileHeaderFilter
 
             if ( log.isDebugEnabled() )
             {
-                log.debug(
-                        "license has changed from [" + oldHeader.getLicense() + "] to [" + newHeader.getLicense() + "]" );
+                log.debug( "license has changed from [" + oldHeader.getLicense() + "] to [" + newHeader.getLicense()
+                        + "]" );
             }
 
             // description has changed, mark header to be updated

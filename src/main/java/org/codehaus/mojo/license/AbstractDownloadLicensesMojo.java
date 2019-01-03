@@ -1,5 +1,27 @@
 package org.codehaus.mojo.license;
 
+/*
+ * #%L
+ * License Maven Plugin
+ * %%
+ * Copyright (C) 2016 Tony Chemit
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Lesser Public License for more details.
+ *
+ * You should have received a copy of the GNU General Lesser Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/lgpl-3.0.html>.
+ * #L%
+ */
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.License;
@@ -104,7 +126,7 @@ public abstract class AbstractDownloadLicensesMojo
      *
      * @since 1.0
      */
-    @Parameter( property = "license.includedScopes")
+    @Parameter( property = "license.includedScopes" )
     private String includedScopes;
 
     /**
@@ -112,7 +134,7 @@ public abstract class AbstractDownloadLicensesMojo
      *
      * @since 1.15
      */
-    @Parameter( property = "license.excludedTypes")
+    @Parameter( property = "license.excludedTypes" )
     private String excludedTypes;
 
     /**
@@ -120,7 +142,7 @@ public abstract class AbstractDownloadLicensesMojo
      *
      * @since 1.15
      */
-    @Parameter( property = "license.includedTypes")
+    @Parameter( property = "license.includedTypes" )
     private String includedTypes;
 
     /**
@@ -181,7 +203,7 @@ public abstract class AbstractDownloadLicensesMojo
      *
      * @since 1.11
      */
-    @Parameter( property = "license.excludedGroups")
+    @Parameter( property = "license.excludedGroups" )
     private String excludedGroups;
 
     /**
@@ -190,7 +212,7 @@ public abstract class AbstractDownloadLicensesMojo
      *
      * @since 1.11
      */
-    @Parameter( property = "license.includedGroups")
+    @Parameter( property = "license.includedGroups" )
     private String includedGroups;
 
     /**
@@ -199,7 +221,7 @@ public abstract class AbstractDownloadLicensesMojo
      *
      * @since 1.11
      */
-    @Parameter( property = "license.excludedArtifacts")
+    @Parameter( property = "license.excludedArtifacts" )
     private String excludedArtifacts;
 
     /**
@@ -208,7 +230,7 @@ public abstract class AbstractDownloadLicensesMojo
      *
      * @since 1.11
      */
-    @Parameter( property = "license.includedArtifacts")
+    @Parameter( property = "license.includedArtifacts" )
     private String includedArtifacts;
 
     /**
@@ -326,8 +348,9 @@ public abstract class AbstractDownloadLicensesMojo
 
         try
         {
-            if (sortByGroupIdAndArtifactId) {
-                depProjectLicenses = sortByGroupIdAndArtifactId(depProjectLicenses);
+            if ( sortByGroupIdAndArtifactId )
+            {
+                depProjectLicenses = sortByGroupIdAndArtifactId( depProjectLicenses );
             }
             LicenseSummaryWriter.writeLicenseSummary( depProjectLicenses, licensesOutputFile );
         }
@@ -337,15 +360,19 @@ public abstract class AbstractDownloadLicensesMojo
         }
     }
 
-    private List<ProjectLicenseInfo> sortByGroupIdAndArtifactId(List<ProjectLicenseInfo> depProjectLicenses) {
-        List sorted = new ArrayList(depProjectLicenses);
-        Comparator<? super ProjectLicenseInfo> comparator = new Comparator<ProjectLicenseInfo>() {
-            public int compare(ProjectLicenseInfo info1, ProjectLicenseInfo info2) {
+    private List<ProjectLicenseInfo> sortByGroupIdAndArtifactId( List<ProjectLicenseInfo> depProjectLicenses )
+    {
+        List<ProjectLicenseInfo> sorted = new ArrayList<>( depProjectLicenses );
+        Comparator<ProjectLicenseInfo> comparator = new Comparator<ProjectLicenseInfo>()
+        {
+            public int compare( ProjectLicenseInfo info1, ProjectLicenseInfo info2 )
+            {
                 //ProjectLicenseInfo::getId() can not be used because . is before : thus a:b.c would be after a.b:c
-                return (info1.getGroupId() + "+" + info1.getArtifactId()).compareTo(info2.getGroupId() + "+" + info2.getArtifactId());
+                return ( info1.getGroupId() + "+" + info1.getArtifactId() ).compareTo( info2.getGroupId()
+                        + "+" + info2.getArtifactId() );
             }
         };
-        Collections.sort(sorted, comparator);
+        Collections.sort( sorted, comparator );
         return sorted;
     }
 
@@ -669,16 +696,16 @@ public abstract class AbstractDownloadLicensesMojo
             {
                 if ( !quiet )
                 {
-                    getLog().warn( "POM for dependency " + depProject.toString() + " has an invalid license URL: " +
-                                       license.getUrl() );
+                    getLog().warn( "POM for dependency " + depProject.toString() + " has an invalid license URL: "
+                                       + license.getUrl() );
                 }
             }
             catch ( FileNotFoundException e )
             {
                 if ( !quiet )
                 {
-                    getLog().warn( "POM for dependency " + depProject.toString() +
-                                       " has a license URL that returns file not found: " + license.getUrl() );
+                    getLog().warn( "POM for dependency " + depProject.toString()
+                                       + " has a license URL that returns file not found: " + license.getUrl() );
                 }
             }
             catch ( IOException e )

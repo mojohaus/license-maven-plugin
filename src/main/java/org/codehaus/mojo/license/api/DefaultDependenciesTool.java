@@ -90,6 +90,7 @@ public class DefaultDependenciesTool
     @Requirement
     private ArtifactMetadataSource artifactMetadataSource;
 
+    // CHECKSTYLE_OFF: MethodLength
     /**
      * {@inheritDoc}
      */
@@ -156,22 +157,22 @@ public class DefaultDependenciesTool
         Map<String, Artifact> includeArtifacts = new HashMap<>();
 
         SortedMap<String, MavenProject> localCache = new TreeMap<>();
-        if (cache != null)
+        if ( cache != null )
         {
-            localCache.putAll(cache);
+            localCache.putAll( cache );
         }
 
         for ( Object o : depArtifacts )
         {
             Artifact artifact = (Artifact) o;
 
-            excludeArtifacts.put(artifact.getId(), artifact);
+            excludeArtifacts.put( artifact.getId(), artifact );
 
             if ( DefaultThirdPartyTool.LICENSE_DB_TYPE.equals( artifact.getType() ) )
             {
                 // the special dependencies for license databases don't count.
-                // Note that this will still see transitive deps of a license db; so using the build helper inside of another project
-                // to make them will be noisy.
+                // Note that this will still see transitive deps of a license db; so using the build helper inside of
+                // another project to make them will be noisy.
                 continue;
             }
 
@@ -216,12 +217,12 @@ public class DefaultDependenciesTool
 
             // Check if the project should be included
             // If there is no specified artifacts and group to include, include all
-            boolean isToInclude = haveNoIncludedArtifacts && haveNoIncludedGroups ||
-                isIncludable( artifact, includedGroupPattern, includedArtifactPattern );
+            boolean isToInclude = haveNoIncludedArtifacts && haveNoIncludedGroups
+                    || isIncludable( artifact, includedGroupPattern, includedArtifactPattern );
 
             // Check if the project should be excluded
-            boolean isToExclude = isToInclude && haveExclusions &&
-                isExcludable( artifact, excludedGroupPattern, excludedArtifactPattern );
+            boolean isToExclude = isToInclude && haveExclusions
+                    && isExcludable( artifact, excludedGroupPattern, excludedArtifactPattern );
 
             if ( !isToInclude || isToExclude )
             {
@@ -266,48 +267,55 @@ public class DefaultDependenciesTool
                 }
 
                 // store it also in cache
-                localCache.put(id, depMavenProject);
+                localCache.put( id, depMavenProject );
             }
 
             // keep the project
-            result.put(id, depMavenProject);
+            result.put( id, depMavenProject );
 
-            excludeArtifacts.remove(artifact.getId());
-            includeArtifacts.put(artifact.getId(), artifact);
+            excludeArtifacts.remove( artifact.getId() );
+            includeArtifacts.put( artifact.getId(), artifact );
         }
 
         // exclude artifacts from the result that contain excluded artifacts in the dependency trail
-        if (excludeTransitiveDependencies) {
-            for (Map.Entry<String, Artifact> entry : includeArtifacts.entrySet()) {
+        if ( excludeTransitiveDependencies )
+        {
+            for ( Map.Entry<String, Artifact> entry : includeArtifacts.entrySet() )
+            {
                 List<String> dependencyTrail = entry.getValue().getDependencyTrail();
 
                 boolean remove = false;
 
-                for (int i = 1; i < dependencyTrail.size() - 1; i++) {
-                    if (excludeArtifacts.containsKey(dependencyTrail.get(i))) {
+                for ( int i = 1; i < dependencyTrail.size() - 1; i++ )
+                {
+                    if ( excludeArtifacts.containsKey( dependencyTrail.get( i ) ) )
+                    {
                         remove = true;
                         break;
                     }
                 }
 
-                if (remove) {
-                    result.remove(MojoHelper.getArtifactId(entry.getValue()));
+                if ( remove )
+                {
+                    result.remove( MojoHelper.getArtifactId( entry.getValue() ) );
                 }
             }
         }
 
-        if (cache != null) {
-            cache.putAll(result);
+        if ( cache != null )
+        {
+            cache.putAll( result );
         }
 
         return result;
     }
+    // CHECKSTYLE_ON: MethodLength
 
     /**
      * {@inheritDoc}
      */
     public void loadProjectArtifacts( ArtifactRepository localRepository, List remoteRepositories,
-                                      MavenProject project , Map<String,List<Dependency>> reactorProjectDependencies )
+                                      MavenProject project, Map<String, List<Dependency>> reactorProjectDependencies )
         throws DependenciesToolException
 
     {
@@ -318,21 +326,23 @@ public class DefaultDependenciesTool
             Set dependenciesArtifacts;
             try
             {
-                List<Dependency> dependencies = new ArrayList<Dependency>(project.getDependencies());
-                if (reactorProjectDependencies!=null) {
+                List<Dependency> dependencies = new ArrayList<Dependency>( project.getDependencies() );
+                if ( reactorProjectDependencies != null )
+                {
 
-                    for (Dependency dependency : new ArrayList<>( dependencies )) {
-                        String id = String.format("%s:%s", dependency.getGroupId(), dependency.getArtifactId());
-                        List<Dependency> projectDependencies = reactorProjectDependencies.get(id);
-                        if (projectDependencies!=null) {
-                            dependencies.remove(dependency);
-                            dependencies.addAll(projectDependencies);
+                    for ( Dependency dependency : new ArrayList<>( dependencies ) )
+                    {
+                        String id = String.format( "%s:%s", dependency.getGroupId(), dependency.getArtifactId() );
+                        List<Dependency> projectDependencies = reactorProjectDependencies.get( id );
+                        if ( projectDependencies != null )
+                        {
+                            dependencies.remove( dependency );
+                            dependencies.addAll( projectDependencies );
                         }
                     }
                 }
                 dependenciesArtifacts =
-                    MavenMetadataSource.createArtifacts(artifactFactory, dependencies, null, null,
-                                                        project );
+                    MavenMetadataSource.createArtifacts( artifactFactory, dependencies, null, null, project );
             }
             catch ( InvalidDependencyVersionException e )
             {
@@ -345,24 +355,27 @@ public class DefaultDependenciesTool
 
         Artifact artifact = project.getArtifact();
         Set<Artifact> reactorArtifacts = new LinkedHashSet<>();
-        if (reactorProjectDependencies != null) {
+        if ( reactorProjectDependencies != null )
+        {
             // let's not include sibling dependencies, since artifact files may not be generated
             // (aggregate mode without forking mode)
             Iterator artifacts = project.getDependencyArtifacts().iterator();
-            while (artifacts.hasNext()) {
+            while ( artifacts.hasNext() )
+            {
                 Artifact artifact1 = (Artifact) artifacts.next();
                 String artifactKey = artifact1.getGroupId() + ":" + artifact1.getArtifactId();
-                if (reactorProjectDependencies.containsKey(artifactKey)) {
+                if ( reactorProjectDependencies.containsKey( artifactKey ) )
+                {
                     artifacts.remove();
-                    reactorArtifacts.add(artifact1);
+                    reactorArtifacts.add( artifact1 );
                 }
             }
         }
         ArtifactResolutionResult result;
         try
         {
-            result = artifactResolver.resolveTransitively( project.getDependencyArtifacts(), artifact, remoteRepositories,
-                                                           localRepository, artifactMetadataSource );
+            result = artifactResolver.resolveTransitively( project.getDependencyArtifacts(), artifact,
+                        remoteRepositories, localRepository, artifactMetadataSource );
         }
         catch ( ArtifactResolutionException e )
         {
@@ -372,7 +385,7 @@ public class DefaultDependenciesTool
         {
             throw new DependenciesToolException( e );
         }
-        reactorArtifacts.addAll(result.getArtifacts());
+        reactorArtifacts.addAll( result.getArtifacts() );
 
         project.setArtifacts( reactorArtifacts );
 

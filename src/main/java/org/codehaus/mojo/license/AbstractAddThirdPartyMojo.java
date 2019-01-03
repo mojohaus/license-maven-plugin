@@ -1,5 +1,27 @@
 package org.codehaus.mojo.license;
 
+/*
+ * #%L
+ * License Maven Plugin
+ * %%
+ * Copyright (C) 2008 - 2011 CodeLutin, Codehaus, Tony Chemit
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Lesser Public License for more details.
+ *
+ * You should have received a copy of the GNU General Lesser Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/lgpl-3.0.html>.
+ * #L%
+ */
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -39,28 +61,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
-
-/*
- * #%L
- * License Maven Plugin
- * %%
- * Copyright (C) 2008 - 2011 CodeLutin, Codehaus, Tony Chemit
- * %%
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Lesser Public License for more details.
- *
- * You should have received a copy of the GNU General Lesser Public
- * License along with this program.  If not, see
- * <http://www.gnu.org/licenses/lgpl-3.0.html>.
- * #L%
- */
 
 /**
  * Abstract mojo for all third-party mojos.
@@ -127,7 +127,7 @@ public abstract class AbstractAddThirdPartyMojo
      *
      * @since 1.1
      */
-    @Parameter( property = "license.includedScopes")
+    @Parameter( property = "license.includedScopes" )
     String includedScopes;
 
     /**
@@ -143,7 +143,7 @@ public abstract class AbstractAddThirdPartyMojo
      *
      * @since 1.15
      */
-    @Parameter( property = "license.includedTypes")
+    @Parameter( property = "license.includedTypes" )
     String includedTypes;
 
     /**
@@ -152,7 +152,7 @@ public abstract class AbstractAddThirdPartyMojo
      *
      * @since 1.1
      */
-    @Parameter( property = "license.excludedGroups")
+    @Parameter( property = "license.excludedGroups" )
     String excludedGroups;
 
     /**
@@ -161,7 +161,7 @@ public abstract class AbstractAddThirdPartyMojo
      *
      * @since 1.1
      */
-    @Parameter( property = "license.includedGroups")
+    @Parameter( property = "license.includedGroups" )
     String includedGroups;
 
     /**
@@ -170,7 +170,7 @@ public abstract class AbstractAddThirdPartyMojo
      *
      * @since 1.1
      */
-    @Parameter( property = "license.excludedArtifacts")
+    @Parameter( property = "license.excludedArtifacts" )
     String excludedArtifacts;
 
     /**
@@ -179,7 +179,7 @@ public abstract class AbstractAddThirdPartyMojo
      *
      * @since 1.1
      */
-    @Parameter( property = "license.includedArtifacts")
+    @Parameter( property = "license.includedArtifacts" )
     String includedArtifacts;
 
     /**
@@ -342,7 +342,7 @@ public abstract class AbstractAddThirdPartyMojo
    *
    * @since 1.1
    */
-  @Parameter(property = "license.includedLicenses")
+  @Parameter( property = "license.includedLicenses" )
   IncludedLicenses includedLicenses;
 
   /**
@@ -395,7 +395,7 @@ public abstract class AbstractAddThirdPartyMojo
    *
    * @since 1.1
    */
-  @Parameter(property = "license.excludedLicenses")
+  @Parameter( property = "license.excludedLicenses" )
   ExcludedLicenses excludedLicenses;
 
     /**
@@ -639,26 +639,29 @@ public abstract class AbstractAddThirdPartyMojo
 
         licenseMap = getHelper().createLicenseMap( projectDependencies );
 
-        if (licenseMergesFile !=null ){
-            if (licenseMergesUrl != null) {
-                throw new MojoExecutionException("You can't use both licenseMergesFile and licenseMergesUrl");
-            }
-            getLog().warn("");
-            getLog().warn("!!! licenseMergesFile is deprecated, use now licenseMergesUrl !!!");
-            getLog().warn("");
-            getLog().warn("licenseMerges will be overridden by licenseMergesFile.");
-            getLog().warn("");
-            licenseMerges = FileUtils.readLines(new File(licenseMergesFile), "utf-8");
-        } else
-        if (licenseMergesUrl != null) {
-            getLog().warn("");
-            getLog().warn("licenseMerges will be overridden by licenseMergesUrl.");
-            getLog().warn("");
-            if (HttpRequester.isStringUrl(licenseMergesUrl))
+        if ( licenseMergesFile != null )
+        {
+            if ( licenseMergesUrl != null )
             {
-                InputStream input = new URL(licenseMergesUrl).openStream();
-                String httpRequestResult = IOUtil.toString(input);
-                licenseMerges = Arrays.asList(httpRequestResult.split("\n"));
+                throw new MojoExecutionException( "You can't use both licenseMergesFile and licenseMergesUrl" );
+            }
+            getLog().warn( "" );
+            getLog().warn( "!!! licenseMergesFile is deprecated, use now licenseMergesUrl !!!" );
+            getLog().warn( "" );
+            getLog().warn( "licenseMerges will be overridden by licenseMergesFile." );
+            getLog().warn( "" );
+            licenseMerges = FileUtils.readLines( new File( licenseMergesFile ), "utf-8" );
+        }
+        else if ( licenseMergesUrl != null )
+        {
+            getLog().warn( "" );
+            getLog().warn( "licenseMerges will be overridden by licenseMergesUrl." );
+            getLog().warn( "" );
+            if ( HttpRequester.isStringUrl( licenseMergesUrl ) )
+            {
+                InputStream input = new URL( licenseMergesUrl ).openStream();
+                String httpRequestResult = IOUtil.toString( input );
+                licenseMerges = Arrays.asList( httpRequestResult.split( "\n" ) );
                 input.close();
             }
         }
@@ -709,7 +712,8 @@ public abstract class AbstractAddThirdPartyMojo
     // Public Methods
     // ----------------------------------------------------------------------
 
-    File getOutputDirectory() {
+    File getOutputDirectory()
+    {
         return outputDirectory;
     }
 
@@ -753,7 +757,8 @@ public abstract class AbstractAddThirdPartyMojo
         return licenseMergesFile;
     }
 
-    public String getLicenseMergesUrl() {
+    public String getLicenseMergesUrl()
+    {
         return licenseMergesUrl;
     }
 
@@ -821,21 +826,22 @@ public abstract class AbstractAddThirdPartyMojo
     {
         if ( helper == null )
         {
-            helper =
-                    new DefaultThirdPartyHelper( getProject(), getEncoding(), isVerbose(), dependenciesTool, thirdPartyTool,
-                                                 localRepository, remoteRepositories, getLog() );
+            helper = new DefaultThirdPartyHelper( getProject(), getEncoding(), isVerbose(), dependenciesTool,
+                    thirdPartyTool, localRepository, remoteRepositories, getLog() );
         }
         return helper;
     }
 
-    void resolveUnsafeDependenciesFromArtifact(String groupId, String artifactId, String version)
+    void resolveUnsafeDependenciesFromArtifact( String groupId, String artifactId, String version )
       throws ArtifactNotFoundException, IOException, ArtifactResolutionException, MojoExecutionException
     {
-        File missingLicensesFromArtifact = thirdPartyTool.resolveMissingLicensesDescriptor( groupId, artifactId, version, localRepository, remoteRepositories );
+        File missingLicensesFromArtifact = thirdPartyTool.resolveMissingLicensesDescriptor( groupId, artifactId,
+                version, localRepository, remoteRepositories );
         resolveUnsafeDependenciesFromFile( missingLicensesFromArtifact );
     }
 
-    void resolveUnsafeDependenciesFromFile(File missingLicenses) throws IOException, MojoExecutionException {
+    void resolveUnsafeDependenciesFromFile( File missingLicenses ) throws IOException, MojoExecutionException
+    {
         SortedSet<MavenProject> unsafeDeps = getUnsafeDependencies();
         if ( missingLicenses != null && missingLicenses.exists() && missingLicenses.length() > 0 )
         {
@@ -847,10 +853,10 @@ public abstract class AbstractAddThirdPartyMojo
                 // load the missing file
                 unsafeMappings.load( missingLicenses );
             }
-            if (HttpRequester.isStringUrl(missingFileUrl))
+            if ( HttpRequester.isStringUrl( missingFileUrl ) )
             {
-                String httpRequestResult = HttpRequester.getFromUrl(missingFileUrl);
-                unsafeMappings.load(new ByteArrayInputStream(httpRequestResult.getBytes()));
+                String httpRequestResult = HttpRequester.getFromUrl( missingFileUrl );
+                unsafeMappings.load( new ByteArrayInputStream( httpRequestResult.getBytes() ) );
             }
 
             Set<MavenProject> resolvedDependencies = new HashSet<>();
@@ -909,8 +915,8 @@ public abstract class AbstractAddThirdPartyMojo
 
             for ( String excludeLicense : blackLicenses )
             {
-                if ( licenses.contains( excludeLicense ) &&
-                        CollectionUtils.isNotEmpty( getLicenseMap().get( excludeLicense ) ) )
+                if ( licenses.contains( excludeLicense )
+                        && CollectionUtils.isNotEmpty( getLicenseMap().get( excludeLicense ) ) )
                 {
                     //bad license found
                     unsafeLicenses.add( excludeLicense );
@@ -926,10 +932,11 @@ public abstract class AbstractAddThirdPartyMojo
             for ( String dependencyLicense : dependencyLicenses )
             {
                 getLog().debug( "Testing license '" + dependencyLicense + "'" );
-                if ( !whiteLicenses.contains( dependencyLicense ) &&
-                        CollectionUtils.isNotEmpty( getLicenseMap().get( dependencyLicense ) ) )
+                if ( !whiteLicenses.contains( dependencyLicense )
+                        && CollectionUtils.isNotEmpty( getLicenseMap().get( dependencyLicense ) ) )
                 {
-                    getLog().debug( "Testing dependency license '" + dependencyLicense + "' against all other licenses" );
+                    getLog().debug( "Testing dependency license '" + dependencyLicense
+                            + "' against all other licenses" );
 
                     for ( MavenProject dependency : getLicenseMap().get( dependencyLicense ) )
                     {
@@ -941,7 +948,8 @@ public abstract class AbstractAddThirdPartyMojo
                         {
                             // skip this license if it is the same as the dependency license
                             // skip this license if it has no projects assigned
-                            if ( otherLicense.equals( dependencyLicense ) || getLicenseMap().get( dependencyLicense ).isEmpty() )
+                            if ( otherLicense.equals( dependencyLicense )
+                                    || getLicenseMap().get( dependencyLicense ).isEmpty() )
                             {
                                 continue;
                             }
@@ -954,8 +962,8 @@ public abstract class AbstractAddThirdPartyMojo
 
                             if ( getLicenseMap().get( otherLicense ).contains( dependency ) )
                             {
-                                getLog().info( "License: '" + dependencyLicense + "' for '" + dependency + "'is OK " +
-                                                 "since it is also licensed under '" + otherLicense + "'" );
+                                getLog().info( "License: '" + dependencyLicense + "' for '" + dependency + "'is OK "
+                                                 + "since it is also licensed under '" + otherLicense + "'" );
                                 // this dependency is licensed under another license from white list
                                 forbiddenLicenseUsed = false;
                                 break;
@@ -986,8 +994,8 @@ public abstract class AbstractAddThirdPartyMojo
                 if ( !deps.isEmpty() )
                 {
                     StringBuilder sb = new StringBuilder();
-                    sb.append( "License: '" ).append( unsafeLicense ).append( "' used by " ).append( deps.size() ).append(
-                            " dependencies:" );
+                    sb.append( "License: '" ).append( unsafeLicense ).append( "' used by " ).append( deps.size() )
+                        .append( " dependencies:" );
                     for ( MavenProject dep : deps )
                     {
                         sb.append( "\n -" ).append( MojoHelper.getArtifactName( dep ) );
@@ -1028,25 +1036,29 @@ public abstract class AbstractAddThirdPartyMojo
         thirdPartyTool.overrideLicenses( licenseMap1, projectDependencies, getEncoding(), overrideFile );
     }
 
-    private boolean isFailOnMissing() {
+    private boolean isFailOnMissing()
+    {
         return failOnMissing;
     }
 
-    private boolean isFailOnBlacklist() {
+    private boolean isFailOnBlacklist()
+    {
         return failOnBlacklist;
     }
 
-    void checkMissing(boolean unsafe) throws MojoFailureException {
+    void checkMissing( boolean unsafe ) throws MojoFailureException
+    {
 
-        if ( unsafe && (isFailOnMissing() || isFailIfWarning()) )
+        if ( unsafe && ( isFailOnMissing() || isFailIfWarning() ) )
         {
             throw new MojoFailureException(
                     "There are some dependencies with no license, please fill the file " + getMissingFile() );
         }
     }
 
-    void checkBlacklist(boolean safeLicense ) throws MojoFailureException {
-        if ( !safeLicense && (isFailOnBlacklist() || isFailIfWarning()) )
+    void checkBlacklist( boolean safeLicense ) throws MojoFailureException
+    {
+        if ( !safeLicense && ( isFailOnBlacklist() || isFailIfWarning() ) )
         {
             throw new MojoFailureException( "There are some forbidden licenses used, please check your dependencies." );
         }
@@ -1075,7 +1087,7 @@ public abstract class AbstractAddThirdPartyMojo
          *
          * @param data the string to split to fill the list of data of the object.
          */
-        IncludedLicenses(String data) throws MojoExecutionException
+        IncludedLicenses( String data ) throws MojoExecutionException
         {
             super( data );
         }
@@ -1114,7 +1126,7 @@ public abstract class AbstractAddThirdPartyMojo
          *
          * @param data the string to split to fill the list of data of the object.
          */
-        ExcludedLicenses(String data) throws MojoExecutionException
+        ExcludedLicenses( String data ) throws MojoExecutionException
         {
             super( data );
         }

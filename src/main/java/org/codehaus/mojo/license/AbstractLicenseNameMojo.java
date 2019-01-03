@@ -78,7 +78,8 @@ public abstract class AbstractLicenseNameMojo
      * url of the repository where the {@code license.properties} is present).
      * <p>
      * <p>
-     * <strong>Note: </strong>If you want to refer to a file within this project, start the expression with <code>${project.baseUri}</code>
+     * <strong>Note: </strong>If you want to refer to a file within this project, start the expression with
+     * <code>${project.baseUri}</code>
      * </p>
      *
      * @since 1.0
@@ -209,8 +210,8 @@ public abstract class AbstractLicenseNameMojo
         License result = licenseStore.getLicense( licenseName );
         if ( checkIfExists && result == null )
         {
-            throw new IllegalArgumentException( "License named '" + licenseName + "' is unknown, use one of " +
-                                                        Arrays.toString( licenseStore.getLicenseNames() ) );
+            throw new IllegalArgumentException( "License named '" + licenseName + "' is unknown, use one of "
+                    + Arrays.toString( licenseStore.getLicenseNames() ) );
         }
         return result;
     }
@@ -430,7 +431,9 @@ public abstract class AbstractLicenseNameMojo
      * @param extensionToCommentStyle
      * @param transformers
      */
-    Map<String, List<File>> obtainFilesToProcessByCommentStyle( Map<String, String> extraFiles, String[] roots, String[] includes, String[] excludes, Map<String, String> extensionToCommentStyle, Map<String, FileHeaderTransformer> transformers )
+    Map<String, List<File>> obtainFilesToProcessByCommentStyle( Map<String, String> extraFiles, String[] roots,
+            String[] includes, String[] excludes, Map<String, String> extensionToCommentStyle, Map<String,
+            FileHeaderTransformer> transformers )
     {
 
         Map<String, List<File>> results = new HashMap<>();

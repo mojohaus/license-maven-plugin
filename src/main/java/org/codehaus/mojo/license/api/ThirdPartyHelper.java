@@ -82,7 +82,8 @@ public interface ThirdPartyHelper
      * @param missingFile         location of an optional missing fille (says where you fix missing license).
      * @param missingFileUrl      location of an optional missing file extension that can be downloaded from some
      *                            resource hoster and that will be merged with the content of the missing file.
-     * @param projectDependencies project dependencies used to detect which dependencies in the missing file are unknown to the project.
+     * @param projectDependencies project dependencies used to detect which dependencies in the missing file are unknown
+     *                            to the project.
      * @return the map of all unsafe mapping
      * @throws IOException if could not load missing file
      */
@@ -139,7 +140,8 @@ public interface ThirdPartyHelper
      * @param missingFileUrl            location of an optional missing file extension that can be downloaded from
      *                                  some resource hoster and that will be merged with the content of the missing
      *                                  file.
-     * @param useRepositoryMissingFiles flag to use or not third-party descriptors via the 'third-party' classifier from maven repositories
+     * @param useRepositoryMissingFiles flag to use or not third-party descriptors via the 'third-party' classifier from
+     *                                  maven repositories
      * @param unsafeDependencies        all unsafe dependencies
      * @param projectDependencies       all project dependencies
      * @return the loaded unsafe mapping

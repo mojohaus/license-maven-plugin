@@ -106,10 +106,10 @@ public class FileHeaderProcessor extends Processor
 
         filter.reset();
 
-        Reader input = new InputStreamReader(new ByteArrayInputStream(inputContent.getBytes(encoding)), encoding);
+        Reader input = new InputStreamReader( new ByteArrayInputStream( inputContent.getBytes( encoding ) ), encoding );
         try
         {
-            Writer output = new OutputStreamWriter(new FileOutputStream(outputFile), encoding);
+            Writer output = new OutputStreamWriter( new FileOutputStream( outputFile ), encoding );
             try
             {
                 process( input, output );

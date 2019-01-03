@@ -256,13 +256,23 @@ public abstract class AbstractFileHeaderTransformer
     /**
      * {@inheritDoc}
      */
-    public String getLineSeparator() {
-        return lineSeparator == null ? lineSeparator = LINE_SEPARATOR : lineSeparator;
+    public String getLineSeparator()
+    {
+        if ( lineSeparator == null )
+        {
+            lineSeparator = LINE_SEPARATOR;
+            return lineSeparator;
+        }
+        else
+        {
+            return lineSeparator;
+        }
     }
     /**
      * {@inheritDoc}
      */
-    public void setLineSeparator(String lineSeparator) {
+    public void setLineSeparator( String lineSeparator )
+    {
         this.lineSeparator = lineSeparator;
     }
 
@@ -354,8 +364,9 @@ public abstract class AbstractFileHeaderTransformer
         String lastYear = matcher.group( 4 );
         String holder = matcher.group( 5 );
         Copyright copyright1 =
-            Copyright.newCopyright( Integer.valueOf( firstYear ), lastYear == null ? null : Integer.valueOf( lastYear.trim() ),
-                           holder.trim() );
+            Copyright.newCopyright( Integer.valueOf( firstYear ), lastYear == null
+                ? null
+                : Integer.valueOf( lastYear.trim() ), holder.trim() );
         model.setCopyright( copyright1 );
 
         // third section is the license
@@ -434,9 +445,10 @@ public abstract class AbstractFileHeaderTransformer
               StringBuilder lineBuffer = new StringBuilder();
               lineBuffer.append( getCommentLinePrefix() );
               lineBuffer.append( line );
-              buffer.append(StringUtils.stripEnd(lineBuffer.toString(), null));
+              buffer.append( StringUtils.stripEnd( lineBuffer.toString(), null ) );
             }
-            else {
+            else
+            {
                buffer.append( getCommentLinePrefix() );
                buffer.append( line );
             }
@@ -458,8 +470,8 @@ public abstract class AbstractFileHeaderTransformer
         int prefixLength = getCommentLinePrefix().length();
         for ( String line : header.split( getLineSeparator() + "" ) )
         {
-            if ( StringUtils.isEmpty( line ) || line.contains( getCommentStartTag() ) ||
-                line.contains( getCommentEndTag() ) )
+            if ( StringUtils.isEmpty( line ) || line.contains( getCommentStartTag() )
+                    || line.contains( getCommentEndTag() ) )
             {
 
                 // not be unboxed, but just skipped
@@ -509,10 +521,9 @@ public abstract class AbstractFileHeaderTransformer
         StringBuilder buffer = new StringBuilder();
         for ( String line : boxedHeader.split( getLineSeparator() + "" ) )
         {
-            if ( StringUtils.isEmpty( line ) || line.contains( getProcessStartTag() ) ||
-                line.contains( getProcessEndTag() ) )
+            if ( StringUtils.isEmpty( line ) || line.contains( getProcessStartTag() )
+                    || line.contains( getProcessEndTag() ) )
             {
-
                 // not be unboxed, but just skipped
                 continue;
             }

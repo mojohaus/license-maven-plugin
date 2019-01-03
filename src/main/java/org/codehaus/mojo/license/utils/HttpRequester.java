@@ -1,5 +1,27 @@
 package org.codehaus.mojo.license.utils;
 
+/*
+ * #%L
+ * License Maven Plugin
+ * %%
+ * Copyright (C) 2018 Captain-P-Goldfish
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Lesser Public License for more details.
+ *
+ * You should have received a copy of the GNU General Lesser Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/lgpl-3.0.html>.
+ * #L%
+ */
+
 import java.io.BufferedReader;
 import java.io.CharArrayReader;
 import java.io.IOException;
@@ -30,123 +52,123 @@ import org.apache.maven.plugin.MojoExecutionException;
 public class HttpRequester
 {
 
-  /**
-   * checks if the input in the {@link org.codehaus.mojo.license.AbstractAddThirdPartyMojo#includedLicenses}
-   * is a URL value
-   *
-   * @param data the license string or a URL
-   * @return true if URL, false else
-   */
-  public static boolean isStringUrl(String data)
-  {
-    if (StringUtils.isBlank(data))
+    /**
+     * checks if the input in the {@link org.codehaus.mojo.license.AbstractAddThirdPartyMojo#includedLicenses}
+     * is a URL value
+     *
+     * @param data the license string or a URL
+     * @return true if URL, false else
+     */
+    public static boolean isStringUrl( String data )
     {
-      return false;
-    }
-    try
-    {
-      new URL(data);
-      return true;
-    }
-    catch (MalformedURLException e)
-    {
-      return false;
-    }
-  }
-
-  /**
-   * this method will send a simple GET-request to the given destination and will return the result as a
-   * string
-   *
-   * @param url the resource destination that is expected to contain pure text
-   * @return the string representation of the resource at the given URL
-   */
-  public static String getFromUrl(String url) throws MojoExecutionException
-  {
-    CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-    HttpGet get = new HttpGet(url);
-    CloseableHttpResponse response = null;
-
-    String result = null;
-    try
-    {
-      response = httpClient.execute(get);
-      result = IOUtils.toString(response.getEntity().getContent(), Charset.forName("UTF-8"));
-    }
-    catch (ClientProtocolException e)
-    {
-      throw new MojoExecutionException(e.getMessage(), e);
-    }
-    catch (IOException e)
-    {
-      throw new MojoExecutionException(e.getMessage(), e);
-    }
-    finally
-    {
-      if (response != null)
-      {
+        if ( StringUtils.isBlank( data ) )
+        {
+            return false;
+        }
         try
         {
-          response.close();
+            new URL( data );
+            return true;
         }
-        catch (IOException e)
+        catch ( MalformedURLException e )
         {
-          throw new MojoExecutionException(e.getMessage(), e);
+            return false;
         }
-      }
     }
-    return result;
-  }
 
-  /**
-   * will download a external resource and read the content of the file that will then be translated into a
-   * new list. <br>
-   * Lines starting with the character '#' will be omitted from the list <br>
-   * <br>
-   * <b>NOTE:</b><br>
-   * certificate checking for this request will be disabled because some resources might be present on some
-   * local servers in the internal network that do not use a safe connection
-   *
-   * @param url the URL to the external resource
-   * @return a new list with all license entries from the remote resource
-   */
-  public static List<String> downloadList(String url) throws MojoExecutionException
-  {
-    List<String> list = new ArrayList<>();
-    BufferedReader bufferedReader = null;
-    try
+    /**
+     * this method will send a simple GET-request to the given destination and will return the result as a
+     * string
+     *
+     * @param url the resource destination that is expected to contain pure text
+     * @return the string representation of the resource at the given URL
+     */
+    public static String getFromUrl( String url ) throws MojoExecutionException
     {
-      bufferedReader = new BufferedReader(new CharArrayReader(getFromUrl(url).toCharArray()));
-      String line;
-      while ((line = bufferedReader.readLine()) != null)
-      {
-        if (StringUtils.isNotBlank(line))
-        {
-          if (!StringUtils.startsWith(line, "#") && !list.contains(line))
-          {
-            list.add(line);
-          }
-        }
-      }
-    }
-    catch (IOException e)
-    {
-      throw new MojoExecutionException("could not open connection to URL: " + url, e);
-    }
-    finally
-    {
-      if (bufferedReader != null)
-      {
+        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+        HttpGet get = new HttpGet( url );
+        CloseableHttpResponse response = null;
+
+        String result = null;
         try
         {
-          bufferedReader.close();
+            response = httpClient.execute( get );
+            result = IOUtils.toString( response.getEntity().getContent(), Charset.forName( "UTF-8" ) );
         }
-        catch (IOException e)
+        catch ( ClientProtocolException e )
         {
-          throw new MojoExecutionException(e.getMessage(), e);
+            throw new MojoExecutionException( e.getMessage(), e );
         }
-      }
+        catch ( IOException e )
+        {
+            throw new MojoExecutionException( e.getMessage(), e );
+        }
+        finally
+        {
+            if ( response != null )
+            {
+                try
+                {
+                    response.close();
+                }
+                catch ( IOException e )
+                {
+                    throw new MojoExecutionException( e.getMessage(), e );
+                }
+            }
+        }
+        return result;
     }
-    return list;
-  }
+
+    /**
+     * will download a external resource and read the content of the file that will then be translated into a
+     * new list. <br>
+     * Lines starting with the character '#' will be omitted from the list <br>
+     * <br>
+     * <b>NOTE:</b><br>
+     * certificate checking for this request will be disabled because some resources might be present on some
+     * local servers in the internal network that do not use a safe connection
+     *
+     * @param url the URL to the external resource
+     * @return a new list with all license entries from the remote resource
+     */
+    public static List<String> downloadList( String url ) throws MojoExecutionException
+    {
+        List<String> list = new ArrayList<>();
+        BufferedReader bufferedReader = null;
+        try
+        {
+            bufferedReader = new BufferedReader( new CharArrayReader( getFromUrl( url ).toCharArray() ) );
+            String line;
+            while ( ( line = bufferedReader.readLine() ) != null )
+            {
+                if ( StringUtils.isNotBlank( line ) )
+                {
+                    if ( !StringUtils.startsWith( line, "#" ) && !list.contains( line ) )
+                    {
+                        list.add( line );
+                    }
+                }
+            }
+        }
+        catch ( IOException e )
+        {
+            throw new MojoExecutionException( "could not open connection to URL: " + url, e );
+        }
+        finally
+        {
+            if ( bufferedReader != null )
+            {
+                try
+                {
+                    bufferedReader.close();
+                }
+                catch ( IOException e )
+                {
+                    throw new MojoExecutionException( e.getMessage(), e );
+                }
+            }
+        }
+        return list;
+    }
 }

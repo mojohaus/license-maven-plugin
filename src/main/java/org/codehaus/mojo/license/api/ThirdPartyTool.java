@@ -73,7 +73,8 @@ public interface ThirdPartyTool
     void setVerbose( boolean verbose );
 
     /**
-     * Collect license information from property file, 'third-party' classified artifacts, and .license.properties dependencies.
+     * Collect license information from property file, 'third-party' classified artifacts, and .license.properties
+     * dependencies.
      *
      * @param dependencies       top-level dependencies to scan for .license.properties files.
      * @param encoding           encoding used to read or write properties files
@@ -157,7 +158,8 @@ public interface ThirdPartyTool
      * @param overrideFile  location of the optional override file
      * @throws IOException if pb while reading override file
      */
-    void overrideLicenses( LicenseMap licenseMap, SortedMap<String, MavenProject> artifactCache, String encoding, File overrideFile ) throws IOException;
+    void overrideLicenses( LicenseMap licenseMap, SortedMap<String, MavenProject> artifactCache, String encoding,
+            File overrideFile ) throws IOException;
 
     /**
      * Add one or more licenses (name and url are {@code licenseNames}) to the given {@code licenseMap} for the given

@@ -22,7 +22,6 @@ package org.codehaus.mojo.license.model;
  * #L%
  */
 
-import java.util.Collection;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.mojo.license.utils.MojoHelper;
 
@@ -89,9 +88,10 @@ public class LicenseMap
      *
      * @param licenseMap license map to put
      */
-    public void putAll( LicenseMap licenseMap)
+    public void putAll( LicenseMap licenseMap )
     {
-        for (Map.Entry<String, SortedSet<MavenProject>> entry : licenseMap.entrySet()) {
+        for ( Map.Entry<String, SortedSet<MavenProject>> entry : licenseMap.entrySet() )
+        {
 
             String key = entry.getKey();
 
@@ -169,8 +169,9 @@ public class LicenseMap
             SortedSet<MavenProject> projects = entry.getValue();
             for ( MavenProject mavenProject : projects )
             {
-                if (project.equals( mavenProject )) {
-                    get(entry.getKey()).remove( project);
+                if ( project.equals( mavenProject ) )
+                {
+                    get( entry.getKey() ).remove( project );
                     return;
                 }
             }

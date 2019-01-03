@@ -138,8 +138,8 @@ public class FreeMarkerHelper
         }
         catch ( TemplateException e )
         {
-            throw new IOException( "Could not render template " +
-                                       template.getName() + " for reason " + e.getMessage() );
+            throw new IOException( "Could not render template " + template.getName() + " for reason "
+                    + e.getMessage() );
         }
         return out.toString();
     }

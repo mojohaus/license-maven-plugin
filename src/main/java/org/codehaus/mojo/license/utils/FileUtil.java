@@ -156,16 +156,22 @@ public class FileUtil
     public static void renameFile( File file, File destination )
         throws IOException
     {
-        try {
-            try {
+        try
+        {
+            try
+            {
                 org.apache.commons.io.FileUtils.forceDelete( destination );
-            } catch (FileNotFoundException ex) {
+            }
+            catch ( FileNotFoundException ex )
+            {
                 //Just do nothing
             }
 
             org.apache.commons.io.FileUtils.moveFile( file, destination );
-        } catch (IOException ex) {
-            throw new IOException(String.format( "could not rename '%s' to '%s'", file, destination ));
+        }
+        catch ( IOException ex )
+        {
+            throw new IOException( String.format( "could not rename '%s' to '%s'", file, destination ) );
         }
     }
 
@@ -248,19 +254,19 @@ public class FileUtil
      * @param encoding the encoding to write in
      * @throws IOException if IO pb
      */
-    public static void printString(File file, String content, String encoding )
+    public static void printString( File file, String content, String encoding )
         throws IOException
     {
         createDirectoryIfNecessary( file.getParentFile() );
 
         BufferedReader in;
         PrintWriter out;
-        in =  new BufferedReader(new StringReader(content));
-        out = new PrintWriter( new BufferedWriter( new OutputStreamWriter( new FileOutputStream( file ), encoding ) ));
+        in =  new BufferedReader( new StringReader( content ) );
+        out = new PrintWriter( new BufferedWriter( new OutputStreamWriter( new FileOutputStream( file ), encoding ) ) );
         try
         {
             String line;
-            while( ( line = in.readLine() ) != null )
+            while ( ( line = in.readLine() ) != null )
             {
                 out.println( line );
             }

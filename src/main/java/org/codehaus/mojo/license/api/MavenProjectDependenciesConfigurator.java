@@ -26,7 +26,9 @@ import java.util.List;
 
 /**
  * Contract to configure which dependencies will be loaded by the dependency tool via the method
- * {@link DependenciesTool#loadProjectDependencies(org.apache.maven.project.MavenProject, MavenProjectDependenciesConfigurator, org.apache.maven.artifact.repository.ArtifactRepository, List, java.util.SortedMap)}
+ * {@link DependenciesTool#loadProjectDependencies(org.apache.maven.project.MavenProject,
+ * MavenProjectDependenciesConfigurator, org.apache.maven.artifact.repository.ArtifactRepository,
+ * List, java.util.SortedMap)}
  *
  * @author tchemit dev@tchemit.fr
  * @see DependenciesTool
@@ -79,8 +81,8 @@ public interface MavenProjectDependenciesConfigurator
     String getIncludedGroups();
 
     /**
-     * @return a pattern to exclude dependencies by their {@code artifactId}, if {@code null} is setted the no exclude is
-     *         done on artifactId.
+     * @return a pattern to exclude dependencies by their {@code artifactId}, if {@code null} is setted the no exclude
+     *         is done on artifactId.
      */
     String getExcludedGroups();
 

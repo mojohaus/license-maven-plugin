@@ -84,7 +84,7 @@ public class Copyright
 
     public Copyright( Copyright copyright )
     {
-        this( copyright.getFirstYear(), copyright.getLastYear(), copyright.getHolder());
+        this( copyright.getFirstYear(), copyright.getLastYear(), copyright.getHolder() );
     }
 
     public Copyright( int firstYear, Integer lastYear, String holder )

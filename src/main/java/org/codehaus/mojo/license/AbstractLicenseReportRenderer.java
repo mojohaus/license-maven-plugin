@@ -121,8 +121,8 @@ public abstract class AbstractLicenseReportRenderer
 
     protected String getGAV( ThirdPartyDetails details )
     {
-        return ArtifactUtils.versionlessKey( details.getGroupId(), details.getArtifactId() ) + ":" +
-            details.getVersion();
+        return ArtifactUtils.versionlessKey( details.getGroupId(), details.getArtifactId() ) + ":"
+                + details.getVersion();
     }
 
     protected void renderThirdPartySummaryTableHeader()
@@ -271,8 +271,10 @@ public abstract class AbstractLicenseReportRenderer
         }
     }
 
+    // CHECKSTYLE_OFF: MethodName
     protected void safeBold_()
     {
+        // CHECKSTYLE_ON: MethodName
         try
         {
             sink.bold_();
@@ -295,8 +297,10 @@ public abstract class AbstractLicenseReportRenderer
         }
     }
 
+    // CHECKSTYLE_OFF: MethodName
     protected void safeItalic_()
     {
+        // CHECKSTYLE_ON: MethodName
         try
         {
             sink.italic_();

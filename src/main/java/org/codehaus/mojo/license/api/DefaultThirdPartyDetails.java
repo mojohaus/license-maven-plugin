@@ -186,9 +186,11 @@ public class DefaultThirdPartyDetails
 
         DefaultThirdPartyDetails that = (DefaultThirdPartyDetails) o;
 
-        return new EqualsBuilder().append( getGroupId(), that.getGroupId() ).append( getArtifactId(),
-                                                                                             that.getArtifactId() ).append(
-            getVersion(), that.getVersion()).append(getClassifier(), that.getClassifier()).isEquals();
+        return new EqualsBuilder().append( getGroupId(), that.getGroupId() )
+                .append( getArtifactId(), that.getArtifactId() )
+                .append( getVersion(), that.getVersion() )
+                .append( getClassifier(), that.getClassifier() )
+                .isEquals();
     }
 
     /**

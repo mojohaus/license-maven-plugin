@@ -65,7 +65,7 @@ public interface FileHeaderTransformer
     /**
      * Line separator.
      */
-    String LINE_SEPARATOR = System.getProperty("line.separator");
+    String LINE_SEPARATOR = System.getProperty( "line.separator" );
 
     /**
      * @return the name of the transformer
@@ -318,5 +318,5 @@ public interface FileHeaderTransformer
      */
     void setTrimHeaderLine( boolean trimLine );
 
-    void setLineSeparator( String lineSeparator);
+    void setLineSeparator( String lineSeparator );
 }

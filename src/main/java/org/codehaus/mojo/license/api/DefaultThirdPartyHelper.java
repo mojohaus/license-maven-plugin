@@ -117,11 +117,13 @@ public class DefaultThirdPartyHelper
      * @param remoteRepositories maven remote repositories
      * @param log                logger
      */
+    // CHECKSTYLE_OFF: ParameterNumber
     public DefaultThirdPartyHelper( MavenProject project, String encoding, boolean verbose,
                                     DependenciesTool dependenciesTool, ThirdPartyTool thirdPartyTool,
                                     ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories,
                                     Log log )
     {
+        // CHECKSTYLE_ON: ParameterNumber
         this.project = project;
         this.encoding = encoding;
         this.verbose = verbose;
@@ -175,7 +177,8 @@ public class DefaultThirdPartyHelper
                                                SortedMap<String, MavenProject> projectDependencies )
       throws IOException, MojoExecutionException
     {
-        return thirdPartyTool.loadUnsafeMapping( licenseMap, projectDependencies, encoding, missingFile, missingFileUrl);
+        return thirdPartyTool.loadUnsafeMapping( licenseMap, projectDependencies, encoding, missingFile,
+                missingFileUrl );
     }
 
     /**
@@ -302,15 +305,17 @@ public class DefaultThirdPartyHelper
                     }
 
                     // check license not already described to be merged
-                    if ( mergeList.contains( licenseToAdd ) || licenseFound.contains( licenseToAdd ) || mainLicense.equals( licenseToAdd ) )
+                    if ( mergeList.contains( licenseToAdd ) || licenseFound.contains( licenseToAdd )
+                            || mainLicense.equals( licenseToAdd ) )
                     {
 
                         // this license to merge was already described, fail the build...
 
                         throw new MojoFailureException(
-                                "The license " + licenseToAdd + " was already registered in the " +
-                                        "configuration, please use only one such entry as described in the example " +
-                                        "http://mojo.codehaus.org/license-maven-plugin/examples/example-thirdparty.html#Merge_licenses." );
+                                "The license " + licenseToAdd + " was already registered in the "
+                                        + "configuration, please use only one such entry as described in the example "
+                                        + "http://mojo.codehaus.org/license-maven-plugin/examples/"
+                                        + "example-thirdparty.html#Merge_licenses." );
                     }
 
                     // can add this license for merge
