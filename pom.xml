@@ -376,6 +376,23 @@
     <plugins>
 
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>checkstyle-check</id>
+            <goals>
+              <goal>check</goal>
+            </goals>
+            <phase>verify</phase>
+          </execution>
+        </executions>
+        <configuration>
+          <headerLocation>config/checkstyle-header.txt</headerLocation>
+          <excludes>**/HelpMojo.java</excludes><!-- HelpMojo.java is generated -->
+        </configuration>
+      </plugin>
+      <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>animal-sniffer-maven-plugin</artifactId>
         <executions>
