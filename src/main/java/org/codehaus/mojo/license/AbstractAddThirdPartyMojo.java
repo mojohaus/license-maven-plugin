@@ -61,6 +61,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
+import org.codehaus.mojo.license.api.DependenciesToolException;
 
 /**
  * Abstract mojo for all third-party mojos.
@@ -574,8 +575,9 @@ public abstract class AbstractAddThirdPartyMojo
      * Loads the dependencies of the project (as {@link MavenProject}, indexed by their gav.
      *
      * @return the map of dependencies of the maven project indexed by their gav.
+     * @throws DependenciesToolException if the dependencies could not be loaded
      */
-    protected abstract SortedMap<String, MavenProject> loadDependencies();
+    protected abstract SortedMap<String, MavenProject> loadDependencies() throws DependenciesToolException;
 
     /**
      * Creates the unsafe mapping (says dependencies with no license given by their pom).
@@ -583,12 +585,14 @@ public abstract class AbstractAddThirdPartyMojo
      * Can come from loaded missing file or from dependencies with no license at all.
      *
      * @return the map of usafe mapping indexed by their gav.
-     * @throws ProjectBuildingException if could not create maven porject for some dependencies
+     * @throws ProjectBuildingException if could not create maven project for some dependencies
      * @throws IOException              if could not load missing file
      * @throws ThirdPartyToolException  for third party tool error
+     * @throws DependenciesToolException if the dependencies could not be loaded
      */
     protected abstract SortedProperties createUnsafeMapping()
-      throws ProjectBuildingException, IOException, ThirdPartyToolException, MojoExecutionException;
+      throws ProjectBuildingException, IOException, ThirdPartyToolException,
+            MojoExecutionException, DependenciesToolException;
 
     // ----------------------------------------------------------------------
     // AbstractLicenseMojo Implementaton
@@ -674,7 +678,8 @@ public abstract class AbstractAddThirdPartyMojo
     }
 
     void consolidate() throws IOException, ArtifactNotFoundException, ArtifactResolutionException, MojoFailureException,
-                              ProjectBuildingException, ThirdPartyToolException, MojoExecutionException
+                              ProjectBuildingException, ThirdPartyToolException,
+                              MojoExecutionException, DependenciesToolException
     {
 
         unsafeDependencies = getHelper().getProjectsWithNoLicense( licenseMap );

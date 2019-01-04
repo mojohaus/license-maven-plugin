@@ -365,6 +365,11 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-invoker-plugin</artifactId>
           <version>3.0.0</version>
+          <configuration>
+            <scriptVariables>
+              <projectVersion>${project.version}</projectVersion>
+            </scriptVariables>
+          </configuration>
         </plugin>
         <plugin>
           <groupId>org.ec4j.maven</groupId>

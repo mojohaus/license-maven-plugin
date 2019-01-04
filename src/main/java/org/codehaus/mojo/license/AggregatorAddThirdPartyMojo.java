@@ -24,14 +24,13 @@ package org.codehaus.mojo.license;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.SortedSet;
-import java.util.TreeMap;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
@@ -208,14 +207,8 @@ public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo
         }
 
         String addThirdPartyRoleHint = groupId + ":" + artifactId + ":" + version + ":" + "add-third-party";
-        Map<String, List<Dependency>> reactorProjectDependencies = new TreeMap<>();
-        for ( MavenProject reactorProject : this.reactorProjects )
-        {
-            reactorProjectDependencies.put( String.format( "%s:%s", reactorProject.getGroupId(),
-                    reactorProject.getArtifactId() ), reactorProject.getDependencies() );
-        }
 
-        for ( Object reactorProject : reactorProjects )
+        for ( MavenProject reactorProject : reactorProjects )
         {
             if ( getProject().equals( reactorProject ) )
             {
@@ -223,11 +216,10 @@ public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo
                 continue;
             }
 
-
             AddThirdPartyMojo mojo = (AddThirdPartyMojo) getSession()
                     .lookup( AddThirdPartyMojo.ROLE, addThirdPartyRoleHint );
 
-            mojo.initFromMojo( this, (MavenProject) reactorProject, reactorProjectDependencies );
+            mojo.initFromMojo( this, reactorProject, new ArrayList<>( this.reactorProjects ) );
 
             LicenseMap childLicenseMap = mojo.getLicenseMap();
             if ( isVerbose() )

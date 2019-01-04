@@ -56,6 +56,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
+import org.codehaus.mojo.license.api.ResolvedProjectDependencies;
 
 /**
  * Created on 23/05/16.
@@ -285,7 +286,9 @@ public abstract class AbstractDownloadLicensesMojo
 
     protected SortedMap<String, MavenProject> getDependencies( MavenProject project )
     {
-        return dependenciesTool.loadProjectDependencies( project, this, localRepository, remoteRepositories, null );
+        return dependenciesTool.loadProjectDependencies(
+                new ResolvedProjectDependencies( project.getArtifacts(), project.getDependencyArtifacts() ),
+                this, localRepository, remoteRepositories, null );
     }
 
     /**

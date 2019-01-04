@@ -31,7 +31,7 @@
   <artifactId>test-ISSUE-59</artifactId>
   <version>@pom.version@</version>
 
-  <name>License Test :: ISSUE-59</name>
+  <name>License Test :: ISSUE-80</name>
   <packaging>jar</packaging>
 
   <licenses>

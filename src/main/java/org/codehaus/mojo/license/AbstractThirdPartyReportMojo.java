@@ -60,6 +60,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import org.codehaus.mojo.license.api.ResolvedProjectDependencies;
 
 /**
  * Base class for third-party reports.
@@ -517,17 +518,24 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
              DependenciesToolException, MojoExecutionException
     {
 
+        ResolvedProjectDependencies loadedDependencies;
         if ( loadArtifacts )
         {
-            dependenciesTool.loadProjectArtifacts( localRepository, project.getRemoteArtifactRepositories(), project,
-                    null );
+            loadedDependencies = dependenciesTool.loadProjectArtifacts( localRepository, licenseMerges, project, null );
+        }
+        else
+        {
+            loadedDependencies = new ResolvedProjectDependencies( getProject().getArtifacts(),
+                    getProject().getDependencyArtifacts() );
         }
 
         ThirdPartyHelper thirdPartyHelper =
-                new DefaultThirdPartyHelper( project, encoding, verbose, dependenciesTool, thirdPartyTool,
+                new DefaultThirdPartyHelper( project, encoding, verbose,
+                        dependenciesTool, thirdPartyTool,
                         localRepository, project.getRemoteArtifactRepositories(), getLog() );
         // load dependencies of the project
-        SortedMap<String, MavenProject> projectDependencies = thirdPartyHelper.loadDependencies( this );
+        SortedMap<String, MavenProject> projectDependencies = thirdPartyHelper.loadDependencies( this,
+                loadedDependencies );
 
         // create licenseMap from it
         LicenseMap licenseMap = thirdPartyHelper.createLicenseMap( projectDependencies );
@@ -549,7 +557,8 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
             {
                 // Resolve unsafe dependencies using missing files, this will update licenseMap and unsafeDependencies
                 thirdPartyHelper.createUnsafeMapping( licenseMap, missingFile, missingFileUrl,
-                        useRepositoryMissingFiles, dependenciesWithNoLicense, projectDependencies );
+                        useRepositoryMissingFiles, dependenciesWithNoLicense,
+                        projectDependencies, loadedDependencies.getAllDependencies() );
             }
         }
 
