@@ -67,7 +67,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
     /**
      * To overwrite the processStartTag used to build header model.
      * <p>
-     * See http://mojo.codehaus.org/license-maven-plugin/header.html#Configuration .
+     * See <a href="http://mojohaus.org/license-maven-plugin/header.html#Configuration">File header configuration</a>.
      *
      * @since 1.1
      */
@@ -77,7 +77,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
     /**
      * To overwrite the processEndTag used to build header model.
      * <p>
-     * See http://mojo.codehaus.org/license-maven-plugin/header.html#Configuration .
+     * See <a href="http://mojohaus.org/license-maven-plugin/header.html#Configuration">File header configuration</a>.
      *
      * @since 1.1
      */
@@ -87,7 +87,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
     /**
      * To overwrite the sectionDelimiter used to build header model.
      * <p>
-     * See http://mojo.codehaus.org/license-maven-plugin/header.html#Configuration .
+     * See <a href="http://mojohaus.org/license-maven-plugin/header.html#Configuration">File header configuration</a>.
      *
      * @since 1.1
      */
