@@ -291,6 +291,18 @@ public abstract class AbstractDownloadLicensesMojo
                 this, localRepository, remoteRepositories, null );
     }
 
+    protected java.util.Properties systemProperties;
+
+    protected void storeProperties()
+    {
+        systemProperties = (java.util.Properties) System.getProperties().clone();
+    }
+    protected void restoreProperties()
+    {
+        if (systemProperties != null)
+            System.setProperties(systemProperties);
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -306,60 +318,67 @@ public abstract class AbstractDownloadLicensesMojo
 
         initDirectories();
 
-        initProxy();
-
-        Map<String, ProjectLicenseInfo> configuredDepLicensesMap = new HashMap<>();
-
-        // License info from previous build
-        if ( licensesOutputFile.exists() )
-        {
-            loadLicenseInfo( configuredDepLicensesMap, licensesOutputFile, true );
-        }
-
-        // Manually configured license info, loaded second to override previously loaded info
-        if ( licensesConfigFile.exists() )
-        {
-            loadLicenseInfo( configuredDepLicensesMap, licensesConfigFile, false );
-        }
-
-        Set<MavenProject> dependencies = getDependencies();
-
-        // The resulting list of licenses after dependency resolution
-        List<ProjectLicenseInfo> depProjectLicenses = new ArrayList<>();
-
-        for ( MavenProject project : dependencies )
-        {
-            Artifact artifact = project.getArtifact();
-            getLog().debug( "Checking licenses for project " + artifact );
-            String artifactProjectId = getArtifactProjectId( artifact );
-            ProjectLicenseInfo depProject;
-            if ( configuredDepLicensesMap.containsKey( artifactProjectId ) )
-            {
-                depProject = configuredDepLicensesMap.get( artifactProjectId );
-                depProject.setVersion( artifact.getVersion() );
-            }
-            else
-            {
-                depProject = createDependencyProject( project );
-            }
-            if ( !offline )
-            {
-                downloadLicenses( depProject );
-            }
-            depProjectLicenses.add( depProject );
-        }
-
         try
         {
-            if ( sortByGroupIdAndArtifactId )
+            initProxy();
+
+            Map<String, ProjectLicenseInfo> configuredDepLicensesMap = new HashMap<>();
+
+            // License info from previous build
+            if ( licensesOutputFile.exists() )
             {
-                depProjectLicenses = sortByGroupIdAndArtifactId( depProjectLicenses );
+                loadLicenseInfo( configuredDepLicensesMap, licensesOutputFile, true );
             }
-            LicenseSummaryWriter.writeLicenseSummary( depProjectLicenses, licensesOutputFile );
+
+            // Manually configured license info, loaded second to override previously loaded info
+            if ( licensesConfigFile.exists() )
+            {
+                loadLicenseInfo( configuredDepLicensesMap, licensesConfigFile, false );
+            }
+
+            Set<MavenProject> dependencies = getDependencies();
+
+            // The resulting list of licenses after dependency resolution
+            List<ProjectLicenseInfo> depProjectLicenses = new ArrayList<>();
+
+            for ( MavenProject project : dependencies )
+            {
+                Artifact artifact = project.getArtifact();
+                getLog().debug( "Checking licenses for project " + artifact );
+                String artifactProjectId = getArtifactProjectId( artifact );
+                ProjectLicenseInfo depProject;
+                if ( configuredDepLicensesMap.containsKey( artifactProjectId ) )
+                {
+                    depProject = configuredDepLicensesMap.get( artifactProjectId );
+                    depProject.setVersion( artifact.getVersion() );
+                }
+                else
+                {
+                    depProject = createDependencyProject( project );
+                }
+                if ( !offline )
+                {
+                    downloadLicenses( depProject );
+                }
+                depProjectLicenses.add( depProject );
+            }
+
+            try
+            {
+                if (sortByGroupIdAndArtifactId) {
+                    depProjectLicenses = sortByGroupIdAndArtifactId(depProjectLicenses);
+                }
+                LicenseSummaryWriter.writeLicenseSummary( depProjectLicenses, licensesOutputFile );
+            }
+            catch ( Exception e )
+            {
+                throw new MojoExecutionException( "Unable to write license summary file: " + licensesOutputFile, e );
+            }
         }
-        catch ( Exception e )
+        finally
         {
-            throw new MojoExecutionException( "Unable to write license summary file: " + licensesOutputFile, e );
+            //restore the system properties to what they where before the plugin execution
+            restoreProperties();
         }
     }
 
@@ -519,7 +538,8 @@ public abstract class AbstractDownloadLicensesMojo
         }
         if ( proxyToUse != null )
         {
-
+            //Save our system settings for restore after plugin run
+            storeProperties();
             System.getProperties().put( "proxySet", "true" );
             System.setProperty( "proxyHost", proxyToUse.getHost() );
             System.setProperty( "proxyPort", String.valueOf( proxyToUse.getPort() ) );
