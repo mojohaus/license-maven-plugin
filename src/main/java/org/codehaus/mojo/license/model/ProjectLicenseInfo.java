@@ -23,7 +23,6 @@ package org.codehaus.mojo.license.model;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.model.License;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +41,7 @@ public class ProjectLicenseInfo
 
     private String version;
 
-    private List<License> licenses = new ArrayList<>();
+    private List<ProjectLicense> licenses = new ArrayList<>();
 
     private String licenseResolutionResult;
 
@@ -101,17 +100,17 @@ public class ProjectLicenseInfo
         this.version = version;
     }
 
-    public List<License> getLicenses()
+    public List<ProjectLicense> getLicenses()
     {
         return licenses;
     }
 
-    public void setLicenses( List<License> licenses )
+    public void setLicenses( List<ProjectLicense> licenses )
     {
         this.licenses = licenses;
     }
 
-    public void addLicense( License license )
+    public void addLicense( ProjectLicense license )
     {
         licenses.add( license );
     }
