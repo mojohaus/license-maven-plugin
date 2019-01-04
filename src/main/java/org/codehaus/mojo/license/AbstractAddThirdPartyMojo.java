@@ -84,7 +84,7 @@ public abstract class AbstractAddThirdPartyMojo
      */
     @Parameter( property = "license.outputDirectory",
             defaultValue = "${project.build.directory}/generated-sources/license", required = true )
-    private File outputDirectory;
+    protected File outputDirectory;
 
     /**
      * Attach the 'missing' file as an additional artifact so that it is deployed in the deploy phase.
@@ -92,7 +92,7 @@ public abstract class AbstractAddThirdPartyMojo
      * @since 1.0
      */
     @Parameter( property = "license.deployMissingFile", defaultValue = "true" )
-    boolean deployMissingFile;
+    protected boolean deployMissingFile;
 
     /**
      * Load files supplying information for missing third party licenses from repositories.
@@ -103,7 +103,7 @@ public abstract class AbstractAddThirdPartyMojo
      * @since 1.0
      */
     @Parameter( property = "license.useRepositoryMissingFiles", defaultValue = "true" )
-    boolean useRepositoryMissingFiles;
+    protected boolean useRepositoryMissingFiles;
 
     /**
      * To execute or not this mojo if project packaging is pom.
@@ -113,7 +113,7 @@ public abstract class AbstractAddThirdPartyMojo
      * @since 1.1
      */
     @Parameter( property = "license.acceptPomPackaging", defaultValue = "false" )
-    boolean acceptPomPackaging;
+    protected boolean acceptPomPackaging;
 
     /**
      * A filter to exclude some scopes.
@@ -124,7 +124,7 @@ public abstract class AbstractAddThirdPartyMojo
      * @since 1.1
      */
     @Parameter( property = "license.excludedScopes", defaultValue = "system" )
-    String excludedScopes;
+    protected String excludedScopes;
 
     /**
      * A filter to include only some scopes, if let empty then all scopes will be used (no filter).
@@ -135,7 +135,7 @@ public abstract class AbstractAddThirdPartyMojo
      * @since 1.1
      */
     @Parameter( property = "license.includedScopes" )
-    String includedScopes;
+    protected String includedScopes;
 
     /**
      * A filter to exclude some types.
@@ -143,7 +143,7 @@ public abstract class AbstractAddThirdPartyMojo
      * @since 1.15
      */
     @Parameter( property = "license.excludedTypes" )
-    String excludedTypes;
+    protected String excludedTypes;
 
     /**
      * A filter to include only some types, if let empty then all types will be used (no filter).
@@ -151,7 +151,7 @@ public abstract class AbstractAddThirdPartyMojo
      * @since 1.15
      */
     @Parameter( property = "license.includedTypes" )
-    String includedTypes;
+    protected String includedTypes;
 
     /**
      * A filter to exclude some GroupIds
@@ -160,7 +160,7 @@ public abstract class AbstractAddThirdPartyMojo
      * @since 1.1
      */
     @Parameter( property = "license.excludedGroups" )
-    String excludedGroups;
+    protected String excludedGroups;
 
     /**
      * A filter to include only some GroupIds
@@ -169,7 +169,7 @@ public abstract class AbstractAddThirdPartyMojo
      * @since 1.1
      */
     @Parameter( property = "license.includedGroups" )
-    String includedGroups;
+    protected String includedGroups;
 
     /**
      * A filter to exclude some ArtifactsIds
@@ -178,7 +178,7 @@ public abstract class AbstractAddThirdPartyMojo
      * @since 1.1
      */
     @Parameter( property = "license.excludedArtifacts" )
-    String excludedArtifacts;
+    protected String excludedArtifacts;
 
     /**
      * A filter to include only some ArtifactsIds
@@ -187,7 +187,7 @@ public abstract class AbstractAddThirdPartyMojo
      * @since 1.1
      */
     @Parameter( property = "license.includedArtifacts" )
-    String includedArtifacts;
+    protected String includedArtifacts;
 
     /**
      * Include transitive dependencies when checking for missing licenses and downloading license files.
@@ -212,7 +212,7 @@ public abstract class AbstractAddThirdPartyMojo
      * @since 1.0
      */
     @Parameter( property = "license.thirdPartyFilename", defaultValue = "THIRD-PARTY.txt", required = true )
-    String thirdPartyFilename;
+    protected String thirdPartyFilename;
 
     /**
      * A flag to use the missing licenses file to consolidate the THID-PARTY file.
@@ -220,7 +220,7 @@ public abstract class AbstractAddThirdPartyMojo
      * @since 1.0
      */
     @Parameter( property = "license.useMissingFile", defaultValue = "false" )
-    boolean useMissingFile;
+    protected boolean useMissingFile;
 
     /**
      * The file to write with a license information template for dependencies with unknown license.
@@ -228,7 +228,7 @@ public abstract class AbstractAddThirdPartyMojo
      * @since 1.0
      */
     @Parameter( property = "license.missingFile", defaultValue = "src/license/THIRD-PARTY.properties" )
-    File missingFile;
+    protected File missingFile;
 
     /**
      * The Url that holds the missing license dependency entries. This is an extension to {@link #missingFile}.
@@ -241,7 +241,7 @@ public abstract class AbstractAddThirdPartyMojo
      * @since 1.15
      */
     @Parameter( property = "license.missingFileUrl" )
-    String missingFileUrl;
+    protected String missingFileUrl;
 
     /**
      * To resolve third party licenses from an artifact.
@@ -249,7 +249,7 @@ public abstract class AbstractAddThirdPartyMojo
      * @since 1.14
      */
     @Parameter( property = "license.missingLicensesFileArtifact" )
-    String missingLicensesFileArtifact;
+    protected String missingLicensesFileArtifact;
 
 
     /**
@@ -286,7 +286,7 @@ public abstract class AbstractAddThirdPartyMojo
      *
      * @see LicenseMojoUtils#prepareThirdPartyOverrideUrl(URL, File, String, File)
      */
-    URL resolvedOverrideUrl;
+    protected URL resolvedOverrideUrl;
 
     /**
      * To merge licenses in final file.
@@ -305,18 +305,18 @@ public abstract class AbstractAddThirdPartyMojo
      * @since 1.0
      */
     @Parameter
-    List<String> licenseMerges;
+    protected List<String> licenseMerges;
 
    /**
      * The file with the merge licenses in order to be used by command line.
      * <b>Note:</b> This option overrides {@link #licenseMerges}.
      *
      * @since 1.15
-    * @deprecated prefer use now {@link #licenseMergesUrl}
+     * @deprecated prefer use now {@link #licenseMergesUrl}
      */
-   @Deprecated
+    @Deprecated
     @Parameter( property = "license.licenseMergesFile" )
-    String licenseMergesFile;
+    protected String licenseMergesFile;
 
    /**
      * Location of file with the merge licenses in order to be used by command line.
@@ -325,114 +325,114 @@ public abstract class AbstractAddThirdPartyMojo
      * @since 1.17
      */
     @Parameter( property = "license.licenseMergesUrl" )
-    String licenseMergesUrl;
+    protected String licenseMergesUrl;
 
-  /**
-   * To specify some licenses to include.
-   * <p>
-   * If this parameter is filled and a license is not in this {@code whitelist} then build will fail when
-   * property {@link #failOnBlacklist} is <tt>true</tt>.
-   * <p>
-   * Since version {@code 1.4}, there are three ways to fill this parameter :
-   * <ul>
-   * <li>A simple string (separated by {@code |}), the way to use by property configuration:
-   *
-   * <pre>
-   * &lt;includedLicenses&gt;licenseA|licenseB&lt;/includedLicenses&gt;
-   * </pre>
-   *
-   * or
-   *
-   * <pre>
-   * -Dlicense.includedLicenses=licenseA|licenseB
-   * </pre>
-   *
-   * </li>
-   * <li>A list of string (can only be used in plugin configuration, not via property configuration)
-   *
-   * <pre>
-   * &lt;includedLicenses&gt;
-   *   &lt;includedLicense&gt;licenseA&lt;/includedLicense&gt;
-   *   &lt;includedLicenses&gt;licenseB&lt;/includedLicense&gt;
-   * &lt;/includedLicenses&gt;
-   * </pre>
-   *
-   * </li>
-   * <li>Since version {@code 1.15}<br>
-   * a URL that contains a set of license names at the target source (only a single URL is accepted as
-   * parameter)
-   *
-   * <pre>
-   *    &lt;includedLicenses&gt;http://my.license.host.com/my-whitelist&lt;/includedLicenses&gt;
-   * </pre>
-   *
-   * the license-list on the given URL is expected to be list with a line-break after every entry e.g.:
-   * <ul style="list-style-type:none;">
-   * <li>The Apache Software License, Version 2.0</li>
-   * <li>Apache License, Version 2.0</li>
-   * <li>Bouncy Castle Licence</li>
-   * <li>MIT License</li>
-   * </ul>
-   * empty lines will be ignored.</li>
-   * </ul>
-   *
-   * @since 1.1
-   */
-  @Parameter( property = "license.includedLicenses" )
-  IncludedLicenses includedLicenses;
+    /**
+     * To specify some licenses to include.
+     * <p>
+     * If this parameter is filled and a license is not in this {@code whitelist} then build will fail when
+     * property {@link #failOnBlacklist} is <tt>true</tt>.
+     * <p>
+     * Since version {@code 1.4}, there are three ways to fill this parameter :
+     * <ul>
+     * <li>A simple string (separated by {@code |}), the way to use by property configuration:
+     *
+     * <pre>
+     * &lt;includedLicenses&gt;licenseA|licenseB&lt;/includedLicenses&gt;
+     * </pre>
+     *
+     * or
+     *
+     * <pre>
+     * -Dlicense.includedLicenses=licenseA|licenseB
+     * </pre>
+     *
+     * </li>
+     * <li>A list of string (can only be used in plugin configuration, not via property configuration)
+     *
+     * <pre>
+     * &lt;includedLicenses&gt;
+     *   &lt;includedLicense&gt;licenseA&lt;/includedLicense&gt;
+     *   &lt;includedLicenses&gt;licenseB&lt;/includedLicense&gt;
+     * &lt;/includedLicenses&gt;
+     * </pre>
+     *
+     * </li>
+     * <li>Since version {@code 1.15}<br>
+     * a URL that contains a set of license names at the target source (only a single URL is accepted as
+     * parameter)
+     *
+     * <pre>
+     *    &lt;includedLicenses&gt;http://my.license.host.com/my-whitelist&lt;/includedLicenses&gt;
+     * </pre>
+     *
+     * the license-list on the given URL is expected to be list with a line-break after every entry e.g.:
+     * <ul style="list-style-type:none;">
+     * <li>The Apache Software License, Version 2.0</li>
+     * <li>Apache License, Version 2.0</li>
+     * <li>Bouncy Castle Licence</li>
+     * <li>MIT License</li>
+     * </ul>
+     * empty lines will be ignored.</li>
+     * </ul>
+     *
+     * @since 1.1
+     */
+    @Parameter( property = "license.includedLicenses" )
+    protected IncludedLicenses includedLicenses;
 
-  /**
-   * To specify some licenses to exclude.
-   * <p>
-   * If a such license is found then build will fail when property {@link #failOnBlacklist} is <tt>true</tt>.
-   * <p>
-   * Since version {@code 1.4}, there are three ways to fill this parameter :
-   * <ul>
-   * <li>A simple string (separated by {@code |}), the way to use by property configuration:
-   *
-   * <pre>
-   * &lt;excludedLicenses&gt;licenseA|licenseB&lt;/excludedLicenses&gt;
-   * </pre>
-   *
-   * or
-   *
-   * <pre>
-   * -Dlicense.excludedLicenses=licenseA|licenseB
-   * </pre>
-   *
-   * </li>
-   * <li>A list of string (can only be used in plugin configuration, not via property configuration)
-   *
-   * <pre>
-   * &lt;excludedLicenses&gt;
-   *   &lt;excludedLicense&gt;licenseA&lt;/excludedLicense&gt;
-   *   &lt;excludedLicense&gt;licenseB&lt;/excludedLicense&gt;
-   * &lt;/excludedLicenses&gt;
-   * </pre>
-   *
-   * </li>
-   * <li>Since version {@code 1.15}<br>
-   * a URL that contains a set of license names at the target source (only a single URL is accepted as
-   * parameter)
-   *
-   * <pre>
-   *    &lt;includedLicenses&gt;http://my.license.host.com/my-blacklist&lt;/includedLicenses&gt;
-   * </pre>
-   *
-   * the license-list on the given URL is expected to be list with a line-break after every entry e.g.:
-   * <ul style="list-style-type:none;">
-   * <li>The Apache Software License, Version 2.0</li>
-   * <li>Apache License, Version 2.0</li>
-   * <li>Bouncy Castle Licence</li>
-   * <li>MIT License</li>
-   * </ul>
-   * empty lines will be ignored.</li>
-   * </ul>
-   *
-   * @since 1.1
-   */
-  @Parameter( property = "license.excludedLicenses" )
-  ExcludedLicenses excludedLicenses;
+    /**
+     * To specify some licenses to exclude.
+     * <p>
+     * If a such license is found then build will fail when property {@link #failOnBlacklist} is <tt>true</tt>.
+     * <p>
+     * Since version {@code 1.4}, there are three ways to fill this parameter :
+     * <ul>
+     * <li>A simple string (separated by {@code |}), the way to use by property configuration:
+     *
+     * <pre>
+     * &lt;excludedLicenses&gt;licenseA|licenseB&lt;/excludedLicenses&gt;
+     * </pre>
+     *
+     * or
+     *
+     * <pre>
+     * -Dlicense.excludedLicenses=licenseA|licenseB
+     * </pre>
+     *
+     * </li>
+     * <li>A list of string (can only be used in plugin configuration, not via property configuration)
+     *
+     * <pre>
+     * &lt;excludedLicenses&gt;
+     *   &lt;excludedLicense&gt;licenseA&lt;/excludedLicense&gt;
+     *   &lt;excludedLicense&gt;licenseB&lt;/excludedLicense&gt;
+     * &lt;/excludedLicenses&gt;
+     * </pre>
+     *
+     * </li>
+     * <li>Since version {@code 1.15}<br>
+     * a URL that contains a set of license names at the target source (only a single URL is accepted as
+     * parameter)
+     *
+     * <pre>
+     *  &lt;includedLicenses&gt;http://my.license.host.com/my-blacklist&lt;/includedLicenses&gt;
+     * </pre>
+     *
+     * the license-list on the given URL is expected to be list with a line-break after every entry e.g.:
+     * <ul style="list-style-type:none;">
+     * <li>The Apache Software License, Version 2.0</li>
+     * <li>Apache License, Version 2.0</li>
+     * <li>Bouncy Castle Licence</li>
+     * <li>MIT License</li>
+     * </ul>
+     * empty lines will be ignored.</li>
+     * </ul>
+     *
+     * @since 1.1
+     */
+    @Parameter( property = "license.excludedLicenses" )
+    protected ExcludedLicenses excludedLicenses;
 
     /**
      * The path of the bundled third party file to produce when
@@ -444,7 +444,7 @@ public abstract class AbstractAddThirdPartyMojo
      */
     @Parameter( property = "license.bundleThirdPartyPath",
             defaultValue = "META-INF/${project.artifactId}-THIRD-PARTY.txt" )
-    String bundleThirdPartyPath;
+    protected String bundleThirdPartyPath;
 
     /**
      * A flag to copy a bundled version of the third-party file. This is useful
@@ -455,7 +455,7 @@ public abstract class AbstractAddThirdPartyMojo
      * @since 1.0
      */
     @Parameter( property = "license.generateBundle", defaultValue = "false" )
-    boolean generateBundle;
+    protected boolean generateBundle;
 
     /**
      * To force generation of the third-party file even if everything is up to date.
@@ -463,7 +463,7 @@ public abstract class AbstractAddThirdPartyMojo
      * @since 1.0
      */
     @Parameter( property = "license.force", defaultValue = "false" )
-    boolean force;
+    protected boolean force;
 
     /**
      * A flag to fail the build if at least one dependency was detected without a license.
@@ -473,7 +473,7 @@ public abstract class AbstractAddThirdPartyMojo
      */
     @Deprecated
     @Parameter( property = "license.failIfWarning", defaultValue = "false" )
-    boolean failIfWarning;
+    protected boolean failIfWarning;
 
     /**
      * A flag to fail the build if at least one dependency was detected without a license.
@@ -481,7 +481,7 @@ public abstract class AbstractAddThirdPartyMojo
      * @since 1.14
      */
     @Parameter( property = "license.failOnMissing", defaultValue = "false" )
-    boolean failOnMissing;
+    protected boolean failOnMissing;
 
     /**
      * A flag to fail the build if at least one dependency was blacklisted.
@@ -489,7 +489,7 @@ public abstract class AbstractAddThirdPartyMojo
      * @since 1.14
      */
     @Parameter( property = "license.failOnBlacklist", defaultValue = "false" )
-    boolean failOnBlacklist;
+    protected boolean failOnBlacklist;
 
     /**
      * A flag to sort artifact by name in the generated third-party file.
@@ -499,7 +499,7 @@ public abstract class AbstractAddThirdPartyMojo
      * @since 1.6
      */
     @Parameter( property = "license.sortArtifactByName", defaultValue = "false" )
-    boolean sortArtifactByName;
+    protected boolean sortArtifactByName;
 
     /**
      * Template used to build the third-party file.
@@ -514,7 +514,7 @@ public abstract class AbstractAddThirdPartyMojo
      * @since 1.1
      */
     @Parameter( property = "license.fileTemplate", defaultValue = "/org/codehaus/mojo/license/third-party-file.ftl" )
-    String fileTemplate;
+    protected String fileTemplate;
 
     /**
      * Local Repository.
@@ -522,7 +522,7 @@ public abstract class AbstractAddThirdPartyMojo
      * @since 1.0.0
      */
     @Parameter( property = "localRepository", required = true, readonly = true )
-    ArtifactRepository localRepository;
+    protected ArtifactRepository localRepository;
 
     /**
      * Remote repositories used for the project.
@@ -530,13 +530,13 @@ public abstract class AbstractAddThirdPartyMojo
      * @since 1.0.0
      */
     @Parameter( property = "project.remoteArtifactRepositories", required = true, readonly = true )
-    List<ArtifactRepository> remoteRepositories;
+    protected List<ArtifactRepository> remoteRepositories;
 
     /**
      * The set of dependencies for the current project, used to locate license databases.
      */
     @Parameter( property = "project.artifacts", required = true, readonly = true )
-    Set<Artifact> dependencies;
+    protected Set<Artifact> dependencies;
 
     // ----------------------------------------------------------------------
     // Plexus components
@@ -557,7 +557,7 @@ public abstract class AbstractAddThirdPartyMojo
      * @since 1.1
      */
     @Component
-    DependenciesTool dependenciesTool;
+    protected DependenciesTool dependenciesTool;
 
     // ----------------------------------------------------------------------
     // Private fields
@@ -568,25 +568,25 @@ public abstract class AbstractAddThirdPartyMojo
      */
     private ThirdPartyHelper helper;
 
-    private SortedMap<String, MavenProject> projectDependencies;
+    protected SortedMap<String, MavenProject> projectDependencies;
 
-    LicenseMap licenseMap;
+    protected LicenseMap licenseMap;
 
-    SortedSet<MavenProject> unsafeDependencies;
+    protected SortedSet<MavenProject> unsafeDependencies;
 
     private File thirdPartyFile;
 
-    SortedProperties unsafeMappings;
+    protected SortedProperties unsafeMappings;
 
     /**
      * Flag computed in the {@link #init()} method to know if there is something has to be generated.
      */
-    private boolean doGenerate;
+    protected boolean doGenerate;
 
     /**
      * Flag computed in the {@link #init()} method to know if a bundle version has to be generated.
      */
-    private boolean doGenerateBundle;
+    protected boolean doGenerateBundle;
 
     /**
      * Map from G/A/V as string to license key, obtained from global dependencies of type=.ld.properties.
@@ -644,7 +644,7 @@ public abstract class AbstractAddThirdPartyMojo
             setVerbose( true );
         }
 
-        thirdPartyFile = new File( getOutputDirectory(), thirdPartyFilename );
+        thirdPartyFile = new File( outputDirectory, thirdPartyFilename );
 
         long buildTimestamp = getBuildTimestamp();
 
@@ -654,18 +654,18 @@ public abstract class AbstractAddThirdPartyMojo
             log.debug( "third-party file : " + thirdPartyFile.lastModified() );
         }
 
-        doGenerate = isForce() || !thirdPartyFile.exists() || buildTimestamp > thirdPartyFile.lastModified();
+        doGenerate = force || !thirdPartyFile.exists() || buildTimestamp > thirdPartyFile.lastModified();
 
         if ( generateBundle )
         {
 
-            File bundleFile = FileUtil.getFile( getOutputDirectory(), bundleThirdPartyPath );
+            File bundleFile = FileUtil.getFile( outputDirectory, bundleThirdPartyPath );
 
             if ( isVerbose() || getLog().isDebugEnabled() )
             {
                 log.debug( "bundle third-party file : " + bundleFile.lastModified() );
             }
-            doGenerateBundle = isForce() || !bundleFile.exists() || buildTimestamp > bundleFile.lastModified();
+            doGenerateBundle = force || !bundleFile.exists() || buildTimestamp > bundleFile.lastModified();
         }
         else
         {
@@ -718,7 +718,7 @@ public abstract class AbstractAddThirdPartyMojo
 
         if ( !CollectionUtils.isEmpty( unsafeDependencies ) )
         {
-            if ( isUseMissingFile() && isDoGenerate() )
+            if ( useMissingFile && doGenerate )
             {
                 // load unsafeMapping from local file and/or third-party classified items.
                 unsafeMappings = createUnsafeMapping();
@@ -749,75 +749,6 @@ public abstract class AbstractAddThirdPartyMojo
         }
 
         overrideLicenses();
-    }
-
-    // ----------------------------------------------------------------------
-    // Public Methods
-    // ----------------------------------------------------------------------
-
-    File getOutputDirectory()
-    {
-        return outputDirectory;
-    }
-
-    public boolean isFailIfWarning()
-    {
-        return failIfWarning;
-    }
-
-    SortedMap<String, MavenProject> getProjectDependencies()
-    {
-        return projectDependencies;
-    }
-
-    SortedSet<MavenProject> getUnsafeDependencies()
-    {
-        return unsafeDependencies;
-    }
-
-    public LicenseMap getLicenseMap()
-    {
-        return licenseMap;
-    }
-
-    public boolean isUseMissingFile()
-    {
-        return useMissingFile;
-    }
-
-    File getMissingFile()
-    {
-        return missingFile;
-    }
-
-    String getLicenseMergesFile()
-    {
-        return licenseMergesFile;
-    }
-
-    public String getLicenseMergesUrl()
-    {
-        return licenseMergesUrl;
-    }
-
-    SortedProperties getUnsafeMappings()
-    {
-        return unsafeMappings;
-    }
-
-    boolean isForce()
-    {
-        return force;
-    }
-
-    boolean isDoGenerate()
-    {
-        return doGenerate;
-    }
-
-    boolean isDoGenerateBundle()
-    {
-        return doGenerateBundle;
     }
 
     /**
@@ -880,7 +811,6 @@ public abstract class AbstractAddThirdPartyMojo
 
     void resolveUnsafeDependenciesFromFile( File missingLicenses ) throws IOException, MojoExecutionException
     {
-        SortedSet<MavenProject> unsafeDeps = getUnsafeDependencies();
         if ( missingLicenses != null && missingLicenses.exists() && missingLicenses.length() > 0 )
         {
             // there are missing licenses available from the artifact
@@ -898,7 +828,7 @@ public abstract class AbstractAddThirdPartyMojo
             }
 
             Set<MavenProject> resolvedDependencies = new HashSet<>();
-            for ( MavenProject unsafeDependency : unsafeDeps )
+            for ( MavenProject unsafeDependency : unsafeDependencies )
             {
                 String id = MojoHelper.getArtifactId( unsafeDependency.getArtifact() );
 
@@ -913,25 +843,24 @@ public abstract class AbstractAddThirdPartyMojo
             }
 
             // remove resolvedDependencies from unsafeDeps;
-            unsafeDeps.removeAll( resolvedDependencies );
+            unsafeDependencies.removeAll( resolvedDependencies );
         }
     }
 
     void checkUnsafeDependencies()
     {
-        SortedSet<MavenProject> unsafeDeps = getUnsafeDependencies();
-        if ( CollectionUtils.isNotEmpty( unsafeDeps ) )
+        if ( CollectionUtils.isNotEmpty( unsafeDependencies ) )
         {
             Log log = getLog();
             if ( log.isWarnEnabled() )
             {
-                boolean plural = unsafeDeps.size() > 1;
+                boolean plural = unsafeDependencies.size() > 1;
                 String message = String.format( "There %s %d %s with no license :",
                     plural ? "are" : "is",
-                    unsafeDeps.size(),
+                            unsafeDependencies.size(),
                     plural ? "dependencies" : "dependency" );
                 log.warn( message );
-                for ( MavenProject dep : unsafeDeps )
+                for ( MavenProject dep : unsafeDependencies )
                 {
 
                     // no license found for the dependency
@@ -948,13 +877,13 @@ public abstract class AbstractAddThirdPartyMojo
         Set<String> unsafeLicenses = new HashSet<>();
         if ( CollectionUtils.isNotEmpty( blackLicenses ) )
         {
-            Set<String> licenses = getLicenseMap().keySet();
+            Set<String> licenses = licenseMap.keySet();
             getLog().info( "Excluded licenses (blacklist): " + blackLicenses );
 
             for ( String excludeLicense : blackLicenses )
             {
                 if ( licenses.contains( excludeLicense )
-                        && CollectionUtils.isNotEmpty( getLicenseMap().get( excludeLicense ) ) )
+                        && CollectionUtils.isNotEmpty( licenseMap.get( excludeLicense ) ) )
                 {
                     //bad license found
                     unsafeLicenses.add( excludeLicense );
@@ -964,19 +893,19 @@ public abstract class AbstractAddThirdPartyMojo
 
         if ( CollectionUtils.isNotEmpty( whiteLicenses ) )
         {
-            Set<String> dependencyLicenses = getLicenseMap().keySet();
+            Set<String> dependencyLicenses = licenseMap.keySet();
             getLog().info( "Included licenses (whitelist): " + whiteLicenses );
 
             for ( String dependencyLicense : dependencyLicenses )
             {
                 getLog().debug( "Testing license '" + dependencyLicense + "'" );
                 if ( !whiteLicenses.contains( dependencyLicense )
-                        && CollectionUtils.isNotEmpty( getLicenseMap().get( dependencyLicense ) ) )
+                        && CollectionUtils.isNotEmpty( licenseMap.get( dependencyLicense ) ) )
                 {
                     getLog().debug( "Testing dependency license '" + dependencyLicense
                             + "' against all other licenses" );
 
-                    for ( MavenProject dependency : getLicenseMap().get( dependencyLicense ) )
+                    for ( MavenProject dependency : licenseMap.get( dependencyLicense ) )
                     {
                         getLog().debug( "  testing dependency " + dependency );
 
@@ -987,7 +916,7 @@ public abstract class AbstractAddThirdPartyMojo
                             // skip this license if it is the same as the dependency license
                             // skip this license if it has no projects assigned
                             if ( otherLicense.equals( dependencyLicense )
-                                    || getLicenseMap().get( dependencyLicense ).isEmpty() )
+                                    || licenseMap.get( dependencyLicense ).isEmpty() )
                             {
                                 continue;
                             }
@@ -998,7 +927,7 @@ public abstract class AbstractAddThirdPartyMojo
                                 continue;
                             }
 
-                            if ( getLicenseMap().get( otherLicense ).contains( dependency ) )
+                            if ( licenseMap.get( otherLicense ).contains( dependency ) )
                             {
                                 getLog().info( "License: '" + dependencyLicense + "' for '" + dependency + "'is OK "
                                                  + "since it is also licensed under '" + otherLicense + "'" );
@@ -1028,7 +957,7 @@ public abstract class AbstractAddThirdPartyMojo
             for ( String unsafeLicense : unsafeLicenses )
             {
 
-                SortedSet<MavenProject> deps = getLicenseMap().get( unsafeLicense );
+                SortedSet<MavenProject> deps = licenseMap.get( unsafeLicense );
                 if ( !deps.isEmpty() )
                 {
                     StringBuilder sb = new StringBuilder();
@@ -1052,7 +981,7 @@ public abstract class AbstractAddThirdPartyMojo
         if ( doGenerate )
         {
 
-            LicenseMap licenseMap1 = getLicenseMap();
+            LicenseMap licenseMap1 = licenseMap;
 
             if ( sortArtifactByName )
             {
@@ -1064,14 +993,13 @@ public abstract class AbstractAddThirdPartyMojo
         if ( doGenerateBundle )
         {
 
-            thirdPartyTool.writeBundleThirdPartyFile( thirdPartyFile, getOutputDirectory(), bundleThirdPartyPath );
+            thirdPartyTool.writeBundleThirdPartyFile( thirdPartyFile, outputDirectory, bundleThirdPartyPath );
         }
     }
 
     void overrideLicenses() throws IOException
     {
-        LicenseMap licenseMap1 = getLicenseMap();
-        thirdPartyTool.overrideLicenses( licenseMap1, projectDependencies, getEncoding(), resolvedOverrideUrl );
+        thirdPartyTool.overrideLicenses( licenseMap, projectDependencies, getEncoding(), resolvedOverrideUrl );
     }
 
     private boolean isFailOnMissing()
@@ -1087,16 +1015,16 @@ public abstract class AbstractAddThirdPartyMojo
     void checkMissing( boolean unsafe ) throws MojoFailureException
     {
 
-        if ( unsafe && ( isFailOnMissing() || isFailIfWarning() ) )
+        if ( unsafe && ( isFailOnMissing() || failIfWarning ) )
         {
             throw new MojoFailureException(
-                    "There are some dependencies with no license, please fill the file " + getMissingFile() );
+                    "There are some dependencies with no license, please fill the file " + missingFile );
         }
     }
 
     void checkBlacklist( boolean safeLicense ) throws MojoFailureException
     {
-        if ( !safeLicense && ( isFailOnBlacklist() || isFailIfWarning() ) )
+        if ( !safeLicense && ( isFailOnBlacklist() || failIfWarning ) )
         {
             throw new MojoFailureException( "There are some forbidden licenses used, please check your dependencies." );
         }
