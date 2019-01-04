@@ -129,7 +129,7 @@ public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo
     @Override
     protected boolean checkSkip()
     {
-        if ( !isDoGenerate() && !isDoGenerateBundle() )
+        if ( !doGenerate && !doGenerateBundle )
         {
 
             getLog().info( "All files are up to date, skip goal execution." );
@@ -221,7 +221,7 @@ public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo
 
             mojo.initFromMojo( this, reactorProject, new ArrayList<>( this.reactorProjects ) );
 
-            LicenseMap childLicenseMap = mojo.getLicenseMap();
+            LicenseMap childLicenseMap = mojo.licenseMap;
             if ( isVerbose() )
             {
                 getLog().info( String.format( "Found %d license(s) in module %s:%s",
@@ -250,7 +250,7 @@ public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo
 
         writeThirdPartyFile();
 
-        checkMissing( CollectionUtils.isNotEmpty( getUnsafeDependencies() ) );
+        checkMissing( CollectionUtils.isNotEmpty( unsafeDependencies ) );
     }
 
     // ----------------------------------------------------------------------
@@ -276,7 +276,7 @@ public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo
     {
 
         String path =
-            getMissingFile().getAbsolutePath().substring( getProject().getBasedir().getAbsolutePath().length() + 1 );
+            missingFile.getAbsolutePath().substring( getProject().getBasedir().getAbsolutePath().length() + 1 );
 
         if ( isVerbose() )
         {
@@ -284,8 +284,6 @@ public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo
         }
 
         SortedProperties unsafeMappings = new SortedProperties( getEncoding() );
-
-        LicenseMap licenseMap = getLicenseMap();
 
         for ( Object o : reactorProjects )
         {
@@ -296,8 +294,7 @@ public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo
             if ( file.exists() )
             {
 
-                SortedProperties tmp = getHelper().loadUnsafeMapping( licenseMap, file, null,
-                                                                      getProjectDependencies() );
+                SortedProperties tmp = getHelper().loadUnsafeMapping( licenseMap, file, null, projectDependencies );
                 unsafeMappings.putAll( tmp );
             }
 
