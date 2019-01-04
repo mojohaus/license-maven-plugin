@@ -20,6 +20,7 @@
           <name>Public Domain</name>
           <url>http://repository.jboss.org/licenses/cc0-1.0.txt</url>
           <distribution>repo</distribution>
+          <file>public domain - cc0-1.0.txt</file>
         </license>
       </licenses>
     </dependency>
@@ -32,6 +33,7 @@
           <name>Public Domain</name>
           <url>http://repository.jboss.org/licenses/cc0-1.0.txt</url>
           <distribution>repo</distribution>
+          <file>public domain - cc0-1.0.txt</file>
         </license>
       </licenses>
     </dependency>

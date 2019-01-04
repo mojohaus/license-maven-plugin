@@ -22,7 +22,7 @@ package org.codehaus.mojo.license.utils;
  * #L%
  */
 
-import org.apache.maven.model.License;
+import org.codehaus.mojo.license.model.ProjectLicense;
 import org.codehaus.mojo.license.model.ProjectLicenseInfo;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -99,7 +99,7 @@ public class LicenseSummaryWriter
         }
         else
         {
-            for ( License lic : dep.getLicenses() )
+            for ( ProjectLicense lic : dep.getLicenses() )
             {
                 licensesNode.appendChild( createLicenseNode( doc, lic ) );
             }
@@ -109,7 +109,7 @@ public class LicenseSummaryWriter
 
     }
 
-    public static Node createLicenseNode( Document doc, License lic )
+    public static Node createLicenseNode( Document doc, ProjectLicense lic )
     {
         Node licenseNode = doc.createElement( "license" );
 
@@ -132,6 +132,13 @@ public class LicenseSummaryWriter
             Node licDistNode = doc.createElement( "distribution" );
             licDistNode.appendChild( doc.createTextNode( lic.getDistribution() ) );
             licenseNode.appendChild( licDistNode );
+        }
+
+        if ( lic.getFile() != null )
+        {
+            Node licFileNode = doc.createElement( "file" );
+            licFileNode.appendChild( doc.createTextNode( lic.getFile() ) );
+            licenseNode.appendChild( licFileNode );
         }
 
         if ( lic.getComments() != null )
