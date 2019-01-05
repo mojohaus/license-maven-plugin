@@ -65,7 +65,7 @@ public class LicenseMap
 
     /**
      * Defines whether this license map was marked as sorted by name.
-     * 
+     *
      * @return flag
      */
     public boolean isSortedByName()
