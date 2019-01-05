@@ -683,15 +683,15 @@ public class DefaultThirdPartyTool
 
     private static Set<Map.Entry<MavenProject, String[]>> toSortedDependencyMapIfMarked( LicenseMap licenseMap )
     {
-        
+
         Set<Map.Entry<MavenProject, String[]>> entrySet = licenseMap.toDependencyMap().entrySet();
-        
+
         if ( licenseMap.isSortedByName() )
         {
             Comparator<Map.Entry<MavenProject, ?>> comparator = MojoHelper.newMavenProjectEntryComparatorByName();
             Set<Map.Entry<MavenProject, String[]>> sorted = new TreeSet<>( comparator );
             sorted.addAll( entrySet );
-            
+
             return sorted;
         }
         else
