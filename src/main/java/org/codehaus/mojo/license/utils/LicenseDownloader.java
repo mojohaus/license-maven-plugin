@@ -125,7 +125,7 @@ public class LicenseDownloader
 
         if ( loginPassword != null )
         {
-            connection.setRequestProperty( "Proxy-Authorization", loginPassword );
+            connection.setRequestProperty( "Proxy-Authorization", "Basic " + loginPassword.trim() );
         }
         connection.setConnectTimeout( DEFAULT_CONNECTION_TIMEOUT );
         connection.setReadTimeout( DEFAULT_CONNECTION_TIMEOUT );
