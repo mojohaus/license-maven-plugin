@@ -1,5 +1,7 @@
 package org.codehaus.mojo.license.utils;
 
+import org.codehaus.mojo.license.model.ProjectLicense;
+
 /*
  * #%L
  * License Maven Plugin
@@ -22,7 +24,6 @@ package org.codehaus.mojo.license.utils;
  * #L%
  */
 
-import org.apache.maven.model.License;
 import org.codehaus.mojo.license.model.ProjectLicenseInfo;
 import org.junit.Assert;
 import org.junit.Test;
@@ -64,6 +65,14 @@ public class LicenseSummaryTest
         Assert.assertEquals( "junk", dep.getArtifactId() );
         Assert.assertEquals( "1.1", dep.getVersion() );
 
+        List<ProjectLicense> licenses = dep.getLicenses();
+        Assert.assertEquals( 1, licenses.size() );
+        ProjectLicense lic0 = dep.getLicenses().get(0);
+        Assert.assertEquals( "lgpl", lic0.getName() );
+        Assert.assertEquals( "http://www.gnu.org/licenses/lgpl-3.0.txt", lic0.getUrl() );
+        Assert.assertEquals( "lgpl-3.0.txt", lic0.getFile() );
+        Assert.assertEquals( "lgpl version 3.0", lic0.getComments() );
+
     }
 
     /**
@@ -85,9 +94,10 @@ public class LicenseSummaryTest
         ProjectLicenseInfo dep1 = new ProjectLicenseInfo( "org.test", "test1", "1.0" );
         ProjectLicenseInfo dep2 = new ProjectLicenseInfo( "org.test", "test2", "2.0" );
 
-        License lic = new License();
+        ProjectLicense lic = new ProjectLicense();
         lic.setName( "lgpl" );
         lic.setUrl( "http://www.gnu.org/licenses/lgpl-3.0.txt" );
+        lic.setFile( "lgpl-3.0.txt" );
         lic.setComments( "lgpl version 3.0" );
         dep1.addLicense( lic );
         dep2.addLicense( lic );
@@ -107,6 +117,14 @@ public class LicenseSummaryTest
         Assert.assertEquals( "org.test", dep.getGroupId() );
         Assert.assertEquals( "test1", dep.getArtifactId() );
         Assert.assertEquals( "1.0", dep.getVersion() );
+
+        List<ProjectLicense> licenses = dep.getLicenses();
+        Assert.assertEquals( 1, licenses.size() );
+        ProjectLicense lic0 = dep.getLicenses().get(0);
+        Assert.assertEquals( "lgpl", lic0.getName() );
+        Assert.assertEquals( "http://www.gnu.org/licenses/lgpl-3.0.txt", lic0.getUrl() );
+        Assert.assertEquals( "lgpl-3.0.txt", lic0.getFile() );
+        Assert.assertEquals( "lgpl version 3.0", lic0.getComments() );
 
     }
 }

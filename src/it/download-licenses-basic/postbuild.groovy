@@ -42,7 +42,12 @@ def assertContains(file, content, expected)
 file = new File(basedir, 'target/generated-resources/licenses/eclipse public license 1.0 - epl-v10.html');
 assertExistsFile(file);
 
-file = new File(basedir, 'target/generated-resources/licenses.xml');
-assertExistsFile(file);
+def licenseFile = new File(basedir, 'target/generated-resources/licenses.xml');
+assertExistsFile(licenseFile);
+// the dependencies in the licenses.xml file may come in any order
+String expectedContentOrdering1 = new File(basedir, 'expected_licenses_ordering_1.xml').getText('UTF-8');
+String expectedContentOrdering2 = new File(basedir, 'expected_licenses_ordering_2.xml').getText('UTF-8');
+String actualContent = licenseFile.getText('UTF-8');
+assert (expectedContentOrdering1 == actualContent || expectedContentOrdering2 == actualContent) : "${licenseFile} has unexpected content"
 
 return true;

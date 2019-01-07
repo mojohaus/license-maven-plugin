@@ -33,6 +33,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Proxy;
 import org.codehaus.mojo.license.api.DependenciesTool;
 import org.codehaus.mojo.license.api.MavenProjectDependenciesConfigurator;
+import org.codehaus.mojo.license.model.ProjectLicense;
 import org.codehaus.mojo.license.model.ProjectLicenseInfo;
 import org.codehaus.mojo.license.utils.FileUtil;
 import org.codehaus.mojo.license.utils.LicenseDownloader;
@@ -51,7 +52,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -259,10 +259,11 @@ public abstract class AbstractDownloadLicensesMojo
     // ----------------------------------------------------------------------
 
     /**
-     * Keeps a collection of the URLs of the licenses that have been downlaoded. This helps the plugin to avoid
-     * downloading the same license multiple times.
+     * A map from the license URLs to file names (without path) where the
+     * licenses were downloaded. This helps the plugin to avoid downloading
+     * the same license multiple times.
      */
-    private Set<String> downloadedLicenseURLs = new HashSet<>();
+    private Map<String, File> downloadedLicenseURLs = new HashMap<>();
 
     /**
      * Proxy Login/Password encoded(only if usgin a proxy with authentication).
@@ -558,10 +559,11 @@ public abstract class AbstractDownloadLicensesMojo
                 configuredDepLicensesMap.put( dep.getId(), dep );
                 if ( previouslyDownloaded )
                 {
-                    for ( License license : dep.getLicenses() )
+                    for ( ProjectLicense license : dep.getLicenses() )
                     {
                         // Save the URL so we don't download it again
-                        downloadedLicenseURLs.add( license.getUrl() );
+                        downloadedLicenseURLs.put( license.getUrl(),
+                                new File( licensesOutputDirectory, license.getFile() ) );
                     }
                 }
             }
@@ -601,7 +603,7 @@ public abstract class AbstractDownloadLicensesMojo
         List<?> licenses = depMavenProject.getLicenses();
         for ( Object license : licenses )
         {
-            dependencyProject.addLicense( (License) license );
+            dependencyProject.addLicense( new ProjectLicense( (License) license ) );
         }
         return dependencyProject;
     }
@@ -615,9 +617,14 @@ public abstract class AbstractDownloadLicensesMojo
      * @return A filename to be used for the downloaded license file
      * @throws MalformedURLException if the license url is malformed
      */
-    private String getLicenseFileName( ProjectLicenseInfo depProject, License license )
+    private String getLicenseFileName( ProjectLicenseInfo depProject, ProjectLicense license )
         throws MalformedURLException
     {
+        if ( license.getFile() != null )
+        {
+            return new File( license.getFile() ).getName();
+        }
+
         String defaultExtension = ".txt";
 
         URL licenseUrl = new URL( license.getUrl() );
@@ -664,7 +671,7 @@ public abstract class AbstractDownloadLicensesMojo
     {
         getLog().debug( "Downloading license(s) for project " + depProject );
 
-        List<License> licenses = depProject.getLicenses();
+        List<ProjectLicense> licenses = depProject.getLicenses();
 
         if ( depProject.getLicenses() == null || depProject.getLicenses().isEmpty() )
         {
@@ -675,25 +682,33 @@ public abstract class AbstractDownloadLicensesMojo
             return;
         }
 
-        for ( License license : licenses )
+        for ( ProjectLicense license : licenses )
         {
             try
             {
-                String licenseFileName = getLicenseFileName( depProject, license );
-
-                File licenseOutputFile = new File( licensesOutputDirectory, licenseFileName );
-                if ( licenseOutputFile.exists() )
-                {
-                    continue;
-                }
-
                 String licenseUrl = license.getUrl();
-
-                if ( !downloadedLicenseURLs.contains( licenseUrl ) || organizeLicensesByDependencies )
+                File licenseOutputFile = downloadedLicenseURLs.get( licenseUrl );
+                if ( licenseOutputFile == null )
                 {
-                    LicenseDownloader.downloadLicense( licenseUrl, proxyLoginPasswordEncoded, licenseOutputFile );
-                    downloadedLicenseURLs.add( licenseUrl );
+                    String licenseFileName = getLicenseFileName( depProject, license );
+                    licenseOutputFile = new File( licensesOutputDirectory, licenseFileName );
                 }
+
+                if ( !licenseOutputFile.exists() )
+                {
+                    if ( !downloadedLicenseURLs.containsKey( licenseUrl ) || organizeLicensesByDependencies )
+                    {
+                        licenseOutputFile = LicenseDownloader.downloadLicense( licenseUrl, proxyLoginPasswordEncoded,
+                                licenseOutputFile );
+                        downloadedLicenseURLs.put( licenseUrl, licenseOutputFile );
+                    }
+                }
+
+                if ( licenseOutputFile != null )
+                {
+                    license.setFile( licenseOutputFile.getName() );
+                }
+
             }
             catch ( MalformedURLException e )
             {

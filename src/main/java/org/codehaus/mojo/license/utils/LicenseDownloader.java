@@ -45,50 +45,55 @@ public class LicenseDownloader
      */
     public static final int DEFAULT_CONNECTION_TIMEOUT = 5000;
 
-    public static void downloadLicense( String licenseUrlString, String loginPassword, File outputFile )
+    /**
+     * Downloads a license file from the given {@code licenseUrlString} stores it locally and
+     * returns the local path where the license file was stored. Note that the
+     * {@code outputFile} name can be further modified by this method, esp. the file extension
+     * can be adjusted based on the mime type of the HTTP response.
+     *
+     * @param licenseUrlString the URL
+     * @param loginPassword the credentials part for the URL, can be {@code null}
+     * @param outputFile a hint where to store the license file
+     * @return the path to the file where the downloaded license file was stored
+     * @throws IOException
+     */
+    public static File downloadLicense( String licenseUrlString, String loginPassword, File outputFile )
         throws IOException
     {
         if ( licenseUrlString == null || licenseUrlString.length() == 0 )
         {
-            return;
+            return outputFile;
         }
 
-        InputStream licenseInputStream = null;
-        FileOutputStream fos = null;
+        URLConnection connection = newConnection( licenseUrlString, loginPassword );
 
-        try
+        boolean redirect = false;
+        if ( connection instanceof HttpURLConnection )
         {
-            URLConnection connection = newConnection( licenseUrlString, loginPassword );
+            int status = ( (HttpURLConnection) connection ).getResponseCode();
 
-            boolean redirect = false;
-            if ( connection instanceof HttpURLConnection )
-            {
-                int status = ( (HttpURLConnection) connection ).getResponseCode();
-
-                redirect = HttpURLConnection.HTTP_MOVED_TEMP == status || HttpURLConnection.HTTP_MOVED_PERM == status
-                        || HttpURLConnection.HTTP_SEE_OTHER == status;
-            }
-
-            if ( redirect )
-            {
-                // get redirect url from "location" header field
-                String newUrl = connection.getHeaderField( "Location" );
-
-                // open the new connnection again
-                connection = newConnection( newUrl, loginPassword );
-
-            }
-
-            licenseInputStream = connection.getInputStream();
-            fos = new FileOutputStream( updateFileExtension( outputFile, connection.getContentType() ) );
-            copyStream( licenseInputStream, fos );
-            licenseInputStream.close();
-            fos.close();
+            redirect = HttpURLConnection.HTTP_MOVED_TEMP == status || HttpURLConnection.HTTP_MOVED_PERM == status
+                    || HttpURLConnection.HTTP_SEE_OTHER == status;
         }
-        finally
+
+        if ( redirect )
         {
-            FileUtil.tryClose( licenseInputStream );
-            FileUtil.tryClose( fos );
+            // get redirect url from "location" header field
+            String newUrl = connection.getHeaderField( "Location" );
+
+            // open the new connnection again
+            connection = newConnection( newUrl, loginPassword );
+
+        }
+
+        try ( InputStream licenseInputStream = connection.getInputStream() )
+        {
+            File updatedFile = updateFileExtension( outputFile, connection.getContentType() );
+            try ( FileOutputStream fos = new FileOutputStream( updatedFile ) )
+            {
+                copyStream( licenseInputStream, fos );
+            }
+            return updatedFile;
         }
 
     }

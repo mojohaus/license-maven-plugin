@@ -315,8 +315,8 @@ public class DefaultThirdPartyHelper
                         throw new MojoFailureException(
                                 "The license " + licenseToAdd + " was already registered in the "
                                         + "configuration, please use only one such entry as described in the example "
-                                        + "http://mojo.codehaus.org/license-maven-plugin/examples/"
-                                        + "example-thirdparty.html#Merge_licenses." );
+                                        + "http://mojohaus.org/license-maven-plugin/examples/"
+                                        + "example-thirdparty.html#Merge_licenses" );
                     }
 
                     // can add this license for merge

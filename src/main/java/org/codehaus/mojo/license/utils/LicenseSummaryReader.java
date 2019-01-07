@@ -22,7 +22,7 @@ package org.codehaus.mojo.license.utils;
  * #L%
  */
 
-import org.apache.maven.model.License;
+import org.codehaus.mojo.license.model.ProjectLicense;
 import org.codehaus.mojo.license.model.ProjectLicenseInfo;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -114,7 +114,7 @@ public class LicenseSummaryReader
                     Node licensesChildNode = licensesChildNodes.item( j );
                     if ( licensesChildNode.getNodeName().equals( "license" ) )
                     {
-                        License license = parseLicense( licensesChildNode );
+                        ProjectLicense license = parseLicense( licensesChildNode );
                         dependency.addLicense( license );
                     }
                 }
@@ -123,9 +123,9 @@ public class LicenseSummaryReader
         return dependency;
     }
 
-    private static License parseLicense( Node licenseNode )
+    private static ProjectLicense parseLicense( Node licenseNode )
     {
-        License license = new License();
+        ProjectLicense license = new ProjectLicense();
         NodeList licenseElements = licenseNode.getChildNodes();
         for ( int i = 0; i < licenseElements.getLength(); ++i )
         {
@@ -145,6 +145,10 @@ public class LicenseSummaryReader
             else if ( node.getNodeName().equals( "comments" ) )
             {
                 license.setComments( node.getTextContent() );
+            }
+            else if ( node.getNodeName().equals( "file" ) )
+            {
+                license.setFile( node.getTextContent() );
             }
         }
         return license;
