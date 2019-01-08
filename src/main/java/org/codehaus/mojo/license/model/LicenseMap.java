@@ -58,7 +58,12 @@ public class LicenseMap
      */
     public LicenseMap()
     {
-        projectComparator = MojoHelper.newMavenProjectComparator();
+        this( MojoHelper.newMavenProjectComparator() );
+    }
+
+    public LicenseMap( Comparator<MavenProject> projectComparator )
+    {
+        this.projectComparator = projectComparator;
     }
 
     /**
@@ -148,17 +153,8 @@ public class LicenseMap
 
     public LicenseMap toLicenseMapOrderByName()
     {
-        LicenseMap result = new LicenseMap();
-
-        Comparator<MavenProject> mavenProjectComparator = MojoHelper.newMavenProjectComparatorByName();
-        for ( Map.Entry<String, SortedSet<MavenProject>> entry : entrySet() )
-        {
-            String licenseKey = entry.getKey();
-            SortedSet<MavenProject> projects =
-                    new TreeSet<>( mavenProjectComparator );
-            projects.addAll( entry.getValue() );
-            result.put( licenseKey, projects );
-        }
+        LicenseMap result = new LicenseMap( MojoHelper.newMavenProjectComparatorByName() );
+        result.putAll( this );
         return result;
     }
 
