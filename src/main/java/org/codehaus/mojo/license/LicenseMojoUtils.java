@@ -38,13 +38,14 @@ import org.codehaus.mojo.license.utils.HttpRequester;
  */
 public final class LicenseMojoUtils
 {
+    /** A special {@link URL} singleton to pass the information that the URL was not set. */
     static final URL NO_URL;
     static final String DEFAULT_OVERRIDE_THIRD_PARTY = "src/license/override-THIRD-PARTY.properties";
 
     static {
         try
         {
-            NO_URL = new URL( "file:///dev/null" );
+            NO_URL = new URL( "file:///inexistent" );
         }
         catch ( MalformedURLException e )
         {
@@ -57,6 +58,15 @@ public final class LicenseMojoUtils
      */
     private LicenseMojoUtils()
     {
+    }
+
+    /**
+     * @param url the {@link URL} to check
+     * @return {@code url != null && url != NO_URL}
+     */
+    public static boolean isValid( URL url )
+    {
+        return url != null && url != NO_URL;
     }
 
     /**

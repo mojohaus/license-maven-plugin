@@ -55,6 +55,7 @@ import org.apache.maven.model.License;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
+import org.codehaus.mojo.license.LicenseMojoUtils;
 import org.codehaus.mojo.license.model.LicenseMap;
 import org.codehaus.mojo.license.utils.FileUtil;
 import org.codehaus.mojo.license.utils.HttpRequester;
@@ -614,38 +615,41 @@ public class DefaultThirdPartyTool
     public void overrideLicenses( LicenseMap licenseMap, SortedMap<String, MavenProject> artifactCache, String encoding,
             URL overrideUrl ) throws IOException
     {
-        final SortedProperties overrideMappings = new SortedProperties( encoding );
-        try ( InputStream input = overrideUrl.openStream() )
+        if ( LicenseMojoUtils.isValid( overrideUrl ) )
         {
-            overrideMappings.load( input );
-        }
-        for ( Object o : overrideMappings.keySet() )
-        {
-            String id = (String) o;
-
-            MavenProject project = artifactCache.get( id );
-            if ( project == null )
+            final SortedProperties overrideMappings = new SortedProperties( encoding );
+            try ( InputStream input = overrideUrl.openStream() )
             {
-                getLogger().warn( "dependency [" + id + "] does not exist in project." );
-                continue;
+                overrideMappings.load( input );
             }
-
-            String license = (String) overrideMappings.get( id );
-
-            String[] licenses = StringUtils.split( license, '|' );
-
-            if ( ArrayUtils.isEmpty( licenses ) )
+            for ( Object o : overrideMappings.keySet() )
             {
+                String id = (String) o;
 
-                // empty license means not fill, skip it
-                continue;
+                MavenProject project = artifactCache.get( id );
+                if ( project == null )
+                {
+                    getLogger().warn( "dependency [" + id + "] does not exist in project." );
+                    continue;
+                }
+
+                String license = (String) overrideMappings.get( id );
+
+                String[] licenses = StringUtils.split( license, '|' );
+
+                if ( ArrayUtils.isEmpty( licenses ) )
+                {
+
+                    // empty license means not fill, skip it
+                    continue;
+                }
+
+                licenseMap.removeProject( project );
+
+                // add license in map
+                addLicense( licenseMap, project, licenses );
+
             }
-
-            licenseMap.removeProject( project );
-
-            // add license in map
-            addLicense( licenseMap, project, licenses );
-
         }
     }
 
