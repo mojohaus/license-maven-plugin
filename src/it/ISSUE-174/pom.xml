@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.codehaus.mojo.license.test</groupId>
+  <artifactId>ISSUE-174</artifactId>
+  <version>@pom.version@</version>
+
+  <name>Test ISSUE-174</name>
+  <url>http://www.mojohaus.org</url>
+
+  <organization>
+    <name>MojoHaus</name>
+  </organization>
+
+  <licenses>
+    <license>
+      <name>The GNU Lesser General Public License, Version 3.0</name>
+      <url>http://www.gnu.org/licenses/lgpl-3.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <license.useJavaNoReformatCommentStartTag>true</license.useJavaNoReformatCommentStartTag>
+    <license.licenseName>gpl_v3</license.licenseName>
+  </properties>
+
+  <inceptionYear>2019</inceptionYear>
+
+  <dependencies>
+    <dependency>
+      <groupId>groovy</groupId>
+      <artifactId>groovy-all</artifactId>
+      <version>1.0-jsr-04</version>
+    </dependency>
+    <dependency>
+      <groupId>nanocontainer</groupId>
+      <artifactId>nanocontainer-remoting</artifactId>
+      <version>1.0-RC-1</version>
+      <exclusions>
+        <exclusion>
+          <groupId>picocontainer</groupId>
+          <artifactId>picocontainer</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>picocontainer</groupId>
+          <artifactId>picocontainer-gems</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>picocontainer</groupId>
+          <artifactId>picocontainer-tck</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>license-maven-plugin</artifactId>
+          <version>@pom.version@</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+</project>
