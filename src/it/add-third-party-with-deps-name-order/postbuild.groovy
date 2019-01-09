@@ -20,17 +20,20 @@
  * #L%
  */
 
+antlr = '(Unknown license) antlr (antlr:antlr:2.7.1 - no url defined)'
 commonsLang = '(Apache License, Version 2.0) Apache Commons Lang (org.apache.commons:commons-lang3:3.8.1 - http://commons.apache.org/proper/commons-lang/)'
 commonsLogging = '(The Apache Software License, Version 2.0) Commons Logging (commons-logging:commons-logging:1.1.1 - http://commons.apache.org/logging)'
 
 file = new File(basedir, 'target/generated-sources/license/third.txt');
 assert file.exists();
 content = file.text;
-assert content.contains(commonsLang);
+assert content.contains(antlr);
+assert content.indexOf(antlr) < content.indexOf(commonsLogging);
 assert content.indexOf(commonsLang) < content.indexOf(commonsLogging);
 
 file = new File(basedir, 'target/generated-sources/license/test/third.txt');
 assert file.exists();
 content = file.text;
-assert content.contains(commonsLang);
+assert content.contains(antlr);
+assert content.indexOf(antlr) < content.indexOf(commonsLogging);
 assert content.indexOf(commonsLang) < content.indexOf(commonsLogging);

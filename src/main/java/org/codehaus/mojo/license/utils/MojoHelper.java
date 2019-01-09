@@ -134,7 +134,7 @@ public class MojoHelper
 
                 String id1 = getProjectName( o1 );
                 String id2 = getProjectName( o2 );
-                return id1.compareTo( id2 );
+                return id1.compareToIgnoreCase( id2 );
             }
         };
 
