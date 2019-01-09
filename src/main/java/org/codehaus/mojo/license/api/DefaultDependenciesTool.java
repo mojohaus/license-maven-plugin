@@ -257,6 +257,23 @@ public class DefaultDependenciesTool
                     depMavenProject =
                         mavenProjectBuilder.buildFromRepository( artifact, remoteRepositories, localRepository, true );
                     depMavenProject.getArtifact().setScope( artifact.getScope() );
+
+                    // In case maven-metadata.xml has different artifactId, groupId or version.
+                    if ( !depMavenProject.getGroupId().equals( artifact.getGroupId() ) )
+                    {
+                        depMavenProject.setGroupId( artifact.getGroupId() );
+                        depMavenProject.getArtifact().setGroupId( artifact.getGroupId() );
+                    }
+                    if ( !depMavenProject.getArtifactId().equals( artifact.getArtifactId() ) )
+                    {
+                        depMavenProject.setArtifactId( artifact.getArtifactId() );
+                        depMavenProject.getArtifact().setArtifactId( artifact.getArtifactId() );
+                    }
+                    if ( !depMavenProject.getVersion().equals( artifact.getVersion() ) )
+                    {
+                        depMavenProject.setVersion( artifact.getVersion() );
+                        depMavenProject.getArtifact().setVersion( artifact.getVersion() );
+                    }
                 }
                 catch ( ProjectBuildingException e )
                 {
