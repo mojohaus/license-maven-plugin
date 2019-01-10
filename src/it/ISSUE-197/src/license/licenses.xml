@@ -1,0 +1,27 @@
+<licenseSummary>
+  <dependencies>
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <licenses>
+        <license>
+          <name>Apache License 2.0</name>
+          <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+      </licenses>
+    </dependency>
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-api</artifactId>
+      <licenses>
+        <license>
+          <!-- In reality, hamcrest-api has BSD license http://www.opensource.org/licenses/bsd-license.php
+               This is just for the sake of testing the overrides -->
+          <name>Apache License 2.0</name>
+          <url>http://www.apache.org/licenses/LICENSE-1.1</url>
+          <file>asl-1.1.txt</file>
+        </license>
+      </licenses>
+    </dependency>
+  </dependencies>
+</licenseSummary>
