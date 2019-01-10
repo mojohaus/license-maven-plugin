@@ -11,8 +11,8 @@
   <artifactId>PR-33-child1</artifactId>
   <licenses>
     <license>
-      <name>LGPL 3.0</name>
-      <url>http://jaxx.nuiton.org/v/latest/license.html</url>
+      <name>LGPL 2.1</name>
+      <url>https://www.gnu.org/licenses/lgpl-2.1.txt</url>
     </license>
   </licenses>
 

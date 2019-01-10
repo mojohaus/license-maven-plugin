@@ -31,6 +31,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 
+import org.apache.maven.plugin.logging.Log;
+
 /**
  * Utilities for downloading remote license files.
  *
@@ -54,10 +56,11 @@ public class LicenseDownloader
      * @param licenseUrlString the URL
      * @param loginPassword the credentials part for the URL, can be {@code null}
      * @param outputFile a hint where to store the license file
+     * @param log
      * @return the path to the file where the downloaded license file was stored
      * @throws IOException
      */
-    public static File downloadLicense( String licenseUrlString, String loginPassword, File outputFile )
+    public static File downloadLicense( String licenseUrlString, String loginPassword, File outputFile, Log log )
         throws IOException
     {
         if ( licenseUrlString == null || licenseUrlString.length() == 0 )
@@ -72,6 +75,8 @@ public class LicenseDownloader
         {
             int status = ( (HttpURLConnection) connection ).getResponseCode();
 
+            log.debug( String.format( "Got HTTP response %d for URL '%s'", status, licenseUrlString ) );
+
             redirect = HttpURLConnection.HTTP_MOVED_TEMP == status || HttpURLConnection.HTTP_MOVED_PERM == status
                     || HttpURLConnection.HTTP_SEE_OTHER == status;
         }
@@ -83,6 +88,12 @@ public class LicenseDownloader
 
             // open the new connnection again
             connection = newConnection( newUrl, loginPassword );
+
+            if ( connection instanceof HttpURLConnection )
+            {
+                int status = ( (HttpURLConnection) connection ).getResponseCode();
+                log.debug( String.format( "Got HTTP response %d for URL '%s'", status, licenseUrlString ) );
+            }
 
         }
 
