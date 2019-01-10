@@ -585,9 +585,16 @@ public abstract class AbstractDownloadLicensesMojo
                 {
                     for ( ProjectLicense license : dep.getLicenses() )
                     {
-                        // Save the URL so we don't download it again
-                        downloadedLicenseURLs.put( license.getUrl(),
-                                new File( licensesOutputDirectory, license.getFile() ) );
+                        final String fileName = license.getFile();
+                        if ( fileName != null )
+                        {
+                            final File licenseFile = new File( licensesOutputDirectory, fileName );
+                            if ( licenseFile.exists() )
+                            {
+                                // Save the URL so we don't download it again
+                                downloadedLicenseURLs.put( license.getUrl(), licenseFile );
+                            }
+                        }
                     }
                 }
             }
