@@ -42,8 +42,6 @@ import org.junit.Test;
  */
 public class FreeMarkerHelperTest
 {
-    private final String LS = System.getProperty( "line.separator" );
-
     /**
      * Logger.
      */
@@ -150,9 +148,7 @@ public class FreeMarkerHelperTest
 
         String s =
             helper.renderTemplate( "/org/codehaus/mojo/license/default-file-header-description.ftl", properties );
-        Assert.assertEquals( "projectName" + LS +
-                                 "$Id:" + "$" + LS +
-                                 "$HeadURL:" + "$", s );
+        Assert.assertEquals( "projectName\n$Id:$\n$HeadURL:$", s );
         if ( log.isInfoEnabled() )
         {
             log.info( s );
