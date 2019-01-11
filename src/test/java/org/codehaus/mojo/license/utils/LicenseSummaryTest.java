@@ -1,5 +1,6 @@
 package org.codehaus.mojo.license.utils;
 
+import org.codehaus.mojo.license.Eol;
 import org.codehaus.mojo.license.model.ProjectLicense;
 
 /*
@@ -35,6 +36,7 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -107,7 +109,7 @@ public class LicenseSummaryTest
 
         File licenseSummaryFile = File.createTempFile( "licSummary", "tmp" );
         // File licenseSummaryFile = new File( "src/test/resources/license-summary-test-2.xml" );
-        LicenseSummaryWriter.writeLicenseSummary( licSummary, licenseSummaryFile );
+        LicenseSummaryWriter.writeLicenseSummary( licSummary, licenseSummaryFile, StandardCharsets.UTF_8, Eol.LF );
 
         Assert.assertTrue( licenseSummaryFile.exists() );
         FileInputStream fis = new FileInputStream( licenseSummaryFile );

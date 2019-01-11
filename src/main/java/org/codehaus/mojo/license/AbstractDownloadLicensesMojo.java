@@ -48,6 +48,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -113,6 +115,30 @@ public abstract class AbstractDownloadLicensesMojo
     @Parameter( property = "licensesOutputFile",
         defaultValue = "${project.build.directory}/generated-resources/licenses.xml" )
     private File licensesOutputFile;
+
+    /**
+     * An end of line constant name denoting the EOL string to use when redering the {@code licenses.xml} file.
+     * Possible values are {@code LF}, {@code CRLF}, {@code AUTODETECT} and {@code PLATFORM}.
+     * <p>
+     * When the value {@code AUTODETECT} is used, the mojo will use whatever EOL value is used in the first existing of
+     * the following files: {@link #licensesConfigFile}, <code>${basedir}/pom.xml</code>.
+     * <p>
+     * The value {@code PLATFORM} is deprecated but still kept for backwards compatibility reasons.
+     *
+     * @since 1.17
+     */
+    @Parameter( property = "licensesOutputFileEol", defaultValue = "AUTODETECT" )
+    private Eol licensesOutputFileEol;
+
+    /**
+     * Encoding used to (1) read the file specified in {@link #licensesConfigFile} and (2) write the file specified in
+     * {@link #licensesOutputFile}.
+     *
+     * @since 1.17
+     */
+    @Parameter( property = "licensesOutputFileEncoding", defaultValue = "${project.build.sourceEncoding}" )
+    private String licensesOutputFileEncoding;
+
 
     /**
      * A filter to exclude some scopes.
@@ -373,7 +399,24 @@ public abstract class AbstractDownloadLicensesMojo
                 {
                     depProjectLicenses = sortByGroupIdAndArtifactId( depProjectLicenses );
                 }
-                LicenseSummaryWriter.writeLicenseSummary( depProjectLicenses, licensesOutputFile );
+
+                if ( licensesOutputFileEncoding == null )
+                {
+                    licensesOutputFileEncoding = System.getProperty( "file.encoding" );
+                    getLog().warn( "Using the default system encoding for reading or writing licenses.xml file."
+                            + " This makes your build platform dependent. You should set either"
+                            + " project.build.sourceEncoding or licensesOutputFileEncoding" );
+                }
+                final Charset charset = Charset.forName( licensesOutputFileEncoding );
+                if ( licensesOutputFileEol == Eol.AUTODETECT )
+                {
+                    final Path autodetectFromFile = licensesConfigFile.exists() ? licensesConfigFile.toPath()
+                            : project.getBasedir().toPath().resolve( "pom.xml" );
+                    licensesOutputFileEol = Eol.autodetect( autodetectFromFile, charset );
+                }
+
+                LicenseSummaryWriter.writeLicenseSummary( depProjectLicenses, licensesOutputFile,
+                        charset, licensesOutputFileEol );
             }
             catch ( Exception e )
             {

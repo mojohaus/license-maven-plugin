@@ -22,6 +22,7 @@ package org.codehaus.mojo.license.utils;
  * #L%
  */
 
+import org.codehaus.mojo.license.Eol;
 import org.codehaus.mojo.license.model.ProjectLicense;
 import org.codehaus.mojo.license.model.ProjectLicenseInfo;
 import org.w3c.dom.Document;
@@ -31,13 +32,16 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Result;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.util.List;
 
 /**
@@ -49,8 +53,9 @@ import java.util.List;
  */
 public class LicenseSummaryWriter
 {
-    public static void writeLicenseSummary( List<ProjectLicenseInfo> dependencies, File outputFile )
-        throws ParserConfigurationException, TransformerException
+    public static void writeLicenseSummary( List<ProjectLicenseInfo> dependencies, File outputFile, Charset charset,
+            Eol eol )
+        throws ParserConfigurationException, TransformerException, IOException
     {
         DocumentBuilderFactory fact = DocumentBuilderFactory.newInstance();
         DocumentBuilder parser = fact.newDocumentBuilder();
@@ -67,13 +72,19 @@ public class LicenseSummaryWriter
         }
 
         // Prepare the output file File
-        Result result = new StreamResult( outputFile.toURI().getPath() );
+        try ( StringWriter sw = new StringWriter() )
+        {
+            Transformer xformer = TransformerFactory.newInstance().newTransformer();
+            xformer.setOutputProperty( OutputKeys.INDENT, "yes" );
+            xformer.setOutputProperty( "{http://xml.apache.org/xslt}indent-amount", "2" );
+            xformer.transform( new DOMSource( doc ), new StreamResult( sw ) );
 
-        // Write the DOM document to the file
-        Transformer xformer = TransformerFactory.newInstance().newTransformer();
-        xformer.setOutputProperty( OutputKeys.INDENT, "yes" );
-        xformer.setOutputProperty( "{http://xml.apache.org/xslt}indent-amount", "2" );
-        xformer.transform( new DOMSource( doc ), result );
+            final String platformEol = Eol.PLATFORM.getEolString();
+            final String outputString = !platformEol.equals( eol.getEolString() )
+                        ? sw.toString().replace( platformEol, eol.getEolString() )
+                        : sw.toString();
+            Files.write( outputFile.toPath(), outputString.getBytes( charset ) );
+        }
     }
 
     public static Node createDependencyNode( Document doc, ProjectLicenseInfo dep )
