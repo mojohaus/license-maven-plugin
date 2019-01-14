@@ -58,6 +58,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.regex.Pattern;
+
 import org.codehaus.mojo.license.api.ResolvedProjectDependencies;
 
 /**
@@ -267,6 +269,37 @@ public abstract class AbstractDownloadLicensesMojo
      */
     @Parameter( defaultValue = "${project}", readonly = true )
     private MavenProject project;
+
+    /**
+     * List of regexps/replacements applied to the license urls prior to download.
+     *
+     * <p>License urls that match a regular expression will be replaced by the corresponding
+     * replacement. Replacement is performed with {@link java.util.regex.Matcher#replaceAll(String)
+     * java.util.regex.Matcher#replaceAll(String)} so you can take advantage of
+     * capturing groups to facilitate flexible transformations.</p>
+     *
+     * <p>If the replacement element is omitted, this is equivalent to an empty replacement string.</p>
+     *
+     * <pre>
+     * {@code
+     *
+     * <licenseUrlReplacements>
+     *   <licenseUrlReplacement>
+     *     <regexp>\Qhttps://glassfish.java.net/public/CDDL+GPL_1_1.html\E</regexp>
+     *     <replacement>https://oss.oracle.com/licenses/CDDL+GPL-1.1</replacement>
+     *   </licenseUrlReplacement>
+     *   <licenseUrlReplacement>
+     *      <regexp>https://(.*)</regexp>
+     *      <replacement>http://$1</replacement>
+     *   </licenseUrlReplacement>
+     * </licenseUrlReplacements>
+     * }
+     * </pre>
+     *
+     * @since 1.17
+     */
+    @Parameter
+    private List<LicenseUrlReplacement> licenseUrlReplacements;
 
     // ----------------------------------------------------------------------
     // Plexus Components
@@ -687,21 +720,14 @@ public abstract class AbstractDownloadLicensesMojo
      * license (if available) and the remote filename of the license.
      *
      * @param depProject the project containing the license
-     * @param license    the license
+     * @param licenseUrl the license url
+     * @param licenseName the license name
      * @return A filename to be used for the downloaded license file
-     * @throws MalformedURLException if the license url is malformed
      */
-    private String getLicenseFileName( ProjectLicenseInfo depProject, ProjectLicense license )
-        throws MalformedURLException
+    private String getLicenseFileName( ProjectLicenseInfo depProject, final URL licenseUrl, final String licenseName )
     {
-        if ( license.getFile() != null )
-        {
-            return new File( license.getFile() ).getName();
-        }
-
         String defaultExtension = ".txt";
 
-        URL licenseUrl = new URL( license.getUrl() );
         File licenseUrlFile = new File( licenseUrl.getPath() );
 
         String licenseFileName;
@@ -709,17 +735,18 @@ public abstract class AbstractDownloadLicensesMojo
         if ( organizeLicensesByDependencies )
         {
             licenseFileName = String.format( "%s.%s%s", depProject.getGroupId(), depProject.getArtifactId(),
-                                             license.getName() != null
-                                                 ? "_" + license.getName()
+                                             licenseName != null
+                                                 ? "_" + licenseName
                                                  : "" ).toLowerCase().replaceAll( "\\s+", "_" );
         }
         else
         {
             licenseFileName = licenseUrlFile.getName();
 
-            if ( license.getName() != null )
+            if ( licenseName != null )
             {
-                licenseFileName = license.getName().replaceAll( "/", "_" ) + " - " + licenseUrlFile.getName();
+                licenseFileName = licenseName.replaceAll( "/", "_" )
+                                  + " - " + licenseUrlFile.getName();
             }
 
             // Check if the file has a valid file extention
@@ -758,13 +785,24 @@ public abstract class AbstractDownloadLicensesMojo
 
         for ( ProjectLicense license : licenses )
         {
+            final String licenseUrl = rewriteLicenseUrlIfNecessary( license.getUrl() );
             try
             {
-                String licenseUrl = license.getUrl();
+
                 File licenseOutputFile = downloadedLicenseURLs.get( licenseUrl );
                 if ( licenseOutputFile == null )
                 {
-                    String licenseFileName = getLicenseFileName( depProject, license );
+                    final String licenseFileName;
+                    if ( license.getFile() != null )
+                    {
+                        licenseFileName = new File( license.getFile() ).getName();
+                    }
+                    else
+                    {
+                        licenseFileName = getLicenseFileName( depProject,
+                                                              new URL( license.getUrl() ),
+                                                              license.getName() );
+                    }
                     licenseOutputFile = new File( licensesOutputDirectory, licenseFileName );
                 }
 
@@ -789,7 +827,7 @@ public abstract class AbstractDownloadLicensesMojo
                 if ( !quiet )
                 {
                     getLog().warn( "POM for dependency " + depProject.toString() + " has an invalid license URL: "
-                                       + license.getUrl() );
+                                       + licenseUrl );
                 }
             }
             catch ( FileNotFoundException e )
@@ -797,13 +835,13 @@ public abstract class AbstractDownloadLicensesMojo
                 if ( !quiet )
                 {
                     getLog().warn( "POM for dependency " + depProject.toString()
-                                       + " has a license URL that returns file not found: " + license.getUrl() );
+                                       + " has a license URL that returns file not found: " + licenseUrl );
                 }
             }
             catch ( IOException e )
             {
                 getLog().warn( "Unable to retrieve license for dependency: " + depProject.toString() );
-                getLog().warn( license.getUrl() );
+                getLog().warn( licenseUrl );
                 getLog().warn( e.getMessage() );
             }
 
@@ -811,4 +849,26 @@ public abstract class AbstractDownloadLicensesMojo
 
     }
 
+    private String rewriteLicenseUrlIfNecessary( final String originalLicenseUrl )
+    {
+        String resultUrl = originalLicenseUrl;
+        if ( licenseUrlReplacements != null )
+        {
+            for ( LicenseUrlReplacement urlReplacement : licenseUrlReplacements )
+            {
+                Pattern regexp = urlReplacement.getRegexp();
+                String replacement = urlReplacement.getReplacement() == null ? "" : urlReplacement.getReplacement();
+                if ( regexp != null )
+                {
+                    resultUrl = regexp.matcher( resultUrl ).replaceAll( replacement );
+                }
+            }
+
+            if ( !resultUrl.equals( originalLicenseUrl ) )
+            {
+                getLog().debug( String.format( "Rewrote URL %s => %s", originalLicenseUrl, resultUrl ) );
+            }
+        }
+        return resultUrl;
+    }
 }
