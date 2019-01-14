@@ -42,7 +42,7 @@
           <artifactId>license-maven-plugin</artifactId>
           <version>@pom.version@</version>
           <configuration>
-            <licenseMergesUrl>file://${project.basedir}/licenses.merge</licenseMergesUrl>
+            <licenseMergesUrl>${project.baseUri}licenses.merge</licenseMergesUrl>
             <useMissingFile>true</useMissingFile>
             <includeTransitiveDependencies>false</includeTransitiveDependencies>
             <licenseMerges>
