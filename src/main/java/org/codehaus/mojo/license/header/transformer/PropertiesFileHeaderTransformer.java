@@ -67,13 +67,13 @@ public class PropertiesFileHeaderTransformer
 
             // shebang was detected
 
-            int endProlog = content.indexOf( getLineSeparator() );
+            int endProlog = content.indexOf( '\n', startProlog );
 
             if ( endProlog > -1 )
             {
 
                 // prolog end was detected
-                prolog = content.substring( 0, endProlog + getLineSeparator().length() );
+                prolog = content.substring( 0, endProlog + 1 );
             }
         }
 
