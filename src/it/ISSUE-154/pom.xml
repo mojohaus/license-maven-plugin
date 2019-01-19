@@ -68,7 +68,7 @@
             <licenseUrlReplacements>
               <licenseUrlReplacement>
                 <regexp>^.*$</regexp>
-                <replacement>file://${project.basedir}/src/alternative.txt</replacement>
+                <replacement>${project.baseUri}src/alternative.txt</replacement>
               </licenseUrlReplacement>
             </licenseUrlReplacements>
           </configuration>
