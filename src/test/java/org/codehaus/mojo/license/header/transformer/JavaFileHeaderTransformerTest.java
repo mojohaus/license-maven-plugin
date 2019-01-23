@@ -40,12 +40,16 @@ public class JavaFileHeaderTransformerTest
 
     private static final String HEADER = "header";
 
+    private static final String LINE_SEPARATOR = "<eol>";
+
     @Test
     public void testAddHeader()
     {
         JavaFileHeaderTransformer transformer = new JavaFileHeaderTransformer();
+        transformer.setLineSeparator(LINE_SEPARATOR);
+        transformer.setEmptyLineAfterHeader(false);
 
-    String content = PACKAGE + FileHeaderTransformer.LINE_SEPARATOR + CONTENT;
+        String content = PACKAGE + FileHeaderTransformer.LINE_SEPARATOR + CONTENT;
 
         transformer.setAddJavaLicenseAfterPackage( false );
 
@@ -54,8 +58,8 @@ public class JavaFileHeaderTransformerTest
 
         transformer.setAddJavaLicenseAfterPackage( true );
 
-    result = transformer.addHeader(HEADER, content);
-    Assert.assertEquals(PACKAGE + FileHeaderTransformer.LINE_SEPARATOR + FileHeaderTransformer.LINE_SEPARATOR
+        result = transformer.addHeader(HEADER, content);
+        Assert.assertEquals(PACKAGE + FileHeaderTransformer.LINE_SEPARATOR + transformer.getLineSeparator()
                         + HEADER + CONTENT,
                         result);
 

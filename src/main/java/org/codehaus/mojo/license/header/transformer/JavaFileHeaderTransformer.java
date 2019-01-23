@@ -126,17 +126,21 @@ public class JavaFileHeaderTransformer
 
                 int lastIndex = endProlog + 1;
 
-                prolog = content.substring( 0, lastIndex );
+                // Include existing end of line in prolog
 
-                // prolog goes to next line
-                prolog += getLineSeparator();
-
-                if ( lastIndex == content.length() )
+                if ( lastIndex < content.length() && content.charAt( lastIndex ) == '\r' )
                 {
-
-                    // adding a new empty end line to the content
-                    content += getLineSeparator();
+                  lastIndex++;
                 }
+
+                if ( lastIndex < content.length() && content.charAt( lastIndex ) == '\n' )
+                {
+                  lastIndex++;
+                }
+
+                // the prolog includes the whole package definition
+
+                prolog = content.substring( 0, lastIndex );
 
 
             }
