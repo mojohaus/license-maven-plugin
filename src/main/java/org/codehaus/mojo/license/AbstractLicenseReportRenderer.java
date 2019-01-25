@@ -217,7 +217,7 @@ public abstract class AbstractLicenseReportRenderer
 
         sink.tableCell();
         String gav = getGAV( details );
-        sink.link( "./third-party-report.html#" + gav );
+        sink.link( "#" + gav );
         sink.text( gav );
         sink.link_();
 
