@@ -116,7 +116,7 @@
 
     <processorVersion>1.3</processorVersion>
 
-    <doxiaVersion>1.5</doxiaVersion>
+    <doxiaVersion>1.6</doxiaVersion>
     <it.debug>true</it.debug>
 
     <version.httpcomponents.httpclient>4.5.4</version.httpcomponents.httpclient>
@@ -151,7 +151,6 @@
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-plugin-api</artifactId>
-      <version>${mavenVersion}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -214,7 +213,7 @@
     <dependency>
       <groupId>org.apache.maven.doxia</groupId>
       <artifactId>doxia-site-renderer</artifactId>
-      <version>1.4</version>
+      <version>${doxiaVersion}</version>
       <exclusions>
         <exclusion>
           <groupId>org.codehaus.plexus</groupId>
