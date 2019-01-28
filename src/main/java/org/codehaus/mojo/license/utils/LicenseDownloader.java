@@ -23,6 +23,7 @@ package org.codehaus.mojo.license.utils;
  */
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -86,7 +87,7 @@ public class LicenseDownloader
 
         }
 
-        try ( InputStream licenseInputStream = connection.getInputStream() )
+        try ( InputStream licenseInputStream = getConnectionInputStream( connection ) )
         {
             File updatedFile = updateFileExtension( outputFile, connection.getContentType() );
             try ( FileOutputStream fos = new FileOutputStream( updatedFile ) )
@@ -146,6 +147,18 @@ public class LicenseDownloader
             }
         }
         return outputFile;
+    }
+
+    private static InputStream getConnectionInputStream( final URLConnection connection ) throws IOException
+    {
+        try
+        {
+            return connection.getInputStream();
+        }
+        catch ( FileNotFoundException e )
+        {
+            throw new LicenseNotFoundException( connection.getURL(), e );
+        }
     }
 
     private static String getFileExtension( String mimeType )

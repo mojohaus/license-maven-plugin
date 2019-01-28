@@ -37,6 +37,7 @@ import org.codehaus.mojo.license.model.ProjectLicense;
 import org.codehaus.mojo.license.model.ProjectLicenseInfo;
 import org.codehaus.mojo.license.utils.FileUtil;
 import org.codehaus.mojo.license.utils.LicenseDownloader;
+import org.codehaus.mojo.license.utils.LicenseNotFoundException;
 import org.codehaus.mojo.license.utils.LicenseSummaryReader;
 import org.codehaus.mojo.license.utils.LicenseSummaryWriter;
 import org.codehaus.mojo.license.utils.MojoHelper;
@@ -44,7 +45,6 @@ import org.codehaus.plexus.util.Base64;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -737,7 +737,7 @@ public abstract class AbstractDownloadLicensesMojo
             licenseFileName = String.format( "%s.%s%s", depProject.getGroupId(), depProject.getArtifactId(),
                                              licenseName != null
                                                  ? "_" + licenseName
-                                                 : "" ).toLowerCase().replaceAll( "\\s+", "_" );
+                                                 : "" ).toLowerCase().replaceAll( "[/\\s]+", "_" );
         }
         else
         {
@@ -830,12 +830,12 @@ public abstract class AbstractDownloadLicensesMojo
                                        + licenseUrl );
                 }
             }
-            catch ( FileNotFoundException e )
+            catch ( LicenseNotFoundException e )
             {
                 if ( !quiet )
                 {
                     getLog().warn( "POM for dependency " + depProject.toString()
-                                       + " has a license URL that returns file not found: " + licenseUrl );
+                                       + " has a license URL that returns file not found: " + e.getLicenseUrl() );
                 }
             }
             catch ( IOException e )
