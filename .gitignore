@@ -1,15 +1,24 @@
-/.idea
-/*/.idea
-/target
-/*/target/
-/*.iml
-/*/*.iml
-/*.ipr
-/*/*.ipr
-/*.iws
-/*/*.iws
+
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+
+# IDEA
+.idea
+*.ipr
+*.iml
+*.iws
+
+# Eclipse
+.project
+.classpath
+.settings/
+bin/
+
+# Misc
 /*~
 /*/*~
-/.project
-/.classpath
-/.settings/
