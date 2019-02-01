@@ -36,23 +36,18 @@ def assertContains(file, content, expected) {
     return true
 }
 
-file = new File(basedir, 'child3/target/generated-resources/licenses/org.codehaus.mojo.license.test.pr-33-child1_lgpl_3.0.html');
-assertExistsFile(file);
 
-content = file.text;
-assert assertContains(file, content, 'http://jaxx.nuiton.org/index.html');
+def lgpl3 = new File(basedir, 'child3/target/generated-resources/licenses/org.codehaus.mojo.license.test.pr-33-child1_lgpl_2.1.txt')
+assert lgpl3.exists()
+assert lgpl3.text.contains('Version 2.1, February 1999');
 
-file = new File(basedir, 'child3/target/generated-resources/licenses/org.codehaus.mojo.license.test.pr-33-child2_lgpl_3.0.html');
-assertExistsFile(file);
+def lgpl21 = new File(basedir, 'child3/target/generated-resources/licenses/org.codehaus.mojo.license.test.pr-33-child2_lgpl_3.0.txt')
+assert lgpl21.exists()
+assert lgpl21.text.contains('Version 3, 29 June 2007');
 
-content = file.text;
-assert assertContains(file, content, 'nuiton-config');
-
-file = new File(basedir, 'child3/target/generated-resources/licenses.xml');
-assertExistsFile(file);
-
-content = file.text;
-assert assertContains(file, content, '<url>http://jaxx.nuiton.org/v/latest/license.html</url>');
-assert assertContains(file, content, '<url>http://nuiton-config.nuiton.org/v/latest/license.html</url>');
-
-return true;
+def licensesXml = new File(basedir, 'child3/target/generated-resources/licenses.xml');
+assert licensesXml.exists()
+assert licensesXml.text.contains('<file>org.codehaus.mojo.license.test.pr-33-child1_lgpl_2.1.txt</file>')
+assert licensesXml.text.contains('<url>https://www.gnu.org/licenses/lgpl-2.1.txt</url>')
+assert licensesXml.text.contains('<file>org.codehaus.mojo.license.test.pr-33-child2_lgpl_3.0.txt</file>')
+assert licensesXml.text.contains('<url>https://www.gnu.org/licenses/lgpl-3.0.txt</url>')

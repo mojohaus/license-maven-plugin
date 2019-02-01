@@ -20,11 +20,6 @@
  * #L%
  */
 
-def lgpl3 = new File(basedir, 'child2/target/generated-resources/licenses/lgpl 3.0 - lgpl-3.0.txt')
-assert lgpl3.exists()
-assert lgpl3.text.contains('GNU LESSER GENERAL PUBLIC LICENSE');
-
-def licensesXml = new File(basedir, 'child2/target/generated-resources/licenses.xml');
-assert licensesXml.exists()
-assert licensesXml.text.contains('<file>lgpl 3.0 - lgpl-3.0.txt</file>')
-assert licensesXml.text.contains('<url>https://www.gnu.org/licenses/lgpl-3.0.txt</url>')
+assert new File(basedir, 'target/generated-resources/licenses.xml').exists()
+assert new File(basedir, 'target/generated-resources/licenses/commons-logging.commons-logging_apache_license_2.0.txt').exists()
+assert new File(basedir, 'target/generated-resources/licenses/javax.activation.javax.activation-api_cddl_gplv2+ce.txt').exists()

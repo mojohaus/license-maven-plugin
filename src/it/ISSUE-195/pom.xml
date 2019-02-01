@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.codehaus.mojo.license</groupId>
+  <artifactId>ISSUE-195</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <name>Integration Test ISSUE-195</name>
+  <url>http://maven.apache.org</url>
+  <description>
+    ISSUE-195
+  </description>
+
+  <dependencies>
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <version>1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>javax.activation</groupId>
+      <artifactId>javax.activation-api</artifactId>
+      <version>1.2.0</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>@pom.version@</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>download-licenses</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <licenseUrlReplacements>
+            <licenseUrlReplacement>
+              <regexp>https://github.com/javaee/activation/blob/master/LICENSE.txt</regexp>
+              <replacement>https://raw.githubusercontent.com/javaee/activation/master/LICENSE.txt</replacement>
+            </licenseUrlReplacement>
+          </licenseUrlReplacements>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

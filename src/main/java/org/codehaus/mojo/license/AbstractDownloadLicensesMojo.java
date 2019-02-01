@@ -55,6 +55,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
@@ -737,7 +738,7 @@ public abstract class AbstractDownloadLicensesMojo
             licenseFileName = String.format( "%s.%s%s", depProject.getGroupId(), depProject.getArtifactId(),
                                              licenseName != null
                                                  ? "_" + licenseName
-                                                 : "" ).toLowerCase().replaceAll( "\\s+", "_" );
+                                                 : "" ).replaceAll( "\\s+", "_" );
         }
         else
         {
@@ -745,8 +746,7 @@ public abstract class AbstractDownloadLicensesMojo
 
             if ( licenseName != null )
             {
-                licenseFileName = licenseName.replaceAll( "/", "_" )
-                                  + " - " + licenseUrlFile.getName();
+                licenseFileName = licenseName + " - " + licenseUrlFile.getName();
             }
 
             // Check if the file has a valid file extention
@@ -756,10 +756,11 @@ public abstract class AbstractDownloadLicensesMojo
                 // This means it isn't a valid file extension, so append the default
                 licenseFileName = licenseFileName + defaultExtension;
             }
-
-            // Force lower case so we don't end up with multiple copies of the same license
-            licenseFileName = licenseFileName.toLowerCase();
         }
+
+        // lower case and (back)slash removal
+        licenseFileName = licenseFileName.toLowerCase( Locale.US ).replaceAll( "[\\\\/]+", "_" );
+
         return licenseFileName;
     }
 
@@ -811,7 +812,7 @@ public abstract class AbstractDownloadLicensesMojo
                     if ( !downloadedLicenseURLs.containsKey( licenseUrl ) || organizeLicensesByDependencies )
                     {
                         licenseOutputFile = LicenseDownloader.downloadLicense( licenseUrl, proxyLoginPasswordEncoded,
-                                licenseOutputFile );
+                                licenseOutputFile, getLog() );
                         downloadedLicenseURLs.put( licenseUrl, licenseOutputFile );
                     }
                 }
