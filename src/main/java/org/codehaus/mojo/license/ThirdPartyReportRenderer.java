@@ -261,7 +261,7 @@ public class ThirdPartyReportRenderer
         sink.sectionTitle2_();
         renderThirdPartyDetailTable( detail );
 
-        sink.link( "./third-party-report.html#" + getText( "report.overview.title" ) );
+        sink.link( "#" + getText( "report.overview.title" ) );
         sink.text( getText( "report.back.to.top.page" ) );
         sink.link_();
         sink.lineBreak();
