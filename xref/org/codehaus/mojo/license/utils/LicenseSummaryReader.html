@@ -15,22 +15,22 @@
 <a class="jxr_linenumber" name="L7" href="#L7">7</a>   <em class="jxr_comment"> * Copyright (C) 2010 - 2011 CodeLutin, Codehaus, Tony Chemit</em>
 <a class="jxr_linenumber" name="L8" href="#L8">8</a>   <em class="jxr_comment"> * %%</em>
 <a class="jxr_linenumber" name="L9" href="#L9">9</a>   <em class="jxr_comment"> * This program is free software: you can redistribute it and/or modify</em>
-<a class="jxr_linenumber" name="L10" href="#L10">10</a>  <em class="jxr_comment"> * it under the terms of the GNU Lesser General Public License as </em>
-<a class="jxr_linenumber" name="L11" href="#L11">11</a>  <em class="jxr_comment"> * published by the Free Software Foundation, either version 3 of the </em>
+<a class="jxr_linenumber" name="L10" href="#L10">10</a>  <em class="jxr_comment"> * it under the terms of the GNU Lesser General Public License as</em>
+<a class="jxr_linenumber" name="L11" href="#L11">11</a>  <em class="jxr_comment"> * published by the Free Software Foundation, either version 3 of the</em>
 <a class="jxr_linenumber" name="L12" href="#L12">12</a>  <em class="jxr_comment"> * License, or (at your option) any later version.</em>
-<a class="jxr_linenumber" name="L13" href="#L13">13</a>  <em class="jxr_comment"> * </em>
+<a class="jxr_linenumber" name="L13" href="#L13">13</a>  <em class="jxr_comment"> *</em>
 <a class="jxr_linenumber" name="L14" href="#L14">14</a>  <em class="jxr_comment"> * This program is distributed in the hope that it will be useful,</em>
 <a class="jxr_linenumber" name="L15" href="#L15">15</a>  <em class="jxr_comment"> * but WITHOUT ANY WARRANTY; without even the implied warranty of</em>
 <a class="jxr_linenumber" name="L16" href="#L16">16</a>  <em class="jxr_comment"> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</em>
 <a class="jxr_linenumber" name="L17" href="#L17">17</a>  <em class="jxr_comment"> * GNU General Lesser Public License for more details.</em>
-<a class="jxr_linenumber" name="L18" href="#L18">18</a>  <em class="jxr_comment"> * </em>
-<a class="jxr_linenumber" name="L19" href="#L19">19</a>  <em class="jxr_comment"> * You should have received a copy of the GNU General Lesser Public </em>
+<a class="jxr_linenumber" name="L18" href="#L18">18</a>  <em class="jxr_comment"> *</em>
+<a class="jxr_linenumber" name="L19" href="#L19">19</a>  <em class="jxr_comment"> * You should have received a copy of the GNU General Lesser Public</em>
 <a class="jxr_linenumber" name="L20" href="#L20">20</a>  <em class="jxr_comment"> * License along with this program.  If not, see</em>
 <a class="jxr_linenumber" name="L21" href="#L21">21</a>  <em class="jxr_comment"> * &lt;<a href="http://www.gnu.org/licenses/lgpl-3.0.html&gt;" target="alexandria_uri">http://www.gnu.org/licenses/lgpl-3.0.html&gt;</a>.</em>
 <a class="jxr_linenumber" name="L22" href="#L22">22</a>  <em class="jxr_comment"> * #L%</em>
 <a class="jxr_linenumber" name="L23" href="#L23">23</a>  <em class="jxr_comment"> */</em>
 <a class="jxr_linenumber" name="L24" href="#L24">24</a>  
-<a class="jxr_linenumber" name="L25" href="#L25">25</a>  <strong class="jxr_keyword">import</strong> org.apache.maven.model.License;
+<a class="jxr_linenumber" name="L25" href="#L25">25</a>  <strong class="jxr_keyword">import</strong> org.codehaus.mojo.license.model.ProjectLicense;
 <a class="jxr_linenumber" name="L26" href="#L26">26</a>  <strong class="jxr_keyword">import</strong> org.codehaus.mojo.license.model.ProjectLicenseInfo;
 <a class="jxr_linenumber" name="L27" href="#L27">27</a>  <strong class="jxr_keyword">import</strong> org.w3c.dom.Document;
 <a class="jxr_linenumber" name="L28" href="#L28">28</a>  <strong class="jxr_keyword">import</strong> org.w3c.dom.Element;
@@ -68,7 +68,7 @@
 <a class="jxr_linenumber" name="L60" href="#L60">60</a>      <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">static</strong> List&lt;ProjectLicenseInfo&gt; parseLicenseSummary( InputStream licSummaryIS )
 <a class="jxr_linenumber" name="L61" href="#L61">61</a>          <strong class="jxr_keyword">throws</strong> IOException, ParserConfigurationException, SAXException
 <a class="jxr_linenumber" name="L62" href="#L62">62</a>      {
-<a class="jxr_linenumber" name="L63" href="#L63">63</a>          List&lt;ProjectLicenseInfo&gt; dependencies = <strong class="jxr_keyword">new</strong> ArrayList&lt;ProjectLicenseInfo&gt;();
+<a class="jxr_linenumber" name="L63" href="#L63">63</a>          List&lt;ProjectLicenseInfo&gt; dependencies = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;();
 <a class="jxr_linenumber" name="L64" href="#L64">64</a>  
 <a class="jxr_linenumber" name="L65" href="#L65">65</a>          DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
 <a class="jxr_linenumber" name="L66" href="#L66">66</a>          DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
@@ -122,7 +122,7 @@
 <a class="jxr_linenumber" name="L114" href="#L114">114</a>                     Node licensesChildNode = licensesChildNodes.item( j );
 <a class="jxr_linenumber" name="L115" href="#L115">115</a>                     <strong class="jxr_keyword">if</strong> ( licensesChildNode.getNodeName().equals( <span class="jxr_string">"license"</span> ) )
 <a class="jxr_linenumber" name="L116" href="#L116">116</a>                     {
-<a class="jxr_linenumber" name="L117" href="#L117">117</a>                         <a href="../../../../../org/codehaus/mojo/license/model/License.html">License</a> license = parseLicense( licensesChildNode );
+<a class="jxr_linenumber" name="L117" href="#L117">117</a>                         <a href="../../../../../org/codehaus/mojo/license/model/ProjectLicense.html">ProjectLicense</a> license = parseLicense( licensesChildNode );
 <a class="jxr_linenumber" name="L118" href="#L118">118</a>                         dependency.addLicense( license );
 <a class="jxr_linenumber" name="L119" href="#L119">119</a>                     }
 <a class="jxr_linenumber" name="L120" href="#L120">120</a>                 }
@@ -131,9 +131,9 @@
 <a class="jxr_linenumber" name="L123" href="#L123">123</a>         <strong class="jxr_keyword">return</strong> dependency;
 <a class="jxr_linenumber" name="L124" href="#L124">124</a>     }
 <a class="jxr_linenumber" name="L125" href="#L125">125</a> 
-<a class="jxr_linenumber" name="L126" href="#L126">126</a>     <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> <a href="../../../../../org/codehaus/mojo/license/model/License.html">License</a> parseLicense( Node licenseNode )
+<a class="jxr_linenumber" name="L126" href="#L126">126</a>     <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">static</strong> <a href="../../../../../org/codehaus/mojo/license/model/ProjectLicense.html">ProjectLicense</a> parseLicense( Node licenseNode )
 <a class="jxr_linenumber" name="L127" href="#L127">127</a>     {
-<a class="jxr_linenumber" name="L128" href="#L128">128</a>         <a href="../../../../../org/codehaus/mojo/license/model/License.html">License</a> license = <strong class="jxr_keyword">new</strong> <a href="../../../../../org/codehaus/mojo/license/model/License.html">License</a>();
+<a class="jxr_linenumber" name="L128" href="#L128">128</a>         <a href="../../../../../org/codehaus/mojo/license/model/ProjectLicense.html">ProjectLicense</a> license = <strong class="jxr_keyword">new</strong> <a href="../../../../../org/codehaus/mojo/license/model/ProjectLicense.html">ProjectLicense</a>();
 <a class="jxr_linenumber" name="L129" href="#L129">129</a>         NodeList licenseElements = licenseNode.getChildNodes();
 <a class="jxr_linenumber" name="L130" href="#L130">130</a>         <strong class="jxr_keyword">for</strong> ( <strong class="jxr_keyword">int</strong> i = 0; i &lt; licenseElements.getLength(); ++i )
 <a class="jxr_linenumber" name="L131" href="#L131">131</a>         {
@@ -154,13 +154,17 @@
 <a class="jxr_linenumber" name="L146" href="#L146">146</a>             {
 <a class="jxr_linenumber" name="L147" href="#L147">147</a>                 license.setComments( node.getTextContent() );
 <a class="jxr_linenumber" name="L148" href="#L148">148</a>             }
-<a class="jxr_linenumber" name="L149" href="#L149">149</a>         }
-<a class="jxr_linenumber" name="L150" href="#L150">150</a>         <strong class="jxr_keyword">return</strong> license;
-<a class="jxr_linenumber" name="L151" href="#L151">151</a>     }
-<a class="jxr_linenumber" name="L152" href="#L152">152</a> 
-<a class="jxr_linenumber" name="L153" href="#L153">153</a> }
+<a class="jxr_linenumber" name="L149" href="#L149">149</a>             <strong class="jxr_keyword">else</strong> <strong class="jxr_keyword">if</strong> ( node.getNodeName().equals( <span class="jxr_string">"file"</span> ) )
+<a class="jxr_linenumber" name="L150" href="#L150">150</a>             {
+<a class="jxr_linenumber" name="L151" href="#L151">151</a>                 license.setFile( node.getTextContent() );
+<a class="jxr_linenumber" name="L152" href="#L152">152</a>             }
+<a class="jxr_linenumber" name="L153" href="#L153">153</a>         }
+<a class="jxr_linenumber" name="L154" href="#L154">154</a>         <strong class="jxr_keyword">return</strong> license;
+<a class="jxr_linenumber" name="L155" href="#L155">155</a>     }
+<a class="jxr_linenumber" name="L156" href="#L156">156</a> 
+<a class="jxr_linenumber" name="L157" href="#L157">157</a> }
 </pre>
 <hr/>
-<div id="footer">Copyright &#169; 2010&#x2013;2018 <a href="http://www.mojohaus.org">MojoHaus</a>. All rights reserved.</div>
+<div id="footer">Copyright &#169; 2010&#x2013;2019 <a href="http://www.mojohaus.org">MojoHaus</a>. All rights reserved.</div>
 </body>
 </html>
