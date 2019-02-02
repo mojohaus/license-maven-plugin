@@ -24,7 +24,7 @@ package org.codehaus.mojo.license;
 
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.doxia.sink.Sink;
-import org.apache.maven.doxia.sink.SinkEventAttributeSet;
+import org.apache.maven.doxia.sink.impl.SinkEventAttributeSet;
 import org.apache.maven.doxia.sink.SinkEventAttributes;
 import org.apache.maven.reporting.AbstractMavenReportRenderer;
 import org.codehaus.mojo.license.api.ThirdPartyDetails;
