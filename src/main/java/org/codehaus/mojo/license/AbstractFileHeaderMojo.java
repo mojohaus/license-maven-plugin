@@ -41,6 +41,8 @@ import org.codehaus.mojo.license.utils.MojoHelper;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
@@ -927,7 +929,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
                 getLog().debug( " - backup original file " + file );
             }
 
-            FileUtil.renameFile( file, backupFile );
+            Files.copy( file.toPath(), backupFile.toPath(), StandardCopyOption.COPY_ATTRIBUTES );
         }
 
         if ( isDryRun() )
@@ -940,9 +942,10 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
         {
             try
             {
-
                 // replace file with the updated one
-                FileUtil.renameFile( processFile, file );
+                String updatedContent = FileUtil.readAsString( processFile, getEncoding() );
+                FileUtil.printString( file, updatedContent, getEncoding() );
+                FileUtil.deleteFile( processFile );
             }
             catch ( IOException e )
             {
