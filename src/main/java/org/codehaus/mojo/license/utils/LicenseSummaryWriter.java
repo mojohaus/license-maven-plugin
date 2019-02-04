@@ -116,6 +116,20 @@ public class LicenseSummaryWriter
             }
         }
         depNode.appendChild( licensesNode );
+
+        final List<String> messages = dep.getDownloaderMessages();
+        if ( messages != null && !messages.isEmpty() )
+        {
+            final Node downloaderMessagesNode = doc.createElement( "downloaderMessages" );
+            for ( String msg : messages )
+            {
+                final Node downloaderMessageNode = doc.createElement( "downloaderMessage" );
+                downloaderMessageNode.appendChild( doc.createTextNode( msg ) );
+                downloaderMessagesNode.appendChild( downloaderMessageNode );
+            }
+            depNode.appendChild( downloaderMessagesNode );
+        }
+
         return depNode;
 
     }

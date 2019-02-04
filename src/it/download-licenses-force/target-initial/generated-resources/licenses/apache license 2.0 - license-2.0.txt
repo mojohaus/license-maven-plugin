@@ -1,0 +1,2 @@
+This content is fake.
+-Dlicense.forceDownload should cause the plugin to overwrite this file.

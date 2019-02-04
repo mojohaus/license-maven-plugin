@@ -27,6 +27,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.License;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
@@ -54,6 +55,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -142,6 +144,17 @@ public abstract class AbstractDownloadLicensesMojo
     @Parameter( property = "licensesOutputFileEncoding", defaultValue = "${project.build.sourceEncoding}" )
     private String licensesOutputFileEncoding;
 
+    /**
+     * A file containing dependencies whose licenses could not be downloaded for some reason. The format is similar to
+     * {@link #licensesOutputFile} but the entries in {@link #licensesErrorsFile} have {@code <downloaderMessage>}
+     * elements attached to them. Those should explain what kind of error happened during the processing of the given
+     * dependency.
+     *
+     * @since 1.18
+     */
+    @Parameter( property = "license.licensesErrorsFile",
+        defaultValue = "${project.build.directory}/generated-resources/licenses-errors.xml" )
+    private File licensesErrorsFile;
 
     /**
      * A filter to exclude some scopes.
@@ -184,12 +197,49 @@ public abstract class AbstractDownloadLicensesMojo
     private boolean offline;
 
     /**
-     * Don't show warnings about bad or missing license files.
+     * Before 1.18, {@link #quiet} having value {@code false} suppressed any license download related warnings in the
+     * log. After 1.18 (incl.), the behavior depends on the value of {@link #errorRemedy}:
+     * <table>
+     *   <tr><th>quiet</th><th>errorRemedy</th><th>effective errorRemedy</th><tr>
+     *   <tr><td>true</td><td>warn</td><td>ignore</td><tr>
+     *   <tr><td>false</td><td>warn</td><td>warn</td><tr>
+     *   <tr><td>true or false</td><td>ignore</td><td>ignore</td><tr>
+     *   <tr><td>true or false</td><td>failFast</td><td>failFast</td><tr>
+     *   <tr><td>true or false</td><td>xmlOutput</td><td>xmlOutput</td><tr>
+     * </table>
      *
      * @since 1.0
+     * @deprecated Use {@link #errorRemedy} instead
      */
     @Parameter( defaultValue = "false" )
     private boolean quiet;
+
+    /**
+     * What to do on any license download related error. The possible values are:
+     * <li>
+     *   <ul>{@link ErrorRemedy#ignore}: all errors are ignored</ul>
+     *   <ul>{@link ErrorRemedy#warn}: all errors are output to the log as warnings</ul>
+     *   <ul>{@link ErrorRemedy#failFast}: a {@link MojoFailureException} is thrown on the first download related
+     *      error</ul>
+     *   <ul>{@link ErrorRemedy#xmlOutput}: error messages are added as {@code <downloaderMessages>} to
+     *   {@link AbstractDownloadLicensesMojo#licensesErrorsFile}</ul>
+     * </li>
+     * @since 1.18
+     */
+    @Parameter( property = "license.errorRemedy", defaultValue = "warn" )
+    private ErrorRemedy errorRemedy;
+
+    /**
+     * If {@code true}, all encountered dependency license URLs are downloaded, no matter what is there in
+     * {@link #licensesConfigFile} and {@link #licensesOutputFile}; otherwise {@link #licensesConfigFile},
+     * {@link #licensesOutputFile} (eventually persisted from a previous build) and the content of
+     * {@link #licensesOutputDirectory} are considered sources of valid information - i.e. only URLs that do not appear
+     * to have been downloaded in the past will be downloaded.
+     *
+     * @since 1.18
+     */
+    @Parameter( property = "license.forceDownload", defaultValue = "false" )
+    private boolean forceDownload;
 
     /**
      * Include transitive dependencies when downloading license files.
@@ -369,9 +419,10 @@ public abstract class AbstractDownloadLicensesMojo
 
     /**
      * {@inheritDoc}
+     * @throws MojoFailureException
      */
     public void execute()
-        throws MojoExecutionException
+        throws MojoExecutionException, MojoFailureException
     {
 
         if ( isSkip() )
@@ -379,6 +430,8 @@ public abstract class AbstractDownloadLicensesMojo
             getLog().info( "skip flag is on, will skip goal." );
             return;
         }
+
+        this.errorRemedy = getEffectiveErrorRemedy( this.quiet, this.errorRemedy );
 
         initDirectories();
 
@@ -391,7 +444,7 @@ public abstract class AbstractDownloadLicensesMojo
             // License info from previous build
             if ( licensesOutputFile.exists() )
             {
-                loadLicenseInfo( configuredDepLicensesMap, licensesOutputFile, true );
+                loadLicenseInfo( configuredDepLicensesMap, licensesOutputFile, !forceDownload );
             }
 
             // Manually configured license info, loaded second to override previously loaded info
@@ -449,8 +502,14 @@ public abstract class AbstractDownloadLicensesMojo
                     licensesOutputFileEol = Eol.autodetect( autodetectFromFile, charset );
                 }
 
-                LicenseSummaryWriter.writeLicenseSummary( depProjectLicenses, licensesOutputFile,
-                        charset, licensesOutputFileEol );
+                List<ProjectLicenseInfo> depProjectLicensesWithErrors = filterErrors( depProjectLicenses );
+                LicenseSummaryWriter.writeLicenseSummary( depProjectLicenses, licensesOutputFile, charset,
+                                                          licensesOutputFileEol );
+                if ( depProjectLicensesWithErrors != null && !depProjectLicensesWithErrors.isEmpty() )
+                {
+                    LicenseSummaryWriter.writeLicenseSummary( depProjectLicensesWithErrors, licensesErrorsFile, charset,
+                                                              licensesOutputFileEol );
+                }
             }
             catch ( Exception e )
             {
@@ -461,6 +520,42 @@ public abstract class AbstractDownloadLicensesMojo
         {
             //restore the system properties to what they where before the plugin execution
             restoreProperties();
+        }
+    }
+
+    /**
+     * Removes from the given {@code depProjectLicenses} those elements which have non-empty
+     * {@link ProjectLicenseInfo#getDownloaderMessages()} and adds those to the resulting {@link List}.
+     *
+     * @param depProjectLicenses the list of {@link ProjectLicenseInfo}s to filter
+     * @return a new {@link List} of {@link ProjectLicenseInfo}s containing only elements with non-empty
+     *         {@link ProjectLicenseInfo#getDownloaderMessages()}
+     */
+    private List<ProjectLicenseInfo> filterErrors( List<ProjectLicenseInfo> depProjectLicenses )
+    {
+        final List<ProjectLicenseInfo> result = new ArrayList<>();
+        final Iterator<ProjectLicenseInfo> it = depProjectLicenses.iterator();
+        while ( it.hasNext() )
+        {
+            final ProjectLicenseInfo dep = it.next();
+            final List<String> messages = dep.getDownloaderMessages();
+            if ( messages != null && !messages.isEmpty() )
+            {
+                it.remove();
+                result.add( dep );
+            }
+        }
+        return result;
+    }
+
+    private static ErrorRemedy getEffectiveErrorRemedy( boolean quiet, ErrorRemedy errorRemedy )
+    {
+        switch ( errorRemedy )
+        {
+            case warn:
+                return quiet ? ErrorRemedy.ignore : ErrorRemedy.warn;
+            default:
+                return errorRemedy;
         }
     }
 
@@ -768,8 +863,9 @@ public abstract class AbstractDownloadLicensesMojo
      * Download the licenses associated with this project
      *
      * @param depProject The project which generated the dependency
+     * @throws MojoFailureException
      */
-    private void downloadLicenses( ProjectLicenseInfo depProject )
+    private void downloadLicenses( ProjectLicenseInfo depProject ) throws MojoFailureException
     {
         getLog().debug( "Downloading license(s) for project " + depProject );
 
@@ -777,10 +873,7 @@ public abstract class AbstractDownloadLicensesMojo
 
         if ( depProject.getLicenses() == null || depProject.getLicenses().isEmpty() )
         {
-            if ( !quiet )
-            {
-                getLog().warn( "No license information available for: " + depProject );
-            }
+            handleError( depProject, "No license information available for: " + depProject );
             return;
         }
 
@@ -807,7 +900,7 @@ public abstract class AbstractDownloadLicensesMojo
                     licenseOutputFile = new File( licensesOutputDirectory, licenseFileName );
                 }
 
-                if ( !licenseOutputFile.exists() )
+                if ( !licenseOutputFile.exists() || forceDownload )
                 {
                     if ( !downloadedLicenseURLs.containsKey( licenseUrl ) || organizeLicensesByDependencies )
                     {
@@ -825,29 +918,43 @@ public abstract class AbstractDownloadLicensesMojo
             }
             catch ( MalformedURLException e )
             {
-                if ( !quiet )
-                {
-                    getLog().warn( "POM for dependency " + depProject.toString() + " has an invalid license URL: "
+                handleError( depProject, "POM for dependency " + depProject.toString() + " has an invalid license URL: "
                                        + licenseUrl );
-                }
             }
             catch ( FileNotFoundException e )
             {
-                if ( !quiet )
-                {
-                    getLog().warn( "POM for dependency " + depProject.toString()
+                handleError( depProject, "POM for dependency " + depProject.toString()
                                        + " has a license URL that returns file not found: " + licenseUrl );
-                }
             }
             catch ( IOException e )
             {
-                getLog().warn( "Unable to retrieve license for dependency: " + depProject.toString() );
-                getLog().warn( licenseUrl );
-                getLog().warn( e.getMessage() );
+                handleError( depProject, "Unable to retrieve license from URL '" + licenseUrl + "' for dependency '"
+                    + depProject.toString() + "': " + e.getMessage() );
             }
 
         }
 
+    }
+
+    private void handleError( ProjectLicenseInfo depProject, String msg ) throws MojoFailureException
+    {
+        switch ( errorRemedy )
+        {
+            case ignore:
+                /* do nothing */
+                break;
+            case warn:
+                getLog().warn( msg );
+                break;
+            case failFast:
+                throw new MojoFailureException( msg );
+            case xmlOutput:
+                depProject.addDownloaderMessage( msg );
+                break;
+            default:
+                throw new IllegalStateException( "Unexpected value of " + ErrorRemedy.class.getName() + ": "
+                    + errorRemedy );
+        }
     }
 
     private String rewriteLicenseUrlIfNecessary( final String originalLicenseUrl )
@@ -871,5 +978,24 @@ public abstract class AbstractDownloadLicensesMojo
             }
         }
         return resultUrl;
+    }
+
+    /**
+     * What to do in case of a license download error.
+     *
+     * @since 1.18
+     */
+    public static enum ErrorRemedy
+    {
+        /** All errors are ignored */
+        ignore,
+        /** All errors are output to the log as warnings */
+        warn,
+        /** The first encountered error is logged and a {@link MojoFailureException} is
+        *      thrown */
+        failFast,
+        /** Error messages are added as {@code <downloaderMessages>} to
+         * {@link AbstractDownloadLicensesMojo#licensesErrorsFile} */
+        xmlOutput
     }
 }

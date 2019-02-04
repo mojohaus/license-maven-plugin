@@ -43,17 +43,7 @@ public class ProjectLicenseInfo
 
     private List<ProjectLicense> licenses = new ArrayList<>();
 
-    private String licenseResolutionResult;
-
-    public String getLicenseResolutionResult()
-    {
-        return licenseResolutionResult;
-    }
-
-    public void setLicenseResolutionResult( String licenseResolutionResult )
-    {
-        this.licenseResolutionResult = licenseResolutionResult;
-    }
+    private List<String> downloaderMessages = new ArrayList<>();
 
     /**
      * Default constructor.
@@ -123,6 +113,16 @@ public class ProjectLicenseInfo
     public String getId()
     {
         return groupId + ":" + artifactId;
+    }
+
+    public List<String> getDownloaderMessages()
+    {
+        return downloaderMessages;
+    }
+
+    public void addDownloaderMessage( String message )
+    {
+        downloaderMessages.add( message );
     }
 
     /**
