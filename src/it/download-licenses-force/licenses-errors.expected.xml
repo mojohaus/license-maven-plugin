@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<licenseSummary>
+  <dependencies>
+    <dependency>
+      <groupId>groovy</groupId>
+      <artifactId>groovy-all</artifactId>
+      <version>1.0-jsr-04</version>
+      <licenses>
+        <!--No license information available. -->
+      </licenses>
+      <downloaderMessages>
+        <downloaderMessage>No license information available for: groovy:groovy-all</downloaderMessage>
+      </downloaderMessages>
+    </dependency>
+  </dependencies>
+</licenseSummary>
