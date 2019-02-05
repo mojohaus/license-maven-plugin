@@ -27,10 +27,20 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpStatus;
+import org.apache.http.StatusLine;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.entity.ContentType;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.maven.plugin.logging.Log;
 
 /**
@@ -39,13 +49,25 @@ import org.apache.maven.plugin.logging.Log;
  * @author pgier
  * @since 1.0
  */
-public class LicenseDownloader
+public class LicenseDownloader implements AutoCloseable
 {
 
     /**
      * Defines the connection timeout in milliseconds when attempting to download license files.
      */
     public static final int DEFAULT_CONNECTION_TIMEOUT = 5000;
+
+    private final CloseableHttpClient client;
+
+    public LicenseDownloader()
+    {
+        final RequestConfig config = RequestConfig.copy( RequestConfig.DEFAULT )
+            .setConnectTimeout( DEFAULT_CONNECTION_TIMEOUT )
+            .setSocketTimeout( DEFAULT_CONNECTION_TIMEOUT )
+            .setConnectionRequestTimeout( DEFAULT_CONNECTION_TIMEOUT )
+            .build();
+        this.client = HttpClients.custom().setDefaultRequestConfig( config ).build();
+    }
 
     /**
      * Downloads a license file from the given {@code licenseUrlString} stores it locally and
@@ -59,54 +81,55 @@ public class LicenseDownloader
      * @param log
      * @return the path to the file where the downloaded license file was stored
      * @throws IOException
+     * @throws URISyntaxException
      */
-    public static File downloadLicense( String licenseUrlString, String loginPassword, File outputFile, Log log )
-        throws IOException
+    public LicenseDownloadResult downloadLicense( String licenseUrlString, String loginPassword, File outputFile,
+                                                  Log log )
+        throws IOException, URISyntaxException
     {
         if ( licenseUrlString == null || licenseUrlString.length() == 0 )
         {
-            return outputFile;
+            return LicenseDownloadResult.success( outputFile );
         }
 
-        URLConnection connection = newConnection( licenseUrlString, loginPassword );
-
-        boolean redirect = false;
-        if ( connection instanceof HttpURLConnection )
+        if ( licenseUrlString.startsWith( "file://" ) )
         {
-            int status = ( (HttpURLConnection) connection ).getResponseCode();
-
-            log.debug( String.format( "Got HTTP response %d for URL '%s'", status, licenseUrlString ) );
-
-            redirect = HttpURLConnection.HTTP_MOVED_TEMP == status || HttpURLConnection.HTTP_MOVED_PERM == status
-                    || HttpURLConnection.HTTP_SEE_OTHER == status;
+            Files.copy( Paths.get( new URI( licenseUrlString ) ), outputFile.toPath() );
+            return LicenseDownloadResult.success( outputFile );
         }
-
-        if ( redirect )
+        else
         {
-            // get redirect url from "location" header field
-            String newUrl = connection.getHeaderField( "Location" );
-
-            // open the new connnection again
-            connection = newConnection( newUrl, loginPassword );
-
-            if ( connection instanceof HttpURLConnection )
+            try ( CloseableHttpResponse response = client.execute( new HttpGet( licenseUrlString ) ) )
             {
-                int status = ( (HttpURLConnection) connection ).getResponseCode();
-                log.debug( String.format( "Got HTTP response %d for URL '%s'", status, licenseUrlString ) );
+                final StatusLine statusLine = response.getStatusLine();
+                if ( statusLine.getStatusCode() != HttpStatus.SC_OK )
+                {
+                    return LicenseDownloadResult.failure( "'" + licenseUrlString + "' returned "
+                        + statusLine.getStatusCode()
+                        + ( statusLine.getReasonPhrase() != null ? " " + statusLine.getReasonPhrase() : "" ) );
+                }
+
+                final HttpEntity entity = response.getEntity();
+                if ( entity != null )
+                {
+                    final ContentType contentType = ContentType.get( entity );
+                    File updatedFile =
+                        updateFileExtension( outputFile, contentType != null ? contentType.getMimeType() : null );
+
+                    try ( InputStream in = entity.getContent();
+                                    FileOutputStream fos = new FileOutputStream( updatedFile ) )
+                    {
+                        copyStream( in, fos );
+                    }
+                    return LicenseDownloadResult.success( updatedFile );
+
+                }
+                else
+                {
+                    return LicenseDownloadResult.failure( "'" + licenseUrlString + "' returned no body." );
+                }
             }
-
         }
-
-        try ( InputStream licenseInputStream = connection.getInputStream() )
-        {
-            File updatedFile = updateFileExtension( outputFile, connection.getContentType() );
-            try ( FileOutputStream fos = new FileOutputStream( updatedFile ) )
-            {
-                copyStream( licenseInputStream, fos );
-            }
-            return updatedFile;
-        }
-
     }
 
     /**
@@ -125,24 +148,6 @@ public class LicenseDownloader
         {
             outStream.write( buf, 0, len );
         }
-    }
-
-    private static URLConnection newConnection( String url, String loginPassword )
-        throws IOException
-    {
-
-        URL licenseUrl = new URL( url );
-        URLConnection connection = licenseUrl.openConnection();
-
-        if ( loginPassword != null )
-        {
-            connection.setRequestProperty( "Proxy-Authorization", "Basic " + loginPassword.trim() );
-        }
-        connection.setConnectTimeout( DEFAULT_CONNECTION_TIMEOUT );
-        connection.setReadTimeout( DEFAULT_CONNECTION_TIMEOUT );
-
-        return connection;
-
     }
 
     private static File updateFileExtension( File outputFile, String mimeType )
@@ -183,6 +188,57 @@ public class LicenseDownloader
         }
 
         return null;
+    }
+
+    @Override
+    public void close()
+        throws Exception
+    {
+        client.close();
+    }
+
+    /**
+     * A result of a license download operation.
+     *
+     * @since 1.18
+     */
+    public static class LicenseDownloadResult
+    {
+        public static LicenseDownloadResult success( File file )
+        {
+            return new LicenseDownloadResult( file, null );
+        }
+
+        public static LicenseDownloadResult failure( String errorMessage )
+        {
+            return new LicenseDownloadResult( null, errorMessage );
+        }
+
+        private LicenseDownloadResult( File file, String errorMessage )
+        {
+            super();
+            this.file = file;
+            this.errorMessage = errorMessage;
+        }
+
+        private final File file;
+
+        private final String errorMessage;
+
+        public File getFile()
+        {
+            return file;
+        }
+
+        public String getErrorMessage()
+        {
+            return errorMessage;
+        }
+
+        public boolean isSuccess()
+        {
+            return errorMessage == null;
+        }
     }
 
 }

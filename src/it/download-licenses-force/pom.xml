@@ -24,6 +24,18 @@
       <artifactId>groovy-all</artifactId>
       <version>1.0-jsr-04</version>
     </dependency>
+    <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-search-parent</artifactId>
+      <type>pom</type>
+      <version>5.10.3.Final</version>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
   </dependencies>
 
   <build>
