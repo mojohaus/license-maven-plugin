@@ -545,8 +545,12 @@ public abstract class AbstractDownloadLicensesMojo
                 getLog().warn( "There were " + downloadErrorCount + " download errors - check the warnings above" );
                 break;
             case xmlOutput:
-                throw new MojoFailureException( "There were " + downloadErrorCount + " download errors - check "
-                    + licensesErrorsFile.getAbsolutePath() );
+                if ( downloadErrorCount > 0 )
+                {
+                    throw new MojoFailureException( "There were " + downloadErrorCount + " download errors - check "
+                        + licensesErrorsFile.getAbsolutePath() );
+                }
+                break;
             default:
                 throw new IllegalStateException( "Unexpected value of " + ErrorRemedy.class.getName() + ": "
                     + errorRemedy );
