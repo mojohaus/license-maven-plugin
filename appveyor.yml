@@ -7,7 +7,7 @@ install:
   - cmd: SET PATH=C:\Users\appveyor\.m2\apache-maven-3.5.4-bin\4lcg54ki11c6mp435njk296gm5\apache-maven-3.5.4\bin;%JAVA_HOME%\bin;%PATH%
 
 build_script:
-  - .\mvnw.cmd clean verify
+  - .\mvnw.cmd clean verify -e
 
 cache:
   - C:\Users\appveyor\.m2\repository
