@@ -692,6 +692,8 @@ public abstract class AbstractDownloadLicensesMojo
             FileUtil.createDirectoryIfNecessary( licensesOutputDirectory );
 
             FileUtil.createDirectoryIfNecessary( licensesOutputFile.getParentFile() );
+
+            FileUtil.createDirectoryIfNecessary( licensesErrorsFile.getParentFile() );
         }
         catch ( IOException e )
         {
