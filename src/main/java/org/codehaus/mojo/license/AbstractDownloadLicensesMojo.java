@@ -223,7 +223,8 @@ public abstract class AbstractDownloadLicensesMojo
      *   <ul>{@link ErrorRemedy#failFast}: a {@link MojoFailureException} is thrown on the first download related
      *      error</ul>
      *   <ul>{@link ErrorRemedy#xmlOutput}: error messages are added as {@code <downloaderMessages>} to
-     *   {@link AbstractDownloadLicensesMojo#licensesErrorsFile}</ul>
+     *   {@link AbstractDownloadLicensesMojo#licensesErrorsFile}; in case there are error messages, the build will
+         * fail after processing all dependencies</ul>
      * </li>
      * @since 1.18
      */
@@ -383,6 +384,8 @@ public abstract class AbstractDownloadLicensesMojo
      */
     private String proxyLoginPasswordEncoded;
 
+    private int downloadErrorCount = 0;
+
     protected abstract boolean isSkip();
 
     protected MavenProject getProject()
@@ -530,6 +533,23 @@ public abstract class AbstractDownloadLicensesMojo
         {
             //restore the system properties to what they where before the plugin execution
             restoreProperties();
+        }
+
+        switch ( errorRemedy )
+        {
+            case ignore:
+            case failFast:
+                /* do nothing */
+                break;
+            case warn:
+                getLog().warn( "There were " + downloadErrorCount + " download errors - check the warnings above" );
+                break;
+            case xmlOutput:
+                throw new MojoFailureException( "There were " + downloadErrorCount + " download errors - check "
+                    + licensesErrorsFile.getAbsolutePath() );
+            default:
+                throw new IllegalStateException( "Unexpected value of " + ErrorRemedy.class.getName() + ": "
+                    + errorRemedy );
         }
     }
 
@@ -990,6 +1010,7 @@ public abstract class AbstractDownloadLicensesMojo
                 throw new IllegalStateException( "Unexpected value of " + ErrorRemedy.class.getName() + ": "
                     + errorRemedy );
         }
+        downloadErrorCount++;
     }
 
     private String rewriteLicenseUrlIfNecessary( final String originalLicenseUrl )
@@ -1030,7 +1051,8 @@ public abstract class AbstractDownloadLicensesMojo
         *      thrown */
         failFast,
         /** Error messages are added as {@code <downloaderMessages>} to
-         * {@link AbstractDownloadLicensesMojo#licensesErrorsFile} */
+         * {@link AbstractDownloadLicensesMojo#licensesErrorsFile}; in case there are error messages, the build will
+         * fail after processing all dependencies. */
         xmlOutput
     }
 }
