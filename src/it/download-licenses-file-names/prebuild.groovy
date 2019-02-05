@@ -2,7 +2,7 @@
  * #%L
  * License Maven Plugin
  * %%
- * Copyright (C) 2008 - 2011 CodeLutin, Codehaus, Tony Chemit
+ * Copyright (C) 2008 - 2011 CodeLutin, Codehaus, Tony Chemit, Tony chemit
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -20,10 +20,12 @@
  * #L%
  */
 
-file = new File(basedir, 'target/licenses.xml');
-expectedFile = new File(basedir, 'expected_licenses.xml');
-assert expectedFile.text.equals(file.text);
+import java.nio.file.Path;
+import java.nio.file.Files;
 
-licenseFile = new File(basedir, 'target/generated-resources/licenses/public domain - alternative.txt');
-expectedLicenseTxt = new File(basedir, 'src/alternative.txt');
-assert expectedLicenseTxt.text.equals(licenseFile.text);
+Path basePath = basedir.toPath()
+
+Files.move(basePath.resolve('target-initial'), basePath.resolve('target'))
+
+Path licenses = basePath.resolve('target/generated-resources/licenses.xml')
+assert Files.exists(licenses)

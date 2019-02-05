@@ -22,6 +22,7 @@ package org.codehaus.mojo.license.utils;
  * #L%
  */
 
+import org.apache.commons.codec.binary.Hex;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 
@@ -38,6 +39,10 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -289,5 +294,18 @@ public class FileUtil
             }
         } );
         return result;
+    }
+
+    public static String sha1( Path in ) throws IOException
+    {
+        try
+        {
+            final MessageDigest md = MessageDigest.getInstance( "SHA-1" );
+            return Hex.encodeHexString( md.digest( Files.readAllBytes( in ) ) );
+        }
+        catch ( NoSuchAlgorithmException e )
+        {
+            throw new RuntimeException( e );
+        }
     }
 }

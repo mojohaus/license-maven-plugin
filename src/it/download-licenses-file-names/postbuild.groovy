@@ -25,23 +25,22 @@ import java.nio.file.Files;
 
 final Path basePath = basedir.toPath()
 
-final Path asl2 = basePath.resolve('target/generated-resources/licenses/apache license 2.0 - license-2.0.txt')
+assert !Files.exists(basePath.resolve('target/generated-resources/licenses/apache license 2.0 - license-2.0.txt'))
+assert !Files.exists(basePath.resolve('target/generated-resources/licenses/bsd license - license.html'))
+
+final Path asl2 = basePath.resolve('target/generated-resources/licenses/asl2.txt')
 assert Files.exists(asl2)
-assert !asl2.text.contains('This content is fake.')
 assert asl2.text.contains('Version 2.0, January 2004')
 
-final Path lgpl21 = basePath.resolve('target/generated-resources/licenses/gnu lesser general public license v2.1 or later - lgpl-2.1.html')
-assert Files.exists(lgpl21)
-assert lgpl21.text.contains('Version 2.1, February 1999')
+final Path bsdAntlr = basePath.resolve('target/generated-resources/licenses/bsd-antlr.html')
+assert Files.exists(bsdAntlr)
+assert bsdAntlr.text.contains('Copyright (c) 2012 Terence Parr and Sam Harwell')
+
+final Path cddl = basePath.resolve('target/generated-resources/licenses/cddl-gplv2-ce.txt')
+assert Files.exists(cddl)
+assert new String(Files.readAllBytes(cddl), 'ISO-8859-1').contains('COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.1')
 
 final Path expectedLicensesXml = basePath.resolve('licenses.expected.xml')
 final Path licensesXml = basePath.resolve('target/generated-resources/licenses.xml')
 assert expectedLicensesXml.text.equals(licensesXml.text)
 
-final Path expectedLicensesErrorsXml = basePath.resolve('licenses-errors.expected.xml')
-final Path licensesErrorsXml = basePath.resolve('target/generated-resources/licenses-errors.xml')
-assert expectedLicensesErrorsXml.text.equals(licensesErrorsXml.text)
-
-final Path log = basePath.resolve('build.log')
-assert Files.exists(log)
-assert log.text.contains('There were 1 download errors - check ')
