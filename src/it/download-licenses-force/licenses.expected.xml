@@ -14,6 +14,20 @@
       </licenses>
     </dependency>
     <dependency>
+      <groupId>javax.cache</groupId>
+      <artifactId>cache-api</artifactId>
+      <version>1.0.0</version>
+      <licenses>
+        <license>
+          <name>JSR-000107 JCACHE 2.9 Public Review - Updated Specification
+                License</name>
+          <url>https://raw.github.com/jsr107/jsr107spec/master/LICENSE.txt</url>
+          <distribution>manual</distribution>
+          <file>jsr-000107 jcache 2.9 public review - updated specification license - license.txt</file>
+        </license>
+      </licenses>
+    </dependency>
+    <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-search-parent</artifactId>
       <version>5.10.3.Final</version>

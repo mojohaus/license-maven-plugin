@@ -443,9 +443,9 @@ public abstract class AbstractDownloadLicensesMojo
             Map<String, ProjectLicenseInfo> configuredDepLicensesMap = new HashMap<>();
 
             // License info from previous build
-            if ( licensesOutputFile.exists() )
+            if ( !forceDownload && licensesOutputFile.exists() )
             {
-                loadLicenseInfo( configuredDepLicensesMap, licensesOutputFile, !forceDownload );
+                loadLicenseInfo( configuredDepLicensesMap, licensesOutputFile, true );
             }
 
             // Manually configured license info, loaded second to override previously loaded info
@@ -863,6 +863,8 @@ public abstract class AbstractDownloadLicensesMojo
                 // This means it isn't a valid file extension, so append the default
                 licenseFileName = licenseFileName + defaultExtension;
             }
+            // Normalize whitespace
+            licenseFileName = licenseFileName.replaceAll( "\\s+", " " );
         }
 
         // lower case and (back)slash removal
