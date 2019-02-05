@@ -38,6 +38,7 @@ import org.codehaus.mojo.license.model.ProjectLicense;
 import org.codehaus.mojo.license.model.ProjectLicenseInfo;
 import org.codehaus.mojo.license.utils.FileUtil;
 import org.codehaus.mojo.license.utils.LicenseDownloader;
+import org.codehaus.mojo.license.utils.LicenseDownloader.LicenseDownloadResult;
 import org.codehaus.mojo.license.utils.LicenseSummaryReader;
 import org.codehaus.mojo.license.utils.LicenseSummaryWriter;
 import org.codehaus.mojo.license.utils.MojoHelper;
@@ -47,7 +48,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
@@ -458,27 +459,36 @@ public abstract class AbstractDownloadLicensesMojo
             // The resulting list of licenses after dependency resolution
             List<ProjectLicenseInfo> depProjectLicenses = new ArrayList<>();
 
-            for ( MavenProject project : dependencies )
+            try ( LicenseDownloader licenseDownloader = new LicenseDownloader() )
             {
-                Artifact artifact = project.getArtifact();
-                getLog().debug( "Checking licenses for project " + artifact );
-                String artifactProjectId = getArtifactProjectId( artifact );
-                ProjectLicenseInfo depProject;
-                if ( configuredDepLicensesMap.containsKey( artifactProjectId ) )
+                for ( MavenProject project : dependencies )
                 {
-                    depProject = configuredDepLicensesMap.get( artifactProjectId );
-                    depProject.setVersion( artifact.getVersion() );
+                    Artifact artifact = project.getArtifact();
+                    getLog().debug( "Checking licenses for project " + artifact );
+                    String artifactProjectId = getArtifactProjectId( artifact );
+                    ProjectLicenseInfo depProject;
+                    if ( configuredDepLicensesMap.containsKey( artifactProjectId ) )
+                    {
+                        depProject = configuredDepLicensesMap.get( artifactProjectId );
+                        depProject.setVersion( artifact.getVersion() );
+                    }
+                    else
+                    {
+                        depProject = createDependencyProject( project );
+                    }
+                    if ( !offline )
+                    {
+                        downloadLicenses( licenseDownloader, depProject );
+                    }
+                    depProjectLicenses.add( depProject );
                 }
-                else
-                {
-                    depProject = createDependencyProject( project );
-                }
-                if ( !offline )
-                {
-                    downloadLicenses( depProject );
-                }
-                depProjectLicenses.add( depProject );
             }
+            catch ( Exception e )
+            {
+                throw new RuntimeException( e );
+            }
+
+
 
             try
             {
@@ -867,7 +877,8 @@ public abstract class AbstractDownloadLicensesMojo
      * @param depProject The project which generated the dependency
      * @throws MojoFailureException
      */
-    private void downloadLicenses( ProjectLicenseInfo depProject ) throws MojoFailureException
+    private void downloadLicenses( LicenseDownloader licenseDownloader, ProjectLicenseInfo depProject )
+                    throws MojoFailureException
     {
         getLog().debug( "Downloading license(s) for project " + depProject );
 
@@ -906,9 +917,20 @@ public abstract class AbstractDownloadLicensesMojo
                 {
                     if ( !downloadedLicenseURLs.containsKey( licenseUrl ) || organizeLicensesByDependencies )
                     {
-                        licenseOutputFile = LicenseDownloader.downloadLicense( licenseUrl, proxyLoginPasswordEncoded,
-                                licenseOutputFile, getLog() );
-                        downloadedLicenseURLs.put( licenseUrl, licenseOutputFile );
+                        final LicenseDownloadResult result =
+                            licenseDownloader.downloadLicense( licenseUrl, proxyLoginPasswordEncoded, licenseOutputFile,
+                                                               getLog() );
+
+                        if ( result.isSuccess() )
+                        {
+                            licenseOutputFile = result.getFile();
+                            downloadedLicenseURLs.put( licenseUrl, licenseOutputFile );
+                        }
+                        else
+                        {
+                            handleError( depProject, result.getErrorMessage() );
+                        }
+
                     }
                 }
 
@@ -918,7 +940,7 @@ public abstract class AbstractDownloadLicensesMojo
                 }
 
             }
-            catch ( MalformedURLException e )
+            catch ( URISyntaxException e )
             {
                 handleError( depProject, "POM for dependency " + depProject.toString() + " has an invalid license URL: "
                                        + licenseUrl );

@@ -30,6 +30,10 @@ assert Files.exists(asl2)
 assert !asl2.text.contains('This content is fake.')
 assert asl2.text.contains('Version 2.0, January 2004')
 
+final Path lgpl21 = basePath.resolve('target/generated-resources/licenses/gnu lesser general public license v2.1 or later - lgpl-2.1.txt.html')
+assert Files.exists(lgpl21)
+assert lgpl21.text.contains('Version 2.1, February 1999')
+
 final Path expectedLicensesXml = basePath.resolve('licenses.expected.xml')
 final Path licensesXml = basePath.resolve('target/generated-resources/licenses.xml')
 assert expectedLicensesXml.text.equals(licensesXml.text)
