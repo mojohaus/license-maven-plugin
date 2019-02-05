@@ -41,3 +41,7 @@ assert expectedLicensesXml.text.equals(licensesXml.text)
 final Path expectedLicensesErrorsXml = basePath.resolve('licenses-errors.expected.xml')
 final Path licensesErrorsXml = basePath.resolve('target/generated-resources/licenses-errors.xml')
 assert expectedLicensesErrorsXml.text.equals(licensesErrorsXml.text)
+
+final Path log = basePath.resolve('build.log')
+assert Files.exists(log)
+assert log.text.contains('There were 1 download errors - check ')

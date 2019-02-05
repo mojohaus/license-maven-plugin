@@ -545,6 +545,7 @@
                   <pomIncludes>
                     <pomInclude>MLICENSE-4/pom.xml</pomInclude>
                   </pomIncludes>
+                  <cloneProjectsTo>${project.build.directory}/it2</cloneProjectsTo>
                 </configuration>
               </execution>
             </executions>
