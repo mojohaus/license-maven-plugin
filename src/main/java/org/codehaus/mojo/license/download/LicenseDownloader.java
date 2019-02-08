@@ -1,4 +1,4 @@
-package org.codehaus.mojo.license.utils;
+package org.codehaus.mojo.license.download;
 
 /*
  * #%L
@@ -63,7 +63,7 @@ import org.apache.http.protocol.HttpContext;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.settings.Proxy;
-import org.codehaus.mojo.license.download.FileNameEntry;
+import org.codehaus.mojo.license.utils.FileUtil;
 
 /**
  * Utilities for downloading remote license files.
