@@ -27,7 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.codehaus.mojo.license.utils.LicenseDownloader.LicenseDownloadResult;
+import org.codehaus.mojo.license.download.LicenseDownloader.LicenseDownloadResult;
 
 /**
  * A simple {@link HashMap} based in-memory cache for storing {@link LicenseDownloadResult}s.

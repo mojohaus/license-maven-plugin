@@ -37,16 +37,15 @@ import org.codehaus.mojo.license.api.MavenProjectDependenciesConfigurator;
 import org.codehaus.mojo.license.api.ResolvedProjectDependencies;
 import org.codehaus.mojo.license.download.Cache;
 import org.codehaus.mojo.license.download.FileNameEntry;
+import org.codehaus.mojo.license.download.LicenseDownloader;
 import org.codehaus.mojo.license.download.PreferredFileNames;
+import org.codehaus.mojo.license.download.LicenseDownloader.LicenseDownloadResult;
 import org.codehaus.mojo.license.model.ProjectLicense;
 import org.codehaus.mojo.license.model.ProjectLicenseInfo;
 import org.codehaus.mojo.license.utils.FileUtil;
-import org.codehaus.mojo.license.utils.LicenseDownloader;
-import org.codehaus.mojo.license.utils.LicenseDownloader.LicenseDownloadResult;
 import org.codehaus.mojo.license.utils.LicenseSummaryReader;
 import org.codehaus.mojo.license.utils.LicenseSummaryWriter;
 import org.codehaus.mojo.license.utils.MojoHelper;
-import org.codehaus.plexus.util.Base64;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -425,13 +424,6 @@ public abstract class AbstractDownloadLicensesMojo
      */
     private Cache cache;
 
-    /**
-     * Proxy Login/Password encoded(only if usgin a proxy with authentication).
-     *
-     * @since 1.4
-     */
-    private String proxyLoginPasswordEncoded;
-
     private int downloadErrorCount = 0;
 
     protected abstract boolean isSkip();
@@ -454,21 +446,6 @@ public abstract class AbstractDownloadLicensesMojo
                 this, localRepository, remoteRepositories, null );
     }
 
-    protected java.util.Properties systemProperties;
-
-    protected void storeProperties()
-    {
-        systemProperties = (java.util.Properties) System.getProperties().clone();
-    }
-    protected void restoreProperties()
-    {
-        if ( systemProperties != null )
-        {
-            System.setProperties( systemProperties );
-            systemProperties = null;
-        }
-    }
-
     /**
      * {@inheritDoc}
      * @throws MojoFailureException
@@ -489,113 +466,101 @@ public abstract class AbstractDownloadLicensesMojo
 
         initDirectories();
 
-        try
+        Map<String, ProjectLicenseInfo> configuredDepLicensesMap = new HashMap<>();
+
+        // License info from previous build
+        if ( !forceDownload && licensesOutputFile.exists() )
         {
-            initProxy();
+            loadLicenseInfo( configuredDepLicensesMap, licensesOutputFile, true );
+        }
 
-            Map<String, ProjectLicenseInfo> configuredDepLicensesMap = new HashMap<>();
+        // Manually configured license info, loaded second to override previously loaded info
+        if ( licensesConfigFile.exists() )
+        {
+            loadLicenseInfo( configuredDepLicensesMap, licensesConfigFile, false );
+        }
 
-            // License info from previous build
-            if ( !forceDownload && licensesOutputFile.exists() )
+        Set<MavenProject> dependencies = getDependencies();
+
+        // The resulting list of licenses after dependency resolution
+        List<ProjectLicenseInfo> depProjectLicenses = new ArrayList<>();
+
+        try ( LicenseDownloader licenseDownloader = new LicenseDownloader( findActiveProxy() ) )
+        {
+            for ( MavenProject project : dependencies )
             {
-                loadLicenseInfo( configuredDepLicensesMap, licensesOutputFile, true );
+                Artifact artifact = project.getArtifact();
+                getLog().debug( "Checking licenses for project " + artifact );
+                String artifactProjectId = getArtifactProjectId( artifact );
+                ProjectLicenseInfo depProject;
+                if ( configuredDepLicensesMap.containsKey( artifactProjectId ) )
+                {
+                    depProject = configuredDepLicensesMap.get( artifactProjectId );
+                    depProject.setVersion( artifact.getVersion() );
+                }
+                else
+                {
+                    depProject = createDependencyProject( project );
+                }
+                depProjectLicenses.add( depProject );
             }
-
-            // Manually configured license info, loaded second to override previously loaded info
-            if ( licensesConfigFile.exists() )
+            if ( !offline )
             {
-                loadLicenseInfo( configuredDepLicensesMap, licensesConfigFile, false );
-            }
-
-            Set<MavenProject> dependencies = getDependencies();
-
-            // The resulting list of licenses after dependency resolution
-            List<ProjectLicenseInfo> depProjectLicenses = new ArrayList<>();
-
-            try ( LicenseDownloader licenseDownloader = new LicenseDownloader() )
-            {
-                for ( MavenProject project : dependencies )
+                /* First save the matching URLs into the cache */
+                for ( ProjectLicenseInfo depProject : depProjectLicenses )
                 {
-                    Artifact artifact = project.getArtifact();
-                    getLog().debug( "Checking licenses for project " + artifact );
-                    String artifactProjectId = getArtifactProjectId( artifact );
-                    ProjectLicenseInfo depProject;
-                    if ( configuredDepLicensesMap.containsKey( artifactProjectId ) )
-                    {
-                        depProject = configuredDepLicensesMap.get( artifactProjectId );
-                        depProject.setVersion( artifact.getVersion() );
-                    }
-                    else
-                    {
-                        depProject = createDependencyProject( project );
-                    }
-                    depProjectLicenses.add( depProject );
+                    downloadLicenses( licenseDownloader, depProject, true );
                 }
-                if ( !offline )
+                getLog().debug( "Finished populating cache" );
+                /*
+                 * Then attempt to download the rest of the URLs using the available cache entries to select local
+                 * file names based on file content sha1
+                 */
+                for ( ProjectLicenseInfo depProject : depProjectLicenses )
                 {
-                    /* First save the matching URLs into the cache */
-                    for ( ProjectLicenseInfo depProject : depProjectLicenses )
-                    {
-                        downloadLicenses( licenseDownloader, depProject, true );
-                    }
-                    getLog().debug( "Finished populating cache" );
-                    /*
-                     * Then attempt to download the rest of the URLs using the available cache entries to select local
-                     * file names based on file content sha1
-                     */
-                    for ( ProjectLicenseInfo depProject : depProjectLicenses )
-                    {
-                        downloadLicenses( licenseDownloader, depProject, false );
-                    }
+                    downloadLicenses( licenseDownloader, depProject, false );
                 }
-            }
-            catch ( IOException e )
-            {
-                throw new RuntimeException( e );
-            }
-
-
-
-            try
-            {
-                if ( sortByGroupIdAndArtifactId )
-                {
-                    depProjectLicenses = sortByGroupIdAndArtifactId( depProjectLicenses );
-                }
-
-                if ( licensesOutputFileEncoding == null )
-                {
-                    licensesOutputFileEncoding = System.getProperty( "file.encoding" );
-                    getLog().warn( "Using the default system encoding for reading or writing licenses.xml file."
-                            + " This makes your build platform dependent. You should set either"
-                            + " project.build.sourceEncoding or licensesOutputFileEncoding" );
-                }
-                final Charset charset = Charset.forName( licensesOutputFileEncoding );
-                if ( licensesOutputFileEol == Eol.AUTODETECT )
-                {
-                    final Path autodetectFromFile = licensesConfigFile.exists() ? licensesConfigFile.toPath()
-                            : project.getBasedir().toPath().resolve( "pom.xml" );
-                    licensesOutputFileEol = Eol.autodetect( autodetectFromFile, charset );
-                }
-
-                List<ProjectLicenseInfo> depProjectLicensesWithErrors = filterErrors( depProjectLicenses );
-                LicenseSummaryWriter.writeLicenseSummary( depProjectLicenses, licensesOutputFile, charset,
-                                                          licensesOutputFileEol );
-                if ( depProjectLicensesWithErrors != null && !depProjectLicensesWithErrors.isEmpty() )
-                {
-                    LicenseSummaryWriter.writeLicenseSummary( depProjectLicensesWithErrors, licensesErrorsFile, charset,
-                                                              licensesOutputFileEol );
-                }
-            }
-            catch ( Exception e )
-            {
-                throw new MojoExecutionException( "Unable to write license summary file: " + licensesOutputFile, e );
             }
         }
-        finally
+        catch ( IOException e )
         {
-            //restore the system properties to what they where before the plugin execution
-            restoreProperties();
+            throw new RuntimeException( e );
+        }
+
+        try
+        {
+            if ( sortByGroupIdAndArtifactId )
+            {
+                depProjectLicenses = sortByGroupIdAndArtifactId( depProjectLicenses );
+            }
+
+            if ( licensesOutputFileEncoding == null )
+            {
+                licensesOutputFileEncoding = System.getProperty( "file.encoding" );
+                getLog().warn( "Using the default system encoding for reading or writing licenses.xml file."
+                        + " This makes your build platform dependent. You should set either"
+                        + " project.build.sourceEncoding or licensesOutputFileEncoding" );
+            }
+            final Charset charset = Charset.forName( licensesOutputFileEncoding );
+            if ( licensesOutputFileEol == Eol.AUTODETECT )
+            {
+                final Path autodetectFromFile = licensesConfigFile.exists() ? licensesConfigFile.toPath()
+                        : project.getBasedir().toPath().resolve( "pom.xml" );
+                licensesOutputFileEol = Eol.autodetect( autodetectFromFile, charset );
+            }
+
+            List<ProjectLicenseInfo> depProjectLicensesWithErrors = filterErrors( depProjectLicenses );
+            LicenseSummaryWriter.writeLicenseSummary( depProjectLicenses, licensesOutputFile, charset,
+                                                      licensesOutputFileEol );
+            if ( depProjectLicensesWithErrors != null && !depProjectLicensesWithErrors.isEmpty() )
+            {
+                LicenseSummaryWriter.writeLicenseSummary( depProjectLicensesWithErrors, licensesErrorsFile, charset,
+                                                          licensesOutputFileEol );
+            }
+        }
+        catch ( Exception e )
+        {
+            throw new MojoExecutionException( "Unable to write license summary file: " + licensesOutputFile, e );
         }
 
         switch ( errorRemedy )
@@ -798,7 +763,7 @@ public abstract class AbstractDownloadLicensesMojo
         }
     }
 
-    private void initProxy()
+    private Proxy findActiveProxy()
         throws MojoExecutionException
     {
         Proxy proxyToUse = null;
@@ -806,29 +771,10 @@ public abstract class AbstractDownloadLicensesMojo
         {
             if ( proxy.isActive() && "http".equals( proxy.getProtocol() ) )
             {
-
-                // found our proxy
-                proxyToUse = proxy;
-                break;
+                return proxy;
             }
         }
-        if ( proxyToUse != null )
-        {
-            //Save our system settings for restore after plugin run
-            storeProperties();
-            System.getProperties().put( "proxySet", "true" );
-            System.setProperty( "proxyHost", proxyToUse.getHost() );
-            System.setProperty( "proxyPort", String.valueOf( proxyToUse.getPort() ) );
-            if ( proxyToUse.getNonProxyHosts() != null )
-            {
-                System.setProperty( "nonProxyHosts", proxyToUse.getNonProxyHosts() );
-            }
-            if ( proxyToUse.getUsername() != null )
-            {
-                String loginPassword = proxyToUse.getUsername() + ":" + proxyToUse.getPassword();
-                proxyLoginPasswordEncoded = new String( Base64.encodeBase64( loginPassword.getBytes() ) );
-            }
-        }
+        return null;
     }
 
     /**
@@ -1067,8 +1013,7 @@ public abstract class AbstractDownloadLicensesMojo
                             if ( !licenseOutputFile.exists() || forceDownload )
                             {
                                 LicenseDownloadResult result =
-                                    licenseDownloader.downloadLicense( licenseUrl, proxyLoginPasswordEncoded,
-                                                                       fileNameEntry, getLog() );
+                                    licenseDownloader.downloadLicense( licenseUrl, fileNameEntry, getLog() );
                                 if ( !organizeLicensesByDependencies && result.isSuccess() )
                                 {
                                     /* check if we can re-use an existing file that has the same content */
