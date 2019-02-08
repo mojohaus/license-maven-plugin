@@ -26,12 +26,15 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
+import org.apache.commons.codec.binary.Hex;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
@@ -41,7 +44,9 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
+import org.codehaus.mojo.license.download.FileNameEntry;
 
 /**
  * Utilities for downloading remote license files.
@@ -82,20 +87,25 @@ public class LicenseDownloader implements AutoCloseable
      * @return the path to the file where the downloaded license file was stored
      * @throws IOException
      * @throws URISyntaxException
+     * @throws MojoFailureException
      */
-    public LicenseDownloadResult downloadLicense( String licenseUrlString, String loginPassword, File outputFile,
-                                                  Log log )
-        throws IOException, URISyntaxException
+    public LicenseDownloadResult downloadLicense( String licenseUrlString, String loginPassword,
+                                                  FileNameEntry fileNameEntry, Log log )
+        throws IOException, URISyntaxException, MojoFailureException
     {
+        final File outputFile = fileNameEntry.getFile();
         if ( licenseUrlString == null || licenseUrlString.length() == 0 )
         {
-            return LicenseDownloadResult.success( outputFile );
+            throw new IllegalArgumentException( "Null URL for file " + outputFile.getPath() );
         }
+
+        log.debug( "Downloading " + licenseUrlString );
 
         if ( licenseUrlString.startsWith( "file://" ) )
         {
-            Files.copy( Paths.get( new URI( licenseUrlString ) ), outputFile.toPath() );
-            return LicenseDownloadResult.success( outputFile );
+            Path in = Paths.get( new URI( licenseUrlString ) );
+            Files.copy( in, outputFile.toPath() );
+            return LicenseDownloadResult.success( outputFile, FileUtil.sha1( in ), fileNameEntry.isPreferred() );
         }
         else
         {
@@ -113,40 +123,46 @@ public class LicenseDownloader implements AutoCloseable
                 if ( entity != null )
                 {
                     final ContentType contentType = ContentType.get( entity );
-                    File updatedFile =
-                        updateFileExtension( outputFile, contentType != null ? contentType.getMimeType() : null );
+
+                    File updatedFile = fileNameEntry.isPreferred() ? outputFile
+                                    : updateFileExtension( outputFile,
+                                                           contentType != null ? contentType.getMimeType() : null );
 
                     try ( InputStream in = entity.getContent();
                                     FileOutputStream fos = new FileOutputStream( updatedFile ) )
                     {
-                        copyStream( in, fos );
+                        final MessageDigest md = MessageDigest.getInstance( "SHA-1" );
+                        final byte[] buf = new byte[1024];
+                        int len;
+                        while ( ( len = in.read( buf ) ) >= 0 )
+                        {
+                            md.update( buf, 0, len );
+                            fos.write( buf, 0, len );
+                        }
+                        final String actualSha1 = Hex.encodeHexString( md.digest() );
+                        final String expectedSha1 = fileNameEntry.getSha1();
+                        if ( expectedSha1 != null && !expectedSha1.equals( actualSha1 ) )
+                        {
+                            throw new MojoFailureException( "URL '" + licenseUrlString
+                                            + "' returned content with unexpected sha1 '" + actualSha1 + "'; expected '"
+                                            + expectedSha1 + "'. You may want to (a) re-run the current mojo"
+                                            + " with -Dlicense.forceDownload=true or (b) change the expected sha1 in"
+                                            + " the licenseUrlFileNames entry '"
+                                            + fileNameEntry.getFile().getName() + "' or (c) split the entry so that"
+                                            + " its URLs return content with different sha1 sums." );
+                        }
+                        return LicenseDownloadResult.success( updatedFile, actualSha1, fileNameEntry.isPreferred() );
                     }
-                    return LicenseDownloadResult.success( updatedFile );
-
+                    catch ( NoSuchAlgorithmException e )
+                    {
+                        throw new RuntimeException( e );
+                    }
                 }
                 else
                 {
                     return LicenseDownloadResult.failure( "'" + licenseUrlString + "' returned no body." );
                 }
             }
-        }
-    }
-
-    /**
-     * Copy data from one stream to another.
-     *
-     * @param inStream
-     * @param outStream
-     * @throws IOException
-     */
-    private static void copyStream( InputStream inStream, OutputStream outStream )
-        throws IOException
-    {
-        byte[] buf = new byte[1024];
-        int len;
-        while ( ( len = inStream.read( buf ) ) > 0 )
-        {
-            outStream.write( buf, 0, len );
         }
     }
 
@@ -160,6 +176,13 @@ public class LicenseDownloader implements AutoCloseable
             {
                 return new File( outputFile.getAbsolutePath() + realExtension );
             }
+        }
+        /* default extension is .txt */
+        final String name = outputFile.getName();
+        final int periodPos = name.lastIndexOf( '.' );
+        if ( periodPos < 0 || name.length() - periodPos > 5 )
+        {
+            return new File( outputFile.getParent(), name.substring( 0, periodPos ) + ".txt" );
         }
         return outputFile;
     }
@@ -191,8 +214,7 @@ public class LicenseDownloader implements AutoCloseable
     }
 
     @Override
-    public void close()
-        throws Exception
+    public void close() throws IOException
     {
         client.close();
     }
@@ -204,26 +226,32 @@ public class LicenseDownloader implements AutoCloseable
      */
     public static class LicenseDownloadResult
     {
-        public static LicenseDownloadResult success( File file )
+        public static LicenseDownloadResult success( File file, String sha1, boolean preferredFileName )
         {
-            return new LicenseDownloadResult( file, null );
+            return new LicenseDownloadResult( file, sha1, preferredFileName, null );
         }
 
         public static LicenseDownloadResult failure( String errorMessage )
         {
-            return new LicenseDownloadResult( null, errorMessage );
+            return new LicenseDownloadResult( null, null, false, errorMessage );
         }
 
-        private LicenseDownloadResult( File file, String errorMessage )
+        private LicenseDownloadResult( File file, String sha1, boolean preferredFileName, String errorMessage )
         {
             super();
             this.file = file;
             this.errorMessage = errorMessage;
+            this.sha1 = sha1;
+            this.preferredFileName = preferredFileName;
         }
 
         private final File file;
 
         private final String errorMessage;
+
+        private final String sha1;
+
+        private final boolean preferredFileName;
 
         public File getFile()
         {
@@ -238,6 +266,21 @@ public class LicenseDownloader implements AutoCloseable
         public boolean isSuccess()
         {
             return errorMessage == null;
+        }
+
+        public boolean isPreferredFileName()
+        {
+            return preferredFileName;
+        }
+
+        public String getSha1()
+        {
+            return sha1;
+        }
+
+        public LicenseDownloadResult withFile( File otherFile )
+        {
+            return new LicenseDownloadResult( otherFile, sha1, preferredFileName, errorMessage );
         }
     }
 

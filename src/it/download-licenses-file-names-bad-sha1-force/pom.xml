@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.codehaus.mojo.license</groupId>
+  <artifactId>download-licenses-file-names-bad-sha1</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <name>Integration Test</name>
+  <url>http://maven.apache.org</url>
+  <description>
+    Check -Dlicense.errorRemedy=xmlOutput -Dlicense.sortByGroupIdAndArtifactId=true
+  </description>
+
+  <dependencies>
+    <dependency>
+      <groupId>antlr</groupId>
+      <artifactId>antlr</artifactId>
+      <version>2.7.7</version>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>commons-collections</groupId>
+      <artifactId>commons-collections</artifactId>
+      <version>3.2.2</version>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>@pom.version@</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>download-licenses</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <licenseUrlFileNames>
+            <asl2.txt>
+                sha1:2b8b815229aa8a61e483fb4ba0588b8b6c491890
+                \Qhttp://www.apache.org/licenses/LICENSE-2.0.txt\E
+                \Qhttps://www.apache.org/licenses/LICENSE-2.0.txt\E
+                \Qhttp://www.antlr.org/license.html\E
+            </asl2.txt>
+          </licenseUrlFileNames>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
