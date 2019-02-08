@@ -33,19 +33,36 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpException;
+import org.apache.http.HttpHost;
+import org.apache.http.HttpRequest;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.Credentials;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.config.RequestConfig.Builder;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.conn.routing.HttpRoutePlanner;
 import org.apache.http.entity.ContentType;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.DefaultProxyRoutePlanner;
+import org.apache.http.protocol.HttpContext;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.settings.Proxy;
 import org.codehaus.mojo.license.download.FileNameEntry;
 
 /**
@@ -64,14 +81,62 @@ public class LicenseDownloader implements AutoCloseable
 
     private final CloseableHttpClient client;
 
-    public LicenseDownloader()
+    public LicenseDownloader( Proxy proxy )
     {
-        final RequestConfig config = RequestConfig.copy( RequestConfig.DEFAULT )
-            .setConnectTimeout( DEFAULT_CONNECTION_TIMEOUT )
-            .setSocketTimeout( DEFAULT_CONNECTION_TIMEOUT )
-            .setConnectionRequestTimeout( DEFAULT_CONNECTION_TIMEOUT )
-            .build();
-        this.client = HttpClients.custom().setDefaultRequestConfig( config ).build();
+
+        final Builder configBuilder = RequestConfig.copy( RequestConfig.DEFAULT ) //
+                        .setConnectTimeout( DEFAULT_CONNECTION_TIMEOUT ) //
+                        .setSocketTimeout( DEFAULT_CONNECTION_TIMEOUT ) //
+                        .setConnectionRequestTimeout( DEFAULT_CONNECTION_TIMEOUT );
+
+        HttpClientBuilder clientBuilder = HttpClients.custom().setDefaultRequestConfig( configBuilder.build() );
+        if ( proxy != null )
+        {
+            if ( proxy.getUsername() != null && proxy.getPassword() != null )
+            {
+                final CredentialsProvider credsProvider = new BasicCredentialsProvider();
+                final Credentials creds = new UsernamePasswordCredentials( proxy.getUsername(), proxy.getPassword() );
+                credsProvider.setCredentials( new AuthScope( proxy.getHost(), proxy.getPort() ), creds );
+                clientBuilder.setDefaultCredentialsProvider( credsProvider );
+            }
+            final String rawNonProxyHosts = proxy.getNonProxyHosts();
+            if ( rawNonProxyHosts != null )
+            {
+                final String[] nonProxyHosts = rawNonProxyHosts.split( "|" );
+                if ( nonProxyHosts.length > 0 )
+                {
+                    final List<Pattern> nonProxyPatterns = new ArrayList<>();
+                    for ( String nonProxyHost : nonProxyHosts )
+                    {
+                        final Pattern pat =
+                            Pattern.compile( nonProxyHost.replaceAll( "\\.", "\\\\." ).replaceAll( "\\*", ".*" ),
+                                             Pattern.CASE_INSENSITIVE );
+                        nonProxyPatterns.add( pat );
+                    }
+                    final HttpHost proxyHost = new HttpHost( proxy.getHost(), proxy.getPort() );
+                    final HttpRoutePlanner routePlanner = new DefaultProxyRoutePlanner( proxyHost )
+                    {
+
+                        @Override
+                        protected HttpHost determineProxy( HttpHost target, HttpRequest request, HttpContext context )
+                            throws HttpException
+                        {
+                            for ( Pattern pattern : nonProxyPatterns )
+                            {
+                                if ( pattern.matcher( target.getHostName() ).matches() )
+                                {
+                                    return null;
+                                }
+                            }
+                            return super.determineProxy( target, request, context );
+                        }
+
+                    };
+                    clientBuilder.setRoutePlanner( routePlanner );
+                }
+            }
+        }
+        this.client = clientBuilder.build();
     }
 
     /**
@@ -81,7 +146,6 @@ public class LicenseDownloader implements AutoCloseable
      * can be adjusted based on the mime type of the HTTP response.
      *
      * @param licenseUrlString the URL
-     * @param loginPassword the credentials part for the URL, can be {@code null}
      * @param outputFile a hint where to store the license file
      * @param log
      * @return the path to the file where the downloaded license file was stored
@@ -89,8 +153,7 @@ public class LicenseDownloader implements AutoCloseable
      * @throws URISyntaxException
      * @throws MojoFailureException
      */
-    public LicenseDownloadResult downloadLicense( String licenseUrlString, String loginPassword,
-                                                  FileNameEntry fileNameEntry, Log log )
+    public LicenseDownloadResult downloadLicense( String licenseUrlString, FileNameEntry fileNameEntry, Log log )
         throws IOException, URISyntaxException, MojoFailureException
     {
         final File outputFile = fileNameEntry.getFile();
