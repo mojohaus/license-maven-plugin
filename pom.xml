@@ -378,6 +378,11 @@
           <artifactId>editorconfig-maven-plugin</artifactId>
           <version>0.0.10</version>
         </plugin>
+        <plugin>
+          <groupId>org.codehaus.gmaven</groupId>
+          <artifactId>groovy-maven-plugin</artifactId>
+          <version>2.1</version>
+        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>
@@ -396,7 +401,7 @@
         </executions>
         <configuration>
           <headerLocation>config/checkstyle-header.txt</headerLocation>
-          <excludes>**/HelpMojo.java</excludes><!-- HelpMojo.java is generated -->
+          <excludes>**/HelpMojo.java,**/SpdxLicenseListData.java</excludes><!-- these are generated -->
         </configuration>
       </plugin>
       <plugin>
@@ -494,6 +499,32 @@
             <exclude>src/test/resources/newRepository/**</exclude>
           </excludes>
         </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.gmaven</groupId>
+        <artifactId>groovy-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <!-- Not bound to any phase. Invoke manually using -->
+            <!--   mvn groovy:execute@GenerateSpdxLicenseList -->
+            <!-- to re-generate SpdxLicenseListData -->
+            <id>GenerateSpdxLicenseList</id>
+            <goals>
+              <goal>execute</goal>
+            </goals>
+            <configuration>
+              <source>${project.basedir}/src/build/scripts/GenerateSpdxLicenseList.groovy</source>
+            </configuration>
+          </execution>
+        </executions>
+        <dependencies>
+          <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>${version.httpcomponents.httpclient}</version>
+          </dependency>
+        </dependencies>
       </plugin>
 
     </plugins>
