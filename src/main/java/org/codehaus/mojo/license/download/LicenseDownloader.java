@@ -162,16 +162,17 @@ public class LicenseDownloader implements AutoCloseable
             throw new IllegalArgumentException( "Null URL for file " + outputFile.getPath() );
         }
 
-        log.debug( "Downloading " + licenseUrlString );
 
         if ( licenseUrlString.startsWith( "file://" ) )
         {
+            log.debug( "Downloading '" + licenseUrlString + "' -> '" + outputFile + "'" );
             Path in = Paths.get( new URI( licenseUrlString ) );
             Files.copy( in, outputFile.toPath() );
             return LicenseDownloadResult.success( outputFile, FileUtil.sha1( in ), fileNameEntry.isPreferred() );
         }
         else
         {
+            log.debug( "About to download '" + licenseUrlString + "'" );
             try ( CloseableHttpResponse response = client.execute( new HttpGet( licenseUrlString ) ) )
             {
                 final StatusLine statusLine = response.getStatusLine();
@@ -190,6 +191,8 @@ public class LicenseDownloader implements AutoCloseable
                     File updatedFile = fileNameEntry.isPreferred() ? outputFile
                                     : updateFileExtension( outputFile,
                                                            contentType != null ? contentType.getMimeType() : null );
+                    log.debug( "Downloading '" + licenseUrlString + "' -> '" + updatedFile + "'"
+                        + ( fileNameEntry.isPreferred() ? " (preferred file name)" : "" ) );
 
                     try ( InputStream in = entity.getContent();
                                     FileOutputStream fos = new FileOutputStream( updatedFile ) )
@@ -231,7 +234,7 @@ public class LicenseDownloader implements AutoCloseable
 
     private static File updateFileExtension( File outputFile, String mimeType )
     {
-        final String realExtension = getFileExtension( mimeType );
+        final String realExtension = FileUtil.toExtension( mimeType, false );
 
         if ( realExtension != null )
         {
@@ -248,32 +251,6 @@ public class LicenseDownloader implements AutoCloseable
             return new File( outputFile.getParent(), name.substring( 0, periodPos ) + ".txt" );
         }
         return outputFile;
-    }
-
-    private static String getFileExtension( String mimeType )
-    {
-        if ( mimeType == null )
-        {
-            return null;
-        }
-
-        final String lowerMimeType = mimeType.toLowerCase();
-        if ( lowerMimeType.contains( "plain" ) )
-        {
-            return ".txt";
-        }
-
-        if ( lowerMimeType.contains( "html" ) )
-        {
-            return ".html";
-        }
-
-        if ( lowerMimeType.contains( "pdf" ) )
-        {
-            return ".pdf";
-        }
-
-        return null;
     }
 
     @Override

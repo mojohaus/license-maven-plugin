@@ -344,8 +344,12 @@ public abstract class AbstractDownloadLicensesMojo
      *     <replacement>https://oss.oracle.com/licenses/CDDL+GPL-1.1</replacement>
      *   </licenseUrlReplacement>
      *   <licenseUrlReplacement>
-     *      <regexp>https://(.*)</regexp>
-     *      <replacement>http://$1</replacement>
+     *     <regexp>https://(.*)</regexp><!-- replace https with http -->
+     *     <replacement>http://$1</replacement>
+     *   </licenseUrlReplacement>
+     *   <licenseUrlReplacement>
+     *     <regexp>^https?://github\.com/([^/]+)/([^/]+)/blob/(.*)$</regexp><!-- replace GitHub web UI with raw -->
+     *     <replacement>https://raw.githubusercontent.com/$1/$2/$3</replacement>
      *   </licenseUrlReplacement>
      * </licenseUrlReplacements>
      * }
@@ -357,25 +361,32 @@ public abstract class AbstractDownloadLicensesMojo
     private List<LicenseUrlReplacement> licenseUrlReplacements;
 
     /**
-     * A map that helps to select names for the local files where the downloaded licenses are stored.
+     * A map that helps to select local files names for the content downloaded from license URLs.
      * <p>
-     * Keys in the map are local file names. These files will be created under {@link #licensesOutputDirectory}.
+     * Keys in the map are the local file names. These files will be created under {@link #licensesOutputDirectory}.
      * <p>
      * Values are white space ({@code " \t\n\r"}) separated lists of regular expressions that will be used to match
      * license URLs. The regular expressions are compiled using {@link Pattern#CASE_INSENSITIVE}. Note that various
      * characters that commonly occur in URLs have special meanings in regular extensions. Therefore, consider using
-     * regex quoting as described in {@link Pattern}.
+     * regex quoting as described in {@link Pattern} - e.g. {@code http://example\.com} or
+     * {@code \Qhttp://example.com\E}
      * <p>
-     * In addition to URL patterns, the list must also contain the sha1 checksum of the expected content. This is to
-     * ensure that URLs returning distinct licenses cannot be saved under the same local path. Note that strict checking
-     * of the checksum happens only when {@link #forceDownload} is {@code true}. Otherwise the mojo assumes the URL
+     * In addition to URL patterns, the list can optionally contain a sha1 checksum of the expected content. This is to
+     * ensure that the content delivered by a URL does not change without notice. Note that strict checking
+     * of the checksum happens only when {@link #forceDownload} is {@code true}. Otherwise the mojo assumes that the URL
      * -&gt; local name mapping is correct and downloads from the URL only if the local file does not exist.
      * <p>
-     * Using {@link #licenseUrlFileNames} for URLs returning volatile content is not a good idea.
-     * <p>An example:
+     * A special value-less entry {@code <spdx/>} can be used to activate built-in license names that are based on
+     * license IDs from <a href="https://spdx.org/licenses/">https://spdx.org/licenses</a>. The built-in SPDX mappings
+     * can be overridden by the subsequent entries. To see which SPDX mappings are built-in, add the {@code <spdx/>}
+     * entry and run the mojo with debug log level, e.g. using {@code -X} or
+     * {-Dorg.slf4j.simpleLogger.log.org.codehaus.mojo.license=debug} on the command line.
+     * <p>
+     * An example:
      * <pre>
      * {@code
      * <licenseUrlFileNames>
+     *   <spdx/><!-- A special element to activate built-in file name entries based on spdx.org license IDs -->
      *   <bsd-antlr.html>
      *       sha1:81ffbd1712afe8cdf138b570c0fc9934742c33c1
      *       https?://(www\.)?antlr\.org/license\.html
@@ -1023,9 +1034,19 @@ public abstract class AbstractDownloadLicensesMojo
                                         final File oldFile = result.getFile();
                                         if ( !oldFile.getName().equals( name ) )
                                         {
+                                            getLog().debug( "Found preferred name '" + name
+                                                + "' by sha1 after downloading '" + licenseUrl + "'; renaming from '"
+                                                + oldFile.getName() + "'" );
                                             final File newFile = new File( licensesOutputDirectory, name );
+                                            if ( newFile.exists() )
+                                            {
+                                                oldFile.delete();
+                                            }
+                                            else
+                                            {
+                                                oldFile.renameTo( newFile );
+                                            }
                                             result = result.withFile( newFile );
-                                            oldFile.delete();
                                         }
                                     }
                                 }
