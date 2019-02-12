@@ -48,6 +48,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Some basic file io utilities
@@ -306,6 +307,45 @@ public class FileUtil
         catch ( NoSuchAlgorithmException e )
         {
             throw new RuntimeException( e );
+        }
+    }
+
+    public static String toExtension( String mimeType, boolean throwDefault )
+    {
+        if ( mimeType == null )
+        {
+            if ( throwDefault )
+            {
+                throw new IllegalStateException( "Unexpected null mime type" );
+            }
+            else
+            {
+                return null;
+            }
+        }
+        final String lowerMimeType = mimeType.toLowerCase( Locale.ROOT );
+        if ( lowerMimeType.contains( "plain" ) || "text/x-c".equals( lowerMimeType ) )
+        {
+            return ".txt";
+        }
+
+        if ( lowerMimeType.contains( "html" ) )
+        {
+            return ".html";
+        }
+
+        if ( lowerMimeType.contains( "pdf" ) )
+        {
+            return ".pdf";
+        }
+
+        if ( throwDefault )
+        {
+            throw new IllegalStateException( "Unexpected mime type '" + mimeType + "'" );
+        }
+        else
+        {
+            return null;
         }
     }
 }
