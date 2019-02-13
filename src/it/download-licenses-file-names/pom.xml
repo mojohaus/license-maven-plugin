@@ -69,34 +69,71 @@
         <version>@pom.version@</version>
         <executions>
           <execution>
+            <id>basic</id>
+            <phase>validate</phase>
             <goals>
               <goal>download-licenses</goal>
             </goals>
+            <configuration>
+              <licensesOutputDirectory>${project.build.directory}/basic/licenses</licensesOutputDirectory>
+              <licensesOutputFile>${project.build.directory}/basic/licenses.xml</licensesOutputFile>
+              <licensesConfigFile>${basedir}/licenses-config.xml</licensesConfigFile>
+              <errorRemedy>xmlOutput</errorRemedy>
+              <sortByGroupIdAndArtifactId>true</sortByGroupIdAndArtifactId>
+              <licenseUrlReplacements>
+                <licenseUrlReplacement>
+                  <regexp>^https?://github\.com/([^/]+)/([^/]+)/blob/(.*)$</regexp>
+                  <replacement>https://raw.githubusercontent.com/$1/$2/$3</replacement>
+                </licenseUrlReplacement>
+              </licenseUrlReplacements>
+              <licenseUrlFileNames>
+                <bsd-antlr.html>
+                    sha1:074f8d6e91730b40875178666513014472888247
+                    \Qhttp://www.antlr.org/license.html\E
+                </bsd-antlr.html>
+                <asl2.txt>
+                    sha1:2b8b815229aa8a61e483fb4ba0588b8b6c491890
+                    \Qhttp://www.apache.org/licenses/LICENSE-2.0.txt\E
+                    \Qhttps://www.apache.org/licenses/LICENSE-2.0.txt\E
+                </asl2.txt>
+                <cddl-gplv2-ce.txt>
+                    sha1:c27730aef98e1d50e937d808654daad00b258f90
+                    \Qhttps://raw.githubusercontent.com/javaee/activation/master/LICENSE.txt\E
+                </cddl-gplv2-ce.txt>
+              </licenseUrlFileNames>
+            </configuration>
+          </execution>
+          <execution>
+            <id>spdx</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>download-licenses</goal>
+            </goals>
+            <configuration>
+              <licensesOutputDirectory>${project.build.directory}/spdx/licenses</licensesOutputDirectory>
+              <licensesOutputFile>${project.build.directory}/spdx/licenses.xml</licensesOutputFile>
+              <errorRemedy>xmlOutput</errorRemedy>
+              <sortByGroupIdAndArtifactId>true</sortByGroupIdAndArtifactId>
+              <licenseUrlReplacements>
+                <licenseUrlReplacement>
+                  <regexp>^https?://github\.com/([^/]+)/([^/]+)/blob/(.*)$</regexp>
+                  <replacement>https://raw.githubusercontent.com/$1/$2/$3</replacement>
+                </licenseUrlReplacement>
+              </licenseUrlReplacements>
+              <licenseUrlFileNames>
+                <spdx/>
+                <bsd-antlr.html>
+                    sha1:074f8d6e91730b40875178666513014472888247
+                    \Qhttp://www.antlr.org/license.html\E
+                </bsd-antlr.html>
+                <cddl-gplv2-ce.txt>
+                    sha1:c27730aef98e1d50e937d808654daad00b258f90
+                    \Qhttps://raw.githubusercontent.com/javaee/activation/master/LICENSE.txt\E
+                </cddl-gplv2-ce.txt>
+              </licenseUrlFileNames>
+            </configuration>
           </execution>
         </executions>
-        <configuration>
-          <licenseUrlReplacements>
-            <licenseUrlReplacement>
-              <regexp>^https?://github\.com/([^/]+)/([^/]+)/blob/(.*)$</regexp>
-              <replacement>https://raw.githubusercontent.com/$1/$2/$3</replacement>
-            </licenseUrlReplacement>
-          </licenseUrlReplacements>
-          <licenseUrlFileNames>
-            <bsd-antlr.html>
-                sha1:074f8d6e91730b40875178666513014472888247
-                \Qhttp://www.antlr.org/license.html\E
-            </bsd-antlr.html>
-            <asl2.txt>
-                sha1:2b8b815229aa8a61e483fb4ba0588b8b6c491890
-                \Qhttp://www.apache.org/licenses/LICENSE-2.0.txt\E
-                \Qhttps://www.apache.org/licenses/LICENSE-2.0.txt\E
-            </asl2.txt>
-            <cddl-gplv2-ce.txt>
-                sha1:c27730aef98e1d50e937d808654daad00b258f90
-                \Qhttps://raw.githubusercontent.com/javaee/activation/master/LICENSE.txt\E
-            </cddl-gplv2-ce.txt>
-          </licenseUrlFileNames>
-        </configuration>
       </plugin>
     </plugins>
   </build>
