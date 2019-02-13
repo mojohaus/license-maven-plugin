@@ -22,6 +22,8 @@ package org.codehaus.mojo.license;
  * #L%
  */
 
+import org.apache.commons.io.FileUtils;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.License;
@@ -114,6 +116,20 @@ public abstract class AbstractDownloadLicensesMojo
     @Parameter( property = "licensesOutputDirectory",
         defaultValue = "${project.build.directory}/generated-resources/licenses" )
     private File licensesOutputDirectory;
+
+    /**
+     * If {@code true}, the mojo will delete all files from {@link #licensesOutputDirectory} and then download them all
+     * anew; otherwise the deletion before the download does not happen.
+     * <p>
+     * This may be useful if you have removed some dependencies and you want the stale license files to go away.
+     * <b>
+     * {@code cleanLicensesOutputDirectory = true} is not implied by {@link #forceDownload} because users may have
+     * other files there in {@link #licensesOutputDirectory} that were not downloaded by the plugin.
+     *
+     * @since 1.18
+     */
+    @Parameter( property = "license.cleanLicensesOutputDirectory", defaultValue = "false" )
+    private boolean cleanLicensesOutputDirectory;
 
     /**
      * The output file containing a mapping between each dependency and it's license information.
@@ -239,6 +255,9 @@ public abstract class AbstractDownloadLicensesMojo
      * {@link #licensesOutputFile} (eventually persisted from a previous build) and the content of
      * {@link #licensesOutputDirectory} are considered sources of valid information - i.e. only URLs that do not appear
      * to have been downloaded in the past will be downloaded.
+     * <b>
+     * If your {@link #licensesOutputDirectory} contains only license files downloaded by this plugin, you may consider
+     * combining {@link #forceDownload} with setting {@link #cleanLicensesOutputDirectory} {@code true}
      *
      * @since 1.18
      */
@@ -762,7 +781,18 @@ public abstract class AbstractDownloadLicensesMojo
     {
         try
         {
-            FileUtil.createDirectoryIfNecessary( licensesOutputDirectory );
+            if ( licensesOutputDirectory.exists() )
+            {
+                if ( cleanLicensesOutputDirectory )
+                {
+                    getLog().info( "Cleaning licensesOutputDirectory '" + licensesOutputDirectory + "'" );
+                    FileUtils.cleanDirectory( licensesOutputDirectory );
+                }
+            }
+            else
+            {
+                FileUtil.createDirectoryIfNecessary( licensesOutputDirectory );
+            }
 
             FileUtil.createDirectoryIfNecessary( licensesOutputFile.getParentFile() );
 

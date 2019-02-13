@@ -27,7 +27,9 @@ import groovy.transform.Field
 @Field Path basePath = basedir.toPath()
 
 return {
-    final Path outputBase = basePath.resolve('target/basic')
+    final String id = 'basic'
+    final Path outputBase = basePath.resolve('target/' + id)
+
     assert !Files.exists(outputBase.resolve('licenses/apache license 2.0 - license-2.0.txt'))
     assert !Files.exists(outputBase.resolve('licenses/bsd license - license.html'))
 
@@ -43,13 +45,13 @@ return {
     assert Files.exists(cddl)
     assert new String(Files.readAllBytes(cddl), 'ISO-8859-1').contains('COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.1')
 
-    final Path expectedLicensesXml = basePath.resolve('licenses-basic.expected.xml')
+    final Path expectedLicensesXml = basePath.resolve('licenses-'+ id +'.expected.xml')
     final Path licensesXml = outputBase.resolve('licenses.xml')
     assert expectedLicensesXml.text.equals(licensesXml.text)
     return true
 }() && {
-
-    final Path outputBase = basePath.resolve('target/spdx')
+    final String id = 'spdx'
+    final Path outputBase = basePath.resolve('target/' + id)
 
     final Path asl2 = outputBase.resolve('licenses/Apache-2.0.txt')
     assert Files.exists(asl2)
@@ -63,8 +65,36 @@ return {
     assert Files.exists(cddl)
     assert new String(Files.readAllBytes(cddl), 'ISO-8859-1').contains('COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.1')
 
-    final Path expectedLicensesXml = basePath.resolve('licenses-spdx.expected.xml')
+    final Path expectedLicensesXml = basePath.resolve('licenses-'+ id +'.expected.xml')
     final Path licensesXml = outputBase.resolve('licenses.xml')
     assert expectedLicensesXml.text.equals(licensesXml.text)
     return true
+}() && {
+
+    final String id = 'cleanLicDir'
+
+    final Path outputBase = basePath.resolve('target/' + id)
+
+    final Path asl2 = outputBase.resolve('licenses/Apache-2.0.txt')
+    assert Files.exists(asl2)
+    assert asl2.text.contains('Version 2.0, January 2004')
+
+    final Path bsdAntlr = outputBase.resolve('licenses/bsd-antlr.html')
+    assert Files.exists(bsdAntlr)
+    assert bsdAntlr.text.contains('Copyright (c) 2012 Terence Parr and Sam Harwell')
+
+    final Path cddl = outputBase.resolve('licenses/cddl-gplv2-ce.txt')
+    assert Files.exists(cddl)
+    assert new String(Files.readAllBytes(cddl), 'ISO-8859-1').contains('COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.1')
+
+    final Path expectedLicensesXml = basePath.resolve('licenses-'+ id +'.expected.xml')
+    final Path licensesXml = outputBase.resolve('licenses.xml')
+    assert expectedLicensesXml.text.equals(licensesXml.text)
+
+    final Path foo = basePath.resolve('target/cleanLicDir/licenses/foo.txt')
+    assert !Files.exists(foo)
+
+    return true
 }()
+
+
