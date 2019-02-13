@@ -1,0 +1,2 @@
+cleanLicensesOutputDirectory=true should make the plugin to delete this file
+

@@ -29,3 +29,6 @@ Files.move(basePath.resolve('target-initial'), basePath.resolve('target'))
 
 Path licenses = basePath.resolve('target/basic/licenses.xml')
 assert Files.exists(licenses)
+
+final Path foo = basePath.resolve('target/cleanLicDir/licenses/foo.txt')
+assert Files.exists(foo)

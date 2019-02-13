@@ -133,6 +133,40 @@
               </licenseUrlFileNames>
             </configuration>
           </execution>
+          <execution>
+            <id>cleanLicDir</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>download-licenses</goal>
+            </goals>
+            <configuration>
+              <licensesConfigFile>${basedir}/src/license/licenses.xml</licensesConfigFile>
+              <licensesOutputDirectory>${project.build.directory}/cleanLicDir/licenses</licensesOutputDirectory>
+              <licensesOutputFile>${project.build.directory}/cleanLicDir/licenses.xml</licensesOutputFile>
+              <licensesErrorsFile>${project.build.directory}/cleanLicDir/licenses-errors.xml</licensesErrorsFile>
+              <cleanLicensesOutputDirectory>true</cleanLicensesOutputDirectory>
+              <forceDownload>true</forceDownload>
+              <errorRemedy>xmlOutput</errorRemedy>
+              <sortByGroupIdAndArtifactId>true</sortByGroupIdAndArtifactId>
+              <licenseUrlReplacements>
+                <licenseUrlReplacement>
+                  <regexp>^https?://github\.com/([^/]+)/([^/]+)/blob/(.*)$</regexp>
+                  <replacement>https://raw.githubusercontent.com/$1/$2/$3</replacement>
+                </licenseUrlReplacement>
+              </licenseUrlReplacements>
+              <licenseUrlFileNames>
+                <spdx/>
+                <bsd-antlr.html>
+                    sha1:074f8d6e91730b40875178666513014472888247
+                    \Qhttp://www.antlr.org/license.html\E
+                </bsd-antlr.html>
+                <cddl-gplv2-ce.txt>
+                    sha1:c27730aef98e1d50e937d808654daad00b258f90
+                    \Qhttps://raw.githubusercontent.com/javaee/activation/master/LICENSE.txt\E
+                </cddl-gplv2-ce.txt>
+              </licenseUrlFileNames>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
     </plugins>
