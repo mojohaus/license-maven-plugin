@@ -58,8 +58,8 @@ import org.apache.maven.project.MavenProjectHelper;
 import org.codehaus.mojo.license.LicenseMojoUtils;
 import org.codehaus.mojo.license.model.LicenseMap;
 import org.codehaus.mojo.license.utils.FileUtil;
-import org.codehaus.mojo.license.utils.HttpRequester;
 import org.codehaus.mojo.license.utils.MojoHelper;
+import org.codehaus.mojo.license.utils.RequesterFacade;
 import org.codehaus.mojo.license.utils.SortedProperties;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -504,9 +504,9 @@ public class DefaultThirdPartyTool
             // load the missing file
             unsafeMappings.load( missingFile );
         }
-        if ( HttpRequester.isStringUrl( missingFileUrl ) )
+        if ( RequesterFacade.isStringUrl( missingFileUrl ) )
         {
-            String httpRequestResult = HttpRequester.getFromUrl( missingFileUrl );
+            String httpRequestResult = RequesterFacade.getFromUrl( missingFileUrl );
             unsafeMappings.load( new ByteArrayInputStream( httpRequestResult.getBytes() ) );
         }
 

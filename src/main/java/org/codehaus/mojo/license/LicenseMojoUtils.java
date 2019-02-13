@@ -29,7 +29,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.apache.maven.plugin.logging.Log;
-import org.codehaus.mojo.license.utils.HttpRequester;
+import org.codehaus.mojo.license.utils.RequesterFacade;
 
 /**
  * Utility methods common to various mojos.
@@ -116,7 +116,7 @@ public final class LicenseMojoUtils
 
         final Path basedirPath = basedir.toPath();
 
-        if ( url != null && HttpRequester.isStringUrl( url ) )
+        if ( url != null && RequesterFacade.isStringUrl( url ) )
         {
             try
             {

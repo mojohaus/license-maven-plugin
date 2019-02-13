@@ -43,8 +43,8 @@ import org.codehaus.mojo.license.api.ThirdPartyTool;
 import org.codehaus.mojo.license.api.ThirdPartyToolException;
 import org.codehaus.mojo.license.model.LicenseMap;
 import org.codehaus.mojo.license.utils.FileUtil;
-import org.codehaus.mojo.license.utils.HttpRequester;
 import org.codehaus.mojo.license.utils.MojoHelper;
+import org.codehaus.mojo.license.utils.RequesterFacade;
 import org.codehaus.mojo.license.utils.SortedProperties;
 import org.codehaus.mojo.license.utils.StringToList;
 import org.codehaus.plexus.util.IOUtil;
@@ -696,7 +696,7 @@ public abstract class AbstractAddThirdPartyMojo
             getLog().warn( "" );
             getLog().warn( "licenseMerges will be overridden by licenseMergesUrl." );
             getLog().warn( "" );
-            if ( HttpRequester.isStringUrl( licenseMergesUrl ) )
+            if ( RequesterFacade.isStringUrl( licenseMergesUrl ) )
             {
                 InputStream input = new URL( licenseMergesUrl ).openStream();
                 String httpRequestResult = IOUtil.toString( input );
@@ -821,9 +821,9 @@ public abstract class AbstractAddThirdPartyMojo
                 // load the missing file
                 unsafeMappings.load( missingLicenses );
             }
-            if ( HttpRequester.isStringUrl( missingFileUrl ) )
+            if ( RequesterFacade.isStringUrl( missingFileUrl ) )
             {
-                String httpRequestResult = HttpRequester.getFromUrl( missingFileUrl );
+                String httpRequestResult = RequesterFacade.getFromUrl( missingFileUrl );
                 unsafeMappings.load( new ByteArrayInputStream( httpRequestResult.getBytes() ) );
             }
 
