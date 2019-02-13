@@ -431,6 +431,19 @@ public abstract class AbstractDownloadLicensesMojo
     @Parameter
     private Map<String, String> licenseUrlFileNames;
 
+    /**
+     * If {@code true}, {@link #licensesOutputFile} and {@link #licensesErrorsFile} will contain {@code <version>}
+     * elements for each {@code <dependency>}; otherwise the {@code <version>} {@link #licensesOutputFile} and
+     * {@link #licensesErrorsFile} elements will not be appended under {@code <dependency>} elements in
+     * <b>
+     * Might be useful if you want to keep the {@link #licensesOutputFile} under source control and you do not want to
+     * see the changing dependency versions there.
+     *
+     * @since 1.18
+     */
+    @Parameter( property = "license.writeVersions", defaultValue = "true" )
+    private boolean writeVersions;
+
     // ----------------------------------------------------------------------
     // Plexus Components
     // ----------------------------------------------------------------------
@@ -581,11 +594,11 @@ public abstract class AbstractDownloadLicensesMojo
 
             List<ProjectLicenseInfo> depProjectLicensesWithErrors = filterErrors( depProjectLicenses );
             LicenseSummaryWriter.writeLicenseSummary( depProjectLicenses, licensesOutputFile, charset,
-                                                      licensesOutputFileEol );
+                                                      licensesOutputFileEol, writeVersions );
             if ( depProjectLicensesWithErrors != null && !depProjectLicensesWithErrors.isEmpty() )
             {
                 LicenseSummaryWriter.writeLicenseSummary( depProjectLicensesWithErrors, licensesErrorsFile, charset,
-                                                          licensesOutputFileEol );
+                                                          licensesOutputFileEol, writeVersions );
             }
         }
         catch ( Exception e )

@@ -54,7 +54,7 @@ import java.util.List;
 public class LicenseSummaryWriter
 {
     public static void writeLicenseSummary( List<ProjectLicenseInfo> dependencies, File outputFile, Charset charset,
-            Eol eol )
+            Eol eol, boolean writeVersions )
         throws ParserConfigurationException, TransformerException, IOException
     {
         DocumentBuilderFactory fact = DocumentBuilderFactory.newInstance();
@@ -68,7 +68,7 @@ public class LicenseSummaryWriter
 
         for ( ProjectLicenseInfo dep : dependencies )
         {
-            dependenciesNode.appendChild( createDependencyNode( doc, dep ) );
+            dependenciesNode.appendChild( createDependencyNode( doc, dep, writeVersions ) );
         }
 
         // Prepare the output file File
@@ -87,7 +87,7 @@ public class LicenseSummaryWriter
         }
     }
 
-    public static Node createDependencyNode( Document doc, ProjectLicenseInfo dep )
+    public static Node createDependencyNode( Document doc, ProjectLicenseInfo dep, boolean writeVersions )
     {
         Node depNode = doc.createElement( "dependency" );
 
@@ -99,9 +99,12 @@ public class LicenseSummaryWriter
         artifactIdNode.appendChild( doc.createTextNode( dep.getArtifactId() ) );
         depNode.appendChild( artifactIdNode );
 
-        Node versionNode = doc.createElement( "version" );
-        versionNode.appendChild( doc.createTextNode( dep.getVersion() ) );
-        depNode.appendChild( versionNode );
+        if ( writeVersions )
+        {
+            Node versionNode = doc.createElement( "version" );
+            versionNode.appendChild( doc.createTextNode( dep.getVersion() ) );
+            depNode.appendChild( versionNode );
+        }
 
         Node licensesNode = doc.createElement( "licenses" );
         if ( dep.getLicenses() == null || dep.getLicenses().size() == 0 )
