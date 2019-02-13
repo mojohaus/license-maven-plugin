@@ -4,20 +4,18 @@
     <dependency>
       <groupId>antlr</groupId>
       <artifactId>antlr</artifactId>
-      <version>2.7.7</version>
       <licenses>
         <license>
           <name>BSD License</name>
           <url>http://www.antlr.org/license.html</url>
           <distribution>repo</distribution>
-          <file>bsd-antlr.html</file>
+          <file>bsd-license-from-config.html</file>
         </license>
       </licenses>
     </dependency>
     <dependency>
       <groupId>com.sun.activation</groupId>
       <artifactId>javax.activation</artifactId>
-      <version>1.2.0</version>
       <licenses>
         <license>
           <name>CDDL/GPLv2+CE</name>
@@ -31,7 +29,6 @@
     <dependency>
       <groupId>commons-beanutils</groupId>
       <artifactId>commons-beanutils</artifactId>
-      <version>1.9.3</version>
       <licenses>
         <license>
           <name>Apache License, Version 2.0</name>
@@ -44,7 +41,6 @@
     <dependency>
       <groupId>commons-collections</groupId>
       <artifactId>commons-collections</artifactId>
-      <version>3.2.2</version>
       <licenses>
         <license>
           <name>Apache License, Version 2.0</name>

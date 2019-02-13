@@ -79,7 +79,7 @@ return {
     assert Files.exists(asl2)
     assert asl2.text.contains('Version 2.0, January 2004')
 
-    final Path bsdAntlr = outputBase.resolve('licenses/bsd-antlr.html')
+    final Path bsdAntlr = outputBase.resolve('licenses/bsd-license-from-config.html')
     assert Files.exists(bsdAntlr)
     assert bsdAntlr.text.contains('Copyright (c) 2012 Terence Parr and Sam Harwell')
 

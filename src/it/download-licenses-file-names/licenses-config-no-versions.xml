@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<licenseSummary>
+  <dependencies>
+    <dependency>
+      <groupId>antlr</groupId>
+      <artifactId>antlr</artifactId>
+      <licenses>
+        <license>
+          <name>BSD License</name>
+          <url>http://www.antlr.org/license.html</url>
+          <distribution>repo</distribution>
+          <file>bsd-license-from-config.html</file>
+        </license>
+      </licenses>
+    </dependency>
+  </dependencies>
+</licenseSummary>

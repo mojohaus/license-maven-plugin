@@ -107,26 +107,51 @@ public class LicenseSummaryTest
         licSummary.add( dep1 );
         licSummary.add( dep2 );
 
-        File licenseSummaryFile = File.createTempFile( "licSummary", "tmp" );
-        // File licenseSummaryFile = new File( "src/test/resources/license-summary-test-2.xml" );
-        LicenseSummaryWriter.writeLicenseSummary( licSummary, licenseSummaryFile, StandardCharsets.UTF_8, Eol.LF );
+        {
+            File licenseSummaryFile = File.createTempFile( "licSummary", "tmp" );
+            LicenseSummaryWriter.writeLicenseSummary( licSummary, licenseSummaryFile, StandardCharsets.UTF_8, Eol.LF,
+                                                      true );
 
-        Assert.assertTrue( licenseSummaryFile.exists() );
-        FileInputStream fis = new FileInputStream( licenseSummaryFile );
-        List<ProjectLicenseInfo> list = LicenseSummaryReader.parseLicenseSummary( fis );
-        fis.close();
-        ProjectLicenseInfo dep = list.get( 0 );
-        Assert.assertEquals( "org.test", dep.getGroupId() );
-        Assert.assertEquals( "test1", dep.getArtifactId() );
-        Assert.assertEquals( "1.0", dep.getVersion() );
+            Assert.assertTrue( licenseSummaryFile.exists() );
+            FileInputStream fis = new FileInputStream( licenseSummaryFile );
+            List<ProjectLicenseInfo> list = LicenseSummaryReader.parseLicenseSummary( fis );
+            fis.close();
+            ProjectLicenseInfo dep = list.get( 0 );
+            Assert.assertEquals( "org.test", dep.getGroupId() );
+            Assert.assertEquals( "test1", dep.getArtifactId() );
+            Assert.assertEquals( "1.0", dep.getVersion() );
 
-        List<ProjectLicense> licenses = dep.getLicenses();
-        Assert.assertEquals( 1, licenses.size() );
-        ProjectLicense lic0 = dep.getLicenses().get(0);
-        Assert.assertEquals( "lgpl", lic0.getName() );
-        Assert.assertEquals( "http://www.gnu.org/licenses/lgpl-3.0.txt", lic0.getUrl() );
-        Assert.assertEquals( "lgpl-3.0.txt", lic0.getFile() );
-        Assert.assertEquals( "lgpl version 3.0", lic0.getComments() );
+            List<ProjectLicense> licenses = dep.getLicenses();
+            Assert.assertEquals( 1, licenses.size() );
+            ProjectLicense lic0 = dep.getLicenses().get(0);
+            Assert.assertEquals( "lgpl", lic0.getName() );
+            Assert.assertEquals( "http://www.gnu.org/licenses/lgpl-3.0.txt", lic0.getUrl() );
+            Assert.assertEquals( "lgpl-3.0.txt", lic0.getFile() );
+            Assert.assertEquals( "lgpl version 3.0", lic0.getComments() );
+        }
+
+        {
+            File licenseSummaryFile = File.createTempFile( "licSummaryNoVersion", "tmp" );
+            LicenseSummaryWriter.writeLicenseSummary( licSummary, licenseSummaryFile, StandardCharsets.UTF_8, Eol.LF,
+                                                      false );
+
+            Assert.assertTrue( licenseSummaryFile.exists() );
+            FileInputStream fis = new FileInputStream( licenseSummaryFile );
+            List<ProjectLicenseInfo> list = LicenseSummaryReader.parseLicenseSummary( fis );
+            fis.close();
+            ProjectLicenseInfo dep = list.get( 0 );
+            Assert.assertEquals( "org.test", dep.getGroupId() );
+            Assert.assertEquals( "test1", dep.getArtifactId() );
+            Assert.assertNull( dep.getVersion() );
+
+            List<ProjectLicense> licenses = dep.getLicenses();
+            Assert.assertEquals( 1, licenses.size() );
+            ProjectLicense lic0 = dep.getLicenses().get(0);
+            Assert.assertEquals( "lgpl", lic0.getName() );
+            Assert.assertEquals( "http://www.gnu.org/licenses/lgpl-3.0.txt", lic0.getUrl() );
+            Assert.assertEquals( "lgpl-3.0.txt", lic0.getFile() );
+            Assert.assertEquals( "lgpl version 3.0", lic0.getComments() );
+        }
 
     }
 }
