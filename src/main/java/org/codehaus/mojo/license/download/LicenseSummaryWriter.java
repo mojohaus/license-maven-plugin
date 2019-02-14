@@ -1,4 +1,4 @@
-package org.codehaus.mojo.license.utils;
+package org.codehaus.mojo.license.download;
 
 /*
  * #%L
@@ -23,8 +23,6 @@ package org.codehaus.mojo.license.utils;
  */
 
 import org.codehaus.mojo.license.Eol;
-import org.codehaus.mojo.license.model.ProjectLicense;
-import org.codehaus.mojo.license.model.ProjectLicenseInfo;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
