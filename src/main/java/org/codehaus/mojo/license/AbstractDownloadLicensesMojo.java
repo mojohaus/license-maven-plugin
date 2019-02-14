@@ -40,13 +40,13 @@ import org.codehaus.mojo.license.api.ResolvedProjectDependencies;
 import org.codehaus.mojo.license.download.Cache;
 import org.codehaus.mojo.license.download.FileNameEntry;
 import org.codehaus.mojo.license.download.LicenseDownloader;
+import org.codehaus.mojo.license.download.LicenseSummaryReader;
+import org.codehaus.mojo.license.download.LicenseSummaryWriter;
 import org.codehaus.mojo.license.download.PreferredFileNames;
+import org.codehaus.mojo.license.download.ProjectLicense;
+import org.codehaus.mojo.license.download.ProjectLicenseInfo;
 import org.codehaus.mojo.license.download.LicenseDownloader.LicenseDownloadResult;
-import org.codehaus.mojo.license.model.ProjectLicense;
-import org.codehaus.mojo.license.model.ProjectLicenseInfo;
 import org.codehaus.mojo.license.utils.FileUtil;
-import org.codehaus.mojo.license.utils.LicenseSummaryReader;
-import org.codehaus.mojo.license.utils.LicenseSummaryWriter;
 import org.codehaus.mojo.license.utils.MojoHelper;
 
 import java.io.File;

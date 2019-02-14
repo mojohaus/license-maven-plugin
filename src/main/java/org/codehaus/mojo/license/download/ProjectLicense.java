@@ -1,4 +1,4 @@
-package org.codehaus.mojo.license.model;
+package org.codehaus.mojo.license.download;
 
 /*
  * #%L

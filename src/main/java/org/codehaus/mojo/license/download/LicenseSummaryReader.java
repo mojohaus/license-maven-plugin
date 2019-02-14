@@ -1,10 +1,10 @@
-package org.codehaus.mojo.license.utils;
+package org.codehaus.mojo.license.download;
 
 /*
  * #%L
  * License Maven Plugin
  * %%
- * Copyright (C) 2010 - 2011 CodeLutin, Codehaus, Tony Chemit
+ * Copyright (C) 2010 - 2011 Codehaus
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -22,8 +22,6 @@ package org.codehaus.mojo.license.utils;
  * #L%
  */
 
-import org.codehaus.mojo.license.model.ProjectLicense;
-import org.codehaus.mojo.license.model.ProjectLicenseInfo;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
