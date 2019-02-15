@@ -552,7 +552,8 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
         ResolvedProjectDependencies loadedDependencies;
         if ( loadArtifacts )
         {
-            loadedDependencies = dependenciesTool.loadProjectArtifacts( localRepository, licenseMerges, project, null );
+            loadedDependencies = dependenciesTool.loadProjectArtifacts( localRepository,
+                    project.getRemoteArtifactRepositories(), project, null );
         }
         else
         {
