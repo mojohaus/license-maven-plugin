@@ -43,7 +43,6 @@
   <properties>
 
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <license.generateBundle>true</license.generateBundle>
     <license.verbose>true</license.verbose>
   </properties>
 
@@ -55,11 +54,24 @@
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>license-maven-plugin</artifactId>
           <version>@pom.version@</version>
-          <configuration>
-            <licenseMerges>
-              <licenseMerge>The Apache Software License, Version 2.0|Apache License, Version 2.0|Apache Public License 2.0</licenseMerge>
-            </licenseMerges>
-          </configuration>
+          <executions>
+            <execution>
+              <id>nourl</id>
+              <configuration>
+                <outputDirectory>${project.reporting.outputDirectory}/nourl</outputDirectory>
+                <licenseMerges>
+                  <licenseMerge>The Apache Software License, Version 2.0|Apache License, Version 2.0|Apache Public License 2.0</licenseMerge>
+                </licenseMerges>
+              </configuration>
+            </execution>
+            <execution>
+              <id>url</id>
+              <configuration>
+                <outputDirectory>${project.reporting.outputDirectory}/url</outputDirectory>
+                <licenseMergesUrl>${project.baseUri}license.merges</licenseMergesUrl>
+              </configuration>
+            </execution>
+          </executions>
         </plugin>
       </plugins>
     </pluginManagement>

@@ -47,11 +47,13 @@ import org.codehaus.mojo.license.api.ThirdPartyTool;
 import org.codehaus.mojo.license.api.ThirdPartyToolException;
 import org.codehaus.mojo.license.model.LicenseMap;
 import org.codehaus.mojo.license.utils.MojoHelper;
+import org.codehaus.mojo.license.utils.UrlRequester;
 import org.codehaus.plexus.i18n.I18N;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
@@ -242,10 +244,20 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
      * &lt;/licenseMerges&gt;
      * &lt;/pre&gt;
      *
+     * <b>Note:</b> This option will be overridden by {@link #licenseMergesUrl} if it is used by command line.
      * @since 1.0
      */
     @Parameter
     private List<String> licenseMerges;
+
+    /**
+      * Location of file with the merge licenses in order to be used by command line.
+      * <b>Note:</b> This option overrides {@link #licenseMerges}.
+      *
+      * @since 1.18
+      */
+     @Parameter( property = "license.licenseMergesUrl" )
+     protected String licenseMergesUrl;
 
     /**
      * The output directory for the report. Note that this parameter is only evaluated if the goal is run directly from
@@ -345,6 +357,27 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
     // ----------------------------------------------------------------------
 
     /**
+     * Method to initialize the mojo before doing any concrete actions.
+     *
+     * <b>Note:</b> The method is invoked before the {@link #executeReport()} method.
+     * @throws IOException
+     */
+    protected void init()
+            throws IOException
+    {
+        if ( licenseMergesUrl != null )
+        {
+            getLog().warn( "" );
+            getLog().warn( "licenseMerges will be overridden by licenseMergesUrl." );
+            getLog().warn( "" );
+            if ( UrlRequester.isStringUrl( licenseMergesUrl ) )
+            {
+                licenseMerges = Arrays.asList( UrlRequester.getFromUrl( licenseMergesUrl ) );
+            }
+        }
+    }
+
+    /**
      * {@inheritDoc}
      */
     protected void executeReport( Locale locale )
@@ -357,6 +390,7 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
 
         try
         {
+            init();
             details = createThirdPartyDetails();
         }
         catch ( IOException e )

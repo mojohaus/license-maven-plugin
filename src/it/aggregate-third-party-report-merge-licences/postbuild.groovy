@@ -20,7 +20,7 @@
  * #L%
  */
 
-file = new File(basedir, 'target/site/aggregate-third-party-report.html');
+file = new File(basedir, 'target/site/nourl/aggregate-third-party-report.html');
 assert file.exists();
 content = file.text;
 assert !content.contains('the project has no dependencies.');
@@ -29,5 +29,18 @@ assert content.contains('<a href="#commons-logging:commons-logging:1.1.1">common
 assert content.contains('<a href="#com.jhlabs:filters:2.0.235">com.jhlabs:filters:2.0.235</a>');
 assert content.contains('<a href="#org.sonatype.plexus:plexus-cipher:1.4">org.sonatype.plexus:plexus-cipher:1.4</a>');
 assert content.contains('<td>The Apache Software License, Version 2.0</td>');
+assert !content.contains('<td>Apache License, Version 2.0</td>');
+assert !content.contains('<td>Apache Public License 2.0</td>');
+
+file = new File(basedir, 'target/site/url/aggregate-third-party-report.html');
+assert file.exists();
+content = file.text;
+assert !content.contains('the project has no dependencies.');
+assert !content.contains('/third-party-report.html#');
+assert content.contains('<a href="#commons-logging:commons-logging:1.1.1">commons-logging:commons-logging:1.1.1</a>');
+assert content.contains('<a href="#com.jhlabs:filters:2.0.235">com.jhlabs:filters:2.0.235</a>');
+assert content.contains('<a href="#org.sonatype.plexus:plexus-cipher:1.4">org.sonatype.plexus:plexus-cipher:1.4</a>');
+assert content.contains('<td>APACHE</td>');
+assert !content.contains('<td>The Apache Software License, Version 2.0</td>');
 assert !content.contains('<td>Apache License, Version 2.0</td>');
 assert !content.contains('<td>Apache Public License 2.0</td>');
