@@ -51,7 +51,6 @@ import org.codehaus.plexus.i18n.I18N;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -220,7 +219,7 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
      *
      * @see LicenseMojoUtils#prepareThirdPartyOverrideUrl(URL, File, String, File)
      */
-    URL resolvedOverrideUrl;
+    String resolvedOverrideUrl;
 
     /**
      * Load from repositories third party missing files.

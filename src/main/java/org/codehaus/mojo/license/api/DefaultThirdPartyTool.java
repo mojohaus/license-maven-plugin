@@ -27,7 +27,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -58,9 +59,9 @@ import org.apache.maven.project.MavenProjectHelper;
 import org.codehaus.mojo.license.LicenseMojoUtils;
 import org.codehaus.mojo.license.model.LicenseMap;
 import org.codehaus.mojo.license.utils.FileUtil;
-import org.codehaus.mojo.license.utils.HttpRequester;
 import org.codehaus.mojo.license.utils.MojoHelper;
 import org.codehaus.mojo.license.utils.SortedProperties;
+import org.codehaus.mojo.license.utils.UrlRequester;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
@@ -504,9 +505,9 @@ public class DefaultThirdPartyTool
             // load the missing file
             unsafeMappings.load( missingFile );
         }
-        if ( HttpRequester.isStringUrl( missingFileUrl ) )
+        if ( UrlRequester.isStringUrl( missingFileUrl ) )
         {
-            String httpRequestResult = HttpRequester.getFromUrl( missingFileUrl );
+            String httpRequestResult = UrlRequester.getFromUrl( missingFileUrl );
             unsafeMappings.load( new ByteArrayInputStream( httpRequestResult.getBytes() ) );
         }
 
@@ -613,14 +614,14 @@ public class DefaultThirdPartyTool
      * {@inheritDoc}
      */
     public void overrideLicenses( LicenseMap licenseMap, SortedMap<String, MavenProject> artifactCache, String encoding,
-            URL overrideUrl ) throws IOException
+            String overrideUrl ) throws IOException
     {
         if ( LicenseMojoUtils.isValid( overrideUrl ) )
         {
             final SortedProperties overrideMappings = new SortedProperties( encoding );
-            try ( InputStream input = overrideUrl.openStream() )
+            try ( Reader reader = new StringReader( UrlRequester.getFromUrl( overrideUrl, encoding ) ) )
             {
-                overrideMappings.load( input );
+                overrideMappings.load( reader );
             }
             for ( Object o : overrideMappings.keySet() )
             {

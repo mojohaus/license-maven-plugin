@@ -43,17 +43,14 @@ import org.codehaus.mojo.license.api.ThirdPartyTool;
 import org.codehaus.mojo.license.api.ThirdPartyToolException;
 import org.codehaus.mojo.license.model.LicenseMap;
 import org.codehaus.mojo.license.utils.FileUtil;
-import org.codehaus.mojo.license.utils.HttpRequester;
 import org.codehaus.mojo.license.utils.MojoHelper;
 import org.codehaus.mojo.license.utils.SortedProperties;
 import org.codehaus.mojo.license.utils.StringToList;
-import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.mojo.license.utils.UrlRequester;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -282,11 +279,11 @@ public abstract class AbstractAddThirdPartyMojo
     private String overrideUrl;
 
     /**
-     * A {@link URL} prepared either our of {@link #overrideFile} or {@link #overrideUrl} or the default value.
+     * A URL prepared either our of {@link #overrideFile} or {@link #overrideUrl} or the default value.
      *
      * @see LicenseMojoUtils#prepareThirdPartyOverrideUrl(URL, File, String, File)
      */
-    protected URL resolvedOverrideUrl;
+    protected String resolvedOverrideUrl;
 
     /**
      * To merge licenses in final file.
@@ -696,12 +693,9 @@ public abstract class AbstractAddThirdPartyMojo
             getLog().warn( "" );
             getLog().warn( "licenseMerges will be overridden by licenseMergesUrl." );
             getLog().warn( "" );
-            if ( HttpRequester.isStringUrl( licenseMergesUrl ) )
+            if ( UrlRequester.isStringUrl( licenseMergesUrl ) )
             {
-                InputStream input = new URL( licenseMergesUrl ).openStream();
-                String httpRequestResult = IOUtil.toString( input );
-                licenseMerges = Arrays.asList( httpRequestResult.split( "\n" ) );
-                input.close();
+                licenseMerges = Arrays.asList( UrlRequester.getFromUrl( licenseMergesUrl ) );
             }
         }
 
@@ -821,9 +815,9 @@ public abstract class AbstractAddThirdPartyMojo
                 // load the missing file
                 unsafeMappings.load( missingLicenses );
             }
-            if ( HttpRequester.isStringUrl( missingFileUrl ) )
+            if ( UrlRequester.isStringUrl( missingFileUrl ) )
             {
-                String httpRequestResult = HttpRequester.getFromUrl( missingFileUrl );
+                String httpRequestResult = UrlRequester.getFromUrl( missingFileUrl );
                 unsafeMappings.load( new ByteArrayInputStream( httpRequestResult.getBytes() ) );
             }
 

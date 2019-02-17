@@ -56,7 +56,7 @@ public class StringToList
     public StringToList( String data ) throws MojoExecutionException
     {
       this();
-      if ( !HttpRequester.isStringUrl( data ) )
+      if ( !UrlRequester.isStringUrl( data ) )
       {
         for ( String s : data.split( "\\s*\\|\\s*" ) )
         {
@@ -65,7 +65,7 @@ public class StringToList
       }
       else
       {
-        for ( String license : HttpRequester.downloadList( data ) )
+        for ( String license : UrlRequester.downloadList( data ) )
         {
           if ( data != null && StringUtils.isNotBlank( license ) && !this.data.contains( license ) )
           {

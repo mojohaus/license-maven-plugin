@@ -23,13 +23,11 @@ package org.codehaus.mojo.license;
  */
 
 import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.apache.maven.plugin.logging.Log;
-import org.codehaus.mojo.license.utils.HttpRequester;
+import org.codehaus.mojo.license.utils.UrlRequester;
 
 /**
  * Utility methods common to various mojos.
@@ -38,20 +36,9 @@ import org.codehaus.mojo.license.utils.HttpRequester;
  */
 public final class LicenseMojoUtils
 {
-    /** A special {@link URL} singleton to pass the information that the URL was not set. */
-    static final URL NO_URL;
+    /** A special singleton to pass the information that the URL was not set. */
+    static final String NO_URL = "file:///inexistent";
     static final String DEFAULT_OVERRIDE_THIRD_PARTY = "src/license/override-THIRD-PARTY.properties";
-
-    static {
-        try
-        {
-            NO_URL = new URL( "file:///inexistent" );
-        }
-        catch ( MalformedURLException e )
-        {
-            throw new RuntimeException( e );
-        }
-    }
 
     /**
      * Hidden
@@ -64,9 +51,9 @@ public final class LicenseMojoUtils
      * @param url the {@link URL} to check
      * @return {@code url != null && url != NO_URL}
      */
-    public static boolean isValid( URL url )
+    public static boolean isValid( String url )
     {
-        return url != null && url != NO_URL;
+        return url != null && !NO_URL.equals( url );
     }
 
     /**
@@ -79,7 +66,7 @@ public final class LicenseMojoUtils
      * @param basedir {@code basedir} to resolve {@value #DEFAULT_OVERRIDE_THIRD_PARTY} against
      * @return a valid URL or {@link #NO_URL}, never {@code null}
      */
-    static URL prepareThirdPartyOverrideUrl( final URL resolvedUrl, final File deprecatedFile, final String url,
+    static String prepareThirdPartyOverrideUrl( final String resolvedUrl, final File deprecatedFile, final String url,
             File basedir, Log log )
     {
         if ( deprecatedFile != null )
@@ -89,10 +76,10 @@ public final class LicenseMojoUtils
         return prepareUrl( resolvedUrl, deprecatedFile, url, basedir, DEFAULT_OVERRIDE_THIRD_PARTY );
     }
 
-    private static URL prepareUrl( final URL resolvedUrl, final File deprecatedFile, final String url, File basedir,
-            String defaultFilePath )
+    private static String prepareUrl( final String resolvedUrl, final File deprecatedFile, final String url,
+            File basedir, String defaultFilePath )
     {
-        if ( resolvedUrl != null && resolvedUrl != NO_URL )
+        if ( resolvedUrl != null && !NO_URL.equals( resolvedUrl ) )
         {
             return resolvedUrl;
         }
@@ -104,42 +91,21 @@ public final class LicenseMojoUtils
 
         if ( deprecatedFile != null && deprecatedFile.exists() )
         {
-            try
-            {
-                return deprecatedFile.toURI().toURL();
-            }
-            catch ( MalformedURLException e )
-            {
-                throw new RuntimeException( e );
-            }
+            return deprecatedFile.toURI().toString();
         }
 
         final Path basedirPath = basedir.toPath();
 
-        if ( url != null && HttpRequester.isStringUrl( url ) )
+        if ( url != null && UrlRequester.isStringUrl( url ) )
         {
-            try
-            {
-                return new URL( basedirPath.toUri().toURL(), url );
-            }
-            catch ( MalformedURLException e )
-            {
-                throw new RuntimeException( e );
-            }
+            return basedirPath.toUri().toString();
         }
 
         final Path defaultPath = basedirPath.resolve( defaultFilePath );
 
         if ( Files.exists( defaultPath ) )
         {
-            try
-            {
-                return defaultPath.toUri().toURL();
-            }
-            catch ( MalformedURLException e )
-            {
-                throw new RuntimeException( e );
-            }
+            return defaultPath.toUri().toString();
         }
 
         return NO_URL;
