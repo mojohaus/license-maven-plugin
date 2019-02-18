@@ -34,7 +34,6 @@ import org.codehaus.mojo.license.utils.SortedProperties;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -161,7 +160,7 @@ public interface ThirdPartyTool
      * @throws IOException if pb while reading override file
      */
     void overrideLicenses( LicenseMap licenseMap, SortedMap<String, MavenProject> artifactCache, String encoding,
-            URL overrideUrl ) throws IOException;
+            String overrideUrl ) throws IOException;
 
     /**
      * Add one or more licenses (name and url are {@code licenseNames}) to the given {@code licenseMap} for the given
