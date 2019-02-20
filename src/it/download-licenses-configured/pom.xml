@@ -62,6 +62,12 @@
               <licensesOutputDirectory>${project.build.directory}/since-1.18/licenses</licensesOutputDirectory>
               <licensesOutputFile>${project.build.directory}/since-1.18/licenses.xml</licensesOutputFile>
               <sortByGroupIdAndArtifactId>true</sortByGroupIdAndArtifactId>
+              <licenseUrlFileNameSanitizers>
+                <licenseUrlFileNameSanitizer>
+                  <regexp>[\s-_]+</regexp>
+                  <replacement>-</replacement>
+                </licenseUrlFileNameSanitizer>
+              </licenseUrlFileNameSanitizers>
             </configuration>
           </execution>
         </executions>

@@ -45,11 +45,11 @@ return {
     final String id = 'since-1.18'
     final Path outputBase = basePath.resolve('target/' + id)
 
-    final Path asl2 = outputBase.resolve('licenses/apache license 2.0 - license-2.0.txt')
+    final Path asl2 = outputBase.resolve('licenses/apache-license-2.0-license-2.0.txt')
     assert Files.exists(asl2)
     assert asl2.text.contains('Version 2.0, January 2004')
 
-    final Path bsdAsm = outputBase.resolve('licenses/bsd 3-clause asm - license.txt')
+    final Path bsdAsm = outputBase.resolve('licenses/bsd-3-clause-asm-license.txt')
     assert Files.exists(bsdAsm)
     assert bsdAsm.text.contains('ASM: a very small and fast Java bytecode manipulation framework')
 

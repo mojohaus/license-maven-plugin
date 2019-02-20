@@ -19,7 +19,7 @@
         <license>
           <name>BSD 3-Clause ASM</name>
           <url>https://gitlab.ow2.org/asm/asm/raw/ASM_3_1_MVN/LICENSE.txt</url>
-          <file>bsd 3-clause asm - license.txt</file>
+          <file>bsd-3-clause-asm-license.txt</file>
         </license>
       </licenses>
     </dependency>
@@ -31,7 +31,7 @@
         <license>
           <name>Apache License 2.0</name>
           <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-          <file>apache license 2.0 - license-2.0.txt</file>
+          <file>apache-license-2.0-license-2.0.txt</file>
         </license>
       </licenses>
     </dependency>
