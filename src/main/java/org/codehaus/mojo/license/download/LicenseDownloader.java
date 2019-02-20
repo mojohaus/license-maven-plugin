@@ -79,6 +79,8 @@ public class LicenseDownloader implements AutoCloseable
      */
     public static final int DEFAULT_CONNECTION_TIMEOUT = 5000;
 
+    private static final Pattern EXTENSION_PATTERN = Pattern.compile( "\\.[a-z]{1,4}$", Pattern.CASE_INSENSITIVE );
+
     private final CloseableHttpClient client;
 
     public LicenseDownloader( Proxy proxy )
@@ -232,23 +234,20 @@ public class LicenseDownloader implements AutoCloseable
         }
     }
 
-    private static File updateFileExtension( File outputFile, String mimeType )
+    static File updateFileExtension( File outputFile, String mimeType )
     {
-        final String realExtension = FileUtil.toExtension( mimeType, false );
-
-        if ( realExtension != null )
+        String realExtension = FileUtil.toExtension( mimeType, false );
+        if ( realExtension == null )
         {
-            if ( !outputFile.getName().endsWith( realExtension ) )
-            {
-                return new File( outputFile.getAbsolutePath() + realExtension );
-            }
+            /* default extension is .txt */
+            realExtension = ".txt";
         }
-        /* default extension is .txt */
-        final String name = outputFile.getName();
-        final int periodPos = name.lastIndexOf( '.' );
-        if ( periodPos < 0 || name.length() - periodPos > 5 )
+
+        final String oldFileName = outputFile.getName();
+        if ( !oldFileName.endsWith( realExtension ) )
         {
-            return new File( outputFile.getParent(), name.substring( 0, periodPos ) + ".txt" );
+            final String newFileName = EXTENSION_PATTERN.matcher( oldFileName ).replaceAll( "" ) + realExtension;
+            return new File( outputFile.getParentFile(), newFileName );
         }
         return outputFile;
     }
