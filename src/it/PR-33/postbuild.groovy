@@ -20,34 +20,18 @@
  * #L%
  */
 
-def assertExistsFile(file) {
-    if (!file.exists() || file.isDirectory()) {
-        println(file.getAbsolutePath() + " file is missing or a directory.")
-        assert false
-    }
-    assert true
-}
 
-def assertContains(file, content, expected) {
-    if (!content.contains(expected)) {
-        println(expected + " was not found in file [" + file + "]\n :" + content)
-        return false
-    }
-    return true
-}
+def asl2 = new File(basedir, 'child3/target/generated-resources/licenses/org.codehaus.mojo.license.test.pr-33-child2_apache_license_2.0.txt')
+assert asl2.exists()
+assert asl2.text.contains('Version 2.0, January 2004');
 
-
-def lgpl3 = new File(basedir, 'child3/target/generated-resources/licenses/org.codehaus.mojo.license.test.pr-33-child1_lgpl_2.1.txt')
-assert lgpl3.exists()
-assert lgpl3.text.contains('Version 2.1, February 1999');
-
-def lgpl21 = new File(basedir, 'child3/target/generated-resources/licenses/org.codehaus.mojo.license.test.pr-33-child2_lgpl_3.0.txt')
-assert lgpl21.exists()
-assert lgpl21.text.contains('Version 3, 29 June 2007');
+def asl1 = new File(basedir, 'child3/target/generated-resources/licenses/org.codehaus.mojo.license.test.pr-33-child1_apache_license_1.0.txt')
+assert asl1.exists()
+assert asl1.text.contains('Copyright (c) 1995-1999 The Apache Group.');
 
 def licensesXml = new File(basedir, 'child3/target/generated-resources/licenses.xml');
 assert licensesXml.exists()
-assert licensesXml.text.contains('<file>org.codehaus.mojo.license.test.pr-33-child1_lgpl_2.1.txt</file>')
-assert licensesXml.text.contains('<url>https://www.gnu.org/licenses/lgpl-2.1.txt</url>')
-assert licensesXml.text.contains('<file>org.codehaus.mojo.license.test.pr-33-child2_lgpl_3.0.txt</file>')
-assert licensesXml.text.contains('<url>https://www.gnu.org/licenses/lgpl-3.0.txt</url>')
+assert licensesXml.text.contains('<file>org.codehaus.mojo.license.test.pr-33-child2_apache_license_2.0.txt</file>')
+assert licensesXml.text.contains('<url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>')
+assert licensesXml.text.contains('<file>org.codehaus.mojo.license.test.pr-33-child1_apache_license_1.0.txt</file>')
+assert licensesXml.text.contains('<url>https://www.apache.org/licenses/LICENSE-1.0</url>')

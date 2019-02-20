@@ -20,11 +20,11 @@
  * #L%
  */
 
-def lgpl3 = new File(basedir, 'child2/target/generated-resources/licenses/lgpl 3.0 - lgpl-3.0.txt')
-assert lgpl3.exists()
-assert lgpl3.text.contains('GNU LESSER GENERAL PUBLIC LICENSE');
+def asl2 = new File(basedir, 'child2/target/generated-resources/licenses/apache license 2.0 - license-2.0.txt')
+assert asl2.exists()
+assert asl2.text.contains('Version 2.0, January 2004');
 
 def licensesXml = new File(basedir, 'child2/target/generated-resources/licenses.xml');
 assert licensesXml.exists()
-assert licensesXml.text.contains('<file>lgpl 3.0 - lgpl-3.0.txt</file>')
-assert licensesXml.text.contains('<url>https://www.gnu.org/licenses/lgpl-3.0.txt</url>')
+assert licensesXml.text.contains('<file>apache license 2.0 - license-2.0.txt</file>')
+assert licensesXml.text.contains('<url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>')

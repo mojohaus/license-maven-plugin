@@ -11,8 +11,8 @@
   <artifactId>PR-32-child1</artifactId>
   <licenses>
     <license>
-      <name>LGPL 3.0</name>
-      <url>https://www.gnu.org/licenses/lgpl-3.0.txt</url>
+      <name>Apache License 2.0</name>
+      <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
     </license>
   </licenses>
 
