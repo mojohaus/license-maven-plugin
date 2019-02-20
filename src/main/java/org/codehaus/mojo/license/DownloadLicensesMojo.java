@@ -35,6 +35,19 @@ import java.util.SortedMap;
 /**
  * Download the license files of all the current project's dependencies, and generate a summary file containing a list
  * of all dependencies and their licenses.
+ * <p>
+ * The license files will be downloaded to {@link AbstractDownloadLicensesMojo#licensesOutputDirectory} to be included
+ * in the final packaging of the project if desired. The licenses are downloaded from the url field of the dependency
+ * POM.
+ * <p>
+ * If the license information (license name and license URL) is missing or otherwise broken in a dependency POM, this
+ * mojo offers several fallback options:
+ * <ul>
+ * <li>{@link AbstractDownloadLicensesMojo#licensesConfigFile}</li>
+ * <li>{@link AbstractDownloadLicensesMojo#errorRemedy}</li>
+ * <li>{@link AbstractDownloadLicensesMojo#licenseUrlReplacements}</li>
+ * <li>{@link AbstractDownloadLicensesMojo#licenseUrlFileNames}</li>
+ * </ul>
  *
  * @author Paul Gier
  * @since 1.0

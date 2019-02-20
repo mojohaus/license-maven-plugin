@@ -19,6 +19,16 @@
       <artifactId>commons-logging</artifactId>
       <version>1.0</version>
     </dependency>
+    <dependency>
+      <groupId>aopalliance</groupId>
+      <artifactId>aopalliance</artifactId>
+      <version>1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>asm</groupId>
+      <artifactId>asm</artifactId>
+      <version>3.1</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -29,9 +39,30 @@
         <version>@pom.version@</version>
         <executions>
           <execution>
+            <id>pre-1.18</id>
+            <phase>validate</phase>
             <goals>
               <goal>download-licenses</goal>
             </goals>
+            <configuration>
+              <licensesConfigFile>${basedir}/src/license/licenses-config-pre-1.18.xml</licensesConfigFile>
+              <licensesOutputDirectory>${project.build.directory}/pre-1.18/licenses</licensesOutputDirectory>
+              <licensesOutputFile>${project.build.directory}/pre-1.18/licenses.xml</licensesOutputFile>
+              <sortByGroupIdAndArtifactId>true</sortByGroupIdAndArtifactId>
+            </configuration>
+          </execution>
+          <execution>
+            <id>since-1.18</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>download-licenses</goal>
+            </goals>
+            <configuration>
+              <licensesConfigFile>${basedir}/src/license/licenses-config-since-1.18.xml</licensesConfigFile>
+              <licensesOutputDirectory>${project.build.directory}/since-1.18/licenses</licensesOutputDirectory>
+              <licensesOutputFile>${project.build.directory}/since-1.18/licenses.xml</licensesOutputFile>
+              <sortByGroupIdAndArtifactId>true</sortByGroupIdAndArtifactId>
+            </configuration>
           </execution>
         </executions>
       </plugin>

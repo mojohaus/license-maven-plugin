@@ -131,4 +131,14 @@ public class LicenseSummaryTest
         }
 
     }
+
+    @Test
+    public void patternOrText()
+    {
+        Assert.assertEquals( "\\Qsimple\\E", LicenseSummaryWriter.patternOrText( "simple", true ) );
+        Assert.assertEquals( "\\Qone two\\E", LicenseSummaryWriter.patternOrText( "one two", true ) );
+        Assert.assertEquals( "\\Qone\\E\\s+\\Qtwo\\E", LicenseSummaryWriter.patternOrText( "one  two", true ) );
+        Assert.assertEquals( "\\Qone\ntwo\\E", LicenseSummaryWriter.patternOrText( "one\ntwo", true ) );
+        Assert.assertEquals( "\\Qone\\E\\s+\\Qtwo\\E", LicenseSummaryWriter.patternOrText( "one\n\t\ttwo", true ) );
+    }
 }

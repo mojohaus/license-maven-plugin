@@ -19,30 +19,42 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
-def assertExistsFile(file)
-{
-    if ( !file.exists() || file.isDirectory() )
-    {
-        println(file.getAbsolutePath() + " file is missing or a directory.")
-        assert false
-    }
-    assert true
-}
 
-def assertContains(file, content, expected)
-{
-    if ( !content.contains(expected) )
-    {
-        println(expected + " was not found in file [" + file + "]\n :" + content)
-        assert false
-    }
-    assert true
-}
+import java.nio.file.Path;
+import java.nio.file.Files;
 
-file = new File(basedir, 'target/generated-resources/licenses/apache license 2.0 - license-2.0.txt');
-assertExistsFile(file);
+final Path basePath = basedir.toPath()
 
-file = new File(basedir, 'target/generated-resources/licenses.xml');
-assertExistsFile(file);
+return {
+    final String id = 'pre-1.18'
+    final Path outputBase = basePath.resolve('target/' + id)
 
-return true;
+    final Path asl2 = outputBase.resolve('licenses/apache license 2.0 - license-2.0.txt')
+    assert Files.exists(asl2)
+    assert asl2.text.contains('Version 2.0, January 2004')
+
+    final Path bsdAsm = outputBase.resolve('licenses/bsd 3-clause asm - license.txt')
+    assert Files.exists(bsdAsm)
+    assert bsdAsm.text.contains('ASM: a very small and fast Java bytecode manipulation framework')
+
+    final Path expectedLicensesXml = basePath.resolve('licenses-'+ id +'.expected.xml')
+    final Path licensesXml = outputBase.resolve('licenses.xml')
+    assert expectedLicensesXml.text.equals(licensesXml.text)
+    return true
+}() && {
+    final String id = 'since-1.18'
+    final Path outputBase = basePath.resolve('target/' + id)
+
+    final Path asl2 = outputBase.resolve('licenses/apache license 2.0 - license-2.0.txt')
+    assert Files.exists(asl2)
+    assert asl2.text.contains('Version 2.0, January 2004')
+
+    final Path bsdAsm = outputBase.resolve('licenses/bsd 3-clause asm - license.txt')
+    assert Files.exists(bsdAsm)
+    assert bsdAsm.text.contains('ASM: a very small and fast Java bytecode manipulation framework')
+
+    final Path expectedLicensesXml = basePath.resolve('licenses-'+ id +'.expected.xml')
+    final Path licensesXml = outputBase.resolve('licenses.xml')
+    assert expectedLicensesXml.text.equals(licensesXml.text)
+    return true
+}()

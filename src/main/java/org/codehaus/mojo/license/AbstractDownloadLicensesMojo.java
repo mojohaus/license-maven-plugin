@@ -40,17 +40,16 @@ import org.codehaus.mojo.license.api.ResolvedProjectDependencies;
 import org.codehaus.mojo.license.download.Cache;
 import org.codehaus.mojo.license.download.FileNameEntry;
 import org.codehaus.mojo.license.download.LicenseDownloader;
-import org.codehaus.mojo.license.download.LicenseSummaryReader;
 import org.codehaus.mojo.license.download.LicenseSummaryWriter;
 import org.codehaus.mojo.license.download.PreferredFileNames;
 import org.codehaus.mojo.license.download.ProjectLicense;
 import org.codehaus.mojo.license.download.ProjectLicenseInfo;
 import org.codehaus.mojo.license.download.LicenseDownloader.LicenseDownloadResult;
+import org.codehaus.mojo.license.download.LicenseMatchers;
 import org.codehaus.mojo.license.utils.FileUtil;
 import org.codehaus.mojo.license.utils.MojoHelper;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
@@ -61,7 +60,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -98,15 +96,97 @@ public abstract class AbstractDownloadLicensesMojo
      * @since 1.0
      */
     @Parameter( defaultValue = "${project.remoteArtifactRepositories}", readonly = true )
-    private List remoteRepositories;
+    private List<ArtifactRepository> remoteRepositories;
 
+    // CHECKSTYLE_OFF: LineLength
     /**
-     * Input file containing a mapping between each dependency and it's license information.
+     * A file containing the license data (most notably license names and license URLs) missing in
+     * {@code pom.xml} files of the dependencies.
+     * <p>
+     * Note that since 1.18, if you set {@link #errorRemedy} to {@code xmlOutput} the format of
+     * {@link #licensesErrorsFile} is the same as the one of {@link #licensesConfigFile}. So you can use
+     * {@link #licensesErrorsFile} as a base for {@link #licensesConfigFile}.
+     * <p>
+     * Since 1.18, the format of the file is as follows:
+     * <pre>
+     * {@code
+     * <licenseSummary>
+     *   <dependencies>
+     *     <dependency>
+     *       <groupId>\Qaopalliance\E</groupId><!-- A regular expression -->
+     *       <artifactId>\Qaopalliance\E</artifactId><!-- A regular expression -->
+     *       <!-- <version>.*</version> A version pattern is optional, .* being the default.
+     *       <matchLicenses>
+     *         <!-- Match a list of licenses with a single entry having name "Public Domain" -->
+     *         <license>
+     *           <name>\QPublic Domain\E</name><!-- A regular expression -->
+     *         </license>
+     *       </matchLicenses>
+     *       <licenses approved="true" /><!-- Leave the matched dependency as is. -->
+     *                                   <!-- In this particular case we approve that code in the Public -->
+     *                                   <!-- Domain does not need any license URL. -->
+     *     </dependency>
+     *     <dependency>
+     *         <groupId>\Qasm\E</groupId>
+     *       <artifactId>\Qasm\E</artifactId>
+     *       <matchLicenses>
+     *         <!-- Match an empty list of licenses -->
+     *       </matchLicenses>
+     *       <!-- Replace the list of licenses in all matching dependencies with the following licenses -->
+     *       <licenses>
+     *         <license>
+     *           <name>BSD 3-Clause ASM</name>
+     *           <url>https://gitlab.ow2.org/asm/asm/raw/ASM_3_1_MVN/LICENSE.txt</url>
+     *         </license>
+     *       </licenses>
+     *     </dependency>
+     *     <dependency>
+     *       <groupId>\Qca.uhn.hapi\E</groupId>
+     *       <artifactId>.*</artifactId>
+     *       <matchLicenses>
+     *         <!-- Match a list of licenses with the following three entries in order: -->
+     *         <license>
+     *           <name>\QHAPI is dual licensed (MPL, GPL)\E</name>
+     *           <comments>\QHAPI is dual licensed under both the Mozilla Public License and the GNU General Public License.\E\s+\QWhat this means is that you may choose to use HAPI under the terms of either license.\E\s+\QYou are both permitted and encouraged to use HAPI, royalty-free, within your applications,\E\s+\Qwhether they are free/open-source or commercial/closed-source, provided you abide by the\E\s+\Qterms of one of the licenses below.\E\s+\QYou are under no obligations to inform the HAPI project about what you are doing with\E\s+\QHAPI, but we would love to hear about it anyway!\E</comments>
+     *         </license>
+     *         <license>
+     *           <name>\QMozilla Public License 1.1\E</name>
+     *           <url>\Qhttp://www.mozilla.org/MPL/MPL-1.1.txt\E</url>
+     *           <file>\Qmozilla public license 1.1 - index.0c5913925d40.txt\E</file>
+     *         </license>
+     *         <license>
+     *           <name>\QGNU General Public License\E</name>
+     *           <url>\Qhttp://www.gnu.org/licenses/gpl.txt\E</url>
+     *           <file>\Qgnu general public license - gpl.txt\E</file>
+     *         </license>
+     *       </matchLicenses>
+     *       <licenses approved="true" /><!-- It is OK that the first entry has no URL -->
+     *     </dependency>
+     *   </dependencies>
+     * </licenseSummary>
+     * }
+     * </pre>
+     * <p>
+     * Before 1.18 the format was the same as the one of {@link #licensesOutputFile} and the groupIds and artifactIds
+     * were matched as plain text rather than regular expressions. No other elements (incl. versions) were matched at
+     * all. Since 1.18 the backwards compatibility is achieved by falling back to plain text matching of groupIds
+     * and artifactIds if the given {@code <dependency>} does not contain the {@code <matchLicenses>} element.
+     * <p>
+     * Relationship to other parameters:
+     * <ul>
+     * <li>License names and license URLs {@link #licensesConfigFile} is applied before
+     * {@link #licenseUrlReplacements}</li>
+     * <li>{@link #licenseUrlReplacements} are applied before {@link #licenseUrlFileNames}</li>
+     * <li>{@link #licenseUrlFileNames} have higher precedence than {@code <file>} elements in
+     * {@link #licensesConfigFile}</li>
+     * <li>{@link #licenseUrlFileNames} are ignored when {@link #organizeLicensesByDependencies} is {@code true}</li>
+     * </ul>
      *
      * @since 1.0
      */
     @Parameter( property = "licensesConfigFile", defaultValue = "${project.basedir}/src/license/licenses.xml" )
-    private File licensesConfigFile;
+    protected File licensesConfigFile;
+    // CHECKSTYLE_ON: LineLength
 
     /**
      * The directory to which the dependency licenses should be written.
@@ -115,7 +195,7 @@ public abstract class AbstractDownloadLicensesMojo
      */
     @Parameter( property = "licensesOutputDirectory",
         defaultValue = "${project.build.directory}/generated-resources/licenses" )
-    private File licensesOutputDirectory;
+    protected File licensesOutputDirectory;
 
     /**
      * If {@code true}, the mojo will delete all files from {@link #licensesOutputDirectory} and then download them all
@@ -247,7 +327,7 @@ public abstract class AbstractDownloadLicensesMojo
      * @since 1.18
      */
     @Parameter( property = "license.errorRemedy", defaultValue = "warn" )
-    private ErrorRemedy errorRemedy;
+    protected ErrorRemedy errorRemedy;
 
     /**
      * If {@code true}, all encountered dependency license URLs are downloaded, no matter what is there in
@@ -373,11 +453,21 @@ public abstract class AbstractDownloadLicensesMojo
      * </licenseUrlReplacements>
      * }
      * </pre>
+     * <p>
+     * Relationship to other parameters:
+     * <ul>
+     * <li>License names and license URLs {@link #licensesConfigFile} is applied before
+     * {@link #licenseUrlReplacements}</li>
+     * <li>{@link #licenseUrlReplacements} are applied before {@link #licenseUrlFileNames}</li>
+     * <li>{@link #licenseUrlFileNames} have higher precedence than {@code <file>} elements in
+     * {@link #licensesConfigFile}</li>
+     * <li>{@link #licenseUrlFileNames} are ignored when {@link #organizeLicensesByDependencies} is {@code true}</li>
+     * </ul>
      *
      * @since 1.17
      */
     @Parameter
-    private List<LicenseUrlReplacement> licenseUrlReplacements;
+    protected List<LicenseUrlReplacement> licenseUrlReplacements;
 
     /**
      * A map that helps to select local files names for the content downloaded from license URLs.
@@ -420,6 +510,8 @@ public abstract class AbstractDownloadLicensesMojo
      * <p>
      * Relationship to other parameters:
      * <ul>
+     * <li>License names and license URLs {@link #licensesConfigFile} is applied before
+     * {@link #licenseUrlReplacements}</li>
      * <li>{@link #licenseUrlReplacements} are applied before {@link #licenseUrlFileNames}</li>
      * <li>{@link #licenseUrlFileNames} have higher precedence than {@code <file>} elements in
      * {@link #licensesConfigFile}</li>
@@ -429,7 +521,7 @@ public abstract class AbstractDownloadLicensesMojo
      * @since 1.18
      */
     @Parameter
-    private Map<String, String> licenseUrlFileNames;
+    protected Map<String, String> licenseUrlFileNames;
 
     /**
      * If {@code true}, {@link #licensesOutputFile} and {@link #licensesErrorsFile} will contain {@code <version>}
@@ -482,6 +574,7 @@ public abstract class AbstractDownloadLicensesMojo
     // Mojo Implementation
     // ----------------------------------------------------------------------
 
+    @SuppressWarnings( "unchecked" )
     protected SortedMap<String, MavenProject> getDependencies( MavenProject project )
     {
         return dependenciesTool.loadProjectDependencies(
@@ -509,24 +602,12 @@ public abstract class AbstractDownloadLicensesMojo
 
         initDirectories();
 
-        Map<String, ProjectLicenseInfo> configuredDepLicensesMap = new HashMap<>();
+        final LicenseMatchers matchers = LicenseMatchers.load( licensesConfigFile );
 
-        // License info from previous build
-        if ( !forceDownload && licensesOutputFile.exists() )
-        {
-            loadLicenseInfo( configuredDepLicensesMap, licensesOutputFile, true );
-        }
-
-        // Manually configured license info, loaded second to override previously loaded info
-        if ( licensesConfigFile.exists() )
-        {
-            loadLicenseInfo( configuredDepLicensesMap, licensesConfigFile, false );
-        }
-
-        Set<MavenProject> dependencies = getDependencies();
+        final Set<MavenProject> dependencies = getDependencies();
 
         // The resulting list of licenses after dependency resolution
-        List<ProjectLicenseInfo> depProjectLicenses = new ArrayList<>();
+        final List<ProjectLicenseInfo> depProjectLicenses = new ArrayList<>();
 
         try ( LicenseDownloader licenseDownloader = new LicenseDownloader( findActiveProxy() ) )
         {
@@ -534,17 +615,8 @@ public abstract class AbstractDownloadLicensesMojo
             {
                 Artifact artifact = project.getArtifact();
                 getLog().debug( "Checking licenses for project " + artifact );
-                String artifactProjectId = getArtifactProjectId( artifact );
-                ProjectLicenseInfo depProject;
-                if ( configuredDepLicensesMap.containsKey( artifactProjectId ) )
-                {
-                    depProject = configuredDepLicensesMap.get( artifactProjectId );
-                    depProject.setVersion( artifact.getVersion() );
-                }
-                else
-                {
-                    depProject = createDependencyProject( project );
-                }
+                final ProjectLicenseInfo depProject = createDependencyProject( project );
+                matchers.replaceMatches( depProject );
                 depProjectLicenses.add( depProject );
             }
             if ( !offline )
@@ -574,7 +646,7 @@ public abstract class AbstractDownloadLicensesMojo
         {
             if ( sortByGroupIdAndArtifactId )
             {
-                depProjectLicenses = sortByGroupIdAndArtifactId( depProjectLicenses );
+                sortByGroupIdAndArtifactId( depProjectLicenses );
             }
 
             if ( licensesOutputFileEncoding == null )
@@ -664,9 +736,8 @@ public abstract class AbstractDownloadLicensesMojo
         }
     }
 
-    private List<ProjectLicenseInfo> sortByGroupIdAndArtifactId( List<ProjectLicenseInfo> depProjectLicenses )
+    private void sortByGroupIdAndArtifactId( List<ProjectLicenseInfo> depProjectLicenses )
     {
-        List<ProjectLicenseInfo> sorted = new ArrayList<>( depProjectLicenses );
         Comparator<ProjectLicenseInfo> comparator = new Comparator<ProjectLicenseInfo>()
         {
             public int compare( ProjectLicenseInfo info1, ProjectLicenseInfo info2 )
@@ -676,8 +747,7 @@ public abstract class AbstractDownloadLicensesMojo
                         + "+" + info2.getArtifactId() );
             }
         };
-        Collections.sort( sorted, comparator );
-        return sorted;
+        Collections.sort( depProjectLicenses, comparator );
     }
 
     // ----------------------------------------------------------------------
@@ -820,7 +890,6 @@ public abstract class AbstractDownloadLicensesMojo
     private Proxy findActiveProxy()
         throws MojoExecutionException
     {
-        Proxy proxyToUse = null;
         for ( Proxy proxy : proxies )
         {
             if ( proxy.isActive() && "http".equals( proxy.getProtocol() ) )
@@ -829,82 +898,6 @@ public abstract class AbstractDownloadLicensesMojo
             }
         }
         return null;
-    }
-
-    /**
-     * Load the license information contained in a file if it exists. Will overwrite existing license information in the
-     * map for dependencies with the same id. If the config file does not exist, the method does nothing.
-     *
-     * @param configuredDepLicensesMap A map between the dependencyId and the license info
-     * @param licenseConfigFile        The license configuration file to load
-     * @param previouslyDownloaded     Whether these licenses were already downloaded
-     * @throws MojoExecutionException if could not load license infos
-     */
-    private void loadLicenseInfo( Map<String, ProjectLicenseInfo> configuredDepLicensesMap, File licenseConfigFile,
-                                  boolean previouslyDownloaded )
-        throws MojoExecutionException
-    {
-        FileInputStream fis = null;
-        try
-        {
-            fis = new FileInputStream( licenseConfigFile );
-            List<ProjectLicenseInfo> licensesList = LicenseSummaryReader.parseLicenseSummary( fis );
-            for ( ProjectLicenseInfo dep : licensesList )
-            {
-                configuredDepLicensesMap.put( dep.getId(), dep );
-                if ( previouslyDownloaded )
-                {
-                    for ( ProjectLicense license : dep.getLicenses() )
-                    {
-                        final String url = license.getUrl();
-                        if ( url != null )
-                        {
-                            final String licenseUrl = rewriteLicenseUrlIfNecessary( url );
-                            final FileNameEntry fileNameEntry =
-                                getLicenseFileName( dep, licenseUrl, license.getName(), license.getFile() );
-                            final File licenseFile = fileNameEntry.getFile();
-                            if ( !forceDownload && licenseFile.exists() )
-                            {
-                                final String actualSha1 = FileUtil.sha1( licenseFile.toPath() );
-                                if ( fileNameEntry.getSha1() != null && !actualSha1.equals( fileNameEntry.getSha1() ) )
-                                {
-                                    throw new MojoFailureException( "Unexpected sha1 checksum for file '"
-                                            + licenseFile.getAbsolutePath() + "': '" + actualSha1 + "'; expected '"
-                                            + fileNameEntry.getSha1() + "'. You may want to (a) re-run the current mojo"
-                                            + " with -Dlicense.forceDownload=true or (b) change the expected sha1 in"
-                                            + " the licenseUrlFileNames entry '"
-                                            + fileNameEntry.getFile().getName() + "' or (c) split the entry so that"
-                                            + " its URLs return content with different sha1 sums." );
-                                }
-                                // Save the URL so we don't download it again
-                                cache.put( license.getUrl(), LicenseDownloadResult.success( licenseFile,
-                                        actualSha1,
-                                        fileNameEntry.isPreferred() ) );
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        catch ( Exception e )
-        {
-            throw new MojoExecutionException( "Unable to parse license summary output file: " + licenseConfigFile, e );
-        }
-        finally
-        {
-            FileUtil.tryClose( fis );
-        }
-    }
-
-    /**
-     * Returns the project ID for the artifact
-     *
-     * @param artifact the artifact
-     * @return groupId:artifactId
-     */
-    private String getArtifactProjectId( Artifact artifact )
-    {
-        return artifact.getGroupId() + ":" + artifact.getArtifactId();
     }
 
     /**
@@ -918,10 +911,11 @@ public abstract class AbstractDownloadLicensesMojo
         ProjectLicenseInfo dependencyProject =
             new ProjectLicenseInfo( depMavenProject.getGroupId(), depMavenProject.getArtifactId(),
                                     depMavenProject.getVersion() );
-        List<?> licenses = depMavenProject.getLicenses();
-        for ( Object license : licenses )
+        @SuppressWarnings( "unchecked" )
+        List<License> licenses = depMavenProject.getLicenses();
+        for ( License license : licenses )
         {
-            dependencyProject.addLicense( new ProjectLicense( (License) license ) );
+            dependencyProject.addLicense( new ProjectLicense( license ) );
         }
         return dependencyProject;
     }
@@ -1148,25 +1142,32 @@ public abstract class AbstractDownloadLicensesMojo
 
     private void handleError( ProjectLicenseInfo depProject, String msg ) throws MojoFailureException
     {
-        switch ( errorRemedy )
+        if ( depProject.isApproved() )
         {
-            case ignore:
-                /* do nothing */
-                break;
-            case warn:
-                getLog().warn( msg );
-                break;
-            case failFast:
-                throw new MojoFailureException( msg );
-            case xmlOutput:
-                getLog().debug( msg );
-                depProject.addDownloaderMessage( msg );
-                break;
-            default:
-                throw new IllegalStateException( "Unexpected value of " + ErrorRemedy.class.getName() + ": "
-                    + errorRemedy );
+            getLog().debug( "Supressing manually approved license issue: " + msg );
         }
-        downloadErrorCount++;
+        else
+        {
+            switch ( errorRemedy )
+            {
+                case ignore:
+                    /* do nothing */
+                    break;
+                case warn:
+                    getLog().warn( msg );
+                    break;
+                case failFast:
+                    throw new MojoFailureException( msg );
+                case xmlOutput:
+                    getLog().debug( msg );
+                    depProject.addDownloaderMessage( msg );
+                    break;
+                default:
+                    throw new IllegalStateException( "Unexpected value of " + ErrorRemedy.class.getName() + ": "
+                        + errorRemedy );
+            }
+            downloadErrorCount++;
+        }
     }
 
     private String rewriteLicenseUrlIfNecessary( final String originalLicenseUrl )

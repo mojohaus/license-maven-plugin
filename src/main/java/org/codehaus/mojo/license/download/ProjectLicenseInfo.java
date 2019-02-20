@@ -26,6 +26,7 @@ import org.apache.maven.artifact.Artifact;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Contains the license information for a single project/dependency
@@ -43,7 +44,12 @@ public class ProjectLicenseInfo
 
     private List<ProjectLicense> licenses = new ArrayList<>();
 
+    private List<ProjectLicense> matchLicenses = new ArrayList<>();
+    private boolean hasMatchLicenses = false;
+
     private List<String> downloaderMessages = new ArrayList<>();
+
+    private boolean approved;
 
     /**
      * Default constructor.
@@ -58,6 +64,14 @@ public class ProjectLicenseInfo
         this.groupId = groupId;
         this.artifactId = artifactId;
         this.version = version;
+    }
+
+    public ProjectLicenseInfo( String groupId, String artifactId, String version, boolean hasMatchLicenses )
+    {
+        this.groupId = groupId;
+        this.artifactId = artifactId;
+        this.version = version;
+        this.hasMatchLicenses = hasMatchLicenses;
     }
 
     public String getGroupId()
@@ -103,6 +117,31 @@ public class ProjectLicenseInfo
     public void addLicense( ProjectLicense license )
     {
         licenses.add( license );
+    }
+
+    public List<ProjectLicense> getMatchLicenses()
+    {
+        return matchLicenses;
+    }
+
+    public void setMatchLicenses( List<ProjectLicense> matchLicenses )
+    {
+        this.matchLicenses = matchLicenses;
+    }
+
+    public void addMatchLicense( ProjectLicense license )
+    {
+        matchLicenses.add( license );
+    }
+
+    public boolean hasMatchLicenses()
+    {
+        return hasMatchLicenses;
+    }
+
+    public void setHasMatchLicenses( boolean hasMatchLicenses )
+    {
+        this.hasMatchLicenses = hasMatchLicenses;
     }
 
     /**
@@ -159,6 +198,14 @@ public class ProjectLicenseInfo
         return false;
     }
 
+    public boolean deepEquals( ProjectLicenseInfo other )
+    {
+        return Objects.equals( groupId, other.groupId ) && Objects.equals( artifactId, other.artifactId )
+            && Objects.equals( version, other.version ) && Objects.equals( licenses, other.licenses )
+            && Objects.equals( matchLicenses, other.matchLicenses )
+            && Objects.equals( downloaderMessages, other.downloaderMessages );
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -166,6 +213,40 @@ public class ProjectLicenseInfo
     public int hashCode()
     {
         return getId().hashCode();
+    }
+
+
+    /**
+     * @return a deep clone of {@link #licenses}
+     */
+    public List<ProjectLicense> cloneLicenses()
+    {
+        try
+        {
+            final ArrayList<ProjectLicense> result = new ArrayList<>( licenses != null ? licenses.size() : 0 );
+            if ( licenses != null )
+            {
+                for ( ProjectLicense license : licenses )
+                {
+                    result.add( license.clone() );
+                }
+            }
+            return result;
+        }
+        catch ( CloneNotSupportedException e )
+        {
+            throw new RuntimeException( e );
+        }
+    }
+
+    public void setApproved( boolean approved )
+    {
+        this.approved = approved;
+    }
+
+    public boolean isApproved()
+    {
+        return approved;
     }
 
 }

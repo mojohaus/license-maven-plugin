@@ -11,8 +11,8 @@
   <artifactId>PR-33-child1</artifactId>
   <licenses>
     <license>
-      <name>LGPL 2.1</name>
-      <url>https://www.gnu.org/licenses/lgpl-2.1.txt</url>
+      <name>Apache License 1.0</name>
+      <url>https://www.apache.org/licenses/LICENSE-1.0</url>
     </license>
   </licenses>
 

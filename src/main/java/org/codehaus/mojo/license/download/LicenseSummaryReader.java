@@ -31,10 +31,16 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A LicenseSummaryReader.
@@ -45,6 +51,19 @@ import java.util.List;
  */
 public class LicenseSummaryReader
 {
+
+    public static List<ProjectLicenseInfo> parseLicenseSummary( File licSummaryFile )
+        throws IOException, ParserConfigurationException, SAXException
+    {
+        if ( licSummaryFile.exists() )
+        {
+            try ( InputStream in = Files.newInputStream( licSummaryFile.toPath() ) )
+            {
+                return parseLicenseSummary( in );
+            }
+        }
+        return Collections.emptyList();
+    }
 
     /**
      * Read a component-info.xml from an input stream into a ComponentInfo object.
@@ -106,19 +125,39 @@ public class LicenseSummaryReader
             }
             else if ( node.getNodeName().equals( "licenses" ) )
             {
-                NodeList licensesChildNodes = node.getChildNodes();
-                for ( int j = 0; j < licensesChildNodes.getLength(); ++j )
-                {
-                    Node licensesChildNode = licensesChildNodes.item( j );
-                    if ( licensesChildNode.getNodeName().equals( "license" ) )
-                    {
-                        ProjectLicense license = parseLicense( licensesChildNode );
-                        dependency.addLicense( license );
-                    }
-                }
+                Map.Entry<Boolean, List<ProjectLicense>> entry = parseLicenses( node );
+                dependency.setLicenses( entry.getValue() );
+                dependency.setApproved( entry.getKey() );
+            }
+            else if ( node.getNodeName().equals( "matchLicenses" ) )
+            {
+                dependency.setHasMatchLicenses( true );
+                dependency.setMatchLicenses( parseLicenses( node ).getValue() );
             }
         }
         return dependency;
+    }
+
+    private static Map.Entry<Boolean, List<ProjectLicense>> parseLicenses( Node node )
+    {
+        final List<ProjectLicense> result = new ArrayList<ProjectLicense>();
+        final NodeList licensesChildNodes = node.getChildNodes();
+        final Node approvedNode = node.getAttributes().getNamedItem( "approved" );
+        boolean approved = Boolean.parseBoolean( approvedNode != null ? approvedNode.getNodeValue() : "false" );
+        for ( int j = 0; j < licensesChildNodes.getLength(); ++j )
+        {
+            final Node licensesChildNode = licensesChildNodes.item( j );
+            final String nodeName = licensesChildNode.getNodeName();
+            if ( nodeName.equals( "license" ) )
+            {
+                if ( approved )
+                {
+                    throw new IllegalStateException( "Cannot combine approved=\"true\" with <license> elements" );
+                }
+                result.add( parseLicense( licensesChildNode ) );
+            }
+        }
+        return new AbstractMap.SimpleImmutableEntry<Boolean, List<ProjectLicense>>( approved, result );
     }
 
     private static ProjectLicense parseLicense( Node licenseNode )

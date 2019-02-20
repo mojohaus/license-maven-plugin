@@ -2,11 +2,33 @@
 <licenseSummary>
   <dependencies>
     <dependency>
-      <groupId>groovy</groupId>
-      <artifactId>groovy-all</artifactId>
-      <version>1.0-jsr-04</version>
+      <groupId>\Qaopalliance\E</groupId>
+      <artifactId>\Qaopalliance\E</artifactId>
+      <version>\Q1.0\E</version>
+      <matchLicenses>
+        <license>
+          <name>\QPublic Domain\E</name>
+        </license>
+      </matchLicenses>
       <licenses>
-        <!--No license information available. -->
+        <!-- Manually fix the existing license nodes: -->
+        <license>
+          <name>Public Domain</name>
+        </license>
+      </licenses>
+      <downloaderMessages>
+        <downloaderMessage>No URL for license at index 0 in dependency aopalliance:aopalliance</downloaderMessage>
+      </downloaderMessages>
+    </dependency>
+    <dependency>
+      <groupId>\Qgroovy\E</groupId>
+      <artifactId>\Qgroovy-all\E</artifactId>
+      <version>\Q1.0-jsr-04\E</version>
+      <matchLicenses>
+        <!-- Match dependency with no licenses -->
+      </matchLicenses>
+      <licenses>
+        <!-- Manually add license elements here: -->
       </licenses>
       <downloaderMessages>
         <downloaderMessage>No license information available for: groovy:groovy-all</downloaderMessage>

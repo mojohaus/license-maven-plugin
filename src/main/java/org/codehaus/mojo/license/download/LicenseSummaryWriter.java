@@ -41,6 +41,8 @@ import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * A LicenseSummaryWriter.
@@ -87,39 +89,69 @@ public class LicenseSummaryWriter
 
     public static Node createDependencyNode( Document doc, ProjectLicenseInfo dep, boolean writeVersions )
     {
-        Node depNode = doc.createElement( "dependency" );
+        final List<String> messages = dep.getDownloaderMessages();
+        final boolean hasDownloaderMessages = messages != null && !messages.isEmpty();
 
-        Node groupIdNode = doc.createElement( "groupId" );
-        groupIdNode.appendChild( doc.createTextNode( dep.getGroupId() ) );
+        final Node depNode = doc.createElement( "dependency" );
+
+        final Node groupIdNode = doc.createElement( "groupId" );
+        groupIdNode.appendChild( doc.createTextNode( patternOrText( dep.getGroupId(), hasDownloaderMessages ) ) );
         depNode.appendChild( groupIdNode );
 
-        Node artifactIdNode = doc.createElement( "artifactId" );
-        artifactIdNode.appendChild( doc.createTextNode( dep.getArtifactId() ) );
+        final Node artifactIdNode = doc.createElement( "artifactId" );
+        artifactIdNode.appendChild( doc.createTextNode( patternOrText( dep.getArtifactId(), hasDownloaderMessages ) ) );
         depNode.appendChild( artifactIdNode );
 
         if ( writeVersions )
         {
-            Node versionNode = doc.createElement( "version" );
-            versionNode.appendChild( doc.createTextNode( dep.getVersion() ) );
+            final Node versionNode = doc.createElement( "version" );
+            versionNode.appendChild( doc.createTextNode( patternOrText( dep.getVersion(), hasDownloaderMessages ) ) );
             depNode.appendChild( versionNode );
         }
+        else if ( hasDownloaderMessages  )
+        {
+            depNode.appendChild( doc.createComment( " <version>" + dep.getVersion() + "</version> " ) );
+        }
+
+        if ( hasDownloaderMessages  )
+        {
+            Node matchLicensesNode = doc.createElement( "matchLicenses" );
+            if ( dep.getLicenses() == null || dep.getLicenses().size() == 0 )
+            {
+                matchLicensesNode.appendChild( doc.createComment( " Match dependency with no licenses " ) );
+            }
+            else
+            {
+                for ( ProjectLicense lic : dep.getLicenses() )
+                {
+                    matchLicensesNode.appendChild( createLicenseNode( doc, lic, true ) );
+                }
+            }
+            depNode.appendChild( matchLicensesNode );
+        }
+
 
         Node licensesNode = doc.createElement( "licenses" );
         if ( dep.getLicenses() == null || dep.getLicenses().size() == 0 )
         {
-            licensesNode.appendChild( doc.createComment( "No license information available. " ) );
+            final String comment =
+                hasDownloaderMessages ? " Manually add license elements here: " : " No license information available. ";
+            licensesNode.appendChild( doc.createComment( comment ) );
         }
         else
         {
+            if ( hasDownloaderMessages )
+            {
+                licensesNode.appendChild( doc.createComment( " Manually fix the existing license nodes: " ) );
+            }
             for ( ProjectLicense lic : dep.getLicenses() )
             {
-                licensesNode.appendChild( createLicenseNode( doc, lic ) );
+                licensesNode.appendChild( createLicenseNode( doc, lic, false ) );
             }
         }
         depNode.appendChild( licensesNode );
 
-        final List<String> messages = dep.getDownloaderMessages();
-        if ( messages != null && !messages.isEmpty() )
+        if ( hasDownloaderMessages )
         {
             final Node downloaderMessagesNode = doc.createElement( "downloaderMessages" );
             for ( String msg : messages )
@@ -135,46 +167,76 @@ public class LicenseSummaryWriter
 
     }
 
-    public static Node createLicenseNode( Document doc, ProjectLicense lic )
+    public static Node createLicenseNode( Document doc, ProjectLicense lic, boolean isMatcher )
     {
         Node licenseNode = doc.createElement( "license" );
 
         if ( lic.getName() != null )
         {
             Node licNameNode = doc.createElement( "name" );
-            licNameNode.appendChild( doc.createTextNode( lic.getName() ) );
+            licNameNode.appendChild( doc.createTextNode( patternOrText( lic.getName(), isMatcher ) ) );
             licenseNode.appendChild( licNameNode );
         }
 
         if ( lic.getUrl() != null )
         {
             Node licUrlNode = doc.createElement( "url" );
-            licUrlNode.appendChild( doc.createTextNode( lic.getUrl() ) );
+            licUrlNode.appendChild( doc.createTextNode( patternOrText( lic.getUrl(), isMatcher ) ) );
             licenseNode.appendChild( licUrlNode );
         }
 
         if ( lic.getDistribution() != null )
         {
             Node licDistNode = doc.createElement( "distribution" );
-            licDistNode.appendChild( doc.createTextNode( lic.getDistribution() ) );
+            licDistNode.appendChild( doc.createTextNode( patternOrText( lic.getDistribution(), isMatcher ) ) );
             licenseNode.appendChild( licDistNode );
         }
 
         if ( lic.getFile() != null )
         {
             Node licFileNode = doc.createElement( "file" );
-            licFileNode.appendChild( doc.createTextNode( lic.getFile() ) );
+            licFileNode.appendChild( doc.createTextNode( patternOrText( lic.getFile(), isMatcher ) ) );
             licenseNode.appendChild( licFileNode );
         }
 
         if ( lic.getComments() != null )
         {
             Node licCommentsNode = doc.createElement( "comments" );
-            licCommentsNode.appendChild( doc.createTextNode( lic.getComments() ) );
+            licCommentsNode.appendChild( doc.createTextNode( patternOrText( lic.getComments(), isMatcher ) ) );
             licenseNode.appendChild( licCommentsNode );
         }
 
         return licenseNode;
+    }
+
+    private static final Pattern WHITESPACE_PATTERN = Pattern.compile( "\\s{2,}" );
+
+    static String patternOrText( String value, boolean isMatcher )
+    {
+        if ( value != null && !value.isEmpty() && isMatcher )
+        {
+            final StringBuilder result = new StringBuilder();
+            final Matcher m = WHITESPACE_PATTERN.matcher( value );
+            int offset = 0;
+            while ( m.find() )
+            {
+                if ( m.start() > offset )
+                {
+                    result.append( Pattern.quote( value.substring( offset, m.start() ) ) );
+                }
+                result.append( "\\s+" );
+                offset = m.end();
+            }
+            if ( offset < value.length() )
+            {
+                result.append( Pattern.quote( value.substring( offset ) ) );
+            }
+            return result.toString();
+        }
+        else
+        {
+            return value;
+        }
     }
 
 }
