@@ -524,6 +524,16 @@ public abstract class AbstractDownloadLicensesMojo
     protected Map<String, String> licenseUrlFileNames;
 
     /**
+     * A list of regexp:replacement pairs that should be applied to file names for storing licenses.
+     * <p>
+     * Note that these patterns are not applied to file names defined in {@link #licenseUrlFileNames}.
+     *
+     * @since 1.18
+     */
+    @Parameter
+    protected List<LicenseUrlReplacement> licenseUrlFileNameSanitizers;
+
+    /**
      * If {@code true}, {@link #licensesOutputFile} and {@link #licensesErrorsFile} will contain {@code <version>}
      * elements for each {@code <dependency>}; otherwise the {@code <version>} {@link #licensesOutputFile} and
      * {@link #licensesErrorsFile} elements will not be appended under {@code <dependency>} elements in
@@ -980,7 +990,26 @@ public abstract class AbstractDownloadLicensesMojo
         // lower case and (back)slash removal
         licenseFileName = licenseFileName.toLowerCase( Locale.US ).replaceAll( "[\\\\/]+", "_" );
 
+        licenseFileName = sanitize( licenseFileName );
+
         return new FileNameEntry( new File( licensesOutputDirectory, licenseFileName ), false, null );
+    }
+
+    private String sanitize( String licenseFileName )
+    {
+        if ( licenseUrlFileNameSanitizers != null )
+        {
+            for ( LicenseUrlReplacement sanitizer : licenseUrlFileNameSanitizers )
+            {
+                Pattern regexp = sanitizer.getRegexp();
+                String replacement = sanitizer.getReplacement() == null ? "" : sanitizer.getReplacement();
+                if ( regexp != null )
+                {
+                    licenseFileName = regexp.matcher( licenseFileName ).replaceAll( replacement );
+                }
+            }
+        }
+        return licenseFileName;
     }
 
     /**
