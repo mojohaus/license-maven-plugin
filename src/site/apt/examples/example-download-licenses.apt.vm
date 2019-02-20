@@ -36,10 +36,8 @@ Download Licenses Examples
   based on the url field of the dependency POM.
 
   After downloading the license files, the plugin will create a summary file in XML format which describes
-  the license(s) associated with each dependency.  Note that subsequent runs of the plugin will attempt
-  to use the existing summary file if found instead of re-downloading the licenses every build.
-  If the license summary file is found, only the licenses of new dependencies not in the file will
-  be downloaded.
+  the license(s) associated with each dependency.  Note that subsequent runs of the plugin will avoid downloading
+  the licenses unless the local file exists or forceDownload is set to true.
 
 * Basic Example
 

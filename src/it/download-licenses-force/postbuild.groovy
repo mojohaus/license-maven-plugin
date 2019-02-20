@@ -44,4 +44,4 @@ assert expectedLicensesErrorsXml.text.equals(licensesErrorsXml.text)
 
 final Path log = basePath.resolve('build.log')
 assert Files.exists(log)
-assert log.text.contains('There were 1 download errors - check ')
+assert log.text.contains('There were 2 download errors - check ')

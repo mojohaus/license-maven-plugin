@@ -29,7 +29,7 @@ import org.apache.maven.model.License;
  *
  * @since 1.17
  */
-public class ProjectLicense
+public class ProjectLicense implements Cloneable
 {
 
 
@@ -224,6 +224,76 @@ public class ProjectLicense
     public void setFile( String file )
     {
         this.file = file;
+    }
+
+    @Override
+    public ProjectLicense clone()
+        throws CloneNotSupportedException
+    {
+        return (ProjectLicense) super.clone();
+    }
+
+    @Override
+    public int hashCode()
+    {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ( ( comments == null ) ? 0 : comments.hashCode() );
+        result = prime * result + ( ( distribution == null ) ? 0 : distribution.hashCode() );
+        result = prime * result + ( ( file == null ) ? 0 : file.hashCode() );
+        result = prime * result + ( ( name == null ) ? 0 : name.hashCode() );
+        result = prime * result + ( ( url == null ) ? 0 : url.hashCode() );
+        return result;
+    }
+
+    @Override
+    public boolean equals( Object obj )
+    {
+        // CHECKSTYLE_OFF: NeedBraces
+        if ( this == obj )
+            return true;
+        if ( obj == null )
+            return false;
+        if ( getClass() != obj.getClass() )
+            return false;
+        ProjectLicense other = (ProjectLicense) obj;
+        if ( comments == null )
+        {
+            if ( other.comments != null )
+                return false;
+        }
+        else if ( !comments.equals( other.comments ) )
+            return false;
+        if ( distribution == null )
+        {
+            if ( other.distribution != null )
+                return false;
+        }
+        else if ( !distribution.equals( other.distribution ) )
+            return false;
+        if ( file == null )
+        {
+            if ( other.file != null )
+                return false;
+        }
+        else if ( !file.equals( other.file ) )
+            return false;
+        if ( name == null )
+        {
+            if ( other.name != null )
+                return false;
+        }
+        else if ( !name.equals( other.name ) )
+            return false;
+        if ( url == null )
+        {
+            if ( other.url != null )
+                return false;
+        }
+        else if ( !url.equals( other.url ) )
+            return false;
+        return true;
+        // CHECKSTYLE_ON: NeedBraces
     }
 
 }

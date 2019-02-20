@@ -1,0 +1,29 @@
+<licenseSummary>
+  <dependencies>
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <licenses>
+        <license>
+          <name>Apache License 2.0</name>
+          <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+      </licenses>
+    </dependency>
+    <dependency>
+      <groupId>aopalliance</groupId>
+      <artifactId>aopalliance</artifactId>
+      <licenses approved="true" />
+    </dependency>
+    <dependency>
+      <groupId>asm</groupId>
+      <artifactId>asm</artifactId>
+      <licenses>
+        <license>
+          <name>BSD 3-Clause ASM</name>
+          <url>https://gitlab.ow2.org/asm/asm/raw/ASM_3_1_MVN/LICENSE.txt</url>
+        </license>
+      </licenses>
+    </dependency>
+  </dependencies>
+</licenseSummary>
