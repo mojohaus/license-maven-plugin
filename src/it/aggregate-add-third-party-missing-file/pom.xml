@@ -40,7 +40,6 @@
   <packaging>pom</packaging>
 
   <properties>
-
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
@@ -53,14 +52,43 @@
           <artifactId>license-maven-plugin</artifactId>
           <version>@pom.version@</version>
           <configuration>
-            <missingFileUrl>${project.baseUri}license.missing</missingFileUrl>
             <failOnMissing>true</failOnMissing>
-            <useMissingFile>true</useMissingFile>
             <verbose>true</verbose>
+            <useMissingFile>true</useMissingFile>
           </configuration>
         </plugin>
       </plugins>
     </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>missing-file-url-only</id>
+            <configuration>
+              <missingFileUrl>${project.baseUri}missingFileUrl.properties</missingFileUrl>
+              <thirdPartyFilename>THIRD-PARTY-missing-file-url-only.txt</thirdPartyFilename>
+            </configuration>
+          </execution>
+          <execution>
+            <id>missing-file-only</id>
+            <configuration>
+              <missingFile>missingFile.properties</missingFile>
+              <thirdPartyFilename>THIRD-PARTY-missing-file-only.txt</thirdPartyFilename>
+            </configuration>
+          </execution>
+          <execution>
+            <id>missing-file-both</id>
+            <configuration>
+              <missingFile>missingFileBoth.properties</missingFile>
+              <missingFileUrl>${project.baseUri}missingFileUrlBoth.properties</missingFileUrl>
+              <thirdPartyFilename>THIRD-PARTY-missing-file-both.txt</thirdPartyFilename>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
   </build>
 
 </project>

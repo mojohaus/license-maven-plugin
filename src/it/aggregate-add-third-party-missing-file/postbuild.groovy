@@ -20,7 +20,24 @@
  * #L%
  */
 
-file = new File(basedir, 'target/generated-sources/license/THIRD-PARTY.txt');
+
+file = new File(basedir, 'target/generated-sources/license/THIRD-PARTY-missing-file-url-only.txt');
 assert file.exists();
 content = file.text;
+assert content.contains('(CDDL-1.0 - Common Development and Distribution License 1.0) connector-api (javax.resource:connector-api:1.5 - no url defined)');
 assert content.contains('(Apache-2.0 - Apache License 2.0) Jettison (org.codehaus.jettison:jettison:1.1 - no url defined)');
+assert content.contains('(The JSON License) JSON (JavaScript Object Notation) (org.json:json:20070829 - http://www.json.org/java/index.html)');
+
+file = new File(basedir, 'target/generated-sources/license/THIRD-PARTY-missing-file-only.txt');
+assert file.exists();
+content = file.text;
+assert content.contains('(CDDL-1.0 - Common Development and Distribution License 1.0) connector-api (javax.resource:connector-api:1.5 - no url defined)');
+assert content.contains('(Apache-2.0 - Apache License 2.0) Jettison (org.codehaus.jettison:jettison:1.1 - no url defined)');
+assert content.contains('(The JSON License) JSON (JavaScript Object Notation) (org.json:json:20070829 - http://www.json.org/java/index.html)');
+
+file = new File(basedir, 'target/generated-sources/license/THIRD-PARTY-missing-file-both.txt');
+assert file.exists();
+content = file.text;
+assert content.contains('(CDDL-1.0 - Common Development and Distribution License 1.0) connector-api (javax.resource:connector-api:1.5 - no url defined)');
+assert content.contains('(Apache-2.0 - Apache License 2.0) Jettison (org.codehaus.jettison:jettison:1.1 - no url defined)');
+assert content.contains('(The JSON License) JSON (JavaScript Object Notation) (org.json:json:20070829 - http://www.json.org/java/index.html)');

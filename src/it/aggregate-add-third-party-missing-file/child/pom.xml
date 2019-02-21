@@ -40,9 +40,20 @@
 
     <!-- no license -->
     <dependency>
+      <groupId>javax.resource</groupId>
+      <artifactId>connector-api</artifactId>
+      <version>1.5</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
       <groupId>org.codehaus.jettison</groupId>
       <artifactId>jettison</artifactId>
       <version>1.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.json</groupId>
+      <artifactId>json</artifactId>
+      <version>20070829</version>
     </dependency>
   </dependencies>
 
