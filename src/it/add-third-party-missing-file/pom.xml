@@ -53,6 +53,11 @@
       <artifactId>json</artifactId>
       <version>20070829</version>
     </dependency>
+    <dependency>
+      <groupId>javax.resource</groupId>
+      <artifactId>connector-api</artifactId>
+      <version>1.5</version>
+    </dependency>
   </dependencies>
 
   <build>

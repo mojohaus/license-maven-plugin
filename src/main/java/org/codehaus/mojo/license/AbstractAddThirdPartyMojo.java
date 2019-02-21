@@ -695,7 +695,7 @@ public abstract class AbstractAddThirdPartyMojo
             getLog().warn( "" );
             if ( UrlRequester.isStringUrl( licenseMergesUrl ) )
             {
-                licenseMerges = Arrays.asList( UrlRequester.getFromUrl( licenseMergesUrl ) );
+                licenseMerges = Arrays.asList( UrlRequester.getFromUrl( licenseMergesUrl ).split( "\n" ) );
             }
         }
 
