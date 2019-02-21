@@ -1076,7 +1076,6 @@ public abstract class AbstractDownloadLicensesMojo
                                 handleResult( licenseUrl, cachedResult, depProject, license );
                             }
                         }
-                        return;
                     }
                     else
                     {
