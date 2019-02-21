@@ -74,22 +74,16 @@ import org.codehaus.mojo.license.utils.FileUtil;
 public class LicenseDownloader implements AutoCloseable
 {
 
-    /**
-     * Defines the connection timeout in milliseconds when attempting to download license files.
-     */
-    public static final int DEFAULT_CONNECTION_TIMEOUT = 5000;
-
     private static final Pattern EXTENSION_PATTERN = Pattern.compile( "\\.[a-z]{1,4}$", Pattern.CASE_INSENSITIVE );
 
     private final CloseableHttpClient client;
 
-    public LicenseDownloader( Proxy proxy )
+    public LicenseDownloader( Proxy proxy, int connectTimeout, int socketTimeout, int connectionRequestTimeout )
     {
-
         final Builder configBuilder = RequestConfig.copy( RequestConfig.DEFAULT ) //
-                        .setConnectTimeout( DEFAULT_CONNECTION_TIMEOUT ) //
-                        .setSocketTimeout( DEFAULT_CONNECTION_TIMEOUT ) //
-                        .setConnectionRequestTimeout( DEFAULT_CONNECTION_TIMEOUT );
+                        .setConnectTimeout( connectTimeout ) //
+                        .setSocketTimeout( socketTimeout ) //
+                        .setConnectionRequestTimeout( connectionRequestTimeout );
 
         HttpClientBuilder clientBuilder = HttpClients.custom().setDefaultRequestConfig( configBuilder.build() );
         if ( proxy != null )

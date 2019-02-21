@@ -546,6 +546,30 @@ public abstract class AbstractDownloadLicensesMojo
     @Parameter( property = "license.writeVersions", defaultValue = "true" )
     private boolean writeVersions;
 
+    /**
+     * Connect timeout in milliseconds passed to the HTTP client when downloading licenses from remote URLs.
+     *
+     * @since 1.18
+     */
+    @Parameter( property = "license.connectTimeout", defaultValue = "5000" )
+    private int connectTimeout;
+
+    /**
+     * Socket timeout in milliseconds passed to the HTTP client when downloading licenses from remote URLs.
+     *
+     * @since 1.18
+     */
+    @Parameter( property = "license.socketTimeout", defaultValue = "5000" )
+    private int socketTimeout;
+
+    /**
+     * Connect request timeout in milliseconds passed to the HTTP client when downloading licenses from remote URLs.
+     *
+     * @since 1.18
+     */
+    @Parameter( property = "license.connectionRequestTimeout", defaultValue = "5000" )
+    private int connectionRequestTimeout;
+
     // ----------------------------------------------------------------------
     // Plexus Components
     // ----------------------------------------------------------------------
@@ -619,7 +643,8 @@ public abstract class AbstractDownloadLicensesMojo
         // The resulting list of licenses after dependency resolution
         final List<ProjectLicenseInfo> depProjectLicenses = new ArrayList<>();
 
-        try ( LicenseDownloader licenseDownloader = new LicenseDownloader( findActiveProxy() ) )
+        try ( LicenseDownloader licenseDownloader =
+            new LicenseDownloader( findActiveProxy(), connectTimeout, socketTimeout, connectionRequestTimeout ) )
         {
             for ( MavenProject project : dependencies )
             {
