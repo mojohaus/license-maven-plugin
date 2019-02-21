@@ -97,8 +97,7 @@ public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo
      * @deprecated since 1.14, please use now {@link #missingFile}.
      */
     @Deprecated
-    @Parameter( property = "license.aggregateMissingLicensesFile",
-                defaultValue = "${project.basedir}/src/license/THIRD-PARTY.properties" )
+    @Parameter( property = "license.aggregateMissingLicensesFile" )
     private File aggregateMissingLicensesFile;
 
     // ----------------------------------------------------------------------
