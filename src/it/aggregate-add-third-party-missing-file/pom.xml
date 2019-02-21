@@ -71,6 +71,21 @@
               <thirdPartyFilename>THIRD-PARTY-missing-file-only.txt</thirdPartyFilename>
             </configuration>
           </execution>
+          <execution>
+            <id>missing-file-url-only</id>
+            <configuration>
+              <missingFileUrl>${project.baseUri}missingFileUrl.properties</missingFileUrl>
+              <thirdPartyFilename>THIRD-PARTY-missing-file-url-only.txt</thirdPartyFilename>
+            </configuration>
+          </execution>
+          <execution>
+            <id>missing-file-both</id>
+            <configuration>
+              <missingFile>missingFileBoth.properties</missingFile>
+              <missingFileUrl>${project.baseUri}missingFileUrlBoth.properties</missingFileUrl>
+              <thirdPartyFilename>THIRD-PARTY-missing-file-both.txt</thirdPartyFilename>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
     </plugins>
