@@ -27,10 +27,12 @@ import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 import java.util.zip.ZipEntry;
 
-JarOutputStream licenseRepo = new JarOutputStream(new FileOutputStream(new File(basedir, "license-repo.jar")));
+String missingLicences = "org.json--json--20070829=The JSON License by classpath url\n" +
+                         "javax.resource--connector-api--1.5=CDDL + GPLv2 with classpath exception by classpath url";
 
+JarOutputStream licenseRepo = new JarOutputStream(new FileOutputStream(new File(basedir, "license-repo.jar")));
 licenseRepo.putNextEntry(new ZipEntry("missing-licenses.properties"));
-licenseRepo.write("org.json--json--20070829=The JSON License by classpath url".getBytes("UTF-8"));
+licenseRepo.write(missingLicences.getBytes("UTF-8"));
 licenseRepo.closeEntry();
 
 licenseRepo.close();
