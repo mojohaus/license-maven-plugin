@@ -882,22 +882,27 @@ public abstract class AbstractAddThirdPartyMojo
 
     void resolveUnsafeDependenciesFromFile( File missingLicenses ) throws IOException, MojoExecutionException
     {
-        if ( missingLicenses != null && missingLicenses.exists() && missingLicenses.length() > 0 )
+        if ( missingLicenses == null )
         {
-            // there are missing licenses available from the artifact
-            SortedProperties unsafeMappings = new SortedProperties( getEncoding() );
+            return;
+        }
 
-            if ( missingLicenses.exists() )
-            {
-                // load the missing file
-                unsafeMappings.load( missingLicenses );
-            }
-            if ( UrlRequester.isStringUrl( missingFileUrl ) )
-            {
-                String httpRequestResult = UrlRequester.getFromUrl( missingFileUrl );
-                unsafeMappings.load( new ByteArrayInputStream( httpRequestResult.getBytes() ) );
-            }
+        // there are missing licenses available from the artifact
+        SortedProperties unsafeMappings = new SortedProperties( getEncoding() );
 
+        if ( missingLicenses.exists() && missingLicenses.length() > 0 )
+        {
+            // load the missing file
+            unsafeMappings.load( missingLicenses );
+        }
+        if ( useMissingFile && UrlRequester.isStringUrl( missingFileUrl ) )
+        {
+            String httpRequestResult = UrlRequester.getFromUrl( missingFileUrl );
+            unsafeMappings.load( new ByteArrayInputStream( httpRequestResult.getBytes() ) );
+        }
+
+        if ( !unsafeMappings.isEmpty() )
+        {
             Set<MavenProject> resolvedDependencies = new HashSet<>();
             for ( MavenProject unsafeDependency : unsafeDependencies )
             {
