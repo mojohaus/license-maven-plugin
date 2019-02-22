@@ -1,0 +1,7 @@
+# this is a comment
+include gaPattern org\.group1:artifact1
+include gaPattern org\.group2:artifact2
+exclude gaPattern org\.group3:artifact3
+include scope compile
+include scope system
+exclude type war

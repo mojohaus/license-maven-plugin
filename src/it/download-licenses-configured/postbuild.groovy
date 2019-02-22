@@ -57,4 +57,15 @@ return {
     final Path licensesXml = outputBase.resolve('licenses.xml')
     assert expectedLicensesXml.text.equals(licensesXml.text)
     return true
+}() && {
+    final String id = 'artifact-filters-url'
+    final Path outputBase = basePath.resolve('target/' + id)
+
+    final Path bsdAsm = outputBase.resolve('licenses/bsd 3-clause asm - license.txt')
+    assert !Files.exists(bsdAsm)
+
+    final Path expectedLicensesXml = basePath.resolve('licenses-'+ id +'.expected.xml')
+    final Path licensesXml = outputBase.resolve('licenses.xml')
+    assert expectedLicensesXml.text.equals(licensesXml.text)
+    return true
 }()

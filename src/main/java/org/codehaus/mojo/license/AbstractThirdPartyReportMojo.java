@@ -343,6 +343,26 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
     @Component
     private ThirdPartyTool thirdPartyTool;
 
+    /**
+     * A URL returning a plain text file that contains include/exclude artifact filters in the following format:
+     * <pre>
+     * {@code
+     * # this is a comment
+     * include gaPattern org\.my-org:my-artifact
+     * include gaPattern org\.other-org:other-artifact
+     * exclude gaPattern org\.yet-anther-org:.*
+     * include scope compile
+     * include scope test
+     * exclude scope system
+     * include type jar
+     * exclude type war
+     * }</pre>
+     *
+     * @since 1.18
+     */
+    @Parameter( property = "license.artifactFiltersUrl" )
+    private String artifactFiltersUrl;
+
     // ----------------------------------------------------------------------
     // Protected Abstract Methods
     // ----------------------------------------------------------------------
@@ -657,5 +677,18 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
         }
         return details;
     }
+
+    /** {@inheritDoc} */
+    public String getArtifactFiltersUrl()
+    {
+        return artifactFiltersUrl;
+    }
+
+    /** {@inheritDoc} */
+    public String getEncoding()
+    {
+        return encoding;
+    }
+
 
 }

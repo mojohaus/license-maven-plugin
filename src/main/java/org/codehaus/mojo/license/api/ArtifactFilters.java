@@ -22,12 +22,15 @@ package org.codehaus.mojo.license.api;
  * #L%
  */
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 
 import org.apache.maven.artifact.Artifact;
+import org.codehaus.mojo.license.utils.UrlRequester;
 
 /**
  * Artifact filtering by
@@ -62,6 +65,23 @@ public class ArtifactFilters
         builder.excludeScopes( config.getExcludedScopes() );
         builder.includeTypes( config.getIncludedTypes() );
         builder.excludeTypes( config.getExcludedTypes() );
+
+        final String url = config.getArtifactFiltersUrl();
+        if ( url != null )
+        {
+            try
+            {
+                final String content = UrlRequester.getFromUrl( url, config.getEncoding() );
+                if ( content != null )
+                {
+                    builder.script( url, content );
+                }
+            }
+            catch ( IOException e )
+            {
+                throw new RuntimeException( e );
+            }
+        }
 
         return builder.build();
     }
@@ -126,6 +146,72 @@ public class ArtifactFilters
         public ArtifactFilters build()
         {
             return new ArtifactFilters( scopeFilters.build(), typeFilters.build(), gaFilters.build() );
+        }
+
+        public void script( String url, String content )
+        {
+            final StringTokenizer st = new StringTokenizer( content, "\r\n" );
+            int i = 1;
+            while ( st.hasMoreTokens() )
+            {
+                final String line = st.nextToken().trim();
+                if ( !line.startsWith( "#" ) && !line.isEmpty() )
+                {
+                    final String[] items = line.split( "\\s+" );
+                    if ( items.length != 3 )
+                    {
+                        throw new IllegalStateException( "Expected 3 space separated tokens on line " + i + " in " + url
+                            + " found: " + line );
+                    }
+                    if ( "include".equals( items[0] ) )
+                    {
+                        if ( "gaPattern".equals( items[1] ) )
+                        {
+                            includeGa( items[2] );
+                        }
+                        else if ( "scope".equals( items[1] ) )
+                        {
+                            includeScope( items[2] );
+                        }
+                        else if ( "type".equals( items[1] ) )
+                        {
+                            includeType( items[2] );
+                        }
+                        else
+                        {
+                            throw new IllegalStateException( "Expected \"gaPattern\", \"scope\" or \"type\" after \""
+                                + items[0] + "\" on line " + i + " in " + url + " found: " + line );
+                        }
+                    }
+                    else if ( "exclude".equals( items[0] ) )
+                    {
+                        if ( "gaPattern".equals( items[1] ) )
+                        {
+                            excludeGa( items[2] );
+                        }
+                        else if ( "scope".equals( items[1] ) )
+                        {
+                            excludeScope( items[2] );
+                        }
+                        else if ( "type".equals( items[1] ) )
+                        {
+                            excludeType( items[2] );
+                        }
+                        else
+                        {
+                            throw new IllegalStateException( "Expected \"gaPattern\", \"scope\" or \"type\" after \""
+                                + items[0] + "\" on line " + i + " in " + url + " found: " + line );
+                        }
+                    }
+                    else
+                    {
+                        throw new IllegalStateException(
+                            "Expected a line starting with \"include\" or \"exclude\" on line "
+                            + i + " in " + url + " found: " + line );
+                    }
+                }
+                i++;
+            }
         }
 
         public Builder excludeGa( String pattern )
