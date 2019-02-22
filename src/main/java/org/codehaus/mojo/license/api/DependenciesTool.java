@@ -67,7 +67,8 @@ public interface DependenciesTool
      * @return the loaded project dependency artifacts
      * @throws DependenciesToolException if could not load project dependencies
      */
-    ResolvedProjectDependencies loadProjectArtifacts( ArtifactRepository localRepository, List remoteRepositories,
-            MavenProject project, List<MavenProject> reactorProjectDependencies )
+    ResolvedProjectDependencies loadProjectArtifacts( ArtifactRepository localRepository,
+                                                      List<ArtifactRepository> remoteRepositories, MavenProject project,
+                                                      List<MavenProject> reactorProjectDependencies )
         throws DependenciesToolException;
 }
