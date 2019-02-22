@@ -93,6 +93,32 @@ public interface MavenProjectDependenciesConfigurator
     String getExcludedArtifacts();
 
     /**
+     * Returns a URL returning a plain text file that contains include/exclude artifact filters in the following format:
+     * <pre>
+     * {@code
+     * # this is a comment
+     * include gaPattern org\.my-org:my-artifact
+     * include gaPattern org\.other-org:other-artifact
+     * exclude gaPattern org\.yet-anther-org:.*
+     * include scope compile
+     * include scope test
+     * exclude scope system
+     * include type jar
+     * exclude type war
+     * }</pre>
+     *
+     * @return a URL returning a plain text file
+     * @since 1.18
+     */
+    String getArtifactFiltersUrl();
+
+    /**
+     * @return the encoding to use when reading {@link #getArtifactFiltersUrl()} unless it is an HTTP URL returning a
+     * valid charset in the {@code Content-Type} response header.
+     */
+    String getEncoding();
+
+    /**
      * @return {@code true} if verbose mode is on, {@code false} otherwise.
      */
     boolean isVerbose();

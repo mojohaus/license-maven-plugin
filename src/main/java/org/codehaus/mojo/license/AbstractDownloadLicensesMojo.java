@@ -288,6 +288,26 @@ public abstract class AbstractDownloadLicensesMojo
     private String includedTypes;
 
     /**
+     * A URL returning a plain text file that contains include/exclude artifact filters in the following format:
+     * <pre>
+     * {@code
+     * # this is a comment
+     * include gaPattern org\.my-org:my-artifact
+     * include gaPattern org\.other-org:other-artifact
+     * exclude gaPattern org\.yet-anther-org:.*
+     * include scope compile
+     * include scope test
+     * exclude scope system
+     * include type jar
+     * exclude type war
+     * }</pre>
+     *
+     * @since 1.18
+     */
+    @Parameter( property = "license.artifactFiltersUrl" )
+    private String artifactFiltersUrl;
+
+    /**
      * Settings offline flag (will not download anything if setted to true).
      *
      * @since 1.0
@@ -636,6 +656,15 @@ public abstract class AbstractDownloadLicensesMojo
 
         initDirectories();
 
+        if ( licensesOutputFileEncoding == null )
+        {
+            licensesOutputFileEncoding = System.getProperty( "file.encoding" );
+            getLog().warn( "Using the default system encoding for reading or writing licenses.xml file."
+                    + " This makes your build platform dependent. You should set either"
+                    + " project.build.sourceEncoding or licensesOutputFileEncoding" );
+        }
+        final Charset charset = Charset.forName( licensesOutputFileEncoding );
+
         final LicenseMatchers matchers = LicenseMatchers.load( licensesConfigFile );
 
         final Set<MavenProject> dependencies = getDependencies();
@@ -684,14 +713,6 @@ public abstract class AbstractDownloadLicensesMojo
                 sortByGroupIdAndArtifactId( depProjectLicenses );
             }
 
-            if ( licensesOutputFileEncoding == null )
-            {
-                licensesOutputFileEncoding = System.getProperty( "file.encoding" );
-                getLog().warn( "Using the default system encoding for reading or writing licenses.xml file."
-                        + " This makes your build platform dependent. You should set either"
-                        + " project.build.sourceEncoding or licensesOutputFileEncoding" );
-            }
-            final Charset charset = Charset.forName( licensesOutputFileEncoding );
             if ( licensesOutputFileEol == Eol.AUTODETECT )
             {
                 final Path autodetectFromFile = licensesConfigFile.exists() ? licensesConfigFile.toPath()
@@ -880,6 +901,18 @@ public abstract class AbstractDownloadLicensesMojo
     public String getExcludedArtifacts()
     {
         return excludedArtifacts;
+    }
+
+    /** {@inheritDoc} */
+    public String getArtifactFiltersUrl()
+    {
+        return artifactFiltersUrl;
+    }
+
+    /** {@inheritDoc} */
+    public String getEncoding()
+    {
+        return licensesOutputFileEncoding;
     }
 
     /**

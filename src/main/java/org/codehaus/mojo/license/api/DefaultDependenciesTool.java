@@ -33,11 +33,7 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -104,37 +100,11 @@ public class DefaultDependenciesTool
                                                                     SortedMap<String, MavenProject> cache )
     {
 
-        boolean haveNoIncludedGroups = StringUtils.isEmpty( configuration.getIncludedGroups() );
-        boolean haveNoIncludedArtifacts = StringUtils.isEmpty( configuration.getIncludedArtifacts() );
-        boolean excludeTransitiveDependencies = configuration.isExcludeTransitiveDependencies();
+        final ArtifactFilters artifactFilters = ArtifactFilters.of( configuration );
 
-        boolean haveExcludedGroups = StringUtils.isNotEmpty( configuration.getExcludedGroups() );
-        boolean haveExcludedArtifacts = StringUtils.isNotEmpty( configuration.getExcludedArtifacts() );
-        boolean haveExclusions = haveExcludedGroups || haveExcludedArtifacts;
+        final boolean excludeTransitiveDependencies = configuration.isExcludeTransitiveDependencies();
 
-        Pattern includedGroupPattern = null;
-        Pattern includedArtifactPattern = null;
-        Pattern excludedGroupPattern = null;
-        Pattern excludedArtifactPattern = null;
-
-        if ( !haveNoIncludedGroups )
-        {
-            includedGroupPattern = Pattern.compile( configuration.getIncludedGroups() );
-        }
-        if ( !haveNoIncludedArtifacts )
-        {
-            includedArtifactPattern = Pattern.compile( configuration.getIncludedArtifacts() );
-        }
-        if ( haveExcludedGroups )
-        {
-            excludedGroupPattern = Pattern.compile( configuration.getExcludedGroups() );
-        }
-        if ( haveExcludedArtifacts )
-        {
-            excludedArtifactPattern = Pattern.compile( configuration.getExcludedArtifacts() );
-        }
-
-        Set<?> depArtifacts;
+        final Set<Artifact> depArtifacts;
 
         if ( configuration.isIncludeTransitiveDependencies() )
         {
@@ -146,11 +116,6 @@ public class DefaultDependenciesTool
             // Only direct project dependencies
             depArtifacts = artifacts.getDirectDependencies();
         }
-
-        List<String> includedScopes = configuration.getIncludedScopes();
-        List<String> excludeScopes = configuration.getExcludedScopes();
-        List<String> includedTypes = configuration.getIncludedTypes();
-        List<String> excludeTypes = configuration.getExcludedTypes();
 
         boolean verbose = configuration.isVerbose();
 
@@ -164,10 +129,10 @@ public class DefaultDependenciesTool
         {
             localCache.putAll( cache );
         }
+        final Logger log = getLogger();
 
-        for ( Object o : depArtifacts )
+        for ( Artifact artifact : depArtifacts )
         {
-            Artifact artifact = (Artifact) o;
 
             excludeArtifacts.put( artifact.getId(), artifact );
 
@@ -179,61 +144,20 @@ public class DefaultDependenciesTool
                 continue;
             }
 
-            String scope = artifact.getScope();
-            if ( CollectionUtils.isNotEmpty( includedScopes ) && !includedScopes.contains( scope ) )
+            if ( !artifactFilters.isIncluded( artifact ) )
             {
-
-                // not in included scopes
+                if ( verbose )
+                {
+                    log.debug( "Excluding artifact " + artifact );
+                }
                 continue;
             }
-
-            if ( excludeScopes.contains( scope ) )
-            {
-
-                // in excluded scopes
-                continue;
-            }
-
-            String type = artifact.getType();
-            if ( CollectionUtils.isNotEmpty( includedTypes ) && !includedTypes.contains( type ) )
-            {
-
-                // not in included scopes
-                continue;
-            }
-
-            if ( excludeTypes.contains( type ) )
-            {
-
-                // in excluded types
-                continue;
-            }
-
-            Logger log = getLogger();
 
             String id = MojoHelper.getArtifactId( artifact );
 
             if ( verbose )
             {
                 log.info( "detected artifact " + id );
-            }
-
-            // Check if the project should be included
-            // If there is no specified artifacts and group to include, include all
-            boolean isToInclude = haveNoIncludedArtifacts && haveNoIncludedGroups
-                    || isIncludable( artifact, includedGroupPattern, includedArtifactPattern );
-
-            // Check if the project should be excluded
-            boolean isToExclude = isToInclude && haveExclusions
-                    && isExcludable( artifact, excludedGroupPattern, excludedArtifactPattern );
-
-            if ( !isToInclude || isToExclude )
-            {
-                if ( verbose )
-                {
-                    log.info( "skip artifact " + id );
-                }
-                continue;
             }
 
             MavenProject depMavenProject;
@@ -334,8 +258,9 @@ public class DefaultDependenciesTool
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings( "unchecked" )
     public ResolvedProjectDependencies loadProjectArtifacts( ArtifactRepository localRepository,
-            List remoteRepositories, MavenProject project, List<MavenProject> reactorProjects )
+            List<ArtifactRepository> remoteRepositories, MavenProject project, List<MavenProject> reactorProjects )
         throws DependenciesToolException
 
     {
@@ -457,6 +382,7 @@ public class DefaultDependenciesTool
         return new ResolvedProjectDependencies( allDependencies, directDependencyArtifacts );
     }
 
+    @SuppressWarnings( "unchecked" )
     private Set<Artifact> createDependencyArtifacts( MavenProject project, List<Dependency> dependencies )
             throws DependenciesToolException
     {
@@ -489,7 +415,7 @@ public class DefaultDependenciesTool
     }
 
     private ArtifactResolutionResult resolve( Set<Artifact> artifacts, Artifact projectArtifact,
-            ArtifactRepository localRepository, List remoteRepositories )
+            ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws DependenciesToolException
     {
         try
@@ -505,123 +431,5 @@ public class DefaultDependenciesTool
         {
             throw new DependenciesToolException( e );
             }
-    }
-
-    /**
-     * Tests if the given project is includeable against a groupdId pattern and a artifact pattern.
-     *
-     * @param project                 the project to test
-     * @param includedGroupPattern    the include group pattern
-     * @param includedArtifactPattern the include artifact pattenr
-     * @return {@code true} if the project is includavble, {@code false} otherwise
-     */
-    protected boolean isIncludable( Artifact project, Pattern includedGroupPattern, Pattern includedArtifactPattern )
-    {
-
-        Logger log = getLogger();
-
-        // check if the groupId of the project should be included
-        if ( includedGroupPattern != null )
-        {
-            // we have some defined license filters
-            try
-            {
-                Matcher matchGroupId = includedGroupPattern.matcher( project.getGroupId() );
-                if ( matchGroupId.find() )
-                {
-                    if ( log.isDebugEnabled() )
-                    {
-                        log.debug( "Include " + project.getGroupId() );
-                    }
-                    return true;
-                }
-            }
-            catch ( PatternSyntaxException e )
-            {
-                log.warn( String.format( INVALID_PATTERN_MESSAGE, includedGroupPattern.pattern() ) );
-            }
-        }
-
-        // check if the artifactId of the project should be included
-        if ( includedArtifactPattern != null )
-        {
-            // we have some defined license filters
-            try
-            {
-                Matcher matchGroupId = includedArtifactPattern.matcher( project.getArtifactId() );
-                if ( matchGroupId.find() )
-                {
-                    if ( log.isDebugEnabled() )
-                    {
-                        log.debug( "Include " + project.getArtifactId() );
-                    }
-                    return true;
-                }
-            }
-            catch ( PatternSyntaxException e )
-            {
-                log.warn( String.format( INVALID_PATTERN_MESSAGE, includedArtifactPattern.pattern() ) );
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Tests if the given project is excludable against a groupdId pattern and a artifact pattern.
-     *
-     * @param project                 the project to test
-     * @param excludedGroupPattern    the exlcude group pattern
-     * @param excludedArtifactPattern the exclude artifact pattenr
-     * @return {@code true} if the project is excludable, {@code false} otherwise
-     */
-    protected boolean isExcludable( Artifact project, Pattern excludedGroupPattern, Pattern excludedArtifactPattern )
-    {
-
-        Logger log = getLogger();
-
-        // check if the groupId of the project should be included
-        if ( excludedGroupPattern != null )
-        {
-            // we have some defined license filters
-            try
-            {
-                Matcher matchGroupId = excludedGroupPattern.matcher( project.getGroupId() );
-                if ( matchGroupId.find() )
-                {
-                    if ( log.isDebugEnabled() )
-                    {
-                        log.debug( "Exclude " + project.getGroupId() );
-                    }
-                    return true;
-                }
-            }
-            catch ( PatternSyntaxException e )
-            {
-                log.warn( String.format( INVALID_PATTERN_MESSAGE, excludedGroupPattern.pattern() ) );
-            }
-        }
-
-        // check if the artifactId of the project should be included
-        if ( excludedArtifactPattern != null )
-        {
-            // we have some defined license filters
-            try
-            {
-                Matcher matchGroupId = excludedArtifactPattern.matcher( project.getArtifactId() );
-                if ( matchGroupId.find() )
-                {
-                    if ( log.isDebugEnabled() )
-                    {
-                        log.debug( "Exclude " + project.getArtifactId() );
-                    }
-                    return true;
-                }
-            }
-            catch ( PatternSyntaxException e )
-            {
-                log.warn( String.format( INVALID_PATTERN_MESSAGE, excludedArtifactPattern.pattern() ) );
-            }
-        }
-        return false;
     }
 }

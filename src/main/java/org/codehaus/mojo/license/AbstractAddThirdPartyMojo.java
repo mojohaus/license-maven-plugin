@@ -650,6 +650,26 @@ public abstract class AbstractAddThirdPartyMojo
      */
     private Map<String, String> globalKnownLicenses;
 
+    /**
+     * A URL returning a plain text file that contains include/exclude artifact filters in the following format:
+     * <pre>
+     * {@code
+     * # this is a comment
+     * include gaPattern org\.my-org:my-artifact
+     * include gaPattern org\.other-org:other-artifact
+     * exclude gaPattern org\.yet-anther-org:.*
+     * include scope compile
+     * include scope test
+     * exclude scope system
+     * include type jar
+     * exclude type war
+     * }</pre>
+     *
+     * @since 1.18
+     */
+    @Parameter( property = "license.artifactFiltersUrl" )
+    protected String artifactFiltersUrl;
+
     // ----------------------------------------------------------------------
     // Abstract Methods
     // ----------------------------------------------------------------------

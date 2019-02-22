@@ -361,6 +361,12 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
         return includedArtifacts;
     }
 
+    /** {@inheritDoc} */
+    public String getArtifactFiltersUrl()
+    {
+        return artifactFiltersUrl;
+    }
+
     /**
      * {@inheritDoc}
      */

@@ -1,0 +1,3 @@
+# comment
+
+exclude gaPattern asm:asm

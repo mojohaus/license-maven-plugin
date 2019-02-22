@@ -13,6 +13,10 @@
     Check default execution.
   </description>
 
+  <properties>
+    <project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>commons-logging</groupId>
@@ -68,6 +72,20 @@
                   <replacement>-</replacement>
                 </licenseUrlFileNameSanitizer>
               </licenseUrlFileNameSanitizers>
+            </configuration>
+          </execution>
+          <execution>
+            <id>artifact-filters-url</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>download-licenses</goal>
+            </goals>
+            <configuration>
+              <licensesConfigFile>${basedir}/src/license/licenses-config-artifact-filters-url.xml</licensesConfigFile>
+              <licensesOutputDirectory>${project.build.directory}/artifact-filters-url/licenses</licensesOutputDirectory>
+              <licensesOutputFile>${project.build.directory}/artifact-filters-url/licenses.xml</licensesOutputFile>
+              <sortByGroupIdAndArtifactId>true</sortByGroupIdAndArtifactId>
+              <artifactFiltersUrl>${project.baseUri}artifact-filters.txt</artifactFiltersUrl>
             </configuration>
           </execution>
         </executions>
