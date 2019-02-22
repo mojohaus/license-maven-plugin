@@ -113,10 +113,15 @@ public abstract class AbstractAddThirdPartyMojo
     protected boolean acceptPomPackaging;
 
     /**
-     * A filter to exclude some scopes.
-     * <p>
-     * Multiple scopes can be delimited by comma, eg. {@code <excludedScopes>test,provided</excludedScopes>}
+     * A comma separated list of scopes to exclude: e.g. {@code <excludedScopes>test,provided</excludedScopes>}
      * or {@code -Dlicense.excludedScopes=test,provided}.
+     * <p>
+     * This filter is applied on the list of direct dependencies (and
+     * their transitive dependencies) of the projects in the reactor.
+     * <p>
+     * By default if an artifact is excluded its transitive dependencies
+     * are not automatically excluded. To enforce this behavior refer to
+     * {@link #excludeTransitiveDependencies}.
      *
      * @since 1.1
      */
@@ -124,10 +129,15 @@ public abstract class AbstractAddThirdPartyMojo
     protected String excludedScopes;
 
     /**
-     * A filter to include only some scopes, if let empty then all scopes will be used (no filter).
-     * <p>
-     * Multiple scopes can be delimited by comma, eg. {@code <includedScopes>test,provided</includedScopes>}
+     * A comma separated list of scopes to include: e.g. {@code <includedScopes>test,provided</includedScopes>}
      * or {@code -Dlicense.includedScopes=test,provided}.
+     * <p>
+     * This filter is applied on the list of direct dependencies (and
+     * their transitive dependencies) of the projects in the reactor.
+     * <p>
+     * By default if an artifact is included also its transitive
+     * dependencies are included. To suppress this behavior refer to
+     * {@link #includeTransitiveDependencies}.
      *
      * @since 1.1
      */
@@ -135,7 +145,15 @@ public abstract class AbstractAddThirdPartyMojo
     protected String includedScopes;
 
     /**
-     * A filter to exclude some types.
+     * A comma separated list of types to exclude: e.g. {@code <excludedTypes>war,pom</excludedTypes>}
+     * or {@code -Dlicense.excludedTypes=was,pom}.
+     * <p>
+     * This filter is applied on the list of direct dependencies (and
+     * their transitive dependencies) of the projects in the reactor.
+     * <p>
+     * By default if an artifact is excluded its transitive dependencies
+     * are not automatically excluded. To enforce this behavior refer to
+     * {@link #excludeTransitiveDependencies}.
      *
      * @since 1.15
      */
@@ -143,7 +161,14 @@ public abstract class AbstractAddThirdPartyMojo
     protected String excludedTypes;
 
     /**
-     * A filter to include only some types, if let empty then all types will be used (no filter).
+     * A comma separated list of types to include.
+     * <p>
+     * This filter is applied on the list of direct dependencies (and
+     * their transitive dependencies) of the projects in the reactor.
+     * <p>
+     * By default if an artifact is included also its transitive
+     * dependencies are included. To suppress this behavior refer to
+     * {@link #includeTransitiveDependencies}.
      *
      * @since 1.15
      */
@@ -151,8 +176,16 @@ public abstract class AbstractAddThirdPartyMojo
     protected String includedTypes;
 
     /**
-     * A filter to exclude some GroupIds
-     * This is a regular expression that is applied to groupIds (not an ant pattern).
+     * A regular expression (not glob pattern) used as filter to exclude
+     * artifacts that have matching groupId. Match could be also partial for
+     * example {@code ^org\.}
+     * <p>
+     * This filter is applied on the list of direct dependencies (and
+     * their transitive dependencies) of the projects in the reactor.
+     * <p>
+     * By default if an artifact is excluded its transitive dependencies
+     * are not automatically excluded. To enforce this behavior refer to
+     * {@link #excludeTransitiveDependencies}.
      *
      * @since 1.1
      */
@@ -160,17 +193,31 @@ public abstract class AbstractAddThirdPartyMojo
     protected String excludedGroups;
 
     /**
-     * A filter to include only some GroupIds
-     * This is a regular expression applied to artifactIds.
+     * A regular expression (not glob pattern) used as filter to include
+     * only artifacts that have matching groupId.
+     * <p>
+     * This filter is applied on the list of direct dependencies (and
+     * their transitive dependencies) of the projects in the reactor.
+     * <p>
+     * By default if an artifact is included also its transitive
+     * dependencies are included. To suppress this behavior refer to
+     * {@link #includeTransitiveDependencies}.
      *
      * @since 1.1
-     */
-    @Parameter( property = "license.includedGroups" )
+     */    @Parameter( property = "license.includedGroups" )
     protected String includedGroups;
 
     /**
-     * A filter to exclude some ArtifactsIds
-     * This is a regular expression applied to artifactIds.
+     * A regular expression (not glob pattern) used as filter to exclude
+     * artifacts that have matching artifactId. Match could be also partial for
+     * example {@code ^org\.}
+     * <p>
+     * This filter is applied on the list of direct dependencies (and
+     * their transitive dependencies) of the projects in the reactor.
+     * <p>
+     * By default if an artifact is excluded its transitive dependencies
+     * are not automatically excluded. To enforce this behavior refer to
+     * {@link #excludeTransitiveDependencies}.
      *
      * @since 1.1
      */
@@ -178,8 +225,15 @@ public abstract class AbstractAddThirdPartyMojo
     protected String excludedArtifacts;
 
     /**
-     * A filter to include only some ArtifactsIds
-     * This is a regular expression applied to artifactIds.
+     * A regular expression (not glob pattern) used as filter to include
+     * only artifacts that have matching artifactId.
+     * <p>
+     * This filter is applied on the list of direct dependencies (and
+     * their transitive dependencies) of the projects in the reactor.
+     * <p>
+     * By default if an artifact is included also its transitive
+     * dependencies are included. To suppress this behavior refer to
+     * {@link #includeTransitiveDependencies}.
      *
      * @since 1.1
      */
@@ -187,8 +241,9 @@ public abstract class AbstractAddThirdPartyMojo
     protected String includedArtifacts;
 
     /**
-     * Include transitive dependencies when checking for missing licenses and downloading license files.
-     * If this is <tt>false</tt>, then only direct dependencies are examined.
+     * If {@code true} enforces including transitive dependencies of the
+     * projects in the reactor; otherwise only direct dependencies of the
+     * reactor projects are considered.
      *
      * @since 1.1
      */
@@ -196,7 +251,9 @@ public abstract class AbstractAddThirdPartyMojo
     boolean includeTransitiveDependencies;
 
     /**
-     * Exclude transitive dependencies from excluded Artifacts
+     * If {@code true} enforces excluding transitive dependencies of the
+     * excluded artifacts in the reactor; otherwise only artifacts that match
+     * exclude filters are excluded.
      *
      * @since 1.13
      */
