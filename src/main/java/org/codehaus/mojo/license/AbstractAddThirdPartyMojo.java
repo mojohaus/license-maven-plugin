@@ -103,9 +103,14 @@ public abstract class AbstractAddThirdPartyMojo
     protected boolean useRepositoryMissingFiles;
 
     /**
-     * To execute or not this mojo if project packaging is pom.
+     * If {@code true} the mojo will be executed for reactor projects having any packaging (including {@code pom});
+     * otherwise the mojo will be executed only for projects that do <b>not</b> have packaging {@code pom}.
      * <p>
-     * <strong>Note:</strong> The default value is {@code false}.
+     * Since 1.18, when {@code acceptPomPackaging} is {@code true}, {@code aggregate-add-third-party} mojo is executed
+     * also for the Maven session root project - i.e. the one out whose directory the mojo was executed.
+     * <b>
+     * Before 1.18, when {@code acceptPomPackaging} was {@code true}, {@code aggregate-add-third-party} mojo was
+     * iterating over all modules in the reactor but the Maven session root project was skipped.
      *
      * @since 1.1
      */

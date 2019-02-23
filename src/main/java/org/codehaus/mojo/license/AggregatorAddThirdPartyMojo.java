@@ -209,9 +209,9 @@ public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo
 
         for ( MavenProject reactorProject : reactorProjects )
         {
-            if ( getProject().equals( reactorProject ) )
+            if ( getProject().equals( reactorProject ) && !acceptPomPackaging )
             {
-                // do not process pom
+                // does not process this pom unless specified
                 continue;
             }
 
