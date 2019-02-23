@@ -64,7 +64,7 @@
 <a class="jxr_linenumber" name="L56" href="#L56">56</a>      <strong class="jxr_keyword">public</strong> <a href="../../../../../org/codehaus/mojo/license/utils/StringToList.html">StringToList</a>( String data ) <strong class="jxr_keyword">throws</strong> MojoExecutionException
 <a class="jxr_linenumber" name="L57" href="#L57">57</a>      {
 <a class="jxr_linenumber" name="L58" href="#L58">58</a>        <strong class="jxr_keyword">this</strong>();
-<a class="jxr_linenumber" name="L59" href="#L59">59</a>        <strong class="jxr_keyword">if</strong> ( !HttpRequester.isStringUrl( data ) )
+<a class="jxr_linenumber" name="L59" href="#L59">59</a>        <strong class="jxr_keyword">if</strong> ( !UrlRequester.isStringUrl( data ) )
 <a class="jxr_linenumber" name="L60" href="#L60">60</a>        {
 <a class="jxr_linenumber" name="L61" href="#L61">61</a>          <strong class="jxr_keyword">for</strong> ( String s : data.split( <span class="jxr_string">"&#92;&#92;s*&#92;&#92;|&#92;&#92;s*"</span> ) )
 <a class="jxr_linenumber" name="L62" href="#L62">62</a>          {
@@ -73,7 +73,7 @@
 <a class="jxr_linenumber" name="L65" href="#L65">65</a>        }
 <a class="jxr_linenumber" name="L66" href="#L66">66</a>        <strong class="jxr_keyword">else</strong>
 <a class="jxr_linenumber" name="L67" href="#L67">67</a>        {
-<a class="jxr_linenumber" name="L68" href="#L68">68</a>          <strong class="jxr_keyword">for</strong> ( String license : HttpRequester.downloadList( data ) )
+<a class="jxr_linenumber" name="L68" href="#L68">68</a>          <strong class="jxr_keyword">for</strong> ( String license : UrlRequester.downloadList( data ) )
 <a class="jxr_linenumber" name="L69" href="#L69">69</a>          {
 <a class="jxr_linenumber" name="L70" href="#L70">70</a>            <strong class="jxr_keyword">if</strong> ( data != <strong class="jxr_keyword">null</strong> &amp;&amp; StringUtils.isNotBlank( license ) &amp;&amp; !<strong class="jxr_keyword">this</strong>.data.contains( license ) )
 <a class="jxr_linenumber" name="L71" href="#L71">71</a>            {

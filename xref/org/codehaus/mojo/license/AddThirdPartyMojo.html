@@ -369,166 +369,172 @@
 <a class="jxr_linenumber" name="L361" href="#L361">361</a>         <strong class="jxr_keyword">return</strong> includedArtifacts;
 <a class="jxr_linenumber" name="L362" href="#L362">362</a>     }
 <a class="jxr_linenumber" name="L363" href="#L363">363</a> 
-<a class="jxr_linenumber" name="L364" href="#L364">364</a>     <em class="jxr_javadoccomment">/**</em>
-<a class="jxr_linenumber" name="L365" href="#L365">365</a> <em class="jxr_javadoccomment">     * {@inheritDoc}</em>
-<a class="jxr_linenumber" name="L366" href="#L366">366</a> <em class="jxr_javadoccomment">     */</em>
-<a class="jxr_linenumber" name="L367" href="#L367">367</a>     <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">boolean</strong> isIncludeTransitiveDependencies()
-<a class="jxr_linenumber" name="L368" href="#L368">368</a>     {
-<a class="jxr_linenumber" name="L369" href="#L369">369</a>         <strong class="jxr_keyword">return</strong> includeTransitiveDependencies;
-<a class="jxr_linenumber" name="L370" href="#L370">370</a>     }
-<a class="jxr_linenumber" name="L371" href="#L371">371</a> 
-<a class="jxr_linenumber" name="L372" href="#L372">372</a>     <em class="jxr_javadoccomment">/**</em>
-<a class="jxr_linenumber" name="L373" href="#L373">373</a> <em class="jxr_javadoccomment">     * {@inheritDoc}</em>
-<a class="jxr_linenumber" name="L374" href="#L374">374</a> <em class="jxr_javadoccomment">     */</em>
-<a class="jxr_linenumber" name="L375" href="#L375">375</a>     <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">boolean</strong> isExcludeTransitiveDependencies()
-<a class="jxr_linenumber" name="L376" href="#L376">376</a>     {
-<a class="jxr_linenumber" name="L377" href="#L377">377</a>         <strong class="jxr_keyword">return</strong> excludeTransitiveDependencies;
-<a class="jxr_linenumber" name="L378" href="#L378">378</a>     }
-<a class="jxr_linenumber" name="L379" href="#L379">379</a> 
-<a class="jxr_linenumber" name="L380" href="#L380">380</a> 
-<a class="jxr_linenumber" name="L381" href="#L381">381</a> 
-<a class="jxr_linenumber" name="L382" href="#L382">382</a>     <em class="jxr_comment">// ----------------------------------------------------------------------</em>
-<a class="jxr_linenumber" name="L383" href="#L383">383</a>     <em class="jxr_comment">// Private Methods</em>
-<a class="jxr_linenumber" name="L384" href="#L384">384</a>     <em class="jxr_comment">// ----------------------------------------------------------------------</em>
+<a class="jxr_linenumber" name="L364" href="#L364">364</a>     <em class="jxr_javadoccomment">/** {@inheritDoc} */</em>
+<a class="jxr_linenumber" name="L365" href="#L365">365</a>     <strong class="jxr_keyword">public</strong> String getArtifactFiltersUrl()
+<a class="jxr_linenumber" name="L366" href="#L366">366</a>     {
+<a class="jxr_linenumber" name="L367" href="#L367">367</a>         <strong class="jxr_keyword">return</strong> artifactFiltersUrl;
+<a class="jxr_linenumber" name="L368" href="#L368">368</a>     }
+<a class="jxr_linenumber" name="L369" href="#L369">369</a> 
+<a class="jxr_linenumber" name="L370" href="#L370">370</a>     <em class="jxr_javadoccomment">/**</em>
+<a class="jxr_linenumber" name="L371" href="#L371">371</a> <em class="jxr_javadoccomment">     * {@inheritDoc}</em>
+<a class="jxr_linenumber" name="L372" href="#L372">372</a> <em class="jxr_javadoccomment">     */</em>
+<a class="jxr_linenumber" name="L373" href="#L373">373</a>     <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">boolean</strong> isIncludeTransitiveDependencies()
+<a class="jxr_linenumber" name="L374" href="#L374">374</a>     {
+<a class="jxr_linenumber" name="L375" href="#L375">375</a>         <strong class="jxr_keyword">return</strong> includeTransitiveDependencies;
+<a class="jxr_linenumber" name="L376" href="#L376">376</a>     }
+<a class="jxr_linenumber" name="L377" href="#L377">377</a> 
+<a class="jxr_linenumber" name="L378" href="#L378">378</a>     <em class="jxr_javadoccomment">/**</em>
+<a class="jxr_linenumber" name="L379" href="#L379">379</a> <em class="jxr_javadoccomment">     * {@inheritDoc}</em>
+<a class="jxr_linenumber" name="L380" href="#L380">380</a> <em class="jxr_javadoccomment">     */</em>
+<a class="jxr_linenumber" name="L381" href="#L381">381</a>     <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">boolean</strong> isExcludeTransitiveDependencies()
+<a class="jxr_linenumber" name="L382" href="#L382">382</a>     {
+<a class="jxr_linenumber" name="L383" href="#L383">383</a>         <strong class="jxr_keyword">return</strong> excludeTransitiveDependencies;
+<a class="jxr_linenumber" name="L384" href="#L384">384</a>     }
 <a class="jxr_linenumber" name="L385" href="#L385">385</a> 
-<a class="jxr_linenumber" name="L386" href="#L386">386</a>     <em class="jxr_javadoccomment">/**</em>
-<a class="jxr_linenumber" name="L387" href="#L387">387</a> <em class="jxr_javadoccomment">     * @param unsafeMappings     the unsafe mapping coming from the missing file</em>
-<a class="jxr_linenumber" name="L388" href="#L388">388</a> <em class="jxr_javadoccomment">     * @param unsafeDependencies the unsafe dependencies from the project</em>
-<a class="jxr_linenumber" name="L389" href="#L389">389</a> <em class="jxr_javadoccomment">     * @return {@code true} if missing ifle should be (re-)generated, {@code false} otherwise</em>
-<a class="jxr_linenumber" name="L390" href="#L390">390</a> <em class="jxr_javadoccomment">     * @throws IOException if any IO problem</em>
-<a class="jxr_linenumber" name="L391" href="#L391">391</a> <em class="jxr_javadoccomment">     * @since 1.0</em>
-<a class="jxr_linenumber" name="L392" href="#L392">392</a> <em class="jxr_javadoccomment">     */</em>
-<a class="jxr_linenumber" name="L393" href="#L393">393</a>     <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">boolean</strong> computeDoGenerateMissingFile( SortedProperties unsafeMappings,
-<a class="jxr_linenumber" name="L394" href="#L394">394</a>                                                   SortedSet&lt;MavenProject&gt; unsafeDependencies ) <strong class="jxr_keyword">throws</strong> IOException
-<a class="jxr_linenumber" name="L395" href="#L395">395</a>     {
-<a class="jxr_linenumber" name="L396" href="#L396">396</a> 
-<a class="jxr_linenumber" name="L397" href="#L397">397</a>         <strong class="jxr_keyword">if</strong> ( !useMissingFile )
-<a class="jxr_linenumber" name="L398" href="#L398">398</a>         {
-<a class="jxr_linenumber" name="L399" href="#L399">399</a> 
-<a class="jxr_linenumber" name="L400" href="#L400">400</a>             <em class="jxr_comment">// never use the missing file</em>
-<a class="jxr_linenumber" name="L401" href="#L401">401</a>             <strong class="jxr_keyword">return</strong> false;
-<a class="jxr_linenumber" name="L402" href="#L402">402</a>         }
-<a class="jxr_linenumber" name="L403" href="#L403">403</a> 
-<a class="jxr_linenumber" name="L404" href="#L404">404</a>         <strong class="jxr_keyword">if</strong> ( force )
-<a class="jxr_linenumber" name="L405" href="#L405">405</a>         {
-<a class="jxr_linenumber" name="L406" href="#L406">406</a> 
-<a class="jxr_linenumber" name="L407" href="#L407">407</a>             <em class="jxr_comment">// the mapping for missing file is not empty, regenerate it</em>
-<a class="jxr_linenumber" name="L408" href="#L408">408</a>             <strong class="jxr_keyword">return</strong> !CollectionUtils.isEmpty( unsafeMappings.keySet() );
-<a class="jxr_linenumber" name="L409" href="#L409">409</a>         }
-<a class="jxr_linenumber" name="L410" href="#L410">410</a> 
-<a class="jxr_linenumber" name="L411" href="#L411">411</a>         <strong class="jxr_keyword">if</strong> ( !CollectionUtils.isEmpty( unsafeDependencies ) )
-<a class="jxr_linenumber" name="L412" href="#L412">412</a>         {
-<a class="jxr_linenumber" name="L413" href="#L413">413</a> 
-<a class="jxr_linenumber" name="L414" href="#L414">414</a>             <em class="jxr_comment">// there is some unsafe dependencies from the project, must</em>
-<a class="jxr_linenumber" name="L415" href="#L415">415</a>             <em class="jxr_comment">// regenerate missing file</em>
-<a class="jxr_linenumber" name="L416" href="#L416">416</a>             <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">true</strong>;
-<a class="jxr_linenumber" name="L417" href="#L417">417</a>         }
-<a class="jxr_linenumber" name="L418" href="#L418">418</a> 
-<a class="jxr_linenumber" name="L419" href="#L419">419</a>         <strong class="jxr_keyword">if</strong> ( !missingFile.exists() )
-<a class="jxr_linenumber" name="L420" href="#L420">420</a>         {
-<a class="jxr_linenumber" name="L421" href="#L421">421</a> 
-<a class="jxr_linenumber" name="L422" href="#L422">422</a>             <em class="jxr_comment">// the missing file does not exists, this happens when</em>
-<a class="jxr_linenumber" name="L423" href="#L423">423</a>             <em class="jxr_comment">// using remote missing file from dependencies</em>
-<a class="jxr_linenumber" name="L424" href="#L424">424</a>             <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">true</strong>;
-<a class="jxr_linenumber" name="L425" href="#L425">425</a>         }
-<a class="jxr_linenumber" name="L426" href="#L426">426</a> 
-<a class="jxr_linenumber" name="L427" href="#L427">427</a>         <em class="jxr_comment">// check if the missing file has changed</em>
-<a class="jxr_linenumber" name="L428" href="#L428">428</a>         <a href="../../../../org/codehaus/mojo/license/utils/SortedProperties.html">SortedProperties</a> oldUnsafeMappings = <strong class="jxr_keyword">new</strong> <a href="../../../../org/codehaus/mojo/license/utils/SortedProperties.html">SortedProperties</a>( getEncoding() );
-<a class="jxr_linenumber" name="L429" href="#L429">429</a>         oldUnsafeMappings.load( missingFile );
-<a class="jxr_linenumber" name="L430" href="#L430">430</a>         <strong class="jxr_keyword">return</strong> !unsafeMappings.equals( oldUnsafeMappings );
-<a class="jxr_linenumber" name="L431" href="#L431">431</a>     }
+<a class="jxr_linenumber" name="L386" href="#L386">386</a> 
+<a class="jxr_linenumber" name="L387" href="#L387">387</a> 
+<a class="jxr_linenumber" name="L388" href="#L388">388</a>     <em class="jxr_comment">// ----------------------------------------------------------------------</em>
+<a class="jxr_linenumber" name="L389" href="#L389">389</a>     <em class="jxr_comment">// Private Methods</em>
+<a class="jxr_linenumber" name="L390" href="#L390">390</a>     <em class="jxr_comment">// ----------------------------------------------------------------------</em>
+<a class="jxr_linenumber" name="L391" href="#L391">391</a> 
+<a class="jxr_linenumber" name="L392" href="#L392">392</a>     <em class="jxr_javadoccomment">/**</em>
+<a class="jxr_linenumber" name="L393" href="#L393">393</a> <em class="jxr_javadoccomment">     * @param unsafeMappings     the unsafe mapping coming from the missing file</em>
+<a class="jxr_linenumber" name="L394" href="#L394">394</a> <em class="jxr_javadoccomment">     * @param unsafeDependencies the unsafe dependencies from the project</em>
+<a class="jxr_linenumber" name="L395" href="#L395">395</a> <em class="jxr_javadoccomment">     * @return {@code true} if missing ifle should be (re-)generated, {@code false} otherwise</em>
+<a class="jxr_linenumber" name="L396" href="#L396">396</a> <em class="jxr_javadoccomment">     * @throws IOException if any IO problem</em>
+<a class="jxr_linenumber" name="L397" href="#L397">397</a> <em class="jxr_javadoccomment">     * @since 1.0</em>
+<a class="jxr_linenumber" name="L398" href="#L398">398</a> <em class="jxr_javadoccomment">     */</em>
+<a class="jxr_linenumber" name="L399" href="#L399">399</a>     <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">boolean</strong> computeDoGenerateMissingFile( SortedProperties unsafeMappings,
+<a class="jxr_linenumber" name="L400" href="#L400">400</a>                                                   SortedSet&lt;MavenProject&gt; unsafeDependencies ) <strong class="jxr_keyword">throws</strong> IOException
+<a class="jxr_linenumber" name="L401" href="#L401">401</a>     {
+<a class="jxr_linenumber" name="L402" href="#L402">402</a> 
+<a class="jxr_linenumber" name="L403" href="#L403">403</a>         <strong class="jxr_keyword">if</strong> ( !useMissingFile )
+<a class="jxr_linenumber" name="L404" href="#L404">404</a>         {
+<a class="jxr_linenumber" name="L405" href="#L405">405</a> 
+<a class="jxr_linenumber" name="L406" href="#L406">406</a>             <em class="jxr_comment">// never use the missing file</em>
+<a class="jxr_linenumber" name="L407" href="#L407">407</a>             <strong class="jxr_keyword">return</strong> false;
+<a class="jxr_linenumber" name="L408" href="#L408">408</a>         }
+<a class="jxr_linenumber" name="L409" href="#L409">409</a> 
+<a class="jxr_linenumber" name="L410" href="#L410">410</a>         <strong class="jxr_keyword">if</strong> ( force )
+<a class="jxr_linenumber" name="L411" href="#L411">411</a>         {
+<a class="jxr_linenumber" name="L412" href="#L412">412</a> 
+<a class="jxr_linenumber" name="L413" href="#L413">413</a>             <em class="jxr_comment">// the mapping for missing file is not empty, regenerate it</em>
+<a class="jxr_linenumber" name="L414" href="#L414">414</a>             <strong class="jxr_keyword">return</strong> !CollectionUtils.isEmpty( unsafeMappings.keySet() );
+<a class="jxr_linenumber" name="L415" href="#L415">415</a>         }
+<a class="jxr_linenumber" name="L416" href="#L416">416</a> 
+<a class="jxr_linenumber" name="L417" href="#L417">417</a>         <strong class="jxr_keyword">if</strong> ( !CollectionUtils.isEmpty( unsafeDependencies ) )
+<a class="jxr_linenumber" name="L418" href="#L418">418</a>         {
+<a class="jxr_linenumber" name="L419" href="#L419">419</a> 
+<a class="jxr_linenumber" name="L420" href="#L420">420</a>             <em class="jxr_comment">// there is some unsafe dependencies from the project, must</em>
+<a class="jxr_linenumber" name="L421" href="#L421">421</a>             <em class="jxr_comment">// regenerate missing file</em>
+<a class="jxr_linenumber" name="L422" href="#L422">422</a>             <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">true</strong>;
+<a class="jxr_linenumber" name="L423" href="#L423">423</a>         }
+<a class="jxr_linenumber" name="L424" href="#L424">424</a> 
+<a class="jxr_linenumber" name="L425" href="#L425">425</a>         <strong class="jxr_keyword">if</strong> ( !missingFile.exists() )
+<a class="jxr_linenumber" name="L426" href="#L426">426</a>         {
+<a class="jxr_linenumber" name="L427" href="#L427">427</a> 
+<a class="jxr_linenumber" name="L428" href="#L428">428</a>             <em class="jxr_comment">// the missing file does not exists, this happens when</em>
+<a class="jxr_linenumber" name="L429" href="#L429">429</a>             <em class="jxr_comment">// using remote missing file from dependencies</em>
+<a class="jxr_linenumber" name="L430" href="#L430">430</a>             <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">true</strong>;
+<a class="jxr_linenumber" name="L431" href="#L431">431</a>         }
 <a class="jxr_linenumber" name="L432" href="#L432">432</a> 
-<a class="jxr_linenumber" name="L433" href="#L433">433</a>     <em class="jxr_javadoccomment">/**</em>
-<a class="jxr_linenumber" name="L434" href="#L434">434</a> <em class="jxr_javadoccomment">     * Write the missing file ({@link #getMissingFile()}.</em>
-<a class="jxr_linenumber" name="L435" href="#L435">435</a> <em class="jxr_javadoccomment">     *</em>
-<a class="jxr_linenumber" name="L436" href="#L436">436</a> <em class="jxr_javadoccomment">     * @throws IOException if error while writing missing file</em>
-<a class="jxr_linenumber" name="L437" href="#L437">437</a> <em class="jxr_javadoccomment">     */</em>
-<a class="jxr_linenumber" name="L438" href="#L438">438</a>     <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> writeMissingFile()
-<a class="jxr_linenumber" name="L439" href="#L439">439</a>             <strong class="jxr_keyword">throws</strong> IOException
-<a class="jxr_linenumber" name="L440" href="#L440">440</a>     {
-<a class="jxr_linenumber" name="L441" href="#L441">441</a> 
-<a class="jxr_linenumber" name="L442" href="#L442">442</a>         Log log = getLog();
-<a class="jxr_linenumber" name="L443" href="#L443">443</a> 
-<a class="jxr_linenumber" name="L444" href="#L444">444</a>         FileUtil.createDirectoryIfNecessary( missingFile.getParentFile() );
-<a class="jxr_linenumber" name="L445" href="#L445">445</a>         log.info( <span class="jxr_string">"Regenerate missing license file "</span> + missingFile );
-<a class="jxr_linenumber" name="L446" href="#L446">446</a> 
-<a class="jxr_linenumber" name="L447" href="#L447">447</a>         FileOutputStream writer = <strong class="jxr_keyword">new</strong> FileOutputStream( missingFile );
-<a class="jxr_linenumber" name="L448" href="#L448">448</a>         <strong class="jxr_keyword">try</strong>
-<a class="jxr_linenumber" name="L449" href="#L449">449</a>         {
-<a class="jxr_linenumber" name="L450" href="#L450">450</a>             StringBuilder sb = <strong class="jxr_keyword">new</strong> StringBuilder( <span class="jxr_string">" Generated by "</span> + getClass().getName() );
-<a class="jxr_linenumber" name="L451" href="#L451">451</a>             List&lt;String&gt; licenses = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;( licenseMap.keySet() );
-<a class="jxr_linenumber" name="L452" href="#L452">452</a>             licenses.remove( LicenseMap.UNKNOWN_LICENSE_MESSAGE );
-<a class="jxr_linenumber" name="L453" href="#L453">453</a>             <strong class="jxr_keyword">if</strong> ( !licenses.isEmpty() )
-<a class="jxr_linenumber" name="L454" href="#L454">454</a>             {
-<a class="jxr_linenumber" name="L455" href="#L455">455</a>                 sb.append( <span class="jxr_string">"\n-------------------------------------------------------------------------------"</span> );
-<a class="jxr_linenumber" name="L456" href="#L456">456</a>                 sb.append( <span class="jxr_string">"\n Already used licenses in project :"</span> );
-<a class="jxr_linenumber" name="L457" href="#L457">457</a>                 <strong class="jxr_keyword">for</strong> ( String license : licenses )
-<a class="jxr_linenumber" name="L458" href="#L458">458</a>                 {
-<a class="jxr_linenumber" name="L459" href="#L459">459</a>                     sb.append( <span class="jxr_string">"\n - "</span> ).append( license );
-<a class="jxr_linenumber" name="L460" href="#L460">460</a>                 }
-<a class="jxr_linenumber" name="L461" href="#L461">461</a>             }
-<a class="jxr_linenumber" name="L462" href="#L462">462</a>             sb.append( <span class="jxr_string">"\n-------------------------------------------------------------------------------"</span> );
-<a class="jxr_linenumber" name="L463" href="#L463">463</a>             sb.append( <span class="jxr_string">"\n Please fill the missing licenses for dependencies :\n\n"</span> );
-<a class="jxr_linenumber" name="L464" href="#L464">464</a>             unsafeMappings.store( writer, sb.toString() );
-<a class="jxr_linenumber" name="L465" href="#L465">465</a>         }
-<a class="jxr_linenumber" name="L466" href="#L466">466</a>         <strong class="jxr_keyword">finally</strong>
-<a class="jxr_linenumber" name="L467" href="#L467">467</a>         {
-<a class="jxr_linenumber" name="L468" href="#L468">468</a>             writer.close();
-<a class="jxr_linenumber" name="L469" href="#L469">469</a>         }
-<a class="jxr_linenumber" name="L470" href="#L470">470</a>     }
-<a class="jxr_linenumber" name="L471" href="#L471">471</a> 
-<a class="jxr_linenumber" name="L472" href="#L472">472</a>     <strong class="jxr_keyword">void</strong> initFromMojo( AggregatorAddThirdPartyMojo mojo, MavenProject mavenProject,
-<a class="jxr_linenumber" name="L473" href="#L473">473</a>             List&lt;MavenProject&gt; reactorProjects ) <strong class="jxr_keyword">throws</strong> Exception
-<a class="jxr_linenumber" name="L474" href="#L474">474</a>     {
-<a class="jxr_linenumber" name="L475" href="#L475">475</a>         project = mavenProject;
-<a class="jxr_linenumber" name="L476" href="#L476">476</a>         deployMissingFile = mojo.deployMissingFile;
-<a class="jxr_linenumber" name="L477" href="#L477">477</a>         useRepositoryMissingFiles = mojo.useRepositoryMissingFiles;
-<a class="jxr_linenumber" name="L478" href="#L478">478</a>         acceptPomPackaging = mojo.acceptPomPackaging;
-<a class="jxr_linenumber" name="L479" href="#L479">479</a>         excludedScopes = mojo.excludedScopes;
-<a class="jxr_linenumber" name="L480" href="#L480">480</a>         includedScopes = mojo.includedScopes;
-<a class="jxr_linenumber" name="L481" href="#L481">481</a>         excludedGroups = mojo.excludedGroups;
-<a class="jxr_linenumber" name="L482" href="#L482">482</a>         includedGroups = mojo.includedGroups;
-<a class="jxr_linenumber" name="L483" href="#L483">483</a>         excludedArtifacts = mojo.excludedArtifacts;
-<a class="jxr_linenumber" name="L484" href="#L484">484</a>         includedArtifacts = mojo.includedArtifacts;
-<a class="jxr_linenumber" name="L485" href="#L485">485</a>         includeTransitiveDependencies = mojo.includeTransitiveDependencies;
-<a class="jxr_linenumber" name="L486" href="#L486">486</a>         excludeTransitiveDependencies = mojo.excludeTransitiveDependencies;
-<a class="jxr_linenumber" name="L487" href="#L487">487</a>         thirdPartyFilename = mojo.thirdPartyFilename;
-<a class="jxr_linenumber" name="L488" href="#L488">488</a>         useMissingFile = mojo.useMissingFile;
-<a class="jxr_linenumber" name="L489" href="#L489">489</a>         String absolutePath = mojo.getProject().getBasedir().getAbsolutePath();
-<a class="jxr_linenumber" name="L490" href="#L490">490</a> 
-<a class="jxr_linenumber" name="L491" href="#L491">491</a>         missingFile = <strong class="jxr_keyword">new</strong> File( project.getBasedir(),
-<a class="jxr_linenumber" name="L492" href="#L492">492</a>                 mojo.missingFile.getAbsolutePath().substring( absolutePath.length() ) );
-<a class="jxr_linenumber" name="L493" href="#L493">493</a>         resolvedOverrideUrl  = mojo.resolvedOverrideUrl;
-<a class="jxr_linenumber" name="L494" href="#L494">494</a>         missingLicensesFileArtifact = mojo.missingLicensesFileArtifact;
-<a class="jxr_linenumber" name="L495" href="#L495">495</a>         localRepository = mojo.localRepository;
-<a class="jxr_linenumber" name="L496" href="#L496">496</a>         remoteRepositories = mavenProject.getRemoteArtifactRepositories();
-<a class="jxr_linenumber" name="L497" href="#L497">497</a>         dependencies = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;( mavenProject.getDependencies() );
-<a class="jxr_linenumber" name="L498" href="#L498">498</a>         licenseMerges = mojo.licenseMerges;
-<a class="jxr_linenumber" name="L499" href="#L499">499</a>         licenseMergesFile = mojo.licenseMergesFile;
-<a class="jxr_linenumber" name="L500" href="#L500">500</a>         includedLicenses = mojo.includedLicenses;
-<a class="jxr_linenumber" name="L501" href="#L501">501</a>         excludedLicenses = mojo.excludedLicenses;
-<a class="jxr_linenumber" name="L502" href="#L502">502</a>         bundleThirdPartyPath = mojo.bundleThirdPartyPath;
-<a class="jxr_linenumber" name="L503" href="#L503">503</a>         generateBundle = mojo.generateBundle;
-<a class="jxr_linenumber" name="L504" href="#L504">504</a>         force = mojo.force;
-<a class="jxr_linenumber" name="L505" href="#L505">505</a>         failIfWarning = mojo.failIfWarning;
-<a class="jxr_linenumber" name="L506" href="#L506">506</a>         failOnMissing = mojo.failOnMissing;
-<a class="jxr_linenumber" name="L507" href="#L507">507</a>         failOnBlacklist = mojo.failOnBlacklist;
-<a class="jxr_linenumber" name="L508" href="#L508">508</a>         sortArtifactByName = mojo.sortArtifactByName;
-<a class="jxr_linenumber" name="L509" href="#L509">509</a>         fileTemplate = mojo.fileTemplate;
-<a class="jxr_linenumber" name="L510" href="#L510">510</a>         session = mojo.session;
-<a class="jxr_linenumber" name="L511" href="#L511">511</a>         verbose = mojo.verbose;
-<a class="jxr_linenumber" name="L512" href="#L512">512</a>         encoding = mojo.encoding;
-<a class="jxr_linenumber" name="L513" href="#L513">513</a> 
-<a class="jxr_linenumber" name="L514" href="#L514">514</a>         setLog( mojo.getLog() );
-<a class="jxr_linenumber" name="L515" href="#L515">515</a> 
-<a class="jxr_linenumber" name="L516" href="#L516">516</a>         isAggregatorBuild = <strong class="jxr_keyword">true</strong>;
-<a class="jxr_linenumber" name="L517" href="#L517">517</a>         reactorProjectDependencies = reactorProjects;
-<a class="jxr_linenumber" name="L518" href="#L518">518</a> 
-<a class="jxr_linenumber" name="L519" href="#L519">519</a>         init();
-<a class="jxr_linenumber" name="L520" href="#L520">520</a> 
-<a class="jxr_linenumber" name="L521" href="#L521">521</a>         consolidate();
-<a class="jxr_linenumber" name="L522" href="#L522">522</a>     }
-<a class="jxr_linenumber" name="L523" href="#L523">523</a> }
+<a class="jxr_linenumber" name="L433" href="#L433">433</a>         <em class="jxr_comment">// check if the missing file has changed</em>
+<a class="jxr_linenumber" name="L434" href="#L434">434</a>         <a href="../../../../org/codehaus/mojo/license/utils/SortedProperties.html">SortedProperties</a> oldUnsafeMappings = <strong class="jxr_keyword">new</strong> <a href="../../../../org/codehaus/mojo/license/utils/SortedProperties.html">SortedProperties</a>( getEncoding() );
+<a class="jxr_linenumber" name="L435" href="#L435">435</a>         oldUnsafeMappings.load( missingFile );
+<a class="jxr_linenumber" name="L436" href="#L436">436</a>         <strong class="jxr_keyword">return</strong> !unsafeMappings.equals( oldUnsafeMappings );
+<a class="jxr_linenumber" name="L437" href="#L437">437</a>     }
+<a class="jxr_linenumber" name="L438" href="#L438">438</a> 
+<a class="jxr_linenumber" name="L439" href="#L439">439</a>     <em class="jxr_javadoccomment">/**</em>
+<a class="jxr_linenumber" name="L440" href="#L440">440</a> <em class="jxr_javadoccomment">     * Write the missing file ({@link #getMissingFile()}.</em>
+<a class="jxr_linenumber" name="L441" href="#L441">441</a> <em class="jxr_javadoccomment">     *</em>
+<a class="jxr_linenumber" name="L442" href="#L442">442</a> <em class="jxr_javadoccomment">     * @throws IOException if error while writing missing file</em>
+<a class="jxr_linenumber" name="L443" href="#L443">443</a> <em class="jxr_javadoccomment">     */</em>
+<a class="jxr_linenumber" name="L444" href="#L444">444</a>     <strong class="jxr_keyword">private</strong> <strong class="jxr_keyword">void</strong> writeMissingFile()
+<a class="jxr_linenumber" name="L445" href="#L445">445</a>             <strong class="jxr_keyword">throws</strong> IOException
+<a class="jxr_linenumber" name="L446" href="#L446">446</a>     {
+<a class="jxr_linenumber" name="L447" href="#L447">447</a> 
+<a class="jxr_linenumber" name="L448" href="#L448">448</a>         Log log = getLog();
+<a class="jxr_linenumber" name="L449" href="#L449">449</a> 
+<a class="jxr_linenumber" name="L450" href="#L450">450</a>         FileUtil.createDirectoryIfNecessary( missingFile.getParentFile() );
+<a class="jxr_linenumber" name="L451" href="#L451">451</a>         log.info( <span class="jxr_string">"Regenerate missing license file "</span> + missingFile );
+<a class="jxr_linenumber" name="L452" href="#L452">452</a> 
+<a class="jxr_linenumber" name="L453" href="#L453">453</a>         FileOutputStream writer = <strong class="jxr_keyword">new</strong> FileOutputStream( missingFile );
+<a class="jxr_linenumber" name="L454" href="#L454">454</a>         <strong class="jxr_keyword">try</strong>
+<a class="jxr_linenumber" name="L455" href="#L455">455</a>         {
+<a class="jxr_linenumber" name="L456" href="#L456">456</a>             StringBuilder sb = <strong class="jxr_keyword">new</strong> StringBuilder( <span class="jxr_string">" Generated by "</span> + getClass().getName() );
+<a class="jxr_linenumber" name="L457" href="#L457">457</a>             List&lt;String&gt; licenses = <strong class="jxr_keyword">new</strong> ArrayList&lt;&gt;( licenseMap.keySet() );
+<a class="jxr_linenumber" name="L458" href="#L458">458</a>             licenses.remove( LicenseMap.UNKNOWN_LICENSE_MESSAGE );
+<a class="jxr_linenumber" name="L459" href="#L459">459</a>             <strong class="jxr_keyword">if</strong> ( !licenses.isEmpty() )
+<a class="jxr_linenumber" name="L460" href="#L460">460</a>             {
+<a class="jxr_linenumber" name="L461" href="#L461">461</a>                 sb.append( <span class="jxr_string">"\n-------------------------------------------------------------------------------"</span> );
+<a class="jxr_linenumber" name="L462" href="#L462">462</a>                 sb.append( <span class="jxr_string">"\n Already used licenses in project :"</span> );
+<a class="jxr_linenumber" name="L463" href="#L463">463</a>                 <strong class="jxr_keyword">for</strong> ( String license : licenses )
+<a class="jxr_linenumber" name="L464" href="#L464">464</a>                 {
+<a class="jxr_linenumber" name="L465" href="#L465">465</a>                     sb.append( <span class="jxr_string">"\n - "</span> ).append( license );
+<a class="jxr_linenumber" name="L466" href="#L466">466</a>                 }
+<a class="jxr_linenumber" name="L467" href="#L467">467</a>             }
+<a class="jxr_linenumber" name="L468" href="#L468">468</a>             sb.append( <span class="jxr_string">"\n-------------------------------------------------------------------------------"</span> );
+<a class="jxr_linenumber" name="L469" href="#L469">469</a>             sb.append( <span class="jxr_string">"\n Please fill the missing licenses for dependencies :\n\n"</span> );
+<a class="jxr_linenumber" name="L470" href="#L470">470</a>             unsafeMappings.store( writer, sb.toString() );
+<a class="jxr_linenumber" name="L471" href="#L471">471</a>         }
+<a class="jxr_linenumber" name="L472" href="#L472">472</a>         <strong class="jxr_keyword">finally</strong>
+<a class="jxr_linenumber" name="L473" href="#L473">473</a>         {
+<a class="jxr_linenumber" name="L474" href="#L474">474</a>             writer.close();
+<a class="jxr_linenumber" name="L475" href="#L475">475</a>         }
+<a class="jxr_linenumber" name="L476" href="#L476">476</a>     }
+<a class="jxr_linenumber" name="L477" href="#L477">477</a> 
+<a class="jxr_linenumber" name="L478" href="#L478">478</a>     <strong class="jxr_keyword">void</strong> initFromMojo( AggregatorAddThirdPartyMojo mojo, MavenProject mavenProject,
+<a class="jxr_linenumber" name="L479" href="#L479">479</a>             List&lt;MavenProject&gt; reactorProjects ) <strong class="jxr_keyword">throws</strong> Exception
+<a class="jxr_linenumber" name="L480" href="#L480">480</a>     {
+<a class="jxr_linenumber" name="L481" href="#L481">481</a>         project = mavenProject;
+<a class="jxr_linenumber" name="L482" href="#L482">482</a>         deployMissingFile = mojo.deployMissingFile;
+<a class="jxr_linenumber" name="L483" href="#L483">483</a>         useRepositoryMissingFiles = mojo.useRepositoryMissingFiles;
+<a class="jxr_linenumber" name="L484" href="#L484">484</a>         acceptPomPackaging = mojo.acceptPomPackaging;
+<a class="jxr_linenumber" name="L485" href="#L485">485</a>         excludedScopes = mojo.excludedScopes;
+<a class="jxr_linenumber" name="L486" href="#L486">486</a>         includedScopes = mojo.includedScopes;
+<a class="jxr_linenumber" name="L487" href="#L487">487</a>         excludedGroups = mojo.excludedGroups;
+<a class="jxr_linenumber" name="L488" href="#L488">488</a>         includedGroups = mojo.includedGroups;
+<a class="jxr_linenumber" name="L489" href="#L489">489</a>         excludedArtifacts = mojo.excludedArtifacts;
+<a class="jxr_linenumber" name="L490" href="#L490">490</a>         includedArtifacts = mojo.includedArtifacts;
+<a class="jxr_linenumber" name="L491" href="#L491">491</a>         includeTransitiveDependencies = mojo.includeTransitiveDependencies;
+<a class="jxr_linenumber" name="L492" href="#L492">492</a>         excludeTransitiveDependencies = mojo.excludeTransitiveDependencies;
+<a class="jxr_linenumber" name="L493" href="#L493">493</a>         thirdPartyFilename = mojo.thirdPartyFilename;
+<a class="jxr_linenumber" name="L494" href="#L494">494</a>         useMissingFile = mojo.useMissingFile;
+<a class="jxr_linenumber" name="L495" href="#L495">495</a>         String absolutePath = mojo.getProject().getBasedir().getAbsolutePath();
+<a class="jxr_linenumber" name="L496" href="#L496">496</a> 
+<a class="jxr_linenumber" name="L497" href="#L497">497</a>         missingFile = <strong class="jxr_keyword">new</strong> File( project.getBasedir(),
+<a class="jxr_linenumber" name="L498" href="#L498">498</a>                 mojo.missingFile.getAbsolutePath().substring( absolutePath.length() ) );
+<a class="jxr_linenumber" name="L499" href="#L499">499</a>         resolvedOverrideUrl  = mojo.resolvedOverrideUrl;
+<a class="jxr_linenumber" name="L500" href="#L500">500</a>         missingLicensesFileArtifact = mojo.missingLicensesFileArtifact;
+<a class="jxr_linenumber" name="L501" href="#L501">501</a>         localRepository = mojo.localRepository;
+<a class="jxr_linenumber" name="L502" href="#L502">502</a>         remoteRepositories = mavenProject.getRemoteArtifactRepositories();
+<a class="jxr_linenumber" name="L503" href="#L503">503</a>         dependencies = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;( mavenProject.getDependencies() );
+<a class="jxr_linenumber" name="L504" href="#L504">504</a>         licenseMerges = mojo.licenseMerges;
+<a class="jxr_linenumber" name="L505" href="#L505">505</a>         licenseMergesFile = mojo.licenseMergesFile;
+<a class="jxr_linenumber" name="L506" href="#L506">506</a>         includedLicenses = mojo.includedLicenses;
+<a class="jxr_linenumber" name="L507" href="#L507">507</a>         excludedLicenses = mojo.excludedLicenses;
+<a class="jxr_linenumber" name="L508" href="#L508">508</a>         bundleThirdPartyPath = mojo.bundleThirdPartyPath;
+<a class="jxr_linenumber" name="L509" href="#L509">509</a>         generateBundle = mojo.generateBundle;
+<a class="jxr_linenumber" name="L510" href="#L510">510</a>         force = mojo.force;
+<a class="jxr_linenumber" name="L511" href="#L511">511</a>         failIfWarning = mojo.failIfWarning;
+<a class="jxr_linenumber" name="L512" href="#L512">512</a>         failOnMissing = mojo.failOnMissing;
+<a class="jxr_linenumber" name="L513" href="#L513">513</a>         failOnBlacklist = mojo.failOnBlacklist;
+<a class="jxr_linenumber" name="L514" href="#L514">514</a>         sortArtifactByName = mojo.sortArtifactByName;
+<a class="jxr_linenumber" name="L515" href="#L515">515</a>         fileTemplate = mojo.fileTemplate;
+<a class="jxr_linenumber" name="L516" href="#L516">516</a>         session = mojo.session;
+<a class="jxr_linenumber" name="L517" href="#L517">517</a>         verbose = mojo.verbose;
+<a class="jxr_linenumber" name="L518" href="#L518">518</a>         encoding = mojo.encoding;
+<a class="jxr_linenumber" name="L519" href="#L519">519</a> 
+<a class="jxr_linenumber" name="L520" href="#L520">520</a>         setLog( mojo.getLog() );
+<a class="jxr_linenumber" name="L521" href="#L521">521</a> 
+<a class="jxr_linenumber" name="L522" href="#L522">522</a>         isAggregatorBuild = <strong class="jxr_keyword">true</strong>;
+<a class="jxr_linenumber" name="L523" href="#L523">523</a>         reactorProjectDependencies = reactorProjects;
+<a class="jxr_linenumber" name="L524" href="#L524">524</a> 
+<a class="jxr_linenumber" name="L525" href="#L525">525</a>         init();
+<a class="jxr_linenumber" name="L526" href="#L526">526</a> 
+<a class="jxr_linenumber" name="L527" href="#L527">527</a>         consolidate();
+<a class="jxr_linenumber" name="L528" href="#L528">528</a>     }
+<a class="jxr_linenumber" name="L529" href="#L529">529</a> }
 </pre>
 <hr/>
 <div id="footer">Copyright &#169; 2010&#x2013;2019 <a href="http://www.mojohaus.org">MojoHaus</a>. All rights reserved.</div>

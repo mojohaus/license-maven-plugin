@@ -25,10 +25,10 @@ under the License.
     <language>en-us</language>
     <copyright>&#169;2010 - 2019 MojoHaus</copyright>
     <item>
-      <title>File: 80,
-             Errors: 72,
-             Warnings: 193,
-             Infos: 18
+      <title>File: 88,
+             Errors: 1597,
+             Warnings: 299,
+             Infos: 19
       </title>
             <link>http://www.mojohaus.org/license-maven-plugin/checkstyle.html</link>
       <description>
@@ -158,6 +158,48 @@ under the License.
               </tr>
                           <tr>
                 <td>
+                  <a href="http://www.mojohaus.org/license-maven-plugin/checkstyle.html#org.codehaus.mojo.license.download.LicenseMatchers.java">org/codehaus/mojo/license/download/LicenseMatchers.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  5
+                </td>
+                <td>
+                  1
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.mojohaus.org/license-maven-plugin/checkstyle.html#org.codehaus.mojo.license.download.ProjectLicenseInfo.java">org/codehaus/mojo/license/download/ProjectLicenseInfo.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  21
+                </td>
+                <td>
+                  1
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.mojohaus.org/license-maven-plugin/checkstyle.html#org.codehaus.mojo.license.download.LicenseDownloader.java">org/codehaus/mojo/license/download/LicenseDownloader.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  15
+                </td>
+                <td>
+                  1
+                </td>
+              </tr>
+                          <tr>
+                <td>
                   <a href="http://www.mojohaus.org/license-maven-plugin/checkstyle.html#org.codehaus.mojo.license.ThirdPartyReportRenderer.java">org/codehaus/mojo/license/ThirdPartyReportRenderer.java</a>
                 </td>
                 <td>
@@ -235,6 +277,20 @@ under the License.
                 </td>
                 <td>
                   0
+                </td>
+                <td>
+                  1
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.mojohaus.org/license-maven-plugin/checkstyle.html#org.codehaus.mojo.license.download.PreferredFileNames.java">org/codehaus/mojo/license/download/PreferredFileNames.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  4
                 </td>
                 <td>
                   1
@@ -326,20 +382,6 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.mojohaus.org/license-maven-plugin/checkstyle.html#org.codehaus.mojo.license.utils.LicenseSummaryWriter.java">org/codehaus/mojo/license/utils/LicenseSummaryWriter.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  3
-                </td>
-                <td>
-                  1
-                </td>
-              </tr>
-                          <tr>
-                <td>
                   <a href="http://www.mojohaus.org/license-maven-plugin/checkstyle.html#org.codehaus.mojo.license.api.ThirdPartyHelper.java">org/codehaus/mojo/license/api/ThirdPartyHelper.java</a>
                 </td>
                 <td>
@@ -378,20 +420,6 @@ under the License.
                 </td>
                 <td>
                   0
-                </td>
-              </tr>
-                          <tr>
-                <td>
-                  <a href="http://www.mojohaus.org/license-maven-plugin/checkstyle.html#org.codehaus.mojo.license.utils.LicenseDownloader.java">org/codehaus/mojo/license/utils/LicenseDownloader.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  2
-                </td>
-                <td>
-                  1
                 </td>
               </tr>
                           <tr>
@@ -480,6 +508,20 @@ under the License.
               </tr>
                           <tr>
                 <td>
+                  <a href="http://www.mojohaus.org/license-maven-plugin/checkstyle.html#org.codehaus.mojo.license.utils.UrlRequester.java">org/codehaus/mojo/license/utils/UrlRequester.java</a>
+                </td>
+                <td>
+                  1
+                </td>
+                <td>
+                  1
+                </td>
+                <td>
+                  1
+                </td>
+              </tr>
+                          <tr>
+                <td>
                   <a href="http://www.mojohaus.org/license-maven-plugin/checkstyle.html#org.codehaus.mojo.license.AbstractFileHeaderMojo.java">org/codehaus/mojo/license/AbstractFileHeaderMojo.java</a>
                 </td>
                 <td>
@@ -550,6 +592,20 @@ under the License.
               </tr>
                           <tr>
                 <td>
+                  <a href="http://www.mojohaus.org/license-maven-plugin/checkstyle.html#org.codehaus.mojo.license.spdx.SpdxLicenseList.java">org/codehaus/mojo/license/spdx/SpdxLicenseList.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  11
+                </td>
+                <td>
+                  1
+                </td>
+              </tr>
+                          <tr>
+                <td>
                   <a href="http://www.mojohaus.org/license-maven-plugin/checkstyle.html#org.codehaus.mojo.license.api.DependenciesToolException.java">org/codehaus/mojo/license/api/DependenciesToolException.java</a>
                 </td>
                 <td>
@@ -584,7 +640,7 @@ under the License.
                   0
                 </td>
                 <td>
-                  5
+                  7
                 </td>
                 <td>
                   1
@@ -598,7 +654,7 @@ under the License.
                   0
                 </td>
                 <td>
-                  2
+                  3
                 </td>
                 <td>
                   1
@@ -732,20 +788,6 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.mojohaus.org/license-maven-plugin/checkstyle.html#org.codehaus.mojo.license.utils.LicenseSummaryReader.java">org/codehaus/mojo/license/utils/LicenseSummaryReader.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  1
-                </td>
-              </tr>
-                          <tr>
-                <td>
                   <a href="http://www.mojohaus.org/license-maven-plugin/checkstyle.html#aggregate-third-party-report_fr.properties">aggregate-third-party-report_fr.properties</a>
                 </td>
                 <td>
@@ -767,6 +809,20 @@ under the License.
                 </td>
                 <td>
                   0
+                </td>
+                <td>
+                  1
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.mojohaus.org/license-maven-plugin/checkstyle.html#org.codehaus.mojo.license.spdx.SpdxLicenseInfo.java">org/codehaus/mojo/license/spdx/SpdxLicenseInfo.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  36
                 </td>
                 <td>
                   1
@@ -802,6 +858,34 @@ under the License.
               </tr>
                           <tr>
                 <td>
+                  <a href="http://www.mojohaus.org/license-maven-plugin/checkstyle.html#org.codehaus.mojo.license.api.ArtifactFilters.java">org/codehaus/mojo/license/api/ArtifactFilters.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  22
+                </td>
+                <td>
+                  1
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.mojohaus.org/license-maven-plugin/checkstyle.html#org.codehaus.mojo.license.download.LicenseSummaryWriter.java">org/codehaus/mojo/license/download/LicenseSummaryWriter.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  3
+                </td>
+                <td>
+                  1
+                </td>
+              </tr>
+                          <tr>
+                <td>
                   <a href="http://www.mojohaus.org/license-maven-plugin/checkstyle.html#org.codehaus.mojo.license.api.DefaultDependenciesTool.java">org/codehaus/mojo/license/api/DefaultDependenciesTool.java</a>
                 </td>
                 <td>
@@ -816,20 +900,6 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.mojohaus.org/license-maven-plugin/checkstyle.html#org.codehaus.mojo.license.model.ProjectLicenseInfo.java">org/codehaus/mojo/license/model/ProjectLicenseInfo.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  12
-                </td>
-                <td>
-                  1
-                </td>
-              </tr>
-                          <tr>
-                <td>
                   <a href="http://www.mojohaus.org/license-maven-plugin/checkstyle.html#org.codehaus.mojo.license.header.transformer.PropertiesFileHeaderTransformer.java">org/codehaus/mojo/license/header/transformer/PropertiesFileHeaderTransformer.java</a>
                 </td>
                 <td>
@@ -837,6 +907,34 @@ under the License.
                 </td>
                 <td>
                   0
+                </td>
+                <td>
+                  1
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.mojohaus.org/license-maven-plugin/checkstyle.html#org.codehaus.mojo.license.download.ProjectLicense.java">org/codehaus/mojo/license/download/ProjectLicense.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  4
+                </td>
+                <td>
+                  1
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.mojohaus.org/license-maven-plugin/checkstyle.html#org.codehaus.mojo.license.download.LicenseSummaryReader.java">org/codehaus/mojo/license/download/LicenseSummaryReader.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  1
                 </td>
                 <td>
                   1
@@ -914,10 +1012,24 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.mojohaus.org/license-maven-plugin/checkstyle.html#org.codehaus.mojo.license.AbstractAddThirdPartyMojo.java">org/codehaus/mojo/license/AbstractAddThirdPartyMojo.java</a>
+                  <a href="http://www.mojohaus.org/license-maven-plugin/checkstyle.html#org.codehaus.mojo.license.download.FileNameEntry.java">org/codehaus/mojo/license/download/FileNameEntry.java</a>
+                </td>
+                <td>
+                  0
                 </td>
                 <td>
                   4
+                </td>
+                <td>
+                  1
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.mojohaus.org/license-maven-plugin/checkstyle.html#org.codehaus.mojo.license.AbstractAddThirdPartyMojo.java">org/codehaus/mojo/license/AbstractAddThirdPartyMojo.java</a>
+                </td>
+                <td>
+                  5
                 </td>
                 <td>
                   5
@@ -956,20 +1068,6 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.mojohaus.org/license-maven-plugin/checkstyle.html#org.codehaus.mojo.license.utils.HttpRequester.java">org/codehaus/mojo/license/utils/HttpRequester.java</a>
-                </td>
-                <td>
-                  0
-                </td>
-                <td>
-                  2
-                </td>
-                <td>
-                  1
-                </td>
-              </tr>
-                          <tr>
-                <td>
                   <a href="http://www.mojohaus.org/license-maven-plugin/checkstyle.html#org.codehaus.mojo.license.header.transformer.AbstractFileHeaderTransformer.java">org/codehaus/mojo/license/header/transformer/AbstractFileHeaderTransformer.java</a>
                 </td>
                 <td>
@@ -977,6 +1075,20 @@ under the License.
                 </td>
                 <td>
                   3
+                </td>
+                <td>
+                  1
+                </td>
+              </tr>
+                          <tr>
+                <td>
+                  <a href="http://www.mojohaus.org/license-maven-plugin/checkstyle.html#org.codehaus.mojo.license.download.Cache.java">org/codehaus/mojo/license/download/Cache.java</a>
+                </td>
+                <td>
+                  0
+                </td>
+                <td>
+                  1
                 </td>
                 <td>
                   1
@@ -1054,16 +1166,16 @@ under the License.
               </tr>
                           <tr>
                 <td>
-                  <a href="http://www.mojohaus.org/license-maven-plugin/checkstyle.html#org.codehaus.mojo.license.model.ProjectLicense.java">org/codehaus/mojo/license/model/ProjectLicense.java</a>
+                  <a href="http://www.mojohaus.org/license-maven-plugin/checkstyle.html#org.codehaus.mojo.license.spdx.SpdxLicenseListData.java">org/codehaus/mojo/license/spdx/SpdxLicenseListData.java</a>
                 </td>
                 <td>
                   0
                 </td>
                 <td>
-                  4
+                  0
                 </td>
                 <td>
-                  1
+                  1518
                 </td>
               </tr>
                           <tr>
@@ -1099,10 +1211,10 @@ under the License.
                   <a href="http://www.mojohaus.org/license-maven-plugin/checkstyle.html#org.codehaus.mojo.license.AbstractDownloadLicensesMojo.java">org/codehaus/mojo/license/AbstractDownloadLicensesMojo.java</a>
                 </td>
                 <td>
-                  1
+                  0
                 </td>
                 <td>
-                  9
+                  7
                 </td>
                 <td>
                   1

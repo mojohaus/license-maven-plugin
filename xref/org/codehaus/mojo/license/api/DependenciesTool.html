@@ -75,10 +75,11 @@
 <a class="jxr_linenumber" name="L67" href="#L67">67</a>  <em class="jxr_javadoccomment">     * @return the loaded project dependency artifacts</em>
 <a class="jxr_linenumber" name="L68" href="#L68">68</a>  <em class="jxr_javadoccomment">     * @throws DependenciesToolException if could not load project dependencies</em>
 <a class="jxr_linenumber" name="L69" href="#L69">69</a>  <em class="jxr_javadoccomment">     */</em>
-<a class="jxr_linenumber" name="L70" href="#L70">70</a>      <a href="../../../../../org/codehaus/mojo/license/api/ResolvedProjectDependencies.html">ResolvedProjectDependencies</a> loadProjectArtifacts( ArtifactRepository localRepository, List remoteRepositories,
-<a class="jxr_linenumber" name="L71" href="#L71">71</a>              MavenProject project, List&lt;MavenProject&gt; reactorProjectDependencies )
-<a class="jxr_linenumber" name="L72" href="#L72">72</a>          <strong class="jxr_keyword">throws</strong> DependenciesToolException;
-<a class="jxr_linenumber" name="L73" href="#L73">73</a>  }
+<a class="jxr_linenumber" name="L70" href="#L70">70</a>      <a href="../../../../../org/codehaus/mojo/license/api/ResolvedProjectDependencies.html">ResolvedProjectDependencies</a> loadProjectArtifacts( ArtifactRepository localRepository,
+<a class="jxr_linenumber" name="L71" href="#L71">71</a>                                                        List&lt;ArtifactRepository&gt; remoteRepositories, MavenProject project,
+<a class="jxr_linenumber" name="L72" href="#L72">72</a>                                                        List&lt;MavenProject&gt; reactorProjectDependencies )
+<a class="jxr_linenumber" name="L73" href="#L73">73</a>          <strong class="jxr_keyword">throws</strong> DependenciesToolException;
+<a class="jxr_linenumber" name="L74" href="#L74">74</a>  }
 </pre>
 <hr/>
 <div id="footer">Copyright &#169; 2010&#x2013;2019 <a href="http://www.mojohaus.org">MojoHaus</a>. All rights reserved.</div>
