@@ -622,6 +622,9 @@
 
     <profile>
       <id>mojo-release</id>
+      <properties>
+        <invoker.skip>true</invoker.skip>
+      </properties>
       <build>
         <plugins>
           <plugin>
@@ -635,6 +638,13 @@
                 </goals>
               </execution>
             </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <configuration>
+              <additionalparam>-Xdoclint:none</additionalparam>
+            </configuration>
           </plugin>
         </plugins>
       </build>
