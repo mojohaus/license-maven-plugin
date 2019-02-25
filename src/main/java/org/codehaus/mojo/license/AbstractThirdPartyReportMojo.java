@@ -159,6 +159,15 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
     private boolean excludeTransitiveDependencies;
 
     /**
+     * If {@code true} both optional and non-optional dependencies will be included in the list of artifacts for
+     * creating the license report; otherwise only non-optional dependencies will be considered.
+     *
+     * @since 1.19
+     */
+    @Parameter( property = "license.includeOptional", defaultValue = "true" )
+    boolean includeOptional;
+
+    /**
      * A flag to use the missing licenses file to consolidate the THID-PARTY file.
      *
      * @since 1.1
@@ -583,6 +592,12 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
     public boolean isExcludeTransitiveDependencies()
     {
         return excludeTransitiveDependencies;
+    }
+
+    /** {@inheritDoc} */
+    public boolean isIncludeOptional()
+    {
+        return includeOptional;
     }
 
     /**

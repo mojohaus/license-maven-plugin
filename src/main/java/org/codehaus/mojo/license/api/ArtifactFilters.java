@@ -65,6 +65,7 @@ public class ArtifactFilters
         builder.excludeScopes( config.getExcludedScopes() );
         builder.includeTypes( config.getIncludedTypes() );
         builder.excludeTypes( config.getExcludedTypes() );
+        builder.includeOptional( config.isIncludeOptional() );
 
         final String url = config.getArtifactFiltersUrl();
         if ( url != null )
@@ -113,18 +114,22 @@ public class ArtifactFilters
 
     private final IncludesExcludes typeFilters;
 
-    public ArtifactFilters( IncludesExcludes scopeFilters, IncludesExcludes typeFilters, IncludesExcludes gaFilters )
+    private final boolean includeOptional;
+
+    public ArtifactFilters( IncludesExcludes scopeFilters, IncludesExcludes typeFilters, IncludesExcludes gaFilters,
+                            boolean includeOptional )
     {
         super();
         this.scopeFilters = scopeFilters;
         this.typeFilters = typeFilters;
         this.gaFilters = gaFilters;
+        this.includeOptional = includeOptional;
     }
 
     public boolean isIncluded( Artifact artifact )
     {
         return scopeFilters.isIncluded( artifact ) && typeFilters.isIncluded( artifact )
-            && gaFilters.isIncluded( artifact );
+            && gaFilters.isIncluded( artifact ) && ( includeOptional || !artifact.isOptional() );
     }
 
     interface ArtifactFilter
@@ -143,9 +148,11 @@ public class ArtifactFilters
 
         private final IncludesExcludes.Builder typeFilters = new IncludesExcludes.Builder();
 
+        private boolean includeOptional = true;
+
         public ArtifactFilters build()
         {
-            return new ArtifactFilters( scopeFilters.build(), typeFilters.build(), gaFilters.build() );
+            return new ArtifactFilters( scopeFilters.build(), typeFilters.build(), gaFilters.build(), includeOptional );
         }
 
         public void script( String url, String content )
@@ -177,10 +184,15 @@ public class ArtifactFilters
                         {
                             includeType( items[2] );
                         }
+                        else if ( "optional".equals( items[1] ) )
+                        {
+                            includeOptional( Boolean.parseBoolean( items[2] ) );
+                        }
                         else
                         {
-                            throw new IllegalStateException( "Expected \"gaPattern\", \"scope\" or \"type\" after \""
-                                + items[0] + "\" on line " + i + " in " + url + " found: " + line );
+                            throw new IllegalStateException( "Expected \"gaPattern\", \"scope\", \"type\" or"
+                                + " \"optional\" after \"" + items[0] + "\" on line " + i + " in " + url + " found: "
+                                + line );
                         }
                     }
                     else if ( "exclude".equals( items[0] ) )
@@ -232,6 +244,12 @@ public class ArtifactFilters
                     gaFilters.exclude( new GaFilter( Pattern.compile( pattern ) ) );
                 }
             }
+            return this;
+        }
+
+        public Builder includeOptional( boolean includeOptional )
+        {
+            this.includeOptional = includeOptional;
             return this;
         }
 

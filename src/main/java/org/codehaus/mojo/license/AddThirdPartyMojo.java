@@ -383,7 +383,11 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
         return excludeTransitiveDependencies;
     }
 
-
+    /** {@inheritDoc} */
+    public boolean isIncludeOptional()
+    {
+        return includeOptional;
+    }
 
     // ----------------------------------------------------------------------
     // Private Methods

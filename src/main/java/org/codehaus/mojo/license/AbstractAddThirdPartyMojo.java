@@ -266,6 +266,15 @@ public abstract class AbstractAddThirdPartyMojo
     boolean excludeTransitiveDependencies;
 
     /**
+     * If {@code true} both optional and non-optional dependencies will be included in the list of artifacts for
+     * creating the license report; otherwise only non-optional dependencies will be considered.
+     *
+     * @since 1.19
+     */
+    @Parameter( property = "license.includeOptional", defaultValue = "true" )
+    boolean includeOptional;
+
+    /**
      * File where to write the third-party file.
      *
      * @since 1.0
