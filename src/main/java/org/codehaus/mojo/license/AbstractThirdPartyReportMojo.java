@@ -392,7 +392,7 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
             getLog().warn( "" );
             if ( UrlRequester.isStringUrl( licenseMergesUrl ) )
             {
-                licenseMerges = Arrays.asList( UrlRequester.getFromUrl( licenseMergesUrl ) );
+                licenseMerges = Arrays.asList( UrlRequester.getFromUrl( licenseMergesUrl ).split( "[\n\r]+" ) );
             }
         }
     }
