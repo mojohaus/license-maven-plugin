@@ -366,6 +366,9 @@
             <scriptVariables>
               <projectVersion>${project.version}</projectVersion>
             </scriptVariables>
+            <environmentVariables>
+              <MAVEN_OPTS>-Duser.country=US -Duser.language=en</MAVEN_OPTS>
+            </environmentVariables>
           </configuration>
         </plugin>
         <plugin>
