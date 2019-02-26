@@ -30,6 +30,7 @@ import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 
 import org.apache.maven.artifact.Artifact;
+import org.codehaus.mojo.license.utils.MojoHelper;
 import org.codehaus.mojo.license.utils.UrlRequester;
 
 /**
@@ -51,31 +52,36 @@ public class ArtifactFilters
         return new Builder();
     }
 
-    public static ArtifactFilters of( MavenProjectDependenciesConfigurator config )
+    // CHECKSTYLE_OFF: ParameterNumber
+
+    public static ArtifactFilters of( String includedGroups, String excludedGroups, String includedArtifacts,
+                                      String excludedArtifacts, String includedScopes, String excludedScopes,
+                                      String includedTypes, String excludedTypes, boolean includeOptional,
+                                      String artifactFiltersUrl, String encoding )
+    // CHECKSTYLE_ON: ParameterNumber
     {
         Builder builder = new Builder();
 
-        builder.includeGa( toGaPattern( config.getIncludedGroups(), true ) );
-        builder.excludeGa( toGaPattern( config.getExcludedGroups(), true ) );
+        builder.includeGa( toGaPattern( includedGroups, true ) );
+        builder.excludeGa( toGaPattern( excludedGroups, true ) );
 
-        builder.includeGa( toGaPattern( config.getIncludedArtifacts(), false ) );
-        builder.excludeGa( toGaPattern( config.getExcludedArtifacts(), false ) );
+        builder.includeGa( toGaPattern( includedArtifacts, false ) );
+        builder.excludeGa( toGaPattern( excludedArtifacts, false ) );
 
-        builder.includeScopes( config.getIncludedScopes() );
-        builder.excludeScopes( config.getExcludedScopes() );
-        builder.includeTypes( config.getIncludedTypes() );
-        builder.excludeTypes( config.getExcludedTypes() );
-        builder.includeOptional( config.isIncludeOptional() );
+        builder.includeScopes( MojoHelper.getParams( includedScopes ) );
+        builder.excludeScopes( MojoHelper.getParams( excludedScopes ) );
+        builder.includeTypes( MojoHelper.getParams( includedTypes ) );
+        builder.excludeTypes( MojoHelper.getParams( excludedTypes ) );
+        builder.includeOptional( includeOptional );
 
-        final String url = config.getArtifactFiltersUrl();
-        if ( url != null )
+        if ( artifactFiltersUrl != null )
         {
             try
             {
-                final String content = UrlRequester.getFromUrl( url, config.getEncoding() );
+                final String content = UrlRequester.getFromUrl( artifactFiltersUrl, encoding );
                 if ( content != null )
                 {
-                    builder.script( url, content );
+                    builder.script( artifactFiltersUrl, content );
                 }
             }
             catch ( IOException e )
