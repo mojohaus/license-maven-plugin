@@ -27,20 +27,16 @@ import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.License;
-import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Proxy;
-import org.codehaus.mojo.license.api.DependenciesTool;
 import org.codehaus.mojo.license.api.MavenProjectDependenciesConfigurator;
 import org.codehaus.mojo.license.api.ResolvedProjectDependencies;
 import org.codehaus.mojo.license.download.Cache;
 import org.codehaus.mojo.license.download.FileNameEntry;
 import org.codehaus.mojo.license.download.LicenseDownloader;
-import org.codehaus.mojo.license.download.LicenseSummaryWriter;
 import org.codehaus.mojo.license.download.PreferredFileNames;
 import org.codehaus.mojo.license.download.ProjectLicense;
 import org.codehaus.mojo.license.download.ProjectLicenseInfo;
@@ -54,7 +50,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -74,7 +69,7 @@ import java.util.regex.Pattern;
  * @author Tony Chemit - chemit@codelutin.com
  */
 public abstract class AbstractDownloadLicensesMojo
-    extends AbstractMojo
+    extends AbstractLicensesXmlMojo
     implements MavenProjectDependenciesConfigurator
 {
 
@@ -210,38 +205,6 @@ public abstract class AbstractDownloadLicensesMojo
      */
     @Parameter( property = "license.cleanLicensesOutputDirectory", defaultValue = "false" )
     private boolean cleanLicensesOutputDirectory;
-
-    /**
-     * The output file containing a mapping between each dependency and it's license information.
-     *
-     * @since 1.0
-     */
-    @Parameter( property = "licensesOutputFile",
-        defaultValue = "${project.build.directory}/generated-resources/licenses.xml" )
-    private File licensesOutputFile;
-
-    /**
-     * An end of line constant name denoting the EOL string to use when redering the {@code licenses.xml} file.
-     * Possible values are {@code LF}, {@code CRLF}, {@code AUTODETECT} and {@code PLATFORM}.
-     * <p>
-     * When the value {@code AUTODETECT} is used, the mojo will use whatever EOL value is used in the first existing of
-     * the following files: {@link #licensesConfigFile}, <code>${basedir}/pom.xml</code>.
-     * <p>
-     * The value {@code PLATFORM} is deprecated but still kept for backwards compatibility reasons.
-     *
-     * @since 1.17
-     */
-    @Parameter( property = "licensesOutputFileEol", defaultValue = "AUTODETECT" )
-    private Eol licensesOutputFileEol;
-
-    /**
-     * Encoding used to (1) read the file specified in {@link #licensesConfigFile} and (2) write the file specified in
-     * {@link #licensesOutputFile}.
-     *
-     * @since 1.17
-     */
-    @Parameter( property = "licensesOutputFileEncoding", defaultValue = "${project.build.sourceEncoding}" )
-    private String licensesOutputFileEncoding;
 
     /**
      * A file containing dependencies whose licenses could not be downloaded for some reason. The format is similar to
@@ -451,7 +414,7 @@ public abstract class AbstractDownloadLicensesMojo
      * @since 1.0
      */
     @Parameter( defaultValue = "${project}", readonly = true )
-    private MavenProject project;
+    protected MavenProject project;
 
     /**
      * List of regexps/replacements applied to the license urls prior to download.
@@ -603,14 +566,6 @@ public abstract class AbstractDownloadLicensesMojo
     // Plexus Components
     // ----------------------------------------------------------------------
 
-    /**
-     * Dependencies tool.
-     *
-     * @since 1.0
-     */
-    @Component
-    private DependenciesTool dependenciesTool;
-
     // ----------------------------------------------------------------------
     // Private Fields
     // ----------------------------------------------------------------------
@@ -665,15 +620,6 @@ public abstract class AbstractDownloadLicensesMojo
 
         initDirectories();
 
-        if ( licensesOutputFileEncoding == null )
-        {
-            licensesOutputFileEncoding = System.getProperty( "file.encoding" );
-            getLog().warn( "Using the default system encoding for reading or writing licenses.xml file."
-                    + " This makes your build platform dependent. You should set either"
-                    + " project.build.sourceEncoding or licensesOutputFileEncoding" );
-        }
-        final Charset charset = Charset.forName( licensesOutputFileEncoding );
-
         final LicenseMatchers matchers = LicenseMatchers.load( licensesConfigFile );
 
         final Set<MavenProject> dependencies = getDependencies();
@@ -722,20 +668,11 @@ public abstract class AbstractDownloadLicensesMojo
                 sortByGroupIdAndArtifactId( depProjectLicenses );
             }
 
-            if ( licensesOutputFileEol == Eol.AUTODETECT )
-            {
-                final Path autodetectFromFile = licensesConfigFile.exists() ? licensesConfigFile.toPath()
-                        : project.getBasedir().toPath().resolve( "pom.xml" );
-                licensesOutputFileEol = Eol.autodetect( autodetectFromFile, charset );
-            }
-
             List<ProjectLicenseInfo> depProjectLicensesWithErrors = filterErrors( depProjectLicenses );
-            LicenseSummaryWriter.writeLicenseSummary( depProjectLicenses, licensesOutputFile, charset,
-                                                      licensesOutputFileEol, writeVersions );
+            writeLicenseSummary( depProjectLicenses, licensesOutputFile, writeVersions );
             if ( depProjectLicensesWithErrors != null && !depProjectLicensesWithErrors.isEmpty() )
             {
-                LicenseSummaryWriter.writeLicenseSummary( depProjectLicensesWithErrors, licensesErrorsFile, charset,
-                                                          licensesOutputFileEol, writeVersions );
+                writeLicenseSummary( depProjectLicensesWithErrors, licensesErrorsFile, writeVersions );
             }
         }
         catch ( Exception e )
@@ -924,12 +861,6 @@ public abstract class AbstractDownloadLicensesMojo
         return artifactFiltersUrl;
     }
 
-    /** {@inheritDoc} */
-    public String getEncoding()
-    {
-        return licensesOutputFileEncoding;
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -968,6 +899,12 @@ public abstract class AbstractDownloadLicensesMojo
         {
             throw new MojoExecutionException( "Unable to create a directory...", e );
         }
+    }
+
+    /** {@inheritDoc} */
+    protected Path[] getAutodetectEolFiles()
+    {
+        return new Path[] { licensesConfigFile.toPath(), project.getBasedir().toPath().resolve( "pom.xml" ) };
     }
 
     private Proxy findActiveProxy()
