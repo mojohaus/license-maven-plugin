@@ -5,3 +5,4 @@ exclude gaPattern org\.group3:artifact3
 include scope compile
 include scope system
 exclude type war
+include optional false

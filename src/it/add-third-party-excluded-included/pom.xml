@@ -69,6 +69,12 @@
       <type>pom</type>
       <version>9.0.1.Final</version>
     </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-all</artifactId>
+      <version>1.10.19</version>
+      <optional>true</optional>
+    </dependency>
   </dependencies>
 
   <build>
@@ -202,6 +208,17 @@
               <excludedGroups>org\.wildfly\.checkstyle</excludedGroups>
               <includedTypes>pom</includedTypes>
               <thirdPartyFilename>thirdWithType.txt</thirdPartyFilename>
+            </configuration>
+          </execution>
+          <execution>
+            <id>exclude-optional</id>
+            <goals>
+              <goal>add-third-party</goal>
+            </goals>
+            <phase>validate</phase>
+            <configuration>
+              <includeOptional>false</includeOptional>
+              <thirdPartyFilename>thirdWithoutOptional.txt</thirdPartyFilename>
             </configuration>
           </execution>
         </executions>

@@ -122,4 +122,10 @@ public interface MavenProjectDependenciesConfigurator
      * @return {@code true} if verbose mode is on, {@code false} otherwise.
      */
     boolean isVerbose();
+
+    /**
+     * @return {@code true} if optional dependencies should be included, {@code false} otherwise.
+     * @since 1.19
+     */
+    boolean isIncludeOptional();
 }

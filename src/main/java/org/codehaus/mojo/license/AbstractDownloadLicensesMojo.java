@@ -381,6 +381,15 @@ public abstract class AbstractDownloadLicensesMojo
     private boolean excludeTransitiveDependencies;
 
     /**
+     * If {@code true} both optional and non-optional dependencies will be included in the list of artifacts for
+     * creating the license report; otherwise only non-optional dependencies will be considered.
+     *
+     * @since 1.19
+     */
+    @Parameter( property = "license.includeOptional", defaultValue = "true" )
+    boolean includeOptional;
+
+    /**
      * Get declared proxies from the {@code settings.xml} file.
      *
      * @since 1.4
@@ -824,6 +833,12 @@ public abstract class AbstractDownloadLicensesMojo
     public boolean isExcludeTransitiveDependencies()
     {
         return excludeTransitiveDependencies;
+    }
+
+    /** {@inheritDoc} */
+    public boolean isIncludeOptional()
+    {
+        return includeOptional;
     }
 
     /**
