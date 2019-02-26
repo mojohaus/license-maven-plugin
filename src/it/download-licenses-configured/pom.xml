@@ -90,13 +90,32 @@
             </configuration>
           </execution>
           <execution>
+            <id>no-download</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>download-licenses</goal>
+            </goals>
+            <configuration>
+              <licensesConfigFile>${basedir}/src/license/licenses-config-no-download.xml</licensesConfigFile>
+              <licensesOutputDirectory>${project.build.directory}/no-download/licenses</licensesOutputDirectory>
+              <licensesOutputFile>${project.build.directory}/no-download/licenses.xml</licensesOutputFile>
+              <sortByGroupIdAndArtifactId>true</sortByGroupIdAndArtifactId>
+              <licenseUrlFileNameSanitizers>
+                <licenseUrlFileNameSanitizer>
+                  <regexp>[\s-_]+</regexp>
+                  <replacement>-</replacement>
+                </licenseUrlFileNameSanitizer>
+              </licenseUrlFileNameSanitizers>
+            </configuration>
+          </execution>
+          <execution>
             <id>insert-versions</id>
             <phase>validate</phase>
             <goals>
               <goal>licenses-xml-insert-versions</goal>
             </goals>
             <configuration>
-              <licensesInputFile>${project.build.directory}/artifact-filters-url/licenses.xml</licensesInputFile>
+              <licensesInputFile>${basedir}/src/license/licenses-input-insert-versions.xml</licensesInputFile>
               <licensesOutputFile>${project.build.directory}/insert-versions/licenses.xml</licensesOutputFile>
             </configuration>
           </execution>

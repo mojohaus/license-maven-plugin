@@ -69,6 +69,22 @@ return {
     assert expectedLicensesXml.text.equals(licensesXml.text)
     return true
 }() && {
+    final String id = 'no-download'
+    final Path outputBase = basePath.resolve('target/' + id)
+
+    final Path asl2 = outputBase.resolve('licenses/apache-license-2.0-license-2.0.txt')
+    assert Files.exists(asl2)
+    assert asl2.text.contains('Fake content')
+
+    final Path bsdAsm = outputBase.resolve('licenses/bsd-3-clause-asm-license.txt')
+    assert Files.exists(bsdAsm)
+    assert bsdAsm.text.contains('Fake content')
+
+    final Path expectedLicensesXml = basePath.resolve('licenses-'+ id +'.expected.xml')
+    final Path licensesXml = outputBase.resolve('licenses.xml')
+    assert expectedLicensesXml.text.equals(licensesXml.text)
+    return true
+}() && {
     final String id = 'insert-versions'
     final Path outputBase = basePath.resolve('target/' + id)
 
