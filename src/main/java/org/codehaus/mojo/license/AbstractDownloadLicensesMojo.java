@@ -43,6 +43,7 @@ import org.codehaus.mojo.license.download.ProjectLicense;
 import org.codehaus.mojo.license.download.ProjectLicenseInfo;
 import org.codehaus.mojo.license.download.LicenseDownloader.LicenseDownloadResult;
 import org.codehaus.mojo.license.download.LicenseMatchers;
+import org.codehaus.mojo.license.download.LicenseSummaryReader;
 import org.codehaus.mojo.license.utils.FileUtil;
 
 import java.io.File;
@@ -623,6 +624,37 @@ public abstract class AbstractDownloadLicensesMojo
         initDirectories();
 
         final LicenseMatchers matchers = LicenseMatchers.load( licensesConfigFile );
+
+        if ( !forceDownload )
+        {
+            try
+            {
+                final List<ProjectLicenseInfo> projectLicenseInfos =
+                                LicenseSummaryReader.parseLicenseSummary( licensesOutputFile );
+                for ( ProjectLicenseInfo dep : projectLicenseInfos )
+                {
+                    for ( ProjectLicense lic : dep.getLicenses() )
+                    {
+                        final String fileName = lic.getFile();
+                        final String url = lic.getUrl();
+                        if ( fileName != null && url != null )
+                        {
+                            final File file = new File( licensesOutputDirectory, fileName );
+                            if ( file.exists() )
+                            {
+                                final LicenseDownloadResult entry =
+                                    LicenseDownloadResult.success( file, FileUtil.sha1( file.toPath() ), false );
+                                cache.put( url, entry );
+                            }
+                        }
+                    }
+                }
+            }
+            catch ( Exception e )
+            {
+                throw new MojoExecutionException( "Unable to process license summary file: " + licensesOutputFile, e );
+            }
+        }
 
         final Set<MavenProject> dependencies = getDependencies();
 
