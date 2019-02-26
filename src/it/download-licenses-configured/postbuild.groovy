@@ -68,4 +68,12 @@ return {
     final Path licensesXml = outputBase.resolve('licenses.xml')
     assert expectedLicensesXml.text.equals(licensesXml.text)
     return true
+}() && {
+    final String id = 'insert-versions'
+    final Path outputBase = basePath.resolve('target/' + id)
+
+    final Path expectedLicensesXml = basePath.resolve('licenses-'+ id +'.expected.xml')
+    final Path licensesXml = outputBase.resolve('licenses.xml')
+    assert expectedLicensesXml.text.equals(licensesXml.text)
+    return true
 }()
