@@ -41,13 +41,13 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
+import org.codehaus.mojo.license.api.ArtifactFilters;
 import org.codehaus.mojo.license.api.DependenciesToolException;
 import org.codehaus.mojo.license.api.MavenProjectDependenciesConfigurator;
 import org.codehaus.mojo.license.api.ResolvedProjectDependencies;
 import org.codehaus.mojo.license.api.ThirdPartyToolException;
 import org.codehaus.mojo.license.model.LicenseMap;
 import org.codehaus.mojo.license.utils.FileUtil;
-import org.codehaus.mojo.license.utils.MojoHelper;
 import org.codehaus.mojo.license.utils.SortedProperties;
 
 // CHECKSTYLE_OFF: LineLength
@@ -116,6 +116,8 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
      * This field stores the result of that manual resolution.
      */
     private ResolvedProjectDependencies dependencyArtifacts;
+
+    private ArtifactFilters artifactFilters;
 
     // ----------------------------------------------------------------------
     // AbstractLicenseMojo Implementaton
@@ -300,76 +302,6 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
     /**
      * {@inheritDoc}
      */
-    public String getExcludedGroups()
-    {
-        return excludedGroups;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getIncludedGroups()
-    {
-        return includedGroups;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public List<String> getExcludedScopes()
-    {
-        return MojoHelper.getParams( excludedScopes );
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public List<String> getIncludedScopes()
-    {
-        return MojoHelper.getParams( includedScopes );
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public List<String> getExcludedTypes()
-    {
-        return MojoHelper.getParams( excludedTypes );
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public List<String> getIncludedTypes()
-    {
-        return MojoHelper.getParams( includedTypes );
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getExcludedArtifacts()
-    {
-        return excludedArtifacts;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getIncludedArtifacts()
-    {
-        return includedArtifacts;
-    }
-
-    /** {@inheritDoc} */
-    public String getArtifactFiltersUrl()
-    {
-        return artifactFiltersUrl;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public boolean isIncludeTransitiveDependencies()
     {
         return includeTransitiveDependencies;
@@ -384,9 +316,15 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
     }
 
     /** {@inheritDoc} */
-    public boolean isIncludeOptional()
+    public ArtifactFilters getArtifactFilters()
     {
-        return includeOptional;
+        if ( artifactFilters == null )
+        {
+            artifactFilters = ArtifactFilters.of( includedGroups, excludedGroups, includedArtifacts, excludedArtifacts,
+                                                  includedScopes, excludedScopes, includedTypes, excludedTypes,
+                                                  includeOptional, artifactFiltersUrl , getEncoding() );
+        }
+        return artifactFilters;
     }
 
     // ----------------------------------------------------------------------

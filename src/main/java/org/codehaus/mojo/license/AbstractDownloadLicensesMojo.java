@@ -32,6 +32,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Proxy;
+import org.codehaus.mojo.license.api.ArtifactFilters;
 import org.codehaus.mojo.license.api.MavenProjectDependenciesConfigurator;
 import org.codehaus.mojo.license.api.ResolvedProjectDependencies;
 import org.codehaus.mojo.license.download.Cache;
@@ -43,7 +44,6 @@ import org.codehaus.mojo.license.download.ProjectLicenseInfo;
 import org.codehaus.mojo.license.download.LicenseDownloader.LicenseDownloadResult;
 import org.codehaus.mojo.license.download.LicenseMatchers;
 import org.codehaus.mojo.license.utils.FileUtil;
-import org.codehaus.mojo.license.utils.MojoHelper;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -579,6 +579,8 @@ public abstract class AbstractDownloadLicensesMojo
 
     private int downloadErrorCount = 0;
 
+    private ArtifactFilters artifactFilters;
+
     protected abstract boolean isSkip();
 
     protected MavenProject getProject()
@@ -773,92 +775,15 @@ public abstract class AbstractDownloadLicensesMojo
     }
 
     /** {@inheritDoc} */
-    public boolean isIncludeOptional()
+    public ArtifactFilters getArtifactFilters()
     {
-        return includeOptional;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public List<String> getExcludedScopes()
-    {
-        return MojoHelper.getParams( excludedScopes );
-    }
-
-    public void setExcludedScopes( String excludedScopes )
-    {
-        this.excludedScopes = excludedScopes;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public List<String> getIncludedScopes()
-    {
-        return MojoHelper.getParams( includedScopes );
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public List<String> getExcludedTypes()
-    {
-        return MojoHelper.getParams( excludedTypes );
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public List<String> getIncludedTypes()
-    {
-        return MojoHelper.getParams( includedTypes );
-    }
-
-    // not used at the moment
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getIncludedArtifacts()
-    {
-        return includedArtifacts;
-    }
-
-    // not used at the moment
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getIncludedGroups()
-    {
-        return includedGroups;
-    }
-
-    // not used at the moment
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getExcludedGroups()
-    {
-        return excludedGroups;
-    }
-
-    // not used at the moment
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getExcludedArtifacts()
-    {
-        return excludedArtifacts;
-    }
-
-    /** {@inheritDoc} */
-    public String getArtifactFiltersUrl()
-    {
-        return artifactFiltersUrl;
+        if ( artifactFilters == null )
+        {
+            artifactFilters = ArtifactFilters.of( includedGroups, excludedGroups, includedArtifacts, excludedArtifacts,
+                                                  includedScopes, excludedScopes, includedTypes, excludedTypes,
+                                                  includeOptional, artifactFiltersUrl , getEncoding() );
+        }
+        return artifactFilters;
     }
 
     /**

@@ -36,6 +36,7 @@ import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.reporting.AbstractMavenReport;
 import org.apache.maven.reporting.MavenReportException;
+import org.codehaus.mojo.license.api.ArtifactFilters;
 import org.codehaus.mojo.license.api.DefaultThirdPartyDetails;
 import org.codehaus.mojo.license.api.DefaultThirdPartyHelper;
 import org.codehaus.mojo.license.api.DependenciesTool;
@@ -372,6 +373,8 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
     @Parameter( property = "license.artifactFiltersUrl" )
     private String artifactFiltersUrl;
 
+    private ArtifactFilters artifactFilters;
+
     // ----------------------------------------------------------------------
     // Protected Abstract Methods
     // ----------------------------------------------------------------------
@@ -517,70 +520,6 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
     /**
      * {@inheritDoc}
      */
-    public List<String> getExcludedScopes()
-    {
-        return MojoHelper.getParams( excludedScopes );
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public List<String> getIncludedScopes()
-    {
-        return MojoHelper.getParams( includedScopes );
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public List<String> getExcludedTypes()
-    {
-        return MojoHelper.getParams( excludedTypes );
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public List<String> getIncludedTypes()
-    {
-        return MojoHelper.getParams( includedTypes );
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getExcludedGroups()
-    {
-        return excludedGroups;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getIncludedGroups()
-    {
-        return includedGroups;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getExcludedArtifacts()
-    {
-        return excludedArtifacts;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getIncludedArtifacts()
-    {
-        return includedArtifacts;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public boolean isIncludeTransitiveDependencies()
     {
         return includeTransitiveDependencies;
@@ -595,9 +534,15 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
     }
 
     /** {@inheritDoc} */
-    public boolean isIncludeOptional()
+    public ArtifactFilters getArtifactFilters()
     {
-        return includeOptional;
+        if ( artifactFilters == null )
+        {
+            artifactFilters = ArtifactFilters.of( includedGroups, excludedGroups, includedArtifacts, excludedArtifacts,
+                                                  includedScopes, excludedScopes, includedTypes, excludedTypes,
+                                                  includeOptional, artifactFiltersUrl , getEncoding() );
+        }
+        return artifactFilters;
     }
 
     /**

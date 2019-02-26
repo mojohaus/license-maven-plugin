@@ -109,7 +109,7 @@ extends AbstractLogEnabled
                                                                     SortedMap<String, MavenProject> cache )
     {
 
-        final ArtifactFilters artifactFilters = ArtifactFilters.of( configuration );
+        final ArtifactFilters artifactFilters = configuration.getArtifactFilters();
 
         final boolean excludeTransitiveDependencies = configuration.isExcludeTransitiveDependencies();
 

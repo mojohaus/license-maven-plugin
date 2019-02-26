@@ -22,8 +22,6 @@ package org.codehaus.mojo.license.api;
  * #L%
  */
 
-import java.util.List;
-
 /**
  * Contract to configure which dependencies will be loaded by the dependency tool via the method
  * {@link DependenciesTool#loadProjectDependencies(org.apache.maven.project.MavenProject,
@@ -49,83 +47,12 @@ public interface MavenProjectDependenciesConfigurator
     boolean isExcludeTransitiveDependencies();
 
     /**
-     * @return list of scopes to include while loading dependencies, if {@code null} is setted, then include all scopes.
+     * @return {@link ArtifactFilters} to apply when processing dependencies
      */
-    List<String> getIncludedScopes();
-
-    /**
-     * @return list of scopes to exclude while loading dependencies, if {@code null} is setted, then include all scopes.
-     */
-    List<String> getExcludedScopes();
-
-    /**
-     * @return list of types to include while loading dependencies, if {@code null} is setted, then include all types.
-     */
-    List<String> getIncludedTypes();
-
-    /**
-     * @return list of types to exclude while loading dependencies, if {@code null} is setted, then include all types.
-     */
-    List<String> getExcludedTypes();
-
-    /**
-     * @return a pattern to include dependencies by thier {@code artificatId}, if {@code null} is setted then include
-     *         all artifacts.
-     */
-    String getIncludedArtifacts();
-
-    /**
-     * @return a pattern to include dependencies by their {@code groupId}, if {@code null} is setted then include
-     *         all artifacts.
-     */
-    String getIncludedGroups();
-
-    /**
-     * @return a pattern to exclude dependencies by their {@code artifactId}, if {@code null} is setted the no exclude
-     *         is done on artifactId.
-     */
-    String getExcludedGroups();
-
-    /**
-     * @return a pattern to exclude dependencies by their {@code groupId}, if {@code null} is setted then no exclude
-     *         is done on groupId.
-     */
-    String getExcludedArtifacts();
-
-    /**
-     * Returns a URL returning a plain text file that contains include/exclude artifact filters in the following format:
-     * <pre>
-     * {@code
-     * # this is a comment
-     * include gaPattern org\.my-org:my-artifact
-     * include gaPattern org\.other-org:other-artifact
-     * exclude gaPattern org\.yet-anther-org:.*
-     * include scope compile
-     * include scope test
-     * exclude scope system
-     * include type jar
-     * exclude type war
-     * }</pre>
-     *
-     * @return a URL returning a plain text file
-     * @since 1.18
-     */
-    String getArtifactFiltersUrl();
-
-    /**
-     * @return the encoding to use when reading {@link #getArtifactFiltersUrl()} unless it is an HTTP URL returning a
-     * valid charset in the {@code Content-Type} response header.
-     */
-    String getEncoding();
+    ArtifactFilters getArtifactFilters();
 
     /**
      * @return {@code true} if verbose mode is on, {@code false} otherwise.
      */
     boolean isVerbose();
-
-    /**
-     * @return {@code true} if optional dependencies should be included, {@code false} otherwise.
-     * @since 1.19
-     */
-    boolean isIncludeOptional();
 }
