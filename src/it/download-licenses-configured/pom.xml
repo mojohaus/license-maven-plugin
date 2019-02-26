@@ -109,6 +109,25 @@
             </configuration>
           </execution>
           <execution>
+            <id>delete-orphans</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>download-licenses</goal>
+            </goals>
+            <configuration>
+              <licensesConfigFile>${basedir}/src/license/licenses-config-delete-orphans.xml</licensesConfigFile>
+              <licensesOutputDirectory>${project.build.directory}/delete-orphans/licenses</licensesOutputDirectory>
+              <licensesOutputFile>${project.build.directory}/delete-orphans/licenses.xml</licensesOutputFile>
+              <sortByGroupIdAndArtifactId>true</sortByGroupIdAndArtifactId>
+              <licenseUrlFileNameSanitizers>
+                <licenseUrlFileNameSanitizer>
+                  <regexp>[\s-_]+</regexp>
+                  <replacement>-</replacement>
+                </licenseUrlFileNameSanitizer>
+              </licenseUrlFileNameSanitizers>
+            </configuration>
+          </execution>
+          <execution>
             <id>insert-versions</id>
             <phase>validate</phase>
             <goals>

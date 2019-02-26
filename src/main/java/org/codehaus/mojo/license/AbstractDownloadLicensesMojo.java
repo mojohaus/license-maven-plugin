@@ -56,6 +56,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -202,10 +203,28 @@ public abstract class AbstractDownloadLicensesMojo
      * {@code cleanLicensesOutputDirectory = true} is not implied by {@link #forceDownload} because users may have
      * other files there in {@link #licensesOutputDirectory} that were not downloaded by the plugin.
      *
+     * @see #removeOrphanLicenseFiles
      * @since 1.18
      */
     @Parameter( property = "license.cleanLicensesOutputDirectory", defaultValue = "false" )
     private boolean cleanLicensesOutputDirectory;
+
+    /**
+     * If {@code true} the files referenced from {@link AbstractLicensesXmlMojo#licensesOutputFile} before executing
+     * the mojo but not referenced from {@link AbstractLicensesXmlMojo#licensesOutputFile} after executing
+     * the mojo will be deleted; otherwise neither before:after diffing nor any file deletions will happen.
+     * <p>
+     * Compared to {@link #cleanLicensesOutputDirectory} that removes all files from {@link #licensesOutputDirectory}
+     * before downloading all licenses anew, the {@link #removeOrphanLicenseFiles} removes only files that
+     * are certainly not needed anymore, e.g. due to a removal of a dependency. {@link #removeOrphanLicenseFiles} thus
+     * allows to avoid downloading the license files of dependencies that were downloaded in the past and are still
+     * available in {@link #licensesOutputDirectory}.
+     *
+     * @see #cleanLicensesOutputDirectory
+     * @since 1.19
+     */
+    @Parameter( property = "license.removeOrphanLicenseFiles", defaultValue = "true" )
+    private boolean removeOrphanLicenseFiles;
 
     /**
      * A file containing dependencies whose licenses could not be downloaded for some reason. The format is similar to
@@ -581,6 +600,7 @@ public abstract class AbstractDownloadLicensesMojo
     private int downloadErrorCount = 0;
 
     private ArtifactFilters artifactFilters;
+    private final Set<String> orphanFileNames = new HashSet<>();
 
     protected abstract boolean isSkip();
 
@@ -636,15 +656,19 @@ public abstract class AbstractDownloadLicensesMojo
                     for ( ProjectLicense lic : dep.getLicenses() )
                     {
                         final String fileName = lic.getFile();
-                        final String url = lic.getUrl();
-                        if ( fileName != null && url != null )
+                        if ( fileName != null )
                         {
-                            final File file = new File( licensesOutputDirectory, fileName );
-                            if ( file.exists() )
+                            orphanFileNames.add( fileName );
+                            final String url = lic.getUrl();
+                            if ( url != null )
                             {
-                                final LicenseDownloadResult entry =
-                                    LicenseDownloadResult.success( file, FileUtil.sha1( file.toPath() ), false );
-                                cache.put( url, entry );
+                                final File file = new File( licensesOutputDirectory, fileName );
+                                if ( file.exists() )
+                                {
+                                    final LicenseDownloadResult entry =
+                                        LicenseDownloadResult.success( file, FileUtil.sha1( file.toPath() ), false );
+                                    cache.put( url, entry );
+                                }
                             }
                         }
                     }
@@ -708,6 +732,8 @@ public abstract class AbstractDownloadLicensesMojo
             {
                 writeLicenseSummary( depProjectLicensesWithErrors, licensesErrorsFile, writeVersions );
             }
+
+            removeOrphanFiles( depProjectLicenses );
         }
         catch ( Exception e )
         {
@@ -733,6 +759,30 @@ public abstract class AbstractDownloadLicensesMojo
             default:
                 throw new IllegalStateException( "Unexpected value of " + ErrorRemedy.class.getName() + ": "
                     + errorRemedy );
+        }
+    }
+
+    private void removeOrphanFiles( List<ProjectLicenseInfo> deps )
+    {
+        if ( removeOrphanLicenseFiles )
+        {
+            for ( ProjectLicenseInfo dep : deps )
+            {
+                for ( ProjectLicense lic : dep.getLicenses() )
+                {
+                    orphanFileNames.remove( lic.getFile() );
+                }
+            }
+
+            for ( String fileName : orphanFileNames )
+            {
+                final File file = new File( licensesOutputDirectory, fileName );
+                if ( file.exists() )
+                {
+                    getLog().info( "Removing orphan license file \"" + file + "\"" );
+                    file.delete();
+                }
+            }
         }
     }
 
