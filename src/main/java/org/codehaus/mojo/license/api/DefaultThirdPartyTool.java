@@ -549,7 +549,7 @@ public class DefaultThirdPartyTool
             // there is some unknown dependencies in the missing file, remove them
             for ( String id : unknownDependenciesId )
             {
-                getLogger().warn(
+                getLogger().debug(
                         "dependency [" + id + "] does not exist in project, remove it from the missing file." );
                 unsafeMappings.remove( id );
             }
