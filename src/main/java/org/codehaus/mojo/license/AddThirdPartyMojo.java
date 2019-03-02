@@ -424,6 +424,7 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
         deployMissingFile = mojo.deployMissingFile;
         useRepositoryMissingFiles = mojo.useRepositoryMissingFiles;
         acceptPomPackaging = mojo.acceptPomPackaging;
+        includeOptional = mojo.includeOptional;
         excludedScopes = mojo.excludedScopes;
         includedScopes = mojo.includedScopes;
         excludedGroups = mojo.excludedGroups;
