@@ -140,6 +140,9 @@ public class SpdxLicenseList
         {
             public static UrlReplacement compile( String id, String urlPattern, String replacement )
             {
+                Objects.requireNonNull( id, "id" );
+                Objects.requireNonNull( urlPattern, "urlPattern" );
+                replacement = replacement == null ? "" : replacement;
                 return new UrlReplacement( id, Pattern.compile( urlPattern, Pattern.CASE_INSENSITIVE ), replacement );
             }
             private final String id;

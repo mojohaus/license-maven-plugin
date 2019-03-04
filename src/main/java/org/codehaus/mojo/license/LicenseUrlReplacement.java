@@ -36,7 +36,7 @@ public class LicenseUrlReplacement
      *
      * @since 1.17
      */
-    private Pattern regexp;
+    private String regexp;
 
     /**
      * Replacement license url.
@@ -49,19 +49,42 @@ public class LicenseUrlReplacement
      */
     private String replacement;
 
-    Pattern getRegexp()
+    /**
+     * A {@link Pattern} lazily compiled from {@link #regexp}.
+     *
+     * @since 1.20
+     */
+    private Pattern pattern;
+
+    /**
+     * An optional id. Useful when overriding default URL replacements.
+     *
+     * @since 1.20
+     * @see AbstractDownloadLicensesMojo#useDefaultUrlReplacements
+     */
+    private String id;
+
+    public String getRegexp()
     {
         return regexp;
     }
 
-    @SuppressWarnings( "unused" )
-    public void setRegexp( final String regexp )
-    {
-        this.regexp = Pattern.compile( regexp );
-    }
-
-    String getReplacement()
+    public String getReplacement()
     {
         return replacement;
+    }
+
+    public String getId()
+    {
+        return id;
+    }
+
+    public Pattern getPattern()
+    {
+        if ( pattern == null && regexp != null )
+        {
+            pattern = Pattern.compile( regexp );
+        }
+        return pattern;
     }
 }

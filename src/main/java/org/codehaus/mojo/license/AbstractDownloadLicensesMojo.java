@@ -41,6 +41,7 @@ import org.codehaus.mojo.license.download.LicenseDownloader;
 import org.codehaus.mojo.license.download.PreferredFileNames;
 import org.codehaus.mojo.license.download.ProjectLicense;
 import org.codehaus.mojo.license.download.ProjectLicenseInfo;
+import org.codehaus.mojo.license.download.UrlReplacements;
 import org.codehaus.mojo.license.spdx.SpdxLicenseList;
 import org.codehaus.mojo.license.spdx.SpdxLicenseList.Attachments.ContentSanitizer;
 import org.codehaus.mojo.license.download.LicenseDownloader.LicenseDownloadResult;
@@ -449,6 +450,13 @@ public abstract class AbstractDownloadLicensesMojo
      *
      * <p>If the replacement element is omitted, this is equivalent to an empty replacement string.</p>
      *
+     * <p>The replacements are applied in the same order as they are present in the configuration. The default
+     * replacements (that can be activated via {@link #useDefaultUrlReplacements}) are appended to
+     * {@link #licenseUrlReplacements}</p>
+     *
+     * <p>The {@code id} field of {@link LicenseUrlReplacement} is optional and is useful only if you want to override
+     * some of the default replacements.</p>
+     *
      * <pre>
      * {@code
      *
@@ -462,6 +470,7 @@ public abstract class AbstractDownloadLicensesMojo
      *     <replacement>http://$1</replacement>
      *   </licenseUrlReplacement>
      *   <licenseUrlReplacement>
+     *     <id>github.com-0</id><!-- An optional id to override the default replacement with the same id -->
      *     <regexp>^https?://github\.com/([^/]+)/([^/]+)/blob/(.*)$</regexp><!-- replace GitHub web UI with raw -->
      *     <replacement>https://raw.githubusercontent.com/$1/$2/$3</replacement>
      *   </licenseUrlReplacement>
@@ -471,6 +480,7 @@ public abstract class AbstractDownloadLicensesMojo
      * <p>
      * Relationship to other parameters:
      * <ul>
+     * <li>Default URL replacements can be unlocked by setting {@link #useDefaultUrlReplacements} to {@code true}.</li>
      * <li>License names and license URLs {@link #licensesConfigFile} is applied before
      * {@link #licenseUrlReplacements}</li>
      * <li>{@link #licenseUrlReplacements} are applied before {@link #licenseUrlFileNames}</li>
@@ -483,6 +493,25 @@ public abstract class AbstractDownloadLicensesMojo
      */
     @Parameter
     protected List<LicenseUrlReplacement> licenseUrlReplacements;
+
+    /**
+     * If {@code true} the default license URL replacements be added to the internal {@link Map} of URL replacements
+     * before adding {@link #licenseUrlReplacements} by their {@code id}; otherwise the default license URL replacements
+     * will not be added to the internal {@link Map} of URL replacements.
+     * <p>
+     * Any individual URL replacement from the set of default URL replacements can be overriden via
+     * {@link #licenseUrlReplacements} if the same {@code id} is used in {@link #licenseUrlReplacements}.
+     * <p>
+     * To view the list of default URL replacements, set {@link #useDefaultUrlReplacements} to {@code true} and run the
+     * mojo with debug log level, e.g. using {@code -X} or
+     * {-Dorg.slf4j.simpleLogger.log.org.codehaus.mojo.license=debug} on the command line.
+     *
+     * @since 1.20
+     * @see #licenseUrlReplacements
+     */
+    @Parameter( property = "license.useDefaultUrlReplacements", defaultValue = "false" )
+    protected boolean useDefaultUrlReplacements;
+
 
     /**
      * A map that helps to select local files names for the content downloaded from license URLs.
@@ -630,9 +659,9 @@ public abstract class AbstractDownloadLicensesMojo
      * Any individual content sanitizer from the set of default sanitizers can be overriden via
      * {@link #licenseContentSanitizers} if the same {@code id} is used in {@link #licenseContentSanitizers}.
      * <p>
-     * To view the list of default content sanitizers, set {@link #artifactFilters to {@code true} and run the mojo with
-     * debug log level, e.g. using {@code -X} or {-Dorg.slf4j.simpleLogger.log.org.codehaus.mojo.license=debug} on the
-     * command line.
+     * To view the list of default content sanitizers, set {@link #useDefaultContentSanitizers} to {@code true} and run
+     * the mojo with debug log level, e.g. using {@code -X} or
+     * {-Dorg.slf4j.simpleLogger.log.org.codehaus.mojo.license=debug} on the command line.
      *
      * @since 1.20
      * @see #licenseContentSanitizers
@@ -659,6 +688,8 @@ public abstract class AbstractDownloadLicensesMojo
 
     private ArtifactFilters artifactFilters;
     private final Set<String> orphanFileNames = new HashSet<>();
+
+    private UrlReplacements urlReplacements;
 
     protected abstract boolean isSkip();
 
@@ -698,6 +729,7 @@ public abstract class AbstractDownloadLicensesMojo
         this.errorRemedy = getEffectiveErrorRemedy( this.quiet, this.errorRemedy );
         this.preferredFileNames = PreferredFileNames.build( licensesOutputDirectory, licenseUrlFileNames, getLog() );
         this.cache = new Cache( licenseUrlFileNames != null && !licenseUrlFileNames.isEmpty() );
+        this.urlReplacements = urlReplacements();
 
         initDirectories();
 
@@ -819,6 +851,19 @@ public abstract class AbstractDownloadLicensesMojo
                 throw new IllegalStateException( "Unexpected value of " + ErrorRemedy.class.getName() + ": "
                     + errorRemedy );
         }
+    }
+
+    private UrlReplacements urlReplacements()
+    {
+        UrlReplacements.Builder b = UrlReplacements.builder( getLog() ).useDefaults( useDefaultUrlReplacements );
+        if ( licenseUrlReplacements != null )
+        {
+            for ( LicenseUrlReplacement r : licenseUrlReplacements )
+            {
+                b.replacement( r.getId(), r.getRegexp(), r.getReplacement() );
+            }
+        }
+        return b.build();
     }
 
     private Map<String, ContentSanitizer> contentSanitizers()
@@ -1128,7 +1173,7 @@ public abstract class AbstractDownloadLicensesMojo
         {
             for ( LicenseUrlReplacement sanitizer : licenseUrlFileNameSanitizers )
             {
-                Pattern regexp = sanitizer.getRegexp();
+                Pattern regexp = sanitizer.getPattern();
                 String replacement = sanitizer.getReplacement() == null ? "" : sanitizer.getReplacement();
                 if ( regexp != null )
                 {
@@ -1170,7 +1215,7 @@ public abstract class AbstractDownloadLicensesMojo
             }
             else if ( license.getUrl() != null )
             {
-                final String licenseUrl = rewriteLicenseUrlIfNecessary( license.getUrl() );
+                final String licenseUrl = urlReplacements.rewriteIfNecessary( license.getUrl() );
 
                 final LicenseDownloadResult cachedResult = cache.get( licenseUrl );
                 try
@@ -1323,29 +1368,6 @@ public abstract class AbstractDownloadLicensesMojo
             }
             downloadErrorCount++;
         }
-    }
-
-    private String rewriteLicenseUrlIfNecessary( final String originalLicenseUrl )
-    {
-        String resultUrl = originalLicenseUrl;
-        if ( licenseUrlReplacements != null )
-        {
-            for ( LicenseUrlReplacement urlReplacement : licenseUrlReplacements )
-            {
-                Pattern regexp = urlReplacement.getRegexp();
-                String replacement = urlReplacement.getReplacement() == null ? "" : urlReplacement.getReplacement();
-                if ( regexp != null )
-                {
-                    resultUrl = regexp.matcher( resultUrl ).replaceAll( replacement );
-                }
-            }
-
-            if ( !resultUrl.equals( originalLicenseUrl ) )
-            {
-                getLog().debug( String.format( "Rewrote URL %s => %s", originalLicenseUrl, resultUrl ) );
-            }
-        }
-        return resultUrl;
     }
 
     /**
