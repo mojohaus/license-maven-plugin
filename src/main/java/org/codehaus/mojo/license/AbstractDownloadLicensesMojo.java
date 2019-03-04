@@ -23,7 +23,7 @@ package org.codehaus.mojo.license;
  */
 
 import org.apache.commons.io.FileUtils;
-
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.License;
@@ -41,6 +41,8 @@ import org.codehaus.mojo.license.download.LicenseDownloader;
 import org.codehaus.mojo.license.download.PreferredFileNames;
 import org.codehaus.mojo.license.download.ProjectLicense;
 import org.codehaus.mojo.license.download.ProjectLicenseInfo;
+import org.codehaus.mojo.license.spdx.SpdxLicenseList;
+import org.codehaus.mojo.license.spdx.SpdxLicenseList.Attachments.ContentSanitizer;
 import org.codehaus.mojo.license.download.LicenseDownloader.LicenseDownloadResult;
 import org.codehaus.mojo.license.download.LicenseMatchers;
 import org.codehaus.mojo.license.download.LicenseSummaryReader;
@@ -63,6 +65,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 /**
@@ -582,6 +585,61 @@ public abstract class AbstractDownloadLicensesMojo
     @Parameter( property = "license.connectionRequestTimeout", defaultValue = "5000" )
     private int connectionRequestTimeout;
 
+    /**
+     * A list of sanitizers to process the content of license files before storing them locally and before computing
+     * their sha1 sums. Useful for removing parts of the content that change over time.
+     * <p>
+     * The content sanitizers are applied in alphabetical order by {@code id}.
+     * <p>
+     * Set {@link #useDefaultContentSanitizers} to {@code true} to apply the built-in content sanitizers.
+     * <p>
+     * An example:
+     * <pre>
+     * {@code
+     * <licenseContentSanitizers>
+     *   <licenseContentSanitizer>
+     *     <id>fedoraproject.org-0</id>
+     *     <urlRegexp>.*fedoraproject\\.org.*</urlRegexp><!-- Apply this sanitizer to URLs that contain fedora.org -->
+     *     <contentRegexp>\"wgRequestId\":\"[^\"]*\"</contentRegexp><!-- wgRequestId value changes with every -->
+     *                                                              <!-- request so we just remove it -->
+     *     <contentReplacement>\"wgRequestId\":\"\"</contentReplacement>
+     *   </licenseContentSanitizer>
+     *   <licenseContentSanitizer>
+     *     <id>opensource.org-0</id>
+     *     <urlRegexp>.*opensource\\.org.*</urlRegexp><!-- Apply this sanitizer to URLs that contain opensource.org -->
+     *     <contentRegexp>jQuery\\.extend\\(Drupal\\.settings[^\\n]+</contentRegexp><!-- Drupal\\.settings contain -->
+     *                                                                              <!-- some clutter that changes -->
+     *                                                                              <!-- often so we just remove it -->
+     *     <contentReplacement></contentReplacement>
+     *   </licenseContentSanitizer>
+     * </licenseContentSanitizers>
+     * }
+     * </pre>
+     *
+     * @since 1.20
+     * @see #useDefaultContentSanitizers
+     */
+    @Parameter( property = "license.licenseContentSanitizers" )
+    private List<LicenseContentSanitizer> licenseContentSanitizers;
+
+    /**
+     * If {@code true} the default content sanitizers will be added to the internal {@link Map} of sanitizes before
+     * adding {@link #licenseContentSanitizers} by their {@code id}; otherwise the default content sanitizers will not
+     * be added to the internal {@link Map} of sanitizes.
+     * <p>
+     * Any individual content sanitizer from the set of default sanitizers can be overriden via
+     * {@link #licenseContentSanitizers} if the same {@code id} is used in {@link #licenseContentSanitizers}.
+     * <p>
+     * To view the list of default content sanitizers, set {@link #artifactFilters to {@code true} and run the mojo with
+     * debug log level, e.g. using {@code -X} or {-Dorg.slf4j.simpleLogger.log.org.codehaus.mojo.license=debug} on the
+     * command line.
+     *
+     * @since 1.20
+     * @see #licenseContentSanitizers
+     */
+    @Parameter( property = "license.useDefaultContentSanitizers", defaultValue = "false" )
+    private boolean useDefaultContentSanitizers;
+
     // ----------------------------------------------------------------------
     // Plexus Components
     // ----------------------------------------------------------------------
@@ -686,7 +744,8 @@ public abstract class AbstractDownloadLicensesMojo
         final List<ProjectLicenseInfo> depProjectLicenses = new ArrayList<>();
 
         try ( LicenseDownloader licenseDownloader =
-            new LicenseDownloader( findActiveProxy(), connectTimeout, socketTimeout, connectionRequestTimeout ) )
+            new LicenseDownloader( findActiveProxy(), connectTimeout, socketTimeout, connectionRequestTimeout,
+                                   contentSanitizers(), getCharset() ) )
         {
             for ( MavenProject project : dependencies )
             {
@@ -760,6 +819,57 @@ public abstract class AbstractDownloadLicensesMojo
                 throw new IllegalStateException( "Unexpected value of " + ErrorRemedy.class.getName() + ": "
                     + errorRemedy );
         }
+    }
+
+    private Map<String, ContentSanitizer> contentSanitizers()
+    {
+        Map<String, ContentSanitizer> result =
+            new TreeMap<String, ContentSanitizer>();
+        if ( useDefaultContentSanitizers )
+        {
+            final Map<String, ContentSanitizer> defaultSanitizers =
+                SpdxLicenseList.getLatest().getAttachments().getContentSanitizers();
+            result.putAll( defaultSanitizers  );
+            if ( getLog().isDebugEnabled() && !defaultSanitizers.isEmpty() )
+            {
+                final StringBuilder sb = new StringBuilder() //
+                        .append( "Applied " ) //
+                        .append( defaultSanitizers.size() ) //
+                        .append( " licenseContentSanitizers:\n<licenseContentSanitizers>\n" );
+                for ( ContentSanitizer sanitizer : defaultSanitizers.values() )
+                {
+                    sb.append( "  <licenseContentSanitizer>\n" ) //
+                      .append( "    <id>" ) //
+                      .append( sanitizer.getId() ) //
+                      .append( "</id>\n" ) //
+                      .append( "    <urlRegexp>" ) //
+                      .append( StringEscapeUtils.escapeJava( sanitizer.getUrlPattern().pattern() ) ) //
+                      .append( "</urlRegexp>\n" ) //
+                      .append( "    <contentRegexp>" ) //
+                      .append( StringEscapeUtils.escapeJava( sanitizer.getContentPattern().pattern() ) ) //
+                      .append( "</contentRegexp>\n" ) //
+                      .append( "    <contentReplacement>" ) //
+                      .append( StringEscapeUtils.escapeJava( sanitizer.getContentReplacement() ) ) //
+                      .append( "</contentReplacement>\n" ) //
+                      .append( "  </licenseContentSanitizer>\n" );
+                }
+                sb.append( "</licenseContentSanitizers>" );
+
+                getLog().debug( sb.toString() );
+            }
+        }
+        if ( licenseContentSanitizers != null )
+        {
+            for ( LicenseContentSanitizer s : licenseContentSanitizers )
+            {
+                result.put( s.getId(),
+                            ContentSanitizer.compile( s.getId(), s.getUrlRegexp(),
+                                                                                  s.getContentRegexp(),
+                                                                                  s.getContentReplacement() ) );
+            }
+        }
+
+        return Collections.unmodifiableMap( result );
     }
 
     private void removeOrphanFiles( List<ProjectLicenseInfo> deps )
