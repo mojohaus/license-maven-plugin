@@ -1,9 +1,12 @@
 
 /* A script to generate SpdxLicenseListData */
 
+import java.nio.charset.Charset
+import java.nio.charset.StandardCharsets
 import java.nio.file.Path
 import java.nio.file.Files
 import java.util.regex.Pattern
+import java.util.Map.Entry
 import java.util.AbstractMap.SimpleImmutableEntry
 import groovy.json.JsonSlurper
 import groovy.transform.Field
@@ -28,14 +31,64 @@ final Path basePath = basedir.toPath()
 final URL licensesUrl = new URL('https://raw.githubusercontent.com/spdx/license-list-data/master/json/licenses.json')
 final Path spdxDir = basePath.resolve('src/main/java/org/codehaus/mojo/license/spdx')
 final Path spdxTestDir = basePath.resolve('src/test/java/org/codehaus/mojo/license/spdx')
+final Path licensesDir = basePath.resolve('target/spdx/licenses')
+
 /* Licenses known to deliver different content over time, although they pass out simple test here */
-final List<Pattern> instableContentUrls = [ Pattern.compile('.*opensource\\.org.*') ]
+final List<Pattern> instableContentUrls = []
+@Field final Map<String, Entry<Pattern, String>> urlReplacements = [
+  /* Workaround for https://github.com/spdx/license-list-XML/issues/777 */
+  'archive.org-0': new SimpleImmutableEntry<>(Pattern.compile('(archive\\.org/web/[0-9]+)/'), '$1id_/' ),
+  'github.com/aws/mit-0': new SimpleImmutableEntry<>(Pattern.compile('.*github\\.com/aws/mit-0'), 'https://raw.githubusercontent.com/aws/mit-0/master/MIT-0' ),
+  'github.com-0': new SimpleImmutableEntry<>(Pattern.compile('github\\.com/([^/]+)/([^/]+)/blob/(.*)'), 'https://raw.githubusercontent.com/$1/$2/$3' ),
+  'microsoft.com/opensource/licenses.mspx': new SimpleImmutableEntry<>(Pattern.compile('.*microsoft\\.com/opensource/licenses\\.mspx'), 'https://web.archive.org/web/20150619132250id_/http://www.microsoft.com/en-us/openness/licenses.aspx' ),
+  'git.kernel.org-0': new SimpleImmutableEntry<>(Pattern.compile('https?://git\\.kernel\\.org/pub/scm/linux/([^/]+)/git/torvalds/linux\\.git/tree/(.*)'), 'https://git.kernel.org/pub/scm/linux/$1/git/torvalds/linux.git/plain/$2' ),
+  'git.savannah.gnu.org-0': new SimpleImmutableEntry<>(Pattern.compile('https?://git\\.savannah\\.gnu\\.org/cgit/(.*)\\.git/tree/(.*)'), 'http://git.savannah.gnu.org/cgit/$1.git/plain/$2' ),
+] as TreeMap
+
+@Field final Map<String, ContentSanitizer> contentSanitizers = [
+    'opensource.org-0': new ContentSanitizer('.*opensource\\.org.*', 'jQuery\\.extend\\(Drupal\\.settings[^\n]+', ''),
+    'opensource.org-1': new ContentSanitizer('.*opensource\\.org.*', 'value="form-[^"]*"', ''),
+    'opensource.org-2': new ContentSanitizer('.*opensource\\.org.*', '<form action="/licenses/[^"]*"', '<form action=""'),
+    'opencascade.org-0': new ContentSanitizer('.*opencascade\\.com.*', 'jQuery\\.extend\\(Drupal\\.settings[^\n]+', ''),
+    'opencascade.org-1': new ContentSanitizer('.*opencascade\\.com.*', 'value="form-[^"]*"', ''),
+    'data.norge.no-0': new ContentSanitizer('.*data\\.norge\\.no.*', 'jQuery\\.extend\\(Drupal\\.settings[^\n]+', ''),
+    'data.norge.no-1': new ContentSanitizer('.*data\\.norge\\.no.*', 'value="form-[^"]*"', ''),
+    'data.norge.no-2': new ContentSanitizer('.*data\\.norge\\.no.*', 'view-dom-id-[0-9a-f]{12}', ''),
+    'directory.fsf.org-0': new ContentSanitizer('.*directory\\.fsf\\.org.*', '"wgRequestId":"[^"]*"', '"wgRequestId":""'),
+    'directory.fsf.org-1': new ContentSanitizer('.*directory\\.fsf\\.org.*', '"wgBackendResponseTime":[0-9]+', '"wgBackendResponseTime":0'),
+    'fedoraproject.org-0': new ContentSanitizer('.*fedoraproject\\.org.*', '"wgRequestId":"[^"]*"', '"wgRequestId":""'),
+    'fedoraproject.org-1': new ContentSanitizer('.*fedoraproject\\.org.*', '"wgBackendResponseTime":[0-9]+', '"wgBackendResponseTime":0'),
+    'zimbra.com-0': new ContentSanitizer('.*zimbra\\.com.*', 'Compiled on [^D]+ - Do not edit', ''),
+    'romanrm.net-0': new ContentSanitizer('.*romanrm.net/mit-zero', 'src="/lib/exe/indexer\\.php\\?id=mit-zero&amp;[0-9]+"', ''),
+    'users.on.net/~triforce-0': new ContentSanitizer('.*users\\.on\\.net/~triforce/glidexp/COPYING\\.txt', '[0-9]+ queries[^\\-]', ''),
+    'users.on.net/~triforce-1': new ContentSanitizer('.*users\\.on\\.net/~triforce/glidexp/COPYING\\.txt', '<!-- [^\\-<>]+ in [^\\-<>]+ -->', ''),
+    'creativecommons.org-0': new ContentSanitizer('.*creativecommons\\.org.*', '\n ', '\n'),
+    'gianluca.dellavedova.org-0': new ContentSanitizer('.*gianluca\\.dellavedova\\.org.*', '<script src=\'https://r-login\\.wordpress\\.com[^\n]*', ''),
+    'gianluca.dellavedova.org-1': new ContentSanitizer('.*gianluca\\.dellavedova\\.org.*', 'type="[0-9a-f]+-text/javascript"', 'type="text/javascript"'),
+    'gianluca.dellavedova.org-2': new ContentSanitizer('.*gianluca\\.dellavedova\\.org.*', 'data-cf-modified-[^\\-]+-', 'data-cf-modified--'),
+    'gianluca.dellavedova.org-3': new ContentSanitizer('.*gianluca\\.dellavedova\\.org.*', 'atatags-[^\\-"]+-[^\\-"]+', 'atatags--'),
+    'eu-datagrid.web.cern.ch-0': new ContentSanitizer('.*eu-datagrid\\.web\\.cern\\.ch.*', 'wct=[^&"]+', 'wct='),
+    'joinup.ec.europa.eu-0': new ContentSanitizer('.*joinup\\.ec\\.europa\\.eu.*', '<script type="text/javascript">window\\.NREUM[^\n]*</script>', ''),
+    'artlibre.org-0': new ContentSanitizer('.*artlibre\\.org.*', '<!-- Dynamic page generated in [^\\-]+ -->', ''),
+    'artlibre.org-1': new ContentSanitizer('.*artlibre\\.org.*', '<!-- Cached page generated by WP-Super-Cache on [^\\>]+ -->', ''),
+    'tcl.tk-0': new ContentSanitizer('.*tcl\\.tk.*', 'email-protection#[0-9a-f]+', 'email-protection'),
+    'tcl.tk-1': new ContentSanitizer('.*tcl\\.tk.*', 'data-cfemail="[^"]+"', 'data-cfemail=""'),
+    'codeproject.com-0': new ContentSanitizer('.*codeproject\\.com.*', '>[^<]+members<', '><'),
+    'codeproject.com-1': new ContentSanitizer('.*codeproject\\.com.*', '<div class="promo">[^\n]+', ''),
+    'codeproject.com-2': new ContentSanitizer('.*codeproject\\.com.*', '<div class="msg-728x90"[^\n]+', ''),
+    'codeproject.com-3': new ContentSanitizer('.*codeproject\\.com.*', '<br />\\s*[^\\s]+\\s*\\|\\s*[^\\s]+\\s*\\|', ''),
+] as TreeMap
+
+if (Files.exists(licensesDir)) {
+    licensesDir.toFile().deleteDir()
+}
+Files.createDirectories(licensesDir)
 
 def engine = new groovy.text.SimpleTemplateEngine()
 JsonSlurper jsonSlurper = new JsonSlurper()
 Map<String, Object> spdx = jsonSlurper.parseText(licensesUrl.text)
 try {
-    urlChecker = new UrlChecker(instableContentUrls)
+    urlChecker = new UrlChecker(instableContentUrls, urlReplacements, contentSanitizers, licensesDir)
 
     spdx['licenses'].each { lic ->
         log.info("Starting "+ lic['licenseId'])
@@ -50,7 +103,10 @@ try {
     def model = [
         spdx: spdx,
         year: Calendar.getInstance().get(Calendar.YEAR),
-        urlChecker: urlChecker
+        urlChecker: urlChecker,
+        contentSanitizers: contentSanitizers,
+        urlReplacements: urlReplacements,
+        generator: this,
     ]
 
     def sourceTemplate = '''package org.codehaus.mojo.license.spdx;
@@ -101,8 +157,10 @@ spdx.each { field, value ->
             println "        builder.license( SpdxLicenseInfo.builder()"
             lic.each { licField, licValue ->
                 switch (licField) {
-                    case 'isDeprecatedLicenseId':
                     case 'referenceNumber':
+                        /* ignore */
+                        break
+                    case 'isDeprecatedLicenseId':
                     case 'isOsiApproved':
                     case 'isFsfLibre':
                         println '            .' + licField + '( ' + licValue + ' )'
@@ -111,12 +169,12 @@ spdx.each { field, value ->
                     case 'name':
                     case 'reference':
                     case 'licenseId':
-                        println '            .' + licField + '( "' + licValue.trim().replace('"', '\\\\" ') + '" )'
+                        println '            .' + licField + '( ' + generator.escapeString(licValue.trim()) + ' )'
                         break
                     case 'seeAlso':
                         licValue.each { seeAlso ->
                             final String url = seeAlso.trim()
-                            println '            .seeAlso( "' + url.replace('"', '\\\\"') + '" )'
+                            println '            .seeAlso( ' + generator.escapeString(url) + ' )'
                         }
                         def urlInfos = urlChecker.getUrlInfos(licValue);
                         if (!urlInfos.isEmpty()) {
@@ -124,7 +182,7 @@ spdx.each { field, value ->
                             urlInfos.each { url, sha1MimeTypeStable ->
                                 final String sha1 = sha1MimeTypeStable.get(0)  == null ? 'null' : ('"' + sha1MimeTypeStable.get(0) + '"')
                                 final String mimeType = sha1MimeTypeStable.get(1)  == null ? 'null' : ('"' + sha1MimeTypeStable.get(1) + '"')
-                                println '            .urlInfo( "' + url + '", ' + sha1 + ', ' + mimeType + ', ' + sha1MimeTypeStable.get(2) + ' )'
+                                println '            .urlInfo( "' + url + '", ' + sha1 + ', ' + mimeType + ', ' + sha1MimeTypeStable.get(2) + ', ' + sha1MimeTypeStable.get(3) + ' )'
                             }
                         }
                         break
@@ -141,6 +199,16 @@ spdx.each { field, value ->
         throw new IllegalStateException( "Unexpected field of SPDX license list "+ field )
     }
 }
+println ''
+urlReplacements.each { id, r ->
+    println '        builder.urlReplacement( ' + generator.escapeString(id) + ', ' + generator.escapeString(r.getKey().pattern()) + ', ' + generator.escapeString(r.getValue()) + ' );'
+}
+println ''
+contentSanitizers.each { id, cs ->
+    println '        builder.contentSanitizer( ' + generator.escapeString(id) + ', ' + generator.escapeString(cs.getUrlPattern().pattern()) + ', ' + generator.escapeString(cs.getContentPattern().pattern()) + ', ' + generator.escapeString(cs.getContentReplacement()) + ' );'
+}
+println ''
+
 %>        return builder.build();
     }
 }
@@ -197,15 +265,63 @@ public class SpdxLicenseListDataTest
     urlChecker?.close()
 }
 
+public static String escapeString(String literal) {
+    if (literal == null) {
+        return 'null'
+    }
+    return '"'+ literal.replace('\n', '\\n').replace('\t', '\\t').replace('\r', '\\r').replace('\\', '\\\\').replace('"', '\\"') +'"'
+}
+
+class ContentSanitizer {
+    private final Pattern urlPattern
+    private final Pattern contentPattern
+    private final String contentReplacement
+    public ContentSanitizer( String urlPattern, String contentPattern, String contentReplacement ) {
+        this.urlPattern = Pattern.compile(urlPattern, Pattern.CASE_INSENSITIVE)
+        this.contentPattern = Pattern.compile(contentPattern, Pattern.CASE_INSENSITIVE)
+        this.contentReplacement = contentReplacement
+    }
+    public boolean applies(String url) {
+        return urlPattern.matcher( url ).matches();
+    }
+
+    public String sanitize(String content) {
+        if ( content == null ) {
+            return null;
+        }
+        return contentPattern.matcher( content ).replaceAll( contentReplacement );
+    }
+
+    public Pattern getUrlPattern() {
+        return urlPattern;
+    }
+
+    public Pattern getContentPattern() {
+        return contentPattern;
+    }
+
+    public String getContentReplacement() {
+        return contentReplacement;
+    }
+}
+
 class UrlChecker implements AutoCloseable {
     def log = LoggerFactory.getLogger(this.class)
     private final Map<String, Set<String>> sha1ToUrls = new LinkedHashMap<>()
     private final Map<String, Map.Entry<String, String>> urlToSha1MimeType = new LinkedHashMap<>()
     private final CloseableHttpClient client
     private final List<Pattern> instableContentUrls
+    private final Map<String, Entry<Pattern, String>> urlReplacements
+    private final Map<String, ContentSanitizer> contentSanitizers
+    private final Path licensesDir
+    private final Set<String> sanitizedUrls = new HashSet<>()
 
-    public UrlChecker(List<Pattern> instableContentUrls) {
+    public UrlChecker(List<Pattern> instableContentUrls, Map<String, Entry<Pattern, String>> urlReplacements,
+            Map<String, ContentSanitizer> contentSanitizers, Path licensesDir) {
         this.instableContentUrls = instableContentUrls
+        this.urlReplacements = urlReplacements
+        this.contentSanitizers = contentSanitizers
+        this.licensesDir = licensesDir
         final RequestConfig config = RequestConfig.copy(RequestConfig.DEFAULT)
                 .setConnectTimeout(2000)
                 .setSocketTimeout(2000)
@@ -215,8 +331,13 @@ class UrlChecker implements AutoCloseable {
     }
 
     public void addUrl(String url) {
+        urlReplacements.each { key, en ->
+            final Pattern pat = en.getKey()
+            final String replacement = en.getValue()
+            url = pat.matcher(url).replaceAll(replacement)
+        }
         if (!urlToSha1MimeType.containsKey(url)) {
-            urlToSha1MimeType.put(url, get(url))
+            urlToSha1MimeType.put(url, get(url, false))
         }
     }
 
@@ -228,7 +349,7 @@ class UrlChecker implements AutoCloseable {
             final String url = old.getKey()
             final Map.Entry<String, String> oldSha1MimeType = old.getValue()
             if (oldSha1MimeType != null) {
-                final Map.Entry<String, String> newSha1 = get(url)
+                final Map.Entry<String, String> newSha1 = get(url, true)
                 if (!oldSha1MimeType.equals(newSha1)) {
                     log.warn("Volatile content from URL: "+ url)
                     old.setValue(new SimpleImmutableEntry(null, oldSha1MimeType.getValue()))
@@ -245,7 +366,7 @@ class UrlChecker implements AutoCloseable {
     }
 
     // @return sha1, mimeType pair
-    private Map.Entry<String, String> get(String url) {
+    private Map.Entry<String, String> get(String url, boolean isRecheck) {
         CloseableHttpResponse response;
         try {
             response = client.execute( new HttpGet( url ) )
@@ -261,15 +382,42 @@ class UrlChecker implements AutoCloseable {
             {
                 final ContentType contentType = ContentType.get( entity );
                 final String mimeType = contentType != null ? contentType.getMimeType() : null
-                InputStream is = null
+                final Charset charset = contentType != null ? (contentType.getCharset() == null ? StandardCharsets.UTF_8 : contentType.getCharset()) : StandardCharsets.UTF_8
+                final Reader r = null
+                final StringBuilder contentBuilder = new StringBuilder()
                 try {
-                    is = entity.getContent()
-                    final String sha1 = DigestUtils.sha1Hex(is)
-                    return new SimpleImmutableEntry(sha1, mimeType)
+                    r = new InputStreamReader(entity.getContent(), charset)
+                    char[] buffer = new char[8192]
+                    int len = 0;
+                    while ((len = r.read(buffer)) >= 0) {
+                        contentBuilder.append(buffer, 0, len)
+                    }
                 }
                 finally {
-                    is?.close()
+                    r?.close()
                 }
+
+                final String rawContent = contentBuilder.toString();
+                final String urlFileName = urlToFileName(url)
+                final String suffix = (isRecheck ? ".recheck.txt" : ".txt")
+                byte[] bytes = rawContent.getBytes(charset);
+                Files.write(licensesDir.resolve(urlFileName + ".raw" + suffix), bytes)
+                String content = rawContent
+                final List<String> sanitizers = new ArrayList<>()
+                for (Map.Entry<String, ContentSanitizer> en in contentSanitizers.entrySet()) {
+                    final ContentSanitizer sanitizer = en.getValue()
+                    if (sanitizer.applies(url)) {
+                        content = sanitizer.sanitize(content)
+                        sanitizers.add(en.getKey())
+                    }
+                }
+                if (!content.equals(rawContent)) {
+                    log.info("Sanitized "+ url + " using "+ sanitizers)
+                    Files.write(licensesDir.resolve(urlFileName  + ".sanitized" + suffix), content.getBytes(charset))
+                    sanitizedUrls.add(url)
+                }
+                final String sha1 = DigestUtils.sha1Hex(bytes)
+                return new SimpleImmutableEntry(sha1, mimeType)
             } else {
                 log.warn("Got no body for "+ url)
                 return null;
@@ -287,6 +435,7 @@ class UrlChecker implements AutoCloseable {
         for (String url in urls) {
             url = url.trim()
             final boolean stable = isStable(url)
+            final boolean sanitized = sanitizedUrls.contains(url)
             final Map.Entry<String, String> sha1MimeType = urlToSha1MimeType.get(url)
             if (sha1MimeType != null) {
                 if (sha1MimeType.getKey() != null) {
@@ -297,10 +446,10 @@ class UrlChecker implements AutoCloseable {
                         Map.Entry<String, String> smt = urlToSha1MimeType.get(shaUrl)
                         assert smt != null
                         final String sha1 = smt.getKey()
-                        result.put(shaUrl, new Tuple(sha1, smt.getValue(), sha1 != null && stable))
+                        result.put(shaUrl, new Tuple(sha1, smt.getValue(), sha1 != null && stable, sanitized))
                     }
                 } else {
-                    result.put(url, new Tuple(null, null, false))
+                    result.put(url, new Tuple(null, null, false, sanitized))
                 }
             }
         }
@@ -313,7 +462,7 @@ class UrlChecker implements AutoCloseable {
 
     private void tryAdd(String url, String sha1, Set<String> urls, Set<Map.Entry<String, Map.Entry<String, String>>> newUrlToSha1MimeType) {
         if (!urls.contains(url)) {
-            final Map.Entry<String, String> newSha1MimeType = get(url)
+            final Map.Entry<String, String> newSha1MimeType = get(url, true)
             if (sha1.equals(newSha1MimeType?.getKey())) {
                 log.info(" - generalized: "+ url)
                 urls.add(url)
@@ -364,6 +513,10 @@ class UrlChecker implements AutoCloseable {
 
     public void close() throws IOException {
         client.close();
+    }
+
+    private String urlToFileName(String url) {
+        return url.replace('/', '!').replace('\\', '!')
     }
 }
 

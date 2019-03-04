@@ -124,6 +124,12 @@ public abstract class AbstractLicensesXmlMojo
         return licensesOutputFileEncoding;
     }
 
+    Charset getCharset()
+    {
+        initEncoding();
+        return charset;
+    }
+
     private void initEncoding()
     {
         if ( charset == null )

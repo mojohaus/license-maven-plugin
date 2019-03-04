@@ -23,14 +23,20 @@
 import java.nio.file.Path;
 import java.nio.file.Files;
 
-Path basePath = basedir.toPath()
+final Path basePath = basedir.toPath()
+
+final String baseUri = basePath.toUri().toString()
+final Path sanitizesConfigPath = basePath.resolve('src/license/licenses-config-content-sanitizers.xml');
+String sanitizersConfigContent = new String(Files.readAllBytes(sanitizesConfigPath), 'utf-8')
+sanitizersConfigContent = sanitizersConfigContent.replace('%project.baseUri%', baseUri)
+Files.write(sanitizesConfigPath, sanitizersConfigContent.getBytes('utf-8'))
 
 Files.move(basePath.resolve('target-initial'), basePath.resolve('target'))
 
-Path asl2 = basePath.resolve('target/no-download/licenses/apache-license-2.0-license-2.0.txt')
+final Path asl2 = basePath.resolve('target/no-download/licenses/apache-license-2.0-license-2.0.txt')
 assert Files.exists(asl2)
 assert asl2.text.contains('Fake content')
 
-Path bsd = basePath.resolve('target/no-download/licenses/bsd-3-clause-asm-license.txt')
+final Path bsd = basePath.resolve('target/no-download/licenses/bsd-3-clause-asm-license.txt')
 assert Files.exists(bsd)
 assert bsd.text.contains('Fake content')

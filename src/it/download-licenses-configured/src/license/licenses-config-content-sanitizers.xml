@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<licenseSummary>
+  <dependencies>
+    <dependency>
+      <groupId>\Qcommons-logging</groupId>
+      <artifactId>\Qcommons-logging</artifactId>
+      <matchLicenses>
+        <!-- match empty license list -->
+      </matchLicenses>
+      <licenses>
+        <license>
+          <name>Apache License 2.0</name>
+          <url>%project.baseUri%/src/license/content-sanitizers/apache-2.0.txt</url>
+        </license>
+      </licenses>
+    </dependency>
+    <dependency>
+      <groupId>\Qaopalliance\E</groupId>
+      <artifactId>\Qaopalliance\E</artifactId>
+      <matchLicenses>
+        <license>
+          <name>\QPublic Domain\E</name>
+        </license>
+      </matchLicenses>
+      <licenses approved="true" />
+    </dependency>
+    <dependency>
+      <groupId>\Qasm\E</groupId>
+      <artifactId>\Qasm\E</artifactId>
+      <matchLicenses>
+        <!-- match empty license list -->
+      </matchLicenses>
+      <licenses>
+        <license>
+          <name>BSD 3-Clause ASM</name>
+          <url>%project.baseUri%/src/license/content-sanitizers/bsd3-asm.txt</url>
+        </license>
+      </licenses>
+    </dependency>
+  </dependencies>
+</licenseSummary>

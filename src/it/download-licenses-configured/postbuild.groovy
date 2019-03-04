@@ -111,4 +111,19 @@ return {
     final Path licensesXml = outputBase.resolve('licenses.xml')
     assert expectedLicensesXml.text.equals(licensesXml.text)
     return true
+}() && {
+    final String id = 'content-sanitizers'
+    final Path outputBase = basePath.resolve('target/' + id)
+
+    final Path asl2 = outputBase.resolve('licenses/apache-license-2.0-apache-2.0.txt')
+    assert Files.exists(asl2)
+    final Path expectedAsl2 = basePath.resolve('src/license/'+ id +'/apache-2.0.expected.txt')
+    assert expectedAsl2.text.equals(asl2.text)
+
+    final Path bsdAsm = outputBase.resolve('licenses/bsd-3-clause-asm-bsd3-asm.txt')
+    assert Files.exists(bsdAsm)
+    final Path expectedBsdAsm = basePath.resolve('src/license/'+ id +'/bsd3-asm.expected.txt')
+    assert expectedBsdAsm.text.equals(bsdAsm.text)
+
+    return true
 }()
