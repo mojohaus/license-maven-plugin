@@ -39,7 +39,7 @@ final List<Pattern> instableContentUrls = []
   /* Workaround for https://github.com/spdx/license-list-XML/issues/777 */
   'archive.org-0': new SimpleImmutableEntry<>(Pattern.compile('(archive\\.org/web/[0-9]+)/'), '$1id_/' ),
   'github.com/aws/mit-0': new SimpleImmutableEntry<>(Pattern.compile('.*github\\.com/aws/mit-0'), 'https://raw.githubusercontent.com/aws/mit-0/master/MIT-0' ),
-  'github.com-0': new SimpleImmutableEntry<>(Pattern.compile('github\\.com/([^/]+)/([^/]+)/blob/(.*)'), 'https://raw.githubusercontent.com/$1/$2/$3' ),
+  'github.com-0': new SimpleImmutableEntry<>(Pattern.compile('https?://github\\.com/([^/]+)/([^/]+)/blob/(.*)'), 'https://raw.githubusercontent.com/$1/$2/$3' ),
   'microsoft.com/opensource/licenses.mspx': new SimpleImmutableEntry<>(Pattern.compile('.*microsoft\\.com/opensource/licenses\\.mspx'), 'https://web.archive.org/web/20150619132250id_/http://www.microsoft.com/en-us/openness/licenses.aspx' ),
   'git.kernel.org-0': new SimpleImmutableEntry<>(Pattern.compile('https?://git\\.kernel\\.org/pub/scm/linux/([^/]+)/git/torvalds/linux\\.git/tree/(.*)'), 'https://git.kernel.org/pub/scm/linux/$1/git/torvalds/linux.git/plain/$2' ),
   'git.savannah.gnu.org-0': new SimpleImmutableEntry<>(Pattern.compile('https?://git\\.savannah\\.gnu\\.org/cgit/(.*)\\.git/tree/(.*)'), 'http://git.savannah.gnu.org/cgit/$1.git/plain/$2' ),

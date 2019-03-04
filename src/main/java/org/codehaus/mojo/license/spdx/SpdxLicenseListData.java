@@ -6231,7 +6231,7 @@ class SpdxLicenseListData
         builder.urlReplacement( "archive.org-0", "(archive\\.org/web/[0-9]+)/", "$1id_/" );
         builder.urlReplacement( "git.kernel.org-0", "https?://git\\.kernel\\.org/pub/scm/linux/([^/]+)/git/torvalds/linux\\.git/tree/(.*)", "https://git.kernel.org/pub/scm/linux/$1/git/torvalds/linux.git/plain/$2" );
         builder.urlReplacement( "git.savannah.gnu.org-0", "https?://git\\.savannah\\.gnu\\.org/cgit/(.*)\\.git/tree/(.*)", "http://git.savannah.gnu.org/cgit/$1.git/plain/$2" );
-        builder.urlReplacement( "github.com-0", "github\\.com/([^/]+)/([^/]+)/blob/(.*)", "https://raw.githubusercontent.com/$1/$2/$3" );
+        builder.urlReplacement( "github.com-0", "https?://github\\.com/([^/]+)/([^/]+)/blob/(.*)", "https://raw.githubusercontent.com/$1/$2/$3" );
         builder.urlReplacement( "github.com/aws/mit-0", ".*github\\.com/aws/mit-0", "https://raw.githubusercontent.com/aws/mit-0/master/MIT-0" );
         builder.urlReplacement( "microsoft.com/opensource/licenses.mspx", ".*microsoft\\.com/opensource/licenses\\.mspx", "https://web.archive.org/web/20150619132250id_/http://www.microsoft.com/en-us/openness/licenses.aspx" );
 
