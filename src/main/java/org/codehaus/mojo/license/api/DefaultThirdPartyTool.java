@@ -99,7 +99,7 @@ public class DefaultThirdPartyTool
     private static final Pattern GAV_PLUS_TYPE_AND_CLASSIFIER_PATTERN =
             Pattern.compile( "(.+)--(.+)--(.+)--(.+)--(.+)" );
 
-    static final String LICENSE_DB_TYPE = "license.properties";
+    public static final String LICENSE_DB_TYPE = "license.properties";
 
     // ----------------------------------------------------------------------
     // Components

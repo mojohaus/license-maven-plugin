@@ -27,11 +27,12 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.mojo.license.api.ResolvedProjectDependencies;
+import org.codehaus.mojo.license.download.LicensedArtifact;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.SortedMap;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Download the license files of all aggregated dependencies of the current project, and generate a summary file
@@ -107,14 +108,16 @@ public class AggregateDownloadLicensesMojo
     /**
      * {@inheritDoc}
      */
-    protected Set<MavenProject> getDependencies()
+    @SuppressWarnings( "unchecked" )
+    protected Map<String, LicensedArtifact> getDependencies()
     {
-        Set<MavenProject> result = new HashSet<>();
+        final Map<String, LicensedArtifact> result = new TreeMap<>();
 
-        for ( MavenProject reactorProject : reactorProjects )
+        for ( MavenProject p : reactorProjects )
         {
-            SortedMap<String, MavenProject> dependencies = getDependencies( reactorProject );
-            result.addAll( dependencies.values() );
+            dependenciesTool.loadProjectDependencies( new ResolvedProjectDependencies( p.getArtifacts(),
+                                                                                       p.getDependencyArtifacts() ),
+                                                      this, localRepository, remoteRepositories, result );
         }
         return result;
     }
