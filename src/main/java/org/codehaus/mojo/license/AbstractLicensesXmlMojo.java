@@ -37,8 +37,8 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.mojo.license.api.DependenciesTool;
 import org.codehaus.mojo.license.download.LicenseSummaryWriter;
+import org.codehaus.mojo.license.download.LicensedArtifactResolver;
 import org.codehaus.mojo.license.download.ProjectLicenseInfo;
 
 /**
@@ -113,7 +113,7 @@ public abstract class AbstractLicensesXmlMojo
      * @since 1.0
      */
     @Component
-    protected DependenciesTool dependenciesTool;
+    protected LicensedArtifactResolver dependenciesTool;
 
     private Charset charset;
 

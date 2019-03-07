@@ -24,10 +24,10 @@ package org.codehaus.mojo.license;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -35,11 +35,11 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
-import org.apache.maven.project.MavenProject;
 import org.codehaus.mojo.license.api.ArtifactFilters;
 import org.codehaus.mojo.license.api.MavenProjectDependenciesConfigurator;
 import org.codehaus.mojo.license.api.ResolvedProjectDependencies;
 import org.codehaus.mojo.license.download.LicenseSummaryReader;
+import org.codehaus.mojo.license.download.LicensedArtifact;
 import org.codehaus.mojo.license.download.ProjectLicenseInfo;
 import org.codehaus.mojo.license.utils.FileUtil;
 
@@ -72,6 +72,7 @@ public class LicensesXmlInsertVersionsMojo
     @Parameter( property = "license.skipDownloadLicenses", defaultValue = "false" )
     private boolean skipDownloadLicenses;
 
+    @SuppressWarnings( "unchecked" )
     public void execute()
         throws MojoExecutionException, MojoFailureException
     {
@@ -135,13 +136,12 @@ public class LicensesXmlInsertVersionsMojo
                     return artifactFilters;
                 }
             };
-            @SuppressWarnings( "unchecked" )
-            final Collection<MavenProject> resolvedDeps =
-                dependenciesTool.loadProjectDependencies(
+            final Map<String, LicensedArtifact> resolvedDeps = new TreeMap<String, LicensedArtifact>();
+            dependenciesTool.loadProjectDependencies(
                     new ResolvedProjectDependencies( project.getArtifacts(), project.getDependencyArtifacts() ),
-                                                     config, localRepository, remoteRepositories, null ).values();
-            final Map<String, MavenProject> resolvedDepsMap = new HashMap<>( resolvedDeps.size() );
-            for ( MavenProject dep : resolvedDeps )
+                                                     config, localRepository, remoteRepositories, resolvedDeps );
+            final Map<String, LicensedArtifact> resolvedDepsMap = new HashMap<>( resolvedDeps.size() );
+            for ( LicensedArtifact dep : resolvedDeps.values() )
             {
                 resolvedDepsMap.put( dep.getGroupId() + ":" + dep.getArtifactId(), dep );
             }
@@ -150,7 +150,7 @@ public class LicensesXmlInsertVersionsMojo
             {
                 getLog().debug( "Checking licenses for project " + dependencyLicenseInfo.toString() );
                 final String id = dependencyLicenseInfo.getId();
-                final MavenProject dependency = resolvedDepsMap.get( id );
+                final LicensedArtifact dependency = resolvedDepsMap.get( id );
                 if ( dependency == null )
                 {
                     throw new MojoFailureException( "Could not resolve version of " + id + " in file "

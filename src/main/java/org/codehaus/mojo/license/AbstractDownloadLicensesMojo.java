@@ -22,33 +22,6 @@ package org.codehaus.mojo.license;
  * #L%
  */
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.model.License;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.settings.Proxy;
-import org.codehaus.mojo.license.api.ArtifactFilters;
-import org.codehaus.mojo.license.api.MavenProjectDependenciesConfigurator;
-import org.codehaus.mojo.license.api.ResolvedProjectDependencies;
-import org.codehaus.mojo.license.download.Cache;
-import org.codehaus.mojo.license.download.FileNameEntry;
-import org.codehaus.mojo.license.download.LicenseDownloader;
-import org.codehaus.mojo.license.download.PreferredFileNames;
-import org.codehaus.mojo.license.download.ProjectLicense;
-import org.codehaus.mojo.license.download.ProjectLicenseInfo;
-import org.codehaus.mojo.license.download.UrlReplacements;
-import org.codehaus.mojo.license.spdx.SpdxLicenseList;
-import org.codehaus.mojo.license.spdx.SpdxLicenseList.Attachments.ContentSanitizer;
-import org.codehaus.mojo.license.download.LicenseDownloader.LicenseDownloadResult;
-import org.codehaus.mojo.license.download.LicenseMatchers;
-import org.codehaus.mojo.license.download.LicenseSummaryReader;
-import org.codehaus.mojo.license.utils.FileUtil;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -65,9 +38,32 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.settings.Proxy;
+import org.codehaus.mojo.license.api.ArtifactFilters;
+import org.codehaus.mojo.license.api.MavenProjectDependenciesConfigurator;
+import org.codehaus.mojo.license.download.Cache;
+import org.codehaus.mojo.license.download.FileNameEntry;
+import org.codehaus.mojo.license.download.LicenseDownloader;
+import org.codehaus.mojo.license.download.LicenseDownloader.LicenseDownloadResult;
+import org.codehaus.mojo.license.download.LicenseMatchers;
+import org.codehaus.mojo.license.download.LicenseSummaryReader;
+import org.codehaus.mojo.license.download.LicensedArtifact;
+import org.codehaus.mojo.license.download.PreferredFileNames;
+import org.codehaus.mojo.license.download.ProjectLicense;
+import org.codehaus.mojo.license.download.ProjectLicenseInfo;
+import org.codehaus.mojo.license.download.UrlReplacements;
+import org.codehaus.mojo.license.spdx.SpdxLicenseList;
+import org.codehaus.mojo.license.spdx.SpdxLicenseList.Attachments.ContentSanitizer;
+import org.codehaus.mojo.license.utils.FileUtil;
 
 /**
  * Created on 23/05/16.
@@ -89,7 +85,7 @@ public abstract class AbstractDownloadLicensesMojo
      * @since 1.0
      */
     @Parameter( defaultValue = "${localRepository}", readonly = true )
-    private ArtifactRepository localRepository;
+    protected ArtifactRepository localRepository;
 
     /**
      * List of Remote Repositories used by the resolver
@@ -97,7 +93,7 @@ public abstract class AbstractDownloadLicensesMojo
      * @since 1.0
      */
     @Parameter( defaultValue = "${project.remoteArtifactRepositories}", readonly = true )
-    private List<ArtifactRepository> remoteRepositories;
+    protected List<ArtifactRepository> remoteRepositories;
 
     // CHECKSTYLE_OFF: LineLength
     /**
@@ -698,19 +694,11 @@ public abstract class AbstractDownloadLicensesMojo
         return project;
     }
 
-    protected abstract Set<MavenProject> getDependencies();
+    protected abstract Map<String, LicensedArtifact> getDependencies();
 
     // ----------------------------------------------------------------------
     // Mojo Implementation
     // ----------------------------------------------------------------------
-
-    @SuppressWarnings( "unchecked" )
-    protected SortedMap<String, MavenProject> getDependencies( MavenProject project )
-    {
-        return dependenciesTool.loadProjectDependencies(
-                new ResolvedProjectDependencies( project.getArtifacts(), project.getDependencyArtifacts() ),
-                this, localRepository, remoteRepositories, null );
-    }
 
     /**
      * {@inheritDoc}
@@ -770,7 +758,7 @@ public abstract class AbstractDownloadLicensesMojo
             }
         }
 
-        final Set<MavenProject> dependencies = getDependencies();
+        final Map<String, LicensedArtifact> dependencies = getDependencies();
 
         // The resulting list of licenses after dependency resolution
         final List<ProjectLicenseInfo> depProjectLicenses = new ArrayList<>();
@@ -779,12 +767,20 @@ public abstract class AbstractDownloadLicensesMojo
             new LicenseDownloader( findActiveProxy(), connectTimeout, socketTimeout, connectionRequestTimeout,
                                    contentSanitizers(), getCharset() ) )
         {
-            for ( MavenProject project : dependencies )
+            for ( LicensedArtifact artifact : dependencies.values() )
             {
-                Artifact artifact = project.getArtifact();
                 getLog().debug( "Checking licenses for project " + artifact );
-                final ProjectLicenseInfo depProject = createDependencyProject( project );
+                final ProjectLicenseInfo depProject = createDependencyProject( artifact );
                 matchers.replaceMatches( depProject );
+
+                /* Copy the messages and handle them via handleError() that may eventually add them back */
+                final List<String> msgs = new ArrayList<>( depProject.getDownloaderMessages() );
+                depProject.getDownloaderMessages().clear();
+                for ( String msg : msgs )
+                {
+                    handleError( depProject, msg );
+                }
+
                 depProjectLicenses.add( depProject );
             }
             if ( !offline )
@@ -1087,18 +1083,26 @@ public abstract class AbstractDownloadLicensesMojo
      *
      * @param depMavenProject the dependency maven project
      * @return DependencyProject with artifact and license info
+     * @throws MojoFailureException
      */
-    private ProjectLicenseInfo createDependencyProject( MavenProject depMavenProject )
+    private ProjectLicenseInfo createDependencyProject( LicensedArtifact depMavenProject ) throws MojoFailureException
     {
-        ProjectLicenseInfo dependencyProject =
+        final ProjectLicenseInfo dependencyProject =
             new ProjectLicenseInfo( depMavenProject.getGroupId(), depMavenProject.getArtifactId(),
                                     depMavenProject.getVersion() );
-        @SuppressWarnings( "unchecked" )
-        List<License> licenses = depMavenProject.getLicenses();
-        for ( License license : licenses )
+        final List<org.codehaus.mojo.license.download.License> licenses = depMavenProject.getLicenses();
+        for ( org.codehaus.mojo.license.download.License license : licenses )
         {
-            dependencyProject.addLicense( new ProjectLicense( license ) );
+            dependencyProject.addLicense( new ProjectLicense( license.getName(), license.getUrl(),
+                                                              license.getDistribution(), license.getComments(),
+                                                              null ) );
         }
+        List<String> msgs = depMavenProject.getErrorMessages();
+        for ( String msg : msgs )
+        {
+            dependencyProject.addDownloaderMessage( msg );
+        }
+
         return dependencyProject;
     }
 

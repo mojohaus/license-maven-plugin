@@ -120,6 +120,7 @@ public class LicenseMatchers
                     dependency.setLicenses( matcher.cloneLicenses() );
                 }
                 dependency.setApproved( true );
+                dependency.getDownloaderMessages().clear();
             }
         }
     }
