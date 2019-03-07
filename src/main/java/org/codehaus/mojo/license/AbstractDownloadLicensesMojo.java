@@ -772,6 +772,15 @@ public abstract class AbstractDownloadLicensesMojo
                 getLog().debug( "Checking licenses for project " + artifact );
                 final ProjectLicenseInfo depProject = createDependencyProject( artifact );
                 matchers.replaceMatches( depProject );
+
+                /* Copy the messages and handle them via handleError() that may eventually add them back */
+                final List<String> msgs = new ArrayList<>( depProject.getDownloaderMessages() );
+                depProject.getDownloaderMessages().clear();
+                for ( String msg : msgs )
+                {
+                    handleError( depProject, msg );
+                }
+
                 depProjectLicenses.add( depProject );
             }
             if ( !offline )
@@ -1074,19 +1083,26 @@ public abstract class AbstractDownloadLicensesMojo
      *
      * @param depMavenProject the dependency maven project
      * @return DependencyProject with artifact and license info
+     * @throws MojoFailureException
      */
-    private ProjectLicenseInfo createDependencyProject( LicensedArtifact depMavenProject )
+    private ProjectLicenseInfo createDependencyProject( LicensedArtifact depMavenProject ) throws MojoFailureException
     {
-        ProjectLicenseInfo dependencyProject =
+        final ProjectLicenseInfo dependencyProject =
             new ProjectLicenseInfo( depMavenProject.getGroupId(), depMavenProject.getArtifactId(),
                                     depMavenProject.getVersion() );
-        List<org.codehaus.mojo.license.download.License> licenses = depMavenProject.getLicenses();
+        final List<org.codehaus.mojo.license.download.License> licenses = depMavenProject.getLicenses();
         for ( org.codehaus.mojo.license.download.License license : licenses )
         {
             dependencyProject.addLicense( new ProjectLicense( license.getName(), license.getUrl(),
                                                               license.getDistribution(), license.getComments(),
                                                               null ) );
         }
+        List<String> msgs = depMavenProject.getErrorMessages();
+        for ( String msg : msgs )
+        {
+            dependencyProject.addDownloaderMessage( msg );
+        }
+
         return dependencyProject;
     }
 

@@ -38,13 +38,25 @@ public class LicensedArtifact
         return new Builder( groupId, artifactId, version );
     }
 
-    LicensedArtifact( String groupId, String artifactId, String version, List<License> licenses )
+    private final String groupId;
+
+    private final String artifactId;
+
+    private final String version;
+
+    private final List<License> licenses;
+
+    private final List<String> errorMessages;
+
+    LicensedArtifact( String groupId, String artifactId, String version, List<License> licenses,
+                      List<String> errorMessages )
     {
         super();
         this.groupId = groupId;
         this.artifactId = artifactId;
         this.version = version;
         this.licenses = licenses;
+        this.errorMessages = errorMessages;
     }
 
     @Override
@@ -102,14 +114,6 @@ public class LicensedArtifact
         // CHECKSTYLE_ON: NeedBraces
     }
 
-    private final String groupId;
-
-    private final String artifactId;
-
-    private final String version;
-
-    private final List<License> licenses;
-
     public String getGroupId()
     {
         return groupId;
@@ -128,6 +132,11 @@ public class LicensedArtifact
     public List<License> getLicenses()
     {
         return licenses;
+    }
+
+    public List<String> getErrorMessages()
+    {
+        return errorMessages;
     }
 
     /**
@@ -152,6 +161,14 @@ public class LicensedArtifact
 
         private List<License> licenses = new ArrayList<>();
 
+        private List<String> errorMessages = new ArrayList<>();
+
+        public Builder errorMessage( String errorMessage )
+        {
+            this.errorMessages.add( errorMessage );
+            return this;
+        }
+
         public Builder license( License license )
         {
             this.licenses.add( license );
@@ -162,7 +179,9 @@ public class LicensedArtifact
         {
             final List<License> lics = Collections.unmodifiableList( licenses );
             licenses = null;
-            return new LicensedArtifact( groupId, artifactId, version, lics );
+            final List<String> msgs = Collections.unmodifiableList( errorMessages );
+            errorMessages = null;
+            return new LicensedArtifact( groupId, artifactId, version, lics, msgs );
         }
     }
 

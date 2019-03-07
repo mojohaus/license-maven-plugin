@@ -169,8 +169,7 @@ public class LicensedArtifactResolver
                 }
                 catch ( ProjectBuildingException e )
                 {
-                    log.warn( "Unable to obtain POM for artifact : " + artifact, e );
-                    continue;
+                    laBuilder.errorMessage( e.getClass().getSimpleName() + ": " + e.getMessage() );
                 }
 
                 depMavenProject = laBuilder.build();
