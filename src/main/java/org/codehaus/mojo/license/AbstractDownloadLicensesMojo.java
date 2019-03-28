@@ -1205,7 +1205,7 @@ public abstract class AbstractDownloadLicensesMojo
 
         if ( matchingUrlsOnly && ( depProject.getLicenses() == null || depProject.getLicenses().isEmpty() ) )
         {
-            handleError( depProject, "No license information available for: " + depProject );
+            handleError( depProject, "No license information available for: " + depProject.toGavString() );
             return;
         }
 
@@ -1215,7 +1215,7 @@ public abstract class AbstractDownloadLicensesMojo
             if ( matchingUrlsOnly && license.getUrl() == null )
             {
                 handleError( depProject, "No URL for license at index " + licenseIndex + " in dependency "
-                    + depProject.toString() );
+                    + depProject.toGavString() );
             }
             else if ( license.getUrl() != null )
             {
@@ -1308,20 +1308,20 @@ public abstract class AbstractDownloadLicensesMojo
                 }
                 catch ( URISyntaxException e )
                 {
-                    handleError( depProject, "POM for dependency " + depProject.toString()
+                    handleError( depProject, "POM for dependency " + depProject.toGavString()
                         + " has an invalid license URL: " + licenseUrl );
                     getLog().debug( e );
                 }
                 catch ( FileNotFoundException e )
                 {
-                    handleError( depProject, "POM for dependency " + depProject.toString()
+                    handleError( depProject, "POM for dependency " + depProject.toGavString()
                         + " has a license URL that returns file not found: " + licenseUrl );
                     getLog().debug( e );
                 }
                 catch ( IOException e )
                 {
                     handleError( depProject, "Unable to retrieve license from URL '" + licenseUrl + "' for dependency '"
-                        + depProject.toString() + "': " + e.getMessage() );
+                        + depProject.toGavString() + "': " + e.getMessage() );
                     getLog().debug( e );
                 }
             }
@@ -1363,7 +1363,7 @@ public abstract class AbstractDownloadLicensesMojo
                 case failFast:
                     throw new MojoFailureException( msg );
                 case xmlOutput:
-                    getLog().debug( msg );
+                    getLog().error( msg );
                     depProject.addDownloaderMessage( msg );
                     break;
                 default:

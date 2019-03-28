@@ -169,7 +169,8 @@ public class LicensedArtifactResolver
                 }
                 catch ( ProjectBuildingException e )
                 {
-                    laBuilder.errorMessage( e.getClass().getSimpleName() + ": " + e.getMessage() );
+                    laBuilder.errorMessage( "Could not create effective POM for '" + id + "': "
+                        + e.getClass().getSimpleName() + ": " + e.getMessage() );
                 }
 
                 depMavenProject = laBuilder.build();
