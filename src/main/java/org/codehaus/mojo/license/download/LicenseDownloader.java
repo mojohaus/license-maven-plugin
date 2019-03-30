@@ -97,6 +97,11 @@ public class LicenseDownloader implements AutoCloseable
                         .setSocketTimeout( socketTimeout ) //
                         .setConnectionRequestTimeout( connectionRequestTimeout );
 
+        if ( proxy != null )
+        {
+            configBuilder.setProxy( new HttpHost( proxy.getHost(), proxy.getPort(), proxy.getProtocol() ) );
+        }
+
         HttpClientBuilder clientBuilder = HttpClients.custom().setDefaultRequestConfig( configBuilder.build() );
         if ( proxy != null )
         {
