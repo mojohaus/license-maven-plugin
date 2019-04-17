@@ -47,11 +47,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.License;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
@@ -66,6 +62,14 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.artifact.DefaultArtifact;
+import org.eclipse.aether.artifact.DefaultArtifactType;
+import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.resolution.ArtifactRequest;
+import org.eclipse.aether.resolution.ArtifactResolutionException;
+import org.eclipse.aether.resolution.ArtifactResult;
+import org.eclipse.aether.transfer.ArtifactNotFoundException;
 
 /**
  * Default implementation of the third party tool.
@@ -106,16 +110,13 @@ public class DefaultThirdPartyTool
     // ----------------------------------------------------------------------
 
     /**
-     * The component that is used to resolve additional artifacts required.
+     * Maven Artifact Resolver repoSystem
      */
     @Requirement
-    private ArtifactResolver artifactResolver;
+    private org.eclipse.aether.RepositorySystem aetherRepoSystem;
 
-    /**
-     * The component used for creating artifact instances.
-     */
     @Requirement
-    private ArtifactFactory artifactFactory;
+    private MavenSession mavenSession;
 
     /**
      * Maven ProjectHelper.
@@ -207,8 +208,7 @@ public class DefaultThirdPartyTool
                                                                        Collection<MavenProject> projects,
                                                                        SortedSet<MavenProject> unsafeDependencies,
                                                                        LicenseMap licenseMap,
-                                                                       ArtifactRepository localRepository,
-                                                                       List<ArtifactRepository> remoteRepositories )
+                                                                       List<RemoteRepository> remoteRepositories )
             throws ThirdPartyToolException, IOException
     {
 
@@ -230,7 +230,7 @@ public class DefaultThirdPartyTool
                 break;
             }
 
-            File thirdPartyDescriptor = resolvThirdPartyDescriptor( mavenProject, localRepository, remoteRepositories );
+            File thirdPartyDescriptor = resolvThirdPartyDescriptor( mavenProject, remoteRepositories );
 
             if ( thirdPartyDescriptor != null && thirdPartyDescriptor.exists() && thirdPartyDescriptor.length() > 0 )
             {
@@ -257,7 +257,7 @@ public class DefaultThirdPartyTool
         }
         try
         {
-            loadGlobalLicenses( topLevelDependencies, localRepository, remoteRepositories, unsafeDependencies,
+            loadGlobalLicenses( topLevelDependencies, remoteRepositories, unsafeDependencies,
                                 licenseMap, unsafeProjects, result );
         }
         catch ( ArtifactNotFoundException e )
@@ -304,26 +304,21 @@ public class DefaultThirdPartyTool
     /**
      * {@inheritDoc}
      */
-    public File resolvThirdPartyDescriptor( MavenProject project, ArtifactRepository localRepository,
-                                            List<ArtifactRepository> repositories )
+    public File resolvThirdPartyDescriptor( MavenProject project, List<RemoteRepository> remoteRepositories )
             throws ThirdPartyToolException
     {
         if ( project == null )
         {
             throw new IllegalArgumentException( "The parameter 'project' can not be null" );
         }
-        if ( localRepository == null )
+        if ( remoteRepositories == null )
         {
-            throw new IllegalArgumentException( "The parameter 'localRepository' can not be null" );
-        }
-        if ( repositories == null )
-        {
-            throw new IllegalArgumentException( "The parameter 'remoteArtifactRepositories' can not be null" );
+            throw new IllegalArgumentException( "The parameter 'remoteRepositories' can not be null" );
         }
 
         try
         {
-            return resolveThirdPartyDescriptor( project, localRepository, repositories );
+            return resolveThirdPartyDescriptor( project, remoteRepositories );
         }
         catch ( ArtifactNotFoundException e )
         {
@@ -692,17 +687,17 @@ public class DefaultThirdPartyTool
         FileUtil.copyFile( thirdPartyFile, bundleTarget );
     }
 
-    private void loadGlobalLicenses( Set<Artifact> dependencies, ArtifactRepository localRepository,
-                                     List<ArtifactRepository> repositories, SortedSet<MavenProject> unsafeDependencies,
-                                     LicenseMap licenseMap, Map<String, MavenProject> unsafeProjects,
-                                     SortedProperties result )
+    private void loadGlobalLicenses( Set<Artifact> dependencies, List<RemoteRepository> remoteRepositories,
+            SortedSet<MavenProject> unsafeDependencies,
+            LicenseMap licenseMap, Map<String, MavenProject> unsafeProjects,
+            SortedProperties result )
             throws IOException, ArtifactNotFoundException, ArtifactResolutionException
     {
         for ( Artifact dep : dependencies )
         {
             if ( LICENSE_DB_TYPE.equals( dep.getType() ) )
             {
-                loadOneGlobalSet( unsafeDependencies, licenseMap, unsafeProjects, dep, localRepository, repositories,
+                loadOneGlobalSet( unsafeDependencies, licenseMap, unsafeProjects, dep, remoteRepositories,
                                   result );
             }
         }
@@ -710,12 +705,12 @@ public class DefaultThirdPartyTool
 
     private void loadOneGlobalSet( SortedSet<MavenProject> unsafeDependencies, LicenseMap licenseMap,
                                    Map<String, MavenProject> unsafeProjects, Artifact dep,
-                                   ArtifactRepository localRepository, List<ArtifactRepository> repositories,
+                                   List<RemoteRepository> remoteRepositories,
                                    SortedProperties result )
             throws IOException, ArtifactNotFoundException, ArtifactResolutionException
     {
-        artifactResolver.resolve( dep, repositories, localRepository );
-        File propFile = dep.getFile();
+        File propFile = resolveArtifact( dep.getGroupId(), dep.getArtifactId(), dep.getVersion(), dep.getType(),
+                dep.getClassifier(), remoteRepositories );
         getLogger().info(
                 String.format( "Loading global license map from %s: %s", dep.toString(), propFile.getAbsolutePath() ) );
         SortedProperties props = new SortedProperties( "utf-8" );
@@ -754,15 +749,14 @@ public class DefaultThirdPartyTool
      * @throws ArtifactResolutionException if any
      * @throws ArtifactNotFoundException   if any
      */
-    private File resolveThirdPartyDescriptor( MavenProject project, ArtifactRepository localRepository,
-                                              List<ArtifactRepository> repositories )
+    private File resolveThirdPartyDescriptor( MavenProject project, List<RemoteRepository> remoteRepositories )
             throws IOException, ArtifactResolutionException, ArtifactNotFoundException
     {
         File result;
         try
         {
             result = resolveArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion(),
-                                      DESCRIPTOR_TYPE, DESCRIPTOR_CLASSIFIER, localRepository, repositories );
+                                      DESCRIPTOR_TYPE, DESCRIPTOR_CLASSIFIER, remoteRepositories );
 
             // we use zero length files to avoid re-resolution (see below)
             if ( result.length() == 0 )
@@ -770,43 +764,66 @@ public class DefaultThirdPartyTool
                 getLogger().debug( "Skipped third party descriptor" );
             }
         }
-        catch ( ArtifactNotFoundException e )
+        catch ( ArtifactResolutionException e )
         {
-            getLogger().debug( "Unable to locate third party files descriptor : " + e );
+            if ( e.getCause() instanceof ArtifactNotFoundException )
+            {
+                ArtifactNotFoundException artifactNotFoundException = ( ArtifactNotFoundException ) e.getCause();
+                getLogger().debug( "Unable to locate third party files descriptor : " + artifactNotFoundException );
 
-            Artifact artifact = e.getArtifact() == null
-                    ? artifactFactory.createArtifactWithClassifier(
-                    project.getGroupId(), project.getArtifactId(), project.getVersion(),
-                    DESCRIPTOR_TYPE, DESCRIPTOR_CLASSIFIER )
-                    : e.getArtifact();
+                org.eclipse.aether.artifact.Artifact artifact;
+                if ( artifactNotFoundException.getArtifact() == null )
+                {
+                    artifact = new DefaultArtifact( project.getGroupId(), project.getArtifactId(),
+                            DESCRIPTOR_CLASSIFIER, null, project.getVersion(),
+                            new DefaultArtifactType( DESCRIPTOR_TYPE ) );
+                }
+                else
+                {
+                    artifact = artifactNotFoundException.getArtifact();
+                }
 
-            // we can afford to write an empty descriptor here as we don't expect it to turn up later in the remote
-            // repository, because the parent was already released (and snapshots are updated automatically if changed)
-            result = new File( localRepository.getBasedir(), localRepository.pathOf( artifact ) );
+                /*
+                 * we can afford to write an empty descriptor here
+                 * as we don't expect it to turn up later in the remote
+                 * repository, because the parent was already released
+                 * (and snapshots are updated automatically if changed)
+                 */
+                RepositorySystemSession aetherSession = mavenSession.getRepositorySession();
+                result = new File( aetherSession.getLocalRepository().getBasedir(),
+                        aetherSession.getLocalRepositoryManager().getPathForLocalArtifact( artifact ) );
+            }
+            else
+            {
+                throw e;
+            }
         }
 
         return result;
     }
 
     public File resolveMissingLicensesDescriptor( String groupId, String artifactId, String version,
-            ArtifactRepository localRepository, List<ArtifactRepository> repositories )
+            List<RemoteRepository> remoteRepositories )
             throws IOException, ArtifactResolutionException, ArtifactNotFoundException
     {
-        return resolveArtifact( groupId, artifactId, version, DESCRIPTOR_TYPE, DESCRIPTOR_CLASSIFIER, localRepository,
-                repositories );
+        return resolveArtifact( groupId, artifactId, version, DESCRIPTOR_TYPE,
+                DESCRIPTOR_CLASSIFIER, remoteRepositories );
     }
 
     private File resolveArtifact( String groupId, String artifactId, String version,
-            String type, String classifier, ArtifactRepository localRepository, List<ArtifactRepository> repositories )
-                    throws ArtifactResolutionException, IOException, ArtifactNotFoundException
+            String type, String classifier, List<RemoteRepository> remoteRepositories )
+                    throws ArtifactResolutionException
     {
-        // TODO: this is a bit crude - proper type, or proper handling as metadata rather than an artifact in 2.1?
-        Artifact artifact = artifactFactory.createArtifactWithClassifier( groupId, artifactId, version, type,
-                                                                          classifier );
+        org.eclipse.aether.artifact.Artifact artifact2
+                = new DefaultArtifact( groupId, artifactId, classifier, null,
+                        version, new DefaultArtifactType( type ) );
+        ArtifactRequest artifactRequest = new ArtifactRequest()
+                .setArtifact( artifact2 )
+                .setRepositories( remoteRepositories );
+        ArtifactResult result = aetherRepoSystem.resolveArtifact( mavenSession.getRepositorySession(),
+                artifactRequest );
 
-        artifactResolver.resolve( artifact, repositories, localRepository );
-
-        return artifact.getFile();
+        return result.getArtifact().getFile();
     }
 
     private Map<String, String> migrateMissingFileKeys( Set<Object> missingFileKeys )

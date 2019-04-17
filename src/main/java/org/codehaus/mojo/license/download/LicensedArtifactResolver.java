@@ -29,9 +29,13 @@ import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.model.building.ModelBuildingRequest;
+import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.MavenProjectBuilder;
+import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.project.ProjectBuildingRequest;
 import org.codehaus.mojo.license.api.ArtifactFilters;
 import org.codehaus.mojo.license.api.DefaultThirdPartyTool;
 import org.codehaus.mojo.license.api.MavenProjectDependenciesConfigurator;
@@ -63,7 +67,10 @@ public class LicensedArtifactResolver
      * Project builder.
      */
     @Requirement
-    private MavenProjectBuilder mavenProjectBuilder;
+    private ProjectBuilder mavenProjectBuilder;
+
+    @Requirement
+    private MavenSession mavenSession;
 
     // CHECKSTYLE_OFF: MethodLength
     /**
@@ -80,7 +87,6 @@ public class LicensedArtifactResolver
      */
     public void loadProjectDependencies( ResolvedProjectDependencies artifacts,
                                                                   MavenProjectDependenciesConfigurator configuration,
-                                                                  ArtifactRepository localRepository,
                                                                   List<ArtifactRepository> remoteRepositories,
                                                                   Map<String, LicensedArtifact> result )
     {
@@ -108,6 +114,13 @@ public class LicensedArtifactResolver
         final Map<String, Artifact> includeArtifacts = new HashMap<>();
 
         final Logger log = getLogger();
+
+        ProjectBuildingRequest projectBuildingRequest
+                = new DefaultProjectBuildingRequest( mavenSession.getProjectBuildingRequest() )
+                        .setRemoteRepositories( remoteRepositories )
+                        .setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL )
+                        .setResolveDependencies( false )
+                        .setProcessPlugins( false );
 
         for ( Artifact artifact : depArtifacts )
         {
@@ -154,8 +167,9 @@ public class LicensedArtifactResolver
                     LicensedArtifact.builder( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion() );
                 try
                 {
-                    final MavenProject project =
-                        mavenProjectBuilder.buildFromRepository( artifact, remoteRepositories, localRepository, true );
+                    final MavenProject project = mavenProjectBuilder
+                            .build( artifact, true, projectBuildingRequest )
+                            .getProject();
                     @SuppressWarnings( "unchecked" )
                     List<org.apache.maven.model.License> lics = project.getLicenses();
                     if ( lics != null )
@@ -215,5 +229,4 @@ public class LicensedArtifactResolver
 
     }
     // CHECKSTYLE_ON: MethodLength
-
 }

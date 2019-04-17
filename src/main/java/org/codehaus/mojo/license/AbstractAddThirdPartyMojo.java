@@ -27,8 +27,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
@@ -59,6 +57,8 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import org.codehaus.mojo.license.api.DependenciesToolException;
+import org.eclipse.aether.resolution.ArtifactResolutionException;
+import org.eclipse.aether.transfer.ArtifactNotFoundException;
 
 /**
  * Abstract mojo for all third-party mojos.
@@ -593,14 +593,6 @@ public abstract class AbstractAddThirdPartyMojo
     protected ArtifactRepository localRepository;
 
     /**
-     * Remote repositories used for the project.
-     *
-     * @since 1.0.0
-     */
-    @Parameter( property = "project.remoteArtifactRepositories", required = true, readonly = true )
-    protected List<ArtifactRepository> remoteRepositories;
-
-    /**
      * The set of dependencies for the current project, used to locate license databases.
      */
     @Parameter( property = "project.artifacts", required = true, readonly = true )
@@ -881,7 +873,8 @@ public abstract class AbstractAddThirdPartyMojo
         if ( helper == null )
         {
             helper = new DefaultThirdPartyHelper( getProject(), getEncoding(), isVerbose(), dependenciesTool,
-                    thirdPartyTool, localRepository, remoteRepositories, getLog() );
+                    thirdPartyTool, getProject().getRemoteArtifactRepositories(),
+                    getProject().getRemoteProjectRepositories(), getLog() );
         }
         return helper;
     }
@@ -890,7 +883,7 @@ public abstract class AbstractAddThirdPartyMojo
       throws ArtifactNotFoundException, IOException, ArtifactResolutionException, MojoExecutionException
     {
         File missingLicensesFromArtifact = thirdPartyTool.resolveMissingLicensesDescriptor( groupId, artifactId,
-                version, localRepository, remoteRepositories );
+                version, getProject().getRemoteProjectRepositories() );
         resolveUnsafeDependenciesFromFile( missingLicensesFromArtifact );
     }
 

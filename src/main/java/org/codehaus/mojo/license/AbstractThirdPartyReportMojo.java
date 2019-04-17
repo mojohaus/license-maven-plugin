@@ -23,7 +23,6 @@ package org.codehaus.mojo.license;
  */
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.doxia.siterenderer.Renderer;
@@ -302,14 +301,6 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
     private String encoding;
 
     /**
-     * Local Repository.
-     *
-     * @since 1.1
-     */
-    @Parameter( property = "localRepository", required = true, readonly = true )
-    private ArtifactRepository localRepository;
-
-    /**
      * The Maven Project.
      *
      * @since 1.1
@@ -434,10 +425,6 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
             throw new MavenReportException( e.getMessage(), e );
         }
         catch ( ProjectBuildingException e )
-        {
-            throw new MavenReportException( e.getMessage(), e );
-        }
-        catch ( InvalidDependencyVersionException e )
         {
             throw new MavenReportException( e.getMessage(), e );
         }
@@ -577,7 +564,7 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
         ThirdPartyHelper thirdPartyHelper =
                 new DefaultThirdPartyHelper( project, encoding, verbose,
                         dependenciesTool, thirdPartyTool,
-                        localRepository, project.getRemoteArtifactRepositories(), getLog() );
+                        project.getRemoteArtifactRepositories(), project.getRemoteProjectRepositories(), getLog() );
         // load dependencies of the project
         SortedMap<String, MavenProject> projectDependencies = thirdPartyHelper.loadDependencies( this,
                 loadedDependencies );
@@ -649,6 +636,5 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
     {
         return encoding;
     }
-
 
 }

@@ -23,9 +23,7 @@ package org.codehaus.mojo.license.api;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.codehaus.mojo.license.utils.MojoHelper;
 import org.codehaus.plexus.component.annotations.Component;
@@ -39,6 +37,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.model.building.ModelBuildingRequest;
+import org.apache.maven.project.DefaultProjectBuildingRequest;
+import org.apache.maven.project.ProjectBuilder;
+import org.apache.maven.project.ProjectBuildingRequest;
 
 /**
  * A tool to deal with dependencies of a project.
@@ -61,7 +65,10 @@ extends AbstractLogEnabled
      * Project builder.
      */
     @Requirement
-    private MavenProjectBuilder mavenProjectBuilder;
+    private ProjectBuilder mavenProjectBuilder;
+
+    @Requirement
+    private MavenSession mavenSession;
 
     // CHECKSTYLE_OFF: MethodLength
     /**
@@ -70,17 +77,15 @@ extends AbstractLogEnabled
      *
      * Result is given in a map where keys are unique artifact id
      *
-     * @param dependencies       the project dependencies
+     * @param artifacts       the project dependencies
      * @param configuration      the configuration
-     * @param localRepository    local repository used to resolv dependencies
-     * @param remoteRepositories remote repositories used to resolv dependencies
+     * @param remoteRepositories remote repositories used to resolve dependencies
      * @param cache              a optional cache where to keep resolved dependencies
      * @return the map of resolved dependencies indexed by their unique id.
      * @see MavenProjectDependenciesConfigurator
      */
     public SortedMap<String, MavenProject> loadProjectDependencies( ResolvedProjectDependencies artifacts,
                                                                     MavenProjectDependenciesConfigurator configuration,
-                                                                    ArtifactRepository localRepository,
                                                                     List<ArtifactRepository> remoteRepositories,
                                                                     SortedMap<String, MavenProject> cache )
     {
@@ -115,6 +120,16 @@ extends AbstractLogEnabled
             localCache.putAll( cache );
         }
         final Logger log = getLogger();
+
+        ProjectBuildingRequest projectBuildingRequest
+                = new DefaultProjectBuildingRequest( mavenSession.getProjectBuildingRequest() )
+                        .setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL )
+                        //We already have the relevant part of the dependency tree
+                        //Re-resolving risks including e.g. excluded artifacts
+                        .setResolveDependencies( false )
+                        //We don't care about plugin licensing
+                        .setProcessPlugins( false )
+                        .setRemoteRepositories( remoteRepositories );
 
         for ( Artifact artifact : depArtifacts )
         {
@@ -163,8 +178,8 @@ extends AbstractLogEnabled
 
                 try
                 {
-                    depMavenProject =
-                        mavenProjectBuilder.buildFromRepository( artifact, remoteRepositories, localRepository, true );
+                    depMavenProject
+                            = mavenProjectBuilder.build( artifact, true, projectBuildingRequest ).getProject();
                     depMavenProject.getArtifact().setScope( artifact.getScope() );
 
                     // In case maven-metadata.xml has different artifactId, groupId or version.

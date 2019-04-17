@@ -84,14 +84,6 @@ public abstract class AbstractLicensesXmlMojo
     private String licensesOutputFileEncoding;
 
     /**
-     * Location of the local repository.
-     *
-     * @since 1.0
-     */
-    @Parameter( defaultValue = "${localRepository}", readonly = true )
-    protected ArtifactRepository localRepository;
-
-    /**
      * List of Remote Repositories used by the resolver
      *
      * @since 1.0
@@ -108,12 +100,12 @@ public abstract class AbstractLicensesXmlMojo
     protected MavenProject project;
 
     /**
-     * Dependencies tool.
+     * Licensed artifact resolver.
      *
      * @since 1.0
      */
     @Component
-    protected LicensedArtifactResolver dependenciesTool;
+    protected LicensedArtifactResolver licensedArtifactResolver;
 
     private Charset charset;
 
