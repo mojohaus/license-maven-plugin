@@ -145,6 +145,9 @@ public class SpdxLicenseInfo
             this.urlInfos = urlInfos;
         }
 
+        /**
+         * @return a {@link Map} from URLs to {@link UrlInfo}s
+         */
         public Map<String, UrlInfo> getUrlInfos()
         {
             return urlInfos;
@@ -174,11 +177,20 @@ public class SpdxLicenseInfo
                 this.sanitized = sanitized;
             }
 
+            /**
+             * @return {@code true} is the checksum returned by {@link #getSha1()} is likely to stay stable over time;
+             *      {@code false} otherwise. The likeness of staying stable is (1) tested automatically when generatting
+             *      {@link SpdxLicenseListData} and (2) for some sites it is set manually based on their historical
+             *      behavior.
+             */
             public boolean isStable()
             {
                 return stable;
             }
 
+            /**
+             * @return the checksum computed after applying sanitizers at {@link SpdxLicenseListData} generation time.
+             */
             public String getSha1()
             {
                 return sha1;
