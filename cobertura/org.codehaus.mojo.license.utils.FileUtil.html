@@ -12,7 +12,7 @@
 <div class="separator">&nbsp;</div>
 <table class="report">
 <thead><tr>  <td class="heading">Classes in this File</td>  <td class="heading"><a class="dfn" href="help.html" onclick="popupwindow('help.html'); return false;">Line Coverage</a></td>  <td class="heading"><a class="dfn" href="help.html" onclick="popupwindow('help.html'); return false;">Branch Coverage</a></td>  <td class="heading"><a class="dfn" href="help.html" onclick="popupwindow('help.html'); return false;">Complexity</a></td></tr></thead>
-  <tr><td><a href="org.codehaus.mojo.license.utils.FileUtil.html">FileUtil</a></td><td><table cellpadding="0px" cellspacing="0px" class="percentgraph"><tr class="percentgraph"><td align="right" class="percentgraph" width="40">11%</td><td class="percentgraph"><div class="percentgraph"><div class="greenbar" style="width:11px"><span class="text">10/86</span></div></div></td></tr></table></td><td><table cellpadding="0px" cellspacing="0px" class="percentgraph"><tr class="percentgraph"><td align="right" class="percentgraph" width="40">29%</td><td class="percentgraph"><div class="percentgraph"><div class="greenbar" style="width:29px"><span class="text">10/34</span></div></div></td></tr></table></td><td class="value"><span class="hidden">3.5;</span>3.5</td></tr>
+  <tr><td><a href="org.codehaus.mojo.license.utils.FileUtil.html">FileUtil</a></td><td><table cellpadding="0px" cellspacing="0px" class="percentgraph"><tr class="percentgraph"><td align="right" class="percentgraph" width="40">11%</td><td class="percentgraph"><div class="percentgraph"><div class="greenbar" style="width:11px"><span class="text">10/86</span></div></div></td></tr></table></td><td><table cellpadding="0px" cellspacing="0px" class="percentgraph"><tr class="percentgraph"><td align="right" class="percentgraph" width="40">26%</td><td class="percentgraph"><div class="percentgraph"><div class="greenbar" style="width:26px"><span class="text">9/34</span></div></div></td></tr></table></td><td class="value"><span class="hidden">3.5;</span>3.5</td></tr>
   <tr><td><a href="org.codehaus.mojo.license.utils.FileUtil.html">FileUtil$1</a></td><td><table cellpadding="0px" cellspacing="0px" class="percentgraph"><tr class="percentgraph"><td align="right" class="percentgraph" width="40">0%</td><td class="percentgraph"><div class="percentgraph"><div class="greenbar" style="width:0px"><span class="text">0/2</span></div></div></td></tr></table></td><td><table cellpadding="0px" cellspacing="0px" class="percentgraph"><tr class="percentgraph"><td align="right" class="percentgraph" width="40"><a class="dfn" href="help.html" onclick="popupwindow('help.html'); return false;">N/A</a></td><td class="percentgraph"><div class="percentgraph"><div class="na" style="width:100px"><span class="text"><a class="dfn" href="help.html" onclick="popupwindow('help.html'); return false;">N/A</a></span></div></div></td></tr></table></td><td class="value"><span class="hidden">3.5;</span>3.5</td></tr>
 
 </table>
@@ -572,7 +572,7 @@
   <td class="src"><pre class="src">&nbsp;    <span class="keyword">public</span> <span class="keyword">static</span> String toExtension( String mimeType, <span class="keyword">boolean</span> throwDefault )</pre></td></tr>
 <tr>  <td class="numLine">&nbsp;314</td>  <td class="nbHits">&nbsp;</td>
   <td class="src"><pre class="src">&nbsp;    {</pre></td></tr>
-<tr>  <td class="numLineCover">&nbsp;315</td>  <td class="nbHitsCovered"><a title="Line 315: Conditional coverage 100% (2/2).">&nbsp;1151</a></td>  <td class="src"><pre class="src">&nbsp;<a title="Line 315: Conditional coverage 100% (2/2).">        <span class="keyword">if</span> ( mimeType == <span class="keyword">null</span> )</a></pre></td></tr>
+<tr>  <td class="numLineCover">&nbsp;315</td>  <td class="nbHitsCovered"><a title="Line 315: Conditional coverage 100% (2/2).">&nbsp;1788</a></td>  <td class="src"><pre class="src">&nbsp;<a title="Line 315: Conditional coverage 100% (2/2).">        <span class="keyword">if</span> ( mimeType == <span class="keyword">null</span> )</a></pre></td></tr>
 <tr>  <td class="numLine">&nbsp;316</td>  <td class="nbHits">&nbsp;</td>
   <td class="src"><pre class="src">&nbsp;        {</pre></td></tr>
 <tr>  <td class="numLineCover">&nbsp;317</td>  <td class="nbHitsUncovered"><a title="Line 317: Conditional coverage 50% (1/2).">&nbsp;1</a></td>  <td class="src"><pre class="src"><span class="srcUncovered">&nbsp;<a title="Line 317: Conditional coverage 50% (1/2).">            <span class="keyword">if</span> ( throwDefault )</a></span></pre></td></tr>
@@ -590,27 +590,27 @@
   <td class="src"><pre class="src">&nbsp;            }</pre></td></tr>
 <tr>  <td class="numLine">&nbsp;325</td>  <td class="nbHits">&nbsp;</td>
   <td class="src"><pre class="src">&nbsp;        }</pre></td></tr>
-<tr>  <td class="numLineCover">&nbsp;326</td>  <td class="nbHitsCovered">&nbsp;1150</td>  <td class="src"><pre class="src">&nbsp;        <span class="keyword">final</span> String lowerMimeType = mimeType.toLowerCase( Locale.ROOT );</pre></td></tr>
-<tr>  <td class="numLineCover">&nbsp;327</td>  <td class="nbHitsCovered"><a title="Line 327: Conditional coverage 100% (4/4) [each condition: 100%, 100%].">&nbsp;1150</a></td>  <td class="src"><pre class="src">&nbsp;<a title="Line 327: Conditional coverage 100% (4/4) [each condition: 100%, 100%].">        <span class="keyword">if</span> ( lowerMimeType.contains( <span class="string">"plain"</span> ) || <span class="string">"text/x-c"</span>.equals( lowerMimeType ) )</a></pre></td></tr>
+<tr>  <td class="numLineCover">&nbsp;326</td>  <td class="nbHitsCovered">&nbsp;1787</td>  <td class="src"><pre class="src">&nbsp;        <span class="keyword">final</span> String lowerMimeType = mimeType.toLowerCase( Locale.ROOT );</pre></td></tr>
+<tr>  <td class="numLineCover">&nbsp;327</td>  <td class="nbHitsUncovered"><a title="Line 327: Conditional coverage 75% (3/4) [each condition: 100%, 50%].">&nbsp;1787</a></td>  <td class="src"><pre class="src"><span class="srcUncovered">&nbsp;<a title="Line 327: Conditional coverage 75% (3/4) [each condition: 100%, 50%].">        <span class="keyword">if</span> ( lowerMimeType.contains( <span class="string">"plain"</span> ) || <span class="string">"text/x-c"</span>.equals( lowerMimeType ) )</a></span></pre></td></tr>
 <tr>  <td class="numLine">&nbsp;328</td>  <td class="nbHits">&nbsp;</td>
   <td class="src"><pre class="src">&nbsp;        {</pre></td></tr>
-<tr>  <td class="numLineCover">&nbsp;329</td>  <td class="nbHitsCovered">&nbsp;135</td>  <td class="src"><pre class="src">&nbsp;            <span class="keyword">return</span> <span class="string">".txt"</span>;</pre></td></tr>
+<tr>  <td class="numLineCover">&nbsp;329</td>  <td class="nbHitsCovered">&nbsp;340</td>  <td class="src"><pre class="src">&nbsp;            <span class="keyword">return</span> <span class="string">".txt"</span>;</pre></td></tr>
 <tr>  <td class="numLine">&nbsp;330</td>  <td class="nbHits">&nbsp;</td>
   <td class="src"><pre class="src">&nbsp;        }</pre></td></tr>
 <tr>  <td class="numLine">&nbsp;331</td>  <td class="nbHits">&nbsp;</td>
   <td class="src"><pre class="src">&nbsp;</pre></td></tr>
-<tr>  <td class="numLineCover">&nbsp;332</td>  <td class="nbHitsCovered"><a title="Line 332: Conditional coverage 100% (2/2).">&nbsp;1015</a></td>  <td class="src"><pre class="src">&nbsp;<a title="Line 332: Conditional coverage 100% (2/2).">        <span class="keyword">if</span> ( lowerMimeType.contains( <span class="string">"html"</span> ) )</a></pre></td></tr>
+<tr>  <td class="numLineCover">&nbsp;332</td>  <td class="nbHitsCovered"><a title="Line 332: Conditional coverage 100% (2/2).">&nbsp;1447</a></td>  <td class="src"><pre class="src">&nbsp;<a title="Line 332: Conditional coverage 100% (2/2).">        <span class="keyword">if</span> ( lowerMimeType.contains( <span class="string">"html"</span> ) )</a></pre></td></tr>
 <tr>  <td class="numLine">&nbsp;333</td>  <td class="nbHits">&nbsp;</td>
   <td class="src"><pre class="src">&nbsp;        {</pre></td></tr>
-<tr>  <td class="numLineCover">&nbsp;334</td>  <td class="nbHitsCovered">&nbsp;999</td>  <td class="src"><pre class="src">&nbsp;            <span class="keyword">return</span> <span class="string">".html"</span>;</pre></td></tr>
+<tr>  <td class="numLineCover">&nbsp;334</td>  <td class="nbHitsCovered">&nbsp;1429</td>  <td class="src"><pre class="src">&nbsp;            <span class="keyword">return</span> <span class="string">".html"</span>;</pre></td></tr>
 <tr>  <td class="numLine">&nbsp;335</td>  <td class="nbHits">&nbsp;</td>
   <td class="src"><pre class="src">&nbsp;        }</pre></td></tr>
 <tr>  <td class="numLine">&nbsp;336</td>  <td class="nbHits">&nbsp;</td>
   <td class="src"><pre class="src">&nbsp;</pre></td></tr>
-<tr>  <td class="numLineCover">&nbsp;337</td>  <td class="nbHitsUncovered"><a title="Line 337: Conditional coverage 50% (1/2).">&nbsp;16</a></td>  <td class="src"><pre class="src"><span class="srcUncovered">&nbsp;<a title="Line 337: Conditional coverage 50% (1/2).">        <span class="keyword">if</span> ( lowerMimeType.contains( <span class="string">"pdf"</span> ) )</a></span></pre></td></tr>
+<tr>  <td class="numLineCover">&nbsp;337</td>  <td class="nbHitsUncovered"><a title="Line 337: Conditional coverage 50% (1/2).">&nbsp;18</a></td>  <td class="src"><pre class="src"><span class="srcUncovered">&nbsp;<a title="Line 337: Conditional coverage 50% (1/2).">        <span class="keyword">if</span> ( lowerMimeType.contains( <span class="string">"pdf"</span> ) )</a></span></pre></td></tr>
 <tr>  <td class="numLine">&nbsp;338</td>  <td class="nbHits">&nbsp;</td>
   <td class="src"><pre class="src">&nbsp;        {</pre></td></tr>
-<tr>  <td class="numLineCover">&nbsp;339</td>  <td class="nbHitsCovered">&nbsp;16</td>  <td class="src"><pre class="src">&nbsp;            <span class="keyword">return</span> <span class="string">".pdf"</span>;</pre></td></tr>
+<tr>  <td class="numLineCover">&nbsp;339</td>  <td class="nbHitsCovered">&nbsp;18</td>  <td class="src"><pre class="src">&nbsp;            <span class="keyword">return</span> <span class="string">".pdf"</span>;</pre></td></tr>
 <tr>  <td class="numLine">&nbsp;340</td>  <td class="nbHits">&nbsp;</td>
   <td class="src"><pre class="src">&nbsp;        }</pre></td></tr>
 <tr>  <td class="numLine">&nbsp;341</td>  <td class="nbHits">&nbsp;</td>
@@ -634,6 +634,6 @@
   <td class="src"><pre class="src">&nbsp;}</pre></td></tr>
 </table>
 
-<div class="footer">Report generated by <a href="http://cobertura.sourceforge.net/" target="_top">Cobertura</a> 2.1.1 on 26/02/19 23:02.</div>
+<div class="footer">Report generated by <a href="http://cobertura.sourceforge.net/" target="_top">Cobertura</a> 2.1.1 on 17/04/19 17:38.</div>
 </body>
 </html>

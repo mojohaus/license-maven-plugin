@@ -432,51 +432,52 @@
 <a class="jxr_linenumber" name="L424" href="#L424">424</a>         deployMissingFile = mojo.deployMissingFile;
 <a class="jxr_linenumber" name="L425" href="#L425">425</a>         useRepositoryMissingFiles = mojo.useRepositoryMissingFiles;
 <a class="jxr_linenumber" name="L426" href="#L426">426</a>         acceptPomPackaging = mojo.acceptPomPackaging;
-<a class="jxr_linenumber" name="L427" href="#L427">427</a>         excludedScopes = mojo.excludedScopes;
-<a class="jxr_linenumber" name="L428" href="#L428">428</a>         includedScopes = mojo.includedScopes;
-<a class="jxr_linenumber" name="L429" href="#L429">429</a>         excludedGroups = mojo.excludedGroups;
-<a class="jxr_linenumber" name="L430" href="#L430">430</a>         includedGroups = mojo.includedGroups;
-<a class="jxr_linenumber" name="L431" href="#L431">431</a>         excludedArtifacts = mojo.excludedArtifacts;
-<a class="jxr_linenumber" name="L432" href="#L432">432</a>         includedArtifacts = mojo.includedArtifacts;
-<a class="jxr_linenumber" name="L433" href="#L433">433</a>         includeTransitiveDependencies = mojo.includeTransitiveDependencies;
-<a class="jxr_linenumber" name="L434" href="#L434">434</a>         excludeTransitiveDependencies = mojo.excludeTransitiveDependencies;
-<a class="jxr_linenumber" name="L435" href="#L435">435</a>         thirdPartyFilename = mojo.thirdPartyFilename;
-<a class="jxr_linenumber" name="L436" href="#L436">436</a>         useMissingFile = mojo.useMissingFile;
-<a class="jxr_linenumber" name="L437" href="#L437">437</a>         String absolutePath = mojo.getProject().getBasedir().getAbsolutePath();
-<a class="jxr_linenumber" name="L438" href="#L438">438</a> 
-<a class="jxr_linenumber" name="L439" href="#L439">439</a>         missingFile = <strong class="jxr_keyword">new</strong> File( project.getBasedir(),
-<a class="jxr_linenumber" name="L440" href="#L440">440</a>                 mojo.missingFile.getAbsolutePath().substring( absolutePath.length() ) );
-<a class="jxr_linenumber" name="L441" href="#L441">441</a>         resolvedOverrideUrl  = mojo.resolvedOverrideUrl;
-<a class="jxr_linenumber" name="L442" href="#L442">442</a>         missingLicensesFileArtifact = mojo.missingLicensesFileArtifact;
-<a class="jxr_linenumber" name="L443" href="#L443">443</a>         localRepository = mojo.localRepository;
-<a class="jxr_linenumber" name="L444" href="#L444">444</a>         remoteRepositories = mavenProject.getRemoteArtifactRepositories();
-<a class="jxr_linenumber" name="L445" href="#L445">445</a>         dependencies = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;( mavenProject.getDependencies() );
-<a class="jxr_linenumber" name="L446" href="#L446">446</a>         licenseMerges = mojo.licenseMerges;
-<a class="jxr_linenumber" name="L447" href="#L447">447</a>         licenseMergesFile = mojo.licenseMergesFile;
-<a class="jxr_linenumber" name="L448" href="#L448">448</a>         includedLicenses = mojo.includedLicenses;
-<a class="jxr_linenumber" name="L449" href="#L449">449</a>         excludedLicenses = mojo.excludedLicenses;
-<a class="jxr_linenumber" name="L450" href="#L450">450</a>         bundleThirdPartyPath = mojo.bundleThirdPartyPath;
-<a class="jxr_linenumber" name="L451" href="#L451">451</a>         generateBundle = mojo.generateBundle;
-<a class="jxr_linenumber" name="L452" href="#L452">452</a>         force = mojo.force;
-<a class="jxr_linenumber" name="L453" href="#L453">453</a>         failIfWarning = mojo.failIfWarning;
-<a class="jxr_linenumber" name="L454" href="#L454">454</a>         failOnMissing = mojo.failOnMissing;
-<a class="jxr_linenumber" name="L455" href="#L455">455</a>         failOnBlacklist = mojo.failOnBlacklist;
-<a class="jxr_linenumber" name="L456" href="#L456">456</a>         sortArtifactByName = mojo.sortArtifactByName;
-<a class="jxr_linenumber" name="L457" href="#L457">457</a>         fileTemplate = mojo.fileTemplate;
-<a class="jxr_linenumber" name="L458" href="#L458">458</a>         session = mojo.session;
-<a class="jxr_linenumber" name="L459" href="#L459">459</a>         verbose = mojo.verbose;
-<a class="jxr_linenumber" name="L460" href="#L460">460</a>         encoding = mojo.encoding;
-<a class="jxr_linenumber" name="L461" href="#L461">461</a> 
-<a class="jxr_linenumber" name="L462" href="#L462">462</a>         setLog( mojo.getLog() );
-<a class="jxr_linenumber" name="L463" href="#L463">463</a> 
-<a class="jxr_linenumber" name="L464" href="#L464">464</a>         isAggregatorBuild = <strong class="jxr_keyword">true</strong>;
-<a class="jxr_linenumber" name="L465" href="#L465">465</a>         reactorProjectDependencies = reactorProjects;
-<a class="jxr_linenumber" name="L466" href="#L466">466</a> 
-<a class="jxr_linenumber" name="L467" href="#L467">467</a>         init();
-<a class="jxr_linenumber" name="L468" href="#L468">468</a> 
-<a class="jxr_linenumber" name="L469" href="#L469">469</a>         consolidate();
-<a class="jxr_linenumber" name="L470" href="#L470">470</a>     }
-<a class="jxr_linenumber" name="L471" href="#L471">471</a> }
+<a class="jxr_linenumber" name="L427" href="#L427">427</a>         includeOptional = mojo.includeOptional;
+<a class="jxr_linenumber" name="L428" href="#L428">428</a>         excludedScopes = mojo.excludedScopes;
+<a class="jxr_linenumber" name="L429" href="#L429">429</a>         includedScopes = mojo.includedScopes;
+<a class="jxr_linenumber" name="L430" href="#L430">430</a>         excludedGroups = mojo.excludedGroups;
+<a class="jxr_linenumber" name="L431" href="#L431">431</a>         includedGroups = mojo.includedGroups;
+<a class="jxr_linenumber" name="L432" href="#L432">432</a>         excludedArtifacts = mojo.excludedArtifacts;
+<a class="jxr_linenumber" name="L433" href="#L433">433</a>         includedArtifacts = mojo.includedArtifacts;
+<a class="jxr_linenumber" name="L434" href="#L434">434</a>         includeTransitiveDependencies = mojo.includeTransitiveDependencies;
+<a class="jxr_linenumber" name="L435" href="#L435">435</a>         excludeTransitiveDependencies = mojo.excludeTransitiveDependencies;
+<a class="jxr_linenumber" name="L436" href="#L436">436</a>         thirdPartyFilename = mojo.thirdPartyFilename;
+<a class="jxr_linenumber" name="L437" href="#L437">437</a>         useMissingFile = mojo.useMissingFile;
+<a class="jxr_linenumber" name="L438" href="#L438">438</a>         String absolutePath = mojo.getProject().getBasedir().getAbsolutePath();
+<a class="jxr_linenumber" name="L439" href="#L439">439</a> 
+<a class="jxr_linenumber" name="L440" href="#L440">440</a>         missingFile = <strong class="jxr_keyword">new</strong> File( project.getBasedir(),
+<a class="jxr_linenumber" name="L441" href="#L441">441</a>                 mojo.missingFile.getAbsolutePath().substring( absolutePath.length() ) );
+<a class="jxr_linenumber" name="L442" href="#L442">442</a>         resolvedOverrideUrl  = mojo.resolvedOverrideUrl;
+<a class="jxr_linenumber" name="L443" href="#L443">443</a>         missingLicensesFileArtifact = mojo.missingLicensesFileArtifact;
+<a class="jxr_linenumber" name="L444" href="#L444">444</a>         localRepository = mojo.localRepository;
+<a class="jxr_linenumber" name="L445" href="#L445">445</a>         remoteRepositories = mavenProject.getRemoteArtifactRepositories();
+<a class="jxr_linenumber" name="L446" href="#L446">446</a>         dependencies = <strong class="jxr_keyword">new</strong> HashSet&lt;&gt;( mavenProject.getDependencies() );
+<a class="jxr_linenumber" name="L447" href="#L447">447</a>         licenseMerges = mojo.licenseMerges;
+<a class="jxr_linenumber" name="L448" href="#L448">448</a>         licenseMergesFile = mojo.licenseMergesFile;
+<a class="jxr_linenumber" name="L449" href="#L449">449</a>         includedLicenses = mojo.includedLicenses;
+<a class="jxr_linenumber" name="L450" href="#L450">450</a>         excludedLicenses = mojo.excludedLicenses;
+<a class="jxr_linenumber" name="L451" href="#L451">451</a>         bundleThirdPartyPath = mojo.bundleThirdPartyPath;
+<a class="jxr_linenumber" name="L452" href="#L452">452</a>         generateBundle = mojo.generateBundle;
+<a class="jxr_linenumber" name="L453" href="#L453">453</a>         force = mojo.force;
+<a class="jxr_linenumber" name="L454" href="#L454">454</a>         failIfWarning = mojo.failIfWarning;
+<a class="jxr_linenumber" name="L455" href="#L455">455</a>         failOnMissing = mojo.failOnMissing;
+<a class="jxr_linenumber" name="L456" href="#L456">456</a>         failOnBlacklist = mojo.failOnBlacklist;
+<a class="jxr_linenumber" name="L457" href="#L457">457</a>         sortArtifactByName = mojo.sortArtifactByName;
+<a class="jxr_linenumber" name="L458" href="#L458">458</a>         fileTemplate = mojo.fileTemplate;
+<a class="jxr_linenumber" name="L459" href="#L459">459</a>         session = mojo.session;
+<a class="jxr_linenumber" name="L460" href="#L460">460</a>         verbose = mojo.verbose;
+<a class="jxr_linenumber" name="L461" href="#L461">461</a>         encoding = mojo.encoding;
+<a class="jxr_linenumber" name="L462" href="#L462">462</a> 
+<a class="jxr_linenumber" name="L463" href="#L463">463</a>         setLog( mojo.getLog() );
+<a class="jxr_linenumber" name="L464" href="#L464">464</a> 
+<a class="jxr_linenumber" name="L465" href="#L465">465</a>         isAggregatorBuild = <strong class="jxr_keyword">true</strong>;
+<a class="jxr_linenumber" name="L466" href="#L466">466</a>         reactorProjectDependencies = reactorProjects;
+<a class="jxr_linenumber" name="L467" href="#L467">467</a> 
+<a class="jxr_linenumber" name="L468" href="#L468">468</a>         init();
+<a class="jxr_linenumber" name="L469" href="#L469">469</a> 
+<a class="jxr_linenumber" name="L470" href="#L470">470</a>         consolidate();
+<a class="jxr_linenumber" name="L471" href="#L471">471</a>     }
+<a class="jxr_linenumber" name="L472" href="#L472">472</a> }
 </pre>
 <hr/>
 <div id="footer">Copyright &#169; 2010&#x2013;2019 <a href="http://www.mojohaus.org">MojoHaus</a>. All rights reserved.</div>
