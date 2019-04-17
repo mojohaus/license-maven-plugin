@@ -5,6 +5,7 @@ import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
 import java.nio.file.Files
+import java.util.regex.Matcher
 import java.util.regex.Pattern
 import java.util.Map.Entry
 import java.util.AbstractMap.SimpleImmutableEntry
@@ -27,23 +28,71 @@ def log = LoggerFactory.getLogger(this.class)
 @Field UrlChecker urlChecker
 
 final Path basePath = basedir.toPath()
-
-final URL licensesUrl = new URL('https://raw.githubusercontent.com/spdx/license-list-data/master/json/licenses.json')
+@Field final String licensesUrlString = 'https://raw.githubusercontent.com/spdx/license-list-data/v3.5/json/licenses.json'
+final URL licensesUrl = new URL(licensesUrlString)
 final Path spdxDir = basePath.resolve('src/main/java/org/codehaus/mojo/license/spdx')
 final Path spdxTestDir = basePath.resolve('src/test/java/org/codehaus/mojo/license/spdx')
 final Path licensesDir = basePath.resolve('target/spdx/licenses')
 
-/* Licenses known to deliver different content over time, although they pass out simple test here */
-final List<Pattern> instableContentUrls = []
+/* Licenses known to deliver different content over time, although they pass our simple test here */
+final List<Pattern> instableContentUrls = [
+    Pattern.compile('https?://(www\\.)?opensource\\.org.*'),
+]
+
 @Field final Map<String, Entry<Pattern, String>> urlReplacements = [
   /* Workaround for https://github.com/spdx/license-list-XML/issues/777 */
   'archive.org-0': new SimpleImmutableEntry<>(Pattern.compile('(archive\\.org/web/[0-9]+)/'), '$1id_/' ),
   'github.com/aws/mit-0': new SimpleImmutableEntry<>(Pattern.compile('.*github\\.com/aws/mit-0'), 'https://raw.githubusercontent.com/aws/mit-0/master/MIT-0' ),
   'github.com-0': new SimpleImmutableEntry<>(Pattern.compile('https?://github\\.com/([^/]+)/([^/]+)/blob/(.*)'), 'https://raw.githubusercontent.com/$1/$2/$3' ),
-  'microsoft.com/opensource/licenses.mspx': new SimpleImmutableEntry<>(Pattern.compile('.*microsoft\\.com/opensource/licenses\\.mspx'), 'https://web.archive.org/web/20150619132250id_/http://www.microsoft.com/en-us/openness/licenses.aspx' ),
   'git.kernel.org-0': new SimpleImmutableEntry<>(Pattern.compile('https?://git\\.kernel\\.org/pub/scm/linux/([^/]+)/git/torvalds/linux\\.git/tree/(.*)'), 'https://git.kernel.org/pub/scm/linux/$1/git/torvalds/linux.git/plain/$2' ),
   'git.savannah.gnu.org-0': new SimpleImmutableEntry<>(Pattern.compile('https?://git\\.savannah\\.gnu\\.org/cgit/(.*)\\.git/tree/(.*)'), 'http://git.savannah.gnu.org/cgit/$1.git/plain/$2' ),
+  'microsoft.com/opensource/licenses.mspx': new SimpleImmutableEntry<>(Pattern.compile('.*microsoft\\.com/opensource/licenses\\.mspx'), 'https://web.archive.org/web/20150619132250id_/http://www.microsoft.com/en-us/openness/licenses.aspx' ),
+  'mozilla.org/MPL/MPL-1.1.txt': new SimpleImmutableEntry<>(Pattern.compile('.*\\Q.mozilla.org/MPL/MPL-1.1.txt\\E'), 'https://www.mozilla.org/media/MPL/1.1/index.0c5913925d40.txt' ),
+  /* repository.jboss.com is known to be slow and timeouting */
+  'repository.jboss.com/licenses': new SimpleImmutableEntry<>(Pattern.compile('https?://repository\\.jboss\\.com/licenses/(.*)'), 'https://web.archive.org/web/20171202125112id_/http://repository.jboss.com/licenses/$1' ),
 ] as TreeMap
+
+@Field final Map<String, List<String>> additionalSeeAlso = [
+    'Apache-1.0': [
+        'https://apache.org/licenses/LICENSE-1.0.txt',
+    ],
+    'Apache-1.1': [
+        'https://apache.org/licenses/LICENSE-1.1.txt',
+    ],
+    'Apache-2.0': [
+        'https://opensource.org/licenses/apache2.0',
+        'https://opensource.org/licenses/apache2.0.php',
+        'https://opensource.org/licenses/apache2.0.html',
+        'https://apache.org/licenses/LICENSE-2.0.txt',
+    ],
+    'BSD-2-Clause': [
+        'https://opensource.org/licenses/bsd-license',
+        'https://opensource.org/licenses/bsd-license.php',
+        'https://opensource.org/licenses/bsd-license.html',
+    ],
+    'CDDL-1.0': [
+        'https://opensource.org/licenses/cddl1',
+        'https://opensource.org/licenses/cddl1.php',
+        'https://opensource.org/licenses/cddl1.html',
+    ],
+    'MIT': [
+        'https://opensource.org/licenses/mit-license',
+        'https://opensource.org/licenses/mit-license.php',
+        'https://opensource.org/licenses/mit-license.html',
+    ]
+]
+['GPL', 'LGPL'].each { lic ->
+    def licLower = lic.toLowerCase(Locale.US)
+    ['1.0', '2.0', '2.1', '3.0'].each { v ->
+        def urlInfix = '3.0'.equals(v) ? '' : 'old-licenses/'
+        ['', '+', '-only', '-or-later'].each { suffix ->
+            additionalSeeAlso.put("${lic}-${v}${suffix}".toString(), [
+                "https://gnu.org/licenses/${urlInfix}${licLower}-${v}.txt".toString(),
+                "https://fsf.org/licensing/licenses/${licLower}-${v}.txt".toString(),
+            ])
+        }
+    }
+}
 
 @Field final Map<String, ContentSanitizer> contentSanitizers = [
     'opensource.org-0': new ContentSanitizer('.*opensource\\.org.*', 'jQuery\\.extend\\(Drupal\\.settings[^\n]+', ''),
@@ -77,6 +126,7 @@ final List<Pattern> instableContentUrls = []
     'codeproject.com-1': new ContentSanitizer('.*codeproject\\.com.*', '<div class="promo">[^\n]+', ''),
     'codeproject.com-2': new ContentSanitizer('.*codeproject\\.com.*', '<div class="msg-728x90"[^\n]+', ''),
     'codeproject.com-3': new ContentSanitizer('.*codeproject\\.com.*', '<br />\\s*[^\\s]+\\s*\\|\\s*[^\\s]+\\s*\\|', ''),
+    'ohwr.org-0': new ContentSanitizer('.*ohwr\\.org.*', '<meta name="csrf-token"[^\n]+', ''),
 ] as TreeMap
 
 if (Files.exists(licensesDir)) {
@@ -91,9 +141,15 @@ try {
     urlChecker = new UrlChecker(instableContentUrls, urlReplacements, contentSanitizers, licensesDir)
 
     spdx['licenses'].each { lic ->
-        log.info("Starting "+ lic['licenseId'])
+        final String licId = lic['licenseId']
+        log.info("Starting "+ licId)
         lic['seeAlso']?.each { url ->
             url = url.trim()
+            urlChecker.addUrl(url)
+        }
+        additionalSeeAlso.get(licId)?.each { url ->
+            url = url.trim()
+            println "adding additional URL "+ url
             urlChecker.addUrl(url)
         }
     }
@@ -135,8 +191,8 @@ try {
 
 /**
  * A class generated by GenerateSpdxLicenseList.groovy from
- * <a href="https://raw.githubusercontent.com/spdx/license-list-data/master/json/licenses.json">
- * https://raw.githubusercontent.com/spdx/license-list-data/master/json/licenses.json</a>
+ * <a href="${generator.licensesUrlString}">
+ * ${generator.licensesUrlString}</a>
  */
 class SpdxLicenseListData
 {
@@ -176,7 +232,10 @@ spdx.each { field, value ->
                             final String url = seeAlso.trim()
                             println '            .seeAlso( ' + generator.escapeString(url) + ' )'
                         }
-                        def urlInfos = urlChecker.getUrlInfos(licValue);
+                        def moreSeeAlso = generator.additionalSeeAlso.get(lic['licenseId'])
+                        moreSeeAlso = moreSeeAlso == null ? [] : moreSeeAlso
+
+                        def urlInfos = urlChecker.getUrlInfos(licValue + moreSeeAlso);
                         if (!urlInfos.isEmpty()) {
                             println ''
                             urlInfos.each { url, sha1MimeTypeStable ->
@@ -243,8 +302,8 @@ def testTemplate = '''package org.codehaus.mojo.license.spdx;
 
 /**
  * A class generated by GenerateSpdxLicenseList.groovy from
- * <a href="https://raw.githubusercontent.com/spdx/license-list-data/master/json/licenses.json">
- * https://raw.githubusercontent.com/spdx/license-list-data/master/json/licenses.json</a>
+ * <a href="${generator.licensesUrlString}">
+ * ${generator.licensesUrlString}</a>
  */
 public class SpdxLicenseListDataTest
 {
@@ -351,10 +410,11 @@ class UrlChecker implements AutoCloseable {
             if (oldSha1MimeType != null) {
                 final Map.Entry<String, String> newSha1 = get(url, true)
                 if (!oldSha1MimeType.equals(newSha1)) {
-                    log.warn("Volatile content from URL: "+ url)
+                    log.warn("Volatile content from URL: "+ url + " old: "+ oldSha1MimeType + ", new "+ newSha1)
                     old.setValue(new SimpleImmutableEntry(null, oldSha1MimeType.getValue()))
                 } else {
-                    generalize(url, oldSha1MimeType.getKey(), newUrlToSha1MimeType)
+                    final String sha1 = oldSha1MimeType.getKey();
+                    generalize(url, sha1, newUrlToSha1MimeType)
                 }
             } else {
                 //it.remove()
@@ -413,7 +473,8 @@ class UrlChecker implements AutoCloseable {
                 }
                 if (!content.equals(rawContent)) {
                     log.info("Sanitized "+ url + " using "+ sanitizers)
-                    Files.write(licensesDir.resolve(urlFileName  + ".sanitized" + suffix), content.getBytes(charset))
+                    bytes = content.getBytes(charset);
+                    Files.write(licensesDir.resolve(urlFileName  + ".sanitized" + suffix), bytes)
                     sanitizedUrls.add(url)
                 }
                 final String sha1 = DigestUtils.sha1Hex(bytes)
@@ -460,15 +521,19 @@ class UrlChecker implements AutoCloseable {
         return urlToSha1MimeType.get(url);
     }
 
-    private void tryAdd(String url, String sha1, Set<String> urls, Set<Map.Entry<String, Map.Entry<String, String>>> newUrlToSha1MimeType) {
+    private boolean tryAdd(String url, String sha1, Set<String> urls, Set<Map.Entry<String, Map.Entry<String, String>>> newUrlToSha1MimeType) {
         if (!urls.contains(url)) {
             final Map.Entry<String, String> newSha1MimeType = get(url, true)
             if (sha1.equals(newSha1MimeType?.getKey())) {
                 log.info(" - generalized: "+ url)
                 urls.add(url)
                 newUrlToSha1MimeType.add(new SimpleImmutableEntry(url, new SimpleImmutableEntry(sha1, newSha1MimeType.getValue())))
+                return true
+            } else {
+                log.warn(" - could not generalize: old sha1 "+ sha1 +" new sha1: "+ newSha1MimeType)
             }
         }
+        return false
     }
 
     private boolean isStable(String url) {
