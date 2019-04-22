@@ -12,3 +12,7 @@ build_script:
 cache:
   - C:\Users\appveyor\.m2\repository
   - C:\Users\appveyor\.m2\wrapper
+
+on_failure:
+  - 7z a it-logs.zip target\it
+  - appveyor PushArtifact it-logs.zip
