@@ -22,38 +22,23 @@ package org.codehaus.mojo.license.api;
  * #L%
  */
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
-import org.apache.maven.artifact.resolver.ArtifactResolver;
-import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
-import org.apache.maven.project.artifact.InvalidDependencyVersionException;
-import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.codehaus.mojo.license.utils.MojoHelper;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.Map.Entry;
 
 /**
  * A tool to deal with dependencies of a project.
@@ -77,15 +62,6 @@ extends AbstractLogEnabled
      */
     @Requirement
     private MavenProjectBuilder mavenProjectBuilder;
-
-    @Requirement
-    private ArtifactFactory artifactFactory;
-
-    @Requirement
-    private ArtifactResolver artifactResolver;
-
-    @Requirement
-    private ArtifactMetadataSource artifactMetadataSource;
 
     // CHECKSTYLE_OFF: MethodLength
     /**
@@ -263,191 +239,4 @@ extends AbstractLogEnabled
         return result;
     }
     // CHECKSTYLE_ON: MethodLength
-
-    /**
-     * Load project artifacts.
-     *
-     * @param localRepository    local repository used to resolv dependencies
-     * @param remoteRepositories remote repositories used to resolv dependencies
-     * @param project            the project to scan
-     * @param reactorProjectDependencies reactor projects. Optional, only relevant if there is more than one)
-     * @return the loaded project dependency artifacts
-     * @throws DependenciesToolException if could not load project dependencies
-     */
-    @SuppressWarnings( "unchecked" )
-    public ResolvedProjectDependencies loadProjectArtifacts( ArtifactRepository localRepository,
-            List<ArtifactRepository> remoteRepositories, MavenProject project, List<MavenProject> reactorProjects )
-        throws DependenciesToolException
-
-    {
-        Map<String, MavenProject> idToReactorProject = new HashMap<>();
-        if ( reactorProjects != null )
-        {
-            for ( MavenProject reactorProject : reactorProjects )
-            {
-                idToReactorProject.put( String.format( "%s:%s", reactorProject.getGroupId(),
-                        reactorProject.getArtifactId() ), reactorProject );
-            }
-        }
-
-        /*
-         * Find the list of dependencies to resolve transitively. Some projects may be in the reactor.
-         * Reactor projects can't be resolved by the artifact resolver yet.
-         * In order to still get the complete dependency tree for the project, we will add the transitive
-         * dependencies of the reactor project to the list of dependencies to resolve.
-         * Since the transitive dependencies could
-         * also be reactor projects, we need to repeat this check for each of those.
-         * Note that since the dependency reactor
-         * project may specify its own list of repositories,
-         * we need to keep track of which project the transitive dependency is declared in.
-         */
-        List<Dependency> directDependencies = new ArrayList<>( project.getDependencies() );
-        Map<MavenProject, List<Dependency>> reactorProjectToTransitiveDependencies = new HashMap<>();
-        Queue<Pair<MavenProject, Dependency>> dependenciesToCheck = new ArrayDeque<>();
-        for ( Dependency dependency : directDependencies )
-        {
-            dependenciesToCheck.add( Pair.of( project, dependency ) );
-        }
-        if ( reactorProjects != null )
-        {
-            while ( !dependenciesToCheck.isEmpty() )
-            {
-                Pair<MavenProject, Dependency> pair = dependenciesToCheck.remove();
-                Dependency dependency = pair.getRight();
-                String id = String.format( "%s:%s", dependency.getGroupId(), dependency.getArtifactId() );
-                MavenProject dependencyReactorProject = idToReactorProject.get( id );
-                if ( dependencyReactorProject != null )
-                {
-                    /*
-                     * Since the project is in the reactor, the artifact resolver may not be able to resolve
-                     * the artifact plus transitive dependencies yet. In order to still get the
-                     * complete dependency tree for the project, we will add the transitive
-                     * dependencies of the reactor project to the list of dependencies to resolve.
-                     * Since the transitive dependencies could
-                     * also be reactor projects, we need to repeat this check for each of those.
-                     * Note that since the dependency reactor
-                     * project may specify its own list of repositories,
-                     * we need to keep track of which project the transitive dependency is
-                     * declared in.
-                     */
-                    for ( Dependency transitiveDependency
-                            : ( List<Dependency> ) dependencyReactorProject.getDependencies() )
-                    {
-                        dependenciesToCheck.add( Pair.of( dependencyReactorProject, transitiveDependency ) );
-                    }
-                }
-                if ( !directDependencies.contains( dependency ) )
-                {
-                    List<Dependency> transitiveForSameProject =
-                            reactorProjectToTransitiveDependencies.get( pair.getLeft() );
-                    if ( transitiveForSameProject == null )
-                    {
-                        transitiveForSameProject = new ArrayList<>();
-                        reactorProjectToTransitiveDependencies.put( pair.getLeft(), transitiveForSameProject );
-                    }
-                    transitiveForSameProject.add( dependency );
-                }
-            }
-        }
-
-        //Create artifacts for all dependencies,
-        //keep the transitive dependencies grouped by project they are declared in
-        Set<Artifact> directDependencyArtifacts = createDependencyArtifacts( project, directDependencies );
-        Map<MavenProject, Set<Artifact>> reactorProjectToDependencyArtifacts = new HashMap<>();
-        for ( Entry<MavenProject, List<Dependency>> entry : reactorProjectToTransitiveDependencies.entrySet() )
-        {
-            reactorProjectToDependencyArtifacts.put( entry.getKey(),
-                    createDependencyArtifacts( entry.getKey(), entry.getValue() ) );
-        }
-
-        //Resolve artifacts. Transitive dependencies are resolved with the settings of the POM they are declared in.
-        //Skip reactor projects, since they can't necessarily be resolved yet.
-        //The transitive handling above ensures we still get a complete list of dependencies.
-        Set<Artifact> reactorArtifacts = new HashSet<>();
-        Set<Artifact> directArtifactsToResolve = new HashSet<>();
-        if ( reactorProjects == null )
-        {
-            directArtifactsToResolve.addAll( directDependencyArtifacts );
-        }
-        else
-        {
-            partitionByIsReactorProject( directDependencyArtifacts, reactorArtifacts,
-                    directArtifactsToResolve, idToReactorProject.keySet() );
-            for ( Entry<MavenProject, Set<Artifact>> entry : reactorProjectToDependencyArtifacts.entrySet() )
-            {
-                Set<Artifact> nonReactorArtifacts = new HashSet<>();
-                partitionByIsReactorProject( entry.getValue(), reactorArtifacts,
-                        nonReactorArtifacts, idToReactorProject.keySet() );
-                entry.setValue( nonReactorArtifacts );
-            }
-        }
-        Set<Artifact> allDependencies = new HashSet<>( reactorArtifacts );
-        allDependencies.addAll( resolve( directArtifactsToResolve, project.getArtifact(), localRepository,
-                remoteRepositories ).getArtifacts() );
-        for ( Entry<MavenProject, Set<Artifact>> entry : reactorProjectToDependencyArtifacts.entrySet() )
-        {
-            MavenProject reactorProject = entry.getKey();
-            Set<Artifact> toResolve = entry.getValue();
-            Artifact reactorProjectArtifact = reactorProject.getArtifact();
-            List<ArtifactRepository> reactorRemoteRepositories = reactorProject.getRemoteArtifactRepositories();
-            allDependencies.addAll(
-                    resolve( toResolve, reactorProjectArtifact, localRepository,
-                            reactorRemoteRepositories ).getArtifacts() );
-        }
-
-        return new ResolvedProjectDependencies( allDependencies, directDependencyArtifacts );
-    }
-
-    @SuppressWarnings( "unchecked" )
-    private Set<Artifact> createDependencyArtifacts( MavenProject project, List<Dependency> dependencies )
-            throws DependenciesToolException
-    {
-        try
-        {
-            return MavenMetadataSource.createArtifacts( artifactFactory, dependencies, null, null, project );
-        }
-        catch ( InvalidDependencyVersionException e )
-        {
-            throw new DependenciesToolException( e );
-        }
-    }
-
-    private void partitionByIsReactorProject( Set<Artifact> artifacts, Set<Artifact> reactorArtifacts,
-            Set<Artifact> nonReactorArtifacts, Set<String> reactorProjectIds )
-    {
-        for ( Artifact dependencyArtifact : artifacts )
-        {
-                String artifactKey = String.format( "%s:%s", dependencyArtifact.getGroupId(),
-                        dependencyArtifact.getArtifactId() );
-                if ( reactorProjectIds.contains( artifactKey ) )
-                {
-                    reactorArtifacts.add( dependencyArtifact );
-                }
-                else
-                {
-                    nonReactorArtifacts.add( dependencyArtifact );
-                }
-            }
-    }
-
-    private ArtifactResolutionResult resolve( Set<Artifact> artifacts, Artifact projectArtifact,
-            ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
-        throws DependenciesToolException
-    {
-        try
-        {
-            return artifactResolver.resolveTransitively( artifacts, projectArtifact, remoteRepositories,
-                                                           localRepository, artifactMetadataSource );
-        }
-        catch ( ArtifactResolutionException e )
-        {
-            throw new DependenciesToolException( e );
-        }
-        catch ( ArtifactNotFoundException e )
-        {
-            throw new DependenciesToolException( e );
-            }
-    }
-
-
 }

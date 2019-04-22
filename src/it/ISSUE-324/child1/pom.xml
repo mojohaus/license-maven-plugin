@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.codehaus.mojo.license.test</groupId>
+    <artifactId>test-ISSUE-324</artifactId>
+    <version>@pom.version@</version>
+  </parent>
+  <artifactId>test-ISSUE-324-child1</artifactId>
+  <packaging>jar</packaging>
+
+  <dependencies>
+        <!-- Depends on old hbase-annotations, which depends on jdk.tools -->
+    <dependency>
+      <groupId>org.apache.hive.hcatalog</groupId>
+      <artifactId>hive-hcatalog-core</artifactId>
+      <version>2.3.4</version>
+    </dependency>
+        <!-- This has a newer hbase-annotations without jdk.tools. This path to hbase-annotations is shorter, so has precedence -->
+    <dependency>
+      <groupId>org.codehaus.mojo.license.test</groupId>
+      <artifactId>test-ISSUE-324-child2</artifactId>
+      <version>@pom.version@</version>
+    </dependency>
+  </dependencies>
+</project>
