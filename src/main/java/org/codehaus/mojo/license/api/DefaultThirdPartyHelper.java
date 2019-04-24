@@ -45,6 +45,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
+import org.eclipse.aether.repository.RemoteRepository;
 
 /**
  * Default implementation of the {@link org.codehaus.mojo.license.api.ThirdPartyHelper}.
@@ -71,14 +72,14 @@ public class DefaultThirdPartyHelper
     private final ThirdPartyTool thirdPartyTool;
 
     /**
-     * Local repository used.
+     * List of remote repositories. Same as remoteRepositories, just a different API.
      */
-    private final ArtifactRepository localRepository;
+    private final List<ArtifactRepository> remoteRepositoriesCoreApi;
 
     /**
      * List of remote repositories.
      */
-    private final List<ArtifactRepository> remoteRepositories;
+    private final List<RemoteRepository> remoteRepositories;
 
     /**
      * Current maven project.
@@ -113,15 +114,15 @@ public class DefaultThirdPartyHelper
      * @param verbose            Verbose flag
      * @param dependenciesTool   tool to load dependencies
      * @param thirdPartyTool     tool to load third-parties descriptors
-     * @param localRepository    maven local repository
+     * @param remoteRepositoriesCoreApi maven remote repositories, in the core api format
      * @param remoteRepositories maven remote repositories
      * @param log                logger
      */
     // CHECKSTYLE_OFF: ParameterNumber
     public DefaultThirdPartyHelper( MavenProject project, String encoding, boolean verbose,
                                     DependenciesTool dependenciesTool, ThirdPartyTool thirdPartyTool,
-                                    ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories,
-                                    Log log )
+                                    List<ArtifactRepository> remoteRepositoriesCoreApi,
+                                    List<RemoteRepository> remoteRepositories, Log log )
     {
         // CHECKSTYLE_ON: ParameterNumber
         this.project = project;
@@ -129,7 +130,7 @@ public class DefaultThirdPartyHelper
         this.verbose = verbose;
         this.dependenciesTool = dependenciesTool;
         this.thirdPartyTool = thirdPartyTool;
-        this.localRepository = localRepository;
+        this.remoteRepositoriesCoreApi = remoteRepositoriesCoreApi;
         this.remoteRepositories = remoteRepositories;
         this.log = log;
         this.thirdPartyTool.setVerbose( verbose );
@@ -153,8 +154,8 @@ public class DefaultThirdPartyHelper
     public SortedMap<String, MavenProject> loadDependencies( MavenProjectDependenciesConfigurator configuration,
                                                              ResolvedProjectDependencies dependencyArtifacts )
     {
-        return dependenciesTool.loadProjectDependencies( dependencyArtifacts, configuration, localRepository,
-                remoteRepositories, getArtifactCache() );
+        return dependenciesTool.loadProjectDependencies( dependencyArtifacts, configuration,
+                remoteRepositoriesCoreApi, getArtifactCache() );
     }
 
     /**
@@ -167,8 +168,7 @@ public class DefaultThirdPartyHelper
             throws ThirdPartyToolException, IOException
     {
         return thirdPartyTool.loadThirdPartyDescriptorsForUnsafeMapping( topLevelDependencies, encoding, projects,
-                                                                         unsafeDependencies, licenseMap,
-                                                                         localRepository, remoteRepositories );
+                unsafeDependencies, licenseMap, remoteRepositories );
     }
 
     /**

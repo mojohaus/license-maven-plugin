@@ -137,9 +137,9 @@ public class LicensesXmlInsertVersionsMojo
                 }
             };
             final Map<String, LicensedArtifact> resolvedDeps = new TreeMap<String, LicensedArtifact>();
-            dependenciesTool.loadProjectDependencies(
+            licensedArtifactResolver.loadProjectDependencies(
                     new ResolvedProjectDependencies( project.getArtifacts(), project.getDependencyArtifacts() ),
-                                                     config, localRepository, remoteRepositories, resolvedDeps );
+                                                     config, remoteRepositories, resolvedDeps );
             final Map<String, LicensedArtifact> resolvedDepsMap = new HashMap<>( resolvedDeps.size() );
             for ( LicensedArtifact dep : resolvedDeps.values() )
             {

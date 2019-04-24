@@ -80,14 +80,6 @@ public abstract class AbstractDownloadLicensesMojo
     // ----------------------------------------------------------------------
 
     /**
-     * Location of the local repository.
-     *
-     * @since 1.0
-     */
-    @Parameter( defaultValue = "${localRepository}", readonly = true )
-    protected ArtifactRepository localRepository;
-
-    /**
      * List of Remote Repositories used by the resolver
      *
      * @since 1.0
