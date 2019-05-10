@@ -80,16 +80,16 @@ public interface ThirdPartyHelper
      * Load unsafe mapping for all dependencies with no license in their pom, we will load the missing file
      * if it exists and also add all dependencies from licenseMap with no license known.
      *
+     * @param reactorProject      the current project.
      * @param licenseMap          the license map of all dependencies.
-     * @param missingFile         location of an optional missing fille (says where you fix missing license).
-     * @param missingFileUrl      location of an optional missing file extension that can be downloaded from some
-     *                            resource hoster and that will be merged with the content of the missing file.
+     * @param missingLicenseProvider Provides missing licenses
      * @param projectDependencies project dependencies used to detect which dependencies in the missing file
      *                            are unknown to the project.
      * @return the map of all unsafe mapping
      * @throws IOException if could not load missing file
      */
-    SortedProperties loadUnsafeMapping( LicenseMap licenseMap, File missingFile, String missingFileUrl,
+    SortedProperties loadUnsafeMapping( MavenProject reactorProject, LicenseMap licenseMap,
+                                        SortedPropertiesProvider missingLicenseProvider,
                                         SortedMap<String, MavenProject> projectDependencies )
       throws IOException, MojoExecutionException;
 
@@ -97,7 +97,7 @@ public interface ThirdPartyHelper
      * Creates a license map from given dependencies.
      *
      * @param dependencies dependencies to store in the license map
-     * @return the created license map fro the given dependencies
+     * @return the created license map for the given dependencies
      */
     LicenseMap createLicenseMap( SortedMap<String, MavenProject> dependencies );
 
@@ -152,7 +152,8 @@ public interface ThirdPartyHelper
      * @throws IOException              if could not load missing file
      * @throws ThirdPartyToolException  if pb with third-party tool
      */
-    SortedProperties createUnsafeMapping( LicenseMap licenseMap, File missingFile, String missingFileUrl,
+    SortedProperties createUnsafeMapping( LicenseMap licenseMap,
+                                          SortedPropertiesProvider missingLicensesProvider,
                                           boolean useRepositoryMissingFiles,
                                           SortedSet<MavenProject> unsafeDependencies,
                                           SortedMap<String, MavenProject> projectDependencies,

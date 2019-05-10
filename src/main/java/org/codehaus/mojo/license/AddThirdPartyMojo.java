@@ -69,7 +69,6 @@ import org.codehaus.mojo.license.utils.SortedProperties;
        defaultPhase = LifecyclePhase.GENERATE_RESOURCES )
 public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements MavenProjectDependenciesConfigurator
 {
-
     // ----------------------------------------------------------------------
     // Mojo Parameters
     // ----------------------------------------------------------------------
@@ -257,9 +256,9 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
       throws ProjectBuildingException, IOException, ThirdPartyToolException,
             MojoExecutionException, DependenciesToolException
     {
-
         SortedProperties unsafeMappings =
-                getHelper().createUnsafeMapping( licenseMap, missingFile, missingFileUrl,
+                getHelper().createUnsafeMapping( licenseMap,
+                                                 createMissingLicensesProvider(),
                                                  useRepositoryMissingFiles, unsafeDependencies,
                                                  projectDependencies,
                                                  resolveDependencyArtifacts().getAllDependencies() );
@@ -458,6 +457,7 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
         session = mojo.session;
         verbose = mojo.verbose;
         encoding = mojo.encoding;
+        unknownDependencyStrategy = mojo.unknownDependencyStrategy;
 
         setLog( mojo.getLog() );
 

@@ -73,6 +73,22 @@ public interface ThirdPartyTool
     void setVerbose( boolean verbose );
 
     /**
+     * Get the strategy to handle unknown dependencies.
+     *
+     * @param The strategy in use
+     * @since 1.21
+     */
+    UnknownDependencyStrategyFactory.Strategy getUnknownDependencyStrategy();
+
+    /**
+     * Defines the strategy to handle unknown dependencies.
+     *
+     * @param strategy to use
+     * @since 1.21
+     */
+    void setUnknownDependencyStrategy( UnknownDependencyStrategyFactory.Strategy strategy );
+
+    /**
      * Collect license information from property file, 'third-party' classified artifacts, and .license.properties
      * dependencies.
      *
@@ -132,6 +148,7 @@ public interface ThirdPartyTool
     /**
      * Loads unsafe mapping and returns it.
      *
+     * @param reactorProject  current project
      * @param licenseMap      license map
      * @param artifactCache   cache of dependencies (used for id migration from missing file)
      * @param encoding        encoding used to load missing file
@@ -141,8 +158,9 @@ public interface ThirdPartyTool
      * @return the unsafe mapping
      * @throws IOException if pb while reading missing file
      */
-    SortedProperties loadUnsafeMapping( LicenseMap licenseMap, SortedMap<String, MavenProject> artifactCache,
-                                        String encoding, File missingFile, String missingFileUrl )
+    SortedProperties loadUnsafeMapping( MavenProject reactorProject, LicenseMap licenseMap,
+                                        SortedMap<String, MavenProject> artifactCache,
+                                        SortedPropertiesProvider missingLicensesProvider )
             throws IOException, MojoExecutionException;
 
     /**
@@ -155,7 +173,8 @@ public interface ThirdPartyTool
      *                      hoster
      * @throws IOException if pb while reading override file
      */
-    void overrideLicenses( LicenseMap licenseMap, SortedMap<String, MavenProject> artifactCache, String encoding,
+    void overrideLicenses( MavenProject project, LicenseMap licenseMap,
+            SortedMap<String, MavenProject> artifactCache, String encoding,
             String overrideUrl ) throws IOException;
 
     /**

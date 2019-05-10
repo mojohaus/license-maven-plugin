@@ -40,6 +40,8 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
+import org.codehaus.mojo.license.api.SortedPropertiesProvider;
+import org.codehaus.mojo.license.api.impl.SortedPropertiesFileProvider;
 import org.codehaus.mojo.license.model.LicenseMap;
 import org.codehaus.mojo.license.utils.SortedProperties;
 
@@ -60,6 +62,7 @@ import org.codehaus.mojo.license.utils.SortedProperties;
         requiresDependencyResolution = ResolutionScope.TEST, threadSafe = true )
 public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo
 {
+
     // ----------------------------------------------------------------------
     // Mojo Parameters
     // ----------------------------------------------------------------------
@@ -292,8 +295,11 @@ public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo
 
             if ( file.exists() )
             {
-
-                SortedProperties tmp = getHelper().loadUnsafeMapping( licenseMap, file, null, projectDependencies );
+                SortedPropertiesProvider missingLicensesProvider =
+                        new SortedPropertiesFileProvider( file, null );
+                // TODO is p == getProject()??
+                SortedProperties tmp = getHelper().loadUnsafeMapping( p, licenseMap, missingLicensesProvider,
+                        projectDependencies );
                 unsafeMappings.putAll( tmp );
             }
 

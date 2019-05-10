@@ -8,11 +8,13 @@ import org.junit.Test;
 
 public class LicenseMojoUtilsTest
 {
+    public static final File OVERRIDES_PROPERTIES = new File( "src/test/resources/overrides.properties" );
+
     private String resolvedUrl;
     private File deprecatedFile;
     private String url;
     private File basedir = new File( "" );
-    private MockLogger log = new MockLogger();
+    private MockLog log = new MockLog();
 
     @Test
     public void testIsValidNull()
@@ -62,7 +64,7 @@ public class LicenseMojoUtilsTest
     @Test
     public void testPrepareThirdPartyOverrideUrlBothOverrides()
     {
-        deprecatedFile = new File( "src/test/resources/overrides.properties" );
+        deprecatedFile = OVERRIDES_PROPERTIES;
         url = "classpath:overrides.properties";
         try
         {
@@ -93,7 +95,7 @@ public class LicenseMojoUtilsTest
     @Test
     public void testPrepareThirdPartyOverrideUrlDeprecatedFile()
     {
-        deprecatedFile = new File( "src/test/resources/overrides.properties" );
+        deprecatedFile = OVERRIDES_PROPERTIES;
         String actual = runTestAndJoinResults();
         assertEquals(
                 "resolved=file:/.../overrides.properties\n"

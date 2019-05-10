@@ -174,12 +174,14 @@ public class DefaultThirdPartyHelper
     /**
      * {@inheritDoc}
      */
-    public SortedProperties loadUnsafeMapping( LicenseMap licenseMap, File missingFile, String missingFileUrl,
-                                               SortedMap<String, MavenProject> projectDependencies )
+    public SortedProperties loadUnsafeMapping(
+            MavenProject reactorProject,
+            LicenseMap licenseMap, SortedPropertiesProvider missingLicensesProvider,
+            SortedMap<String, MavenProject> projectDependencies )
       throws IOException, MojoExecutionException
     {
-        return thirdPartyTool.loadUnsafeMapping( licenseMap, projectDependencies, encoding, missingFile,
-                missingFileUrl );
+        return thirdPartyTool.loadUnsafeMapping( reactorProject, licenseMap, projectDependencies,
+                missingLicensesProvider );
     }
 
     /**
@@ -218,7 +220,8 @@ public class DefaultThirdPartyHelper
     /**
      * {@inheritDoc}
      */
-    public SortedProperties createUnsafeMapping( LicenseMap licenseMap, File missingFile, String missingFileUrl,
+    public SortedProperties createUnsafeMapping( LicenseMap licenseMap,
+                                                 SortedPropertiesProvider missingLicensesProvider,
                                                  boolean useRepositoryMissingFiles,
                                                  SortedSet<MavenProject> unsafeDependencies,
                                                  SortedMap<String, MavenProject> projectDependencies,
@@ -226,8 +229,8 @@ public class DefaultThirdPartyHelper
       throws ProjectBuildingException, IOException, ThirdPartyToolException, MojoExecutionException
     {
 
-        SortedProperties unsafeMappings = loadUnsafeMapping( licenseMap, missingFile, missingFileUrl,
-                                                             projectDependencies );
+        SortedProperties unsafeMappings = loadUnsafeMapping( project, licenseMap,
+                missingLicensesProvider, projectDependencies );
 
         if ( CollectionUtils.isNotEmpty( unsafeDependencies ) )
         {

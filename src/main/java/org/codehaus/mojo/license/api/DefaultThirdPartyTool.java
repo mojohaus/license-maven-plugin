@@ -22,7 +22,6 @@ package org.codehaus.mojo.license.api;
  * #L%
  */
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -136,6 +135,8 @@ public class DefaultThirdPartyTool
 
     private boolean verbose;
 
+    private UnknownDependencyStrategyFactory.Strategy strategy;
+
     /**
      * {@inheritDoc}
      */
@@ -150,6 +151,22 @@ public class DefaultThirdPartyTool
     public void setVerbose( boolean verbose )
     {
         this.verbose = verbose;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public UnknownDependencyStrategyFactory.Strategy getUnknownDependencyStrategy()
+    {
+        return strategy;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setUnknownDependencyStrategy( UnknownDependencyStrategyFactory.Strategy strategy )
+    {
+        this.strategy = strategy;
     }
 
     /**
@@ -458,11 +475,10 @@ public class DefaultThirdPartyTool
     /**
      * {@inheritDoc}
      */
-    public SortedProperties loadUnsafeMapping( LicenseMap licenseMap,
+    public SortedProperties loadUnsafeMapping( MavenProject reactorProject, LicenseMap licenseMap,
                                                SortedMap<String, MavenProject> artifactCache,
-                                               String encoding,
-                                               File missingFile,
-                                               String missingFileUrl ) throws IOException, MojoExecutionException
+                                               SortedPropertiesProvider missingLicensesProvider
+                                               ) throws IOException, MojoExecutionException
     {
         Map<String, MavenProject> snapshots = new HashMap<>();
 
@@ -489,22 +505,7 @@ public class DefaultThirdPartyTool
         }
         SortedSet<MavenProject> unsafeDependencies = getProjectsWithNoLicense( licenseMap, false );
 
-        SortedProperties unsafeMappings = new SortedProperties( encoding );
-
-        if ( missingFile.exists() )
-        {
-            // there is some unsafe dependencies
-
-            getLogger().info( "Load missing file " + missingFile );
-
-            // load the missing file
-            unsafeMappings.load( missingFile );
-        }
-        if ( UrlRequester.isStringUrl( missingFileUrl ) )
-        {
-            String httpRequestResult = UrlRequester.getFromUrl( missingFileUrl );
-            unsafeMappings.load( new ByteArrayInputStream( httpRequestResult.getBytes() ) );
-        }
+        SortedProperties unsafeMappings = missingLicensesProvider.get();
 
         // get from the missing file, all unknown dependencies
         List<String> unknownDependenciesId = new ArrayList<>();
@@ -538,14 +539,14 @@ public class DefaultThirdPartyTool
             }
         }
 
+        UnknownDependencyStrategy strategy = createUnknownDependencyStrategy( reactorProject, "missingFileUrl" );
+
         if ( !unknownDependenciesId.isEmpty() )
         {
-
             // there is some unknown dependencies in the missing file, remove them
             for ( String id : unknownDependenciesId )
             {
-                getLogger().warn(
-                        "dependency [" + id + "] does not exist in project, remove it from the missing file." );
+                strategy.handleUnknownDependency( id );
                 unsafeMappings.remove( id );
             }
 
@@ -560,7 +561,7 @@ public class DefaultThirdPartyTool
             MavenProject project = artifactCache.get( id );
             if ( project == null )
             {
-                getLogger().warn( "dependency [" + id + "] does not exist in project." );
+                strategy.handleUnknownDependency( id );
                 continue;
             }
 
@@ -605,19 +606,30 @@ public class DefaultThirdPartyTool
         return unsafeMappings;
     }
 
+    private UnknownDependencyStrategy createUnknownDependencyStrategy( MavenProject project, String configOptionName )
+    {
+        return new UnknownDependencyStrategyFactory()
+                .build( strategy, getLogger(), project, configOptionName );
+    }
+
     /**
      * {@inheritDoc}
      */
-    public void overrideLicenses( LicenseMap licenseMap, SortedMap<String, MavenProject> artifactCache, String encoding,
-            String overrideUrl ) throws IOException
+    public void overrideLicenses( MavenProject reactorProject, LicenseMap licenseMap,
+            SortedMap<String, MavenProject> artifactCache,
+            String encoding, String overrideUrl ) throws IOException
     {
         if ( LicenseMojoUtils.isValid( overrideUrl ) )
         {
             final SortedProperties overrideMappings = new SortedProperties( encoding );
+            final UnknownDependencyStrategy strategy =
+                    createUnknownDependencyStrategy( reactorProject, "missingFileUrl" );
+
             try ( Reader reader = new StringReader( UrlRequester.getFromUrl( overrideUrl, encoding ) ) )
             {
                 overrideMappings.load( reader );
             }
+
             for ( Object o : overrideMappings.keySet() )
             {
                 String id = (String) o;
@@ -625,7 +637,7 @@ public class DefaultThirdPartyTool
                 MavenProject project = artifactCache.get( id );
                 if ( project == null )
                 {
-                    getLogger().warn( "dependency [" + id + "] does not exist in project." );
+                    strategy.handleUnknownDependency( id );
                     continue;
                 }
 

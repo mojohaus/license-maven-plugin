@@ -39,6 +39,7 @@ import org.codehaus.mojo.license.api.DependenciesTool;
 import org.codehaus.mojo.license.api.ThirdPartyHelper;
 import org.codehaus.mojo.license.api.ThirdPartyTool;
 import org.codehaus.mojo.license.api.ThirdPartyToolException;
+import org.codehaus.mojo.license.api.UnknownDependencyStrategyFactory;
 import org.codehaus.mojo.license.model.LicenseMap;
 import org.codehaus.mojo.license.utils.FileUtil;
 import org.codehaus.mojo.license.utils.MojoHelper;
@@ -57,6 +58,8 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import org.codehaus.mojo.license.api.DependenciesToolException;
+import org.codehaus.mojo.license.api.SortedPropertiesProvider;
+import org.codehaus.mojo.license.api.SortedPropertiesProviderFactory;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.transfer.ArtifactNotFoundException;
 
@@ -598,6 +601,17 @@ public abstract class AbstractAddThirdPartyMojo
     @Parameter( property = "project.artifacts", required = true, readonly = true )
     protected Set<Artifact> dependencies;
 
+    /**
+     * What to do when a license is specified in either the missing or override files:
+     * <li>
+     *   <ul>{@link UnknownDependencyStrategyFactory.Strategy#ignore}: all errors are ignored</ul>
+     *   <ul>{@link UnknownDependencyStrategyFactory.Strategy#warn}: all errors are output to the log as warnings</ul>
+     * </li>
+     * @since 1.21
+     */
+    @Parameter( property = "license.unknownDependencyStrategy", defaultValue = "warn" )
+    protected UnknownDependencyStrategyFactory.Strategy unknownDependencyStrategy;
+
     // ----------------------------------------------------------------------
     // Plexus components
     // ----------------------------------------------------------------------
@@ -784,6 +798,8 @@ public abstract class AbstractAddThirdPartyMojo
 
         resolvedOverrideUrl = LicenseMojoUtils.prepareThirdPartyOverrideUrl( resolvedOverrideUrl, overrideFile,
                 overrideUrl, project.getBasedir(), getLog() );
+
+        thirdPartyTool.setUnknownDependencyStrategy( unknownDependencyStrategy );
     }
 
     void consolidate() throws IOException, ArtifactNotFoundException, ArtifactResolutionException, MojoFailureException,
@@ -1082,7 +1098,8 @@ public abstract class AbstractAddThirdPartyMojo
 
     void overrideLicenses() throws IOException
     {
-        thirdPartyTool.overrideLicenses( licenseMap, projectDependencies, getEncoding(), resolvedOverrideUrl );
+        thirdPartyTool.overrideLicenses( getProject(), licenseMap, projectDependencies, getEncoding(),
+                resolvedOverrideUrl );
     }
 
     private boolean isFailOnMissing()
@@ -1111,6 +1128,12 @@ public abstract class AbstractAddThirdPartyMojo
         {
             throw new MojoFailureException( "There are some forbidden licenses used, please check your dependencies." );
         }
+    }
+
+    protected SortedPropertiesProvider createMissingLicensesProvider()
+    {
+         return new SortedPropertiesProviderFactory( encoding )
+                .build( missingFile, missingFileUrl );
     }
 
     /**

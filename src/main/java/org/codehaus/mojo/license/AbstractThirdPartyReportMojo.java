@@ -48,7 +48,9 @@ import org.codehaus.mojo.license.api.ThirdPartyToolException;
 import org.codehaus.mojo.license.model.LicenseMap;
 import org.codehaus.mojo.license.utils.MojoHelper;
 import org.codehaus.mojo.license.utils.UrlRequester;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.i18n.I18N;
+import org.codehaus.plexus.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -63,6 +65,8 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import org.codehaus.mojo.license.api.ResolvedProjectDependencies;
+import org.codehaus.mojo.license.api.SortedPropertiesProvider;
+import org.codehaus.mojo.license.api.SortedPropertiesProviderFactory;
 
 /**
  * Base class for third-party reports.
@@ -73,6 +77,8 @@ import org.codehaus.mojo.license.api.ResolvedProjectDependencies;
 public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
     implements MavenProjectDependenciesConfigurator
 {
+    @Requirement
+    private Logger logger;
 
     // ----------------------------------------------------------------------
     // Mojo Parameters
@@ -176,7 +182,7 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
     private boolean useMissingFile;
 
     /**
-     * The file where to fill the license for dependencies with unknwon license.
+     * The file where to fill the license for dependencies with unknown license.
      *
      * @since 1.1
      */
@@ -587,8 +593,12 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
 
             if ( useMissingFile )
             {
+                SortedPropertiesProvider missingLicensesProvider =
+                        new SortedPropertiesProviderFactory( encoding )
+                            .build( missingFile, missingFileUrl );
+
                 // Resolve unsafe dependencies using missing files, this will update licenseMap and unsafeDependencies
-                thirdPartyHelper.createUnsafeMapping( licenseMap, missingFile, missingFileUrl,
+                thirdPartyHelper.createUnsafeMapping( licenseMap, missingLicensesProvider,
                         useRepositoryMissingFiles, dependenciesWithNoLicense,
                         projectDependencies, loadedDependencies.getAllDependencies() );
             }
@@ -598,7 +608,7 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
         thirdPartyHelper.mergeLicenses( licenseMerges, licenseMap );
 
         // Add override licenses
-        thirdPartyTool.overrideLicenses( licenseMap, projectDependencies, encoding, resolvedOverrideUrl );
+        thirdPartyTool.overrideLicenses( project, licenseMap, projectDependencies, encoding, resolvedOverrideUrl );
 
         // let's build third party details for each dependencies
         Collection<ThirdPartyDetails> details = new ArrayList<>();
