@@ -73,11 +73,11 @@ public final class LicenseMojoUtils
         {
             log.warn( "'overrideFile' mojo parameter is deprecated. Use 'overrideUrl' instead." );
         }
-        return prepareUrl( resolvedUrl, deprecatedFile, url, basedir, DEFAULT_OVERRIDE_THIRD_PARTY );
+        return prepareUrl( resolvedUrl, deprecatedFile, url, basedir, DEFAULT_OVERRIDE_THIRD_PARTY, log );
     }
 
     private static String prepareUrl( final String resolvedUrl, final File deprecatedFile, final String url,
-            File basedir, String defaultFilePath )
+            File basedir, String defaultFilePath, Log log )
     {
         if ( resolvedUrl != null && !NO_URL.equals( resolvedUrl ) )
         {
@@ -89,25 +89,47 @@ public final class LicenseMojoUtils
             throw new IllegalArgumentException( "You can't use both overrideFile and overrideUrl" );
         }
 
-        if ( deprecatedFile != null && deprecatedFile.exists() )
+        if ( deprecatedFile != null )
         {
-            return deprecatedFile.toURI().toString();
+            if ( deprecatedFile.exists() )
+            {
+                String result = deprecatedFile.toURI().toString();
+                log.debug( "Loading overrides from file " + result );
+                return result;
+            }
+            else
+            {
+                log.warn( "overrideFile [" + deprecatedFile.getAbsolutePath() + "] was configured but doesn't exist" );
+            }
+        }
+
+        if ( url != null )
+        {
+            if ( UrlRequester.isStringUrl( url ) )
+            {
+                log.debug( "Loading overrides from URL " + url );
+                return url;
+            }
+            else
+            {
+                log.warn( "Unsupported or invalid URL [" + url + "] found in overrideUrl; "
+                        + "supported are 'classpath:' URLs and  anything your JVM supports "
+                        + "(file:, http: and https: should always work)" );
+            }
         }
 
         final Path basedirPath = basedir.toPath();
-
-        if ( url != null && UrlRequester.isStringUrl( url ) )
-        {
-            return basedirPath.toUri().toString();
-        }
-
         final Path defaultPath = basedirPath.resolve( defaultFilePath );
 
         if ( Files.exists( defaultPath ) )
         {
-            return defaultPath.toUri().toString();
+            String result = defaultPath.toUri().toString();
+            log.debug( "Loading overrides from file " + result );
+            return result;
         }
 
+        log.debug( "No (valid) URL and no file [" + defaultPath.toAbsolutePath()
+                + "] found; not loading any overrides" );
         return NO_URL;
     }
 
