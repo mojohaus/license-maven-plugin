@@ -731,6 +731,8 @@ public abstract class AbstractAddThirdPartyMojo
 
         Log log = getLog();
 
+        thirdPartyTool.setUnknownDependencyStrategy( unknownDependencyStrategy );
+
         if ( log.isDebugEnabled() )
         {
 

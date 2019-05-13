@@ -45,6 +45,7 @@ import org.codehaus.mojo.license.api.ThirdPartyDetails;
 import org.codehaus.mojo.license.api.ThirdPartyHelper;
 import org.codehaus.mojo.license.api.ThirdPartyTool;
 import org.codehaus.mojo.license.api.ThirdPartyToolException;
+import org.codehaus.mojo.license.api.UnknownDependencyStrategyFactory;
 import org.codehaus.mojo.license.model.LicenseMap;
 import org.codehaus.mojo.license.utils.MojoHelper;
 import org.codehaus.mojo.license.utils.UrlRequester;
@@ -370,6 +371,17 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
     @Parameter( property = "license.artifactFiltersUrl" )
     private String artifactFiltersUrl;
 
+    /**
+     * What to do when a license is specified in either the missing or override files:
+     * <li>
+     *   <ul>{@link UnknownDependencyStrategyFactory.Strategy#ignore}: all errors are ignored</ul>
+     *   <ul>{@link UnknownDependencyStrategyFactory.Strategy#warn}: all errors are output to the log as warnings</ul>
+     * </li>
+     * @since 1.21
+     */
+    @Parameter( property = "license.unknownDependencyStrategy", defaultValue = "warn" )
+    protected UnknownDependencyStrategyFactory.Strategy unknownDependencyStrategy;
+
     private ArtifactFilters artifactFilters;
 
     // ----------------------------------------------------------------------
@@ -394,6 +406,8 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
     protected void init()
             throws IOException
     {
+        thirdPartyTool.setUnknownDependencyStrategy( unknownDependencyStrategy );
+
         if ( licenseMergesUrl != null )
         {
             getLog().warn( "" );
