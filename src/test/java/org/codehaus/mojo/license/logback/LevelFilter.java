@@ -1,6 +1,6 @@
 package org.codehaus.mojo.license.logback;
 
-import java.util.function.Predicate;
+import com.google.common.base.Predicate;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
@@ -32,7 +32,7 @@ public class LevelFilter implements Predicate<ILoggingEvent>
     }
 
     @Override
-    public boolean test( ILoggingEvent input )
+    public boolean apply( ILoggingEvent input )
     {
         return comparison.matches( input.getLevel(), level );
     }

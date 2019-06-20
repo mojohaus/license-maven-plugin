@@ -2,12 +2,12 @@ package org.codehaus.mojo.license.logback;
 
 import java.lang.reflect.Field;
 import java.util.List;
-import java.util.function.Predicate;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Function;
+import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 
 import ch.qos.logback.classic.Level;
@@ -190,7 +190,7 @@ public class RedirectLogger
 
         for ( Pair<ILoggingEvent, String> event : appender.list )
         {
-            if ( filter.test( event.getKey() ) )
+            if ( filter.apply( event.getKey() ) )
             {
                 buffer.append( event.getValue() );
             }
