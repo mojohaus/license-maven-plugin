@@ -43,8 +43,8 @@ import org.codehaus.mojo.license.api.ResolvedProjectDependencies;
 import org.codehaus.mojo.license.download.LicensedArtifact.Builder;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A tool to deal with dependencies of a project.
@@ -54,8 +54,8 @@ import org.codehaus.plexus.logging.Logger;
  */
 @Component( role = LicensedArtifactResolver.class, hint = "default" )
 public class LicensedArtifactResolver
-    extends AbstractLogEnabled
 {
+    private static final Logger LOG = LoggerFactory.getLogger( LicensedArtifactResolver.class );
 
     /**
      * Message used when an invalid expression pattern is found.
@@ -113,8 +113,6 @@ public class LicensedArtifactResolver
         final Map<String, Artifact> excludeArtifacts = new HashMap<>();
         final Map<String, Artifact> includeArtifacts = new HashMap<>();
 
-        final Logger log = getLogger();
-
         ProjectBuildingRequest projectBuildingRequest
                 = new DefaultProjectBuildingRequest( mavenSession.getProjectBuildingRequest() )
                         .setRemoteRepositories( remoteRepositories )
@@ -137,10 +135,7 @@ public class LicensedArtifactResolver
 
             if ( !artifactFilters.isIncluded( artifact ) )
             {
-                if ( verbose )
-                {
-                    log.debug( "Excluding artifact " + artifact );
-                }
+                LOG.debug( "Excluding artifact {}", artifact );
                 continue;
             }
 
@@ -148,7 +143,7 @@ public class LicensedArtifactResolver
 
             if ( verbose )
             {
-                log.info( "detected artifact " + id );
+                LOG.info( "detected artifact {}", id );
             }
 
             LicensedArtifact depMavenProject;
@@ -158,7 +153,7 @@ public class LicensedArtifactResolver
 
             if ( depMavenProject != null )
             {
-                log.debug( "Dependency [" + id + "] already present in the result" );
+                LOG.debug( "Dependency [{}] already present in the result", id );
             }
             else
             {
@@ -170,7 +165,6 @@ public class LicensedArtifactResolver
                     final MavenProject project = mavenProjectBuilder
                             .build( artifact, true, projectBuildingRequest )
                             .getProject();
-                    @SuppressWarnings( "unchecked" )
                     List<org.apache.maven.model.License> lics = project.getLicenses();
                     if ( lics != null )
                     {
@@ -191,7 +185,7 @@ public class LicensedArtifactResolver
 
                 if ( verbose )
                 {
-                    log.info( "add dependency [" + id + "]" );
+                    LOG.info( "add dependency [{}]", id );
                 }
 
                 result.put( id, depMavenProject );

@@ -127,7 +127,7 @@ public interface ThirdPartyTool
      * @param doLog      a flag to add debug logs
      * @return the set of projects with no license
      */
-    SortedSet<MavenProject> getProjectsWithNoLicense( LicenseMap licenseMap, boolean doLog );
+    SortedSet<MavenProject> getProjectsWithNoLicense( LicenseMap licenseMap );
 
     /**
      * Loads unsafe mapping and returns it.

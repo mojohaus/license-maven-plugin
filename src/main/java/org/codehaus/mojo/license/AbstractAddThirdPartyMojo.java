@@ -29,7 +29,6 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
@@ -59,6 +58,8 @@ import java.util.SortedSet;
 import org.codehaus.mojo.license.api.DependenciesToolException;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.transfer.ArtifactNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Abstract mojo for all third-party mojos.
@@ -69,6 +70,7 @@ import org.eclipse.aether.transfer.ArtifactNotFoundException;
 public abstract class AbstractAddThirdPartyMojo
         extends AbstractLicenseMojo
 {
+    private static final Logger LOG = LoggerFactory.getLogger( AbstractAddThirdPartyMojo.class );
 
     // ----------------------------------------------------------------------
     // Mojo Parameters
@@ -715,11 +717,8 @@ public abstract class AbstractAddThirdPartyMojo
             throws Exception
     {
 
-        Log log = getLog();
-
-        if ( log.isDebugEnabled() )
+        if ( getLog().isDebugEnabled() )
         {
-
             // always be verbose in debug mode
             setVerbose( true );
         }
@@ -728,11 +727,8 @@ public abstract class AbstractAddThirdPartyMojo
 
         long buildTimestamp = getBuildTimestamp();
 
-        if ( isVerbose() || getLog().isDebugEnabled() )
-        {
-            log.debug( "Build start   at : " + buildTimestamp );
-            log.debug( "third-party file : " + thirdPartyFile.lastModified() );
-        }
+        LOG.debug( "Build start   at: {}", buildTimestamp );
+        LOG.debug( "third-party file: {}", thirdPartyFile.lastModified() );
 
         doGenerate = force || !thirdPartyFile.exists() || buildTimestamp > thirdPartyFile.lastModified();
 
@@ -741,10 +737,7 @@ public abstract class AbstractAddThirdPartyMojo
 
             File bundleFile = FileUtil.getFile( outputDirectory, bundleThirdPartyPath );
 
-            if ( isVerbose() || getLog().isDebugEnabled() )
-            {
-                log.debug( "bundle third-party file : " + bundleFile.lastModified() );
-            }
+            LOG.debug( "bundle third-party file: {}", bundleFile.lastModified() );
             doGenerateBundle = force || !bundleFile.exists() || buildTimestamp > bundleFile.lastModified();
         }
         else
@@ -764,18 +757,18 @@ public abstract class AbstractAddThirdPartyMojo
             {
                 throw new MojoExecutionException( "You can't use both licenseMergesFile and licenseMergesUrl" );
             }
-            getLog().warn( "" );
-            getLog().warn( "!!! licenseMergesFile is deprecated, use now licenseMergesUrl !!!" );
-            getLog().warn( "" );
-            getLog().warn( "licenseMerges will be overridden by licenseMergesFile." );
-            getLog().warn( "" );
+            LOG.warn( "" );
+            LOG.warn( "!!! licenseMergesFile is deprecated, use now licenseMergesUrl !!!" );
+            LOG.warn( "" );
+            LOG.warn( "licenseMerges will be overridden by licenseMergesFile." );
+            LOG.warn( "" );
             licenseMerges = FileUtils.readLines( new File( licenseMergesFile ), "utf-8" );
         }
         else if ( licenseMergesUrl != null )
         {
-            getLog().warn( "" );
-            getLog().warn( "licenseMerges will be overridden by licenseMergesUrl." );
-            getLog().warn( "" );
+            LOG.warn( "" );
+            LOG.warn( "licenseMerges will be overridden by licenseMergesUrl." );
+            LOG.warn( "" );
             if ( UrlRequester.isStringUrl( licenseMergesUrl ) )
             {
                 licenseMerges = Arrays.asList( UrlRequester.getFromUrl( licenseMergesUrl ).split( "[\n\r]+" ) );
@@ -874,7 +867,7 @@ public abstract class AbstractAddThirdPartyMojo
         {
             helper = new DefaultThirdPartyHelper( getProject(), getEncoding(), isVerbose(), dependenciesTool,
                     thirdPartyTool, getProject().getRemoteArtifactRepositories(),
-                    getProject().getRemoteProjectRepositories(), getLog() );
+                    getProject().getRemoteProjectRepositories() );
         }
         return helper;
     }
@@ -934,20 +927,19 @@ public abstract class AbstractAddThirdPartyMojo
     {
         if ( CollectionUtils.isNotEmpty( unsafeDependencies ) )
         {
-            Log log = getLog();
-            if ( log.isWarnEnabled() )
+            if ( LOG.isWarnEnabled() )
             {
                 boolean plural = unsafeDependencies.size() > 1;
                 String message = String.format( "There %s %d %s with no license :",
                     plural ? "are" : "is",
                             unsafeDependencies.size(),
                     plural ? "dependencies" : "dependency" );
-                log.warn( message );
+                LOG.warn( message );
                 for ( MavenProject dep : unsafeDependencies )
                 {
 
                     // no license found for the dependency
-                    log.warn( " - " + MojoHelper.getArtifactId( dep.getArtifact() ) );
+                    LOG.warn( " - {}", MojoHelper.getArtifactId( dep.getArtifact() ) );
                 }
             }
         }
@@ -961,7 +953,7 @@ public abstract class AbstractAddThirdPartyMojo
         if ( CollectionUtils.isNotEmpty( blackLicenses ) )
         {
             Set<String> licenses = licenseMap.keySet();
-            getLog().info( "Excluded licenses (blacklist): " + blackLicenses );
+            LOG.info( "Excluded licenses (blacklist): {}", blackLicenses );
 
             for ( String excludeLicense : blackLicenses )
             {
@@ -977,20 +969,19 @@ public abstract class AbstractAddThirdPartyMojo
         if ( CollectionUtils.isNotEmpty( whiteLicenses ) )
         {
             Set<String> dependencyLicenses = licenseMap.keySet();
-            getLog().info( "Included licenses (whitelist): " + whiteLicenses );
+            LOG.info( "Included licenses (whitelist): {}", whiteLicenses );
 
             for ( String dependencyLicense : dependencyLicenses )
             {
-                getLog().debug( "Testing license '" + dependencyLicense + "'" );
+                LOG.debug( "Testing license '{}'", dependencyLicense );
                 if ( !whiteLicenses.contains( dependencyLicense )
                         && CollectionUtils.isNotEmpty( licenseMap.get( dependencyLicense ) ) )
                 {
-                    getLog().debug( "Testing dependency license '" + dependencyLicense
-                            + "' against all other licenses" );
+                    LOG.debug( "Testing dependency license '{}' against all other licenses", dependencyLicense );
 
                     for ( MavenProject dependency : licenseMap.get( dependencyLicense ) )
                     {
-                        getLog().debug( "  testing dependency " + dependency );
+                        LOG.debug( "- testing dependency {}" + dependency );
 
                         boolean forbiddenLicenseUsed = true;
 
@@ -1012,8 +1003,10 @@ public abstract class AbstractAddThirdPartyMojo
 
                             if ( licenseMap.get( otherLicense ).contains( dependency ) )
                             {
-                                getLog().info( "License: '" + dependencyLicense + "' for '" + dependency + "'is OK "
-                                                 + "since it is also licensed under '" + otherLicense + "'" );
+                                LOG.info( "License: '{}' for '{}' is OK since it is also licensed under '{}'",
+                                         dependencyLicense,
+                                         dependency,
+                                         otherLicense );
                                 // this dependency is licensed under another license from white list
                                 forbiddenLicenseUsed = false;
                                 break;
@@ -1035,8 +1028,7 @@ public abstract class AbstractAddThirdPartyMojo
 
         if ( !safe )
         {
-            Log log = getLog();
-            log.warn( "There are " + unsafeLicenses.size() + " forbidden licenses used:" );
+            LOG.warn( "There are {} forbidden licenses used:", unsafeLicenses.size() );
             for ( String unsafeLicense : unsafeLicenses )
             {
 
@@ -1050,7 +1042,7 @@ public abstract class AbstractAddThirdPartyMojo
                     {
                         sb.append( "\n -" ).append( MojoHelper.getArtifactName( dep ) );
                     }
-                    log.warn( sb.toString() );
+                    LOG.warn( "{}", sb );
                 }
             }
         }

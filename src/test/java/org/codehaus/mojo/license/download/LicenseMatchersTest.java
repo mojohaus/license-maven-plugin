@@ -22,7 +22,6 @@ package org.codehaus.mojo.license.download;
  * #L%
  */
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.codehaus.mojo.license.download.LicenseMatchers.DependencyMatcher;

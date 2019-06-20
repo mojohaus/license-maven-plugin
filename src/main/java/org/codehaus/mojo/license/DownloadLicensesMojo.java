@@ -82,7 +82,6 @@ public class DownloadLicensesMojo
         return skipDownloadLicenses;
     }
 
-    @SuppressWarnings( "unchecked" )
     protected Map<String, LicensedArtifact> getDependencies()
     {
         final Map<String, LicensedArtifact> result = new TreeMap<>();

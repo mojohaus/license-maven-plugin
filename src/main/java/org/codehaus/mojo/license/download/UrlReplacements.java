@@ -29,9 +29,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.maven.plugin.logging.Log;
 import org.codehaus.mojo.license.spdx.SpdxLicenseList;
 import org.codehaus.mojo.license.spdx.SpdxLicenseList.Attachments.UrlReplacement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Applies manually configured license URL replacements as well as the default ones a necessary.
@@ -41,21 +42,19 @@ import org.codehaus.mojo.license.spdx.SpdxLicenseList.Attachments.UrlReplacement
  */
 public class UrlReplacements
 {
+    private static final Logger LOG = LoggerFactory.getLogger( UrlReplacements.class );
 
-    public static Builder builder( Log log )
+    public static Builder builder()
     {
-        return new Builder( log );
+        return new Builder();
     }
 
     private final List<UrlReplacement> replacements;
 
-    private final Log log;
-
-    UrlReplacements( List<UrlReplacement> replacements, Log log )
+    UrlReplacements( List<UrlReplacement> replacements )
     {
         super();
         this.replacements = replacements;
-        this.log = log;
     }
 
     public String rewriteIfNecessary( final String originalLicenseUrl )
@@ -66,9 +65,9 @@ public class UrlReplacements
             resultUrl = r.getUrlPattern().matcher( resultUrl ).replaceAll( r.getReplacement() );
         }
 
-        if ( log.isDebugEnabled() && !resultUrl.equals( originalLicenseUrl ) )
+        if ( LOG.isDebugEnabled() && !resultUrl.equals( originalLicenseUrl ) )
         {
-            log.debug( String.format( "Rewrote URL %s => %s", originalLicenseUrl, resultUrl ) );
+            LOG.debug( "Rewrote URL {} => {}", originalLicenseUrl, resultUrl );
         }
         return resultUrl;
     }
@@ -82,16 +81,9 @@ public class UrlReplacements
     {
         private List<UrlReplacement> replacements = new ArrayList<>();
 
-        private final Log log;
-
         private boolean useDefaults;
 
         private Set<String> ids = new HashSet<>();
-
-        public Builder( Log log )
-        {
-            this.log = log;
-        }
 
         public Builder replacement( String id, String urlPattern, String replacement )
         {
@@ -130,7 +122,7 @@ public class UrlReplacements
                     }
                 }
 
-                if ( usedDefaults > 0 && log.isDebugEnabled() )
+                if ( usedDefaults > 0 && LOG.isDebugEnabled() )
                 {
                     final StringBuilder sb = new StringBuilder();
                     sb.append( "Appending " + usedDefaults + " default licenseUrlReplacements:\n" )
@@ -156,12 +148,12 @@ public class UrlReplacements
                     }
                     sb
                     .append( "</licenseUrlReplacements>\n" );
-                    log.debug( sb.toString() );
+                    LOG.debug( sb.toString() );
                 }
             }
             List<UrlReplacement> rs = Collections.unmodifiableList( replacements );
             replacements = null;
-            return new UrlReplacements( rs, log );
+            return new UrlReplacements( rs );
         }
     }
 }
