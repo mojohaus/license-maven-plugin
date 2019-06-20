@@ -26,8 +26,9 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import org.apache.maven.plugin.logging.Log;
 import org.codehaus.mojo.license.utils.UrlRequester;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility methods common to various mojos.
@@ -36,6 +37,8 @@ import org.codehaus.mojo.license.utils.UrlRequester;
  */
 public final class LicenseMojoUtils
 {
+    private static final Logger LOG = LoggerFactory.getLogger(LicenseMojoUtils.class);
+
     /** A special singleton to pass the information that the URL was not set. */
     static final String NO_URL = "file:///inexistent";
     static final String DEFAULT_OVERRIDE_THIRD_PARTY = "src/license/override-THIRD-PARTY.properties";
@@ -67,17 +70,17 @@ public final class LicenseMojoUtils
      * @return a valid URL or {@link #NO_URL}, never {@code null}
      */
     static String prepareThirdPartyOverrideUrl( final String resolvedUrl, final File deprecatedFile, final String url,
-            File basedir, Log log )
+            File basedir )
     {
         if ( deprecatedFile != null )
         {
-            log.warn( "'overrideFile' mojo parameter is deprecated. Use 'overrideUrl' instead." );
+            LOG.warn( "'overrideFile' mojo parameter is deprecated. Use 'overrideUrl' instead." );
         }
-        return prepareUrl( resolvedUrl, deprecatedFile, url, basedir, DEFAULT_OVERRIDE_THIRD_PARTY, log );
+        return prepareUrl( resolvedUrl, deprecatedFile, url, basedir, DEFAULT_OVERRIDE_THIRD_PARTY );
     }
 
     private static String prepareUrl( final String resolvedUrl, final File deprecatedFile, final String url,
-            File basedir, String defaultFilePath, Log log )
+            File basedir, String defaultFilePath )
     {
         if ( resolvedUrl != null && !NO_URL.equals( resolvedUrl ) )
         {
@@ -94,12 +97,12 @@ public final class LicenseMojoUtils
             if ( deprecatedFile.exists() )
             {
                 String result = deprecatedFile.toURI().toString();
-                log.debug( "Loading overrides from file " + result );
+                LOG.debug( "Loading overrides from file " + result );
                 return result;
             }
             else
             {
-                log.warn( "overrideFile [" + deprecatedFile.getAbsolutePath() + "] was configured but doesn't exist" );
+                LOG.warn( "overrideFile [" + deprecatedFile.getAbsolutePath() + "] was configured but doesn't exist" );
             }
         }
 
@@ -107,12 +110,12 @@ public final class LicenseMojoUtils
         {
             if ( UrlRequester.isStringUrl( url ) )
             {
-                log.debug( "Loading overrides from URL " + url );
+                LOG.debug( "Loading overrides from URL " + url );
                 return url;
             }
             else
             {
-                log.warn( "Unsupported or invalid URL [" + url + "] found in overrideUrl; "
+                LOG.warn( "Unsupported or invalid URL [" + url + "] found in overrideUrl; "
                         + "supported are 'classpath:' URLs and  anything your JVM supports "
                         + "(file:, http: and https: should always work)" );
             }
@@ -124,11 +127,11 @@ public final class LicenseMojoUtils
         if ( Files.exists( defaultPath ) )
         {
             String result = defaultPath.toUri().toString();
-            log.debug( "Loading overrides from file " + result );
+            LOG.debug( "Loading overrides from file " + result );
             return result;
         }
 
-        log.debug( "No (valid) URL and no file [" + defaultPath.toAbsolutePath()
+        LOG.debug( "No (valid) URL and no file [" + defaultPath.toAbsolutePath()
                 + "] found; not loading any overrides" );
         return NO_URL;
     }

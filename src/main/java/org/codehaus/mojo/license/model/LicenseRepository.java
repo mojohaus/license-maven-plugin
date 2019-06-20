@@ -23,9 +23,9 @@ package org.codehaus.mojo.license.model;
  */
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.codehaus.mojo.license.utils.MojoHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URL;
@@ -46,11 +46,7 @@ import java.util.regex.Pattern;
 public class LicenseRepository
     implements Iterable<License>
 {
-
-    /**
-     * Logger.
-     */
-    private static final Log LOG = LogFactory.getLog( LicenseRepository.class );
+    private static final Logger LOG = LoggerFactory.getLogger(LicenseRepository.class);
 
     public static final String REPOSITORY_DEFINITION_FILE = "licenses.properties";
 
@@ -160,14 +156,8 @@ public class LicenseRepository
 
                 license.setDescription( licenseDescription );
 
-                if ( LOG.isInfoEnabled() )
-                {
-                    LOG.info( "register " + license.getDescription() );
-                }
-                if ( LOG.isDebugEnabled() )
-                {
-                    LOG.debug( license );
-                }
+                LOG.info( "register {}", license.getDescription() );
+                LOG.debug( "{}", license );
                 licenses.add( license );
             }
             licenses = Collections.unmodifiableList( licenses );

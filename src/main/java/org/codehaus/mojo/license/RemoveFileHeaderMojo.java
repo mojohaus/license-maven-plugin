@@ -32,10 +32,11 @@ import org.codehaus.mojo.license.model.License;
 import org.codehaus.mojo.license.utils.FileUtil;
 import org.codehaus.mojo.license.utils.MojoHelper;
 import org.codehaus.plexus.util.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashSet;
@@ -53,6 +54,7 @@ import java.util.TreeMap;
 @Mojo( name = "remove-file-header", threadSafe = true )
 public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo
 {
+    private static final Logger LOG = LoggerFactory.getLogger(RemoveFileHeaderMojo.class);
 
     // ----------------------------------------------------------------------
     // Mojo Parameters
@@ -255,7 +257,7 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo
                 String str = String.format( commentFormat, aTransformer.getName(), aTransformer.getDescription() );
                 buffer.append( str );
             }
-            getLog().info( buffer.toString() );
+            LOG.info( "{}", buffer );
         }
 
         // set timestamp used for temporary files
@@ -268,7 +270,7 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo
             roots = DEFAULT_ROOTS;
             if ( isVerbose() )
             {
-                getLog().info( "Will use default roots " + Arrays.toString( roots ) );
+                LOG.info( "Will use default roots {}", ( Object ) roots );
             }
         }
 
@@ -277,7 +279,7 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo
             includes = DEFAULT_INCLUDES;
             if ( isVerbose() )
             {
-                getLog().info( "Will use default includes " + Arrays.toString( includes ) );
+                LOG.info( "Will use default includes {}", ( Object ) includes );
             }
         }
 
@@ -286,7 +288,7 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo
             excludes = DEFAULT_EXCLUDES;
             if ( isVerbose() )
             {
-                getLog().info( "Will use default excludes" + Arrays.toString( excludes ) );
+                LOG.info( "Will use default excludes {}", ( Object ) excludes );
             }
         }
 
@@ -302,7 +304,7 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo
             {
                 if ( isVerbose() )
                 {
-                    getLog().info( "Associate extension " + extension + " to comment style " + commentStyle );
+                    LOG.info( "Associate extension '{}' to comment style '{}'", extension, commentStyle );
                 }
                 extensionToCommentStyle.put( extension, commentStyle );
             }
@@ -319,8 +321,8 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo
                 {
 
                     // override existing extension mapping
-                    getLog().warn( "The extension " + extension + " is already accepted for comment style "
-                                           + extensionToCommentStyle.get( extension ) );
+                    LOG.warn( "The extension '{}' is already accepted for comment style '{}'",
+                            extension, extensionToCommentStyle.get( extension ) );
                 }
                 String commentStyle = entry.getValue();
 
@@ -329,7 +331,7 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo
 
                 if ( isVerbose() )
                 {
-                    getLog().info( "Associate extension '" + extension + "' to comment style '" + commentStyle + "'" );
+                    LOG.info( "Associate extension '{}' to comment style '{}'", extension, commentStyle );
                 }
                 extensionToCommentStyle.put( extension, commentStyle );
             }
@@ -372,20 +374,18 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo
             int nbFiles = processedFiles.size();
             if ( nbFiles == 0 && !ignoreNoFileToScan )
             {
-                getLog().warn( "No file to scan." );
+                LOG.warn( "No file to scan." );
             }
             else
             {
                 String delay = MojoHelper.convertTime( System.nanoTime() - t0 );
-                String message =
-                        String.format( "Scan %s file%s header done in %s.", nbFiles, nbFiles > 1 ? "s" : "", delay );
-                getLog().info( message );
+                LOG.info( "Scanned {} file headers in {}.", nbFiles, delay );
             }
             Set<FileState> states = result.keySet();
             if ( states.size() == 1 && states.contains( FileState.uptodate ) )
             {
                 // all files where up to date
-                getLog().info( "All files are up-to-date." );
+                LOG.info( "All files are up-to-date." );
             }
             else
             {
@@ -397,7 +397,7 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo
                     reportType( result, state, buffer );
                 }
 
-                getLog().info( buffer.toString() );
+                LOG.info( "{}", buffer );
             }
 
         }
@@ -423,8 +423,8 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo
 
         if ( isVerbose() )
         {
-            getLog().info( "Process header '" + commentStyle + "'" );
-            getLog().info( " - using " + license.getDescription() );
+            LOG.info( "Process header '{}'", commentStyle );
+            LOG.info( " - using {}", license.getDescription() );
         }
 
         // use header transformer according to comment style given in header
@@ -455,7 +455,7 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo
         //check that file is not marked to be ignored
         if ( content.contains( ignoreTag ) )
         {
-            getLog().info( " - ignore file (detected " + ignoreTag + ") " + file );
+            LOG.info( " - ignore file (detected {}) {}", ignoreTag, file );
 
             FileState.ignore.addFile( file, result );
 
@@ -491,7 +491,7 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo
 
         if ( isVerbose() )
         {
-            getLog().info( " - header was removed for " + file );
+            LOG.info( " - header was removed for {}", file );
         }
 
         String contentWithoutHeader = content.substring( 0, firstIndex ) + content.substring( lastIndex + 1 );
@@ -513,7 +513,7 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo
 
         if ( processedFiles.contains( file ) )
         {
-            getLog().info( " - skip already processed file " + file );
+            LOG.info( " - skip already processed file {}", file );
             return;
         }
 
@@ -526,8 +526,10 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo
         }
         catch ( Exception e )
         {
-            getLog().warn( "skip failed file : " + e.getMessage()
-                                   + ( e.getCause() == null ? "" : " Cause : " + e.getCause().getMessage() ), e );
+            LOG.warn( "skip failed file: {}{}",
+                   e.getMessage(),
+                   e.getCause() == null ? "" : " Cause : " + e.getCause().getMessage(),
+                   e );
             FileState.fail.addFile( file, result );
             doFinalize = false;
         }
@@ -573,7 +575,7 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo
 
             if ( isVerbose() )
             {
-                getLog().debug( " - backup original file " + file );
+                LOG.debug( " - backup original file {}", file );
             }
 
             FileUtil.renameFile( file, backupFile );
@@ -595,7 +597,7 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo
             }
             catch ( IOException e )
             {
-                getLog().warn( e.getMessage() );
+                LOG.warn( e.getMessage(), e );
             }
         }
     }

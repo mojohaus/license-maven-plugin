@@ -27,6 +27,8 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.codehaus.mojo.license.model.License;
 import org.codehaus.mojo.license.utils.FileUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 
@@ -45,6 +47,7 @@ import java.io.File;
 public class UpdateProjectLicenseMojo
     extends AbstractLicenseNameMojo
 {
+    private static final Logger LOG = LoggerFactory.getLogger(UpdateProjectLicenseMojo.class);
 
     // ----------------------------------------------------------------------
     // Mojo Parameters
@@ -166,17 +169,17 @@ public class UpdateProjectLicenseMojo
         if ( doGenerate )
         {
 
-            getLog().info( "Will create or update license file [" + license.getName() + "] to " + licenseFile );
+            LOG.info( "Will create or update license file [{}] to {}", license.getName(), licenseFile );
             if ( isVerbose() )
             {
-                getLog().info( "detail of license :\n" + license );
+                LOG.info( "detail of license :\n{}", license );
             }
 
             if ( licenseFile.exists() && isKeepBackup() )
             {
                 if ( isVerbose() )
                 {
-                    getLog().info( "backup " + licenseFile );
+                    LOG.info( "backup {}", licenseFile );
                 }
                 // copy it to backup file
                 FileUtil.backupFile( licenseFile );

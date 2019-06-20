@@ -23,9 +23,9 @@ package org.codehaus.mojo.license.model;
  */
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URL;
@@ -47,7 +47,7 @@ public class LicenseStore
     /**
      * Logger.
      */
-    private static final Log LOG = LogFactory.getLog( LicenseStore.class );
+    private static final Logger LOG = LoggerFactory.getLogger( LicenseStore.class );
 
     /**
      * class-path directory where is the licenses repository.
@@ -69,7 +69,7 @@ public class LicenseStore
      */
     protected boolean init;
 
-    public static LicenseStore createLicenseStore( org.apache.maven.plugin.logging.Log log, String... extraResolver )
+    public static LicenseStore createLicenseStore( String... extraResolver )
         throws MojoExecutionException
     {
         LicenseStore store;
@@ -83,7 +83,7 @@ public class LicenseStore
                 {
                     if ( StringUtils.isNotEmpty( s ) )
                     {
-                        log.info( "adding extra resolver " + s );
+                        LOG.info( "adding extra resolver {}", s );
                         store.addRepository( s );
                     }
                 }
@@ -174,9 +174,9 @@ public class LicenseStore
                 break;
             }
         }
-        if ( result == null && LOG.isDebugEnabled() )
+        if ( result == null )
         {
-            LOG.debug( "could not find license named '" + licenseName + "'" );
+            LOG.debug( "could not find license named '{}'", licenseName );
         }
         return result;
     }
@@ -192,10 +192,7 @@ public class LicenseStore
         else if ( extraResolver.startsWith( CLASSPATH_PROTOCOL ) )
         {
             extraResolver = extraResolver.substring( CLASSPATH_PROTOCOL.length() );
-            if ( LOG.isDebugEnabled() )
-            {
-                LOG.info( "Using classpath extraresolver: " + extraResolver );
-            }
+            LOG.info( "Using classpath extraresolver: {}", extraResolver );
             URL baseURL = getClass().getClassLoader().getResource( extraResolver );
             addRepository( baseURL );
         }
@@ -212,10 +209,7 @@ public class LicenseStore
         checkNotInit( "addRepository" );
         LicenseRepository repository = new LicenseRepository();
         repository.setBaseURL( baseURL );
-        if ( LOG.isDebugEnabled() )
-        {
-            LOG.debug( "Adding a license repository " + repository );
-        }
+        LOG.debug( "Adding a license repository {}", repository );
         addRepository( repository );
     }
 
@@ -226,10 +220,7 @@ public class LicenseStore
         URL baseURL = getClass().getResource( JAR_LICENSE_REPOSITORY );
         LicenseRepository repository = new LicenseRepository();
         repository.setBaseURL( baseURL );
-        if ( LOG.isDebugEnabled() )
-        {
-            LOG.debug( "Adding a jar license repository " + repository );
-        }
+        LOG.debug( "Adding a jar license repository {}", repository );
         addRepository( repository );
     }
 
@@ -237,10 +228,7 @@ public class LicenseStore
         throws IOException
     {
         checkNotInit( "addRootPackageClassPathRepository" );
-        if ( LOG.isDebugEnabled() )
-        {
-            LOG.debug( "Adding a no package class path license repository " );
-        }
+        LOG.debug( "Adding a no package class path license repository " );
         addRepository( new RootPackageClassPathLicenseRepository() );
     }
 
@@ -260,10 +248,7 @@ public class LicenseStore
             repositories = new ArrayList<>();
 
         }
-        if ( LOG.isInfoEnabled() )
-        {
-            LOG.info( "Adding a license repository " + repository.getBaseURL() );
-        }
+        LOG.info( "Adding a license repository {}", repository.getBaseURL() );
         repositories.add( repository );
     }
 

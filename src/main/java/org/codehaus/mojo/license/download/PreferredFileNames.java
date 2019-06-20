@@ -39,11 +39,12 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
-import org.apache.maven.plugin.logging.Log;
 import org.codehaus.mojo.license.spdx.SpdxLicenseInfo;
 import org.codehaus.mojo.license.spdx.SpdxLicenseInfo.Attachments.UrlInfo;
 import org.codehaus.mojo.license.spdx.SpdxLicenseList;
 import org.codehaus.mojo.license.utils.FileUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An url -&gt; {@link FileNameEntry} mapping.
@@ -54,14 +55,13 @@ import org.codehaus.mojo.license.utils.FileUtil;
 // CHECKSTYLE_OFF: MethodLength
 public class PreferredFileNames
 {
+    private static final Logger LOG = LoggerFactory.getLogger(PreferredFileNames.class);
     /**
      * @param licensesOutputDirectory
      * @param licenseUrlFileNames
-     * @param log
      * @return a new {@link PreferredFileNames} built of AbstractDownloadLicensesMojo.licenseUrlFileNames
      */
-    public static PreferredFileNames build( File licensesOutputDirectory, Map<String, String> licenseUrlFileNames,
-                                              Log log )
+    public static PreferredFileNames build( File licensesOutputDirectory, Map<String, String> licenseUrlFileNames )
     {
         final Map<String, Map.Entry<String, List<Pattern>>> fileNameToUrlPatterns = new LinkedHashMap<>();
         final Map<String, String> sha1TofileName = new LinkedHashMap<String, String>();
@@ -71,7 +71,7 @@ public class PreferredFileNames
         {
             if ( licenseUrlFileNames.containsKey( "spdx" ) )
             {
-                spdx( log, fileNameToUrlPatterns, sha1TofileName );
+                spdx( fileNameToUrlPatterns, sha1TofileName );
             }
 
             for ( Entry<String, String> en : licenseUrlFileNames.entrySet() )
@@ -119,17 +119,17 @@ public class PreferredFileNames
                 }
             }
         }
-        return new PreferredFileNames( licensesOutputDirectory, fileNameToUrlPatterns, sha1TofileName, log );
+        return new PreferredFileNames( licensesOutputDirectory, fileNameToUrlPatterns, sha1TofileName );
 
     }
 
-    private static <V, K> void spdx( Log log, Map<String, Entry<String, List<Pattern>>> result,
+    private static <V, K> void spdx( Map<String, Entry<String, List<Pattern>>> result,
                               Map<String, String> sha1TofileName )
     {
         final Map<String, Entry<String, List<Pattern>>> fileNameToUrlPatterns = new TreeMap<>();
         final SpdxLicenseList spdxList = SpdxLicenseList.getLatest();
         final Map<String, SpdxLicenseInfo> lics = spdxList.getLicenses();
-        log.info( "Honoring " + lics.size() + " SPDX licenses" );
+        LOG.info( "Honoring " + lics.size() + " SPDX licenses" );
 
         /* Count in how many licenses is the given sha1 used */
         final Map<String, Set<String>> sha1ToLicenseIds = new HashMap<>();
@@ -239,8 +239,8 @@ public class PreferredFileNames
                         || ( avail.getKey() != null && avail.getKey().equals( useSha1 ) ) )
                         || !isEqual( usePatterns, avail.getValue() ) )
                     {
-                        log.warn( "Available: " + fileName + ", " + avail.getKey() + ", " + avail.getValue() );
-                        log.warn( "To add   : " + fileName + ", " + useSha1 + ", " + patterns );
+                        LOG.warn( "Available: {}, {}, {}", fileName, avail.getKey(), avail.getValue() );
+                        LOG.warn( "To add   : {}, {}, {}", fileName, useSha1, patterns );
                         throw new IllegalStateException( fileName + " already present" );
                     }
 
@@ -248,7 +248,7 @@ public class PreferredFileNames
             }
         }
 
-        if ( log.isDebugEnabled() )
+        if ( LOG.isDebugEnabled() )
         {
             final StringBuilder sb = new StringBuilder();
             sb.append( "<licenseUrlFileNames>\n" );
@@ -271,8 +271,8 @@ public class PreferredFileNames
 
             }
             sb.append( "</licenseUrlFileNames>\n" );
-            log.debug( "SPDX licenseUrlFileNames:" );
-            log.debug( sb.toString() );
+            LOG.debug( "SPDX licenseUrlFileNames:" );
+            LOG.debug( sb.toString() );
         }
         result.putAll( fileNameToUrlPatterns );
     }
@@ -298,17 +298,15 @@ public class PreferredFileNames
     private final File licensesOutputDirectory;
     private final Map<String, Map.Entry<String, List<Pattern>>> fileNameToUrlPatterns;
     private final Map<String, String> sha1ToFileName;
-    private final Log log;
 
     public PreferredFileNames( File licensesOutputDirectory,
                                Map<String, Map.Entry<String, List<Pattern>>> fileNameToUrlPatterns,
-                               Map<String, String> sha1ToFileName, Log log )
+                               Map<String, String> sha1ToFileName )
     {
         super();
         this.licensesOutputDirectory = licensesOutputDirectory;
         this.fileNameToUrlPatterns = fileNameToUrlPatterns;
         this.sha1ToFileName = sha1ToFileName;
-        this.log = log;
     }
 
     /**
@@ -332,8 +330,10 @@ public class PreferredFileNames
             {
                 if ( pat.matcher( url ).matches() )
                 {
-                    log.debug( "Using file name '" + fn.getKey() + "' for URL '" + url + "' that matched pattern '"
-                        + pat.pattern() + "'" );
+                    LOG.debug( "Using file name '{}' for URL '{}' that matched pattern '{}'",
+                        fn.getKey(),
+                        url,
+                        pat.pattern());
                     return new FileNameEntry( new File( licensesOutputDirectory, fn.getKey() ), true,
                                               fn.getValue().getKey() );
                 }

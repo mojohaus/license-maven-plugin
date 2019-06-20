@@ -22,9 +22,10 @@ package org.codehaus.mojo.license.header;
  * #L%
  */
 
-import org.apache.maven.plugin.logging.Log;
 import org.codehaus.mojo.license.header.transformer.FileHeaderTransformer;
 import org.nuiton.processor.filters.DefaultFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * File Header filter.
@@ -35,6 +36,7 @@ import org.nuiton.processor.filters.DefaultFilter;
 public abstract class FileHeaderFilter
     extends DefaultFilter
 {
+    private static final Logger LOG = LoggerFactory.getLogger(FileHeaderFilter.class);
 
     /**
      * flag set to {@code true} when a header was detected (says detects both
@@ -78,11 +80,6 @@ public abstract class FileHeaderFilter
     protected String fullHeaderContent;
 
     /**
-     * maven logger.
-     */
-    protected Log log;
-
-    /**
      * Obtains the new header to use according to the old one.
      *
      * <b>Note:</b> If the new header should not be updated, then the result is {@code null}.
@@ -101,33 +98,13 @@ public abstract class FileHeaderFilter
     }
 
     /**
-     * @return logger
-     */
-    public Log getLog()
-    {
-        return log;
-    }
-
-    /**
-     * Sets the logger.
-     *
-     * @param log logger to use
-     */
-    public void setLog( Log log )
-    {
-        this.log = log;
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
     protected String performInFilter( String ch )
     {
-        if ( log.isDebugEnabled() )
-        {
-            log.debug( "performInFilter - original header =\n" + ch );
-        }
+        LOG.debug( "performInFilter - original header =\n{}", ch );
+
         if ( isTouched() )
         {
             // Can NOT authorize two header in a same source
@@ -179,10 +156,7 @@ public abstract class FileHeaderFilter
     @Override
     protected String performOutFilter( String ch )
     {
-        if ( log.isDebugEnabled() )
-        {
-            log.debug( ch );
-        }
+        LOG.debug( ch );
         return ch;
     }
 

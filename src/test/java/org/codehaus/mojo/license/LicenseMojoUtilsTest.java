@@ -55,7 +55,7 @@ public class LicenseMojoUtilsTest
     @Test
     public void testPrepareThirdPartyOverrideUrlNull()
     {
-        String actual = LicenseMojoUtils.prepareThirdPartyOverrideUrl( resolvedUrl, deprecatedFile, url, basedir, log );
+        String actual = LicenseMojoUtils.prepareThirdPartyOverrideUrl( resolvedUrl, deprecatedFile, url, basedir );
         assertEquals( LicenseMojoUtils.NO_URL, actual );
     }
 
@@ -66,7 +66,7 @@ public class LicenseMojoUtilsTest
         url = "classpath:overrides.properties";
         try
         {
-            LicenseMojoUtils.prepareThirdPartyOverrideUrl( resolvedUrl, deprecatedFile, url, basedir, log );
+            LicenseMojoUtils.prepareThirdPartyOverrideUrl( resolvedUrl, deprecatedFile, url, basedir );
 
             fail( "Missing exception" );
         }
@@ -107,7 +107,7 @@ public class LicenseMojoUtilsTest
     public void testPrepareThirdPartyOverrideClasspathResource()
     {
         url = "classpath:overrides.properties";
-        String actual = LicenseMojoUtils.prepareThirdPartyOverrideUrl( resolvedUrl, deprecatedFile, url, basedir, log );
+        String actual = LicenseMojoUtils.prepareThirdPartyOverrideUrl( resolvedUrl, deprecatedFile, url, basedir );
         assertEquals( url, actual );
         assertTrue( LicenseMojoUtils.isValid(actual) );
         assertEquals( "DEBUG Loading overrides from URL classpath:overrides.properties", log.dump() );
@@ -143,7 +143,7 @@ public class LicenseMojoUtilsTest
     /** Allow to validate several test results in one assert */
     private String runTestAndJoinResults()
     {
-        String result = LicenseMojoUtils.prepareThirdPartyOverrideUrl( resolvedUrl, deprecatedFile, url, basedir, log );
+        String result = LicenseMojoUtils.prepareThirdPartyOverrideUrl( resolvedUrl, deprecatedFile, url, basedir );
         File defaultOverride = new File ( LicenseMojoUtils.DEFAULT_OVERRIDE_THIRD_PARTY );
         String dump = log.dump()
                 .replace( defaultOverride.getAbsolutePath(), ".../" + defaultOverride.getName() );

@@ -31,9 +31,10 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.mojo.license.utils.MojoHelper;
 import org.codehaus.plexus.util.ReaderFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.Arrays;
 
 /**
  * Abstract license mojo.
@@ -44,6 +45,7 @@ import java.util.Arrays;
 public abstract class AbstractLicenseMojo
     extends AbstractMojo
 {
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractLicenseMojo.class);
 
     // ----------------------------------------------------------------------
     // Mojo Parameters
@@ -147,7 +149,7 @@ public abstract class AbstractLicenseMojo
 
             if ( mustSkip )
             {
-                getLog().info( "skip flag is on, will skip goal." );
+                LOG.info( "skip flag is on, will skip goal." );
                 return;
             }
 
@@ -156,7 +158,7 @@ public abstract class AbstractLicenseMojo
             boolean canContinue = checkPackaging();
             if ( !canContinue )
             {
-                getLog().warn( "The goal is skip due to packaging '" + getProject().getPackaging() + "'" );
+                LOG.warn( "The goal is skip due to packaging '{}'", getProject().getPackaging() );
                 return;
             }
 
@@ -190,7 +192,7 @@ public abstract class AbstractLicenseMojo
             {
                 if ( isVerbose() )
                 {
-                    getLog().info( "Goal will not be executed." );
+                    LOG.info( "Goal will not be executed." );
                 }
                 return;
             }
@@ -388,12 +390,12 @@ public abstract class AbstractLicenseMojo
 
         if ( isVerbose() )
         {
-            getLog().info( "Will check encoding : " + getEncoding() );
+            LOG.info( "Will check encoding: {}", getEncoding() );
         }
         if ( StringUtils.isEmpty( getEncoding() ) )
         {
-            getLog().warn( "File encoding has not been set, using platform encoding " + ReaderFactory.FILE_ENCODING
-                               + ", i.e. build is platform dependent!" );
+            LOG.warn( "File encoding has not been set, using platform encoding {}, i.e. build is platform dependent!",
+                    ReaderFactory.FILE_ENCODING );
             setEncoding( ReaderFactory.FILE_ENCODING );
         }
     }
@@ -410,7 +412,7 @@ public abstract class AbstractLicenseMojo
         boolean added = MojoHelper.addResourceDir( dir, getProject(), includes );
         if ( added && isVerbose() )
         {
-            getLog().info( "add resource " + dir + " with includes " + Arrays.toString( includes ) );
+            LOG.info( "add resource {} with includes {}", dir, ( Object ) includes );
         }
     }
 

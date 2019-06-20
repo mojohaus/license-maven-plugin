@@ -24,6 +24,8 @@ package org.codehaus.mojo.license.header;
 
 import org.codehaus.mojo.license.header.transformer.FileHeaderTransformer;
 import org.codehaus.mojo.license.model.Copyright;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of {@link FileHeaderFilter} to update an incoming header.
@@ -33,6 +35,7 @@ import org.codehaus.mojo.license.model.Copyright;
  */
 public class UpdateFileHeaderFilter extends FileHeaderFilter
 {
+    private static final Logger LOG = LoggerFactory.getLogger(UpdateFileHeaderFilter.class);
 
     /**
      * Flag sets to {@code true} if description can be updated.
@@ -68,14 +71,11 @@ public class UpdateFileHeaderFilter extends FileHeaderFilter
 
         if ( isUpdateDescription() && !transformer.isDescriptionEquals( oldHeader, newHeader ) )
         {
-
             // can update description and it has changed
 
-            if ( log.isDebugEnabled() )
-            {
-                log.debug( "description has changed from [" + oldHeader.getDescription() + "] to ["
-                                   + newHeader.getDescription() + "]" );
-            }
+            LOG.debug( "description has changed from [{}] to [{}]",
+                    oldHeader.getDescription(),
+                    newHeader.getDescription() );
 
             // description has changed, mark header to be updated
             modified = true;
@@ -86,14 +86,11 @@ public class UpdateFileHeaderFilter extends FileHeaderFilter
 
         if ( isUpdateCopyright() && !transformer.isCopyrightEquals( oldHeader, newHeader ) )
         {
-
             // can update copyright and it has changed
 
-            if ( log.isDebugEnabled() )
-            {
-                log.debug( "copyright has changed from [" + oldHeader.getCopyright() + "] to ["
-                        + newHeader.getCopyright() + "]" );
-            }
+            LOG.debug( "copyright has changed from [{}] to []",
+                    oldHeader.getCopyright(),
+                    newHeader.getCopyright() );
 
             // description has changed, mark header to be updated
             modified = true;
@@ -104,14 +101,11 @@ public class UpdateFileHeaderFilter extends FileHeaderFilter
 
         if ( isUpdateLicense() && !transformer.isLicenseEquals( oldHeader, newHeader ) )
         {
-
             // can update license and it has changed
 
-            if ( log.isDebugEnabled() )
-            {
-                log.debug( "license has changed from [" + oldHeader.getLicense() + "] to [" + newHeader.getLicense()
-                        + "]" );
-            }
+            LOG.debug( "license has changed from [{}] to [{}]",
+                    oldHeader.getLicense(),
+                    newHeader.getLicense() );
 
             // description has changed, mark header to be updated
             modified = true;

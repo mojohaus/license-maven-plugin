@@ -28,6 +28,8 @@ import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.codehaus.mojo.license.header.transformer.FileHeaderTransformer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -45,6 +47,7 @@ import java.util.Map;
 public class CommentStyleListMojo
     extends AbstractLicenseMojo
 {
+    private static final Logger LOG = LoggerFactory.getLogger(CommentStyleListMojo.class);
 
     // ----------------------------------------------------------------------
     // Mojo Parameters
@@ -143,6 +146,6 @@ public class CommentStyleListMojo
             }
         }
 
-        getLog().info( buffer.toString() );
+        LOG.info( "{}", buffer );
     }
 }

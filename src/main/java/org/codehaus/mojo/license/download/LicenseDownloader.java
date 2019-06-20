@@ -66,10 +66,11 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.DefaultProxyRoutePlanner;
 import org.apache.http.protocol.HttpContext;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.settings.Proxy;
 import org.codehaus.mojo.license.spdx.SpdxLicenseList.Attachments.ContentSanitizer;
 import org.codehaus.mojo.license.utils.FileUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utilities for downloading remote license files.
@@ -79,6 +80,7 @@ import org.codehaus.mojo.license.utils.FileUtil;
  */
 public class LicenseDownloader implements AutoCloseable
 {
+    private static final Logger LOG = LoggerFactory.getLogger(LicenseDownloader.class);
 
     private static final Pattern EXTENSION_PATTERN = Pattern.compile( "\\.[a-z]{1,4}$", Pattern.CASE_INSENSITIVE );
 
@@ -160,13 +162,12 @@ public class LicenseDownloader implements AutoCloseable
      *
      * @param licenseUrlString the URL
      * @param outputFile a hint where to store the license file
-     * @param log
      * @return the path to the file where the downloaded license file was stored
      * @throws IOException
      * @throws URISyntaxException
      * @throws MojoFailureException
      */
-    public LicenseDownloadResult downloadLicense( String licenseUrlString, FileNameEntry fileNameEntry, Log log )
+    public LicenseDownloadResult downloadLicense( String licenseUrlString, FileNameEntry fileNameEntry )
         throws IOException, URISyntaxException, MojoFailureException
     {
         final File outputFile = fileNameEntry.getFile();
@@ -179,7 +180,7 @@ public class LicenseDownloader implements AutoCloseable
 
         if ( licenseUrlString.startsWith( "file://" ) )
         {
-            log.debug( "Downloading '" + licenseUrlString + "' -> '" + outputFile + "'" );
+            LOG.debug( "Downloading '" + licenseUrlString + "' -> '" + outputFile + "'" );
             Path in = Paths.get( new URI( licenseUrlString ) );
             if ( sanitizers.isEmpty() )
             {
@@ -196,7 +197,7 @@ public class LicenseDownloader implements AutoCloseable
         }
         else
         {
-            log.debug( "About to download '" + licenseUrlString + "'" );
+            LOG.debug( "About to download '" + licenseUrlString + "'" );
             try ( CloseableHttpResponse response = client.execute( new HttpGet( licenseUrlString ) ) )
             {
                 final StatusLine statusLine = response.getStatusLine();
@@ -215,7 +216,7 @@ public class LicenseDownloader implements AutoCloseable
                     File updatedFile = fileNameEntry.isPreferred() ? outputFile
                                     : updateFileExtension( outputFile,
                                                            contentType != null ? contentType.getMimeType() : null );
-                    log.debug( "Downloading '" + licenseUrlString + "' -> '" + updatedFile + "'"
+                    LOG.debug( "Downloading '" + licenseUrlString + "' -> '" + updatedFile + "'"
                         + ( fileNameEntry.isPreferred() ? " (preferred file name)" : "" ) );
 
                     if ( sanitizers.isEmpty() )

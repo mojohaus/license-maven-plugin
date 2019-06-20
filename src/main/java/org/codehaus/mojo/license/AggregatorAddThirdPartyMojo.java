@@ -33,7 +33,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -42,6 +41,8 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
 import org.codehaus.mojo.license.model.LicenseMap;
 import org.codehaus.mojo.license.utils.SortedProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This goal forks executions of the add-third-party goal for all the leaf projects
@@ -60,6 +61,8 @@ import org.codehaus.mojo.license.utils.SortedProperties;
         requiresDependencyResolution = ResolutionScope.TEST, threadSafe = true )
 public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo
 {
+    private static final Logger LOG = LoggerFactory.getLogger(AggregatorAddThirdPartyMojo.class);
+    
     // ----------------------------------------------------------------------
     // Mojo Parameters
     // ----------------------------------------------------------------------
@@ -131,7 +134,7 @@ public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo
         if ( !doGenerate && !doGenerateBundle )
         {
 
-            getLog().info( "All files are up to date, skip goal execution." );
+            LOG.info( "All files are up to date, skip goal execution." );
             return false;
         }
         return super.checkSkip();
@@ -143,18 +146,18 @@ public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo
         // CHECKSTYLE_OFF: LineLength
         if ( aggregateMissingLicensesFile != null && !aggregateMissingLicensesFile.equals( missingFile ) )
         {
-            getLog().warn( "" );
-            getLog().warn( "You should use *missingFile* parameter instead of deprecated *aggregateMissingLicensesFile*." );
-            getLog().warn( "" );
+            LOG.warn( "" );
+            LOG.warn( "You should use *missingFile* parameter instead of deprecated *aggregateMissingLicensesFile*." );
+            LOG.warn( "" );
             missingFile = aggregateMissingLicensesFile;
         }
 
         if ( aggregateMissingLicensesFileArtifact != null
                 && !aggregateMissingLicensesFileArtifact.equals( missingLicensesFileArtifact ) )
         {
-            getLog().warn( "" );
-            getLog().warn( "You should use *missingLicensesFileArtifact* parameter instead of deprecated *aggregateMissingLicensesFileArtifact*." );
-            getLog().warn( "" );
+            LOG.warn( "" );
+            LOG.warn( "You should use *missingLicensesFileArtifact* parameter instead of deprecated *aggregateMissingLicensesFileArtifact*." );
+            LOG.warn( "" );
             missingLicensesFileArtifact = aggregateMissingLicensesFileArtifact;
         }
         // CHECKSTYLE_ON: LineLength
@@ -168,11 +171,9 @@ public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo
     protected void doAction()
             throws Exception
     {
-        Log log = getLog();
-
         if ( isVerbose() )
         {
-            log.info( "After executing on " + reactorProjects.size() + " project(s)" );
+            LOG.info( "After executing on " + reactorProjects.size() + " project(s)" );
         }
 
         licenseMap = new LicenseMap();
@@ -223,19 +224,19 @@ public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo
             LicenseMap childLicenseMap = mojo.licenseMap;
             if ( isVerbose() )
             {
-                getLog().info( String.format( "Found %d license(s) in module %s:%s",
-                        childLicenseMap.size(), mojo.project.getGroupId(), mojo.project.getArtifactId() ) );
+                LOG.info( "Found {} license(s) in module {}:{}",
+                        childLicenseMap.size(), mojo.project.getGroupId(), mojo.project.getArtifactId() );
             }
             licenseMap.putAll( childLicenseMap );
 
         }
 
-        getLog().info( licenseMap.size() + " detected license(s)." );
+        LOG.info( "Detected {} license(s).", licenseMap.size() );
         if ( isVerbose() )
         {
             for ( Map.Entry<String, SortedSet<MavenProject>> entry: licenseMap.entrySet() )
             {
-                getLog().info( " - " + entry.getKey() + " for " + entry.getValue().size() + " artifact(s)." );
+                LOG.info( " - {} for {} artifact(s).", entry.getKey(), entry.getValue().size() );
             }
         }
 
@@ -279,7 +280,7 @@ public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo
 
         if ( isVerbose() )
         {
-            getLog().info( "Use missing file path : " + path );
+            LOG.info( "Use missing file path: ", path );
         }
 
         SortedProperties unsafeMappings = new SortedProperties( getEncoding() );

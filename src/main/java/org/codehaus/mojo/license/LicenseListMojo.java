@@ -28,6 +28,8 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.codehaus.mojo.license.model.License;
 import org.codehaus.mojo.license.model.LicenseStore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -44,6 +46,7 @@ import java.util.List;
 public class LicenseListMojo
     extends AbstractLicenseMojo
 {
+    private static final Logger LOG = LoggerFactory.getLogger(LicenseListMojo.class);
 
     // ----------------------------------------------------------------------
     // Mojo Parameters
@@ -100,7 +103,7 @@ public class LicenseListMojo
     {
 
         // obtain licenses store
-        licenseStore = LicenseStore.createLicenseStore( getLog(), extraResolver );
+        licenseStore = LicenseStore.createLicenseStore( extraResolver );
     }
 
     /**
@@ -153,6 +156,6 @@ public class LicenseListMojo
                 }
             }
         }
-        getLog().info( buffer.toString() );
+        LOG.info( "{}", buffer );
     }
 }

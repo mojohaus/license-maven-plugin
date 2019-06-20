@@ -31,6 +31,8 @@ import org.codehaus.mojo.license.model.License;
 import org.codehaus.mojo.license.model.LicenseStore;
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,6 +43,7 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 /**
@@ -53,6 +56,7 @@ import java.util.Set;
 public abstract class AbstractLicenseNameMojo
         extends AbstractLicenseMojo
 {
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractLicenseNameMojo.class);
 
     // ----------------------------------------------------------------------
     // Constants
@@ -182,7 +186,7 @@ public abstract class AbstractLicenseNameMojo
     {
 
         // init licenses store
-        licenseStore = LicenseStore.createLicenseStore( getLog(), licenseResolver );
+        licenseStore = LicenseStore.createLicenseStore( licenseResolver );
 
         // check licenseName exists
         license = getLicense( licenseName, true );
@@ -296,10 +300,7 @@ public abstract class AbstractLicenseNameMojo
                 continue;
             }
 
-            if ( getLog().isDebugEnabled() )
-            {
-                getLog().debug( "discovering source files in " + src );
-            }
+            LOG.debug( "discovering source files in {}", src );
 
             ds.setBasedir( f );
             // scan
@@ -460,14 +461,14 @@ public abstract class AbstractLicenseNameMojo
             }
             if ( f.exists() )
             {
-                getLog().info( "Will search files to update from root " + f );
+                LOG.info( "Will search files to update from root {}", f );
                 rootsList.add( f.getAbsolutePath() );
             }
             else
             {
                 if ( isVerbose() )
                 {
-                    getLog().info( "Skip not found root " + f );
+                    LOG.info( "Skip not found root {}", f );
                 }
             }
         }
@@ -525,7 +526,14 @@ public abstract class AbstractLicenseNameMojo
     // Private Methods
     // ----------------------------------------------------------------------
 
-    private void addPropertiesToContext( Map properties, String prefix, Map<String, Object> context )
+    private void addPropertiesToContext( Properties properties, String prefix, Map<String, Object> context )
+    {
+        @SuppressWarnings({ "rawtypes", "unchecked" })
+        Map<String, String> cast = (Map) properties;
+        addPropertiesToContext( cast, prefix, context );
+    }
+    
+    private void addPropertiesToContext( Map<String, String> properties, String prefix, Map<String, Object> context )
     {
         if ( properties != null )
         {

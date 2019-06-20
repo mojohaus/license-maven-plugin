@@ -25,14 +25,14 @@ package org.codehaus.mojo.license.api;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.mojo.license.model.LicenseMap;
 import org.junit.Assert;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tests the {@link FreeMarkerHelper} and given templates.
@@ -42,10 +42,7 @@ import org.junit.Test;
  */
 public class FreeMarkerHelperTest
 {
-    /**
-     * Logger.
-     */
-    private static final Log log = LogFactory.getLog( FreeMarkerHelperTest.class );
+    private static final Logger LOG = LoggerFactory.getLogger(FreeMarkerHelperTest.class);
 
     @Test
     public void testRenderTemplateForThirdPartyFile()
@@ -79,10 +76,7 @@ public class FreeMarkerHelperTest
         properties.put( "dependencyMap", licenseMap.toDependencyMap().entrySet() );
 
         String s = helper.renderTemplate( "/org/codehaus/mojo/license/third-party-file.ftl", properties );
-        if ( log.isInfoEnabled() )
-        {
-            log.info( s );
-        }
+        LOG.info( "{}", s );
     }
 
     @Test
@@ -118,10 +112,7 @@ public class FreeMarkerHelperTest
 
         String s =
             helper.renderTemplate( "/org/codehaus/mojo/license/third-party-file-groupByLicense.ftl", properties );
-        if ( log.isInfoEnabled() )
-        {
-            log.info( s );
-        }
+        LOG.info( "{}", s );
     }
 
     @Test
@@ -149,9 +140,6 @@ public class FreeMarkerHelperTest
         String s =
             helper.renderTemplate( "/org/codehaus/mojo/license/default-file-header-description.ftl", properties );
         Assert.assertEquals( "projectName\n$Id:$\n$HeadURL:$", s );
-        if ( log.isInfoEnabled() )
-        {
-            log.info( s );
-        }
+        LOG.info( "{}", s );
     }
 }
