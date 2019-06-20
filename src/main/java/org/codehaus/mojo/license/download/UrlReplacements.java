@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
  */
 public class UrlReplacements
 {
-    private static final Logger LOG = LoggerFactory.getLogger(UrlReplacements.class);
+    private static final Logger LOG = LoggerFactory.getLogger( UrlReplacements.class );
 
     public static Builder builder()
     {

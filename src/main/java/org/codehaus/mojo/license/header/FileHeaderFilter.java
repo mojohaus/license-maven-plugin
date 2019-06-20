@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
 public abstract class FileHeaderFilter
     extends DefaultFilter
 {
-    private static final Logger LOG = LoggerFactory.getLogger(FileHeaderFilter.class);
+    private static final Logger LOG = LoggerFactory.getLogger( FileHeaderFilter.class );
 
     /**
      * flag set to {@code true} when a header was detected (says detects both

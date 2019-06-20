@@ -47,7 +47,7 @@ import java.util.Map;
 public class CommentStyleListMojo
     extends AbstractLicenseMojo
 {
-    private static final Logger LOG = LoggerFactory.getLogger(CommentStyleListMojo.class);
+    private static final Logger LOG = LoggerFactory.getLogger( CommentStyleListMojo.class );
 
     // ----------------------------------------------------------------------
     // Mojo Parameters

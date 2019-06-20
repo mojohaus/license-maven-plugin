@@ -62,7 +62,7 @@ import java.util.TreeMap;
  */
 public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
 {
-    private static final Logger LOG = LoggerFactory.getLogger(AbstractFileHeaderMojo.class);
+    private static final Logger LOG = LoggerFactory.getLogger( AbstractFileHeaderMojo.class );
 
     // ----------------------------------------------------------------------
     // Mojo Parameters

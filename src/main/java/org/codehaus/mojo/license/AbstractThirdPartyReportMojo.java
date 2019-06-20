@@ -75,7 +75,7 @@ import org.codehaus.mojo.license.api.ResolvedProjectDependencies;
 public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
     implements MavenProjectDependenciesConfigurator
 {
-    private static final Logger LOG = LoggerFactory.getLogger(AbstractThirdPartyReportMojo.class);
+    private static final Logger LOG = LoggerFactory.getLogger( AbstractThirdPartyReportMojo.class );
 
     // ----------------------------------------------------------------------
     // Mojo Parameters

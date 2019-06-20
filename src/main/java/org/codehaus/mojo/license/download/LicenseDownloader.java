@@ -80,7 +80,7 @@ import org.slf4j.LoggerFactory;
  */
 public class LicenseDownloader implements AutoCloseable
 {
-    private static final Logger LOG = LoggerFactory.getLogger(LicenseDownloader.class);
+    private static final Logger LOG = LoggerFactory.getLogger( LicenseDownloader.class );
 
     private static final Pattern EXTENSION_PATTERN = Pattern.compile( "\\.[a-z]{1,4}$", Pattern.CASE_INSENSITIVE );
 

@@ -45,7 +45,7 @@ import java.io.File;
 public abstract class AbstractLicenseMojo
     extends AbstractMojo
 {
-    private static final Logger LOG = LoggerFactory.getLogger(AbstractLicenseMojo.class);
+    private static final Logger LOG = LoggerFactory.getLogger( AbstractLicenseMojo.class );
 
     // ----------------------------------------------------------------------
     // Mojo Parameters

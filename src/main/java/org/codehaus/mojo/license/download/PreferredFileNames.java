@@ -55,7 +55,7 @@ import org.slf4j.LoggerFactory;
 // CHECKSTYLE_OFF: MethodLength
 public class PreferredFileNames
 {
-    private static final Logger LOG = LoggerFactory.getLogger(PreferredFileNames.class);
+    private static final Logger LOG = LoggerFactory.getLogger( PreferredFileNames.class );
     /**
      * @param licensesOutputDirectory
      * @param licenseUrlFileNames
@@ -333,7 +333,7 @@ public class PreferredFileNames
                     LOG.debug( "Using file name '{}' for URL '{}' that matched pattern '{}'",
                         fn.getKey(),
                         url,
-                        pat.pattern());
+                        pat.pattern() );
                     return new FileNameEntry( new File( licensesOutputDirectory, fn.getKey() ), true,
                                               fn.getValue().getKey() );
                 }

@@ -56,7 +56,7 @@ import org.slf4j.LoggerFactory;
 public class LicensesXmlInsertVersionsMojo
     extends AbstractLicensesXmlMojo
 {
-    private static final Logger LOG = LoggerFactory.getLogger(LicensesXmlInsertVersionsMojo.class);
+    private static final Logger LOG = LoggerFactory.getLogger( LicensesXmlInsertVersionsMojo.class );
 
     /**
      * The file whose XML content will be used as a base for adding versions. Defaults to

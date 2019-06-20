@@ -70,8 +70,8 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractAddThirdPartyMojo
         extends AbstractLicenseMojo
 {
-    private static final Logger LOG = LoggerFactory.getLogger(AbstractAddThirdPartyMojo.class);
-    
+    private static final Logger LOG = LoggerFactory.getLogger( AbstractAddThirdPartyMojo.class );
+
     // ----------------------------------------------------------------------
     // Mojo Parameters
     // ----------------------------------------------------------------------

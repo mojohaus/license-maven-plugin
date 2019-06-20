@@ -70,7 +70,7 @@ import org.slf4j.LoggerFactory;
        defaultPhase = LifecyclePhase.GENERATE_RESOURCES )
 public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements MavenProjectDependenciesConfigurator
 {
-    private static final Logger LOG = LoggerFactory.getLogger(AddThirdPartyMojo.class);
+    private static final Logger LOG = LoggerFactory.getLogger( AddThirdPartyMojo.class );
 
     // ----------------------------------------------------------------------
     // Mojo Parameters

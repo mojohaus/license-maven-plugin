@@ -46,7 +46,7 @@ import java.util.regex.Pattern;
 public class LicenseRepository
     implements Iterable<License>
 {
-    private static final Logger LOG = LoggerFactory.getLogger(LicenseRepository.class);
+    private static final Logger LOG = LoggerFactory.getLogger( LicenseRepository.class );
 
     public static final String REPOSITORY_DEFINITION_FILE = "licenses.properties";
 

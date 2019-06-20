@@ -56,7 +56,7 @@ import java.util.Set;
 public abstract class AbstractLicenseNameMojo
         extends AbstractLicenseMojo
 {
-    private static final Logger LOG = LoggerFactory.getLogger(AbstractLicenseNameMojo.class);
+    private static final Logger LOG = LoggerFactory.getLogger( AbstractLicenseNameMojo.class );
 
     // ----------------------------------------------------------------------
     // Constants
@@ -528,11 +528,11 @@ public abstract class AbstractLicenseNameMojo
 
     private void addPropertiesToContext( Properties properties, String prefix, Map<String, Object> context )
     {
-        @SuppressWarnings({ "rawtypes", "unchecked" })
+        @SuppressWarnings( { "rawtypes", "unchecked" } )
         Map<String, String> cast = (Map) properties;
         addPropertiesToContext( cast, prefix, context );
     }
-    
+
     private void addPropertiesToContext( Map<String, String> properties, String prefix, Map<String, Object> context )
     {
         if ( properties != null )

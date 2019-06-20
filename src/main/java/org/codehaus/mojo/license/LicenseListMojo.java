@@ -46,7 +46,7 @@ import java.util.List;
 public class LicenseListMojo
     extends AbstractLicenseMojo
 {
-    private static final Logger LOG = LoggerFactory.getLogger(LicenseListMojo.class);
+    private static final Logger LOG = LoggerFactory.getLogger( LicenseListMojo.class );
 
     // ----------------------------------------------------------------------
     // Mojo Parameters

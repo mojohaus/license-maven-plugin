@@ -47,7 +47,7 @@ import java.io.File;
 public class UpdateProjectLicenseMojo
     extends AbstractLicenseNameMojo
 {
-    private static final Logger LOG = LoggerFactory.getLogger(UpdateProjectLicenseMojo.class);
+    private static final Logger LOG = LoggerFactory.getLogger( UpdateProjectLicenseMojo.class );
 
     // ----------------------------------------------------------------------
     // Mojo Parameters

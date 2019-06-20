@@ -112,7 +112,7 @@ public class LicenseMojoUtilsTest
         try
         {
             rl.install();
-            
+
             url = "classpath:overrides.properties";
             String actual = LicenseMojoUtils.prepareThirdPartyOverrideUrl( resolvedUrl, deprecatedFile, url, basedir );
             assertEquals( url, actual );
@@ -122,7 +122,7 @@ public class LicenseMojoUtilsTest
         {
             rl.deinstall();
         }
-        
+
         assertEquals(
                 "DEBUG Loading overrides from URL classpath:overrides.properties\n",
                 rl.dump( Level.DEBUG ) );
@@ -159,12 +159,12 @@ public class LicenseMojoUtilsTest
     private String runTestAndJoinResults()
     {
         RedirectLogger rl = new RedirectLogger( LicenseMojoUtils.class );
-        
+
         String result;
         try
         {
             rl.install();
-            
+
             result = LicenseMojoUtils.prepareThirdPartyOverrideUrl( resolvedUrl, deprecatedFile, url, basedir );
         }
         finally

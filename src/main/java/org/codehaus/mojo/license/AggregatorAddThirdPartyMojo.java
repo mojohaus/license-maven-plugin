@@ -61,8 +61,8 @@ import org.slf4j.LoggerFactory;
         requiresDependencyResolution = ResolutionScope.TEST, threadSafe = true )
 public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo
 {
-    private static final Logger LOG = LoggerFactory.getLogger(AggregatorAddThirdPartyMojo.class);
-    
+    private static final Logger LOG = LoggerFactory.getLogger( AggregatorAddThirdPartyMojo.class );
+
     // ----------------------------------------------------------------------
     // Mojo Parameters
     // ----------------------------------------------------------------------

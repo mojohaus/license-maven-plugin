@@ -54,7 +54,7 @@ import java.util.TreeMap;
 @Mojo( name = "remove-file-header", threadSafe = true )
 public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo
 {
-    private static final Logger LOG = LoggerFactory.getLogger(RemoveFileHeaderMojo.class);
+    private static final Logger LOG = LoggerFactory.getLogger( RemoveFileHeaderMojo.class );
 
     // ----------------------------------------------------------------------
     // Mojo Parameters

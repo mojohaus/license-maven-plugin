@@ -76,7 +76,7 @@ public abstract class AbstractDownloadLicensesMojo
     extends AbstractLicensesXmlMojo
     implements MavenProjectDependenciesConfigurator
 {
-    private static final Logger LOG = LoggerFactory.getLogger(AbstractDownloadLicensesMojo.class);
+    private static final Logger LOG = LoggerFactory.getLogger( AbstractDownloadLicensesMojo.class );
 
     // ----------------------------------------------------------------------
     // Mojo Parameters
@@ -1270,7 +1270,9 @@ public abstract class AbstractDownloadLicensesMojo
                                         final File oldFile = result.getFile();
                                         if ( !oldFile.getName().equals( name ) )
                                         {
-                                            LOG.debug( "Found preferred name '{}' by SHA1 after downloading '{}'; renaming from '{}'",
+                                            LOG.debug(
+                                                "Found preferred name '{}' by SHA1 after downloading '{}'; "
+                                                + "renaming from '{}'",
                                                 name,
                                                 licenseUrl,
                                                 oldFile.getName() );

@@ -57,7 +57,7 @@ import org.slf4j.LoggerFactory;
 public class DefaultThirdPartyHelper
         implements ThirdPartyHelper
 {
-    private static final Logger LOG = LoggerFactory.getLogger(DefaultThirdPartyHelper.class);
+    private static final Logger LOG = LoggerFactory.getLogger( DefaultThirdPartyHelper.class );
 
     /**
      * DependenciesTool to load dependencies.

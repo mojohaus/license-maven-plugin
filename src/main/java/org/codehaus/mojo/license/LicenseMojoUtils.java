@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
  */
 public final class LicenseMojoUtils
 {
-    private static final Logger LOG = LoggerFactory.getLogger(LicenseMojoUtils.class);
+    private static final Logger LOG = LoggerFactory.getLogger( LicenseMojoUtils.class );
 
     /** A special singleton to pass the information that the URL was not set. */
     static final String NO_URL = "file:///inexistent";

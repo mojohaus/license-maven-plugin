@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
  */
 public class UpdateFileHeaderFilter extends FileHeaderFilter
 {
-    private static final Logger LOG = LoggerFactory.getLogger(UpdateFileHeaderFilter.class);
+    private static final Logger LOG = LoggerFactory.getLogger( UpdateFileHeaderFilter.class );
 
     /**
      * Flag sets to {@code true} if description can be updated.

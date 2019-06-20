@@ -52,7 +52,7 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractLicensesXmlMojo
     extends AbstractMojo
 {
-    private static final Logger LOG = LoggerFactory.getLogger(AbstractLicensesXmlMojo.class);
+    private static final Logger LOG = LoggerFactory.getLogger( AbstractLicensesXmlMojo.class );
 
     /**
      * The output file containing a mapping between each dependency and it's license information.
