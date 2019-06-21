@@ -170,7 +170,6 @@ public class LicensedArtifactResolver
                     final MavenProject project = mavenProjectBuilder
                             .build( artifact, true, projectBuildingRequest )
                             .getProject();
-                    @SuppressWarnings( "unchecked" )
                     List<org.apache.maven.model.License> lics = project.getLicenses();
                     if ( lics != null )
                     {
