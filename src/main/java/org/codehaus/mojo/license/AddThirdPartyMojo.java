@@ -276,9 +276,9 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
         if ( doGenerateMissing && isVerbose() )
         {
             StringBuilder sb = new StringBuilder();
-            sb.append( "Will use from missing file " );
+            sb.append( "Will use " );
             sb.append( unsafeMappings.size() );
-            sb.append( " dependencies :" );
+            sb.append( " dependencies from missingFile:" );
             for ( Map.Entry<Object, Object> entry : unsafeMappings.entrySet() )
             {
                 String id = (String) entry.getKey();
