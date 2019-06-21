@@ -28,8 +28,8 @@ import org.apache.maven.project.ProjectBuildingException;
 import org.codehaus.mojo.license.utils.MojoHelper;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.List;
@@ -52,8 +52,8 @@ import org.apache.maven.project.ProjectBuildingRequest;
  */
 @Component( role = DependenciesTool.class, hint = "default" )
 public class DependenciesTool
-extends AbstractLogEnabled
 {
+    private static final Logger LOG = LoggerFactory.getLogger( DependenciesTool.class );
 
     /**
      * Message used when an invalid expression pattern is found.
@@ -119,8 +119,6 @@ extends AbstractLogEnabled
         {
             localCache.putAll( cache );
         }
-        final Logger log = getLogger();
-
         ProjectBuildingRequest projectBuildingRequest
                 = new DefaultProjectBuildingRequest( mavenSession.getProjectBuildingRequest() )
                         .setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL )
@@ -146,10 +144,7 @@ extends AbstractLogEnabled
 
             if ( !artifactFilters.isIncluded( artifact ) )
             {
-                if ( verbose )
-                {
-                    log.debug( "Excluding artifact " + artifact );
-                }
+                LOG.debug( "Excluding artifact {}", artifact );
                 continue;
             }
 
@@ -157,7 +152,7 @@ extends AbstractLogEnabled
 
             if ( verbose )
             {
-                log.info( "detected artifact " + id );
+                LOG.info( "detected artifact {}", id );
             }
 
             MavenProject depMavenProject;
@@ -169,7 +164,7 @@ extends AbstractLogEnabled
             {
                 if ( verbose )
                 {
-                    log.info( "add dependency [" + id + "] (from cache)" );
+                    LOG.info( "add dependency [{}] (from cache)", id  );
                 }
             }
             else
@@ -201,13 +196,13 @@ extends AbstractLogEnabled
                 }
                 catch ( ProjectBuildingException e )
                 {
-                    log.warn( "Unable to obtain POM for artifact : " + artifact, e );
+                    LOG.warn( "Unable to obtain POM for artifact: {}", artifact, e );
                     continue;
                 }
 
                 if ( verbose )
                 {
-                    log.info( "add dependency [" + id + "]" );
+                    LOG.info( "add dependency [{}]", id );
                 }
 
                 // store it also in cache

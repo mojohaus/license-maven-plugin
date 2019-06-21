@@ -207,7 +207,7 @@ public class DefaultThirdPartyHelper
      */
     public SortedSet<MavenProject> getProjectsWithNoLicense( LicenseMap licenseMap )
     {
-        return thirdPartyTool.getProjectsWithNoLicense( licenseMap, verbose );
+        return thirdPartyTool.getProjectsWithNoLicense( licenseMap );
     }
 
     /**
