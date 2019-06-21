@@ -331,7 +331,7 @@ public class DefaultThirdPartyHelper
                 Set<String> mergedLicense = entry.getValue();
                 if ( verbose )
                 {
-                    LOG.info( "Will merge to *" + mainLicense + "*, licenses: " + mergedLicense );
+                    LOG.info( "Will merge to '{}', licenses: {}", mainLicense, mergedLicense );
                 }
 
                 thirdPartyTool.mergeLicenses( licenseMap, mainLicense, mergedLicense );

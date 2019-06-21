@@ -727,8 +727,8 @@ public abstract class AbstractAddThirdPartyMojo
 
         long buildTimestamp = getBuildTimestamp();
 
-        LOG.debug( "Build start   at : " + buildTimestamp );
-        LOG.debug( "third-party file : " + thirdPartyFile.lastModified() );
+        LOG.debug( "Build start   at: {}", buildTimestamp );
+        LOG.debug( "third-party file: {}", thirdPartyFile.lastModified() );
 
         doGenerate = force || !thirdPartyFile.exists() || buildTimestamp > thirdPartyFile.lastModified();
 
@@ -737,7 +737,7 @@ public abstract class AbstractAddThirdPartyMojo
 
             File bundleFile = FileUtil.getFile( outputDirectory, bundleThirdPartyPath );
 
-            LOG.debug( "bundle third-party file : " + bundleFile.lastModified() );
+            LOG.debug( "bundle third-party file: {}", bundleFile.lastModified() );
             doGenerateBundle = force || !bundleFile.exists() || buildTimestamp > bundleFile.lastModified();
         }
         else

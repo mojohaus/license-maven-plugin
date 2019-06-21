@@ -97,12 +97,13 @@ public final class LicenseMojoUtils
             if ( deprecatedFile.exists() )
             {
                 String result = deprecatedFile.toURI().toString();
-                LOG.debug( "Loading overrides from file " + result );
+                LOG.debug( "Loading overrides from file {}", result );
                 return result;
             }
             else
             {
-                LOG.warn( "overrideFile [" + deprecatedFile.getAbsolutePath() + "] was configured but doesn't exist" );
+                LOG.warn( "overrideFile [{}] was configured but doesn't exist",
+                          deprecatedFile.getAbsolutePath() );
             }
         }
 
@@ -110,14 +111,14 @@ public final class LicenseMojoUtils
         {
             if ( UrlRequester.isStringUrl( url ) )
             {
-                LOG.debug( "Loading overrides from URL " + url );
+                LOG.debug( "Loading overrides from URL {}", url );
                 return url;
             }
             else
             {
-                LOG.warn( "Unsupported or invalid URL [" + url + "] found in overrideUrl; "
+                LOG.warn( "Unsupported or invalid URL [{}] found in overrideUrl; "
                         + "supported are 'classpath:' URLs and  anything your JVM supports "
-                        + "(file:, http: and https: should always work)" );
+                        + "(file:, http: and https: should always work)", url );
             }
         }
 
@@ -127,12 +128,12 @@ public final class LicenseMojoUtils
         if ( Files.exists( defaultPath ) )
         {
             String result = defaultPath.toUri().toString();
-            LOG.debug( "Loading overrides from file " + result );
+            LOG.debug( "Loading overrides from file {}", result );
             return result;
         }
 
-        LOG.debug( "No (valid) URL and no file [" + defaultPath.toAbsolutePath()
-                + "] found; not loading any overrides" );
+        LOG.debug( "No (valid) URL and no file [{}] found; not loading any overrides",
+                   defaultPath.toAbsolutePath() );
         return NO_URL;
     }
 

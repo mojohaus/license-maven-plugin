@@ -129,7 +129,7 @@ public class PreferredFileNames
         final Map<String, Entry<String, List<Pattern>>> fileNameToUrlPatterns = new TreeMap<>();
         final SpdxLicenseList spdxList = SpdxLicenseList.getLatest();
         final Map<String, SpdxLicenseInfo> lics = spdxList.getLicenses();
-        LOG.info( "Honoring " + lics.size() + " SPDX licenses" );
+        LOG.info( "Honoring {} SPDX licenses", lics.size() );
 
         /* Count in how many licenses is the given sha1 used */
         final Map<String, Set<String>> sha1ToLicenseIds = new HashMap<>();

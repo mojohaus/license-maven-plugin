@@ -180,7 +180,7 @@ public class LicenseDownloader implements AutoCloseable
 
         if ( licenseUrlString.startsWith( "file://" ) )
         {
-            LOG.debug( "Downloading '" + licenseUrlString + "' -> '" + outputFile + "'" );
+            LOG.debug( "Downloading '{}' -> '{}'", licenseUrlString, outputFile );
             Path in = Paths.get( new URI( licenseUrlString ) );
             if ( sanitizers.isEmpty() )
             {
@@ -197,7 +197,7 @@ public class LicenseDownloader implements AutoCloseable
         }
         else
         {
-            LOG.debug( "About to download '" + licenseUrlString + "'" );
+            LOG.debug( "About to download '{}'", licenseUrlString );
             try ( CloseableHttpResponse response = client.execute( new HttpGet( licenseUrlString ) ) )
             {
                 final StatusLine statusLine = response.getStatusLine();
@@ -216,8 +216,10 @@ public class LicenseDownloader implements AutoCloseable
                     File updatedFile = fileNameEntry.isPreferred() ? outputFile
                                     : updateFileExtension( outputFile,
                                                            contentType != null ? contentType.getMimeType() : null );
-                    LOG.debug( "Downloading '" + licenseUrlString + "' -> '" + updatedFile + "'"
-                        + ( fileNameEntry.isPreferred() ? " (preferred file name)" : "" ) );
+                    LOG.debug( "Downloading '{}' -> '{}'{}",
+                        licenseUrlString,
+                        updatedFile,
+                        fileNameEntry.isPreferred() ? " (preferred file name)" : "" );
 
                     if ( sanitizers.isEmpty() )
                     {

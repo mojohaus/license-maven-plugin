@@ -88,7 +88,7 @@ public class UpdateFileHeaderFilter extends FileHeaderFilter
         {
             // can update copyright and it has changed
 
-            LOG.debug( "copyright has changed from [{}] to []",
+            LOG.debug( "copyright has changed from [{}] to [{}]",
                     oldHeader.getCopyright(),
                     newHeader.getCopyright() );
 

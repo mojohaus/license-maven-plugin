@@ -173,7 +173,7 @@ public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo
     {
         if ( isVerbose() )
         {
-            LOG.info( "After executing on " + reactorProjects.size() + " project(s)" );
+            LOG.info( "After executing on {} project(s)", reactorProjects.size() );
         }
 
         licenseMap = new LicenseMap();
@@ -280,7 +280,7 @@ public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo
 
         if ( isVerbose() )
         {
-            LOG.info( "Use missing file path: ", path );
+            LOG.info( "Use missing file path: {}", path );
         }
 
         SortedProperties unsafeMappings = new SortedProperties( getEncoding() );

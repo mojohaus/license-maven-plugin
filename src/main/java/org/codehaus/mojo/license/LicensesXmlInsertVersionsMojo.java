@@ -150,7 +150,7 @@ public class LicensesXmlInsertVersionsMojo
 
             for ( ProjectLicenseInfo dependencyLicenseInfo : projectLicenseInfos )
             {
-                LOG.debug( "Checking licenses for project {}", dependencyLicenseInfo.toString() );
+                LOG.debug( "Checking licenses for project {}", dependencyLicenseInfo );
                 final String id = dependencyLicenseInfo.getId();
                 final LicensedArtifact dependency = resolvedDepsMap.get( id );
                 if ( dependency == null )
