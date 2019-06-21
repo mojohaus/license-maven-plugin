@@ -476,7 +476,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
         processEndTag = cleanHeaderConfiguration( processEndTag, FileHeaderTransformer.DEFAULT_PROCESS_END_TAG );
         if ( isVerbose() )
         {
-            LOG.info( "Will use processEndTag: " + processEndTag );
+            LOG.info( "Will use processEndTag: {}", processEndTag );
         }
         sectionDelimiter = cleanHeaderConfiguration( sectionDelimiter,
                 FileHeaderTransformer.DEFAULT_SECTION_DELIMITER );
@@ -511,7 +511,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
             {
                 if ( isVerbose() )
                 {
-                    LOG.info( "Associate extension {} to comment style {}", extension, commentStyle );
+                    LOG.info( "Associate extension '{}' to comment style '{}'", extension, commentStyle );
                 }
                 extensionToCommentStyle.put( extension, commentStyle );
             }
