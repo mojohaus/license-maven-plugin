@@ -573,11 +573,7 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo
                 FileUtil.deleteFile( backupFile );
             }
 
-            if ( isVerbose() )
-            {
-                LOG.debug( " - backup original file {}", file );
-            }
-
+            LOG.debug( " - backup original file {}", file );
             FileUtil.renameFile( file, backupFile );
         }
 

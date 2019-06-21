@@ -922,11 +922,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
                 FileUtil.deleteFile( backupFile );
             }
 
-            if ( isVerbose() )
-            {
-                LOG.debug( " - backup original file {}", file );
-            }
-
+            LOG.debug( " - backup original file {}", file );
             Files.copy( file.toPath(), backupFile.toPath(), StandardCopyOption.COPY_ATTRIBUTES );
         }
 
