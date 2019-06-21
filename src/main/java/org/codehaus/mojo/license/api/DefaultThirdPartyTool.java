@@ -81,7 +81,7 @@ public class DefaultThirdPartyTool
         implements ThirdPartyTool
 {
     private static final Logger LOG = LoggerFactory.getLogger( DefaultThirdPartyTool.class );
-    
+
     /**
      * Classifier of the third-parties descriptor attached to a maven module.
      */
@@ -702,11 +702,11 @@ public class DefaultThirdPartyTool
                 "Loading global license map from {}: {}", dep.toString(), propFile.getAbsolutePath() );
         SortedProperties props = new SortedProperties( "utf-8" );
 
-        try( InputStream propStream = new FileInputStream( propFile ) )
+        try ( InputStream propStream = new FileInputStream( propFile ) )
         {
             props.load( propStream );
         }
-        catch( IOException e )
+        catch ( IOException e )
         {
             throw new IOException( "Unable to load " + propFile.getAbsolutePath(), e );
         }

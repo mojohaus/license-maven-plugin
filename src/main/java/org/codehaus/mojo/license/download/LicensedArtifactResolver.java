@@ -55,7 +55,7 @@ import org.slf4j.LoggerFactory;
 @Component( role = LicensedArtifactResolver.class, hint = "default" )
 public class LicensedArtifactResolver
 {
-    private static final Logger log = LoggerFactory.getLogger( LicensedArtifactResolver.class );
+    private static final Logger LOG = LoggerFactory.getLogger( LicensedArtifactResolver.class );
 
     /**
      * Message used when an invalid expression pattern is found.
@@ -135,7 +135,7 @@ public class LicensedArtifactResolver
 
             if ( !artifactFilters.isIncluded( artifact ) )
             {
-                log.debug( "Excluding artifact {}", artifact );
+                LOG.debug( "Excluding artifact {}", artifact );
                 continue;
             }
 
@@ -143,7 +143,7 @@ public class LicensedArtifactResolver
 
             if ( verbose )
             {
-                log.info( "detected artifact {}", id );
+                LOG.info( "detected artifact {}", id );
             }
 
             LicensedArtifact depMavenProject;
@@ -153,7 +153,7 @@ public class LicensedArtifactResolver
 
             if ( depMavenProject != null )
             {
-                log.debug( "Dependency [{}] already present in the result", id );
+                LOG.debug( "Dependency [{}] already present in the result", id );
             }
             else
             {
@@ -185,7 +185,7 @@ public class LicensedArtifactResolver
 
                 if ( verbose )
                 {
-                    log.info( "add dependency [{}]", id );
+                    LOG.info( "add dependency [{}]", id );
                 }
 
                 result.put( id, depMavenProject );
