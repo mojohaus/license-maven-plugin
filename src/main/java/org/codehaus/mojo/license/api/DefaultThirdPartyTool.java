@@ -43,7 +43,6 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
@@ -702,16 +701,14 @@ public class DefaultThirdPartyTool
         LOG.info(
                 "Loading global license map from {}: {}", dep.toString(), propFile.getAbsolutePath() );
         SortedProperties props = new SortedProperties( "utf-8" );
-        InputStream propStream = null;
 
-        try
+        try( InputStream propStream = new FileInputStream( propFile ) )
         {
-            propStream = new FileInputStream( propFile );
             props.load( propStream );
         }
-        finally
+        catch( IOException e )
         {
-            IOUtils.closeQuietly( propStream );
+            throw new IOException( "Unable to load " + propFile.getAbsolutePath(), e );
         }
 
         for ( Object keyObj : props.keySet() )
