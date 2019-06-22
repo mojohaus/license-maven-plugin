@@ -49,6 +49,8 @@ import org.codehaus.mojo.license.model.LicenseMap;
 import org.codehaus.mojo.license.utils.MojoHelper;
 import org.codehaus.mojo.license.utils.UrlRequester;
 import org.codehaus.plexus.i18n.I18N;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -73,6 +75,7 @@ import org.codehaus.mojo.license.api.ResolvedProjectDependencies;
 public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
     implements MavenProjectDependenciesConfigurator
 {
+    private static final Logger LOG = LoggerFactory.getLogger( AbstractThirdPartyReportMojo.class );
 
     // ----------------------------------------------------------------------
     // Mojo Parameters
@@ -390,9 +393,9 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
     {
         if ( licenseMergesUrl != null )
         {
-            getLog().warn( "" );
-            getLog().warn( "licenseMerges will be overridden by licenseMergesUrl." );
-            getLog().warn( "" );
+            LOG.warn( "" );
+            LOG.warn( "licenseMerges will be overridden by licenseMergesUrl." );
+            LOG.warn( "" );
             if ( UrlRequester.isStringUrl( licenseMergesUrl ) )
             {
                 licenseMerges = Arrays.asList( UrlRequester.getFromUrl( licenseMergesUrl ).split( "[\n\r]+" ) );
@@ -407,7 +410,7 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
             throws MavenReportException
     {
         resolvedOverrideUrl = LicenseMojoUtils.prepareThirdPartyOverrideUrl( resolvedOverrideUrl, overrideFile,
-                overrideUrl, project.getBasedir(), getLog() );
+                overrideUrl, project.getBasedir() );
 
         Collection<ThirdPartyDetails> details;
 
@@ -564,7 +567,7 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
         ThirdPartyHelper thirdPartyHelper =
                 new DefaultThirdPartyHelper( project, encoding, verbose,
                         dependenciesTool, thirdPartyTool,
-                        project.getRemoteArtifactRepositories(), project.getRemoteProjectRepositories(), getLog() );
+                        project.getRemoteArtifactRepositories(), project.getRemoteProjectRepositories() );
         // load dependencies of the project
         SortedMap<String, MavenProject> projectDependencies = thirdPartyHelper.loadDependencies( this,
                 loadedDependencies );

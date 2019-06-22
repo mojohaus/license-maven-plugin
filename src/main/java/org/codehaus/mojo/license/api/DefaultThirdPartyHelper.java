@@ -27,7 +27,6 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
 import org.codehaus.mojo.license.model.LicenseMap;
@@ -46,6 +45,8 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import org.eclipse.aether.repository.RemoteRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation of the {@link org.codehaus.mojo.license.api.ThirdPartyHelper}.
@@ -56,6 +57,7 @@ import org.eclipse.aether.repository.RemoteRepository;
 public class DefaultThirdPartyHelper
         implements ThirdPartyHelper
 {
+    private static final Logger LOG = LoggerFactory.getLogger( DefaultThirdPartyHelper.class );
 
     /**
      * DependenciesTool to load dependencies.
@@ -97,11 +99,6 @@ public class DefaultThirdPartyHelper
     private final boolean verbose;
 
     /**
-     * Instance logger.
-     */
-    private final Log log;
-
-    /**
      * Cache of dependencies (as maven project) loaded.
      */
     private static SortedMap<String, MavenProject> artifactCache;
@@ -116,13 +113,12 @@ public class DefaultThirdPartyHelper
      * @param thirdPartyTool     tool to load third-parties descriptors
      * @param remoteRepositoriesCoreApi maven remote repositories, in the core api format
      * @param remoteRepositories maven remote repositories
-     * @param log                logger
      */
     // CHECKSTYLE_OFF: ParameterNumber
     public DefaultThirdPartyHelper( MavenProject project, String encoding, boolean verbose,
                                     DependenciesTool dependenciesTool, ThirdPartyTool thirdPartyTool,
                                     List<ArtifactRepository> remoteRepositoriesCoreApi,
-                                    List<RemoteRepository> remoteRepositories, Log log )
+                                    List<RemoteRepository> remoteRepositories )
     {
         // CHECKSTYLE_ON: ParameterNumber
         this.project = project;
@@ -132,7 +128,6 @@ public class DefaultThirdPartyHelper
         this.thirdPartyTool = thirdPartyTool;
         this.remoteRepositoriesCoreApi = remoteRepositoriesCoreApi;
         this.remoteRepositories = remoteRepositories;
-        this.log = log;
         this.thirdPartyTool.setVerbose( verbose );
     }
 
@@ -212,7 +207,7 @@ public class DefaultThirdPartyHelper
      */
     public SortedSet<MavenProject> getProjectsWithNoLicense( LicenseMap licenseMap )
     {
-        return thirdPartyTool.getProjectsWithNoLicense( licenseMap, verbose );
+        return thirdPartyTool.getProjectsWithNoLicense( licenseMap );
     }
 
     /**
@@ -336,7 +331,7 @@ public class DefaultThirdPartyHelper
                 Set<String> mergedLicense = entry.getValue();
                 if ( verbose )
                 {
-                    log.info( "Will merge to *" + mainLicense + "*, licenses: " + mergedLicense );
+                    LOG.info( "Will merge to '{}', licenses: {}", mainLicense, mergedLicense );
                 }
 
                 thirdPartyTool.mergeLicenses( licenseMap, mainLicense, mergedLicense );

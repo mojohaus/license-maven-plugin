@@ -34,7 +34,6 @@ import java.util.SortedSet;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -49,6 +48,8 @@ import org.codehaus.mojo.license.api.ThirdPartyToolException;
 import org.codehaus.mojo.license.model.LicenseMap;
 import org.codehaus.mojo.license.utils.FileUtil;
 import org.codehaus.mojo.license.utils.SortedProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 // CHECKSTYLE_OFF: LineLength
 /**
@@ -69,6 +70,7 @@ import org.codehaus.mojo.license.utils.SortedProperties;
        defaultPhase = LifecyclePhase.GENERATE_RESOURCES )
 public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements MavenProjectDependenciesConfigurator
 {
+    private static final Logger LOG = LoggerFactory.getLogger( AddThirdPartyMojo.class );
 
     // ----------------------------------------------------------------------
     // Mojo Parameters
@@ -158,7 +160,7 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
         if ( !doGenerate && !doGenerateBundle && !doGenerateMissing )
         {
 
-            getLog().info( "All files are up to date, skip goal execution." );
+            LOG.info( "All files are up to date, skip goal execution." );
             return false;
         }
         return true;
@@ -196,7 +198,7 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
         {
 
             // there is no missing dependencies, but still a missing file, delete it
-            getLog().info( "There is no dependency to put in missing file, delete it at " + missingFile );
+            LOG.info( "There is no dependency to put in missing file, delete it at {}", missingFile );
             FileUtil.deleteFile( missingFile );
         }
 
@@ -204,7 +206,7 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
         {
 
             // can deploy missing file
-            getLog().info( "Will attach third party file from " + missingFile );
+            LOG.info( "Will attach third party file from {}", missingFile );
             getHelper().attachThirdPartyDescriptor( missingFile );
         }
 
@@ -265,7 +267,7 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
                                                  resolveDependencyArtifacts().getAllDependencies() );
         if ( isVerbose() )
         {
-            getLog().info( "found " + unsafeMappings.size() + " unsafe mappings" );
+            LOG.info( "found {} unsafe mappings", unsafeMappings.size() );
         }
 
         // compute if missing file should be (re)-generate
@@ -274,22 +276,22 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
         if ( doGenerateMissing && isVerbose() )
         {
             StringBuilder sb = new StringBuilder();
-            sb.append( "Will use from missing file " );
+            sb.append( "Will use " );
             sb.append( unsafeMappings.size() );
-            sb.append( " dependencies :" );
+            sb.append( " dependencies from missingFile:" );
             for ( Map.Entry<Object, Object> entry : unsafeMappings.entrySet() )
             {
                 String id = (String) entry.getKey();
                 String license = (String) entry.getValue();
                 sb.append( "\n - " ).append( id ).append( " - " ).append( license );
             }
-            getLog().info( sb.toString() );
+            LOG.info( "{}", sb );
         }
         else
         {
             if ( useMissingFile && !unsafeMappings.isEmpty() )
             {
-                getLog().info( "Missing file " + missingFile + " is up-to-date." );
+                LOG.info( "Missing file {} is up-to-date.", missingFile );
             }
         }
         return unsafeMappings;
@@ -387,10 +389,8 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
             throws IOException
     {
 
-        Log log = getLog();
-
         FileUtil.createDirectoryIfNecessary( missingFile.getParentFile() );
-        log.info( "Regenerate missing license file " + missingFile );
+        LOG.info( "Regenerate missing license file {}", missingFile );
 
         FileOutputStream writer = new FileOutputStream( missingFile );
         try

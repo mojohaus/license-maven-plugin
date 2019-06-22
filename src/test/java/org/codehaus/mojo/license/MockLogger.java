@@ -1,178 +1,49 @@
 package org.codehaus.mojo.license;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import org.apache.maven.plugin.logging.Log;
-import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.mojo.license.LicenseMojoUtils.LoggerFacade;
 
-public class MockLogger implements Log
+public class MockLogger
+    implements LoggerFacade
 {
-    private boolean debugEnabled = true;
-    private boolean infoEnabled = true;
-    private boolean warnEnabled = true;
-    private boolean errorEnabled = true;
-    private List<String> messages = new ArrayList<>();
+    private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile( "\\Q{}\\E" );
 
-    @Override
-    public boolean isDebugEnabled()
+    private static final String format( String template, Object param )
     {
-        return debugEnabled;
+        return PLACEHOLDER_PATTERN.matcher( template )
+                        .replaceFirst( Matcher.quoteReplacement( String.valueOf( param ) ) );
     }
 
+    private final StringBuilder log = new StringBuilder();
+
     @Override
-    public void debug( CharSequence content )
+    public void debug( String template, Object param )
     {
-        add( debugEnabled, "DEBUG", content );
+        log.append( "DEBUG " ).append( format( template, param ) ).append( "\n" );
     }
 
     @Override
-    public void debug( CharSequence content, Throwable error )
+    public void warn( String string )
     {
-        add( debugEnabled, "DEBUG", content, error );
+        log.append( "WARN " ).append( string ).append( "\n" );
     }
 
     @Override
-    public void debug( Throwable error )
+    public void warn( String template, Object param )
     {
-        add( debugEnabled, "DEBUG", error );
-    }
-
-    @Override
-    public boolean isInfoEnabled()
-    {
-        return infoEnabled;
-    }
-
-    @Override
-    public void info( CharSequence content )
-    {
-        add( infoEnabled, "INFO", content );
-    }
-
-    @Override
-    public void info( CharSequence content, Throwable error )
-    {
-        add( infoEnabled, "INFO", content, error );
-    }
-
-    @Override
-    public void info( Throwable error )
-    {
-        add( infoEnabled, "INFO", error );
-    }
-
-    @Override
-    public boolean isWarnEnabled()
-    {
-        return warnEnabled;
-    }
-
-    @Override
-    public void warn( CharSequence content )
-    {
-        add( warnEnabled, "WARN", content );
-    }
-
-    @Override
-    public void warn( CharSequence content, Throwable error )
-    {
-        add( warnEnabled, "WARN", content, error );
-    }
-
-    @Override
-    public void warn( Throwable error )
-    {
-        add( warnEnabled, "WARN", error );
-    }
-
-    @Override
-    public boolean isErrorEnabled()
-    {
-        return errorEnabled;
-    }
-
-    @Override
-    public void error( CharSequence content )
-    {
-        add( errorEnabled, "ERROR", content );
-    }
-
-    @Override
-    public void error( CharSequence content, Throwable error )
-    {
-        add( errorEnabled, "ERROR", content, error );
-    }
-
-    @Override
-    public void error( Throwable error )
-    {
-        add( errorEnabled, "ERROR", error );
-    }
-
-    // Builder pattern initialization
-
-    public MockLogger enableDebug( boolean enable )
-    {
-        debugEnabled = enable;
-        return this;
-    }
-
-    public MockLogger enableInfo( boolean enable )
-    {
-        infoEnabled = enable;
-        return this;
-    }
-
-    public MockLogger enableWarn( boolean enable )
-    {
-        warnEnabled = enable;
-        return this;
-    }
-
-    public MockLogger enableError( boolean enable )
-    {
-        errorEnabled = enable;
-        return this;
-    }
-
-    private void add(boolean enabled, String level, Throwable error) {
-        add(enabled, level, null, error);
-    }
-
-    private void add(boolean enabled, String level, CharSequence content) {
-        add(enabled, level, content, null);
-    }
-
-    private void add(boolean enabled, String level, CharSequence content, Throwable error) {
-        if (!enabled) {
-            return;
-        }
-
-        StringBuilder buffer = new StringBuilder(level);
-        if (content != null) {
-            buffer.append( ' ' ).append(content);
-        }
-
-        if (error != null) {
-            buffer.append( "\n" ).append(error.toString());
-        }
-
-        messages.add( buffer.toString() );
-    }
-
-    public List<String> getMessages()
-    {
-        return messages;
+        log.append( "WARN " ).append( format( template, param ) ).append( "\n" );
     }
 
     public String dump()
     {
-        return StringUtils.join( messages.iterator(), "\n" );
+        return log.toString();
     }
 
     public void reset()
     {
-        messages.clear();
+        log.setLength( 0 );
     }
+
 }

@@ -64,6 +64,8 @@ import org.codehaus.mojo.license.download.UrlReplacements;
 import org.codehaus.mojo.license.spdx.SpdxLicenseList;
 import org.codehaus.mojo.license.spdx.SpdxLicenseList.Attachments.ContentSanitizer;
 import org.codehaus.mojo.license.utils.FileUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created on 23/05/16.
@@ -74,6 +76,7 @@ public abstract class AbstractDownloadLicensesMojo
     extends AbstractLicensesXmlMojo
     implements MavenProjectDependenciesConfigurator
 {
+    private static final Logger LOG = LoggerFactory.getLogger( AbstractDownloadLicensesMojo.class );
 
     // ----------------------------------------------------------------------
     // Mojo Parameters
@@ -702,12 +705,12 @@ public abstract class AbstractDownloadLicensesMojo
 
         if ( isSkip() )
         {
-            getLog().info( "skip flag is on, will skip goal." );
+            LOG.info( "skip flag is on, will skip goal." );
             return;
         }
 
         this.errorRemedy = getEffectiveErrorRemedy( this.quiet, this.errorRemedy );
-        this.preferredFileNames = PreferredFileNames.build( licensesOutputDirectory, licenseUrlFileNames, getLog() );
+        this.preferredFileNames = PreferredFileNames.build( licensesOutputDirectory, licenseUrlFileNames );
         this.cache = new Cache( licenseUrlFileNames != null && !licenseUrlFileNames.isEmpty() );
         this.urlReplacements = urlReplacements();
 
@@ -761,7 +764,7 @@ public abstract class AbstractDownloadLicensesMojo
         {
             for ( LicensedArtifact artifact : dependencies.values() )
             {
-                getLog().debug( "Checking licenses for project " + artifact );
+                LOG.debug( "Checking licenses for project " + artifact );
                 final ProjectLicenseInfo depProject = createDependencyProject( artifact );
                 matchers.replaceMatches( depProject );
 
@@ -782,7 +785,7 @@ public abstract class AbstractDownloadLicensesMojo
                 {
                     downloadLicenses( licenseDownloader, depProject, true );
                 }
-                getLog().debug( "Finished populating cache" );
+                LOG.debug( "Finished populating cache" );
                 /*
                  * Then attempt to download the rest of the URLs using the available cache entries to select local
                  * file names based on file content sha1
@@ -826,7 +829,7 @@ public abstract class AbstractDownloadLicensesMojo
                 /* do nothing */
                 break;
             case warn:
-                getLog().warn( "There were " + downloadErrorCount + " download errors - check the warnings above" );
+                LOG.warn( "There were {} download errors - check the warnings above", downloadErrorCount );
                 break;
             case xmlOutput:
                 if ( downloadErrorCount > 0 )
@@ -843,7 +846,7 @@ public abstract class AbstractDownloadLicensesMojo
 
     private UrlReplacements urlReplacements()
     {
-        UrlReplacements.Builder b = UrlReplacements.builder( getLog() ).useDefaults( useDefaultUrlReplacements );
+        UrlReplacements.Builder b = UrlReplacements.builder().useDefaults( useDefaultUrlReplacements );
         if ( licenseUrlReplacements != null )
         {
             for ( LicenseUrlReplacement r : licenseUrlReplacements )
@@ -863,7 +866,7 @@ public abstract class AbstractDownloadLicensesMojo
             final Map<String, ContentSanitizer> defaultSanitizers =
                 SpdxLicenseList.getLatest().getAttachments().getContentSanitizers();
             result.putAll( defaultSanitizers  );
-            if ( getLog().isDebugEnabled() && !defaultSanitizers.isEmpty() )
+            if ( LOG.isDebugEnabled() && !defaultSanitizers.isEmpty() )
             {
                 final StringBuilder sb = new StringBuilder() //
                         .append( "Applied " ) //
@@ -888,7 +891,7 @@ public abstract class AbstractDownloadLicensesMojo
                 }
                 sb.append( "</licenseContentSanitizers>" );
 
-                getLog().debug( sb.toString() );
+                LOG.debug( sb.toString() );
             }
         }
         if ( licenseContentSanitizers != null )
@@ -922,7 +925,7 @@ public abstract class AbstractDownloadLicensesMojo
                 final File file = new File( licensesOutputDirectory, fileName );
                 if ( file.exists() )
                 {
-                    getLog().info( "Removing orphan license file \"" + file + "\"" );
+                    LOG.info( "Removing orphan license file \"{}\"", file );
                     file.delete();
                 }
             }
@@ -1032,7 +1035,7 @@ public abstract class AbstractDownloadLicensesMojo
             {
                 if ( cleanLicensesOutputDirectory )
                 {
-                    getLog().info( "Cleaning licensesOutputDirectory '" + licensesOutputDirectory + "'" );
+                    LOG.info( "Cleaning licensesOutputDirectory '{}'", licensesOutputDirectory );
                     FileUtils.cleanDirectory( licensesOutputDirectory );
                 }
             }
@@ -1191,7 +1194,7 @@ public abstract class AbstractDownloadLicensesMojo
                                    boolean matchingUrlsOnly )
         throws MojoFailureException
     {
-        getLog().debug( "Downloading license(s) for project " + depProject );
+        LOG.debug( "Downloading license(s) for project {}", depProject );
 
         List<ProjectLicense> licenses = depProject.getLicenses();
 
@@ -1257,7 +1260,7 @@ public abstract class AbstractDownloadLicensesMojo
                             if ( !licenseOutputFile.exists() || forceDownload )
                             {
                                 LicenseDownloadResult result =
-                                    licenseDownloader.downloadLicense( licenseUrl, fileNameEntry, getLog() );
+                                    licenseDownloader.downloadLicense( licenseUrl, fileNameEntry );
                                 if ( !organizeLicensesByDependencies && result.isSuccess() )
                                 {
                                     /* check if we can re-use an existing file that has the same content */
@@ -1267,9 +1270,12 @@ public abstract class AbstractDownloadLicensesMojo
                                         final File oldFile = result.getFile();
                                         if ( !oldFile.getName().equals( name ) )
                                         {
-                                            getLog().debug( "Found preferred name '" + name
-                                                + "' by sha1 after downloading '" + licenseUrl + "'; renaming from '"
-                                                + oldFile.getName() + "'" );
+                                            LOG.debug(
+                                                "Found preferred name '{}' by SHA1 after downloading '{}'; "
+                                                + "renaming from '{}'",
+                                                name,
+                                                licenseUrl,
+                                                oldFile.getName() );
                                             final File newFile = new File( licensesOutputDirectory, name );
                                             if ( newFile.exists() )
                                             {
@@ -1300,21 +1306,24 @@ public abstract class AbstractDownloadLicensesMojo
                 }
                 catch ( URISyntaxException e )
                 {
-                    handleError( depProject, "POM for dependency " + depProject.toGavString()
-                        + " has an invalid license URL: " + licenseUrl );
-                    getLog().debug( e );
+                    String msg = "POM for dependency " + depProject.toGavString()
+                        + " has an invalid license URL: " + licenseUrl;
+                    handleError( depProject, msg );
+                    LOG.debug( msg, e );
                 }
                 catch ( FileNotFoundException e )
                 {
-                    handleError( depProject, "POM for dependency " + depProject.toGavString()
-                        + " has a license URL that returns file not found: " + licenseUrl );
-                    getLog().debug( e );
+                    String msg = "POM for dependency " + depProject.toGavString()
+                        + " has a license URL that returns file not found: " + licenseUrl;
+                    handleError( depProject, msg );
+                    LOG.debug( msg, e );
                 }
                 catch ( IOException e )
                 {
-                    handleError( depProject, "Unable to retrieve license from URL '" + licenseUrl + "' for dependency '"
-                        + depProject.toGavString() + "': " + e.getMessage() );
-                    getLog().debug( e );
+                    String msg = "Unable to retrieve license from URL '" + licenseUrl + "' for dependency '"
+                        + depProject.toGavString() + "': " + e.getMessage();
+                    handleError( depProject, msg );
+                    LOG.debug( msg, e );
                 }
             }
             licenseIndex++;
@@ -1340,7 +1349,7 @@ public abstract class AbstractDownloadLicensesMojo
     {
         if ( depProject.isApproved() )
         {
-            getLog().debug( "Supressing manually approved license issue: " + msg );
+            LOG.debug( "Supressing manually approved license issue: {}", msg );
         }
         else
         {
@@ -1350,12 +1359,12 @@ public abstract class AbstractDownloadLicensesMojo
                     /* do nothing */
                     break;
                 case warn:
-                    getLog().warn( msg );
+                    LOG.warn( msg );
                     break;
                 case failFast:
                     throw new MojoFailureException( msg );
                 case xmlOutput:
-                    getLog().error( msg );
+                    LOG.error( msg );
                     depProject.addDownloaderMessage( msg );
                     break;
                 default:

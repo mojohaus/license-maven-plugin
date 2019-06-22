@@ -108,7 +108,6 @@ public class AggregateDownloadLicensesMojo
     /**
      * {@inheritDoc}
      */
-    @SuppressWarnings( "unchecked" )
     protected Map<String, LicensedArtifact> getDependencies()
     {
         final Map<String, LicensedArtifact> result = new TreeMap<>();
