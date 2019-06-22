@@ -1,3 +1,4 @@
+org.codehaus.mojo.license
 org.codehaus.mojo.license.api
 org.codehaus.mojo.license.download
 org.codehaus.mojo.license.header.transformer
