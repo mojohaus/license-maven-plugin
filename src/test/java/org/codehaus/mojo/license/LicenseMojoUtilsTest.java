@@ -86,7 +86,7 @@ public class LicenseMojoUtilsTest
                 + "valid=false\n"
                 + "WARN 'overrideFile' mojo parameter is deprecated. Use 'overrideUrl' instead.\n"
                 + "WARN overrideFile [.../foo] was configured but doesn't exist\n"
-                + "DEBUG No (valid) URL and no file [.../override-THIRD-PARTY.properties] found; not loading any overrides"
+                + "DEBUG No (valid) URL and no file [.../override-THIRD-PARTY.properties] found; not loading any overrides\n"
                 , actual );
     }
 
@@ -99,7 +99,7 @@ public class LicenseMojoUtilsTest
                 "resolved=file:/.../overrides.properties\n"
                 + "valid=true\n"
                 + "WARN 'overrideFile' mojo parameter is deprecated. Use 'overrideUrl' instead.\n"
-                + "DEBUG Loading overrides from file file:/.../overrides.properties"
+                + "DEBUG Loading overrides from file file:/.../overrides.properties\n"
                 , actual );
     }
 
@@ -110,7 +110,7 @@ public class LicenseMojoUtilsTest
         String actual = LicenseMojoUtils.prepareThirdPartyOverrideUrl( resolvedUrl, deprecatedFile, url, basedir, log );
         assertEquals( url, actual );
         assertTrue( LicenseMojoUtils.isValid(actual) );
-        assertEquals( "DEBUG Loading overrides from URL classpath:overrides.properties", log.dump() );
+        assertEquals( "DEBUG Loading overrides from URL classpath:overrides.properties\n", log.dump() );
     }
 
     @Test
@@ -122,7 +122,7 @@ public class LicenseMojoUtilsTest
                 "resolved=file:///inexistent\n"
                 + "valid=false\n"
                 + "WARN Unsupported or invalid URL [foo://localhost/bar] found in overrideUrl; supported are 'classpath:' URLs and  anything your JVM supports (file:, http: and https: should always work)\n"
-                + "DEBUG No (valid) URL and no file [.../override-THIRD-PARTY.properties] found; not loading any overrides"
+                + "DEBUG No (valid) URL and no file [.../override-THIRD-PARTY.properties] found; not loading any overrides\n"
                 , actual );
     }
 
@@ -136,7 +136,7 @@ public class LicenseMojoUtilsTest
         assertEquals(
                 "resolved=classpath:overrides.properties\n"
                 + "valid=true\n"
-                + "WARN 'overrideFile' mojo parameter is deprecated. Use 'overrideUrl' instead."
+                + "WARN 'overrideFile' mojo parameter is deprecated. Use 'overrideUrl' instead.\n"
                 , actual );
     }
 

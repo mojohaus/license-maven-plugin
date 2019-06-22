@@ -410,7 +410,7 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
             throws MavenReportException
     {
         resolvedOverrideUrl = LicenseMojoUtils.prepareThirdPartyOverrideUrl( resolvedOverrideUrl, overrideFile,
-                overrideUrl, project.getBasedir(), getLog() );
+                overrideUrl, project.getBasedir() );
 
         Collection<ThirdPartyDetails> details;
 

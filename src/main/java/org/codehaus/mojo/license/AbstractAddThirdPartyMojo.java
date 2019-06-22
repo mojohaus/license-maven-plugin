@@ -776,7 +776,7 @@ public abstract class AbstractAddThirdPartyMojo
         }
 
         resolvedOverrideUrl = LicenseMojoUtils.prepareThirdPartyOverrideUrl( resolvedOverrideUrl, overrideFile,
-                overrideUrl, project.getBasedir(), getLog() );
+                overrideUrl, project.getBasedir() );
     }
 
     void consolidate() throws IOException, ArtifactNotFoundException, ArtifactResolutionException, MojoFailureException,
