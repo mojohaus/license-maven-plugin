@@ -630,6 +630,7 @@
                     <pomInclude>download-licenses-proxy/pom.xml</pomInclude>
                   </pomIncludes>
                   <cloneProjectsTo>${project.build.directory}/it-proxy</cloneProjectsTo>
+                  <streamLogs>true</streamLogs>
                 </configuration>
               </execution>
             </executions>
