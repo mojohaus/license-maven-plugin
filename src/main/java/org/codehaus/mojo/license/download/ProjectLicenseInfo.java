@@ -23,6 +23,7 @@ package org.codehaus.mojo.license.download;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.codehaus.mojo.license.extended.ExtendedInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,6 +52,8 @@ public class ProjectLicenseInfo
 
     private boolean approved;
 
+    private ExtendedInfo extendedInfo;
+
     /**
      * Default constructor.
      */
@@ -59,11 +62,12 @@ public class ProjectLicenseInfo
 
     }
 
-    public ProjectLicenseInfo( String groupId, String artifactId, String version )
+    public ProjectLicenseInfo( String groupId, String artifactId, String version, ExtendedInfo extendedInfo )
     {
         this.groupId = groupId;
         this.artifactId = artifactId;
         this.version = version;
+        this.extendedInfo = extendedInfo;
     }
 
     public ProjectLicenseInfo( String groupId, String artifactId, String version, boolean hasMatchLicenses )
@@ -254,4 +258,8 @@ public class ProjectLicenseInfo
         return approved;
     }
 
+    public ExtendedInfo getExtendedInfo()
+    {
+        return extendedInfo;
+    }
 }

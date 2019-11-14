@@ -70,8 +70,8 @@ public class LicenseSummaryTest
         TransformerException
     {
         List<ProjectLicenseInfo> licSummary = new ArrayList<>();
-        ProjectLicenseInfo dep1 = new ProjectLicenseInfo( "org.test", "test1", "1.0" );
-        ProjectLicenseInfo dep2 = new ProjectLicenseInfo( "org.test", "test2", "2.0" );
+        ProjectLicenseInfo dep1 = new ProjectLicenseInfo( "org.test", "test1", "1.0", null );
+        ProjectLicenseInfo dep2 = new ProjectLicenseInfo( "org.test", "test2", "2.0", null );
 
         ProjectLicense lic = new ProjectLicense();
         lic.setName( "lgpl" );

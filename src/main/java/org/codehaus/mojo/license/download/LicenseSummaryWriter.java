@@ -22,7 +22,12 @@ package org.codehaus.mojo.license.download;
  * #L%
  */
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.maven.model.Developer;
+import org.apache.maven.model.Organization;
 import org.codehaus.mojo.license.Eol;
+import org.codehaus.mojo.license.extended.ExtendedInfo;
+import org.codehaus.mojo.license.extended.InfoFile;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -40,7 +45,9 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.util.Collection;
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -130,9 +137,32 @@ public class LicenseSummaryWriter
             depNode.appendChild( matchLicensesNode );
         }
 
+        if ( dep.getExtendedInfo() != null )
+        {
+            ExtendedInfo extendedInfo = dep.getExtendedInfo();
+            addTextPropertyIfSet( doc, depNode, "bundleLicense", extendedInfo.getBundleLicense() );
+            addCdataIfSet( doc, depNode, "bundleVendor", extendedInfo.getBundleVendor() );
+            appendChildNodesIfSet( doc, depNode, "developers", extendedInfo.getDevelopers(),
+                    ( doc1, developer ) -> createDeveloperNode( doc, developer ) );
+            addCdataIfSet( doc, depNode, "implementationVendor", extendedInfo.getImplementationVendor() );
+            appendChildNodesIfSet( doc, depNode, "infoFiles", extendedInfo.getInfoFiles(),
+                    ( doc1, infoFile ) -> createInfoFileNode( doc, infoFile ) );
+            if ( extendedInfo.getOrganization() != null
+                    && ( extendedInfo.getOrganization().getName() != null
+                    || extendedInfo.getOrganization().getUrl() != null ) )
+            {
+                Node organizationNode = doc.createElement( "organization" );
+                final Organization organization = extendedInfo.getOrganization();
+                addTextPropertyIfSet( doc, organizationNode, "name", organization.getName() );
+                addTextPropertyIfSet( doc, organizationNode, "url", organization.getUrl() );
+                depNode.appendChild( organizationNode );
+            }
+            addTextPropertyIfSet( doc, depNode, "scm", extendedInfo.getScm() );
+            addTextPropertyIfSet( doc, depNode, "url", extendedInfo.getUrl() );
+        }
 
         Node licensesNode = doc.createElement( "licenses" );
-        if ( dep.getLicenses() == null || dep.getLicenses().size() == 0 )
+        if ( CollectionUtils.isEmpty( dep.getLicenses() ) )
         {
             final String comment =
                 hasDownloaderMessages ? " Manually add license elements here: " : " No license information available. ";
@@ -164,7 +194,30 @@ public class LicenseSummaryWriter
         }
 
         return depNode;
+    }
 
+    /**
+     * Lambda interface for {@link #appendChildNodesIfSet(Document, Node, String, Collection, CreateSubNode)}.
+     *
+     * @param <T> Type in collection to add as child node entries.
+     */
+    interface CreateSubNode<T>
+    {
+        Node createSubNode( Document doc, T t );
+    }
+
+    private static <T> void appendChildNodesIfSet( Document doc, Node parentNode, String elementName,
+                                                   Collection<T> collection, CreateSubNode<T> createSubNode )
+    {
+        if ( !CollectionUtils.isEmpty( collection ) )
+        {
+            Node developersNode = doc.createElement( elementName );
+            for ( T t : collection )
+            {
+                developersNode.appendChild( createSubNode.createSubNode( doc, t ) );
+            }
+            parentNode.appendChild( developersNode );
+        }
     }
 
     public static Node createLicenseNode( Document doc, ProjectLicense lic, boolean isMatcher )
@@ -207,6 +260,70 @@ public class LicenseSummaryWriter
         }
 
         return licenseNode;
+    }
+
+    private static Node createDeveloperNode( Document doc, Developer developer )
+    {
+        Node developerNode = doc.createElement( "developer" );
+
+        addTextPropertyIfSet( doc, developerNode, "email", developer.getEmail() );
+        addTextPropertyIfSet( doc, developerNode, "name", developer.getName() );
+        addTextPropertyIfSet( doc, developerNode, "organization", developer.getOrganization() );
+        addTextPropertyIfSet( doc, developerNode, "organizationUrl", developer.getOrganizationUrl() );
+        addTextPropertyIfSet( doc, developerNode, "url", developer.getUrl() );
+
+        return developerNode;
+    }
+
+    private static Node createInfoFileNode( Document doc, InfoFile infoFile )
+    {
+        Node infoFileNode = doc.createElement( "infoFile" );
+
+        addCdataIfSet( doc, infoFileNode, "content", infoFile.getContent() );
+        appendChildNodesIfSet( doc, infoFileNode, "extractedCopyrightLines", infoFile.getExtractedCopyrightLines(),
+                ( doc1, line ) -> {
+                    Node devNameNode = doc.createElement( "line" );
+                    devNameNode.appendChild( doc.createCDATASection( line ) );
+                    return devNameNode;
+                } );
+        addCdataIfSet( doc, infoFileNode, "fileName", infoFile.getFileName() );
+        addTextPropertyIfSet( doc, infoFileNode, "type", infoFile.getType().toString() );
+
+        return infoFileNode;
+    }
+
+    private static void addTextPropertyIfSet( Document doc, Node parentNode, String elementName, String property )
+    {
+        addPropertyIfSet( doc, parentNode, elementName, property, () -> doc.createTextNode( property ) );
+    }
+
+    private static void addCdataIfSet( Document doc, Node parentNode, String elementName, String property )
+    {
+        addPropertyIfSet( doc, parentNode, elementName, property,
+                () -> doc.createCDATASection( prepareCdata( property ) ) );
+    }
+
+    /**
+     * Fix string to being written as CDATA under windows, also compatible with *nix systems.<br/>
+     * See https://bugs.openjdk.java.net/browse/JDK-8133452
+     *
+     * @param property Property to prepare being written as XML CDATA
+     * @return The properly prepared string.
+     */
+    private static String prepareCdata( String property )
+    {
+        return property.replace( "\r\n", "\n" );
+    }
+
+    private static void addPropertyIfSet( Document doc, Node parentNode, String elementName,
+                                          String property, Supplier<Node> nodeSupplier )
+    {
+        if ( property != null )
+        {
+            Node devNameNode = doc.createElement( elementName );
+            devNameNode.appendChild( nodeSupplier.get() );
+            parentNode.appendChild( devNameNode );
+        }
     }
 
     private static final Pattern WHITESPACE_PATTERN = Pattern.compile( "\\s{2,}" );

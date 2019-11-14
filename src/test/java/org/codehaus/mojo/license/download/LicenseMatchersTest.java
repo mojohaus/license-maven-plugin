@@ -76,7 +76,7 @@ public class LicenseMatchersTest
     @Test
     public void replaceMatchesLegacy()
     {
-        final ProjectLicenseInfo dep = new ProjectLicenseInfo( "myGroup", "myArtifact", "1a2.3" );
+        final ProjectLicenseInfo dep = new ProjectLicenseInfo( "myGroup", "myArtifact", "1a2.3", null );
         final ProjectLicenseInfo pli1 = new ProjectLicenseInfo( "myGroup", "myArtifact", "1.2.3", false );
         final ProjectLicense lic2 = new ProjectLicense("lic2", "http://other.org", null, "other comment", null);
         pli1.addLicense( lic2 );
@@ -98,7 +98,7 @@ public class LicenseMatchersTest
     public void replaceMatches()
     {
 
-        final ProjectLicenseInfo dep = new ProjectLicenseInfo( "myGroup", "myArtifact", "1.2.3" );
+        final ProjectLicenseInfo dep = new ProjectLicenseInfo( "myGroup", "myArtifact", "1.2.3", null );
         final DependencyMatcher m0 =
                         DependencyMatcher.of( new ProjectLicenseInfo( "myGroup", "myArtifact", null, true ) );
                     Assert.assertTrue( m0.matches( dep ) );
@@ -134,7 +134,7 @@ public class LicenseMatchersTest
         dep.addLicense( new ProjectLicense( "lic1", "http://some.org", null, "comment", null ) );
         Assert.assertFalse( m1.matches( dep ) );
 
-        final ProjectLicenseInfo dep11 = new ProjectLicenseInfo( "myGroup", "myArtifact", "1.2.3" );
+        final ProjectLicenseInfo dep11 = new ProjectLicenseInfo( "myGroup", "myArtifact", "1.2.3", null );
         dep11.addLicense( new ProjectLicense( "lic1", "http://some.org", null, "comment", null ) );
         final List<ProjectLicense> oldLics11 = dep.cloneLicenses();
         final ProjectLicenseInfo pli11 = new ProjectLicenseInfo( "myGroup", "myArtifact", "1\\.2\\.3", true );

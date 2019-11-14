@@ -77,20 +77,19 @@ public class LicensedArtifactResolver
      * For a given {@code project}, obtain the universe of its dependencies after applying transitivity and filtering
      * rules given in the {@code configuration} object. Result is given in a map where keys are unique artifact id
      *
-     * @param dependencies the project dependencies
+     * @param artifacts Dependencies
      * @param configuration the configuration
-     * @param localRepository local repository used to resolv dependencies
-     * @param remoteRepositories remote repositories used to resolv dependencies
-     * @param cache a optional cache where to keep resolved dependencies
+     * @param remoteRepositories remote repositories used to resolve dependencies
+     * @param result Map with Key/Value = PluginID/LicensedArtifact
      * @return the map of resolved dependencies indexed by their unique id.
      * @see MavenProjectDependenciesConfigurator
      */
     public void loadProjectDependencies( ResolvedProjectDependencies artifacts,
                                                                   MavenProjectDependenciesConfigurator configuration,
                                                                   List<ArtifactRepository> remoteRepositories,
-                                                                  Map<String, LicensedArtifact> result )
+                                                                  Map<String, LicensedArtifact> result,
+                                                                  boolean extendedInfo )
     {
-
         final ArtifactFilters artifactFilters = configuration.getArtifactFilters();
 
         final boolean excludeTransitiveDependencies = configuration.isExcludeTransitiveDependencies();
@@ -158,13 +157,19 @@ public class LicensedArtifactResolver
             else
             {
                 // build project
-                final Builder laBuilder =
-                    LicensedArtifact.builder( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion() );
+                final Builder laBuilder = LicensedArtifact.builder( artifact, extendedInfo );
                 try
                 {
                     final MavenProject project = mavenProjectBuilder
                             .build( artifact, true, projectBuildingRequest )
                             .getProject();
+                    if ( extendedInfo )
+                    {
+                        laBuilder.setInceptionYear( project.getInceptionYear() );
+                        laBuilder.setOrganization( project.getOrganization() );
+                        laBuilder.setDevelopers( project.getDevelopers() );
+                        laBuilder.setUrl( project.getUrl() );
+                    }
                     List<org.apache.maven.model.License> lics = project.getLicenses();
                     if ( lics != null )
                     {

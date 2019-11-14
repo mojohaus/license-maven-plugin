@@ -87,7 +87,7 @@ public class DownloadLicensesMojo
         final Map<String, LicensedArtifact> result = new TreeMap<>();
         licensedArtifactResolver.loadProjectDependencies(
                 new ResolvedProjectDependencies( project.getArtifacts(), project.getDependencyArtifacts() ),
-                this, remoteRepositories, result );
+                this, remoteRepositories, result, false );
         return result;
     }
 

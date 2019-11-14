@@ -40,6 +40,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
+
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -810,7 +812,7 @@ public abstract class AbstractDownloadLicensesMojo
 
             List<ProjectLicenseInfo> depProjectLicensesWithErrors = filterErrors( depProjectLicenses );
             writeLicenseSummary( depProjectLicenses, licensesOutputFile, writeVersions );
-            if ( depProjectLicensesWithErrors != null && !depProjectLicensesWithErrors.isEmpty() )
+            if ( !CollectionUtils.isEmpty( depProjectLicensesWithErrors ) )
             {
                 writeLicenseSummary( depProjectLicensesWithErrors, licensesErrorsFile, writeVersions );
             }
@@ -970,16 +972,10 @@ public abstract class AbstractDownloadLicensesMojo
 
     private void sortByGroupIdAndArtifactId( List<ProjectLicenseInfo> depProjectLicenses )
     {
-        Comparator<ProjectLicenseInfo> comparator = new Comparator<ProjectLicenseInfo>()
-        {
-            public int compare( ProjectLicenseInfo info1, ProjectLicenseInfo info2 )
-            {
+        Comparator<ProjectLicenseInfo> comparator = Comparator.comparing( info -> (
                 //ProjectLicenseInfo::getId() can not be used because . is before : thus a:b.c would be after a.b:c
-                return ( info1.getGroupId() + "+" + info1.getArtifactId() ).compareTo( info2.getGroupId()
-                        + "+" + info2.getArtifactId() );
-            }
-        };
-        Collections.sort( depProjectLicenses, comparator );
+                info.getGroupId() + "+" + info.getArtifactId() ) );
+        depProjectLicenses.sort( comparator );
     }
 
     // ----------------------------------------------------------------------
@@ -1084,7 +1080,7 @@ public abstract class AbstractDownloadLicensesMojo
     {
         final ProjectLicenseInfo dependencyProject =
             new ProjectLicenseInfo( depMavenProject.getGroupId(), depMavenProject.getArtifactId(),
-                                    depMavenProject.getVersion() );
+                                    depMavenProject.getVersion(), depMavenProject.getExtendedInfos() );
         final List<org.codehaus.mojo.license.download.License> licenses = depMavenProject.getLicenses();
         for ( org.codehaus.mojo.license.download.License license : licenses )
         {
@@ -1106,9 +1102,9 @@ public abstract class AbstractDownloadLicensesMojo
      * license (if available) and the remote filename of the license.
      *
      * @param depProject the project containing the license
-     * @param licenseUrl the license url
+     * @param url the license url
      * @param licenseName the license name
-     * @param string
+     * @param licenseFileName License file name
      * @return A filename to be used for the downloaded license file
      * @throws URISyntaxException
      */
