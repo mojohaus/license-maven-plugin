@@ -35,6 +35,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
 import org.codehaus.mojo.license.api.DefaultThirdPartyHelper;
 import org.codehaus.mojo.license.api.DependenciesTool;
+import org.codehaus.mojo.license.api.DependenciesToolException;
 import org.codehaus.mojo.license.api.ThirdPartyHelper;
 import org.codehaus.mojo.license.api.ThirdPartyTool;
 import org.codehaus.mojo.license.api.ThirdPartyToolException;
@@ -44,6 +45,10 @@ import org.codehaus.mojo.license.utils.MojoHelper;
 import org.codehaus.mojo.license.utils.SortedProperties;
 import org.codehaus.mojo.license.utils.StringToList;
 import org.codehaus.mojo.license.utils.UrlRequester;
+import org.eclipse.aether.resolution.ArtifactResolutionException;
+import org.eclipse.aether.transfer.ArtifactNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -55,11 +60,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
-import org.codehaus.mojo.license.api.DependenciesToolException;
-import org.eclipse.aether.resolution.ArtifactResolutionException;
-import org.eclipse.aether.transfer.ArtifactNotFoundException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Abstract mojo for all third-party mojos.
@@ -354,7 +354,7 @@ public abstract class AbstractAddThirdPartyMojo
     /**
      * A URL prepared either our of {@link #overrideFile} or {@link #overrideUrl} or the default value.
      *
-     * @see LicenseMojoUtils#prepareThirdPartyOverrideUrl(URL, File, String, File)
+     * @see LicenseMojoUtils#prepareThirdPartyOverrideUrl(String, File, String, File)
      */
     protected String resolvedOverrideUrl;
 

@@ -40,6 +40,11 @@ import java.util.TreeSet;
 /**
  * Map of artifacts (stub in mavenproject) group by their license.
  *
+ * <ul>
+ *     <li><code>key</code> is the license on which to associate the given project.</li>
+ *     <li><code>value</code> list of projects belonging to the license.</li>
+ * </ul>
+ *
  * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
@@ -54,7 +59,7 @@ public class LicenseMap
     private final Comparator<MavenProject> projectComparator;
 
     /**
-     * Default contructor.
+     * Default constructor.
      */
     public LicenseMap()
     {
@@ -69,7 +74,7 @@ public class LicenseMap
     /**
      * Store in the license map a project to a given license.
      *
-     * @param key   the license on which to associate the gieven project
+     * @param key   the license on which to associate the given project
      * @param value project to register in the license map
      * @return the set of projects using the given license
      */
@@ -80,7 +85,6 @@ public class LicenseMap
         SortedSet<MavenProject> valueList = get( key );
         if ( valueList == null )
         {
-
             valueList = new TreeSet<>( projectComparator );
         }
 

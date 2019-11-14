@@ -22,13 +22,6 @@ package org.codehaus.mojo.license;
  * #L%
  */
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.SortedSet;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Plugin;
@@ -44,6 +37,14 @@ import org.codehaus.mojo.license.model.LicenseMap;
 import org.codehaus.mojo.license.utils.SortedProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.SortedSet;
 
 /**
  * This goal forks executions of the add-third-party goal for all the leaf projects
@@ -274,7 +275,7 @@ public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo
     }
 
     // ----------------------------------------------------------------------
-    // AbstractAddThirdPartyMojo Implementaton
+    // AbstractAddThirdPartyMojo Implementation
     // ----------------------------------------------------------------------
 
     /**

@@ -361,14 +361,12 @@ public class DefaultThirdPartyTool
 
         if ( Artifact.SCOPE_SYSTEM.equals( project.getArtifact().getScope() ) )
         {
-
             // do NOT treat system dependency
             return;
         }
 
         if ( CollectionUtils.isEmpty( licenses ) )
         {
-
             // no license found for the dependency
             licenseMap.put( LicenseMap.UNKNOWN_LICENSE_MESSAGE, project );
             return;
