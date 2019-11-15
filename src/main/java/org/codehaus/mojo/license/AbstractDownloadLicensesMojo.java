@@ -63,6 +63,7 @@ import org.codehaus.mojo.license.download.PreferredFileNames;
 import org.codehaus.mojo.license.download.ProjectLicense;
 import org.codehaus.mojo.license.download.ProjectLicenseInfo;
 import org.codehaus.mojo.license.download.UrlReplacements;
+import org.codehaus.mojo.license.extended.spreadsheet.ExcelFileWriter;
 import org.codehaus.mojo.license.spdx.SpdxLicenseList;
 import org.codehaus.mojo.license.spdx.SpdxLicenseList.Attachments.ContentSanitizer;
 import org.codehaus.mojo.license.utils.FileUtil;
@@ -662,6 +663,27 @@ public abstract class AbstractDownloadLicensesMojo
     @Parameter( property = "license.useDefaultContentSanitizers", defaultValue = "false" )
     private boolean useDefaultContentSanitizers;
 
+    /**
+     * Write Excel file (XLSX) for goal license:aggregate-download-licenses.
+     *
+     * @since 2.1
+     */
+    @Parameter( property = "license.writeExcelFile", defaultValue = "false" )
+    private boolean writeExcelFile;
+
+    /**
+     * The excel output file used if {@link #writeExcelFile} is true,
+     * containing a mapping between each dependency and it's license information.
+     * With extended information, if available.
+     *
+     * @see AbstractDownloadLicensesMojo#writeExcelFile
+     * @see AggregateDownloadLicensesMojo#extendedInfo
+     * @since 2.1
+     */
+    @Parameter( property = "licensesExcelOutputFile",
+            defaultValue = "${project.build.directory}/generated-resources/licenses.xlsx" )
+    protected File licensesExcelOutputFile;
+
     // ----------------------------------------------------------------------
     // Plexus Components
     // ----------------------------------------------------------------------
@@ -812,6 +834,10 @@ public abstract class AbstractDownloadLicensesMojo
 
             List<ProjectLicenseInfo> depProjectLicensesWithErrors = filterErrors( depProjectLicenses );
             writeLicenseSummary( depProjectLicenses, licensesOutputFile, writeVersions );
+            if ( writeExcelFile )
+            {
+                ExcelFileWriter.write( depProjectLicenses, licensesExcelOutputFile );
+            }
             if ( !CollectionUtils.isEmpty( depProjectLicensesWithErrors ) )
             {
                 writeLicenseSummary( depProjectLicensesWithErrors, licensesErrorsFile, writeVersions );

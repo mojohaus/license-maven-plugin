@@ -4,7 +4,7 @@ package org.codehaus.mojo.license.extended;
  * #%L
  * License Maven Plugin
  * %%
- * Copyright (C) 2008 - 2011 Jan-Hendrik Diederich
+ * Copyright (C) 2019 Jan-Hendrik Diederich
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -51,7 +51,7 @@ public class InfoFile
 
     private String fileName;
     private String content;
-    private Set<String> extractedCopyrightLines = new HashSet<>(  );
+    private Set<String> extractedCopyrightLines = new HashSet<>();
     private Type type;
 
     public String getFileName()

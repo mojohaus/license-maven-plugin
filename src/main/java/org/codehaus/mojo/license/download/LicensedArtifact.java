@@ -29,6 +29,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Developer;
 import org.apache.maven.model.Organization;
+import org.apache.maven.model.Scm;
 import org.codehaus.mojo.license.spdx.SpdxLicenseInfo;
 import org.codehaus.mojo.license.spdx.SpdxLicenseList;
 import org.codehaus.mojo.license.extended.ExtendedInfo;
@@ -389,6 +390,11 @@ public class LicensedArtifact
         public void setUrl( String url )
         {
             this.extendedInfos.setUrl( url );
+        }
+
+        public void setScm( Scm scm )
+        {
+            this.extendedInfos.setScm( scm );
         }
     }
 }

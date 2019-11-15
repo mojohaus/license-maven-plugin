@@ -169,6 +169,7 @@ public class LicensedArtifactResolver
                         laBuilder.setOrganization( project.getOrganization() );
                         laBuilder.setDevelopers( project.getDevelopers() );
                         laBuilder.setUrl( project.getUrl() );
+                        laBuilder.setScm( project.getScm() );
                     }
                     List<org.apache.maven.model.License> lics = project.getLicenses();
                     if ( lics != null )

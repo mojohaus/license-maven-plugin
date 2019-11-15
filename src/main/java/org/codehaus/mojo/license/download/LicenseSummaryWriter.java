@@ -25,6 +25,7 @@ package org.codehaus.mojo.license.download;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.maven.model.Developer;
 import org.apache.maven.model.Organization;
+import org.apache.maven.model.Scm;
 import org.codehaus.mojo.license.Eol;
 import org.codehaus.mojo.license.extended.ExtendedInfo;
 import org.codehaus.mojo.license.extended.InfoFile;
@@ -47,6 +48,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -145,6 +147,7 @@ public class LicenseSummaryWriter
             appendChildNodesIfSet( doc, depNode, "developers", extendedInfo.getDevelopers(),
                     ( doc1, developer ) -> createDeveloperNode( doc, developer ) );
             addCdataIfSet( doc, depNode, "implementationVendor", extendedInfo.getImplementationVendor() );
+            addTextPropertyIfSet( doc, depNode, "inceptionYear", extendedInfo.getInceptionYear() );
             appendChildNodesIfSet( doc, depNode, "infoFiles", extendedInfo.getInfoFiles(),
                     ( doc1, infoFile ) -> createInfoFileNode( doc, infoFile ) );
             if ( extendedInfo.getOrganization() != null
@@ -157,7 +160,9 @@ public class LicenseSummaryWriter
                 addTextPropertyIfSet( doc, organizationNode, "url", organization.getUrl() );
                 depNode.appendChild( organizationNode );
             }
-            addTextPropertyIfSet( doc, depNode, "scm", extendedInfo.getScm() );
+            addTextPropertyIfSet( doc, depNode, "scm", Optional.ofNullable( extendedInfo.getScm() )
+                    .map( Scm::getUrl )
+                    .orElse( null ) );
             addTextPropertyIfSet( doc, depNode, "url", extendedInfo.getUrl() );
         }
 
@@ -266,11 +271,13 @@ public class LicenseSummaryWriter
     {
         Node developerNode = doc.createElement( "developer" );
 
+        addTextPropertyIfSet( doc, developerNode, "id", developer.getId() );
         addTextPropertyIfSet( doc, developerNode, "email", developer.getEmail() );
         addTextPropertyIfSet( doc, developerNode, "name", developer.getName() );
         addTextPropertyIfSet( doc, developerNode, "organization", developer.getOrganization() );
         addTextPropertyIfSet( doc, developerNode, "organizationUrl", developer.getOrganizationUrl() );
         addTextPropertyIfSet( doc, developerNode, "url", developer.getUrl() );
+        addTextPropertyIfSet( doc, developerNode, "timezone", developer.getTimezone() );
 
         return developerNode;
     }

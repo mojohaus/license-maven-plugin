@@ -4,7 +4,7 @@ package org.codehaus.mojo.license.extended;
  * #%L
  * License Maven Plugin
  * %%
- * Copyright (C) 2008 - 2011 Jan-Hendrik Diederich
+ * Copyright (C) 2019 Jan-Hendrik Diederich
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -25,6 +25,7 @@ package org.codehaus.mojo.license.extended;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Developer;
 import org.apache.maven.model.Organization;
+import org.apache.maven.model.Scm;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +45,7 @@ public class ExtendedInfo
     private String inceptionYear;
     private Organization organization;
     private List<Developer> developers;
-    private String scm;
+    private Scm scm;
     private String url;
 
     public Artifact getArtifact()
@@ -127,12 +128,12 @@ public class ExtendedInfo
         this.developers = developers;
     }
 
-    public String getScm()
+    public Scm getScm()
     {
         return scm;
     }
 
-    public void setScm( String scm )
+    public void setScm( Scm scm )
     {
         this.scm = scm;
     }
