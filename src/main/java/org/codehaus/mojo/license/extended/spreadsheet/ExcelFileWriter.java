@@ -35,12 +35,14 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.Hyperlink;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.ss.util.RegionUtil;
 import org.apache.poi.ss.util.WorkbookUtil;
 import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -70,20 +72,25 @@ public class ExcelFileWriter
     private static final Logger LOG = LoggerFactory.getLogger( ExcelFileWriter.class );
 
     // Columns values for Maven data, including separator gaps for data grouping.
-    private static final int PLUGIN_ID_COLUMNS = 3;
+    private static final int GENERAL_START_COLUMN = 0, GENERAL_COLUMNS = 1,
+            GENERAL_END_COLUMN = GENERAL_START_COLUMN + GENERAL_COLUMNS;
+    private static final int PLUGIN_ID_START_COLUMN = GENERAL_END_COLUMN + 1, PLUGIN_ID_COLUMNS = 3,
+            PLUGIN_ID_END_COLUMN = PLUGIN_ID_START_COLUMN + PLUGIN_ID_COLUMNS;
     // "Start" column are the actual start columns, they are inclusive.
     // "End" columns point just one column behind the last one, it's the exclusive column index.
-    private static final int LICENSES_START_COLUMN = PLUGIN_ID_COLUMNS + 1, LICENSES_COLUMNS = 5,
+    private static final int LICENSES_START_COLUMN = PLUGIN_ID_END_COLUMN + 1, LICENSES_COLUMNS = 5,
             LICENSES_END_COLUMN = LICENSES_START_COLUMN + LICENSES_COLUMNS;
     private static final int DEVELOPERS_START_COLUMN = LICENSES_END_COLUMN + 1, DEVELOPER_COLUMNS = 7,
             DEVELOPERS_END_COLUMN = DEVELOPERS_START_COLUMN + DEVELOPER_COLUMNS;
     private static final int MISC_START_COLUMN = DEVELOPERS_END_COLUMN + 1, MISC_COLUMNS = 4,
             MISC_END_COLUMN = MISC_START_COLUMN + MISC_COLUMNS;
 
-    private static final int MAVEN_DATA_COLUMNS = PLUGIN_ID_COLUMNS + LICENSES_COLUMNS
+    private static final int MAVEN_DATA_COLUMNS = GENERAL_COLUMNS + PLUGIN_ID_COLUMNS + LICENSES_COLUMNS
             + DEVELOPER_COLUMNS + MISC_COLUMNS,
-            MAVEN_COLUMN_GROUPING_GAPS = 3;
-    private static final int MAVEN_COLUMNS = MAVEN_DATA_COLUMNS + MAVEN_COLUMN_GROUPING_GAPS;
+            MAVEN_COLUMN_GROUPING_GAPS = 4;
+    private static final int MAVEN_START_COLUMN = 0,
+            MAVEN_COLUMNS = MAVEN_DATA_COLUMNS + MAVEN_COLUMN_GROUPING_GAPS,
+        MAVEN_END_COLUMN = MAVEN_START_COLUMN + MAVEN_COLUMNS;
 
     // Columns values for JAR data, including separator gaps for data grouping.
     private static final int INFO_FILES_GAPS = 2, MANIFEST_GAPS = 1;
@@ -95,12 +102,18 @@ public class ExcelFileWriter
             INFO_LICENSES_END_COLUMN = INFO_LICENSES_START_COLUMN + INFO_LICENSES_COLUMNS;
     private static final int INFO_SPDX_START_COLUMN = INFO_LICENSES_END_COLUMN + 1, INFO_SPDX_COLUMNS = 3,
             INFO_SPDX_END_COLUMN = INFO_SPDX_START_COLUMN + INFO_SPDX_COLUMNS;
-    private static final int EXTENDED_INFO_COLUMNS = MANIFEST_COLUMNS
+    private static final int EXTENDED_INFO_START_COLUMN = MAVEN_END_COLUMN + 1,
+            EXTENDED_INFO_COLUMNS = MANIFEST_COLUMNS
             + INFO_NOTICES_COLUMNS + INFO_LICENSES_COLUMNS + INFO_SPDX_COLUMNS
-            + INFO_FILES_GAPS + MANIFEST_GAPS;
+            + INFO_FILES_GAPS + MANIFEST_GAPS,
+            EXTENDED_INFO_END_COLUMN = EXTENDED_INFO_START_COLUMN + EXTENDED_INFO_COLUMNS;
 
     // Width of gap columns
-    private static final int GAP_WIDTH = 20;
+    private static final int EXCEL_WIDTH_SCALE = 256;
+    private static final int GAP_WIDTH = 3 * EXCEL_WIDTH_SCALE;
+    private static final BorderStyle HEADER_CELLS_BORDER_STYLE = BorderStyle.MEDIUM;
+    private static final int TIMEZONE_WIDTH = " Timezone ".length() * EXCEL_WIDTH_SCALE,
+            INCEPTION_YEAR_WIDTH =  " Inception Year ".length() * EXCEL_WIDTH_SCALE;
 
     /**
      * Writes list of projects into excel file.
@@ -132,19 +145,167 @@ public class ExcelFileWriter
         }
     }
 
+    private static void createHeader( List<ProjectLicenseInfo> projectLicenseInfos, Workbook wb, Sheet sheet )
+    {
+        boolean hasExtendedInfo = false;
+        for ( ProjectLicenseInfo projectLicenseInfo : projectLicenseInfos )
+        {
+            if ( projectLicenseInfo.getExtendedInfo() != null )
+            {
+                hasExtendedInfo = true;
+                break;
+            }
+        }
+
+        // Create header style
+        CellStyle headerCellStyle = wb.createCellStyle();
+        headerCellStyle.setFillBackgroundColor( IndexedColors.GREY_25_PERCENT.getIndex() );
+        Font headerFont = new XSSFFont();
+        headerFont.setBold( true );
+        headerCellStyle.setFont( headerFont );
+        headerCellStyle.setAlignment( HorizontalAlignment.CENTER );
+        setBorderStyle( headerCellStyle, HEADER_CELLS_BORDER_STYLE );
+
+        // Create 1st header row. The Maven/JAR header row
+        Row mavenJarRow = sheet.createRow( 0 );
+
+        // Create Maven header cell
+        createMergedCellsInRow( sheet, MAVEN_START_COLUMN, MAVEN_END_COLUMN, headerCellStyle, mavenJarRow,
+                "Maven information", 0 );
+
+        if ( hasExtendedInfo )
+        {
+            // Create JAR header cell
+            createMergedCellsInRow( sheet, EXTENDED_INFO_START_COLUMN, EXTENDED_INFO_END_COLUMN,
+                    headerCellStyle, mavenJarRow,
+                    "JAR Content", 0 );
+        }
+
+        // Create 2nd header row
+        Row secondHeaderRow = sheet.createRow( 1 );
+
+        // Create Maven "General" header
+        createMergedCellsInRow( sheet, GENERAL_START_COLUMN, GENERAL_END_COLUMN, headerCellStyle, secondHeaderRow,
+                "General", 1 );
+
+        // Create Maven "Plugin ID" header
+        createMergedCellsInRow( sheet, PLUGIN_ID_START_COLUMN, PLUGIN_ID_END_COLUMN, headerCellStyle, secondHeaderRow,
+                "Plugin ID", 1 );
+
+        // Gap "General" <-> "Plugin ID".
+        sheet.setColumnWidth( GENERAL_END_COLUMN, GAP_WIDTH );
+
+        // Create Maven "Licenses" header
+        createMergedCellsInRow( sheet, LICENSES_START_COLUMN, LICENSES_END_COLUMN, headerCellStyle, secondHeaderRow,
+                "Licenses", 1 );
+
+        // Gap "Plugin ID" <-> "Licenses".
+        sheet.setColumnWidth( PLUGIN_ID_END_COLUMN, GAP_WIDTH );
+
+        // Create Maven "Developers" header
+        createMergedCellsInRow( sheet, DEVELOPERS_START_COLUMN, DEVELOPERS_END_COLUMN, headerCellStyle,
+                secondHeaderRow,
+                "Developers", 1 );
+
+        // Gap "Licenses" <-> "Developers".
+        sheet.setColumnWidth( LICENSES_END_COLUMN, GAP_WIDTH );
+
+        // Create Maven "Miscellaneous" header
+        createMergedCellsInRow( sheet, MISC_START_COLUMN, MISC_END_COLUMN, headerCellStyle,
+                secondHeaderRow,
+                "Miscellaneous", 1 );
+
+        // Gap "Developers" <-> "Miscellaneous".
+        sheet.setColumnWidth( DEVELOPERS_END_COLUMN, GAP_WIDTH );
+
+        if ( hasExtendedInfo )
+        {
+            createMergedCellsInRow( sheet, MANIFEST_START_COLUMN, MANIFEST_END_COLUMN, headerCellStyle,
+                    secondHeaderRow,
+                    "MANIFEST.MF", 1 );
+
+            // Gap "Miscellaneous" <-> "MANIFEST.MF".
+            sheet.setColumnWidth( DEVELOPERS_END_COLUMN, GAP_WIDTH );
+
+            createMergedCellsInRow( sheet, INFO_NOTICES_START_COLUMN, INFO_NOTICES_END_COLUMN, headerCellStyle,
+                    secondHeaderRow,
+                    "Notices text files", 1 );
+
+            // Gap "MANIFEST.MF" <-> "Notice text files".
+            sheet.setColumnWidth( MANIFEST_END_COLUMN, GAP_WIDTH );
+
+            createMergedCellsInRow( sheet, INFO_LICENSES_START_COLUMN, INFO_LICENSES_END_COLUMN, headerCellStyle,
+                    secondHeaderRow,
+                    "License text files", 1 );
+
+            // Gap "Notice text files" <-> "License text files".
+            sheet.setColumnWidth( INFO_NOTICES_END_COLUMN, GAP_WIDTH );
+
+            createMergedCellsInRow( sheet, INFO_SPDX_START_COLUMN, INFO_SPDX_END_COLUMN, headerCellStyle,
+                    secondHeaderRow,
+                    "SPDX license id matched", 1 );
+
+            // Gap "License text files" <-> "SPDX license matches".
+            sheet.setColumnWidth( INFO_LICENSES_END_COLUMN, GAP_WIDTH );
+        }
+//        sheet.setColumnGroupCollapsed();
+
+        // Create 3rd header row
+        Row thirdHeaderRow = sheet.createRow( 2 );
+
+        // General
+        createCellsInRow( thirdHeaderRow, GENERAL_START_COLUMN, headerCellStyle, "Name" );
+        // Plugin ID
+        createCellsInRow( thirdHeaderRow, PLUGIN_ID_START_COLUMN, headerCellStyle,
+                "Group ID", "Artifact ID", "Version" );
+        // Licenses
+        createCellsInRow( thirdHeaderRow, LICENSES_START_COLUMN, headerCellStyle,
+                "Name", "URL", "Distribution", "Comments", "File" );
+        // Developers
+        createCellsInRow( thirdHeaderRow, DEVELOPERS_START_COLUMN, headerCellStyle,
+                "Id", "Email", "Name", "Organization", "Organization URL", "URL", "Timezone" );
+        // Miscellaneous
+        createCellsInRow( thirdHeaderRow, MISC_START_COLUMN, headerCellStyle,
+                "Inception Year", "Organization", "SCM", "URL" );
+
+        int headerLineCount = 3;
+
+        if ( hasExtendedInfo )
+        {
+            // MANIFEST.MF
+            createCellsInRow( thirdHeaderRow, MANIFEST_START_COLUMN, headerCellStyle,
+                    "Bundle license", "Bundle vendor", "Implementation vendor" );
+            // 3 InfoFile groups: Notices, Licenses and SPDX-Licenses.
+            createInfoFileCellsInRow( thirdHeaderRow, headerCellStyle,
+                    INFO_NOTICES_START_COLUMN, INFO_LICENSES_START_COLUMN, INFO_SPDX_START_COLUMN );
+
+            sheet.createFreezePane( EXTENDED_INFO_END_COLUMN, headerLineCount );
+        }
+        else
+        {
+            sheet.createFreezePane( MAVEN_END_COLUMN, headerLineCount );
+        }
+
+        sheet.createFreezePane( GENERAL_END_COLUMN, headerLineCount );
+    }
+
+
     private static void writeData( List<ProjectLicenseInfo> projectLicenseInfos, Workbook wb, Sheet sheet )
     {
         final int firstRowIndex = 3;
         int currentRowIndex = firstRowIndex;
         final Map<Integer, Row> rows = new HashMap<>();
         boolean hasExtendedInfo = false;
+
+        final CellStyle hyperlinkStyle = createHyperlinkStyle( wb );
+
         for ( ProjectLicenseInfo projectInfo : projectLicenseInfos )
         {
             int extraRows = 0;
             Row currentRow = sheet.createRow( currentRowIndex );
             rows.put( currentRowIndex, currentRow );
             // Plugin ID
-            createCellsInRow( currentRow, 0,
+            createCellsInRow( currentRow, PLUGIN_ID_START_COLUMN,
                     projectInfo.getGroupId(), projectInfo.getArtifactId(), projectInfo.getVersion() );
             // Licenses
             extraRows = addCollection( sheet, rows, currentRowIndex, extraRows,
@@ -154,13 +315,16 @@ public class ExcelFileWriter
                                 license.getName(), license.getUrl(),
                                 license.getDistribution(), license.getComments(),
                                 license.getFile() );
-                        addHyperlinkIfExists( wb, licenses[ 1 ], HyperlinkType.URL );
+                        addHyperlinkIfExists( wb, licenses[ 1 ], hyperlinkStyle, HyperlinkType.URL );
                     } );
 
             final ExtendedInfo extendedInfo = projectInfo.getExtendedInfo();
             if ( extendedInfo != null )
             {
                 hasExtendedInfo = true;
+                // General
+                createCellsInRow( currentRow, GENERAL_START_COLUMN,
+                        extendedInfo.getName() );
                 // Developers
                 extraRows = addCollection( sheet, rows, currentRowIndex, extraRows,
                         extendedInfo.getDevelopers(),
@@ -170,9 +334,9 @@ public class ExcelFileWriter
                                     developer.getName(),
                                     developer.getOrganization(), developer.getOrganizationUrl(),
                                     developer.getUrl(), developer.getTimezone() );
-                            addHyperlinkIfExists( wb, licenses[ 1 ], HyperlinkType.EMAIL );
-                            addHyperlinkIfExists( wb, licenses[ 4 ], HyperlinkType.URL );
-                            addHyperlinkIfExists( wb, licenses[ 5 ], HyperlinkType.URL );
+                            addHyperlinkIfExists( wb, licenses[ 1 ], hyperlinkStyle, HyperlinkType.EMAIL );
+                            addHyperlinkIfExists( wb, licenses[ 4 ], hyperlinkStyle, HyperlinkType.URL );
+                            addHyperlinkIfExists( wb, licenses[ 5 ], hyperlinkStyle, HyperlinkType.URL );
                         } );
                 // Miscellaneous
                 Cell[] miscCells = createCellsInRow( currentRow, MISC_START_COLUMN,
@@ -184,8 +348,8 @@ public class ExcelFileWriter
                                 .map( Scm::getUrl )
                                 .orElse( null ),
                         extendedInfo.getUrl() );
-                addHyperlinkIfExists( wb, miscCells[ 2 ], HyperlinkType.URL );
-                addHyperlinkIfExists( wb, miscCells[ 3 ], HyperlinkType.URL );
+                addHyperlinkIfExists( wb, miscCells[ 2 ], hyperlinkStyle, HyperlinkType.URL );
+                addHyperlinkIfExists( wb, miscCells[ 3 ], hyperlinkStyle, HyperlinkType.URL );
 
                 // MANIFEST.MF
                 createCellsInRow( currentRow, MANIFEST_START_COLUMN,
@@ -233,137 +397,27 @@ public class ExcelFileWriter
         autosizeColumns( sheet, hasExtendedInfo );
     }
 
-    private static void createHeader( List<ProjectLicenseInfo> projectLicenseInfos, Workbook wb, Sheet sheet )
+    private static CellStyle createHyperlinkStyle( Workbook wb )
     {
-        int columns = MAVEN_COLUMNS;
-        boolean hasExtendedInfo = false;
-        for ( ProjectLicenseInfo projectLicenseInfo : projectLicenseInfos )
-        {
-            if ( projectLicenseInfo.getExtendedInfo() != null )
-            {
-                columns += EXTENDED_INFO_COLUMNS;
-                hasExtendedInfo = true;
-                break;
-            }
-        }
-
-        // Create header style
-        CellStyle headerCellStyle = wb.createCellStyle();
-        headerCellStyle.setFillBackgroundColor( IndexedColors.GREY_25_PERCENT.getIndex() );
-        Font headerFont = new XSSFFont();
-        headerFont.setBold( true );
-        headerCellStyle.setFont( headerFont );
-        setBorderStyle( headerCellStyle, BorderStyle.MEDIUM );
-
-        // Create 1st header row. The Maven/JAR header row
-        Row mavenJarRow = sheet.createRow( 0 );
-
-        // Create Maven header cell
-        createMergedCellsInRow( sheet, 0, MAVEN_COLUMNS, headerCellStyle, mavenJarRow, "Maven information", 0 );
-
-        if ( hasExtendedInfo )
-        {
-            // Create JAR header cell
-            Cell jarHeaderCell = mavenJarRow.createCell( 0 );
-            jarHeaderCell.setCellValue( "JAR Content" );
-            jarHeaderCell.setCellStyle( headerCellStyle );
-            createCellsInRow( MAVEN_COLUMNS, columns, mavenJarRow );
-            CellRangeAddress jarHeaderAddress = new CellRangeAddress( 0, 0, MAVEN_COLUMNS, columns - 1 );
-            sheet.addMergedRegion( jarHeaderAddress );
-        }
-
-        // Create 2nd header row
-        Row secondHeaderRow = sheet.createRow( 1 );
-
-        // Create Maven "Plugin ID" header
-        createMergedCellsInRow( sheet, 0, PLUGIN_ID_COLUMNS, headerCellStyle, secondHeaderRow, "Plugin ID", 1 );
-
-        // Create Maven "Licenses" header
-        createMergedCellsInRow( sheet, LICENSES_START_COLUMN, LICENSES_END_COLUMN, headerCellStyle, secondHeaderRow,
-                "Licenses", 1 );
-
-        // Gap "Plugin ID" <-> "Licenses".
-        sheet.setColumnWidth( PLUGIN_ID_COLUMNS, GAP_WIDTH );
-
-        // Create Maven "Developers" header
-        createMergedCellsInRow( sheet, DEVELOPERS_START_COLUMN, DEVELOPERS_END_COLUMN, headerCellStyle,
-                secondHeaderRow,
-                "Developers", 1 );
-
-        // Gap "Licenses" <-> "Developers".
-        sheet.setColumnWidth( LICENSES_END_COLUMN, GAP_WIDTH );
-
-        // Create Maven "Miscellaneous" header
-        createMergedCellsInRow( sheet, MISC_START_COLUMN, MISC_END_COLUMN, headerCellStyle,
-                secondHeaderRow,
-                "Miscellaneous", 1 );
-
-        // Gap "Developers" <-> "Miscellaneous".
-        sheet.setColumnWidth( DEVELOPERS_END_COLUMN, GAP_WIDTH );
-
-        if ( hasExtendedInfo )
-        {
-            createMergedCellsInRow( sheet, MANIFEST_START_COLUMN, MANIFEST_END_COLUMN, headerCellStyle,
-                    secondHeaderRow,
-                    "MANIFEST.MF", 1 );
-
-            // Gap "Miscellaneous" <-> "MANIFEST.MF".
-            sheet.setColumnWidth( DEVELOPERS_END_COLUMN, GAP_WIDTH );
-
-            createMergedCellsInRow( sheet, INFO_NOTICES_START_COLUMN, INFO_NOTICES_END_COLUMN, headerCellStyle,
-                    secondHeaderRow,
-                    "Notices text files", 1 );
-
-            // Gap "MANIFEST.MF" <-> "Notice text files".
-            sheet.setColumnWidth( MANIFEST_END_COLUMN, GAP_WIDTH );
-
-            createMergedCellsInRow( sheet, INFO_LICENSES_START_COLUMN, INFO_LICENSES_END_COLUMN, headerCellStyle,
-                    secondHeaderRow,
-                    "License text files", 1 );
-
-            // Gap "Notice text files" <-> "License text files".
-            sheet.setColumnWidth( INFO_LICENSES_END_COLUMN, GAP_WIDTH );
-
-            createMergedCellsInRow( sheet, INFO_SPDX_START_COLUMN, INFO_SPDX_END_COLUMN, headerCellStyle,
-                    secondHeaderRow,
-                    "SPDX license id matched", 1 );
-        }
-//        sheet.setColumnGroupCollapsed();
-
-        // Create 3rd header row
-        Row thirdHeaderRow = sheet.createRow( 2 );
-
-        // Plugin ID
-        createCellsInRow( thirdHeaderRow, 0, headerCellStyle, "Group ID", "Artifact ID", "Version" );
-        // Licenses
-        createCellsInRow( thirdHeaderRow, LICENSES_START_COLUMN, headerCellStyle,
-                "Name", "URL", "Distribution", "Comments", "File" );
-        // Developers
-        createCellsInRow( thirdHeaderRow, DEVELOPERS_START_COLUMN, headerCellStyle,
-                "Id", "Email", "Name", "Organization", "Organization URL", "URL", "Timezone" );
-        // Miscellaneous
-        createCellsInRow( thirdHeaderRow, MISC_START_COLUMN, headerCellStyle,
-                "Inception Year", "Organization", "SCM", "URL" );
-
-        if ( hasExtendedInfo )
-        {
-            // MANIFEST.MF
-            createCellsInRow( thirdHeaderRow, MANIFEST_START_COLUMN, headerCellStyle,
-                    "Bundle license", "Bundle vendor", "Implementation vendor" );
-            // 3 InfoFile groups: Notices, Licenses and SPDX-Licenses.
-            createInfoFileCellsInRow( thirdHeaderRow, headerCellStyle,
-                    INFO_NOTICES_START_COLUMN, INFO_LICENSES_START_COLUMN, INFO_SPDX_START_COLUMN );
-        }
+        Font hyperlinkFont = wb.createFont();
+        hyperlinkFont.setUnderline( XSSFFont.U_SINGLE );
+        hyperlinkFont.setColor( IndexedColors.BLUE.getIndex() );
+        CellStyle hyperlinkStyle = wb.createCellStyle();
+        hyperlinkStyle.setFont( hyperlinkFont );
+        return hyperlinkStyle;
     }
 
     private static void autosizeColumns( Sheet sheet, boolean hasExtendedInfo )
     {
         autosizeColumns( sheet,
-                new ImmutablePair<>( 0, PLUGIN_ID_COLUMNS ),
+                new ImmutablePair<>( GENERAL_START_COLUMN, GENERAL_END_COLUMN ),
+                new ImmutablePair<>( PLUGIN_ID_START_COLUMN, PLUGIN_ID_END_COLUMN ),
                 new ImmutablePair<>( LICENSES_START_COLUMN, LICENSES_END_COLUMN ),
                 new ImmutablePair<>( DEVELOPERS_START_COLUMN, DEVELOPERS_END_COLUMN - 1 ),
                 new ImmutablePair<>( MISC_START_COLUMN + 1, MISC_END_COLUMN )
         );
+        sheet.setColumnWidth( DEVELOPERS_END_COLUMN - 1, TIMEZONE_WIDTH );
+        sheet.setColumnWidth( MISC_START_COLUMN, INCEPTION_YEAR_WIDTH );
         if ( hasExtendedInfo )
         {
             autosizeColumns( sheet,
@@ -375,11 +429,11 @@ public class ExcelFileWriter
         }
     }
 
-    private static void autosizeColumns( Sheet sheet, ImmutablePair<Integer, Integer>... ranges )
+    private static void autosizeColumns( Sheet sheet, Pair<Integer, Integer>... ranges )
     {
-        for ( ImmutablePair<Integer, Integer> pair : ranges )
+        for ( Pair<Integer, Integer> range : ranges )
         {
-            for ( int i = pair.left; i < pair.right; i++ )
+            for ( int i = range.getLeft(); i < range.getRight(); i++ )
             {
                 sheet.autoSizeColumn( i );
             }
@@ -423,7 +477,8 @@ public class ExcelFileWriter
         return extraRows;
     }
 
-    private static void addHyperlinkIfExists( Workbook workbook, Cell cell, HyperlinkType hyperlinkType )
+    private static void addHyperlinkIfExists( Workbook workbook, Cell cell, CellStyle hyperlinkStyle,
+                                              HyperlinkType hyperlinkType )
     {
         if ( !StringUtils.isEmpty( cell.getStringCellValue() ) )
         {
@@ -432,7 +487,9 @@ public class ExcelFileWriter
             {
                 hyperlink.setAddress( cell.getStringCellValue() );
                 cell.setHyperlink( hyperlink );
-            } catch ( IllegalArgumentException e )
+                cell.setCellStyle( hyperlinkStyle );
+            }
+            catch ( IllegalArgumentException e )
             {
                 LOG.debug( "Can't set Hyperlink for cell value " + cell.getStringCellValue()
                         + " it gets rejected as URI", e );
@@ -446,7 +503,20 @@ public class ExcelFileWriter
         for ( int i = 0; i < names.length; i++ )
         {
             Cell cell = row.createCell( startColumn + i, CellType.STRING );
-            cell.setCellValue( names[ i ] );
+            if ( !StringUtils.isEmpty( names[ i ] ) )
+            {
+                final String value;
+                final int maxCellStringLength = Short.MAX_VALUE;
+                if ( names[ i ].length() > maxCellStringLength )
+                {
+                    value = names[ i ].substring( 0, maxCellStringLength - 3 ) + "...";
+                }
+                else
+                {
+                    value = names[ i ];
+                }
+                cell.setCellValue( value );
+            }
             result[ i ] = cell;
         }
         return result;
@@ -471,7 +541,7 @@ public class ExcelFileWriter
     {
         for ( int i = 0; i < names.length; i++ )
         {
-            Cell cell = row.createCell( startColumn + i );
+            Cell cell = row.createCell( startColumn + i, CellType.STRING );
             cell.setCellStyle( cellStyle );
             cell.setCellValue( names[ i ] );
         }
@@ -480,21 +550,45 @@ public class ExcelFileWriter
     private static void createMergedCellsInRow( Sheet sheet, int startColumn, int endColumn, CellStyle cellStyle,
                                                 Row row, String cellValue, int rowIndex )
     {
-        Cell licensesCell = row.createCell( startColumn );
-        licensesCell.setCellValue( cellValue );
-        licensesCell.setCellStyle( cellStyle );
-        createCellsInRow( startColumn + 1, endColumn, row );
-        CellRangeAddress licensesHeaderAddress = new CellRangeAddress( rowIndex, rowIndex, startColumn, endColumn - 1 );
-        sheet.addMergedRegion( licensesHeaderAddress );
-        sheet.groupColumn( startColumn, endColumn - 1 );
+        Cell cell = createCellsInRow( startColumn, endColumn, row );
+        final boolean merge = endColumn - 1 > startColumn;
+        CellRangeAddress mergeAddress = null;
+        if ( merge )
+        {
+            mergeAddress = new CellRangeAddress( rowIndex, rowIndex, startColumn, endColumn - 1 );
+            sheet.addMergedRegion( mergeAddress );
+        }
+        // Set value and style only after merge
+        cell.setCellValue( cellValue );
+        cell.setCellStyle( cellStyle );
+        if ( merge )
+        {
+            setBorderAroundRegion( sheet, mergeAddress, HEADER_CELLS_BORDER_STYLE );
+            sheet.groupColumn( startColumn, endColumn - 1 );
+        }
     }
 
-    private static void createCellsInRow( int startColumn, int exclusiveEndColumn, Row inRow )
+    private static void setBorderAroundRegion( Sheet sheet, CellRangeAddress licensesHeaderAddress,
+                                               BorderStyle borderStyle )
     {
+        RegionUtil.setBorderLeft( borderStyle, licensesHeaderAddress, sheet );
+        RegionUtil.setBorderTop( borderStyle, licensesHeaderAddress, sheet );
+        RegionUtil.setBorderRight( borderStyle, licensesHeaderAddress, sheet );
+        RegionUtil.setBorderBottom( borderStyle, licensesHeaderAddress, sheet );
+    }
+
+    private static Cell createCellsInRow( int startColumn, int exclusiveEndColumn, Row inRow )
+    {
+        Cell firstCell = null;
         for ( int i = startColumn; i < exclusiveEndColumn; i++ )
         {
-            inRow.createCell( i );
+            Cell cell = inRow.createCell( i );
+            if ( i == startColumn )
+            {
+                firstCell = cell;
+            }
         }
+        return firstCell;
     }
 
     private static void setBorderStyle( CellStyle cellStyle, BorderStyle borderStyle )

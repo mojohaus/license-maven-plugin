@@ -165,6 +165,7 @@ public class LicensedArtifactResolver
                             .getProject();
                     if ( extendedInfo )
                     {
+                        laBuilder.setName( project.getName() );
                         laBuilder.setInceptionYear( project.getInceptionYear() );
                         laBuilder.setOrganization( project.getOrganization() );
                         laBuilder.setDevelopers( project.getDevelopers() );

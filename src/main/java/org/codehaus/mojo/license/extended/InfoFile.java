@@ -22,6 +22,8 @@ package org.codehaus.mojo.license.extended;
  * #L%
  */
 
+import org.codehaus.mojo.license.download.LicenseDownloader;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -54,6 +56,8 @@ public class InfoFile
     private Set<String> extractedCopyrightLines = new HashSet<>();
     private Type type;
 
+    private String normalizedContent;
+
     public String getFileName()
     {
         return fileName;
@@ -72,6 +76,7 @@ public class InfoFile
     public void setContent( String content )
     {
         this.content = content;
+        this.normalizedContent = LicenseDownloader.calculateStringChecksum( content );
     }
 
     public Set<String> getExtractedCopyrightLines()
@@ -92,5 +97,10 @@ public class InfoFile
     public void setType( Type type )
     {
         this.type = type;
+    }
+
+    public String getNormalizedContent()
+    {
+        return normalizedContent;
     }
 }

@@ -28,6 +28,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.codehaus.mojo.license.download.LicenseDownloader.LicenseDownloadResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A simple {@link HashMap} based in-memory cache for storing {@link LicenseDownloadResult}s.
@@ -37,9 +39,13 @@ import org.codehaus.mojo.license.download.LicenseDownloader.LicenseDownloadResul
  */
 public class Cache
 {
+    private static final Logger LOG = LoggerFactory.getLogger( Cache.class );
+
     private final Map<String, LicenseDownloadResult> urlToFile = new HashMap<>();
 
     private final Map<String, LicenseDownloadResult> sha1ToFile = new HashMap<>();
+
+    private final Map<String, LicenseDownloadResult> normalizedContentToFile = new HashMap<>();
 
     private final boolean enforcingUniqueSha1s;
 
@@ -57,6 +63,17 @@ public class Cache
     public LicenseDownloadResult get( String url )
     {
         return urlToFile.get( url );
+    }
+
+    /**
+     * If this cache has a normalized version of a license file.
+     *
+     * @param normalizedContentChecksum Normalized file content.
+     * @return If the cache has a license file with the same normalized content.
+     */
+    public boolean hasNormalizedContent( String normalizedContentChecksum )
+    {
+        return normalizedContentToFile.get( normalizedContentChecksum ) != null;
     }
 
     /**
@@ -98,8 +115,16 @@ public class Cache
                     + "' should belong to licenseUrlFileName having key '" + existingFile.getName()
                     + "' together with URLs '" + sb.toString() + "'" );
             }
+            final String normalizedContentChecksum = entry.getNormalizedContentChecksum();
+            if ( normalizedContentChecksum != null )
+            {
+                normalizedContentToFile.put( normalizedContentChecksum, entry );
+            }
+            else
+            {
+                LOG.warn( "Couldn't find normalized content checksum for license download " + entry );
+            }
         }
         urlToFile.put( url, entry );
     }
-
 }

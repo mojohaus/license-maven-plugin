@@ -24,6 +24,7 @@ package org.codehaus.mojo.license.download;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,6 +44,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpException;
 import org.apache.http.HttpHost;
@@ -345,7 +347,10 @@ public class LicenseDownloader implements AutoCloseable
     {
         public static LicenseDownloadResult success( File file, String sha1, boolean preferredFileName )
         {
-            return new LicenseDownloadResult( file, sha1, preferredFileName, null );
+            final LicenseDownloadResult licenseDownloadResult
+                    = new LicenseDownloadResult( file, sha1, preferredFileName, null );
+            licenseDownloadResult.calculateFileChecksum();
+            return licenseDownloadResult;
         }
 
         public static LicenseDownloadResult failure( String errorMessage )
@@ -366,7 +371,17 @@ public class LicenseDownloader implements AutoCloseable
 
         private final String errorMessage;
 
+        /**
+         * Checksum to file name.
+         */
         private final String sha1;
+
+        /**
+         * Checksum to "normalized" content of the file.
+         * <br/>
+         * Normalized means: Removal of all newlines - in all formats, lines trimmed, all chars converted to lowercase.
+         */
+        private String normalizedContentChecksum;
 
         private final boolean preferredFileName;
 
@@ -380,6 +395,11 @@ public class LicenseDownloader implements AutoCloseable
             return errorMessage;
         }
 
+        /**
+         * Is true when no errorMessage is set.
+         *
+         * @return If errorMessage is set.
+         */
         public boolean isSuccess()
         {
             return errorMessage == null;
@@ -395,10 +415,76 @@ public class LicenseDownloader implements AutoCloseable
             return sha1;
         }
 
+        public String getNormalizedContentChecksum()
+        {
+            return normalizedContentChecksum;
+        }
+
         public LicenseDownloadResult withFile( File otherFile )
         {
             return new LicenseDownloadResult( otherFile, sha1, preferredFileName, errorMessage );
         }
+
+        public void calculateFileChecksum()
+        {
+            normalizedContentChecksum = LicenseDownloader.calculateFileChecksum( file );
+        }
+
+        @Override
+        public String toString()
+        {
+            return "LicenseDownloadResult{"
+                    + "file=" + file
+                    + ", errorMessage='" + errorMessage + '\''
+                    + ", sha1='" + sha1 + '\''
+                    + ", normalizedContentChecksum='" + normalizedContentChecksum + '\''
+                    + ", preferredFileName=" + preferredFileName
+                    + '}';
+        }
     }
 
+    private static String calculateFileChecksum( File file )
+    {
+        try ( InputStream inputStream = new FileInputStream( file ) )
+        {
+            byte[] content = IOUtils.readFully( inputStream, (int) file.length() );
+            String contentString = new String( content );
+            return calculateStringChecksum( contentString );
+        }
+        catch ( IOException e )
+        {
+            LOG.error( "Error reading license file and normalizing it ", e );
+            return null;
+        }
+    }
+
+    public static String calculateStringChecksum( String contentString )
+    {
+        contentString = normalizeString( contentString );
+        try
+        {
+            final MessageDigest md = MessageDigest.getInstance( "SHA-1" );
+            return Hex.encodeHexString( md.digest( contentString.getBytes() ) );
+        }
+        catch ( NoSuchAlgorithmException e )
+        {
+            LOG.error( "Error fetching SHA-1 hashsum generator ", e );
+            return null;
+        }
+    }
+
+    private static String normalizeString( String contentString )
+    {
+        return contentString
+                // Windows
+                .replace( "\r\n", " " )
+                // Classic MacOS
+                .replace( "\r", " " )
+                // *nix
+                .replace( "\n", " " )
+                // Set all spaces, tabs, etc. to one space width
+                .replaceAll( "\\s\\s+", " " )
+                // All to lowercase
+                .toLowerCase();
+    }
 }

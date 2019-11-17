@@ -53,7 +53,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 /**
- * @author <a href="https://github.com/ppalaga">Peter Palaga</a>
+ * @author <a href="https://github.com/ppalaga">Peter Palaga</a>, Jan-Hendrik Diederich (for the extended information)
  * @since 1.20
  */
 public class LicensedArtifact
@@ -169,6 +169,12 @@ public class LicensedArtifact
         return errorMessages;
     }
 
+    /**
+     * Gets the extended information.
+     *
+     * @return Extended information.
+     * @since 2.1.0
+     */
     public ExtendedInfo getExtendedInfos()
     {
         return extendedInfos;
@@ -274,13 +280,15 @@ public class LicensedArtifact
                             result.setBundleVendor( bundleVendor );
                             final String bundleLicense = mainAttributes.getValue( Constants.BUNDLE_LICENSE );
                             result.setBundleLicense( bundleLicense );
-                        } catch ( IOException e )
+                        }
+                        catch ( IOException e )
                         {
                             LOG.warn( "Error at reading data from jar manifest", e );
                         }
                     }
                 }
-            } catch ( IOException e )
+            }
+            catch ( IOException e )
             {
                 LOG.warn( "Can't open zip file", e );
             }
@@ -365,7 +373,8 @@ public class LicensedArtifact
                 byte[] content = IOUtils.readFully( inputStream, (int) zipEntry.getSize() );
                 String contentString = new String( content );
                 return new ImmutablePair<>( contentString, contentString.split( "\\R+" ) );
-            } catch ( IOException e )
+            }
+            catch ( IOException e )
             {
                 LOG.warn( "Can't read zip file entry " + zipEntry, e );
                 return null;
@@ -374,27 +383,50 @@ public class LicensedArtifact
 
         public void setInceptionYear( String inceptionYear )
         {
-            this.extendedInfos.setInceptionYear( inceptionYear );
+            if ( extendedInfos != null )
+            {
+                this.extendedInfos.setInceptionYear( inceptionYear );
+            }
         }
 
         public void setOrganization( Organization organization )
         {
-            this.extendedInfos.setOrganization( organization );
+            if ( extendedInfos != null )
+            {
+                this.extendedInfos.setOrganization( organization );
+            }
         }
 
         public void setDevelopers( List<Developer> developers )
         {
-            this.extendedInfos.setDevelopers( developers );
+            if ( extendedInfos != null )
+            {
+                this.extendedInfos.setDevelopers( developers );
+            }
         }
 
         public void setUrl( String url )
         {
-            this.extendedInfos.setUrl( url );
+            if ( extendedInfos != null )
+            {
+                this.extendedInfos.setUrl( url );
+            }
         }
 
         public void setScm( Scm scm )
         {
-            this.extendedInfos.setScm( scm );
+            if ( extendedInfos != null )
+            {
+                this.extendedInfos.setScm( scm );
+            }
+        }
+
+        public void setName( String name )
+        {
+            if ( extendedInfos != null )
+            {
+                this.extendedInfos.setName( name );
+            }
         }
     }
 }

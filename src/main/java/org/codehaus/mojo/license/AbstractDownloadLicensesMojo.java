@@ -22,25 +22,6 @@ package org.codehaus.mojo.license;
  * #L%
  */
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.regex.Pattern;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringEscapeUtils;
@@ -63,12 +44,34 @@ import org.codehaus.mojo.license.download.PreferredFileNames;
 import org.codehaus.mojo.license.download.ProjectLicense;
 import org.codehaus.mojo.license.download.ProjectLicenseInfo;
 import org.codehaus.mojo.license.download.UrlReplacements;
+import org.codehaus.mojo.license.extended.InfoFile;
 import org.codehaus.mojo.license.extended.spreadsheet.ExcelFileWriter;
 import org.codehaus.mojo.license.spdx.SpdxLicenseList;
 import org.codehaus.mojo.license.spdx.SpdxLicenseList.Attachments.ContentSanitizer;
 import org.codehaus.mojo.license.utils.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.regex.Pattern;
 
 /**
  * Created on 23/05/16.
@@ -235,6 +238,18 @@ public abstract class AbstractDownloadLicensesMojo
     @Parameter( property = "license.licensesErrorsFile",
         defaultValue = "${project.build.directory}/generated-resources/licenses-errors.xml" )
     private File licensesErrorsFile;
+
+    /**
+     * A file containing dependencies whose licenses could not be downloaded for some reason. The format is similar to
+     * {@link #licensesExcelOutputFile} but the entries in {@link #licensesExcelErrorFile} have
+     * {@code <downloaderMessage>} elements attached to them. Those should explain what kind of error happened during
+     * the processing of the given dependency.
+     *
+     * @since 2.1
+     */
+    @Parameter( property = "license.licensesExcelErrorFile",
+            defaultValue = "${project.build.directory}/generated-resources/licenses-errors.xlsx" )
+    private File licensesExcelErrorFile;
 
     /**
      * A filter to exclude some scopes.
@@ -819,6 +834,8 @@ public abstract class AbstractDownloadLicensesMojo
                     downloadLicenses( licenseDownloader, depProject, false );
                 }
             }
+
+            filterCopyrightLines( depProjectLicenses );
         }
         catch ( IOException e )
         {
@@ -833,14 +850,11 @@ public abstract class AbstractDownloadLicensesMojo
             }
 
             List<ProjectLicenseInfo> depProjectLicensesWithErrors = filterErrors( depProjectLicenses );
-            writeLicenseSummary( depProjectLicenses, licensesOutputFile, writeVersions );
-            if ( writeExcelFile )
-            {
-                ExcelFileWriter.write( depProjectLicenses, licensesExcelOutputFile );
-            }
+            writeLicenseSummaries( depProjectLicenses, licensesOutputFile, licensesExcelOutputFile );
+
             if ( !CollectionUtils.isEmpty( depProjectLicensesWithErrors ) )
             {
-                writeLicenseSummary( depProjectLicensesWithErrors, licensesErrorsFile, writeVersions );
+                writeLicenseSummaries( depProjectLicensesWithErrors, licensesErrorsFile, licensesExcelErrorFile );
             }
 
             removeOrphanFiles( depProjectLicenses );
@@ -869,6 +883,47 @@ public abstract class AbstractDownloadLicensesMojo
             default:
                 throw new IllegalStateException( "Unexpected value of " + ErrorRemedy.class.getName() + ": "
                     + errorRemedy );
+        }
+    }
+
+    private void writeLicenseSummaries( List<ProjectLicenseInfo> depProjectLicenses,
+                                        File licensesOutputFile,
+                                        File licensesExcelOutputFile )
+            throws ParserConfigurationException, TransformerException, IOException
+    {
+        writeLicenseSummary( depProjectLicenses, licensesOutputFile, writeVersions );
+        if ( writeExcelFile )
+        {
+            ExcelFileWriter.write( depProjectLicenses, licensesExcelOutputFile );
+        }
+    }
+
+    /**
+     * Removes all extracted copyright lines if the license is an unmodified original license.<br/>
+     * So no actual copyright lines are contained in the extracted copyright lines.
+     *
+     * @param depProjectLicenses Projects with extracted copyright lines.
+     */
+    private void filterCopyrightLines( List<ProjectLicenseInfo> depProjectLicenses )
+    {
+        for ( ProjectLicenseInfo projectLicenseInfo : depProjectLicenses )
+        {
+            if ( projectLicenseInfo.getExtendedInfo() == null
+                    || CollectionUtils.isEmpty( projectLicenseInfo.getExtendedInfo().getInfoFiles() ) )
+            {
+                continue;
+            }
+            List<InfoFile> infoFiles = projectLicenseInfo.getExtendedInfo().getInfoFiles();
+            for ( InfoFile infoFile : infoFiles )
+            {
+                if ( cache.hasNormalizedContent( infoFile.getNormalizedContent() ) )
+                {
+                    LOG.debug( "Removed extracted copyright lines for "
+                            + projectLicenseInfo.getExtendedInfo().getName()
+                            + " (" + projectLicenseInfo.toGavString() + ")" );
+                    infoFile.setExtractedCopyrightLines( null );
+                }
+            }
         }
     }
 

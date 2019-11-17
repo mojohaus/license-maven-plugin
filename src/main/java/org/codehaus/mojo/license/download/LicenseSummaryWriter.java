@@ -142,6 +142,7 @@ public class LicenseSummaryWriter
         if ( dep.getExtendedInfo() != null )
         {
             ExtendedInfo extendedInfo = dep.getExtendedInfo();
+            addTextPropertyIfSet( doc, depNode, "name", extendedInfo.getName() );
             addTextPropertyIfSet( doc, depNode, "bundleLicense", extendedInfo.getBundleLicense() );
             addCdataIfSet( doc, depNode, "bundleVendor", extendedInfo.getBundleVendor() );
             appendChildNodesIfSet( doc, depNode, "developers", extendedInfo.getDevelopers(),

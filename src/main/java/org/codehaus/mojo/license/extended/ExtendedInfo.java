@@ -36,6 +36,7 @@ import java.util.List;
  */
 public class ExtendedInfo
 {
+    private String name;
     private Artifact artifact;
     private List<InfoFile> infoFiles = new ArrayList<>();
     private String implementationVendor;
@@ -146,5 +147,15 @@ public class ExtendedInfo
     public void setUrl( String url )
     {
         this.url = url;
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public void setName( String name )
+    {
+        this.name = name;
     }
 }
