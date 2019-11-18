@@ -290,7 +290,7 @@ public class LicensedArtifact
             }
             catch ( IOException e )
             {
-                LOG.warn( "Can't open zip file", e );
+                LOG.warn( "Can't open zip file \"" + artifact.getFile() + "\"", e );
             }
             return result;
         }
