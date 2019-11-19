@@ -119,7 +119,8 @@ public class ExcelFileWriter
     private static final BorderStyle HEADER_CELLS_BORDER_STYLE = BorderStyle.MEDIUM;
     private static final int TIMEZONE_WIDTH = " Timezone ".length() * EXCEL_WIDTH_SCALE,
             INCEPTION_YEAR_WIDTH = " Inception Year ".length() * EXCEL_WIDTH_SCALE;
-    private static final Color ALTERNATING_ROWS_COLOR = new Color( 240, 240, 240 );
+    // Color must be dark enough for low contrast monitors
+    private static final Color ALTERNATING_ROWS_COLOR = new Color( 220, 220, 220 );
     private static final String COPYRIGHT_JOIN_SEPARATOR = "§";
 
     /**
