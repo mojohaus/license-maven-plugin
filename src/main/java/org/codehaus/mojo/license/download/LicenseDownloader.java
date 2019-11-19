@@ -22,26 +22,6 @@ package org.codehaus.mojo.license.download;
  * #L%
  */
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Pattern;
-
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
@@ -73,6 +53,26 @@ import org.codehaus.mojo.license.spdx.SpdxLicenseList.Attachments.ContentSanitiz
 import org.codehaus.mojo.license.utils.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * Utilities for downloading remote license files.
@@ -484,6 +484,10 @@ public class LicenseDownloader implements AutoCloseable
                 .replace( "\n", " " )
                 // Set all spaces, tabs, etc. to one space width
                 .replaceAll( "\\s\\s+", " " )
+                /* License files exist which are completely identical, except that someone changed
+                <http://fsf.org/> to <https://fsf.org/>.
+                 */
+                .replace( "http://", "https://" )
                 // All to lowercase
                 .toLowerCase();
     }
