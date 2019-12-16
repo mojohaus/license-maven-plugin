@@ -1106,9 +1106,9 @@ public abstract class AbstractDownloadLicensesMojo
      * license (if available) and the remote filename of the license.
      *
      * @param depProject the project containing the license
-     * @param licenseUrl the license url
+     * @param url the license url
      * @param licenseName the license name
-     * @param string
+     * @param licenseFileName the file name where to save the license
      * @return A filename to be used for the downloaded license file
      * @throws URISyntaxException
      */
@@ -1127,7 +1127,7 @@ public abstract class AbstractDownloadLicensesMojo
                 return new FileNameEntry( new File( licensesOutputDirectory, new File( licenseFileName ).getName() ),
                                           false, null );
             }
-            licenseFileName = String.format( "%s.%s%s", depProject.getGroupId(), depProject.getArtifactId(),
+            licenseFileName = String.format( "%s.%s%s.txt", depProject.getGroupId(), depProject.getArtifactId(),
                                              licenseName != null
                                                  ? "_" + licenseName
                                                  : "" ).replaceAll( "\\s+", "_" );
@@ -1233,7 +1233,10 @@ public abstract class AbstractDownloadLicensesMojo
                                 final File byDepsFile = fileNameEntry.getFile();
                                 if ( cachedResult.isSuccess() && !cachedFile.equals( byDepsFile ) )
                                 {
-                                    Files.copy( cachedFile.toPath(), byDepsFile.toPath() );
+                                    if ( ! byDepsFile.exists() )
+                                    {
+                                        Files.copy( cachedFile.toPath(), byDepsFile.toPath() );
+                                    }
                                     byDepsResult = cachedResult.withFile( byDepsFile );
                                 }
                                 else
