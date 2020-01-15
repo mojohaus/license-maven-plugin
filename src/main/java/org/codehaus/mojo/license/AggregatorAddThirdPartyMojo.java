@@ -33,6 +33,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -203,10 +204,29 @@ public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo
         }
         if ( groupId == null )
         {
-            throw new IllegalStateException( "Can't find license-maven-plugin" );
+            try
+            {
+                final PluginDescriptor pd = ( PluginDescriptor ) getPluginContext().get( "pluginDescriptor" );
+                groupId = pd.getGroupId();
+                artifactId = pd.getArtifactId();
+                version = pd.getVersion();
+            }
+            catch ( ClassCastException e )
+            {
+                LOG.warn( "Failed to access PluginDescriptor", e );
+            }
+
+            if ( groupId == null )
+            {
+                throw new IllegalStateException( "Failed to determine the license-maven-plugin artifact."
+                    +
+                    "Please add it to your parent POM." );
+            }
         }
 
         String addThirdPartyRoleHint = groupId + ":" + artifactId + ":" + version + ":" + "add-third-party";
+
+        LOG.info( "The default plugin hint is: " + addThirdPartyRoleHint );
 
         for ( MavenProject reactorProject : reactorProjects )
         {
