@@ -46,8 +46,6 @@ public class SpdxLicenseInfo
 
     private final String detailsUrl;
 
-    private final int referenceNumber;
-
     private final String name;
 
     private final String licenseId;
@@ -67,7 +65,7 @@ public class SpdxLicenseInfo
 
     // CHECKSTYLE_OFF: ParameterNumber
     public SpdxLicenseInfo( String reference, boolean isDeprecatedLicenseId, boolean isFsfLibre, String detailsUrl,
-                            int referenceNumber, String name, String licenseId, List<String> seeAlso,
+                            String name, String licenseId, List<String> seeAlso,
                             boolean isOsiApproved, Attachments attachments )
     {
         super();
@@ -75,7 +73,6 @@ public class SpdxLicenseInfo
         this.isDeprecatedLicenseId = isDeprecatedLicenseId;
         this.isFsfLibre = isFsfLibre;
         this.detailsUrl = detailsUrl;
-        this.referenceNumber = referenceNumber;
         this.name = name;
         this.licenseId = licenseId;
         this.seeAlso = seeAlso;
@@ -101,11 +98,6 @@ public class SpdxLicenseInfo
     public String getDetailsUrl()
     {
         return detailsUrl;
-    }
-
-    public int getReferenceNumber()
-    {
-        return referenceNumber;
     }
 
     public String getName()
@@ -153,6 +145,9 @@ public class SpdxLicenseInfo
             this.urlInfos = urlInfos;
         }
 
+        /**
+         * @return a {@link Map} from URLs to {@link UrlInfo}s
+         */
         public Map<String, UrlInfo> getUrlInfos()
         {
             return urlInfos;
@@ -171,19 +166,31 @@ public class SpdxLicenseInfo
 
             private final boolean stable;
 
-            public UrlInfo( String sha1, String mimeType, boolean stable )
+            private final boolean sanitized;
+
+            public UrlInfo( String sha1, String mimeType, boolean stable, boolean sanitized )
             {
                 super();
                 this.sha1 = sha1;
                 this.mimeType = mimeType;
                 this.stable = stable;
+                this.sanitized = sanitized;
             }
 
+            /**
+             * @return {@code true} is the checksum returned by {@link #getSha1()} is likely to stay stable over time;
+             *      {@code false} otherwise. The likeness of staying stable is (1) tested automatically when generatting
+             *      {@link SpdxLicenseListData} and (2) for some sites it is set manually based on their historical
+             *      behavior.
+             */
             public boolean isStable()
             {
                 return stable;
             }
 
+            /**
+             * @return the checksum computed after applying sanitizers at {@link SpdxLicenseListData} generation time.
+             */
             public String getSha1()
             {
                 return sha1;
@@ -192,6 +199,11 @@ public class SpdxLicenseInfo
             public String getMimeType()
             {
                 return mimeType;
+            }
+
+            public boolean isSanitized()
+            {
+                return sanitized;
             }
         }
     }
@@ -209,8 +221,6 @@ public class SpdxLicenseInfo
         private boolean isFsfLibre;
 
         private String detailsUrl;
-
-        private Integer referenceNumber;
 
         private String name;
 
@@ -248,12 +258,6 @@ public class SpdxLicenseInfo
             return this;
         }
 
-        public Builder referenceNumber( int referenceNumber )
-        {
-            this.referenceNumber = referenceNumber;
-            return this;
-        }
-
         public Builder name( String name )
         {
             this.name = name;
@@ -272,9 +276,9 @@ public class SpdxLicenseInfo
             return this;
         }
 
-        public Builder urlInfo( String url, String sha1, String mimeType, boolean stable )
+        public Builder urlInfo( String url, String sha1, String mimeType, boolean stable, boolean sanitized )
         {
-            this.urlInfos.put( url, new UrlInfo( sha1, mimeType, stable ) );
+            this.urlInfos.put( url, new UrlInfo( sha1, mimeType, stable, sanitized ) );
             return this;
         }
 
@@ -289,7 +293,6 @@ public class SpdxLicenseInfo
             Objects.requireNonNull( isDeprecatedLicenseId, "isDeprecatedLicenseId" );
             Objects.requireNonNull( detailsUrl, "detailsUrl" );
             Objects.requireNonNull( reference, "reference" );
-            Objects.requireNonNull( referenceNumber, "referenceNumber" );
             Objects.requireNonNull( name, "name" );
             Objects.requireNonNull( licenseId, "licenseId" );
             Objects.requireNonNull( isOsiApproved, "isOsiApproved" );
@@ -304,7 +307,7 @@ public class SpdxLicenseInfo
             final Map<String, UrlInfo> uis = Collections.unmodifiableMap( urlInfos );
             urlInfos = null;
 
-            return new SpdxLicenseInfo( reference, isDeprecatedLicenseId, isFsfLibre, detailsUrl, referenceNumber, name,
+            return new SpdxLicenseInfo( reference, isDeprecatedLicenseId, isFsfLibre, detailsUrl, name,
                                         licenseId, sa, isOsiApproved, new Attachments( uis ) );
         }
 

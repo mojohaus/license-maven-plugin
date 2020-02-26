@@ -26,6 +26,12 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.TreeMap;
+import java.util.regex.Pattern;
+
+import org.apache.commons.lang.StringEscapeUtils;
+import org.codehaus.mojo.license.spdx.SpdxLicenseList.Attachments.ContentSanitizer;
+import org.codehaus.mojo.license.spdx.SpdxLicenseList.Attachments.UrlReplacement;
 
 /**
  * A Java representation of
@@ -61,17 +67,21 @@ public class SpdxLicenseList
 
     private final Map<String, SpdxLicenseInfo> licenses;
 
+    private final Attachments attachments;
+
     public static Builder builder()
     {
         return new Builder();
     }
 
-    public SpdxLicenseList( String licenseListVersion, Map<String, SpdxLicenseInfo> licenses, String releaseDate )
+    SpdxLicenseList( String licenseListVersion, Map<String, SpdxLicenseInfo> licenses, String releaseDate,
+                            Attachments attachments )
     {
         super();
         this.licenseListVersion = licenseListVersion;
         this.licenses = licenses;
         this.releaseDate = releaseDate;
+        this.attachments = attachments;
     }
 
     public String getLicenseListVersion()
@@ -92,6 +102,148 @@ public class SpdxLicenseList
         return releaseDate;
     }
 
+    public Attachments getAttachments()
+    {
+        return attachments;
+    }
+
+    /**
+     *
+     * @since 1.20
+     */
+    public static class Attachments
+    {
+        private final Map<String, ContentSanitizer> contentSanitizers;
+        private final Map<String, UrlReplacement> urlReplacements;
+
+        Attachments( Map<String, ContentSanitizer> contentSanitizers, Map<String, UrlReplacement> urlReplacements )
+        {
+            super();
+            this.contentSanitizers = contentSanitizers;
+            this.urlReplacements = urlReplacements;
+        }
+
+        public Map<String, ContentSanitizer> getContentSanitizers()
+        {
+            return contentSanitizers;
+        }
+
+        public Map<String, UrlReplacement> getUrlReplacements()
+        {
+            return urlReplacements;
+        }
+
+        /**
+         * @since 1.20
+         */
+        public static class UrlReplacement
+        {
+            public static UrlReplacement compile( String id, String urlPattern, String replacement )
+            {
+                Objects.requireNonNull( id, "id" );
+                Objects.requireNonNull( urlPattern, "urlPattern" );
+                replacement = replacement == null ? "" : replacement;
+                return new UrlReplacement( id, Pattern.compile( urlPattern, Pattern.CASE_INSENSITIVE ), replacement );
+            }
+            private final String id;
+            private final Pattern urlPattern;
+            private final String replacement;
+            public UrlReplacement( String id, Pattern urlPattern, String replacement )
+            {
+                super();
+                this.id = id;
+                this.urlPattern = urlPattern;
+                this.replacement = replacement;
+            }
+            public String getId()
+            {
+                return id;
+            }
+            public Pattern getUrlPattern()
+            {
+                return urlPattern;
+            }
+            public String getReplacement()
+            {
+                return replacement;
+            }
+
+        }
+
+        /**
+         * @since 1.20
+         */
+        public static class ContentSanitizer
+        {
+            public static ContentSanitizer compile( String id, String urlPattern, String contentPattern,
+                                                    String contentReplacement )
+            {
+                Objects.requireNonNull( id, "id" );
+                Objects.requireNonNull( urlPattern, "urlPattern" );
+                Objects.requireNonNull( contentPattern, "contentPattern" );
+                contentReplacement = contentReplacement == null ? "" : contentReplacement;
+                contentReplacement = StringEscapeUtils.unescapeJava( contentReplacement );
+                return new ContentSanitizer( id,
+                                             Pattern.compile( urlPattern, Pattern.CASE_INSENSITIVE ),
+                                             Pattern.compile( contentPattern,
+                                                              Pattern.CASE_INSENSITIVE ),
+                                             contentReplacement );
+            }
+
+            private final String id;
+            private final Pattern urlPattern;
+            private final Pattern contentPattern;
+            private final String contentReplacement;
+
+            public ContentSanitizer( String id, Pattern urlPattern, Pattern contentPattern, String contentReplacement )
+            {
+                super();
+                Objects.requireNonNull( id, "id" );
+                Objects.requireNonNull( urlPattern, "urlPattern" );
+                Objects.requireNonNull( contentPattern, "contentPattern" );
+                Objects.requireNonNull( contentReplacement, "contentReplacement" );
+                this.id = id;
+                this.urlPattern = urlPattern;
+                this.contentPattern = contentPattern;
+                this.contentReplacement = contentReplacement;
+            }
+
+            public boolean applies( String url )
+            {
+                return urlPattern.matcher( url ).matches();
+            }
+
+            public String sanitize( String content )
+            {
+                if ( content == null )
+                {
+                    return null;
+                }
+                return contentPattern.matcher( content ).replaceAll( contentReplacement );
+            }
+
+            public String getId()
+            {
+                return id;
+            }
+
+            public Pattern getUrlPattern()
+            {
+                return urlPattern;
+            }
+
+            public Pattern getContentPattern()
+            {
+                return contentPattern;
+            }
+
+            public String getContentReplacement()
+            {
+                return contentReplacement;
+            }
+        }
+    }
+
     /**
      * A {@link SpdxLicenseList} builder.
      *
@@ -105,6 +257,9 @@ public class SpdxLicenseList
 
         private Map<String, SpdxLicenseInfo> licenses = new LinkedHashMap<>();
 
+        private Map<String, ContentSanitizer> contentSanitizers = new TreeMap<>();
+        private Map<String, UrlReplacement> urlReplacements = new TreeMap<>();
+
         public SpdxLicenseList build()
         {
             Objects.requireNonNull( licenseListVersion, "isDeprecatedLicenseId" );
@@ -113,9 +268,17 @@ public class SpdxLicenseList
             {
                 throw new IllegalStateException( "licenses cannot be empty" );
             }
-            Map<String, SpdxLicenseInfo> lics = Collections.unmodifiableMap( licenses );
+            final Map<String, SpdxLicenseInfo> lics = Collections.unmodifiableMap( licenses );
             this.licenses = null;
-            return new SpdxLicenseList( licenseListVersion, lics, releaseDate );
+
+            final Map<String, ContentSanitizer> sanitizers = Collections.unmodifiableMap( contentSanitizers );
+            this.contentSanitizers = null;
+
+            final Map<String, UrlReplacement> replacements = Collections.unmodifiableMap( urlReplacements );
+            this.urlReplacements = null;
+
+            return new SpdxLicenseList( licenseListVersion, lics, releaseDate,
+                                        new Attachments( sanitizers, replacements ) );
         }
 
         public Builder licenseListVersion( String licenseListVersion )
@@ -133,6 +296,20 @@ public class SpdxLicenseList
         public Builder license( SpdxLicenseInfo license )
         {
             this.licenses.put( license.getLicenseId(), license );
+            return this;
+        }
+
+        public Builder contentSanitizer( String id, String urlPattern, String contentPattern,
+                                         String contentReplacement )
+        {
+            this.contentSanitizers.put( id, ContentSanitizer.compile( id, urlPattern, contentPattern,
+                                                                      contentReplacement ) );
+            return this;
+        }
+
+        public Builder urlReplacement( String id, String urlPattern, String replacement )
+        {
+            this.urlReplacements.put( id, UrlReplacement.compile( id, urlPattern, replacement ) );
             return this;
         }
     }

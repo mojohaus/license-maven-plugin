@@ -23,9 +23,6 @@ package org.codehaus.mojo.license.api;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.model.License;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
@@ -39,6 +36,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
+import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.resolution.ArtifactResolutionException;
+import org.eclipse.aether.transfer.ArtifactNotFoundException;
 
 /**
  * A tool to load third party files missing files.
@@ -81,7 +81,6 @@ public interface ThirdPartyTool
      * @param projects           all projects where to read third parties descriptors
      * @param unsafeProjects     all unsafe projects
      * @param licenseMap         license map where to store new licenses
-     * @param localRepository    local repository
      * @param remoteRepositories remote repositories
      * @return the map of loaded missing from the remote missing third party files
      * @throws ThirdPartyToolException if any
@@ -91,8 +90,7 @@ public interface ThirdPartyTool
                                                                 Collection<MavenProject> projects,
                                                                 SortedSet<MavenProject> unsafeProjects,
                                                                 LicenseMap licenseMap,
-                                                                ArtifactRepository localRepository,
-                                                                List<ArtifactRepository> remoteRepositories )
+                                                                List<RemoteRepository> remoteRepositories )
             throws ThirdPartyToolException, IOException;
 
     /**
@@ -108,20 +106,18 @@ public interface ThirdPartyTool
     /**
      * Obtain the third party file from the repository.
      * <p>
-     * Will first search in the local repository, then into the remote repositories and will resolv it.
+     * Will first search in the local repository, then into the remote repositories and will resolve it.
      *
      * @param project         the project
-     * @param localRepository the local repository
-     * @param repositories    the remote repositories
+     * @param remoteRepositories    the remote repositories
      * @return the locale file resolved into the local repository
      * @throws ThirdPartyToolException if any
      */
-    File resolvThirdPartyDescriptor( MavenProject project, ArtifactRepository localRepository,
-                                     List<ArtifactRepository> repositories )
+    File resolvThirdPartyDescriptor( MavenProject project, List<RemoteRepository> remoteRepositories )
             throws ThirdPartyToolException;
 
     File resolveMissingLicensesDescriptor( String groupId, String artifactId, String version,
-                                           ArtifactRepository localRepository, List<ArtifactRepository> repositories )
+                                     List<RemoteRepository> remoteRepositories )
             throws IOException, ArtifactResolutionException, ArtifactNotFoundException;
 
     /**
@@ -131,7 +127,7 @@ public interface ThirdPartyTool
      * @param doLog      a flag to add debug logs
      * @return the set of projects with no license
      */
-    SortedSet<MavenProject> getProjectsWithNoLicense( LicenseMap licenseMap, boolean doLog );
+    SortedSet<MavenProject> getProjectsWithNoLicense( LicenseMap licenseMap );
 
     /**
      * Loads unsafe mapping and returns it.

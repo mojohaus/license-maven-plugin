@@ -37,9 +37,11 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.mojo.license.api.DependenciesTool;
 import org.codehaus.mojo.license.download.LicenseSummaryWriter;
+import org.codehaus.mojo.license.download.LicensedArtifactResolver;
 import org.codehaus.mojo.license.download.ProjectLicenseInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A common parent for {@link LicensesXmlInsertVersionsMojo} and {@link AbstractDownloadLicensesMojo}.
@@ -50,6 +52,7 @@ import org.codehaus.mojo.license.download.ProjectLicenseInfo;
 public abstract class AbstractLicensesXmlMojo
     extends AbstractMojo
 {
+    private static final Logger LOG = LoggerFactory.getLogger( AbstractLicensesXmlMojo.class );
 
     /**
      * The output file containing a mapping between each dependency and it's license information.
@@ -84,14 +87,6 @@ public abstract class AbstractLicensesXmlMojo
     private String licensesOutputFileEncoding;
 
     /**
-     * Location of the local repository.
-     *
-     * @since 1.0
-     */
-    @Parameter( defaultValue = "${localRepository}", readonly = true )
-    protected ArtifactRepository localRepository;
-
-    /**
      * List of Remote Repositories used by the resolver
      *
      * @since 1.0
@@ -108,12 +103,12 @@ public abstract class AbstractLicensesXmlMojo
     protected MavenProject project;
 
     /**
-     * Dependencies tool.
+     * Licensed artifact resolver.
      *
      * @since 1.0
      */
     @Component
-    protected DependenciesTool dependenciesTool;
+    protected LicensedArtifactResolver licensedArtifactResolver;
 
     private Charset charset;
 
@@ -124,6 +119,12 @@ public abstract class AbstractLicensesXmlMojo
         return licensesOutputFileEncoding;
     }
 
+    Charset getCharset()
+    {
+        initEncoding();
+        return charset;
+    }
+
     private void initEncoding()
     {
         if ( charset == null )
@@ -131,7 +132,7 @@ public abstract class AbstractLicensesXmlMojo
             if ( licensesOutputFileEncoding == null )
             {
                 licensesOutputFileEncoding = System.getProperty( "file.encoding" );
-                getLog().warn( "Using the default system encoding for reading or writing licenses.xml file."
+                LOG.warn( "Using the default system encoding for reading or writing licenses.xml file."
                     + " This makes your build platform dependent. You should set either"
                     + " project.build.sourceEncoding or licensesOutputFileEncoding" );
             }

@@ -23,7 +23,6 @@ package org.codehaus.mojo.license;
  */
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.doxia.siterenderer.Renderer;
@@ -50,6 +49,8 @@ import org.codehaus.mojo.license.model.LicenseMap;
 import org.codehaus.mojo.license.utils.MojoHelper;
 import org.codehaus.mojo.license.utils.UrlRequester;
 import org.codehaus.plexus.i18n.I18N;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -74,6 +75,7 @@ import org.codehaus.mojo.license.api.ResolvedProjectDependencies;
 public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
     implements MavenProjectDependenciesConfigurator
 {
+    private static final Logger LOG = LoggerFactory.getLogger( AbstractThirdPartyReportMojo.class );
 
     // ----------------------------------------------------------------------
     // Mojo Parameters
@@ -302,14 +304,6 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
     private String encoding;
 
     /**
-     * Local Repository.
-     *
-     * @since 1.1
-     */
-    @Parameter( property = "localRepository", required = true, readonly = true )
-    private ArtifactRepository localRepository;
-
-    /**
      * The Maven Project.
      *
      * @since 1.1
@@ -399,9 +393,9 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
     {
         if ( licenseMergesUrl != null )
         {
-            getLog().warn( "" );
-            getLog().warn( "licenseMerges will be overridden by licenseMergesUrl." );
-            getLog().warn( "" );
+            LOG.warn( "" );
+            LOG.warn( "licenseMerges will be overridden by licenseMergesUrl." );
+            LOG.warn( "" );
             if ( UrlRequester.isStringUrl( licenseMergesUrl ) )
             {
                 licenseMerges = Arrays.asList( UrlRequester.getFromUrl( licenseMergesUrl ).split( "[\n\r]+" ) );
@@ -416,7 +410,7 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
             throws MavenReportException
     {
         resolvedOverrideUrl = LicenseMojoUtils.prepareThirdPartyOverrideUrl( resolvedOverrideUrl, overrideFile,
-                overrideUrl, project.getBasedir(), getLog() );
+                overrideUrl, project.getBasedir() );
 
         Collection<ThirdPartyDetails> details;
 
@@ -434,10 +428,6 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
             throw new MavenReportException( e.getMessage(), e );
         }
         catch ( ProjectBuildingException e )
-        {
-            throw new MavenReportException( e.getMessage(), e );
-        }
-        catch ( InvalidDependencyVersionException e )
         {
             throw new MavenReportException( e.getMessage(), e );
         }
@@ -565,8 +555,8 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
         ResolvedProjectDependencies loadedDependencies;
         if ( loadArtifacts )
         {
-            loadedDependencies = dependenciesTool.loadProjectArtifacts( localRepository,
-                    project.getRemoteArtifactRepositories(), project, null );
+            loadedDependencies =
+                    new ResolvedProjectDependencies( project.getArtifacts(), project.getDependencyArtifacts() );
         }
         else
         {
@@ -577,7 +567,7 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
         ThirdPartyHelper thirdPartyHelper =
                 new DefaultThirdPartyHelper( project, encoding, verbose,
                         dependenciesTool, thirdPartyTool,
-                        localRepository, project.getRemoteArtifactRepositories(), getLog() );
+                        project.getRemoteArtifactRepositories(), project.getRemoteProjectRepositories() );
         // load dependencies of the project
         SortedMap<String, MavenProject> projectDependencies = thirdPartyHelper.loadDependencies( this,
                 loadedDependencies );
@@ -649,6 +639,5 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
     {
         return encoding;
     }
-
 
 }

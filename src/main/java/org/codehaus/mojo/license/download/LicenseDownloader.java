@@ -22,12 +22,15 @@ package org.codehaus.mojo.license.download;
  * #L%
  */
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -35,9 +38,11 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpException;
 import org.apache.http.HttpHost;
@@ -61,9 +66,11 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.DefaultProxyRoutePlanner;
 import org.apache.http.protocol.HttpContext;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.settings.Proxy;
+import org.codehaus.mojo.license.spdx.SpdxLicenseList.Attachments.ContentSanitizer;
 import org.codehaus.mojo.license.utils.FileUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utilities for downloading remote license files.
@@ -73,17 +80,29 @@ import org.codehaus.mojo.license.utils.FileUtil;
  */
 public class LicenseDownloader implements AutoCloseable
 {
+    private static final Logger LOG = LoggerFactory.getLogger( LicenseDownloader.class );
 
     private static final Pattern EXTENSION_PATTERN = Pattern.compile( "\\.[a-z]{1,4}$", Pattern.CASE_INSENSITIVE );
 
     private final CloseableHttpClient client;
 
-    public LicenseDownloader( Proxy proxy, int connectTimeout, int socketTimeout, int connectionRequestTimeout )
+    private final Map<String, ContentSanitizer> contentSanitizers;
+    private final Charset charset;
+
+    public LicenseDownloader( Proxy proxy, int connectTimeout, int socketTimeout, int connectionRequestTimeout,
+                              Map<String, ContentSanitizer> contentSanitizers, Charset charset )
     {
+        this.contentSanitizers = contentSanitizers;
+        this.charset = charset;
         final Builder configBuilder = RequestConfig.copy( RequestConfig.DEFAULT ) //
                         .setConnectTimeout( connectTimeout ) //
                         .setSocketTimeout( socketTimeout ) //
                         .setConnectionRequestTimeout( connectionRequestTimeout );
+
+        if ( proxy != null )
+        {
+            configBuilder.setProxy( new HttpHost( proxy.getHost(), proxy.getPort(), proxy.getProtocol() ) );
+        }
 
         HttpClientBuilder clientBuilder = HttpClients.custom().setDefaultRequestConfig( configBuilder.build() );
         if ( proxy != null )
@@ -143,13 +162,12 @@ public class LicenseDownloader implements AutoCloseable
      *
      * @param licenseUrlString the URL
      * @param outputFile a hint where to store the license file
-     * @param log
      * @return the path to the file where the downloaded license file was stored
      * @throws IOException
      * @throws URISyntaxException
      * @throws MojoFailureException
      */
-    public LicenseDownloadResult downloadLicense( String licenseUrlString, FileNameEntry fileNameEntry, Log log )
+    public LicenseDownloadResult downloadLicense( String licenseUrlString, FileNameEntry fileNameEntry )
         throws IOException, URISyntaxException, MojoFailureException
     {
         final File outputFile = fileNameEntry.getFile();
@@ -158,17 +176,28 @@ public class LicenseDownloader implements AutoCloseable
             throw new IllegalArgumentException( "Null URL for file " + outputFile.getPath() );
         }
 
+        List<ContentSanitizer> sanitizers = filterSanitizers( licenseUrlString );
 
         if ( licenseUrlString.startsWith( "file://" ) )
         {
-            log.debug( "Downloading '" + licenseUrlString + "' -> '" + outputFile + "'" );
+            LOG.debug( "Downloading '{}' -> '{}'", licenseUrlString, outputFile );
             Path in = Paths.get( new URI( licenseUrlString ) );
-            Files.copy( in, outputFile.toPath() );
-            return LicenseDownloadResult.success( outputFile, FileUtil.sha1( in ), fileNameEntry.isPreferred() );
+            if ( sanitizers.isEmpty() )
+            {
+                Files.copy( in, outputFile.toPath() );
+                return LicenseDownloadResult.success( outputFile, FileUtil.sha1( in ), fileNameEntry.isPreferred() );
+            }
+            else
+            {
+                try ( BufferedReader r = Files.newBufferedReader( in, charset ) )
+                {
+                    return sanitize( r, outputFile, charset, sanitizers, fileNameEntry.isPreferred() );
+                }
+            }
         }
         else
         {
-            log.debug( "About to download '" + licenseUrlString + "'" );
+            LOG.debug( "About to download '{}'", licenseUrlString );
             try ( CloseableHttpResponse response = client.execute( new HttpGet( licenseUrlString ) ) )
             {
                 final StatusLine statusLine = response.getStatusLine();
@@ -187,37 +216,54 @@ public class LicenseDownloader implements AutoCloseable
                     File updatedFile = fileNameEntry.isPreferred() ? outputFile
                                     : updateFileExtension( outputFile,
                                                            contentType != null ? contentType.getMimeType() : null );
-                    log.debug( "Downloading '" + licenseUrlString + "' -> '" + updatedFile + "'"
-                        + ( fileNameEntry.isPreferred() ? " (preferred file name)" : "" ) );
+                    LOG.debug( "Downloading '{}' -> '{}'{}",
+                        licenseUrlString,
+                        updatedFile,
+                        fileNameEntry.isPreferred() ? " (preferred file name)" : "" );
 
-                    try ( InputStream in = entity.getContent();
-                                    FileOutputStream fos = new FileOutputStream( updatedFile ) )
+                    if ( sanitizers.isEmpty() )
                     {
-                        final MessageDigest md = MessageDigest.getInstance( "SHA-1" );
-                        final byte[] buf = new byte[1024];
-                        int len;
-                        while ( ( len = in.read( buf ) ) >= 0 )
+                        try ( InputStream in = entity.getContent();
+                                        FileOutputStream fos = new FileOutputStream( updatedFile ) )
                         {
-                            md.update( buf, 0, len );
-                            fos.write( buf, 0, len );
+                            final MessageDigest md = MessageDigest.getInstance( "SHA-1" );
+                            final byte[] buf = new byte[1024];
+                            int len;
+                            while ( ( len = in.read( buf ) ) >= 0 )
+                            {
+                                md.update( buf, 0, len );
+                                fos.write( buf, 0, len );
+                            }
+                            final String actualSha1 = Hex.encodeHexString( md.digest() );
+                            final String expectedSha1 = fileNameEntry.getSha1();
+                            if ( expectedSha1 != null && !expectedSha1.equals( actualSha1 ) )
+                            {
+                                throw new MojoFailureException( "URL '" + licenseUrlString
+                                    + "' returned content with unexpected sha1 '" + actualSha1 + "'; expected '"
+                                    + expectedSha1 + "'. You may want to (a) re-run the current mojo"
+                                    + " with -Dlicense.forceDownload=true or (b) change the expected sha1 in"
+                                    + " the licenseUrlFileNames entry '" + fileNameEntry.getFile().getName()
+                                    + "' or (c) split the entry so that"
+                                    + " its URLs return content with different sha1 sums." );
+                            }
+                            return LicenseDownloadResult.success( updatedFile, actualSha1,
+                                                                  fileNameEntry.isPreferred() );
                         }
-                        final String actualSha1 = Hex.encodeHexString( md.digest() );
-                        final String expectedSha1 = fileNameEntry.getSha1();
-                        if ( expectedSha1 != null && !expectedSha1.equals( actualSha1 ) )
+                        catch ( NoSuchAlgorithmException e )
                         {
-                            throw new MojoFailureException( "URL '" + licenseUrlString
-                                            + "' returned content with unexpected sha1 '" + actualSha1 + "'; expected '"
-                                            + expectedSha1 + "'. You may want to (a) re-run the current mojo"
-                                            + " with -Dlicense.forceDownload=true or (b) change the expected sha1 in"
-                                            + " the licenseUrlFileNames entry '"
-                                            + fileNameEntry.getFile().getName() + "' or (c) split the entry so that"
-                                            + " its URLs return content with different sha1 sums." );
+                            throw new RuntimeException( e );
                         }
-                        return LicenseDownloadResult.success( updatedFile, actualSha1, fileNameEntry.isPreferred() );
                     }
-                    catch ( NoSuchAlgorithmException e )
+                    else
                     {
-                        throw new RuntimeException( e );
+                        final Charset cs = contentType != null
+                                        ? ( contentType.getCharset() == null ? this.charset : contentType.getCharset() )
+                                        : this.charset;
+                        try ( BufferedReader r =
+                                        new BufferedReader( new InputStreamReader( entity.getContent(), cs ) ) )
+                        {
+                            return sanitize( r, updatedFile, cs, sanitizers, fileNameEntry.isPreferred() );
+                        }
                     }
                 }
                 else
@@ -226,6 +272,44 @@ public class LicenseDownloader implements AutoCloseable
                 }
             }
         }
+    }
+
+    static LicenseDownloadResult sanitize( BufferedReader r, File out, Charset charset,
+                                           List<ContentSanitizer> sanitizers, boolean preferredFileName )
+        throws IOException
+    {
+        final StringBuilder contentBuilder = new StringBuilder();
+        // CHECKSTYLE_OFF: MagicNumber
+        char[] buffer = new char[8192];
+        // CHECKSTYLE_ON: MagicNumber
+        int len = 0;
+        while ( ( len = r.read( buffer ) ) >= 0 )
+        {
+            contentBuilder.append( buffer, 0, len );
+        }
+
+        String content = contentBuilder.toString();
+        for ( ContentSanitizer sanitizer : sanitizers )
+        {
+            content = sanitizer.sanitize( content );
+        }
+        byte[] bytes = content.getBytes( charset );
+        Files.write( out.toPath(), bytes );
+        final String sha1 = DigestUtils.sha1Hex( bytes );
+        return LicenseDownloadResult.success( out, sha1, preferredFileName );
+    }
+
+    List<ContentSanitizer> filterSanitizers( String licenseUrlString )
+    {
+        ArrayList<ContentSanitizer> result = new ArrayList<>();
+        for ( ContentSanitizer s : contentSanitizers.values() )
+        {
+            if ( s.applies( licenseUrlString ) )
+            {
+                result.add( s );
+            }
+        }
+        return result;
     }
 
     static File updateFileExtension( File outputFile, String mimeType )

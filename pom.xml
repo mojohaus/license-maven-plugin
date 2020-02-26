@@ -32,7 +32,7 @@
   </parent>
 
   <artifactId>license-maven-plugin</artifactId>
-  <version>1.20-SNAPSHOT</version>
+  <version>2.0.1-SNAPSHOT</version>
   <packaging>maven-plugin</packaging>
 
   <name>License Maven Plugin</name>
@@ -111,7 +111,7 @@
   </distributionManagement>
 
   <properties>
-    <mavenVersion>2.2.1</mavenVersion>
+    <mavenVersion>3.5.4</mavenVersion>
     <mojo.java.target>1.7</mojo.java.target>
 
     <processorVersion>1.3</processorVersion>
@@ -132,10 +132,16 @@
 
     <pluginPluginVersion>3.5.1</pluginPluginVersion>
     <plexusComponentVersion>1.7.1</plexusComponentVersion>
+    <maven-resolver.version>1.3.3</maven-resolver.version>
   </properties>
 
   <dependencyManagement>
     <dependencies>
+      <dependency>
+        <groupId>org.apache.maven.plugin-tools</groupId>
+        <artifactId>maven-plugin-annotations</artifactId>
+        <version>${pluginPluginVersion}</version>
+      </dependency>
       <dependency>
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpclient</artifactId>
@@ -145,6 +151,11 @@
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpcore</artifactId>
         <version>${version.httpcomponents.httpcore}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>1.7.26</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -156,13 +167,13 @@
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
-      <artifactId>maven-project</artifactId>
+      <artifactId>maven-artifact</artifactId>
       <version>${mavenVersion}</version>
     </dependency>
     <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-artifact</artifactId>
-      <version>${mavenVersion}</version>
+      <groupId>org.apache.maven.resolver</groupId>
+      <artifactId>maven-resolver-api</artifactId>
+      <version>${maven-resolver.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -236,7 +247,6 @@
     <dependency>
       <groupId>org.apache.maven.plugin-tools</groupId>
       <artifactId>maven-plugin-annotations</artifactId>
-      <version>${pluginPluginVersion}</version>
       <scope>provided</scope>
     </dependency>
 
@@ -255,7 +265,7 @@
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-container-default</artifactId>
-      <version>1.0-alpha-9-stable-1</version>
+      <version>2.0.0</version>
       <scope>provided</scope>
     </dependency>
 
@@ -300,10 +310,8 @@
     </dependency>
 
     <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-      <version>1.2.17</version>
-      <scope>runtime</scope>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
     </dependency>
 
     <dependency>
@@ -541,6 +549,39 @@
         <defaultGoal>verify</defaultGoal>
         <plugins>
           <plugin>
+            <groupId>org.codehaus.gmaven</groupId>
+            <artifactId>groovy-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>LittleProxyStart</id>
+                <goals>
+                  <goal>execute</goal>
+                </goals>
+                <phase>pre-integration-test</phase>
+                <configuration>
+                  <source>${project.basedir}/src/build/scripts/LittleProxyStart.groovy</source>
+                </configuration>
+              </execution>
+              <execution>
+                <id>LittleProxyStop</id>
+                <goals>
+                  <goal>execute</goal>
+                </goals>
+                <phase>post-integration-test</phase>
+                <configuration>
+                  <source>System.setProperty('LittleProxy.stop', 'true')</source>
+                </configuration>
+              </execution>
+            </executions>
+            <dependencies>
+              <dependency>
+                <groupId>org.littleshoot</groupId>
+                <artifactId>littleproxy</artifactId>
+                <version>1.1.2</version>
+              </dependency>
+            </dependencies>
+          </plugin>
+          <plugin>
             <artifactId>maven-invoker-plugin</artifactId>
             <configuration>
               <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
@@ -561,6 +602,7 @@
                   </extraArtifacts>
                   <pomExcludes>
                     <pomExclude>MLICENSE-4/pom.xml</pomExclude>
+                    <pomExclude>download-licenses-proxy/pom.xml</pomExclude>
                   </pomExcludes>
                 </configuration>
               </execution>
@@ -574,7 +616,20 @@
                   <pomIncludes>
                     <pomInclude>MLICENSE-4/pom.xml</pomInclude>
                   </pomIncludes>
-                  <cloneProjectsTo>${project.build.directory}/it2</cloneProjectsTo>
+                  <cloneProjectsTo>${project.build.directory}/it-offline</cloneProjectsTo>
+                </configuration>
+              </execution>
+              <execution>
+                <id>integration-test-proxy</id>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <settingsFile>src/it/settings-proxy.xml</settingsFile>
+                  <pomIncludes>
+                    <pomInclude>download-licenses-proxy/pom.xml</pomInclude>
+                  </pomIncludes>
+                  <cloneProjectsTo>${project.build.directory}/it-proxy</cloneProjectsTo>
                 </configuration>
               </execution>
             </executions>

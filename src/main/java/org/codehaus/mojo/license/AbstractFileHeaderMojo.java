@@ -38,12 +38,13 @@ import org.codehaus.mojo.license.model.Copyright;
 import org.codehaus.mojo.license.model.License;
 import org.codehaus.mojo.license.utils.FileUtil;
 import org.codehaus.mojo.license.utils.MojoHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -61,6 +62,7 @@ import java.util.TreeMap;
  */
 public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
 {
+    private static final Logger LOG = LoggerFactory.getLogger( AbstractFileHeaderMojo.class );
 
     // ----------------------------------------------------------------------
     // Mojo Parameters
@@ -411,12 +413,12 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
         {
             if ( isFailOnMissingHeader() )
             {
-                getLog().warn( "The failOnMissingHeader has no effect if the property dryRun is not set." );
+                LOG.warn( "The failOnMissingHeader has no effect if the property dryRun is not set." );
             }
 
             if ( isFailOnNotUptodateHeader() )
             {
-                getLog().warn( "The failOnNotUptodateHeader has no effect if the property dryRun is not set." );
+                LOG.warn( "The failOnNotUptodateHeader has no effect if the property dryRun is not set." );
             }
         }
 
@@ -432,7 +434,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
                 String str = String.format( commentFormat, aTransformer.getName(), aTransformer.getDescription() );
                 buffer.append( str );
             }
-            getLog().info( buffer.toString() );
+            LOG.info( "{}", buffer );
         }
         // set timestamp used for temporary files
         this.timestamp = System.nanoTime();
@@ -442,7 +444,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
             roots = DEFAULT_ROOTS;
             if ( isVerbose() )
             {
-                getLog().info( "Will use default roots " + Arrays.toString( roots ) );
+                LOG.info( "Will use default roots {}", ( Object ) roots );
             }
         }
 
@@ -451,7 +453,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
             includes = DEFAULT_INCLUDES;
             if ( isVerbose() )
             {
-                getLog().info( "Will use default includes " + Arrays.toString( includes ) );
+                LOG.info( "Will use default includes {}", ( Object ) includes );
             }
         }
 
@@ -460,7 +462,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
             excludes = DEFAULT_EXCLUDES;
             if ( isVerbose() )
             {
-                getLog().info( "Will use default excludes" + Arrays.toString( excludes ) );
+                LOG.info( "Will use default excludes {}", ( Object ) excludes );
             }
         }
 
@@ -469,18 +471,18 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
         processStartTag = cleanHeaderConfiguration( processStartTag, FileHeaderTransformer.DEFAULT_PROCESS_START_TAG );
         if ( isVerbose() )
         {
-            getLog().info( "Will use processStartTag: " + processStartTag );
+            LOG.info( "Will use processStartTag: {}", processStartTag );
         }
         processEndTag = cleanHeaderConfiguration( processEndTag, FileHeaderTransformer.DEFAULT_PROCESS_END_TAG );
         if ( isVerbose() )
         {
-            getLog().info( "Will use processEndTag: " + processEndTag );
+            LOG.info( "Will use processEndTag: {}", processEndTag );
         }
         sectionDelimiter = cleanHeaderConfiguration( sectionDelimiter,
                 FileHeaderTransformer.DEFAULT_SECTION_DELIMITER );
         if ( isVerbose() )
         {
-            getLog().info( "Will use sectionDelimiter: " + sectionDelimiter );
+            LOG.info( "Will use sectionDelimiter: {}", sectionDelimiter );
         }
 
         // add default extensions from header transformers
@@ -509,7 +511,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
             {
                 if ( isVerbose() )
                 {
-                    getLog().info( "Associate extension " + extension + " to comment style " + commentStyle );
+                    LOG.info( "Associate extension '{}' to comment style '{}'", extension, commentStyle );
                 }
                 extensionToCommentStyle.put( extension, commentStyle );
             }
@@ -524,15 +526,15 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
                 if ( extensionToCommentStyle.containsKey( extension ) )
                 {
                     // override existing extension mapping
-                    getLog().warn( "The extension " + extension + " is already accepted for comment style "
-                                           + extensionToCommentStyle.get( extension ) );
+                    LOG.warn( "The extension '{}' is already accepted for comment style '{}'",
+                            extension, extensionToCommentStyle.get( extension ) );
                 }
                 String commentStyle = entry.getValue();
                 // check transformer exists
                 getTransformer( transformers, commentStyle );
                 if ( isVerbose() )
                 {
-                    getLog().info( "Associate extension '" + extension + "' to comment style '" + commentStyle + "'" );
+                    LOG.info( "Associate extension '{}' to comment style '{}'", extension, commentStyle );
                 }
                 extensionToCommentStyle.put( extension, commentStyle );
             }
@@ -547,7 +549,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
         // build the description template
         if ( isVerbose() )
         {
-            getLog().info( "Use description template : " + descriptionTemplate );
+            LOG.info( "Use description template: {}", descriptionTemplate );
         }
         descriptionTemplate0 = freeMarkerHelper.getTemplate( descriptionTemplate );
     }
@@ -581,20 +583,20 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
             int nbFiles = processedFiles.size();
             if ( nbFiles == 0 && !ignoreNoFileToScan )
             {
-                getLog().warn( "No file to scan." );
+                LOG.warn( "No file to scan." );
             }
             else
             {
                 String delay = MojoHelper.convertTime( System.nanoTime() - t0 );
                 String message =
                         String.format( "Scan %s file%s header done in %s.", nbFiles, nbFiles > 1 ? "s" : "", delay );
-                getLog().info( message );
+                LOG.info( message );
             }
             Set<FileState> states = result.keySet();
             if ( states.size() == 1 && states.contains( FileState.uptodate ) )
             {
                 // all files where up to date
-                getLog().info( "All files are up-to-date." );
+                LOG.info( "All files are up-to-date." );
             }
             else
             {
@@ -606,7 +608,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
                     reportType( result, state, buffer );
                 }
 
-                getLog().info( buffer.toString() );
+                LOG.info( buffer.toString() );
             }
 
         }
@@ -672,8 +674,8 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
 
         if ( isVerbose() )
         {
-            getLog().info( "Process header '" + commentStyle + "'" );
-            getLog().info( " - using " + license.getDescription() );
+            LOG.info( "Process header '{}'", commentStyle );
+            LOG.info( " - using {}", license.getDescription() );
         }
 
         // use header transformer according to comment style given in header
@@ -696,7 +698,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
 
         if ( inceptionYear == null )
         {
-            getLog().warn( "No inceptionYear defined (will use current year)" );
+            LOG.warn( "No inceptionYear defined (will use current year)" );
         }
 
         Copyright copyright = getCopyright( getCopyrightOwners() );
@@ -714,7 +716,6 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
         filter.setUpdateDescription( canUpdateDescription );
         filter.setUpdateLicense( canUpdateLicense );
 
-        filter.setLog( getLog() );
         // update processor filter
         return new FileHeaderProcessor( filter, header, transformer );
     }
@@ -731,7 +732,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
 
         if ( processedFiles.contains( file ) )
         {
-            getLog().info( " - skip already processed file " + file );
+            LOG.info( " - skip already processed file {}", file );
             return;
         }
 
@@ -744,7 +745,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
         }
         catch ( Exception e )
         {
-            getLog().warn( "skip failed file : " + e.getMessage()
+            LOG.warn( "skip failed file: " + e.getMessage()
                                    + ( e.getCause() == null ? "" : " Cause : " + e.getCause().getMessage() ), e );
             FileState.fail.addFile( file, result );
             doFinalize = false;
@@ -780,8 +781,8 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
 
         if ( getLog().isDebugEnabled() )
         {
-            getLog().debug( " - process file " + file );
-            getLog().debug( " - will process into file " + processFile );
+            LOG.debug( " - process file {}", file );
+            LOG.debug( " - will process into file {}", processFile );
         }
 
         // update the file header description
@@ -793,15 +794,12 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
         descriptionParameters.put( "organizationName", organizationName );
         descriptionParameters.put( "file", file );
 
-        getLog().debug( "Description parameters:" + descriptionParameters );
+        LOG.debug( "Description parameters: {}", descriptionParameters );
 
         String description = freeMarkerHelper.renderTemplate( descriptionTemplate0, descriptionParameters );
         processor.updateDescription( description );
 
-        if ( getLog().isDebugEnabled() )
-        {
-            getLog().debug( "header description : " + processor.getFileHeaderDescription() );
-        }
+        LOG.debug( "header description : " + processor.getFileHeaderDescription() );
 
         String content;
 
@@ -823,7 +821,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
         //check that file is not marked to be ignored
         if ( content.contains( ignoreTag ) )
         {
-            getLog().info( " - ignore file (detected " + ignoreTag + ") " + file );
+            LOG.info( " - ignore file (detected {}) {}", ignoreTag, file );
 
             FileState.ignore.addFile( file, result );
 
@@ -856,7 +854,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
 
             if ( isVerbose() )
             {
-                getLog().info( " - header was updated for " + file );
+                LOG.info( " - header was updated for {}", file );
             }
             if ( processor.isModified() )
             {
@@ -886,7 +884,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
         // no header at all, add a new header
         if ( isVerbose() )
         {
-            getLog().info( " - adding license header on file " + file );
+            LOG.info( " - adding license header on file {}", file );
         }
 
         //FIXME tchemit 20100409 xml files must add header after a xml prolog line
@@ -924,11 +922,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
                 FileUtil.deleteFile( backupFile );
             }
 
-            if ( isVerbose() )
-            {
-                getLog().debug( " - backup original file " + file );
-            }
-
+            LOG.debug( " - backup original file {}", file );
             Files.copy( file.toPath(), backupFile.toPath(), StandardCopyOption.COPY_ATTRIBUTES );
         }
 
@@ -949,7 +943,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
             }
             catch ( IOException e )
             {
-                getLog().warn( e.getMessage() );
+                LOG.warn( "Error updating {} -> {}", processFile, file, e );
             }
         }
     }

@@ -22,15 +22,15 @@ package org.codehaus.mojo.license;
  * #L%
  */
 
+import java.util.Map;
+import java.util.TreeMap;
+
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
-import org.apache.maven.project.MavenProject;
-
-import java.util.HashSet;
-import java.util.Set;
-import java.util.SortedMap;
+import org.codehaus.mojo.license.api.ResolvedProjectDependencies;
+import org.codehaus.mojo.license.download.LicensedArtifact;
 
 /**
  * Download the license files of all the current project's dependencies, and generate a summary file containing a list
@@ -82,10 +82,13 @@ public class DownloadLicensesMojo
         return skipDownloadLicenses;
     }
 
-    protected Set<MavenProject> getDependencies()
+    protected Map<String, LicensedArtifact> getDependencies()
     {
-        SortedMap<String, MavenProject> dependencies = getDependencies( getProject() );
-        return new HashSet<>( dependencies.values() );
+        final Map<String, LicensedArtifact> result = new TreeMap<>();
+        licensedArtifactResolver.loadProjectDependencies(
+                new ResolvedProjectDependencies( project.getArtifacts(), project.getDependencyArtifacts() ),
+                this, remoteRepositories, result );
+        return result;
     }
 
 }

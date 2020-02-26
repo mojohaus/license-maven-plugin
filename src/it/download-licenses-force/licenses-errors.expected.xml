@@ -17,7 +17,7 @@
         </license>
       </licenses>
       <downloaderMessages>
-        <downloaderMessage>No URL for license at index 0 in dependency aopalliance:aopalliance</downloaderMessage>
+        <downloaderMessage>No URL for license at index 0 in dependency aopalliance:aopalliance:1.0</downloaderMessage>
       </downloaderMessages>
     </dependency>
     <dependency>
@@ -31,7 +31,7 @@
         <!-- Manually add license elements here: -->
       </licenses>
       <downloaderMessages>
-        <downloaderMessage>No license information available for: groovy:groovy-all</downloaderMessage>
+        <downloaderMessage>No license information available for: groovy:groovy-all:1.0-jsr-04</downloaderMessage>
       </downloaderMessages>
     </dependency>
   </dependencies>

@@ -27,7 +27,6 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
 import org.codehaus.mojo.license.model.LicenseMap;
@@ -45,6 +44,9 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
+import org.eclipse.aether.repository.RemoteRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation of the {@link org.codehaus.mojo.license.api.ThirdPartyHelper}.
@@ -55,6 +57,7 @@ import java.util.TreeMap;
 public class DefaultThirdPartyHelper
         implements ThirdPartyHelper
 {
+    private static final Logger LOG = LoggerFactory.getLogger( DefaultThirdPartyHelper.class );
 
     /**
      * DependenciesTool to load dependencies.
@@ -71,14 +74,14 @@ public class DefaultThirdPartyHelper
     private final ThirdPartyTool thirdPartyTool;
 
     /**
-     * Local repository used.
+     * List of remote repositories. Same as remoteRepositories, just a different API.
      */
-    private final ArtifactRepository localRepository;
+    private final List<ArtifactRepository> remoteRepositoriesCoreApi;
 
     /**
      * List of remote repositories.
      */
-    private final List<ArtifactRepository> remoteRepositories;
+    private final List<RemoteRepository> remoteRepositories;
 
     /**
      * Current maven project.
@@ -96,11 +99,6 @@ public class DefaultThirdPartyHelper
     private final boolean verbose;
 
     /**
-     * Instance logger.
-     */
-    private final Log log;
-
-    /**
      * Cache of dependencies (as maven project) loaded.
      */
     private static SortedMap<String, MavenProject> artifactCache;
@@ -113,15 +111,14 @@ public class DefaultThirdPartyHelper
      * @param verbose            Verbose flag
      * @param dependenciesTool   tool to load dependencies
      * @param thirdPartyTool     tool to load third-parties descriptors
-     * @param localRepository    maven local repository
+     * @param remoteRepositoriesCoreApi maven remote repositories, in the core api format
      * @param remoteRepositories maven remote repositories
-     * @param log                logger
      */
     // CHECKSTYLE_OFF: ParameterNumber
     public DefaultThirdPartyHelper( MavenProject project, String encoding, boolean verbose,
                                     DependenciesTool dependenciesTool, ThirdPartyTool thirdPartyTool,
-                                    ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories,
-                                    Log log )
+                                    List<ArtifactRepository> remoteRepositoriesCoreApi,
+                                    List<RemoteRepository> remoteRepositories )
     {
         // CHECKSTYLE_ON: ParameterNumber
         this.project = project;
@@ -129,9 +126,8 @@ public class DefaultThirdPartyHelper
         this.verbose = verbose;
         this.dependenciesTool = dependenciesTool;
         this.thirdPartyTool = thirdPartyTool;
-        this.localRepository = localRepository;
+        this.remoteRepositoriesCoreApi = remoteRepositoriesCoreApi;
         this.remoteRepositories = remoteRepositories;
-        this.log = log;
         this.thirdPartyTool.setVerbose( verbose );
     }
 
@@ -153,8 +149,8 @@ public class DefaultThirdPartyHelper
     public SortedMap<String, MavenProject> loadDependencies( MavenProjectDependenciesConfigurator configuration,
                                                              ResolvedProjectDependencies dependencyArtifacts )
     {
-        return dependenciesTool.loadProjectDependencies( dependencyArtifacts, configuration, localRepository,
-                remoteRepositories, getArtifactCache() );
+        return dependenciesTool.loadProjectDependencies( dependencyArtifacts, configuration,
+                remoteRepositoriesCoreApi, getArtifactCache() );
     }
 
     /**
@@ -167,8 +163,7 @@ public class DefaultThirdPartyHelper
             throws ThirdPartyToolException, IOException
     {
         return thirdPartyTool.loadThirdPartyDescriptorsForUnsafeMapping( topLevelDependencies, encoding, projects,
-                                                                         unsafeDependencies, licenseMap,
-                                                                         localRepository, remoteRepositories );
+                unsafeDependencies, licenseMap, remoteRepositories );
     }
 
     /**
@@ -212,7 +207,7 @@ public class DefaultThirdPartyHelper
      */
     public SortedSet<MavenProject> getProjectsWithNoLicense( LicenseMap licenseMap )
     {
-        return thirdPartyTool.getProjectsWithNoLicense( licenseMap, verbose );
+        return thirdPartyTool.getProjectsWithNoLicense( licenseMap );
     }
 
     /**
@@ -336,7 +331,7 @@ public class DefaultThirdPartyHelper
                 Set<String> mergedLicense = entry.getValue();
                 if ( verbose )
                 {
-                    log.info( "Will merge to *" + mainLicense + "*, licenses: " + mergedLicense );
+                    LOG.info( "Will merge to '{}', licenses: {}", mainLicense, mergedLicense );
                 }
 
                 thirdPartyTool.mergeLicenses( licenseMap, mainLicense, mergedLicense );

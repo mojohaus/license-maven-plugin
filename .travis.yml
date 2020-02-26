@@ -1,5 +1,5 @@
 language: java
-sudo: false
+dist: trusty
 
 # Skip the Travis CI's default install command
 install: true

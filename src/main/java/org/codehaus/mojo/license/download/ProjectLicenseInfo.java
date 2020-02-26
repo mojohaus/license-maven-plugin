@@ -173,6 +173,11 @@ public class ProjectLicenseInfo
         return getId();
     }
 
+    public String toGavString()
+    {
+        return groupId + ":" + artifactId + ( version == null ? "" : ( ":" + version ) );
+    }
+
     /**
      * {@inheritDoc}
      */

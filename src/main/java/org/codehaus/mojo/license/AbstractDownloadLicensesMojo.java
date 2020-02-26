@@ -22,30 +22,6 @@ package org.codehaus.mojo.license;
  * #L%
  */
 
-import org.apache.commons.io.FileUtils;
-
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.model.License;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.settings.Proxy;
-import org.codehaus.mojo.license.api.ArtifactFilters;
-import org.codehaus.mojo.license.api.MavenProjectDependenciesConfigurator;
-import org.codehaus.mojo.license.api.ResolvedProjectDependencies;
-import org.codehaus.mojo.license.download.Cache;
-import org.codehaus.mojo.license.download.FileNameEntry;
-import org.codehaus.mojo.license.download.LicenseDownloader;
-import org.codehaus.mojo.license.download.PreferredFileNames;
-import org.codehaus.mojo.license.download.ProjectLicense;
-import org.codehaus.mojo.license.download.ProjectLicenseInfo;
-import org.codehaus.mojo.license.download.LicenseDownloader.LicenseDownloadResult;
-import org.codehaus.mojo.license.download.LicenseMatchers;
-import org.codehaus.mojo.license.download.LicenseSummaryReader;
-import org.codehaus.mojo.license.utils.FileUtil;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -62,8 +38,34 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.regex.Pattern;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.settings.Proxy;
+import org.codehaus.mojo.license.api.ArtifactFilters;
+import org.codehaus.mojo.license.api.MavenProjectDependenciesConfigurator;
+import org.codehaus.mojo.license.download.Cache;
+import org.codehaus.mojo.license.download.FileNameEntry;
+import org.codehaus.mojo.license.download.LicenseDownloader;
+import org.codehaus.mojo.license.download.LicenseDownloader.LicenseDownloadResult;
+import org.codehaus.mojo.license.download.LicenseMatchers;
+import org.codehaus.mojo.license.download.LicenseSummaryReader;
+import org.codehaus.mojo.license.download.LicensedArtifact;
+import org.codehaus.mojo.license.download.PreferredFileNames;
+import org.codehaus.mojo.license.download.ProjectLicense;
+import org.codehaus.mojo.license.download.ProjectLicenseInfo;
+import org.codehaus.mojo.license.download.UrlReplacements;
+import org.codehaus.mojo.license.spdx.SpdxLicenseList;
+import org.codehaus.mojo.license.spdx.SpdxLicenseList.Attachments.ContentSanitizer;
+import org.codehaus.mojo.license.utils.FileUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created on 23/05/16.
@@ -74,18 +76,11 @@ public abstract class AbstractDownloadLicensesMojo
     extends AbstractLicensesXmlMojo
     implements MavenProjectDependenciesConfigurator
 {
+    private static final Logger LOG = LoggerFactory.getLogger( AbstractDownloadLicensesMojo.class );
 
     // ----------------------------------------------------------------------
     // Mojo Parameters
     // ----------------------------------------------------------------------
-
-    /**
-     * Location of the local repository.
-     *
-     * @since 1.0
-     */
-    @Parameter( defaultValue = "${localRepository}", readonly = true )
-    private ArtifactRepository localRepository;
 
     /**
      * List of Remote Repositories used by the resolver
@@ -93,7 +88,7 @@ public abstract class AbstractDownloadLicensesMojo
      * @since 1.0
      */
     @Parameter( defaultValue = "${project.remoteArtifactRepositories}", readonly = true )
-    private List<ArtifactRepository> remoteRepositories;
+    protected List<ArtifactRepository> remoteRepositories;
 
     // CHECKSTYLE_OFF: LineLength
     /**
@@ -446,6 +441,13 @@ public abstract class AbstractDownloadLicensesMojo
      *
      * <p>If the replacement element is omitted, this is equivalent to an empty replacement string.</p>
      *
+     * <p>The replacements are applied in the same order as they are present in the configuration. The default
+     * replacements (that can be activated via {@link #useDefaultUrlReplacements}) are appended to
+     * {@link #licenseUrlReplacements}</p>
+     *
+     * <p>The {@code id} field of {@link LicenseUrlReplacement} is optional and is useful only if you want to override
+     * some of the default replacements.</p>
+     *
      * <pre>
      * {@code
      *
@@ -459,6 +461,7 @@ public abstract class AbstractDownloadLicensesMojo
      *     <replacement>http://$1</replacement>
      *   </licenseUrlReplacement>
      *   <licenseUrlReplacement>
+     *     <id>github.com-0</id><!-- An optional id to override the default replacement with the same id -->
      *     <regexp>^https?://github\.com/([^/]+)/([^/]+)/blob/(.*)$</regexp><!-- replace GitHub web UI with raw -->
      *     <replacement>https://raw.githubusercontent.com/$1/$2/$3</replacement>
      *   </licenseUrlReplacement>
@@ -468,6 +471,7 @@ public abstract class AbstractDownloadLicensesMojo
      * <p>
      * Relationship to other parameters:
      * <ul>
+     * <li>Default URL replacements can be unlocked by setting {@link #useDefaultUrlReplacements} to {@code true}.</li>
      * <li>License names and license URLs {@link #licensesConfigFile} is applied before
      * {@link #licenseUrlReplacements}</li>
      * <li>{@link #licenseUrlReplacements} are applied before {@link #licenseUrlFileNames}</li>
@@ -480,6 +484,25 @@ public abstract class AbstractDownloadLicensesMojo
      */
     @Parameter
     protected List<LicenseUrlReplacement> licenseUrlReplacements;
+
+    /**
+     * If {@code true} the default license URL replacements be added to the internal {@link Map} of URL replacements
+     * before adding {@link #licenseUrlReplacements} by their {@code id}; otherwise the default license URL replacements
+     * will not be added to the internal {@link Map} of URL replacements.
+     * <p>
+     * Any individual URL replacement from the set of default URL replacements can be overriden via
+     * {@link #licenseUrlReplacements} if the same {@code id} is used in {@link #licenseUrlReplacements}.
+     * <p>
+     * To view the list of default URL replacements, set {@link #useDefaultUrlReplacements} to {@code true} and run the
+     * mojo with debug log level, e.g. using {@code -X} or
+     * {-Dorg.slf4j.simpleLogger.log.org.codehaus.mojo.license=debug} on the command line.
+     *
+     * @since 1.20
+     * @see #licenseUrlReplacements
+     */
+    @Parameter( property = "license.useDefaultUrlReplacements", defaultValue = "false" )
+    protected boolean useDefaultUrlReplacements;
+
 
     /**
      * A map that helps to select local files names for the content downloaded from license URLs.
@@ -582,6 +605,61 @@ public abstract class AbstractDownloadLicensesMojo
     @Parameter( property = "license.connectionRequestTimeout", defaultValue = "5000" )
     private int connectionRequestTimeout;
 
+    /**
+     * A list of sanitizers to process the content of license files before storing them locally and before computing
+     * their sha1 sums. Useful for removing parts of the content that change over time.
+     * <p>
+     * The content sanitizers are applied in alphabetical order by {@code id}.
+     * <p>
+     * Set {@link #useDefaultContentSanitizers} to {@code true} to apply the built-in content sanitizers.
+     * <p>
+     * An example:
+     * <pre>
+     * {@code
+     * <licenseContentSanitizers>
+     *   <licenseContentSanitizer>
+     *     <id>fedoraproject.org-0</id>
+     *     <urlRegexp>.*fedoraproject\\.org.*</urlRegexp><!-- Apply this sanitizer to URLs that contain fedora.org -->
+     *     <contentRegexp>\"wgRequestId\":\"[^\"]*\"</contentRegexp><!-- wgRequestId value changes with every -->
+     *                                                              <!-- request so we just remove it -->
+     *     <contentReplacement>\"wgRequestId\":\"\"</contentReplacement>
+     *   </licenseContentSanitizer>
+     *   <licenseContentSanitizer>
+     *     <id>opensource.org-0</id>
+     *     <urlRegexp>.*opensource\\.org.*</urlRegexp><!-- Apply this sanitizer to URLs that contain opensource.org -->
+     *     <contentRegexp>jQuery\\.extend\\(Drupal\\.settings[^\\n]+</contentRegexp><!-- Drupal\\.settings contain -->
+     *                                                                              <!-- some clutter that changes -->
+     *                                                                              <!-- often so we just remove it -->
+     *     <contentReplacement></contentReplacement>
+     *   </licenseContentSanitizer>
+     * </licenseContentSanitizers>
+     * }
+     * </pre>
+     *
+     * @since 1.20
+     * @see #useDefaultContentSanitizers
+     */
+    @Parameter( property = "license.licenseContentSanitizers" )
+    private List<LicenseContentSanitizer> licenseContentSanitizers;
+
+    /**
+     * If {@code true} the default content sanitizers will be added to the internal {@link Map} of sanitizes before
+     * adding {@link #licenseContentSanitizers} by their {@code id}; otherwise the default content sanitizers will not
+     * be added to the internal {@link Map} of sanitizes.
+     * <p>
+     * Any individual content sanitizer from the set of default sanitizers can be overriden via
+     * {@link #licenseContentSanitizers} if the same {@code id} is used in {@link #licenseContentSanitizers}.
+     * <p>
+     * To view the list of default content sanitizers, set {@link #useDefaultContentSanitizers} to {@code true} and run
+     * the mojo with debug log level, e.g. using {@code -X} or
+     * {-Dorg.slf4j.simpleLogger.log.org.codehaus.mojo.license=debug} on the command line.
+     *
+     * @since 1.20
+     * @see #licenseContentSanitizers
+     */
+    @Parameter( property = "license.useDefaultContentSanitizers", defaultValue = "false" )
+    private boolean useDefaultContentSanitizers;
+
     // ----------------------------------------------------------------------
     // Plexus Components
     // ----------------------------------------------------------------------
@@ -602,6 +680,8 @@ public abstract class AbstractDownloadLicensesMojo
     private ArtifactFilters artifactFilters;
     private final Set<String> orphanFileNames = new HashSet<>();
 
+    private UrlReplacements urlReplacements;
+
     protected abstract boolean isSkip();
 
     protected MavenProject getProject()
@@ -609,19 +689,11 @@ public abstract class AbstractDownloadLicensesMojo
         return project;
     }
 
-    protected abstract Set<MavenProject> getDependencies();
+    protected abstract Map<String, LicensedArtifact> getDependencies();
 
     // ----------------------------------------------------------------------
     // Mojo Implementation
     // ----------------------------------------------------------------------
-
-    @SuppressWarnings( "unchecked" )
-    protected SortedMap<String, MavenProject> getDependencies( MavenProject project )
-    {
-        return dependenciesTool.loadProjectDependencies(
-                new ResolvedProjectDependencies( project.getArtifacts(), project.getDependencyArtifacts() ),
-                this, localRepository, remoteRepositories, null );
-    }
 
     /**
      * {@inheritDoc}
@@ -633,13 +705,14 @@ public abstract class AbstractDownloadLicensesMojo
 
         if ( isSkip() )
         {
-            getLog().info( "skip flag is on, will skip goal." );
+            LOG.info( "skip flag is on, will skip goal." );
             return;
         }
 
         this.errorRemedy = getEffectiveErrorRemedy( this.quiet, this.errorRemedy );
-        this.preferredFileNames = PreferredFileNames.build( licensesOutputDirectory, licenseUrlFileNames, getLog() );
+        this.preferredFileNames = PreferredFileNames.build( licensesOutputDirectory, licenseUrlFileNames );
         this.cache = new Cache( licenseUrlFileNames != null && !licenseUrlFileNames.isEmpty() );
+        this.urlReplacements = urlReplacements();
 
         initDirectories();
 
@@ -680,20 +753,29 @@ public abstract class AbstractDownloadLicensesMojo
             }
         }
 
-        final Set<MavenProject> dependencies = getDependencies();
+        final Map<String, LicensedArtifact> dependencies = getDependencies();
 
         // The resulting list of licenses after dependency resolution
         final List<ProjectLicenseInfo> depProjectLicenses = new ArrayList<>();
 
         try ( LicenseDownloader licenseDownloader =
-            new LicenseDownloader( findActiveProxy(), connectTimeout, socketTimeout, connectionRequestTimeout ) )
+            new LicenseDownloader( findActiveProxy(), connectTimeout, socketTimeout, connectionRequestTimeout,
+                                   contentSanitizers(), getCharset() ) )
         {
-            for ( MavenProject project : dependencies )
+            for ( LicensedArtifact artifact : dependencies.values() )
             {
-                Artifact artifact = project.getArtifact();
-                getLog().debug( "Checking licenses for project " + artifact );
-                final ProjectLicenseInfo depProject = createDependencyProject( project );
+                LOG.debug( "Checking licenses for project " + artifact );
+                final ProjectLicenseInfo depProject = createDependencyProject( artifact );
                 matchers.replaceMatches( depProject );
+
+                /* Copy the messages and handle them via handleError() that may eventually add them back */
+                final List<String> msgs = new ArrayList<>( depProject.getDownloaderMessages() );
+                depProject.getDownloaderMessages().clear();
+                for ( String msg : msgs )
+                {
+                    handleError( depProject, msg );
+                }
+
                 depProjectLicenses.add( depProject );
             }
             if ( !offline )
@@ -703,7 +785,7 @@ public abstract class AbstractDownloadLicensesMojo
                 {
                     downloadLicenses( licenseDownloader, depProject, true );
                 }
-                getLog().debug( "Finished populating cache" );
+                LOG.debug( "Finished populating cache" );
                 /*
                  * Then attempt to download the rest of the URLs using the available cache entries to select local
                  * file names based on file content sha1
@@ -747,7 +829,7 @@ public abstract class AbstractDownloadLicensesMojo
                 /* do nothing */
                 break;
             case warn:
-                getLog().warn( "There were " + downloadErrorCount + " download errors - check the warnings above" );
+                LOG.warn( "There were {} download errors - check the warnings above", downloadErrorCount );
                 break;
             case xmlOutput:
                 if ( downloadErrorCount > 0 )
@@ -760,6 +842,70 @@ public abstract class AbstractDownloadLicensesMojo
                 throw new IllegalStateException( "Unexpected value of " + ErrorRemedy.class.getName() + ": "
                     + errorRemedy );
         }
+    }
+
+    private UrlReplacements urlReplacements()
+    {
+        UrlReplacements.Builder b = UrlReplacements.builder().useDefaults( useDefaultUrlReplacements );
+        if ( licenseUrlReplacements != null )
+        {
+            for ( LicenseUrlReplacement r : licenseUrlReplacements )
+            {
+                b.replacement( r.getId(), r.getRegexp(), r.getReplacement() );
+            }
+        }
+        return b.build();
+    }
+
+    private Map<String, ContentSanitizer> contentSanitizers()
+    {
+        Map<String, ContentSanitizer> result =
+            new TreeMap<String, ContentSanitizer>();
+        if ( useDefaultContentSanitizers )
+        {
+            final Map<String, ContentSanitizer> defaultSanitizers =
+                SpdxLicenseList.getLatest().getAttachments().getContentSanitizers();
+            result.putAll( defaultSanitizers  );
+            if ( LOG.isDebugEnabled() && !defaultSanitizers.isEmpty() )
+            {
+                final StringBuilder sb = new StringBuilder() //
+                        .append( "Applied " ) //
+                        .append( defaultSanitizers.size() ) //
+                        .append( " licenseContentSanitizers:\n<licenseContentSanitizers>\n" );
+                for ( ContentSanitizer sanitizer : defaultSanitizers.values() )
+                {
+                    sb.append( "  <licenseContentSanitizer>\n" ) //
+                      .append( "    <id>" ) //
+                      .append( sanitizer.getId() ) //
+                      .append( "</id>\n" ) //
+                      .append( "    <urlRegexp>" ) //
+                      .append( StringEscapeUtils.escapeJava( sanitizer.getUrlPattern().pattern() ) ) //
+                      .append( "</urlRegexp>\n" ) //
+                      .append( "    <contentRegexp>" ) //
+                      .append( StringEscapeUtils.escapeJava( sanitizer.getContentPattern().pattern() ) ) //
+                      .append( "</contentRegexp>\n" ) //
+                      .append( "    <contentReplacement>" ) //
+                      .append( StringEscapeUtils.escapeJava( sanitizer.getContentReplacement() ) ) //
+                      .append( "</contentReplacement>\n" ) //
+                      .append( "  </licenseContentSanitizer>\n" );
+                }
+                sb.append( "</licenseContentSanitizers>" );
+
+                LOG.debug( sb.toString() );
+            }
+        }
+        if ( licenseContentSanitizers != null )
+        {
+            for ( LicenseContentSanitizer s : licenseContentSanitizers )
+            {
+                result.put( s.getId(),
+                            ContentSanitizer.compile( s.getId(), s.getUrlRegexp(),
+                                                                                  s.getContentRegexp(),
+                                                                                  s.getContentReplacement() ) );
+            }
+        }
+
+        return Collections.unmodifiableMap( result );
     }
 
     private void removeOrphanFiles( List<ProjectLicenseInfo> deps )
@@ -779,7 +925,7 @@ public abstract class AbstractDownloadLicensesMojo
                 final File file = new File( licensesOutputDirectory, fileName );
                 if ( file.exists() )
                 {
-                    getLog().info( "Removing orphan license file \"" + file + "\"" );
+                    LOG.info( "Removing orphan license file \"{}\"", file );
                     file.delete();
                 }
             }
@@ -889,7 +1035,7 @@ public abstract class AbstractDownloadLicensesMojo
             {
                 if ( cleanLicensesOutputDirectory )
                 {
-                    getLog().info( "Cleaning licensesOutputDirectory '" + licensesOutputDirectory + "'" );
+                    LOG.info( "Cleaning licensesOutputDirectory '{}'", licensesOutputDirectory );
                     FileUtils.cleanDirectory( licensesOutputDirectory );
                 }
             }
@@ -932,18 +1078,26 @@ public abstract class AbstractDownloadLicensesMojo
      *
      * @param depMavenProject the dependency maven project
      * @return DependencyProject with artifact and license info
+     * @throws MojoFailureException
      */
-    private ProjectLicenseInfo createDependencyProject( MavenProject depMavenProject )
+    private ProjectLicenseInfo createDependencyProject( LicensedArtifact depMavenProject ) throws MojoFailureException
     {
-        ProjectLicenseInfo dependencyProject =
+        final ProjectLicenseInfo dependencyProject =
             new ProjectLicenseInfo( depMavenProject.getGroupId(), depMavenProject.getArtifactId(),
                                     depMavenProject.getVersion() );
-        @SuppressWarnings( "unchecked" )
-        List<License> licenses = depMavenProject.getLicenses();
-        for ( License license : licenses )
+        final List<org.codehaus.mojo.license.download.License> licenses = depMavenProject.getLicenses();
+        for ( org.codehaus.mojo.license.download.License license : licenses )
         {
-            dependencyProject.addLicense( new ProjectLicense( license ) );
+            dependencyProject.addLicense( new ProjectLicense( license.getName(), license.getUrl(),
+                                                              license.getDistribution(), license.getComments(),
+                                                              null ) );
         }
+        List<String> msgs = depMavenProject.getErrorMessages();
+        for ( String msg : msgs )
+        {
+            dependencyProject.addDownloaderMessage( msg );
+        }
+
         return dependencyProject;
     }
 
@@ -1018,7 +1172,7 @@ public abstract class AbstractDownloadLicensesMojo
         {
             for ( LicenseUrlReplacement sanitizer : licenseUrlFileNameSanitizers )
             {
-                Pattern regexp = sanitizer.getRegexp();
+                Pattern regexp = sanitizer.getPattern();
                 String replacement = sanitizer.getReplacement() == null ? "" : sanitizer.getReplacement();
                 if ( regexp != null )
                 {
@@ -1040,13 +1194,13 @@ public abstract class AbstractDownloadLicensesMojo
                                    boolean matchingUrlsOnly )
         throws MojoFailureException
     {
-        getLog().debug( "Downloading license(s) for project " + depProject );
+        LOG.debug( "Downloading license(s) for project {}", depProject );
 
         List<ProjectLicense> licenses = depProject.getLicenses();
 
         if ( matchingUrlsOnly && ( depProject.getLicenses() == null || depProject.getLicenses().isEmpty() ) )
         {
-            handleError( depProject, "No license information available for: " + depProject );
+            handleError( depProject, "No license information available for: " + depProject.toGavString() );
             return;
         }
 
@@ -1056,11 +1210,11 @@ public abstract class AbstractDownloadLicensesMojo
             if ( matchingUrlsOnly && license.getUrl() == null )
             {
                 handleError( depProject, "No URL for license at index " + licenseIndex + " in dependency "
-                    + depProject.toString() );
+                    + depProject.toGavString() );
             }
             else if ( license.getUrl() != null )
             {
-                final String licenseUrl = rewriteLicenseUrlIfNecessary( license.getUrl() );
+                final String licenseUrl = urlReplacements.rewriteIfNecessary( license.getUrl() );
 
                 final LicenseDownloadResult cachedResult = cache.get( licenseUrl );
                 try
@@ -1106,7 +1260,7 @@ public abstract class AbstractDownloadLicensesMojo
                             if ( !licenseOutputFile.exists() || forceDownload )
                             {
                                 LicenseDownloadResult result =
-                                    licenseDownloader.downloadLicense( licenseUrl, fileNameEntry, getLog() );
+                                    licenseDownloader.downloadLicense( licenseUrl, fileNameEntry );
                                 if ( !organizeLicensesByDependencies && result.isSuccess() )
                                 {
                                     /* check if we can re-use an existing file that has the same content */
@@ -1116,9 +1270,12 @@ public abstract class AbstractDownloadLicensesMojo
                                         final File oldFile = result.getFile();
                                         if ( !oldFile.getName().equals( name ) )
                                         {
-                                            getLog().debug( "Found preferred name '" + name
-                                                + "' by sha1 after downloading '" + licenseUrl + "'; renaming from '"
-                                                + oldFile.getName() + "'" );
+                                            LOG.debug(
+                                                "Found preferred name '{}' by SHA1 after downloading '{}'; "
+                                                + "renaming from '{}'",
+                                                name,
+                                                licenseUrl,
+                                                oldFile.getName() );
                                             final File newFile = new File( licensesOutputDirectory, name );
                                             if ( newFile.exists() )
                                             {
@@ -1149,21 +1306,24 @@ public abstract class AbstractDownloadLicensesMojo
                 }
                 catch ( URISyntaxException e )
                 {
-                    handleError( depProject, "POM for dependency " + depProject.toString()
-                        + " has an invalid license URL: " + licenseUrl );
-                    getLog().debug( e );
+                    String msg = "POM for dependency " + depProject.toGavString()
+                        + " has an invalid license URL: " + licenseUrl;
+                    handleError( depProject, msg );
+                    LOG.debug( msg, e );
                 }
                 catch ( FileNotFoundException e )
                 {
-                    handleError( depProject, "POM for dependency " + depProject.toString()
-                        + " has a license URL that returns file not found: " + licenseUrl );
-                    getLog().debug( e );
+                    String msg = "POM for dependency " + depProject.toGavString()
+                        + " has a license URL that returns file not found: " + licenseUrl;
+                    handleError( depProject, msg );
+                    LOG.debug( msg, e );
                 }
                 catch ( IOException e )
                 {
-                    handleError( depProject, "Unable to retrieve license from URL '" + licenseUrl + "' for dependency '"
-                        + depProject.toString() + "': " + e.getMessage() );
-                    getLog().debug( e );
+                    String msg = "Unable to retrieve license from URL '" + licenseUrl + "' for dependency '"
+                        + depProject.toGavString() + "': " + e.getMessage();
+                    handleError( depProject, msg );
+                    LOG.debug( msg, e );
                 }
             }
             licenseIndex++;
@@ -1189,7 +1349,7 @@ public abstract class AbstractDownloadLicensesMojo
     {
         if ( depProject.isApproved() )
         {
-            getLog().debug( "Supressing manually approved license issue: " + msg );
+            LOG.debug( "Supressing manually approved license issue: {}", msg );
         }
         else
         {
@@ -1199,12 +1359,12 @@ public abstract class AbstractDownloadLicensesMojo
                     /* do nothing */
                     break;
                 case warn:
-                    getLog().warn( msg );
+                    LOG.warn( msg );
                     break;
                 case failFast:
                     throw new MojoFailureException( msg );
                 case xmlOutput:
-                    getLog().debug( msg );
+                    LOG.error( msg );
                     depProject.addDownloaderMessage( msg );
                     break;
                 default:
@@ -1213,29 +1373,6 @@ public abstract class AbstractDownloadLicensesMojo
             }
             downloadErrorCount++;
         }
-    }
-
-    private String rewriteLicenseUrlIfNecessary( final String originalLicenseUrl )
-    {
-        String resultUrl = originalLicenseUrl;
-        if ( licenseUrlReplacements != null )
-        {
-            for ( LicenseUrlReplacement urlReplacement : licenseUrlReplacements )
-            {
-                Pattern regexp = urlReplacement.getRegexp();
-                String replacement = urlReplacement.getReplacement() == null ? "" : urlReplacement.getReplacement();
-                if ( regexp != null )
-                {
-                    resultUrl = regexp.matcher( resultUrl ).replaceAll( replacement );
-                }
-            }
-
-            if ( !resultUrl.equals( originalLicenseUrl ) )
-            {
-                getLog().debug( String.format( "Rewrote URL %s => %s", originalLicenseUrl, resultUrl ) );
-            }
-        }
-        return resultUrl;
     }
 
     /**
