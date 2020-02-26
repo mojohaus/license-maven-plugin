@@ -26,6 +26,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.License;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.mojo.license.UnkownFileRemedy;
 import org.codehaus.mojo.license.model.LicenseMap;
 import org.codehaus.mojo.license.utils.SortedProperties;
 
@@ -138,11 +139,12 @@ public interface ThirdPartyTool
      * @param missingFile     location of the optional missing file
      * @param missingFileUrl  location of an optional missing file extension that can be downloaded from some
      *                        resource hoster and that will be merged with the content of the missing file.
+     * @param unkownFileRemedy
      * @return the unsafe mapping
      * @throws IOException if pb while reading missing file
      */
-    SortedProperties loadUnsafeMapping( LicenseMap licenseMap, SortedMap<String, MavenProject> artifactCache,
-                                        String encoding, File missingFile, String missingFileUrl )
+    SortedProperties loadUnsafeMapping(LicenseMap licenseMap, SortedMap<String, MavenProject> artifactCache,
+                                       String encoding, File missingFile, String missingFileUrl, final UnkownFileRemedy unkownFileRemedy)
             throws IOException, MojoExecutionException;
 
     /**

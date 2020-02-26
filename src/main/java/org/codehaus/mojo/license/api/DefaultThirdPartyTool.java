@@ -52,6 +52,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 import org.codehaus.mojo.license.LicenseMojoUtils;
+import org.codehaus.mojo.license.UnkownFileRemedy;
 import org.codehaus.mojo.license.model.LicenseMap;
 import org.codehaus.mojo.license.utils.FileUtil;
 import org.codehaus.mojo.license.utils.MojoHelper;
@@ -450,11 +451,13 @@ public class DefaultThirdPartyTool
     /**
      * {@inheritDoc}
      */
-    public SortedProperties loadUnsafeMapping( LicenseMap licenseMap,
-                                               SortedMap<String, MavenProject> artifactCache,
-                                               String encoding,
-                                               File missingFile,
-                                               String missingFileUrl ) throws IOException, MojoExecutionException
+    public SortedProperties loadUnsafeMapping(LicenseMap licenseMap,
+                                              SortedMap<String, MavenProject> artifactCache,
+                                              String encoding,
+                                              File missingFile,
+                                              String missingFileUrl,
+                                              UnkownFileRemedy unkownFileRemedy)
+        throws IOException, MojoExecutionException
     {
         Map<String, MavenProject> snapshots = new HashMap<>();
 
@@ -536,8 +539,7 @@ public class DefaultThirdPartyTool
             // there is some unknown dependencies in the missing file, remove them
             for ( String id : unknownDependenciesId )
             {
-                LOG.warn(
-                        "dependency [{}] does not exist in project, remove it from the missing file.", id );
+                handleUnkownDependency(unkownFileRemedy,"dependency [" + id + "] does not exist in project, remove it from the missing file.");
                 unsafeMappings.remove( id );
             }
 
@@ -552,7 +554,7 @@ public class DefaultThirdPartyTool
             MavenProject project = artifactCache.get( id );
             if ( project == null )
             {
-                LOG.warn( "dependency [{}] does not exist in project.", id );
+                handleUnkownDependency(unkownFileRemedy,  "dependency [" + id + "] does not exist in project." );
                 continue;
             }
 
@@ -592,6 +594,26 @@ public class DefaultThirdPartyTool
             }
         }
         return unsafeMappings;
+    }
+
+    private void handleUnkownDependency(final UnkownFileRemedy unkownFileRemedy, final String message)
+        throws MojoExecutionException {
+
+        switch ( unkownFileRemedy )
+        {
+            case debug:
+                LOG.debug( message );
+                break;
+            case failFast:
+                throw new MojoExecutionException(message);
+            case warn:
+                LOG.warn( message );
+                break;
+            default:
+                throw new IllegalStateException( "Unexpected value of " + UnkownFileRemedy.class.getName() + ": "
+                    + unkownFileRemedy );
+        }
+
     }
 
     /**

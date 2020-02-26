@@ -229,9 +229,9 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
     private String overrideUrl;
 
     /**
-     * A {@link URL} prepared either our of {@link #overrideFile} or {@link #overrideUrl} or the default value.
+     * A {@link String} prepared either our of {@link #overrideFile} or {@link #overrideUrl} or the default value.
      *
-     * @see LicenseMojoUtils#prepareThirdPartyOverrideUrl(URL, File, String, File)
+     * @see LicenseMojoUtils#prepareThirdPartyOverrideUrl(String, File, String, File)
      */
     String resolvedOverrideUrl;
 
@@ -311,6 +311,19 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
     @Parameter( defaultValue = "${project}", readonly = true )
     private MavenProject project;
 
+    /**
+     * What to do on defined files not found in project. The possible values are:
+     * <li>
+     *   <ul>{@link UnkownFileRemedy#debug}: unkown files are logged debug</ul>
+     *   <ul>{@link UnkownFileRemedy#warn}: unkown files are output to the log as warnings</ul>
+     *   <ul>{@link UnkownFileRemedy#failFast}: a {@link MojoExecutionException} is thrown on the
+     *      file not found in project</ul>
+     * </li>
+     * @since 2.0.1
+     */
+    @Parameter( property = "license.unkownFileRemedy", defaultValue = "warn" )
+    protected UnkownFileRemedy unkownFileRemedy;
+
     // ----------------------------------------------------------------------
     // Plexus Components
     // ----------------------------------------------------------------------
@@ -385,7 +398,7 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
     /**
      * Method to initialize the mojo before doing any concrete actions.
      *
-     * <b>Note:</b> The method is invoked before the {@link #executeReport()} method.
+     * <b>Note:</b> The method is invoked before the {@link #executeReport(Locale)} method.
      * @throws IOException
      */
     protected void init()
@@ -593,7 +606,7 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
                 // Resolve unsafe dependencies using missing files, this will update licenseMap and unsafeDependencies
                 thirdPartyHelper.createUnsafeMapping( licenseMap, missingFile, missingFileUrl,
                         useRepositoryMissingFiles, dependenciesWithNoLicense,
-                        projectDependencies, loadedDependencies.getAllDependencies() );
+                        projectDependencies, loadedDependencies.getAllDependencies(), unkownFileRemedy);
             }
         }
 
@@ -639,5 +652,4 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
     {
         return encoding;
     }
-
 }

@@ -264,7 +264,7 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
                 getHelper().createUnsafeMapping( licenseMap, missingFile, missingFileUrl,
                                                  useRepositoryMissingFiles, unsafeDependencies,
                                                  projectDependencies,
-                                                 resolveDependencyArtifacts().getAllDependencies() );
+                                                 resolveDependencyArtifacts().getAllDependencies(), unkownFileRemedy);
         if ( isVerbose() )
         {
             LOG.info( "found {} unsafe mappings", unsafeMappings.size() );
