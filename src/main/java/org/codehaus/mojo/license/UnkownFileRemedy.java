@@ -34,7 +34,8 @@ public enum UnkownFileRemedy
     /** Unkown files are output to the log as warnings */
     warn,
     /**
-     * The first encountered unkown file is logged and a {@link org.apache.maven.plugin.MojoExecutionException} is thrown
+     * The first encountered unkown file is logged and a {@link org.apache.maven.plugin.MojoExecutionException} is
+     * thrown
      */
     failFast,
 }
