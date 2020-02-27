@@ -451,12 +451,12 @@ public class DefaultThirdPartyTool
     /**
      * {@inheritDoc}
      */
-    public SortedProperties loadUnsafeMapping(LicenseMap licenseMap,
-                                              SortedMap<String, MavenProject> artifactCache,
-                                              String encoding,
-                                              File missingFile,
-                                              String missingFileUrl,
-                                              UnkownFileRemedy unkownFileRemedy)
+    public SortedProperties loadUnsafeMapping( LicenseMap licenseMap,
+                                               SortedMap<String, MavenProject> artifactCache,
+                                               String encoding,
+                                               File missingFile,
+                                               String missingFileUrl,
+                                               UnkownFileRemedy unkownFileRemedy )
         throws IOException, MojoExecutionException
     {
         Map<String, MavenProject> snapshots = new HashMap<>();
@@ -539,7 +539,8 @@ public class DefaultThirdPartyTool
             // there is some unknown dependencies in the missing file, remove them
             for ( String id : unknownDependenciesId )
             {
-                handleUnkownDependency(unkownFileRemedy,"dependency [" + id + "] does not exist in project, remove it from the missing file.");
+                handleUnkownDependency( unkownFileRemedy, "dependency [" + id
+                    + "] does not exist in project, remove it from the missing file." );
                 unsafeMappings.remove( id );
             }
 
@@ -554,7 +555,7 @@ public class DefaultThirdPartyTool
             MavenProject project = artifactCache.get( id );
             if ( project == null )
             {
-                handleUnkownDependency(unkownFileRemedy,  "dependency [" + id + "] does not exist in project." );
+                handleUnkownDependency( unkownFileRemedy,  "dependency [" + id + "] does not exist in project." );
                 continue;
             }
 
@@ -596,8 +597,9 @@ public class DefaultThirdPartyTool
         return unsafeMappings;
     }
 
-    private void handleUnkownDependency(final UnkownFileRemedy unkownFileRemedy, final String message)
-        throws MojoExecutionException {
+    private void handleUnkownDependency( final UnkownFileRemedy unkownFileRemedy, final String message )
+        throws MojoExecutionException
+    {
 
         switch ( unkownFileRemedy )
         {
@@ -605,7 +607,7 @@ public class DefaultThirdPartyTool
                 LOG.debug( message );
                 break;
             case failFast:
-                throw new MojoExecutionException(message);
+                throw new MojoExecutionException( message );
             case warn:
                 LOG.warn( message );
                 break;
@@ -619,9 +621,11 @@ public class DefaultThirdPartyTool
     /**
      * {@inheritDoc}
      */
-    public void overrideLicenses(LicenseMap licenseMap, SortedMap<String, MavenProject> artifactCache, String encoding,
-                                 String overrideUrl, final UnkownFileRemedy unkownFileRemedy)
-        throws IOException, MojoExecutionException {
+    public void overrideLicenses( LicenseMap licenseMap, SortedMap<String, MavenProject> artifactCache,
+                                  String encoding, String overrideUrl,
+                                  UnkownFileRemedy unkownFileRemedy )
+        throws IOException, MojoExecutionException
+    {
         if ( LicenseMojoUtils.isValid( overrideUrl ) )
         {
             final SortedProperties overrideMappings = new SortedProperties( encoding );
@@ -636,7 +640,8 @@ public class DefaultThirdPartyTool
                 MavenProject project = artifactCache.get( id );
                 if ( project == null )
                 {
-                    handleUnkownDependency(unkownFileRemedy,  "dependency [" + id + "] does not exist in project." );
+                    handleUnkownDependency( unkownFileRemedy,  "dependency [" + id
+                        + "] does not exist in project." );
                     continue;
                 }
 

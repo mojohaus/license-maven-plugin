@@ -143,8 +143,9 @@ public interface ThirdPartyTool
      * @return the unsafe mapping
      * @throws IOException if pb while reading missing file
      */
-    SortedProperties loadUnsafeMapping(LicenseMap licenseMap, SortedMap<String, MavenProject> artifactCache,
-                                       String encoding, File missingFile, String missingFileUrl, final UnkownFileRemedy unkownFileRemedy)
+    SortedProperties loadUnsafeMapping( LicenseMap licenseMap, SortedMap<String, MavenProject> artifactCache,
+                                        String encoding, File missingFile, String missingFileUrl,
+                                        UnkownFileRemedy unkownFileRemedy )
             throws IOException, MojoExecutionException;
 
     /**
@@ -158,8 +159,8 @@ public interface ThirdPartyTool
      * @param unkownFileRemedy how to handle if dependency is not used
      * @throws IOException if pb while reading override file
      */
-    void overrideLicenses(LicenseMap licenseMap, SortedMap<String, MavenProject> artifactCache, String encoding,
-                          String overrideUrl, final UnkownFileRemedy unkownFileRemedy)
+    void overrideLicenses( LicenseMap licenseMap, SortedMap<String, MavenProject> artifactCache, String encoding,
+                           String overrideUrl, final UnkownFileRemedy unkownFileRemedy )
         throws IOException, MojoExecutionException;
 
     /**

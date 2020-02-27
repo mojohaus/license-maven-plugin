@@ -314,7 +314,8 @@ public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo
             if ( file.exists() )
             {
 
-                SortedProperties tmp = getHelper().loadUnsafeMapping( licenseMap, file, null, projectDependencies, unkownFileRemedy );
+                SortedProperties tmp = getHelper().loadUnsafeMapping( licenseMap, file, null,
+                    projectDependencies );
                 unsafeMappings.putAll( tmp );
             }
 

@@ -27,7 +27,6 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
-import org.codehaus.mojo.license.UnkownFileRemedy;
 import org.codehaus.mojo.license.model.LicenseMap;
 import org.codehaus.mojo.license.utils.SortedProperties;
 
@@ -87,12 +86,11 @@ public interface ThirdPartyHelper
      *                            resource hoster and that will be merged with the content of the missing file.
      * @param projectDependencies project dependencies used to detect which dependencies in the missing file
      *                            are unknown to the project.
-     * @param unkownFileRemedy
      * @return the map of all unsafe mapping
      * @throws IOException if could not load missing file
      */
-    SortedProperties loadUnsafeMapping(LicenseMap licenseMap, File missingFile, String missingFileUrl,
-                                       SortedMap<String, MavenProject> projectDependencies, final UnkownFileRemedy unkownFileRemedy)
+    SortedProperties loadUnsafeMapping( LicenseMap licenseMap, File missingFile, String missingFileUrl,
+                                        SortedMap<String, MavenProject> projectDependencies )
       throws IOException, MojoExecutionException;
 
     /**
@@ -149,17 +147,16 @@ public interface ThirdPartyHelper
      * @param unsafeDependencies        all unsafe dependencies
      * @param projectDependencies       all project dependencies
      * @param dependencyArtifacts       all project dependency artifacts
-     * @param unkownFileRemedy
      * @return the loaded unsafe mapping
      * @throws ProjectBuildingException if could not build some dependencies maven project
      * @throws IOException              if could not load missing file
      * @throws ThirdPartyToolException  if pb with third-party tool
      */
-    SortedProperties createUnsafeMapping(LicenseMap licenseMap, File missingFile, String missingFileUrl,
-                                         boolean useRepositoryMissingFiles,
-                                         SortedSet<MavenProject> unsafeDependencies,
-                                         SortedMap<String, MavenProject> projectDependencies,
-                                         Set<Artifact> dependencyArtifacts, final UnkownFileRemedy unkownFileRemedy)
+    SortedProperties createUnsafeMapping( LicenseMap licenseMap, File missingFile, String missingFileUrl,
+                                          boolean useRepositoryMissingFiles,
+                                          SortedSet<MavenProject> unsafeDependencies,
+                                          SortedMap<String, MavenProject> projectDependencies,
+                                          Set<Artifact> dependencyArtifacts )
       throws ProjectBuildingException, IOException, ThirdPartyToolException, MojoExecutionException;
 
     /**

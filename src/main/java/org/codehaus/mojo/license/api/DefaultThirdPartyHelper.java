@@ -85,6 +85,11 @@ public class DefaultThirdPartyHelper
     private final List<RemoteRepository> remoteRepositories;
 
     /**
+     * how to handle unknown files
+     */
+    private final UnkownFileRemedy unkownFileRemedy;
+
+    /**
      * Current maven project.
      */
     private final MavenProject project;
@@ -114,12 +119,14 @@ public class DefaultThirdPartyHelper
      * @param thirdPartyTool     tool to load third-parties descriptors
      * @param remoteRepositoriesCoreApi maven remote repositories, in the core api format
      * @param remoteRepositories maven remote repositories
+     * @param unkownFileRemedy   how to react if a file or dependency is declared but not in project
      */
     // CHECKSTYLE_OFF: ParameterNumber
     public DefaultThirdPartyHelper( MavenProject project, String encoding, boolean verbose,
                                     DependenciesTool dependenciesTool, ThirdPartyTool thirdPartyTool,
                                     List<ArtifactRepository> remoteRepositoriesCoreApi,
-                                    List<RemoteRepository> remoteRepositories )
+                                    List<RemoteRepository> remoteRepositories,
+                                    UnkownFileRemedy unkownFileRemedy )
     {
         // CHECKSTYLE_ON: ParameterNumber
         this.project = project;
@@ -129,6 +136,7 @@ public class DefaultThirdPartyHelper
         this.thirdPartyTool = thirdPartyTool;
         this.remoteRepositoriesCoreApi = remoteRepositoriesCoreApi;
         this.remoteRepositories = remoteRepositories;
+        this.unkownFileRemedy = unkownFileRemedy;
         this.thirdPartyTool.setVerbose( verbose );
     }
 
@@ -170,9 +178,8 @@ public class DefaultThirdPartyHelper
     /**
      * {@inheritDoc}
      */
-    public SortedProperties loadUnsafeMapping(LicenseMap licenseMap, File missingFile, String missingFileUrl,
-                                              SortedMap<String, MavenProject> projectDependencies,
-                                              UnkownFileRemedy unkownFileRemedy)
+    public SortedProperties loadUnsafeMapping( LicenseMap licenseMap, File missingFile, String missingFileUrl,
+                                               SortedMap<String, MavenProject> projectDependencies )
       throws IOException, MojoExecutionException
     {
         return thirdPartyTool.loadUnsafeMapping( licenseMap, projectDependencies, encoding, missingFile,
@@ -215,17 +222,16 @@ public class DefaultThirdPartyHelper
     /**
      * {@inheritDoc}
      */
-    public SortedProperties createUnsafeMapping(LicenseMap licenseMap, File missingFile, String missingFileUrl,
-                                                boolean useRepositoryMissingFiles,
-                                                SortedSet<MavenProject> unsafeDependencies,
-                                                SortedMap<String, MavenProject> projectDependencies,
-                                                Set<Artifact> dependencyArtifacts,
-                                                UnkownFileRemedy unkownFileRemedy)
+    public SortedProperties createUnsafeMapping( LicenseMap licenseMap, File missingFile, String missingFileUrl,
+                                                 boolean useRepositoryMissingFiles,
+                                                 SortedSet<MavenProject> unsafeDependencies,
+                                                 SortedMap<String, MavenProject> projectDependencies,
+                                                 Set<Artifact> dependencyArtifacts )
       throws ProjectBuildingException, IOException, ThirdPartyToolException, MojoExecutionException
     {
 
         SortedProperties unsafeMappings = loadUnsafeMapping( licenseMap, missingFile, missingFileUrl,
-                                                             projectDependencies, unkownFileRemedy);
+                                                             projectDependencies );
 
         if ( CollectionUtils.isNotEmpty( unsafeDependencies ) )
         {

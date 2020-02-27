@@ -580,7 +580,8 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
         ThirdPartyHelper thirdPartyHelper =
                 new DefaultThirdPartyHelper( project, encoding, verbose,
                         dependenciesTool, thirdPartyTool,
-                        project.getRemoteArtifactRepositories(), project.getRemoteProjectRepositories() );
+                        project.getRemoteArtifactRepositories(), project.getRemoteProjectRepositories(),
+                        unkownFileRemedy );
         // load dependencies of the project
         SortedMap<String, MavenProject> projectDependencies = thirdPartyHelper.loadDependencies( this,
                 loadedDependencies );
@@ -606,7 +607,7 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
                 // Resolve unsafe dependencies using missing files, this will update licenseMap and unsafeDependencies
                 thirdPartyHelper.createUnsafeMapping( licenseMap, missingFile, missingFileUrl,
                         useRepositoryMissingFiles, dependenciesWithNoLicense,
-                        projectDependencies, loadedDependencies.getAllDependencies(), unkownFileRemedy);
+                        projectDependencies, loadedDependencies.getAllDependencies() );
             }
         }
 
@@ -614,7 +615,8 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
         thirdPartyHelper.mergeLicenses( licenseMerges, licenseMap );
 
         // Add override licenses
-        thirdPartyTool.overrideLicenses( licenseMap, projectDependencies, encoding, resolvedOverrideUrl, unkownFileRemedy);
+        thirdPartyTool.overrideLicenses( licenseMap, projectDependencies, encoding, resolvedOverrideUrl,
+                unkownFileRemedy );
 
         // let's build third party details for each dependencies
         Collection<ThirdPartyDetails> details = new ArrayList<>();

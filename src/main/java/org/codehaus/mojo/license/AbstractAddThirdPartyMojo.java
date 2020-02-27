@@ -881,7 +881,8 @@ public abstract class AbstractAddThirdPartyMojo
         {
             helper = new DefaultThirdPartyHelper( getProject(), getEncoding(), isVerbose(), dependenciesTool,
                     thirdPartyTool, getProject().getRemoteArtifactRepositories(),
-                    getProject().getRemoteProjectRepositories() );
+                    getProject().getRemoteProjectRepositories(),
+                    unkownFileRemedy );
         }
         return helper;
     }
@@ -1086,8 +1087,10 @@ public abstract class AbstractAddThirdPartyMojo
         }
     }
 
-    void overrideLicenses() throws IOException, MojoExecutionException {
-        thirdPartyTool.overrideLicenses( licenseMap, projectDependencies, getEncoding(), resolvedOverrideUrl, unkownFileRemedy );
+    void overrideLicenses() throws IOException, MojoExecutionException
+    {
+        thirdPartyTool.overrideLicenses( licenseMap, projectDependencies, getEncoding(), resolvedOverrideUrl,
+            unkownFileRemedy );
     }
 
     private boolean isFailOnMissing()
