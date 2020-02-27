@@ -31,4 +31,4 @@ assert asl2.text.contains('Proxied via LittleProxy')
 
 final Path expectedLicensesXml = basePath.resolve('licenses.expected.xml')
 final Path licensesXml = basePath.resolve('target/generated-resources/licenses.xml')
-assert expectedLicensesXml.text.equals(licensesXml.text)
+assert expectedLicensesXml.text.equals(licensesXml.text.replace("\r\n", "\n").replace('\r', '\n'))

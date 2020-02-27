@@ -36,11 +36,11 @@ assert lgpl21.text.contains('Version 2.1, February 1999')
 
 final Path expectedLicensesXml = basePath.resolve('licenses.expected.xml')
 final Path licensesXml = basePath.resolve('target/generated-resources/licenses.xml')
-assert expectedLicensesXml.text.equals(licensesXml.text)
+assert expectedLicensesXml.text.equals(licensesXml.text.replace("\r\n", "\n").replace('\r', '\n'))
 
 final Path expectedLicensesErrorsXml = basePath.resolve('licenses-errors.expected.xml')
 final Path licensesErrorsXml = basePath.resolve('target/generated-resources/licenses-errors.xml')
-assert expectedLicensesErrorsXml.text.equals(licensesErrorsXml.text)
+assert expectedLicensesErrorsXml.text.equals(licensesErrorsXml.text.replace("\r\n", "\n").replace('\r', '\n'))
 
 final Path log = basePath.resolve('build.log')
 assert Files.exists(log)

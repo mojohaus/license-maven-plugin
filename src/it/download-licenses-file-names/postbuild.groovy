@@ -47,7 +47,7 @@ return {
 
     final Path expectedLicensesXml = basePath.resolve('licenses-'+ id +'.expected.xml')
     final Path licensesXml = outputBase.resolve('licenses.xml')
-    assert expectedLicensesXml.text.equals(licensesXml.text)
+    assert expectedLicensesXml.text.equals(licensesXml.text.replace("\r\n", "\n").replace('\r', '\n'))
     return true
 }() && {
     final String id = 'spdx'
@@ -67,7 +67,7 @@ return {
 
     final Path expectedLicensesXml = basePath.resolve('licenses-'+ id +'.expected.xml')
     final Path licensesXml = outputBase.resolve('licenses.xml')
-    assert expectedLicensesXml.text.equals(licensesXml.text)
+    assert expectedLicensesXml.text.equals(licensesXml.text.replace("\r\n", "\n").replace('\r', '\n'))
     return true
 }() && {
 
@@ -89,7 +89,7 @@ return {
 
     final Path expectedLicensesXml = basePath.resolve('licenses-'+ id +'.expected.xml')
     final Path licensesXml = outputBase.resolve('licenses.xml')
-    assert expectedLicensesXml.text.equals(licensesXml.text)
+    assert expectedLicensesXml.text.equals(licensesXml.text.replace("\r\n", "\n").replace('\r', '\n'))
 
     final Path foo = basePath.resolve('target/cleanLicDir/licenses/foo.txt')
     assert !Files.exists(foo)
