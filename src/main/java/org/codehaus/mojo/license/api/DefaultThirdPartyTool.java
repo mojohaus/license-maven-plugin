@@ -619,9 +619,9 @@ public class DefaultThirdPartyTool
     /**
      * {@inheritDoc}
      */
-    public void overrideLicenses( LicenseMap licenseMap, SortedMap<String, MavenProject> artifactCache, String encoding,
-            String overrideUrl ) throws IOException
-    {
+    public void overrideLicenses(LicenseMap licenseMap, SortedMap<String, MavenProject> artifactCache, String encoding,
+                                 String overrideUrl, final UnkownFileRemedy unkownFileRemedy)
+        throws IOException, MojoExecutionException {
         if ( LicenseMojoUtils.isValid( overrideUrl ) )
         {
             final SortedProperties overrideMappings = new SortedProperties( encoding );
@@ -636,7 +636,7 @@ public class DefaultThirdPartyTool
                 MavenProject project = artifactCache.get( id );
                 if ( project == null )
                 {
-                    LOG.warn( "dependency [{}] does not exist in project.", id );
+                    handleUnkownDependency(unkownFileRemedy,  "dependency [" + id + "] does not exist in project." );
                     continue;
                 }
 

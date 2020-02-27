@@ -155,10 +155,12 @@ public interface ThirdPartyTool
      * @param encoding      encoding used to load override file
      * @param overrideUrl   location of an optional override file extension that can be downloaded from some resource
      *                      hoster
+     * @param unkownFileRemedy how to handle if dependency is not used
      * @throws IOException if pb while reading override file
      */
-    void overrideLicenses( LicenseMap licenseMap, SortedMap<String, MavenProject> artifactCache, String encoding,
-            String overrideUrl ) throws IOException;
+    void overrideLicenses(LicenseMap licenseMap, SortedMap<String, MavenProject> artifactCache, String encoding,
+                          String overrideUrl, final UnkownFileRemedy unkownFileRemedy)
+        throws IOException, MojoExecutionException;
 
     /**
      * Add one or more licenses (name and url are {@code licenseNames}) to the given {@code licenseMap} for the given

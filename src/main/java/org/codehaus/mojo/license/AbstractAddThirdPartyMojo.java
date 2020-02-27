@@ -1086,9 +1086,8 @@ public abstract class AbstractAddThirdPartyMojo
         }
     }
 
-    void overrideLicenses() throws IOException
-    {
-        thirdPartyTool.overrideLicenses( licenseMap, projectDependencies, getEncoding(), resolvedOverrideUrl );
+    void overrideLicenses() throws IOException, MojoExecutionException {
+        thirdPartyTool.overrideLicenses( licenseMap, projectDependencies, getEncoding(), resolvedOverrideUrl, unkownFileRemedy );
     }
 
     private boolean isFailOnMissing()

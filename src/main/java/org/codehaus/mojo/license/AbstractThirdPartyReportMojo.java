@@ -614,7 +614,7 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
         thirdPartyHelper.mergeLicenses( licenseMerges, licenseMap );
 
         // Add override licenses
-        thirdPartyTool.overrideLicenses( licenseMap, projectDependencies, encoding, resolvedOverrideUrl );
+        thirdPartyTool.overrideLicenses( licenseMap, projectDependencies, encoding, resolvedOverrideUrl, unkownFileRemedy);
 
         // let's build third party details for each dependencies
         Collection<ThirdPartyDetails> details = new ArrayList<>();
