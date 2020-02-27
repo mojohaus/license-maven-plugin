@@ -22,8 +22,6 @@ package org.codehaus.mojo.license;
  * #L%
  */
 
-import org.apache.maven.plugin.MojoExecutionException;
-
 /**
  * What to do in case of a file not found in project.
  *
@@ -36,7 +34,7 @@ public enum UnkownFileRemedy
     /** Unkown files are output to the log as warnings */
     warn,
     /**
-     * The first encountered unkown file is logged and a {@link MojoExecutionException} is thrown
+     * The first encountered unkown file is logged and a {@link org.apache.maven.plugin.MojoExecutionException} is thrown
      */
     failFast,
 }
