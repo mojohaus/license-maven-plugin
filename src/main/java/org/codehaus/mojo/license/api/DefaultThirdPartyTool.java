@@ -539,8 +539,8 @@ public class DefaultThirdPartyTool
             // there is some unknown dependencies in the missing file, remove them
             for ( String id : unknownDependenciesId )
             {
-                handleUnkownDependency( unkownFileRemedy, "dependency [" + id
-                    + "] does not exist in project, remove it from the missing file." );
+                handleUnknownDependency( unkownFileRemedy, "dependency [%s]"
+                    + " does not exist in project, remove it from the missing file.", id );
                 unsafeMappings.remove( id );
             }
 
@@ -555,7 +555,7 @@ public class DefaultThirdPartyTool
             MavenProject project = artifactCache.get( id );
             if ( project == null )
             {
-                handleUnkownDependency( unkownFileRemedy,  "dependency [" + id + "] does not exist in project." );
+                handleUnknownDependency( unkownFileRemedy,  "dependency [%s] does not exist in project.", id );
                 continue;
             }
 
@@ -597,19 +597,21 @@ public class DefaultThirdPartyTool
         return unsafeMappings;
     }
 
-    private void handleUnkownDependency( final UnkownFileRemedy unkownFileRemedy, final String message )
+    private void handleUnknownDependency( final UnkownFileRemedy unkownFileRemedy, final String message,
+                                          final String id )
         throws MojoExecutionException
     {
 
+        final String completeMessage = String.format( message, id );
         switch ( unkownFileRemedy )
         {
             case debug:
-                LOG.debug( message );
+                LOG.debug( completeMessage );
                 break;
             case failFast:
-                throw new MojoExecutionException( message );
+                throw new MojoExecutionException( completeMessage );
             case warn:
-                LOG.warn( message );
+                LOG.warn( completeMessage );
                 break;
             default:
                 throw new IllegalStateException( "Unexpected value of " + UnkownFileRemedy.class.getName() + ": "
@@ -640,8 +642,8 @@ public class DefaultThirdPartyTool
                 MavenProject project = artifactCache.get( id );
                 if ( project == null )
                 {
-                    handleUnkownDependency( unkownFileRemedy,  "dependency [" + id
-                        + "] does not exist in project." );
+                    handleUnknownDependency( unkownFileRemedy,  "dependency [%s]"
+                        + " does not exist in project.", id );
                     continue;
                 }
 
@@ -754,8 +756,7 @@ public class DefaultThirdPartyTool
 
     /**
      * @param project         not null
-     * @param localRepository not null
-     * @param repositories    not null
+     * @param remoteRepositories not null
      * @return the resolved site descriptor
      * @throws IOException                 if any
      * @throws ArtifactResolutionException if any
