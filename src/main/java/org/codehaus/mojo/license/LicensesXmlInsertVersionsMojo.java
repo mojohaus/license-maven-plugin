@@ -140,10 +140,8 @@ public class LicensesXmlInsertVersionsMojo
                 }
             };
             final Map<String, LicensedArtifact> resolvedDeps = new TreeMap<String, LicensedArtifact>();
-            licensedArtifactResolver.loadProjectDependencies(
-                    new ResolvedProjectDependencies( project.getArtifacts(),
-                            MojoHelper.getDependencyArtifacts( project ) ), config, remoteRepositories,
-                            resolvedDeps );
+            licensedArtifactResolver.loadProjectDependencies( new ResolvedProjectDependencies( project.getArtifacts(),
+                    MojoHelper.getDependencyArtifacts( project ) ), config, remoteRepositories, resolvedDeps );
             final Map<String, LicensedArtifact> resolvedDepsMap = new HashMap<>( resolvedDeps.size() );
             for ( LicensedArtifact dep : resolvedDeps.values() )
             {
