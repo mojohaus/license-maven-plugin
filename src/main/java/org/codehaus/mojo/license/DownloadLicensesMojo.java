@@ -31,6 +31,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.codehaus.mojo.license.api.ResolvedProjectDependencies;
 import org.codehaus.mojo.license.download.LicensedArtifact;
+import org.codehaus.mojo.license.utils.MojoHelper;
 
 /**
  * Download the license files of all the current project's dependencies, and generate a summary file containing a list
@@ -86,7 +87,7 @@ public class DownloadLicensesMojo
     {
         final Map<String, LicensedArtifact> result = new TreeMap<>();
         licensedArtifactResolver.loadProjectDependencies(
-                new ResolvedProjectDependencies( project.getArtifacts(), project.getDependencyArtifacts() ),
+                new ResolvedProjectDependencies( project.getArtifacts(), MojoHelper.getDependencyArtifacts( project ) ),
                 this, remoteRepositories, result );
         return result;
     }

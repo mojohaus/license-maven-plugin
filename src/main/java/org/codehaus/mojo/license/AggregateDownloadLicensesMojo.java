@@ -29,6 +29,7 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.mojo.license.api.ResolvedProjectDependencies;
 import org.codehaus.mojo.license.download.LicensedArtifact;
+import org.codehaus.mojo.license.utils.MojoHelper;
 
 import java.util.List;
 import java.util.Map;
@@ -115,8 +116,7 @@ public class AggregateDownloadLicensesMojo
         for ( MavenProject p : reactorProjects )
         {
             licensedArtifactResolver.loadProjectDependencies( new ResolvedProjectDependencies( p.getArtifacts(),
-                                                                                       p.getDependencyArtifacts() ),
-                                                      this, remoteRepositories, result );
+                    MojoHelper.getDependencyArtifacts( p ) ), this, remoteRepositories, result );
         }
         return result;
     }
