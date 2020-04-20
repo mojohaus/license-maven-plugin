@@ -158,8 +158,14 @@ public class LicenseMap
         return result;
     }
 
-    public void removeProject( MavenProject project )
+    /**
+     * Remove project from all licenses it is mapped to.
+     * @param project
+     * @return a List of license names that the given project was mapped to
+     */
+    public List<String> removeProject( MavenProject project )
     {
+        List<String> removedFrom = new ArrayList<>();
         for ( Map.Entry<String, SortedSet<MavenProject>> entry : entrySet() )
         {
             SortedSet<MavenProject> projects = entry.getValue();
@@ -168,9 +174,10 @@ public class LicenseMap
                 if ( project.equals( mavenProject ) )
                 {
                     get( entry.getKey() ).remove( project );
-                    return;
+                    removedFrom.add(entry.getKey());
                 }
             }
         }
+        return removedFrom;
     }
 }
