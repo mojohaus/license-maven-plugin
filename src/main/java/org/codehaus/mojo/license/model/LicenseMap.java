@@ -38,7 +38,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 /**
- * Map of artifacts (stub in mavenproject) group by their license.
+ * Map of artifacts (stub in mavenproject) grouped by their license.
  *
  * @author tchemit dev@tchemit.fr
  * @since 1.0
@@ -69,7 +69,7 @@ public class LicenseMap
     /**
      * Store in the license map a project to a given license.
      *
-     * @param key   the license on which to associate the gieven project
+     * @param key   the license on which to associate the given project
      * @param value project to register in the license map
      * @return the set of projects using the given license
      */
