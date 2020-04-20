@@ -173,11 +173,16 @@ public class LicenseMap
             {
                 if ( project.equals( mavenProject ) )
                 {
-                    get( entry.getKey() ).remove( project );
-                    removedFrom.add(entry.getKey());
+                    removedFrom.add( entry.getKey() );
                 }
             }
         }
+
+        for ( String r : removedFrom )
+        {
+            get( r ).remove( project );
+        }
+
         return removedFrom;
     }
 }
