@@ -121,7 +121,7 @@ public abstract class AbstractLicenseNameMojo
     /**
      * Name of project's organization.
      * <p>
-     * Will be used as copyrigth's holder in new header.
+     * Will be used as copyright's holder in new header.
      *
      * @since 1.0
      */
@@ -147,6 +147,17 @@ public abstract class AbstractLicenseNameMojo
      */
     @Parameter( property = "license.copyrightOwners" )
     protected String copyrightOwners;
+
+    /**
+     * optional copyright string format
+     * <p>
+     * If not set, "Copyright (C) %1$s %2$s" is used where the copyright dates are
+     * substituted for $1 and the copyright holder for $2.
+     *
+     * @since 2.0.1
+     */
+    @Parameter( property = "license.copyrightStringFormat" )
+    protected String copyrightStringFormat;
 
     /**
      * optional extra templates parameters.
@@ -261,16 +272,16 @@ public abstract class AbstractLicenseNameMojo
 
         templateParameters.put( "organizationName", organizationName );
         templateParameters.put( "inceptionYear", inceptionYear );
-        templateParameters.put( "copyright", getCopyright( getCopyrightOwners() ) );
+        templateParameters.put( "copyright", getCopyright( copyrightStringFormat, getCopyrightOwners() ) );
         templateParameters.put( "projectName", projectName );
 
         addPropertiesToContext( extraTemplateParameters, "extra_", templateParameters );
         return licenseFreeMarkerHelper.renderTemplate( FreeMarkerHelper.TEMPLATE, templateParameters );
     }
 
-    Copyright getCopyright( String holder )
+    Copyright getCopyright( String copyrightStringFormat, String holder )
     {
-        return Copyright.newCopyright( inceptionYear, holder );
+        return Copyright.newCopyright( copyrightStringFormat, inceptionYear, holder );
     }
 
     /**
