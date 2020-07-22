@@ -1,3 +1,7 @@
 install:
+    # Fix the group id
+    - find . -name "pom.xml" | xargs sed -i "s/<\/parent>/<\/parent><groupId>${GROUP}<\/groupId>/g"
+    # Fix the version
+    - ./mvnw versions:set -DnewVersion=${VERSION}
     # We also need to skip the integration tests
     - ./mvnw clean install -DskipTests -DskipITs
