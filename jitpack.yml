@@ -1,0 +1,3 @@
+install:
+    # We also need to skip the integration tests
+    - ./mvnw clean install -DskipTests -DskipITs
