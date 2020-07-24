@@ -22,7 +22,7 @@ package org.codehaus.mojo.license.download;
  * #L%
  */
 
-import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -54,12 +54,12 @@ public class LicenseMatchers {
      * @return new {@link LicenseMatchers} configured from the given {@code licenseMatchersFile}
      * @throws MojoExecutionException
      */
-    public static LicenseMatchers load(File licenseMatchersFile) throws MojoExecutionException {
+    public static LicenseMatchers load(URL licenseMatchersFile) throws MojoExecutionException {
         final List<DependencyMatcher> matchers = new ArrayList<>();
         try {
-            if (licenseMatchersFile != null && licenseMatchersFile.exists()) {
+            if (licenseMatchersFile != null) {
                 final List<ProjectLicenseInfo> replacements =
-                        LicenseSummaryReader.parseLicenseSummary(licenseMatchersFile);
+                        LicenseSummaryReader.parseLicenseSummary(licenseMatchersFile.openStream());
 
                 for (ProjectLicenseInfo dependency : replacements) {
                     matchers.add(DependencyMatcher.of(dependency));
