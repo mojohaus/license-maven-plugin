@@ -96,7 +96,10 @@
               <goal>download-licenses</goal>
             </goals>
             <configuration>
-              <licensesConfigFile>${basedir}/src/license/licenses-config-no-download.xml</licensesConfigFile>
+              <licensesConfigFiles>
+                <licensesConfigFile>${basedir}/src/license/licenses-config-no-download-1.xml</licensesConfigFile>
+                <licensesConfigFile>${basedir}/src/license/licenses-config-no-download-2.xml</licensesConfigFile>
+              </licensesConfigFiles>
               <licensesOutputDirectory>${project.build.directory}/no-download/licenses</licensesOutputDirectory>
               <licensesOutputFile>${project.build.directory}/no-download/licenses.xml</licensesOutputFile>
               <sortByGroupIdAndArtifactId>true</sortByGroupIdAndArtifactId>

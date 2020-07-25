@@ -46,7 +46,7 @@ import org.codehaus.mojo.license.utils.MojoHelper;
  * If the license information (license name and license URL) is missing or otherwise broken in a dependency POM, this
  * mojo offers several fallback options:
  * <ul>
- * <li>{@link AbstractDownloadLicensesMojo#licensesConfigFile}</li>
+ * <li>{@link AbstractDownloadLicensesMojo#licensesConfigFiles}</li>
  * <li>{@link AbstractDownloadLicensesMojo#errorRemedy}</li>
  * <li>{@link AbstractDownloadLicensesMojo#licenseUrlReplacements}</li>
  * <li>{@link AbstractDownloadLicensesMojo#licenseUrlFileNames}</li>

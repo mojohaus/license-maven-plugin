@@ -41,9 +41,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
@@ -104,12 +106,17 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
 
     // CHECKSTYLE_OFF: LineLength
     /**
-     * A file containing the license data (most notably license names and license URLs) missing in
+     * A list of files containing the license data (most notably license names and license URLs) missing in
      * {@code pom.xml} files of the dependencies.
+     *
+     * Since 2.1, this parameter is called licensesConfigFiles and supports a list of files, urls or resources.
+     * Before 2.1 this parameter was called licensesConfigFile and only supported a single file.
+     * The legacy parameter name is still supported.
+     *
      * <p>
      * Note that since 1.18, if you set {@link #errorRemedy} to {@code xmlOutput} the format of
-     * {@link #licensesErrorsFile} is the same as the one of {@link #licensesConfigFile}. So you can use
-     * {@link #licensesErrorsFile} as a base for {@link #licensesConfigFile}.
+     * {@link #licensesErrorsFile} is the same as the one of {@link #licensesConfigFiles}. So you can use
+     * {@link #licensesErrorsFile} as a base for {@link #licensesConfigFiles}.
      * <p>
      * Since 1.18, the format of the file is as follows:
      * <pre>
@@ -178,18 +185,21 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
      * <p>
      * Relationship to other parameters:
      * <ul>
-     * <li>License names and license URLs {@link #licensesConfigFile} is applied before
+     * <li>License names and license URLs {@link #licensesConfigFiles} is applied before
      * {@link #licenseUrlReplacements}</li>
      * <li>{@link #licenseUrlReplacements} are applied before {@link #licenseUrlFileNames}</li>
      * <li>{@link #licenseUrlFileNames} have higher precedence than {@code <file>} elements in
-     * {@link #licensesConfigFile}</li>
+     * {@link #licensesConfigFiles}</li>
      * <li>{@link #licenseUrlFileNames} are ignored when {@link #organizeLicensesByDependencies} is {@code true}</li>
      * </ul>
      *
      * @since 1.0
      */
-    @Parameter(property = "licensesConfigFile", defaultValue = "${project.basedir}/src/license/licenses.xml")
-    protected String licensesConfigFile;
+    @Parameter(
+            property = "licensesConfigFiles",
+            alias = "licensesConfigFile",
+            defaultValue = "${project.basedir}/src/license/licenses.xml")
+    protected List<String> licensesConfigFiles;
     // CHECKSTYLE_ON: LineLength
 
     /**
@@ -369,7 +379,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
 
     /**
      * If {@code true}, all encountered dependency license URLs are downloaded, no matter what is there in
-     * {@link #licensesConfigFile} and {@link #licensesOutputFile}; otherwise {@link #licensesConfigFile},
+     * {@link #licensesConfigFiles} and {@link #licensesOutputFile}; otherwise {@link #licensesConfigFiles},
      * {@link #licensesOutputFile} (eventually persisted from a previous build) and the content of
      * {@link #licensesOutputDirectory} are considered sources of valid information - i.e. only URLs that do not appear
      * to have been downloaded in the past will be downloaded.
@@ -512,11 +522,11 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
      * Relationship to other parameters:
      * <ul>
      * <li>Default URL replacements can be unlocked by setting {@link #useDefaultUrlReplacements} to {@code true}.</li>
-     * <li>License names and license URLs {@link #licensesConfigFile} is applied before
+     * <li>License names and license URLs {@link #licensesConfigFiles} is applied before
      * {@link #licenseUrlReplacements}</li>
      * <li>{@link #licenseUrlReplacements} are applied before {@link #licenseUrlFileNames}</li>
      * <li>{@link #licenseUrlFileNames} have higher precedence than {@code <file>} elements in
-     * {@link #licensesConfigFile}</li>
+     * {@link #licensesConfigFiles}</li>
      * <li>{@link #licenseUrlFileNames} are ignored when {@link #organizeLicensesByDependencies} is {@code true}</li>
      * </ul>
      *
@@ -584,11 +594,11 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
      * <p>
      * Relationship to other parameters:
      * <ul>
-     * <li>License names and license URLs {@link #licensesConfigFile} is applied before
+     * <li>License names and license URLs {@link #licensesConfigFiles} is applied before
      * {@link #licenseUrlReplacements}</li>
      * <li>{@link #licenseUrlReplacements} are applied before {@link #licenseUrlFileNames}</li>
      * <li>{@link #licenseUrlFileNames} have higher precedence than {@code <file>} elements in
-     * {@link #licensesConfigFile}</li>
+     * {@link #licensesConfigFiles}</li>
      * <li>{@link #licenseUrlFileNames} are ignored when {@link #organizeLicensesByDependencies} is {@code true}</li>
      * </ul>
      *
@@ -834,7 +844,10 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
 
         initDirectories();
 
-        final LicenseMatchers matchers = LicenseMatchers.load(getResource(licensesConfigFile));
+        final LicenseMatchers matchers = LicenseMatchers.load(licensesConfigFiles.stream()
+                .map(this::getResource)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList()));
 
         if (!forceDownload) {
             try {
@@ -1172,10 +1185,11 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
     protected Path[] getAutodetectEolFiles() {
         File resource;
         try {
-            resource = getLocator().getResourceAsFile(licensesConfigFile).getAbsoluteFile();
+            resource =
+                    getLocator().getResourceAsFile(licensesConfigFiles.get(0)).getAbsoluteFile();
         } catch (ResourceNotFoundException | FileResourceCreationException e) {
             // Fallback on previous handling
-            resource = new File(licensesConfigFile);
+            resource = new File(licensesConfigFiles.get(0));
         }
         return new Path[] {resource.toPath(), project.getBasedir().toPath().resolve("pom.xml")};
     }
