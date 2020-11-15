@@ -22,7 +22,6 @@ package org.codehaus.mojo.license;
  * #L%
  */
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -435,10 +434,7 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
         excludeTransitiveDependencies = mojo.excludeTransitiveDependencies;
         thirdPartyFilename = mojo.thirdPartyFilename;
         useMissingFile = mojo.useMissingFile;
-        String absolutePath = mojo.getProject().getBasedir().getAbsolutePath();
-
-        missingFile = new File( project.getBasedir(),
-                mojo.missingFile.getAbsolutePath().substring( absolutePath.length() ) );
+        missingFile = mojo.missingFile;
         resolvedOverrideUrl  = mojo.resolvedOverrideUrl;
         missingLicensesFileArtifact = mojo.missingLicensesFileArtifact;
         localRepository = mojo.localRepository;
