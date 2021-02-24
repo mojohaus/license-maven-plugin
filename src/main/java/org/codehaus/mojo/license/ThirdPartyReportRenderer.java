@@ -24,12 +24,14 @@ package org.codehaus.mojo.license;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.maven.doxia.sink.Sink;
+import org.apache.maven.model.License;
 import org.codehaus.mojo.license.api.ThirdPartyDetails;
 import org.codehaus.plexus.i18n.I18N;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Generates a report of third parties of the project.
@@ -41,12 +43,14 @@ public class ThirdPartyReportRenderer
     extends AbstractLicenseReportRenderer
 {
     private final Collection<ThirdPartyDetails> details;
+    private final Map<String, License> licenseLookup;
 
     public ThirdPartyReportRenderer( Sink sink, I18N i18n, String outputName, Locale locale,
-                                     Collection<ThirdPartyDetails> details )
+                                    Collection<ThirdPartyDetails> details, Map<String, License> licenseLookup )
     {
         super( sink, outputName, i18n, locale );
         this.details = details;
+        this.licenseLookup = licenseLookup;
     }
 
     protected Collection<ThirdPartyDetails> getThirdPartiesPomLicense()
@@ -259,7 +263,7 @@ public class ThirdPartyReportRenderer
         sink.sectionTitle2();
         sink.text( getGAV( detail ) );
         sink.sectionTitle2_();
-        renderThirdPartyDetailTable( detail );
+        renderThirdPartyDetailTable( detail, licenseLookup );
 
         sink.link( "#" + getText( "report.overview.title" ) );
         sink.text( getText( "report.back.to.top.page" ) );

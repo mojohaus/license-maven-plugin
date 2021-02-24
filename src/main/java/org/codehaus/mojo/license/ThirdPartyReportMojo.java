@@ -22,6 +22,7 @@ package org.codehaus.mojo.license;
  * #L%
  */
 
+import org.apache.maven.model.License;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -34,6 +35,7 @@ import org.codehaus.mojo.license.api.ThirdPartyToolException;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * Generates a report of all third-parties detected in the module.
@@ -88,5 +90,14 @@ public class ThirdPartyReportMojo extends AbstractThirdPartyReportMojo
              DependenciesToolException, MojoExecutionException
     {
         return createThirdPartyDetails( getProject(), false );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Map<String, License> createLicenseLookup()
+    {
+        return createLicenseLookup( getProject(), false );
     }
 }
