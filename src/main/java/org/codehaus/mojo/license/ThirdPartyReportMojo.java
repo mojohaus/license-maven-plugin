@@ -22,7 +22,6 @@ package org.codehaus.mojo.license;
  * #L%
  */
 
-import org.apache.maven.model.License;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -96,7 +95,7 @@ public class ThirdPartyReportMojo extends AbstractThirdPartyReportMojo
      * {@inheritDoc}
      */
     @Override
-    protected Map<String, License> createLicenseLookup()
+    protected Map<String, String> createLicenseLookup()
     {
         return createLicenseLookup( getProject(), false );
     }

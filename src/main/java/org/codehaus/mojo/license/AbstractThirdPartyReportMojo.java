@@ -62,6 +62,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
@@ -372,6 +373,16 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
 
     private ArtifactFilters artifactFilters;
 
+    /**
+     * Maps license names to URLs.
+     *
+     * This is used by the <pre>third-party-report</pre>-goal in order to set custom license URLs
+     *
+     * @since 2.0.1
+     */
+    @Parameter( property = "license.urlmappings" )
+    private Properties urlMappings;
+
     // ----------------------------------------------------------------------
     // Protected Abstract Methods
     // ----------------------------------------------------------------------
@@ -381,7 +392,7 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
              InvalidDependencyVersionException, ArtifactNotFoundException, ArtifactResolutionException,
              DependenciesToolException, MojoExecutionException;
 
-    protected abstract Map<String, License> createLicenseLookup();
+    protected abstract Map<String, String> createLicenseLookup();
 
     // ----------------------------------------------------------------------
     // AbstractMavenReport Implementation
@@ -418,7 +429,7 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
                 overrideUrl, project.getBasedir() );
 
         Collection<ThirdPartyDetails> details;
-        Map<String, License> licenseLookup;
+        Map<String, String> licenseLookup;
 
         try
         {
@@ -625,9 +636,15 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
         return details;
     }
 
-    protected Map<String, License> createLicenseLookup( MavenProject project, boolean loadArtifacts )
+    protected Map<String, String> createLicenseLookup( MavenProject project, boolean loadArtifacts )
     {
-        Map<String, License> licenseLookup = new HashMap<>();
+        Map<String, String> licenseLookup = new HashMap<>();
+
+        //load explicit license url mappings
+        for ( String licenseName : urlMappings.stringPropertyNames() )
+        {
+            licenseLookup.put( licenseName, urlMappings.getProperty( licenseName ) );
+        }
 
         ResolvedProjectDependencies loadedDependencies = resolveProjectDependencies( project, loadArtifacts );
 
@@ -645,12 +662,11 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
 
             for ( License license : dependency.getLicenses() )
             {
-
                 String licenseName = license.getName();
 
                 if ( !licenseLookup.containsKey( license.getName() ) )
                 {
-                    licenseLookup.put( licenseName, license );
+                    licenseLookup.put( licenseName, license.getUrl() );
                 }
 
             }

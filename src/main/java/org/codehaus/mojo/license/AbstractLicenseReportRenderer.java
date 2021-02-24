@@ -26,7 +26,6 @@ import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.doxia.sink.Sink;
 import org.apache.maven.doxia.sink.impl.SinkEventAttributeSet;
 import org.apache.maven.doxia.sink.SinkEventAttributes;
-import org.apache.maven.model.License;
 import org.apache.maven.reporting.AbstractMavenReportRenderer;
 import org.codehaus.mojo.license.api.ThirdPartyDetails;
 import org.codehaus.plexus.i18n.I18N;
@@ -314,13 +313,13 @@ public abstract class AbstractLicenseReportRenderer
     }
 
     protected void renderThirdPartyDetailTable( ThirdPartyDetails details,
-                                                Map<String, License> licenseLookup )
+                                                Map<String, String> licenseLookup )
     {
         renderThirdPartyDetailTable( details, licenseLookup, true, true, true );
     }
 
     protected void renderThirdPartyDetailTable( ThirdPartyDetails details,
-                                               Map<String, License> licenseLookup,
+                                               Map<String, String> licenseLookup,
                                                boolean includeScope, boolean includeClassifier,
                                                boolean includeType )
     {
@@ -397,7 +396,7 @@ public abstract class AbstractLicenseReportRenderer
 
                 if ( licenseLookup.containsKey( licenses[i] ) )
                 {
-                    sink.link( licenseLookup.get( licenses[i] ).getUrl() );
+                    sink.link( licenseLookup.get( licenses[i] ) );
                     sink.text( licenses[i] );
                     sink.link_();
                 }

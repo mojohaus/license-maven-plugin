@@ -24,7 +24,6 @@ package org.codehaus.mojo.license;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.maven.doxia.sink.Sink;
-import org.apache.maven.model.License;
 import org.codehaus.mojo.license.api.ThirdPartyDetails;
 import org.codehaus.plexus.i18n.I18N;
 
@@ -43,10 +42,10 @@ public class ThirdPartyReportRenderer
     extends AbstractLicenseReportRenderer
 {
     private final Collection<ThirdPartyDetails> details;
-    private final Map<String, License> licenseLookup;
+    private final Map<String, String> licenseLookup;
 
     public ThirdPartyReportRenderer( Sink sink, I18N i18n, String outputName, Locale locale,
-                                    Collection<ThirdPartyDetails> details, Map<String, License> licenseLookup )
+                                    Collection<ThirdPartyDetails> details, Map<String, String> licenseLookup )
     {
         super( sink, outputName, i18n, locale );
         this.details = details;

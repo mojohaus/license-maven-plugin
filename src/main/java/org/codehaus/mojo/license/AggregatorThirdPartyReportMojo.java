@@ -24,7 +24,6 @@ package org.codehaus.mojo.license;
 
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-import org.apache.maven.model.License;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -138,14 +137,14 @@ public class AggregatorThirdPartyReportMojo
     /**
      * {@inheritDoc}
      */
-    protected Map<String, License> createLicenseLookup()
+    protected Map<String, String> createLicenseLookup()
     {
-        Map<String, License> licenses = new HashMap<>();
+        Map<String, String> licenses = new HashMap<>();
 
         for ( MavenProject reactorProject : reactorProjects )
         {
 
-            Map<String, License> thirdPartyLicenses = createLicenseLookup( reactorProject, true );
+            Map<String, String> thirdPartyLicenses = createLicenseLookup( reactorProject, true );
             licenses.putAll( thirdPartyLicenses );
 
         }
