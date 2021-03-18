@@ -1344,7 +1344,7 @@ public abstract class AbstractDownloadLicensesMojo
     {
         if ( depProject.isApproved() )
         {
-            LOG.debug( "Supressing manually approved license issue: {}", msg );
+            LOG.debug( "Suppressing manually approved license issue: {}", msg );
         }
         else
         {
