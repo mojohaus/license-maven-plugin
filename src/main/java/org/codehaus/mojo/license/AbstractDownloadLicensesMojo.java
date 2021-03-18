@@ -822,25 +822,20 @@ public abstract class AbstractDownloadLicensesMojo
             throw new MojoExecutionException( "Unable to write license summary file: " + licensesOutputFile, e );
         }
 
-        switch ( errorRemedy )
-        {
-            case ignore:
-            case failFast:
-                /* do nothing */
-                break;
-            case warn:
-                LOG.warn( "There were {} download errors - check the warnings above", downloadErrorCount );
-                break;
-            case xmlOutput:
-                if ( downloadErrorCount > 0 )
-                {
-                    throw new MojoFailureException( "There were " + downloadErrorCount + " download errors - check "
-                        + licensesErrorsFile.getAbsolutePath() );
-                }
-                break;
-            default:
-                throw new IllegalStateException( "Unexpected value of " + ErrorRemedy.class.getName() + ": "
-                    + errorRemedy );
+        if ( downloadErrorCount > 0 ) {
+            switch (errorRemedy) {
+                case ignore:
+                case failFast:
+                    /* do nothing */
+                    break;
+                case warn:
+                    LOG.warn("There were {} download errors - check the warnings above", downloadErrorCount);
+                    break;
+                case xmlOutput:
+                    throw new MojoFailureException("There were " + downloadErrorCount + " download errors - check " + licensesErrorsFile.getAbsolutePath());
+                default:
+                    throw new IllegalStateException("Unexpected value of " + ErrorRemedy.class.getName() + ": " + errorRemedy);
+            }
         }
     }
 
