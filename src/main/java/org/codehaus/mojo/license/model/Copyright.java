@@ -37,9 +37,14 @@ public class Copyright
 {
 
     /**
+     * Default copyright to string format.
+     */
+    protected static final String DEFAULT_COPYRIGHT_TO_STRING_FORMAT = "Copyright (C) %1$s %2$s";
+
+    /**
      * Copyright to string format.
      */
-    protected static final String COPYRIGHT_TO_STRING_FORMAT = "Copyright (C) %1$s %2$s";
+    protected String copyrightToStringFormat;
 
     /**
      * Copyright holder.
@@ -57,15 +62,35 @@ public class Copyright
      */
     protected Integer lastYear;
 
-    public static Copyright newCopyright( Integer inceptionYear, Integer lastYear, String holder )
+    public static Copyright newCopyright( String copyrightToStringFormat,
+            Integer inceptionYear, Integer lastYear, String holder )
     {
         int firstYear = inceptionYear == null ? lastYear : inceptionYear;
         if ( lastYear == null || firstYear >= lastYear )
         {
             lastYear = null;
         }
-        Copyright result = new Copyright( firstYear, lastYear, holder );
+        if ( copyrightToStringFormat == null )
+        {
+            return newCopyright( DEFAULT_COPYRIGHT_TO_STRING_FORMAT, firstYear, lastYear, holder );
+        }
+        Copyright result = new Copyright( copyrightToStringFormat, firstYear, lastYear, holder );
         return result;
+    }
+
+    public static Copyright newCopyright( Integer inceptionYear, Integer lastYear, String holder )
+    {
+        return newCopyright( DEFAULT_COPYRIGHT_TO_STRING_FORMAT, inceptionYear, lastYear, holder );
+    }
+
+    public static Copyright newCopyright( String copyrightToStringFormat, Integer inceptionYear, String holder )
+    {
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime( new Date() );
+        Integer lastYear = cal.get( Calendar.YEAR );
+
+        return newCopyright( copyrightToStringFormat, inceptionYear, lastYear, holder );
     }
 
     public static Copyright newCopyright( Integer inceptionYear, String holder )
@@ -84,14 +109,24 @@ public class Copyright
 
     public Copyright( Copyright copyright )
     {
-        this( copyright.getFirstYear(), copyright.getLastYear(), copyright.getHolder() );
+        this( copyright.getCopyrightToStringFormat(), copyright.getFirstYear(),
+                copyright.getLastYear(), copyright.getHolder() );
     }
 
-    public Copyright( int firstYear, Integer lastYear, String holder )
+    public Copyright( String copyrightToStringFormat, int firstYear, Integer lastYear, String holder )
     {
+        this.copyrightToStringFormat = copyrightToStringFormat;
         this.firstYear = firstYear;
         this.lastYear = lastYear;
         this.holder = holder;
+    }
+
+    /**
+     * @return the copyright to string format
+     */
+    public String getCopyrightToStringFormat()
+    {
+        return copyrightToStringFormat;
     }
 
     /**
@@ -169,7 +204,7 @@ public class Copyright
      */
     public String getText()
     {
-        String copyright = String.format( COPYRIGHT_TO_STRING_FORMAT, getYears(), getHolder() );
+        String copyright = String.format( getCopyrightToStringFormat(), getYears(), getHolder() );
         return copyright;
     }
 
