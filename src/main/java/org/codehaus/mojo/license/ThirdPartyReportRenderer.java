@@ -30,6 +30,7 @@ import org.codehaus.plexus.i18n.I18N;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Generates a report of third parties of the project.
@@ -41,12 +42,14 @@ public class ThirdPartyReportRenderer
     extends AbstractLicenseReportRenderer
 {
     private final Collection<ThirdPartyDetails> details;
+    private final Map<String, String> licenseLookup;
 
     public ThirdPartyReportRenderer( Sink sink, I18N i18n, String outputName, Locale locale,
-                                     Collection<ThirdPartyDetails> details )
+                                    Collection<ThirdPartyDetails> details, Map<String, String> licenseLookup )
     {
         super( sink, outputName, i18n, locale );
         this.details = details;
+        this.licenseLookup = licenseLookup;
     }
 
     protected Collection<ThirdPartyDetails> getThirdPartiesPomLicense()
@@ -259,7 +262,7 @@ public class ThirdPartyReportRenderer
         sink.sectionTitle2();
         sink.text( getGAV( detail ) );
         sink.sectionTitle2_();
-        renderThirdPartyDetailTable( detail );
+        renderThirdPartyDetailTable( detail, licenseLookup );
 
         sink.link( "#" + getText( "report.overview.title" ) );
         sink.text( getText( "report.back.to.top.page" ) );

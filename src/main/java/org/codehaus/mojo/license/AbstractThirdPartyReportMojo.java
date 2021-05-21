@@ -26,6 +26,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.doxia.siterenderer.Renderer;
+import org.apache.maven.model.License;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
@@ -57,13 +58,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeSet;
+
 import org.codehaus.mojo.license.api.ResolvedProjectDependencies;
 
 /**
@@ -369,6 +373,16 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
 
     private ArtifactFilters artifactFilters;
 
+    /**
+     * Maps license names to URLs.
+     *
+     * This is used by the <pre>third-party-report</pre>-goal in order to set custom license URLs
+     *
+     * @since 2.0.1
+     */
+    @Parameter( property = "license.urlmappings" )
+    private Properties urlMappings;
+
     // ----------------------------------------------------------------------
     // Protected Abstract Methods
     // ----------------------------------------------------------------------
@@ -377,6 +391,8 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
       throws IOException, ThirdPartyToolException, ProjectBuildingException, MojoFailureException,
              InvalidDependencyVersionException, ArtifactNotFoundException, ArtifactResolutionException,
              DependenciesToolException, MojoExecutionException;
+
+    protected abstract Map<String, String> createLicenseLookup();
 
     // ----------------------------------------------------------------------
     // AbstractMavenReport Implementation
@@ -413,11 +429,13 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
                 overrideUrl, project.getBasedir() );
 
         Collection<ThirdPartyDetails> details;
+        Map<String, String> licenseLookup;
 
         try
         {
             init();
             details = createThirdPartyDetails();
+            licenseLookup = createLicenseLookup();
         }
         catch ( IOException e )
         {
@@ -453,7 +471,7 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
         }
 
         ThirdPartyReportRenderer renderer =
-                new ThirdPartyReportRenderer( getSink(), i18n, getOutputName(), locale, details );
+                new ThirdPartyReportRenderer( getSink(), i18n, getOutputName(), locale, details, licenseLookup );
         renderer.render();
 
     }
@@ -552,17 +570,7 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
              DependenciesToolException, MojoExecutionException
     {
 
-        ResolvedProjectDependencies loadedDependencies;
-        if ( loadArtifacts )
-        {
-            loadedDependencies =
-                    new ResolvedProjectDependencies( project.getArtifacts(), project.getDependencyArtifacts() );
-        }
-        else
-        {
-            loadedDependencies = new ResolvedProjectDependencies( getProject().getArtifacts(),
-                    getProject().getDependencyArtifacts() );
-        }
+        ResolvedProjectDependencies loadedDependencies = resolveProjectDependencies( project, loadArtifacts );
 
         ThirdPartyHelper thirdPartyHelper =
                 new DefaultThirdPartyHelper( project, encoding, verbose,
@@ -626,6 +634,62 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
             }
         }
         return details;
+    }
+
+    protected Map<String, String> createLicenseLookup( MavenProject project, boolean loadArtifacts )
+    {
+        Map<String, String> licenseLookup = new HashMap<>();
+
+        //load explicit license url mappings
+        for ( String licenseName : urlMappings.stringPropertyNames() )
+        {
+            licenseLookup.put( licenseName, urlMappings.getProperty( licenseName ) );
+        }
+
+        ResolvedProjectDependencies loadedDependencies = resolveProjectDependencies( project, loadArtifacts );
+
+        ThirdPartyHelper thirdPartyHelper =
+            new DefaultThirdPartyHelper( project, encoding, verbose,
+                dependenciesTool, thirdPartyTool,
+                project.getRemoteArtifactRepositories(), project.getRemoteProjectRepositories() );
+        // load dependencies of the project
+        SortedMap<String, MavenProject> projectDependencies = thirdPartyHelper.loadDependencies( this,
+            loadedDependencies );
+
+        //add the licenses to the lookup table
+        for ( MavenProject dependency : projectDependencies.values() )
+        {
+
+            for ( License license : dependency.getLicenses() )
+            {
+                String licenseName = license.getName();
+
+                if ( !licenseLookup.containsKey( license.getName() ) )
+                {
+                    licenseLookup.put( licenseName, license.getUrl() );
+                }
+
+            }
+
+        }
+
+        return licenseLookup;
+    }
+
+    private ResolvedProjectDependencies resolveProjectDependencies( MavenProject project, boolean loadArtifacts )
+    {
+        ResolvedProjectDependencies loadedDependencies;
+        if ( loadArtifacts )
+        {
+            loadedDependencies =
+                new ResolvedProjectDependencies( project.getArtifacts(), project.getDependencyArtifacts() );
+        }
+        else
+        {
+            loadedDependencies = new ResolvedProjectDependencies( getProject().getArtifacts(),
+                getProject().getDependencyArtifacts() );
+        }
+        return loadedDependencies;
     }
 
     /** {@inheritDoc} */

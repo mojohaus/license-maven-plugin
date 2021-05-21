@@ -34,6 +34,7 @@ import org.codehaus.mojo.license.api.ThirdPartyToolException;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * Generates a report of all third-parties detected in the module.
@@ -88,5 +89,14 @@ public class ThirdPartyReportMojo extends AbstractThirdPartyReportMojo
              DependenciesToolException, MojoExecutionException
     {
         return createThirdPartyDetails( getProject(), false );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Map<String, String> createLicenseLookup()
+    {
+        return createLicenseLookup( getProject(), false );
     }
 }
