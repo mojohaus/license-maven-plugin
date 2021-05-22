@@ -47,6 +47,7 @@ import org.codehaus.mojo.license.api.ResolvedProjectDependencies;
 import org.codehaus.mojo.license.api.ThirdPartyToolException;
 import org.codehaus.mojo.license.model.LicenseMap;
 import org.codehaus.mojo.license.utils.FileUtil;
+import org.codehaus.mojo.license.utils.MojoHelper;
 import org.codehaus.mojo.license.utils.SortedProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -240,13 +241,13 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
         }
         if ( isAggregatorBuild )
         {
-            dependencyArtifacts =
-                    new ResolvedProjectDependencies( project.getArtifacts(), project.getDependencyArtifacts() );
+            dependencyArtifacts = new ResolvedProjectDependencies( project.getArtifacts(),
+                    MojoHelper.getDependencyArtifacts( project ) );
         }
         else
         {
             dependencyArtifacts = new ResolvedProjectDependencies( project.getArtifacts(),
-                    project.getDependencyArtifacts() );
+                    MojoHelper.getDependencyArtifacts( project ) );
         }
         return dependencyArtifacts;
     }
@@ -442,7 +443,7 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
         resolvedOverrideUrl  = mojo.resolvedOverrideUrl;
         missingLicensesFileArtifact = mojo.missingLicensesFileArtifact;
         localRepository = mojo.localRepository;
-        dependencies = new HashSet<>( mavenProject.getDependencyArtifacts() );
+        dependencies = new HashSet<>( MojoHelper.getDependencyArtifacts( mavenProject ) );
         licenseMerges = mojo.licenseMerges;
         licenseMergesFile = mojo.licenseMergesFile;
         includedLicenses = mojo.includedLicenses;

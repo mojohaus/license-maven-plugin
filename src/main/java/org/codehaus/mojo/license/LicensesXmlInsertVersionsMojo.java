@@ -42,6 +42,7 @@ import org.codehaus.mojo.license.download.LicenseSummaryReader;
 import org.codehaus.mojo.license.download.LicensedArtifact;
 import org.codehaus.mojo.license.download.ProjectLicenseInfo;
 import org.codehaus.mojo.license.utils.FileUtil;
+import org.codehaus.mojo.license.utils.MojoHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -139,9 +140,8 @@ public class LicensesXmlInsertVersionsMojo
                 }
             };
             final Map<String, LicensedArtifact> resolvedDeps = new TreeMap<String, LicensedArtifact>();
-            licensedArtifactResolver.loadProjectDependencies(
-                    new ResolvedProjectDependencies( project.getArtifacts(), project.getDependencyArtifacts() ),
-                                                     config, remoteRepositories, resolvedDeps );
+            licensedArtifactResolver.loadProjectDependencies( new ResolvedProjectDependencies( project.getArtifacts(),
+                    MojoHelper.getDependencyArtifacts( project ) ), config, remoteRepositories, resolvedDeps );
             final Map<String, LicensedArtifact> resolvedDepsMap = new HashMap<>( resolvedDeps.size() );
             for ( LicensedArtifact dep : resolvedDeps.values() )
             {
