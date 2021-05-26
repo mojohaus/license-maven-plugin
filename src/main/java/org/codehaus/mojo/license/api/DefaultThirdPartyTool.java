@@ -52,6 +52,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 import org.codehaus.mojo.license.LicenseMojoUtils;
+import org.codehaus.mojo.license.UnkownFileRemedy;
 import org.codehaus.mojo.license.model.LicenseMap;
 import org.codehaus.mojo.license.utils.FileUtil;
 import org.codehaus.mojo.license.utils.MojoHelper;
@@ -454,7 +455,9 @@ public class DefaultThirdPartyTool
                                                SortedMap<String, MavenProject> artifactCache,
                                                String encoding,
                                                File missingFile,
-                                               String missingFileUrl ) throws IOException, MojoExecutionException
+                                               String missingFileUrl,
+                                               UnkownFileRemedy unkownFileRemedy )
+        throws IOException, MojoExecutionException
     {
         Map<String, MavenProject> snapshots = new HashMap<>();
 
@@ -536,8 +539,8 @@ public class DefaultThirdPartyTool
             // there is some unknown dependencies in the missing file, remove them
             for ( String id : unknownDependenciesId )
             {
-                LOG.warn(
-                        "dependency [{}] does not exist in project, remove it from the missing file.", id );
+                handleUnknownDependency( unkownFileRemedy, "dependency [%s]"
+                    + " does not exist in project, remove it from the missing file.", id );
                 unsafeMappings.remove( id );
             }
 
@@ -552,7 +555,7 @@ public class DefaultThirdPartyTool
             MavenProject project = artifactCache.get( id );
             if ( project == null )
             {
-                LOG.warn( "dependency [{}] does not exist in project.", id );
+                handleUnknownDependency( unkownFileRemedy,  "dependency [%s] does not exist in project.", id );
                 continue;
             }
 
@@ -594,11 +597,36 @@ public class DefaultThirdPartyTool
         return unsafeMappings;
     }
 
+    private void handleUnknownDependency( final UnkownFileRemedy unkownFileRemedy, final String message,
+                                          final String id )
+        throws MojoExecutionException
+    {
+
+        final String completeMessage = String.format( message, id );
+        switch ( unkownFileRemedy )
+        {
+            case debug:
+                LOG.debug( completeMessage );
+                break;
+            case failFast:
+                throw new MojoExecutionException( completeMessage );
+            case warn:
+                LOG.warn( completeMessage );
+                break;
+            default:
+                throw new IllegalStateException( "Unexpected value of " + UnkownFileRemedy.class.getName() + ": "
+                    + unkownFileRemedy );
+        }
+
+    }
+
     /**
      * {@inheritDoc}
      */
-    public void overrideLicenses( LicenseMap licenseMap, SortedMap<String, MavenProject> artifactCache, String encoding,
-            String overrideUrl ) throws IOException
+    public void overrideLicenses( LicenseMap licenseMap, SortedMap<String, MavenProject> artifactCache,
+                                  String encoding, String overrideUrl,
+                                  UnkownFileRemedy unkownFileRemedy )
+        throws IOException, MojoExecutionException
     {
         if ( LicenseMojoUtils.isValid( overrideUrl ) )
         {
@@ -614,7 +642,8 @@ public class DefaultThirdPartyTool
                 MavenProject project = artifactCache.get( id );
                 if ( project == null )
                 {
-                    LOG.warn( "dependency [{}] does not exist in project.", id );
+                    handleUnknownDependency( unkownFileRemedy,  "dependency [%s]"
+                        + " does not exist in project.", id );
                     continue;
                 }
 
@@ -727,8 +756,7 @@ public class DefaultThirdPartyTool
 
     /**
      * @param project         not null
-     * @param localRepository not null
-     * @param repositories    not null
+     * @param remoteRepositories not null
      * @return the resolved site descriptor
      * @throws IOException                 if any
      * @throws ArtifactResolutionException if any

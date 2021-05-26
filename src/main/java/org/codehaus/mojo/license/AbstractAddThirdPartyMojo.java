@@ -600,6 +600,20 @@ public abstract class AbstractAddThirdPartyMojo
     @Parameter( property = "project.artifacts", required = true, readonly = true )
     protected Set<Artifact> dependencies;
 
+
+    /**
+     * What to do on defined files not found in project. The possible values are:
+     * <li>
+     *   <ul>{@link UnkownFileRemedy#debug}: unkown files are logged debug</ul>
+     *   <ul>{@link UnkownFileRemedy#warn}: unkown files are output to the log as warnings</ul>
+     *   <ul>{@link UnkownFileRemedy#failFast}: a {@link MojoExecutionException} is thrown on the
+     *      file not found in project</ul>
+     * </li>
+     * @since 2.0.1
+     */
+    @Parameter( property = "license.unkownFileRemedy", defaultValue = "warn" )
+    protected UnkownFileRemedy unkownFileRemedy;
+
     // ----------------------------------------------------------------------
     // Plexus components
     // ----------------------------------------------------------------------
@@ -867,7 +881,8 @@ public abstract class AbstractAddThirdPartyMojo
         {
             helper = new DefaultThirdPartyHelper( getProject(), getEncoding(), isVerbose(), dependenciesTool,
                     thirdPartyTool, getProject().getRemoteArtifactRepositories(),
-                    getProject().getRemoteProjectRepositories() );
+                    getProject().getRemoteProjectRepositories(),
+                    unkownFileRemedy );
         }
         return helper;
     }
@@ -1072,9 +1087,10 @@ public abstract class AbstractAddThirdPartyMojo
         }
     }
 
-    void overrideLicenses() throws IOException
+    void overrideLicenses() throws IOException, MojoExecutionException
     {
-        thirdPartyTool.overrideLicenses( licenseMap, projectDependencies, getEncoding(), resolvedOverrideUrl );
+        thirdPartyTool.overrideLicenses( licenseMap, projectDependencies, getEncoding(), resolvedOverrideUrl,
+            unkownFileRemedy );
     }
 
     private boolean isFailOnMissing()

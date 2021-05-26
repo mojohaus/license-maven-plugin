@@ -29,6 +29,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
+import org.codehaus.mojo.license.UnkownFileRemedy;
 import org.codehaus.mojo.license.model.LicenseMap;
 import org.codehaus.mojo.license.utils.SortedProperties;
 
@@ -84,6 +85,11 @@ public class DefaultThirdPartyHelper
     private final List<RemoteRepository> remoteRepositories;
 
     /**
+     * how to handle unknown files
+     */
+    private final UnkownFileRemedy unkownFileRemedy;
+
+    /**
      * Current maven project.
      */
     private final MavenProject project;
@@ -113,12 +119,14 @@ public class DefaultThirdPartyHelper
      * @param thirdPartyTool     tool to load third-parties descriptors
      * @param remoteRepositoriesCoreApi maven remote repositories, in the core api format
      * @param remoteRepositories maven remote repositories
+     * @param unkownFileRemedy   how to react if a file or dependency is declared but not in project
      */
     // CHECKSTYLE_OFF: ParameterNumber
     public DefaultThirdPartyHelper( MavenProject project, String encoding, boolean verbose,
                                     DependenciesTool dependenciesTool, ThirdPartyTool thirdPartyTool,
                                     List<ArtifactRepository> remoteRepositoriesCoreApi,
-                                    List<RemoteRepository> remoteRepositories )
+                                    List<RemoteRepository> remoteRepositories,
+                                    UnkownFileRemedy unkownFileRemedy )
     {
         // CHECKSTYLE_ON: ParameterNumber
         this.project = project;
@@ -128,6 +136,7 @@ public class DefaultThirdPartyHelper
         this.thirdPartyTool = thirdPartyTool;
         this.remoteRepositoriesCoreApi = remoteRepositoriesCoreApi;
         this.remoteRepositories = remoteRepositories;
+        this.unkownFileRemedy = unkownFileRemedy;
         this.thirdPartyTool.setVerbose( verbose );
     }
 
@@ -174,7 +183,7 @@ public class DefaultThirdPartyHelper
       throws IOException, MojoExecutionException
     {
         return thirdPartyTool.loadUnsafeMapping( licenseMap, projectDependencies, encoding, missingFile,
-                missingFileUrl );
+                missingFileUrl, unkownFileRemedy );
     }
 
     /**

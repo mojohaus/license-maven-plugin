@@ -1,8 +1,10 @@
+package org.codehaus.mojo.license;
+
 /*
  * #%L
  * License Maven Plugin
  * %%
- * Copyright (C) 2008 - 2018 Codehaus
+ * Copyright (C) 2008 - 2011 CodeLutin, Codehaus, Tony Chemit, Tony chemit
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -20,15 +22,20 @@
  * #L%
  */
 
-import java.nio.file.Path;
-import java.nio.file.Files;
-
-final Path basePath = basedir.toPath()
-
-final Path asl2 = basePath.resolve('target/generated-resources/licenses/apache license 2.0 - license-2.0.txt')
-assert Files.exists(asl2)
-assert asl2.text.contains('Proxied via LittleProxy')
-
-final Path expectedLicensesXml = basePath.resolve('licenses.expected.xml')
-final Path licensesXml = basePath.resolve('target/generated-resources/licenses.xml')
-assert expectedLicensesXml.text.equals(licensesXml.text.replace("\r\n", "\n").replace('\r', '\n'))
+/**
+ * What to do in case of a file not found in project.
+ *
+ * @since 2.0.1
+ */
+public enum UnkownFileRemedy
+{
+    /** Unkown files will be logged debug */
+    debug,
+    /** Unkown files are output to the log as warnings */
+    warn,
+    /**
+     * The first encountered unkown file is logged and a {@link org.apache.maven.plugin.MojoExecutionException} is
+     * thrown
+     */
+    failFast,
+}

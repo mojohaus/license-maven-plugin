@@ -39,7 +39,7 @@ return {
 
     final Path expectedLicensesXml = basePath.resolve('licenses-'+ id +'.expected.xml')
     final Path licensesXml = outputBase.resolve('licenses.xml')
-    assert expectedLicensesXml.text.equals(licensesXml.text)
+    assert expectedLicensesXml.text.equals(licensesXml.text.replace("\r\n", "\n").replace('\r', '\n'))
     return true
 }() && {
     final String id = 'since-1.18'
@@ -55,7 +55,7 @@ return {
 
     final Path expectedLicensesXml = basePath.resolve('licenses-'+ id +'.expected.xml')
     final Path licensesXml = outputBase.resolve('licenses.xml')
-    assert expectedLicensesXml.text.equals(licensesXml.text)
+    assert expectedLicensesXml.text.equals(licensesXml.text.replace("\r\n", "\n").replace('\r', '\n'))
     return true
 }() && {
     final String id = 'artifact-filters-url'
@@ -66,7 +66,7 @@ return {
 
     final Path expectedLicensesXml = basePath.resolve('licenses-'+ id +'.expected.xml')
     final Path licensesXml = outputBase.resolve('licenses.xml')
-    assert expectedLicensesXml.text.equals(licensesXml.text)
+    assert expectedLicensesXml.text.equals(licensesXml.text.replace("\r\n", "\n").replace('\r', '\n'))
     return true
 }() && {
     final String id = 'no-download'
@@ -82,7 +82,7 @@ return {
 
     final Path expectedLicensesXml = basePath.resolve('licenses-'+ id +'.expected.xml')
     final Path licensesXml = outputBase.resolve('licenses.xml')
-    assert expectedLicensesXml.text.equals(licensesXml.text)
+    assert expectedLicensesXml.text.equals(licensesXml.text.replace("\r\n", "\n").replace('\r', '\n'))
     return true
 }() && {
     final String id = 'delete-orphans'
@@ -101,7 +101,7 @@ return {
 
     final Path expectedLicensesXml = basePath.resolve('licenses-'+ id +'.expected.xml')
     final Path licensesXml = outputBase.resolve('licenses.xml')
-    assert expectedLicensesXml.text.equals(licensesXml.text)
+    assert expectedLicensesXml.text.equals(licensesXml.text.replace("\r\n", "\n").replace('\r', '\n'))
     return true
 }() && {
     final String id = 'insert-versions'
@@ -109,7 +109,7 @@ return {
 
     final Path expectedLicensesXml = basePath.resolve('licenses-'+ id +'.expected.xml')
     final Path licensesXml = outputBase.resolve('licenses.xml')
-    assert expectedLicensesXml.text.equals(licensesXml.text)
+    assert expectedLicensesXml.text.equals(licensesXml.text.replace("\r\n", "\n").replace('\r', '\n'))
     return true
 }() && {
     final String id = 'content-sanitizers'
@@ -118,12 +118,12 @@ return {
     final Path asl2 = outputBase.resolve('licenses/apache-license-2.0-apache-2.0.txt')
     assert Files.exists(asl2)
     final Path expectedAsl2 = basePath.resolve('src/license/'+ id +'/apache-2.0.expected.txt')
-    assert expectedAsl2.text.equals(asl2.text)
+    assert expectedAsl2.text.equals(asl2.text.replace("\r\n", "\n").replace('\r', '\n'))
 
     final Path bsdAsm = outputBase.resolve('licenses/bsd-3-clause-asm-bsd3-asm.txt')
     assert Files.exists(bsdAsm)
     final Path expectedBsdAsm = basePath.resolve('src/license/'+ id +'/bsd3-asm.expected.txt')
-    assert expectedBsdAsm.text.equals(bsdAsm.text)
+    assert expectedBsdAsm.text.equals(bsdAsm.text.replace("\r\n", "\n").replace('\r', '\n'))
 
     return true
 }()
