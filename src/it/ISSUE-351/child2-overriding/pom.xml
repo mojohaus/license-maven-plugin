@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.codehaus.mojo.license.test</groupId>
+    <artifactId>test-ISSUE-351</artifactId>
+    <version>@pom.version@</version>
+  </parent>
+  <artifactId>child2-overriding</artifactId>
+  <packaging>jar</packaging>
+
+  <properties>
+    <license.verbose>true</license.verbose>
+    <license.useMissingFile>true</license.useMissingFile>
+    <license.deployMissingFile>true</license.deployMissingFile>
+    <license.useRepositoryMissingFiles>true</license.useRepositoryMissingFiles>
+    <license.failIfWarning>true</license.failIfWarning>
+  </properties>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>license-maven-plugin</artifactId>
+          <version>@pom.version@</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.codehaus.mojo.license.test</groupId>
+      <artifactId>child1-multi-license</artifactId>
+      <version>1.0.0</version>
+    </dependency>
+  </dependencies>
+</project>

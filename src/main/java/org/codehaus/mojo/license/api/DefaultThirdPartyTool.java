@@ -624,16 +624,20 @@ public class DefaultThirdPartyTool
 
                 if ( ArrayUtils.isEmpty( licenses ) )
                 {
-
                     // empty license means not fill, skip it
+                    LOG.debug( " Not overriding license for dependency [{}] because no override given", id );
                     continue;
                 }
 
-                licenseMap.removeProject( project );
+                // remove project only removes first occurrence of project from license -> project[] map.
+                List<String> removedFrom = licenseMap.removeProject( project );
+                LOG.info( "Overriding license(s) for dependency [{}] with [{}], overriden license(s): [{}]",
+                        id,
+                        "(" + StringUtils.join( licenses, ") (" ) + ")",
+                        "(" + StringUtils.join( removedFrom.toArray(), ") (" ) + ")" );
 
-                // add license in map
+                // add licenses to map
                 addLicense( licenseMap, project, licenses );
-
             }
         }
     }
