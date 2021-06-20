@@ -32,46 +32,16 @@
   <version>@pom.version@</version>
 
   <name>License Test :: ISSUE-351</name>
-  <packaging>jar</packaging>
-
-  <licenses>
-    <license>
-      <name>The GNU Lesser General Public License, Version 3.0</name>
-      <url>http://www.gnu.org/licenses/lgpl-3.0.txt</url>
-      <distribution>repo</distribution>
-    </license>
-  </licenses>
+  <packaging>pom</packaging>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <license.verbose>true</license.verbose>
-    <license.useMissingFile>true</license.useMissingFile>
-    <license.deployMissingFile>true</license.deployMissingFile>
-    <license.useRepositoryMissingFiles>true</license.useRepositoryMissingFiles>
-    <license.failIfWarning>true</license.failIfWarning>
   </properties>
 
-  <dependencies>
-    <dependency>
-      <groupId>org.glassfish.jersey.containers</groupId>
-      <artifactId>jersey-container-servlet</artifactId>
-      <version>2.30.1</version>
-    </dependency>
-  </dependencies>
-
-  <build>
-
-    <pluginManagement>
-      <plugins>
-
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>license-maven-plugin</artifactId>
-          <version>@pom.version@</version>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-  </build>
+  <modules>
+    <module>child1-multi-license</module>
+    <module>child2-overriding</module>
+  </modules>
 
 </project>
 

@@ -20,11 +20,9 @@
  * #L%
  */
 
-file = new File(basedir, 'target/generated-sources/license/THIRD-PARTY.txt');
+file = new File(basedir, 'child2-overriding/target/generated-sources/license/THIRD-PARTY.txt');
 assert file.exists();
 content = file.text;
-assert content.contains('(Eclipse Public License 2.0) jersey-container-servlet (org.glassfish.jersey.containers:jersey-container-servlet:2.30.1 - https://projects.eclipse.org/projects/ee4j.jersey/project/jersey-container-servlet');
-assert !content.contains('(Apache License, 2.0) (BSD 2-Clause) (EDL 1.0) (EPL 2.0) (GPL2 w/ CPE) (MIT license) (Modified BSD) (Public Domain) (W3C license) (jQuery license) jersey-container-servlet (org.glassfish.jersey.containers:jersey-container-servlet:2.30.1 - https://projects.eclipse.org/projects/ee4j.jersey/project/jersey-container-servlet');
-
-
+assert content.contains('(Eclipse Public License 2.0) child1-multi-license (org.codehaus.mojo.license.test:child1-multi-license:1.0.0 - no url defined)');
+assert !content.contains('(TestLicense-01) (TestLicense-02) child1-multi-license (org.codehaus.mojo.license.test:child1-multi-license:1.0.0 - no url defined)');
 return true;
