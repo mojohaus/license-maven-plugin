@@ -174,6 +174,7 @@ public class LicenseMap
                 if ( project.equals( mavenProject ) )
                 {
                     removedFrom.add( entry.getKey() );
+                    break;
                 }
             }
         }
