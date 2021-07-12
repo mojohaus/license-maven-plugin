@@ -104,7 +104,7 @@ public class LicenseDownloader implements AutoCloseable
             configBuilder.setProxy( new HttpHost( proxy.getHost(), proxy.getPort(), proxy.getProtocol() ) );
         }
 
-        HttpClientBuilder clientBuilder = HttpClients.custom().setDefaultRequestConfig( configBuilder.build() );
+        HttpClientBuilder clientBuilder = HttpClients.custom().setCookieSpec(CookieSpecs.STANDARD).setDefaultRequestConfig( configBuilder.build() );
         if ( proxy != null )
         {
             if ( proxy.getUsername() != null && proxy.getPassword() != null )
