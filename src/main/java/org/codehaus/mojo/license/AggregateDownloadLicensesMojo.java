@@ -115,8 +115,9 @@ public class AggregateDownloadLicensesMojo
 
         for ( MavenProject p : reactorProjects )
         {
-            licensedArtifactResolver.loadProjectDependencies( new ResolvedProjectDependencies( p.getArtifacts(),
-                    MojoHelper.getDependencyArtifacts( p ) ), this, remoteRepositories, result );
+            licensedArtifactResolver.loadProjectDependencies( new ResolvedProjectDependencies( p.getArtifacts(), 
+                                                                                        MojoHelper.getDependencyArtifacts( p ) ), 
+                                                      this, remoteRepositories, result );
         }
         return result;
     }

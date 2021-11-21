@@ -241,8 +241,8 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
         }
         if ( isAggregatorBuild )
         {
-            dependencyArtifacts = new ResolvedProjectDependencies( project.getArtifacts(),
-                    MojoHelper.getDependencyArtifacts( project ) );
+            dependencyArtifacts = 
+                    new ResolvedProjectDependencies( project.getArtifacts(), MojoHelper.getDependencyArtifacts( project ) );
         }
         else
         {
