@@ -22,5 +22,5 @@
 
 file = new File(basedir, 'target/licenses.xml');
 expectedFile = new File(basedir, 'expected_licenses.xml');
-assert expectedFile.text.equals(file.text);
+assert expectedFile.text.equals(file.text.replace("\r\n", "\n").replace('\r', '\n'));
 return true;

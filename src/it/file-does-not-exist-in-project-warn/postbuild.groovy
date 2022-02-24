@@ -2,7 +2,7 @@
  * #%L
  * License Maven Plugin
  * %%
- * Copyright (C) 2008 - 2018 Codehaus
+ * Copyright (C) 2008 - 2011 CodeLutin, Codehaus, Tony Chemit
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -19,16 +19,9 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
+file = new File(basedir, "build.log")
+assert file.exists()
+content = file.text
+assert content.contains("dependency [org.apache.commons--commons-lang3--3.3.2] does not exist in project, remove it from the missing file.")
 
-import java.nio.file.Path;
-import java.nio.file.Files;
-
-final Path basePath = basedir.toPath()
-
-final Path asl2 = basePath.resolve('target/generated-resources/licenses/apache license 2.0 - license-2.0.txt')
-assert Files.exists(asl2)
-assert asl2.text.contains('Proxied via LittleProxy')
-
-final Path expectedLicensesXml = basePath.resolve('licenses.expected.xml')
-final Path licensesXml = basePath.resolve('target/generated-resources/licenses.xml')
-assert expectedLicensesXml.text.equals(licensesXml.text.replace("\r\n", "\n").replace('\r', '\n'))
+return true
