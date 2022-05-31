@@ -1,2 +1,3 @@
-*        text eol=lf
-*.cmd    text eol=crlf
+*         text eol=lf
+*.cmd     text eol=crlf
+*.crlf.sh text eol=crlf
