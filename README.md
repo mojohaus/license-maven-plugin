@@ -6,6 +6,8 @@ to extract more license information from the dependencies. It can also write a r
 Information about the source project (the license stays of course the same):
 
 [![Build status](https://github.com/JD-CSTx/license-maven-plugin/workflows/CI/badge.svg)](https://github.com/JD-CSTx/license-maven-plugin/actions/workflows/maven.yml)
+Tests pass locally, currently just not on Github.
+
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mojohaus/license-maven-plugin?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![The GNU Lesser General Public License, Version 3.0](https://img.shields.io/badge/license-LGPL3-blue.svg)](http://www.gnu.org/licenses/lgpl-3.0.txt)
 
