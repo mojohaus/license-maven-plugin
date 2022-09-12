@@ -10,5 +10,5 @@ end_of_line = lf
 [*.xml]
 indent_size = 2
 
-[*.cmd]
+[{*.cmd, *.crlf.sh}]
 end_of_line = crlf
