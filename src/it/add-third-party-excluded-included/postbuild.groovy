@@ -28,7 +28,7 @@ assert thirdWithoutScope.contains('commons-logging:commons-logging:1.1.1');
 assert thirdWithoutScope.contains('org.nuiton:nuiton-utils:1.4');
 assert thirdWithoutScope.contains('org.nuiton.i18n:nuiton-i18n:1.2.2');
 assert thirdWithoutScope.contains('org.nuiton:maven-helper-plugin');
-assert !thirdWithoutScope.contains('junit:junit:4.8.2');
+assert !thirdWithoutScope.contains('junit:junit:4.13.1');
 assert thirdWithoutScope.contains('org.mockito:mockito-all:1.10.19');
 
 file = new File(basedir, 'target/generated-sources/license/thirdWithScope.txt');
@@ -39,7 +39,7 @@ assert !thirdWithScope.contains('commons-logging:commons-logging:1.1.1');
 assert !thirdWithScope.contains('org.nuiton:nuiton-utils:1.4');
 assert !thirdWithScope.contains('org.nuiton.i18n:nuiton-i18n:1.2.2');
 assert !thirdWithScope.contains('org.nuiton:maven-helper-plugin');
-assert thirdWithScope.contains('junit:junit:4.8.2');
+assert thirdWithScope.contains('junit:junit:4.13.1');
 assert !thirdWithScope.contains('org.mockito:mockito-all:1.10.19');
 
 file = new File(basedir, 'target/generated-sources/license/thirdWithoutGroup.txt');
@@ -49,7 +49,7 @@ assert !thirdWithoutGroup.contains('The project has no dependencies.');
 assert thirdWithoutGroup.contains('commons-logging:commons-logging:1.1.1');
 assert !thirdWithoutGroup.contains('org.nuiton:nuiton-utils:1.4');
 assert !thirdWithoutGroup.contains('org.nuiton.i18n:nuiton-i18n:1.2.2');
-assert thirdWithoutGroup.contains('junit:junit:4.8.2');
+assert thirdWithoutGroup.contains('junit:junit:4.13.1');
 assert thirdWithoutGroup.contains('org.mockito:mockito-all:1.10.19');
 
 file = new File(basedir, 'target/generated-sources/license/thirdWithoutArtifact.txt');
@@ -59,7 +59,7 @@ assert !thirdWithoutArtifact.contains('The project has no dependencies.');
 assert thirdWithoutArtifact.contains('commons-logging:commons-logging:1.1.1');
 assert thirdWithoutArtifact.contains('org.nuiton:nuiton-utils:1.4');
 assert !thirdWithoutArtifact.contains('org.nuiton.i18n:nuiton-i18n:1.2.2');
-assert thirdWithoutArtifact.contains('junit:junit:4.8.2');
+assert thirdWithoutArtifact.contains('junit:junit:4.13.1');
 assert thirdWithoutArtifact.contains('org.mockito:mockito-all:1.10.19');
 
 file = new File(basedir, 'target/generated-sources/license/thirdWithGroupWithoutArtifact.txt');
@@ -101,7 +101,7 @@ assert thirdWithoutGroupWithoutArtifact.contains('commons-logging:commons-loggin
 assert !thirdWithoutGroupWithoutArtifact.contains('org.nuiton:nuiton-utils:1.4');
 assert !thirdWithoutGroupWithoutArtifact.contains('org.nuiton.i18n:nuiton-i18n:1.2.2');
 assert !thirdWithoutGroupWithoutArtifact.contains('org.nuiton:maven-helper-plugin');
-assert thirdWithoutGroupWithoutArtifact.contains('junit:junit:4.8.2');
+assert thirdWithoutGroupWithoutArtifact.contains('junit:junit:4.13.1');
 assert thirdWithoutGroupWithoutArtifact.contains('org.mockito:mockito-all:1.10.19');
 
 file = new File(basedir, 'target/generated-sources/license/thirdWithoutType.txt');
@@ -113,7 +113,7 @@ assert thirdWithoutType.contains('org.nuiton:nuiton-utils:1.4');
 assert thirdWithoutType.contains('org.nuiton.i18n:nuiton-i18n:1.2.2');
 assert thirdWithoutType.contains('org.nuiton:maven-helper-plugin');
 assert !thirdWithoutType.contains('org.wildfly:wildfly-ejb-client-bom:9.0.1.Final');
-assert thirdWithoutType.contains('junit:junit:4.8.2');
+assert thirdWithoutType.contains('junit:junit:4.13.1');
 assert thirdWithoutType.contains('org.mockito:mockito-all:1.10.19');
 
 file = new File(basedir, 'target/generated-sources/license/thirdWithType.txt');
@@ -125,7 +125,7 @@ assert !thirdWithType.contains('org.nuiton:nuiton-utils:1.4');
 assert !thirdWithType.contains('org.nuiton.i18n:nuiton-i18n:1.2.2');
 assert !thirdWithType.contains('org.nuiton:maven-helper-plugin');
 assert thirdWithType.contains('org.wildfly:wildfly-ejb-client-bom:9.0.1.Final');
-assert !thirdWithType.contains('junit:junit:4.8.2');
+assert !thirdWithType.contains('junit:junit:4.13.1');
 assert !thirdWithType.contains('org.mockito:mockito-all:1.10.19');
 
 file = new File(basedir, 'target/generated-sources/license/thirdWithoutOptional.txt');
@@ -137,7 +137,7 @@ assert thirdWithoutOptional.contains('org.nuiton:nuiton-utils:1.4');
 assert thirdWithoutOptional.contains('org.nuiton.i18n:nuiton-i18n:1.2.2');
 assert thirdWithoutOptional.contains('org.nuiton:maven-helper-plugin');
 assert thirdWithoutOptional.contains('org.wildfly:wildfly-ejb-client-bom:9.0.1.Final');
-assert thirdWithoutOptional.contains('junit:junit:4.8.2');
+assert thirdWithoutOptional.contains('junit:junit:4.13.1');
 assert !thirdWithoutOptional.contains('org.mockito:mockito-all:1.10.19');
 
 return true;
