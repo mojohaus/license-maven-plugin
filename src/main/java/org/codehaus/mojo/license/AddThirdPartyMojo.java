@@ -67,7 +67,7 @@ import org.slf4j.LoggerFactory;
  */
 // CHECKSTYLE_ON: LineLength
 @Mojo( name = "add-third-party", requiresDependencyResolution = ResolutionScope.TEST,
-       defaultPhase = LifecyclePhase.GENERATE_RESOURCES )
+       defaultPhase = LifecyclePhase.GENERATE_RESOURCES, threadSafe = true )
 public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements MavenProjectDependenciesConfigurator
 {
     private static final Logger LOG = LoggerFactory.getLogger( AddThirdPartyMojo.class );
