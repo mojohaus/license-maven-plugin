@@ -102,7 +102,10 @@ public class DefaultThirdPartyHelper
     /**
      * Cache of dependencies (as maven project) loaded.
      */
-    private static SortedMap<String, MavenProject> artifactCache;
+    private static volatile SortedMap<String, MavenProject> artifactCache;
+
+    // Mutex to guard lazy initialization of artifactCache
+    private static final Object artifactCacheMutex = new Object();
 
     /**
      * Constructor of the helper.
@@ -139,7 +142,7 @@ public class DefaultThirdPartyHelper
     {
         if ( artifactCache == null )
         {
-            synchronized ( SortedMap.class )
+            synchronized ( artifactCacheMutex )
             {
                 if ( artifactCache == null )
                 {
@@ -192,9 +195,12 @@ public class DefaultThirdPartyHelper
 
         LicenseMap licenseMap = new LicenseMap();
 
-        for ( MavenProject project : dependencies.values() )
+        synchronized ( dependencies )
         {
-            thirdPartyTool.addLicense( licenseMap, project, project.getLicenses() );
+            for ( MavenProject project : dependencies.values() )
+            {
+                thirdPartyTool.addLicense( licenseMap, project, project.getLicenses() );
+            }
         }
         return licenseMap;
     }
