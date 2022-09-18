@@ -105,7 +105,7 @@ public class DefaultThirdPartyHelper
     private static volatile SortedMap<String, MavenProject> artifactCache;
 
     // Mutex to guard lazy initialization of artifactCache
-    private static final Object artifactCacheMutex = new Object();
+    private static final Object ARTIFACT_CACHE_MUTEX = new Object();
 
     /**
      * Constructor of the helper.
@@ -142,7 +142,7 @@ public class DefaultThirdPartyHelper
     {
         if ( artifactCache == null )
         {
-            synchronized ( artifactCacheMutex )
+            synchronized ( ARTIFACT_CACHE_MUTEX )
             {
                 if ( artifactCache == null )
                 {
@@ -247,7 +247,11 @@ public class DefaultThirdPartyHelper
 
                 // try to load missing third party files from dependencies
 
-                Collection<MavenProject> projects = new ArrayList<>( projectDependencies.values() );
+                Collection<MavenProject> projects;
+                synchronized ( projectDependencies )
+                {
+                    projects = new ArrayList<>( projectDependencies.values() );
+                }
                 projects.remove( project );
                 projects.removeAll( unsafeDependencies );
 
