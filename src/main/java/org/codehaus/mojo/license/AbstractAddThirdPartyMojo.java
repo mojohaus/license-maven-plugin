@@ -766,9 +766,12 @@ public abstract class AbstractAddThirdPartyMojo
         }
         else if ( licenseMergesUrl != null )
         {
-            LOG.warn( "" );
-            LOG.warn( "licenseMerges will be overridden by licenseMergesUrl." );
-            LOG.warn( "" );
+            if ( licenseMerges != null )
+            {
+                LOG.warn( "" );
+                LOG.warn( "licenseMerges will be overridden by licenseMergesUrl." );
+                LOG.warn( "" );
+            }
             if ( UrlRequester.isStringUrl( licenseMergesUrl ) )
             {
                 licenseMerges = Arrays.asList( UrlRequester.getFromUrl( licenseMergesUrl ).split( "[\n\r]+" ) );

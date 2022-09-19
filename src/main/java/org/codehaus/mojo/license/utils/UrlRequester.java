@@ -91,6 +91,20 @@ public class UrlRequester
     }
 
     /**
+     * Returns the protocol of the given URL as a string.
+     *
+     * The RFC specifies that the url is composed by <protocol>:<schema-part>.
+     *
+     * @param url the URL as a string.
+     * @return the protocol from the URL.
+     */
+    public static String findProtocol( String url )
+    {
+        // Here could not be used the URL parser because classpath does not have a registered Handler
+        return StringUtils.substringBefore( url, ":" ).toLowerCase();
+    }
+
+    /**
      * Returns the content of the resource pointed by the given URL as a string.
      *
      * @param url the resource destination that is expected to contain pure text
@@ -100,9 +114,7 @@ public class UrlRequester
      */
     public static String getFromUrl( String url, String encoding ) throws IOException
     {
-        // by RFC url is composed by <protocol>:<schema-part>.
-        // Here could not be used the URL parser because classpath does not have a registered Handler
-        String protocol = StringUtils.substringBefore( url, ":" ).toLowerCase();
+        String protocol = findProtocol( url );
         Charset charset = Charset.forName( encoding );
 
         String result = null;

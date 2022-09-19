@@ -27,24 +27,41 @@
 
   <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>org.codehaus.mojo.license.test</groupId>
-    <artifactId>test-aggregate-third-party-report</artifactId>
-    <version>@pom.version@</version>
-  </parent>
-  <artifactId>test-aggregate-third-party-report-child2</artifactId>
+  <groupId>org.codehaus.mojo.license.test</groupId>
+  <artifactId>issue-345</artifactId>
+  <version>@pom.version@</version>
 
-  <name>License Test :: aggregate-third-party-report - child 2</name>
+  <name>License Test :: ISSUE-345</name>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <license.verbose>true</license.verbose>
+    <license.licenseMergesUrl>${project.baseUri}license.merges</license.licenseMergesUrl>
+  </properties>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>license-maven-plugin</artifactId>
+          <version>@pom.version@</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
 
   <dependencies>
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.13.1</version>
-      <scope>test</scope>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <version>1.1.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <version>3.8.1</version>
     </dependency>
   </dependencies>
 
 </project>
-
-

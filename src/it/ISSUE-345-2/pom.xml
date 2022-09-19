@@ -27,33 +27,46 @@
 
   <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>org.codehaus.mojo.license.test</groupId>
-    <artifactId>exclude-transitive-deps</artifactId>
-    <version>1.0</version>
-  </parent>
-  <artifactId>exclude-transitive-deps-child2</artifactId>
+  <groupId>org.codehaus.mojo.license.test</groupId>
+  <artifactId>issue-345-2</artifactId>
+  <version>@pom.version@</version>
+
+  <name>License Test :: ISSUE-345-2</name>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <license.generateBundle>true</license.generateBundle>
     <license.verbose>true</license.verbose>
+    <license.licenseMergesUrl>${project.baseUri}license.merges</license.licenseMergesUrl>
   </properties>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>license-maven-plugin</artifactId>
+          <version>@pom.version@</version>
+          <configuration>
+            <licenseMerges>
+              <licenseMerge>Apache-2.0|The Apache Software License, Version 2.0</licenseMerge>
+            </licenseMerges>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
 
   <dependencies>
     <dependency>
-      <groupId>org.nuiton</groupId>
-      <artifactId>nuiton-utils</artifactId>
-      <version>1.4</version>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <version>1.1.1</version>
     </dependency>
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.13.1</version>
-      <scope>test</scope>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <version>3.8.1</version>
     </dependency>
   </dependencies>
 
 </project>
-
-

@@ -614,7 +614,16 @@ public class DefaultThirdPartyTool
                 MavenProject project = artifactCache.get( id );
                 if ( project == null )
                 {
-                    LOG.warn( "dependency [{}] does not exist in project.", id );
+                    // Log at warn for local override files, but at debug for remote (presumably shared) override files.
+                    String protocol = UrlRequester.findProtocol( overrideUrl );
+                    if ( "http".equals( protocol ) || "https".equals( protocol ) )
+                    {
+                        LOG.debug( "dependency [{}] does not exist in project.", id );
+                    }
+                    else
+                    {
+                        LOG.warn( "dependency [{}] does not exist in project.", id );
+                    }
                     continue;
                 }
 
