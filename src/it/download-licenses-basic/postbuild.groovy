@@ -55,9 +55,11 @@ String expectedContentOrdering2 = new File(basedir, 'expected_licenses_ordering_
 String actualContent = licenseFile.getText('UTF-8');
 
 Diff d1 = DiffBuilder.compare(Input.fromString(expectedContentOrdering1))
+    .ignoreComments()
     .withTest(Input.fromString(actualContent)).build();
 
 Diff d2 = DiffBuilder.compare(Input.fromString(expectedContentOrdering2))
+    .ignoreComments()
     .withTest(Input.fromString(actualContent)).build();
 
 assert !d1.hasDifferences() || !d2.hasDifferences() : "${licenseFile} has unexpected content " + actualContent
