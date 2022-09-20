@@ -40,6 +40,8 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -65,6 +67,8 @@ public class LicenseSummaryWriter
         doc.appendChild( root );
         Node dependenciesNode = doc.createElement( "dependencies" );
         root.appendChild( dependenciesNode );
+
+        Collections.sort(dependencies, Comparator.comparing(value -> value.getId()));
 
         for ( ProjectLicenseInfo dep : dependencies )
         {

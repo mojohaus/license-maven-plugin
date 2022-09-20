@@ -25,6 +25,7 @@ package org.codehaus.mojo.license.download;
 import org.apache.maven.artifact.Artifact;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -195,10 +196,7 @@ public class ProjectLicenseInfo
         if ( compareTo instanceof Artifact )
         {
             Artifact compare = (Artifact) compareTo;
-            if ( groupId.equals( compare.getGroupId() ) && artifactId.equals( compare.getArtifactId() ) )
-            {
-                return true;
-            }
+            return groupId.equals(compare.getGroupId()) && artifactId.equals(compare.getArtifactId());
         }
         return false;
     }
