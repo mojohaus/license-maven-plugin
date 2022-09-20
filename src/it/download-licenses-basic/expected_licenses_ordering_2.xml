@@ -10,7 +10,6 @@
           <name>New BSD License</name>
           <url>http://www.opensource.org/licenses/bsd-license.php</url>
           <distribution>repo</distribution>
-<!--          <file>new bsd license - bsd-license.html</file>-->
         </license>
       </licenses>
     </dependency>
