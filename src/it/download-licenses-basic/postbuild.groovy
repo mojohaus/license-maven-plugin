@@ -19,6 +19,11 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
+
+import org.xmlunit.builder.DiffBuilder
+import org.xmlunit.builder.Input
+import org.xmlunit.diff.Diff
+
 def assertExistsFile(file)
 {
     if ( !file.exists() || file.isDirectory() )
@@ -48,7 +53,13 @@ assertExistsFile(licenseFile);
 String expectedContentOrdering1 = new File(basedir, 'expected_licenses_ordering_1.xml').getText('UTF-8');
 String expectedContentOrdering2 = new File(basedir, 'expected_licenses_ordering_2.xml').getText('UTF-8');
 String actualContent = licenseFile.getText('UTF-8');
-assert (expectedContentOrdering1 == actualContent || expectedContentOrdering2 == actualContent) :
-    "${licenseFile} has unexpected content " + licenseFile.getText('UTF-8')
+
+Diff d1 = DiffBuilder.compare(Input.fromString(expectedContentOrdering1))
+    .withTest(Input.fromString(actualContent)).build();
+
+Diff d2 = DiffBuilder.compare(Input.fromString(expectedContentOrdering2))
+    .withTest(Input.fromString(actualContent)).build();
+
+assert !d1.hasDifferences() || !d2.hasDifferences()
 
 return true;

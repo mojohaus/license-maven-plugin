@@ -580,6 +580,13 @@
               <settingsFile>src/it/settings.xml</settingsFile>
               <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
             </configuration>
+            <dependencies>
+              <dependency>
+                <groupId>org.xmlunit</groupId>
+                <artifactId>xmlunit-core</artifactId>
+                <version>2.9.0</version>
+              </dependency>
+            </dependencies>
             <executions>
               <execution>
                 <id>all-integration-test</id>
@@ -625,41 +632,6 @@
                 </configuration>
               </execution>
             </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <profile>
-      <id>run-one-it</id>
-      <build>
-        <defaultGoal>verify</defaultGoal>
-        <plugins>
-          <plugin>
-            <artifactId>maven-invoker-plugin</artifactId>
-            <configuration>
-              <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
-              <settingsFile>src/it/settings.xml</settingsFile>
-              <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
-            </configuration>
-            <executions>
-              <execution>
-                <id>one-integration-test</id>
-                <goals>
-                  <goal>install</goal>
-                  <goal>run</goal>
-                </goals>
-                <configuration>
-                  <streamLogs>true</streamLogs>
-                  <pomIncludes>
-                    <pomInclude>${itName}/pom.xml</pomInclude>
-                  </pomIncludes>
-                </configuration>
-              </execution>
-            </executions>
-            <dependencies>
-
-            </dependencies>
           </plugin>
         </plugins>
       </build>
