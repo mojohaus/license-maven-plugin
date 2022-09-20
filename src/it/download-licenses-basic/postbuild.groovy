@@ -62,6 +62,6 @@ Diff d2 = DiffBuilder.compare(Input.fromString(expectedContentOrdering2))
     .ignoreComments()
     .withTest(Input.fromString(actualContent)).build();
 
-assert !d1.hasDifferences() || !d2.hasDifferences() : "${licenseFile} has unexpected content " + actualContent
+assert !d1.hasDifferences() || !d2.hasDifferences() //: "${licenseFile} has unexpected content " + actualContent
 
 return true;
