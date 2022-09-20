@@ -68,7 +68,7 @@ public class LicenseSummaryWriter
         Node dependenciesNode = doc.createElement( "dependencies" );
         root.appendChild( dependenciesNode );
 
-        Collections.sort(dependencies, Comparator.comparing(value -> value.getId()));
+        Collections.sort( dependencies, Comparator.comparing( value -> value.getId( ) ) );
 
         for ( ProjectLicenseInfo dep : dependencies )
         {
