@@ -48,6 +48,7 @@ assertExistsFile(licenseFile);
 String expectedContentOrdering1 = new File(basedir, 'expected_licenses_ordering_1.xml').getText('UTF-8');
 String expectedContentOrdering2 = new File(basedir, 'expected_licenses_ordering_2.xml').getText('UTF-8');
 String actualContent = licenseFile.getText('UTF-8');
-assert (expectedContentOrdering1 == actualContent || expectedContentOrdering2 == actualContent) : "${licenseFile} has unexpected content"
+assert (expectedContentOrdering1 == actualContent || expectedContentOrdering2 == actualContent) :
+    "${licenseFile} has unexpected content " + licenseFile.getText('UTF-8')
 
 return true;
