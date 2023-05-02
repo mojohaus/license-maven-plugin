@@ -161,7 +161,7 @@ public final class LicenseMojoUtils
 
         private final Logger delegate;
 
-        public Slf4jLoggerFacade( Logger delegate )
+        Slf4jLoggerFacade( Logger delegate )
         {
             super();
             this.delegate = delegate;

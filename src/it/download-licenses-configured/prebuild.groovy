@@ -35,8 +35,8 @@ Files.move(basePath.resolve('target-initial'), basePath.resolve('target'))
 
 final Path asl2 = basePath.resolve('target/no-download/licenses/apache-license-2.0-license-2.0.txt')
 assert Files.exists(asl2)
-assert asl2.text.contains('Fake content')
+assert asl2.toFile().text.contains('Fake content')
 
 final Path bsd = basePath.resolve('target/no-download/licenses/bsd-3-clause-asm-license.txt')
 assert Files.exists(bsd)
-assert bsd.text.contains('Fake content')
+assert bsd.toFile().text.contains('Fake content')

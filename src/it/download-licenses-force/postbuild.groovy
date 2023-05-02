@@ -27,21 +27,21 @@ final Path basePath = basedir.toPath()
 
 final Path asl2 = basePath.resolve('target/generated-resources/licenses/apache license 2.0 - license-2.0.txt')
 assert Files.exists(asl2)
-assert !asl2.text.contains('This content is fake.')
-assert asl2.text.contains('Version 2.0, January 2004')
+assert !asl2.toFile().text.contains('This content is fake.')
+assert asl2.toFile().text.contains('Version 2.0, January 2004')
 
 final Path lgpl21 = basePath.resolve('target/generated-resources/licenses/gnu lesser general public license v2.1 or later - lgpl-2.1.html')
 assert Files.exists(lgpl21)
-assert lgpl21.text.contains('Version 2.1, February 1999')
+assert lgpl21.toFile().text.contains('Version 2.1, February 1999')
 
 final Path expectedLicensesXml = basePath.resolve('licenses.expected.xml')
 final Path licensesXml = basePath.resolve('target/generated-resources/licenses.xml')
-assert expectedLicensesXml.text.equals(licensesXml.text)
+assert expectedLicensesXml.toFile().text.equals(licensesXml.toFile().text)
 
 final Path expectedLicensesErrorsXml = basePath.resolve('licenses-errors.expected.xml')
 final Path licensesErrorsXml = basePath.resolve('target/generated-resources/licenses-errors.xml')
-assert expectedLicensesErrorsXml.text.equals(licensesErrorsXml.text)
+assert expectedLicensesErrorsXml.toFile().text.equals(licensesErrorsXml.toFile().text)
 
 final Path log = basePath.resolve('build.log')
 assert Files.exists(log)
-assert log.text.contains('There were 2 download errors - check ')
+assert log.toFile().text.contains('There were 2 download errors - check ')
