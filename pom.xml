@@ -125,7 +125,7 @@
     <license.licenseName>lgpl_v3</license.licenseName>
     <licensePluginVersion>1.14</licensePluginVersion>
 
-    <plexusComponentVersion>1.7.1</plexusComponentVersion>
+    <plexusComponentVersion>2.1.1</plexusComponentVersion>
     <maven-resolver.version>1.3.3</maven-resolver.version>
     <project.build.outputTimestamp>2023-05-05T03:36:54Z</project.build.outputTimestamp>
   </properties>
