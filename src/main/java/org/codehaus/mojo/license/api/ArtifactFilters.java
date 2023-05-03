@@ -407,7 +407,7 @@ public class ArtifactFilters
     {
         private final Pattern pattern;
 
-        public GaFilter( Pattern pattern )
+        GaFilter( Pattern pattern )
         {
             super();
             this.pattern = pattern;
@@ -452,7 +452,7 @@ public class ArtifactFilters
 
         private final List<ArtifactFilter> includesExcludes;
 
-        public IncludesExcludes( List<ArtifactFilter> includesExcludes, int includesCount )
+        IncludesExcludes( List<ArtifactFilter> includesExcludes, int includesCount )
         {
             super();
             this.includesExcludes = includesExcludes;
@@ -486,7 +486,7 @@ public class ArtifactFilters
     {
         private final String scope;
 
-        public ScopeFilter( String scope )
+        ScopeFilter( String scope )
         {
             super();
             this.scope = scope;
@@ -503,7 +503,7 @@ public class ArtifactFilters
     {
         private final String type;
 
-        public TypeFilter( String type )
+        TypeFilter( String type )
         {
             super();
             this.type = type;

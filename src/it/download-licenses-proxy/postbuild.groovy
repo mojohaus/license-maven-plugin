@@ -27,8 +27,8 @@ final Path basePath = basedir.toPath()
 
 final Path asl2 = basePath.resolve('target/generated-resources/licenses/apache license 2.0 - license-2.0.txt')
 assert Files.exists(asl2)
-assert asl2.text.contains('Proxied via LittleProxy')
+assert asl2.toFile().text.contains('Proxied via LittleProxy')
 
 final Path expectedLicensesXml = basePath.resolve('licenses.expected.xml')
 final Path licensesXml = basePath.resolve('target/generated-resources/licenses.xml')
-assert expectedLicensesXml.text.equals(licensesXml.text)
+assert expectedLicensesXml.toFile().text.equals(licensesXml.toFile().text)

@@ -27,4 +27,4 @@ final Path basePath = basedir.toPath()
 
 final Path log = basePath.resolve('build.log')
 assert Files.exists(log)
-assert log.text.contains('No license information available for: groovy:groovy-all')
+assert log.toFile().text.contains('No license information available for: groovy:groovy-all')
