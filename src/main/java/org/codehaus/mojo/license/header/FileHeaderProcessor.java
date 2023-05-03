@@ -24,12 +24,13 @@ package org.codehaus.mojo.license.header;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
+import java.nio.file.Files;
+
 import org.codehaus.mojo.license.header.transformer.FileHeaderTransformer;
 import org.nuiton.processor.Processor;
 
@@ -106,22 +107,12 @@ public class FileHeaderProcessor extends Processor
 
         filter.reset();
 
-        Reader input = new InputStreamReader( new ByteArrayInputStream( inputContent.getBytes( encoding ) ), encoding );
-        try
+        try ( Reader input = new InputStreamReader( new ByteArrayInputStream( inputContent.getBytes( encoding ) ), encoding ) )
         {
-            Writer output = new OutputStreamWriter( new FileOutputStream( outputFile ), encoding );
-            try
+            try (Writer output = new OutputStreamWriter( Files.newOutputStream( outputFile.toPath() ), encoding ) )
             {
                 process( input, output );
             }
-            finally
-            {
-                output.close();
-            }
-        }
-        finally
-        {
-            input.close();
         }
     }
 

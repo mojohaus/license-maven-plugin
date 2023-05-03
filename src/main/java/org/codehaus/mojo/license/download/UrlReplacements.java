@@ -125,7 +125,7 @@ public class UrlReplacements
                 if ( usedDefaults > 0 && LOG.isDebugEnabled() )
                 {
                     final StringBuilder sb = new StringBuilder();
-                    sb.append( "Appending " + usedDefaults + " default licenseUrlReplacements:\n" )
+                    sb.append( "Appending " ).append( usedDefaults ).append( " default licenseUrlReplacements:\n" )
                     .append( "<licenseUrlReplacements>\n" );
 
                     for ( UrlReplacement r : defaults )

@@ -111,28 +111,25 @@ public class LicenseSummaryReader
         {
             Node node = depElements.item( i );
 
-            if ( node.getNodeName().equals( "groupId" ) )
-            {
-                dependency.setGroupId( node.getTextContent() );
-            }
-            else if ( node.getNodeName().equals( "artifactId" ) )
-            {
-                dependency.setArtifactId( node.getTextContent() );
-            }
-            else if ( node.getNodeName().equals( "version" ) )
-            {
-                dependency.setVersion( node.getTextContent() );
-            }
-            else if ( node.getNodeName().equals( "licenses" ) )
-            {
-                Map.Entry<Boolean, List<ProjectLicense>> entry = parseLicenses( node );
-                dependency.setLicenses( entry.getValue() );
-                dependency.setApproved( entry.getKey() );
-            }
-            else if ( node.getNodeName().equals( "matchLicenses" ) )
-            {
-                dependency.setHasMatchLicenses( true );
-                dependency.setMatchLicenses( parseLicenses( node ).getValue() );
+            switch (node.getNodeName()) {
+                case "groupId":
+                    dependency.setGroupId(node.getTextContent());
+                    break;
+                case "artifactId":
+                    dependency.setArtifactId(node.getTextContent());
+                    break;
+                case "version":
+                    dependency.setVersion(node.getTextContent());
+                    break;
+                case "licenses":
+                    Map.Entry<Boolean, List<ProjectLicense>> entry = parseLicenses(node);
+                    dependency.setLicenses(entry.getValue());
+                    dependency.setApproved(entry.getKey());
+                    break;
+                case "matchLicenses":
+                    dependency.setHasMatchLicenses(true);
+                    dependency.setMatchLicenses(parseLicenses(node).getValue());
+                    break;
             }
         }
         return dependency;
@@ -140,7 +137,7 @@ public class LicenseSummaryReader
 
     private static Map.Entry<Boolean, List<ProjectLicense>> parseLicenses( Node node )
     {
-        final List<ProjectLicense> result = new ArrayList<ProjectLicense>();
+        final List<ProjectLicense> result = new ArrayList<>();
         final NodeList licensesChildNodes = node.getChildNodes();
         final Node approvedNode = node.getAttributes().getNamedItem( "approved" );
         boolean approved = Boolean.parseBoolean( approvedNode != null ? approvedNode.getNodeValue() : "false" );
@@ -157,7 +154,7 @@ public class LicenseSummaryReader
                 result.add( parseLicense( licensesChildNode ) );
             }
         }
-        return new AbstractMap.SimpleImmutableEntry<Boolean, List<ProjectLicense>>( approved, result );
+        return new AbstractMap.SimpleImmutableEntry<>( approved, result );
     }
 
     private static ProjectLicense parseLicense( Node licenseNode )
@@ -167,25 +164,22 @@ public class LicenseSummaryReader
         for ( int i = 0; i < licenseElements.getLength(); ++i )
         {
             Node node = licenseElements.item( i );
-            if ( node.getNodeName().equals( "name" ) )
-            {
-                license.setName( node.getTextContent() );
-            }
-            else if ( node.getNodeName().equals( "url" ) )
-            {
-                license.setUrl( node.getTextContent() );
-            }
-            else if ( node.getNodeName().equals( "distribution" ) )
-            {
-                license.setDistribution( node.getTextContent() );
-            }
-            else if ( node.getNodeName().equals( "comments" ) )
-            {
-                license.setComments( node.getTextContent() );
-            }
-            else if ( node.getNodeName().equals( "file" ) )
-            {
-                license.setFile( node.getTextContent() );
+            switch (node.getNodeName()) {
+                case "name":
+                    license.setName(node.getTextContent());
+                    break;
+                case "url":
+                    license.setUrl(node.getTextContent());
+                    break;
+                case "distribution":
+                    license.setDistribution(node.getTextContent());
+                    break;
+                case "comments":
+                    license.setComments(node.getTextContent());
+                    break;
+                case "file":
+                    license.setFile(node.getTextContent());
+                    break;
             }
         }
         return license;

@@ -64,8 +64,7 @@ public class FreeMarkerHelper
     public static FreeMarkerHelper newDefaultHelper()
     {
         ClassTemplateLoader templateLoader = new ClassTemplateLoader( FreeMarkerHelper.class, "/" );
-        FreeMarkerHelper result = new FreeMarkerHelper( templateLoader );
-        return result;
+        return new FreeMarkerHelper( templateLoader );
     }
 
     /**
@@ -79,8 +78,7 @@ public class FreeMarkerHelper
         StringTemplateLoader templateLoader = new StringTemplateLoader();
         templateLoader.putTemplate( TEMPLATE, stringTemplate );
 
-        FreeMarkerHelper result = new FreeMarkerHelper( templateLoader );
-        return result;
+        return new FreeMarkerHelper( templateLoader );
     }
 
     protected FreeMarkerHelper( TemplateLoader templateLoader )

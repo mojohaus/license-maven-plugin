@@ -195,10 +195,7 @@ public class ProjectLicenseInfo
         if ( compareTo instanceof Artifact )
         {
             Artifact compare = (Artifact) compareTo;
-            if ( groupId.equals( compare.getGroupId() ) && artifactId.equals( compare.getArtifactId() ) )
-            {
-                return true;
-            }
+            return groupId.equals(compare.getGroupId()) && artifactId.equals(compare.getArtifactId());
         }
         return false;
     }

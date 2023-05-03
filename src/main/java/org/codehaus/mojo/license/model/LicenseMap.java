@@ -130,12 +130,7 @@ public class LicenseMap
             SortedSet<MavenProject> set = entry.getValue();
             for ( MavenProject p : set )
             {
-                Set<String> list = tmp.get( p );
-                if ( list == null )
-                {
-                    list = new HashSet<>();
-                    tmp.put( p, list );
-                }
+                Set<String> list = tmp.computeIfAbsent( p, k -> new HashSet<>() );
                 list.add( license );
             }
         }
@@ -145,7 +140,7 @@ public class LicenseMap
         {
             List<String> value = new ArrayList<>( entry.getValue() );
             Collections.sort( value );
-            result.put( entry.getKey(), value.toArray( new String[value.size()] ) );
+            result.put( entry.getKey(), value.toArray( new String[0] ) );
         }
         tmp.clear();
         return result;

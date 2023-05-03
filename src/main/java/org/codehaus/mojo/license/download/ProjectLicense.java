@@ -287,12 +287,9 @@ public class ProjectLicense implements Cloneable
             return false;
         if ( url == null )
         {
-            if ( other.url != null )
-                return false;
+            return other.url == null;
         }
-        else if ( !url.equals( other.url ) )
-            return false;
-        return true;
+        else return url.equals(other.url);
         // CHECKSTYLE_ON: NeedBraces
     }
 

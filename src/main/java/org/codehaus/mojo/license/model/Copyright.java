@@ -24,6 +24,7 @@ package org.codehaus.mojo.license.model;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * Model of a copyright.
@@ -64,8 +65,7 @@ public class Copyright
         {
             lastYear = null;
         }
-        Copyright result = new Copyright( firstYear, lastYear, holder );
-        return result;
+        return new Copyright( firstYear, lastYear, holder );
     }
 
     public static Copyright newCopyright( Integer inceptionYear, String holder )
@@ -191,16 +191,11 @@ public class Copyright
         {
             return false;
         }
-        if ( holder != null ? !holder.equals( copyright.holder ) : copyright.holder != null )
+        if ( !Objects.equals( holder, copyright.holder ) )
         {
             return false;
         }
-        if ( lastYear != null ? !lastYear.equals( copyright.lastYear ) : copyright.lastYear != null )
-        {
-            return false;
-        }
-
-        return true;
+        return Objects.equals( lastYear, copyright.lastYear );
     }
 
     @Override

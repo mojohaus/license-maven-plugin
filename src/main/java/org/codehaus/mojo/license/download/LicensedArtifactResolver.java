@@ -77,12 +77,10 @@ public class LicensedArtifactResolver
      * For a given {@code project}, obtain the universe of its dependencies after applying transitivity and filtering
      * rules given in the {@code configuration} object. Result is given in a map where keys are unique artifact id
      *
-     * @param dependencies the project dependencies
+     * @param artifacts the project dependencies
      * @param configuration the configuration
-     * @param localRepository local repository used to resolv dependencies
      * @param remoteRepositories remote repositories used to resolv dependencies
-     * @param cache a optional cache where to keep resolved dependencies
-     * @return the map of resolved dependencies indexed by their unique id.
+     * @param result the map of resolved dependencies indexed by their unique id.
      * @see MavenProjectDependenciesConfigurator
      */
     public void loadProjectDependencies( ResolvedProjectDependencies artifacts,

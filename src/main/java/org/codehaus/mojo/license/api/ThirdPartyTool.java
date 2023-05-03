@@ -124,7 +124,6 @@ public interface ThirdPartyTool
      * From the given {@code licenseMap}, obtain all the projects with no license.
      *
      * @param licenseMap the license map to query
-     * @param doLog      a flag to add debug logs
      * @return the set of projects with no license
      */
     SortedSet<MavenProject> getProjectsWithNoLicense( LicenseMap licenseMap );
@@ -184,7 +183,7 @@ public interface ThirdPartyTool
      * @param project    the project
      * @param licenses   the licenses to add
      */
-    void addLicense( LicenseMap licenseMap, MavenProject project, List<?> licenses );
+    void addLicense( LicenseMap licenseMap, MavenProject project, List<License> licenses );
 
     /**
      * For a given {@code licenseMap}, merge all {@code licenses}.
