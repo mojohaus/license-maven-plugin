@@ -301,6 +301,18 @@
       <artifactId>junit</artifactId>
       <scope>test</scope>
     </dependency>
+
+    <dependency>
+      <groupId>org.xmlunit</groupId>
+      <artifactId>xmlunit-core</artifactId>
+      <version>2.9.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xmlunit</groupId>
+      <artifactId>xmlunit-legacy</artifactId>
+      <version>2.9.1</version>
+    </dependency>
+
   </dependencies>
 
   <build>
@@ -512,6 +524,7 @@
                     <pomExclude>download-licenses-basic/pom.xml</pomExclude>
                     <pomExclude>download-licenses-force/pom.xml</pomExclude>
                   </pomExcludes>
+                  <addTestClassPath>true</addTestClassPath>
                 </configuration>
               </execution>
               <!-- as this it is run in offline, then execute it after the previous its... -->
