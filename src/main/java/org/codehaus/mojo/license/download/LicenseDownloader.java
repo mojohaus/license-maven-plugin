@@ -53,6 +53,7 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.config.RequestConfig.Builder;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -89,14 +90,15 @@ public class LicenseDownloader implements AutoCloseable
     private final Map<String, ContentSanitizer> contentSanitizers;
     private final Charset charset;
 
-    public LicenseDownloader( Proxy proxy, int connectTimeout, int socketTimeout, int connectionRequestTimeout,
-                              Map<String, ContentSanitizer> contentSanitizers, Charset charset )
+    public LicenseDownloader( final Proxy proxy, final int connectTimeout, final int socketTimeout, final int connectionRequestTimeout,
+                              final Map<String, ContentSanitizer> contentSanitizers, final Charset charset )
     {
         this.contentSanitizers = contentSanitizers;
         this.charset = charset;
-        final Builder configBuilder = RequestConfig.copy( RequestConfig.DEFAULT ) //
-                        .setConnectTimeout( connectTimeout ) //
-                        .setSocketTimeout( socketTimeout ) //
+        final Builder configBuilder = RequestConfig.copy( RequestConfig.DEFAULT )
+                        .setConnectTimeout( connectTimeout )
+                        .setSocketTimeout( socketTimeout )
+                        .setCookieSpec(CookieSpecs.STANDARD)
                         .setConnectionRequestTimeout( connectionRequestTimeout );
 
         if ( proxy != null )
@@ -104,7 +106,7 @@ public class LicenseDownloader implements AutoCloseable
             configBuilder.setProxy( new HttpHost( proxy.getHost(), proxy.getPort(), proxy.getProtocol() ) );
         }
 
-        HttpClientBuilder clientBuilder = HttpClients.custom().setDefaultRequestConfig( configBuilder.build() );
+        final HttpClientBuilder clientBuilder = HttpClients.custom().setDefaultRequestConfig( configBuilder.build() );
         if ( proxy != null )
         {
             if ( proxy.getUsername() != null && proxy.getPassword() != null )
@@ -121,7 +123,7 @@ public class LicenseDownloader implements AutoCloseable
                 if ( nonProxyHosts.length > 0 )
                 {
                     final List<Pattern> nonProxyPatterns = new ArrayList<>();
-                    for ( String nonProxyHost : nonProxyHosts )
+                    for ( final String nonProxyHost : nonProxyHosts )
                     {
                         final Pattern pat =
                             Pattern.compile( nonProxyHost.replaceAll( "\\.", "\\\\." ).replaceAll( "\\*", ".*" ),
@@ -133,10 +135,10 @@ public class LicenseDownloader implements AutoCloseable
                     {
 
                         @Override
-                        protected HttpHost determineProxy( HttpHost target, HttpRequest request, HttpContext context )
+                        protected HttpHost determineProxy( final HttpHost target, final HttpRequest request, final HttpContext context )
                             throws HttpException
                         {
-                            for ( Pattern pattern : nonProxyPatterns )
+                            for ( final Pattern pattern : nonProxyPatterns )
                             {
                                 if ( pattern.matcher( target.getHostName() ).matches() )
                                 {
@@ -167,7 +169,7 @@ public class LicenseDownloader implements AutoCloseable
      * @throws URISyntaxException
      * @throws MojoFailureException
      */
-    public LicenseDownloadResult downloadLicense( String licenseUrlString, FileNameEntry fileNameEntry )
+    public LicenseDownloadResult downloadLicense( final String licenseUrlString, final FileNameEntry fileNameEntry )
         throws IOException, URISyntaxException, MojoFailureException
     {
         final File outputFile = fileNameEntry.getFile();
@@ -176,12 +178,12 @@ public class LicenseDownloader implements AutoCloseable
             throw new IllegalArgumentException( "Null URL for file " + outputFile.getPath() );
         }
 
-        List<ContentSanitizer> sanitizers = filterSanitizers( licenseUrlString );
+        final List<ContentSanitizer> sanitizers = this.filterSanitizers( licenseUrlString );
 
         if ( licenseUrlString.startsWith( "file://" ) )
         {
-            LOG.debug( "Downloading '{}' -> '{}'", licenseUrlString, outputFile );
-            Path in = Paths.get( new URI( licenseUrlString ) );
+            LicenseDownloader.LOG.debug( "Downloading '{}' -> '{}'", licenseUrlString, outputFile );
+            final Path in = Paths.get( new URI( licenseUrlString ) );
             if ( sanitizers.isEmpty() )
             {
                 Files.copy( in, outputFile.toPath() );
@@ -189,16 +191,16 @@ public class LicenseDownloader implements AutoCloseable
             }
             else
             {
-                try ( BufferedReader r = Files.newBufferedReader( in, charset ) )
+                try ( BufferedReader r = Files.newBufferedReader( in, this.charset ) )
                 {
-                    return sanitize( r, outputFile, charset, sanitizers, fileNameEntry.isPreferred() );
+                    return LicenseDownloader.sanitize( r, outputFile, this.charset, sanitizers, fileNameEntry.isPreferred() );
                 }
             }
         }
         else
         {
-            LOG.debug( "About to download '{}'", licenseUrlString );
-            try ( CloseableHttpResponse response = client.execute( new HttpGet( licenseUrlString ) ) )
+            LicenseDownloader.LOG.debug( "About to download '{}'", licenseUrlString );
+            try ( CloseableHttpResponse response = this.client.execute( new HttpGet( licenseUrlString ) ) )
             {
                 final StatusLine statusLine = response.getStatusLine();
                 if ( statusLine.getStatusCode() != HttpStatus.SC_OK )
@@ -213,10 +215,10 @@ public class LicenseDownloader implements AutoCloseable
                 {
                     final ContentType contentType = ContentType.get( entity );
 
-                    File updatedFile = fileNameEntry.isPreferred() ? outputFile
-                                    : updateFileExtension( outputFile,
+                    final File updatedFile = fileNameEntry.isPreferred() ? outputFile
+                                    : LicenseDownloader.updateFileExtension( outputFile,
                                                            contentType != null ? contentType.getMimeType() : null );
-                    LOG.debug( "Downloading '{}' -> '{}'{}",
+                    LicenseDownloader.LOG.debug( "Downloading '{}' -> '{}'{}",
                         licenseUrlString,
                         updatedFile,
                         fileNameEntry.isPreferred() ? " (preferred file name)" : "" );
@@ -249,7 +251,7 @@ public class LicenseDownloader implements AutoCloseable
                             return LicenseDownloadResult.success( updatedFile, actualSha1,
                                                                   fileNameEntry.isPreferred() );
                         }
-                        catch ( NoSuchAlgorithmException e )
+                        catch ( final NoSuchAlgorithmException e )
                         {
                             throw new RuntimeException( e );
                         }
@@ -262,7 +264,7 @@ public class LicenseDownloader implements AutoCloseable
                         try ( BufferedReader r =
                                         new BufferedReader( new InputStreamReader( entity.getContent(), cs ) ) )
                         {
-                            return sanitize( r, updatedFile, cs, sanitizers, fileNameEntry.isPreferred() );
+                            return LicenseDownloader.sanitize( r, updatedFile, cs, sanitizers, fileNameEntry.isPreferred() );
                         }
                     }
                 }
@@ -274,13 +276,13 @@ public class LicenseDownloader implements AutoCloseable
         }
     }
 
-    static LicenseDownloadResult sanitize( BufferedReader r, File out, Charset charset,
-                                           List<ContentSanitizer> sanitizers, boolean preferredFileName )
+    static LicenseDownloadResult sanitize( final BufferedReader r, final File out, final Charset charset,
+                                           final List<ContentSanitizer> sanitizers, final boolean preferredFileName )
         throws IOException
     {
         final StringBuilder contentBuilder = new StringBuilder();
         // CHECKSTYLE_OFF: MagicNumber
-        char[] buffer = new char[8192];
+        final char[] buffer = new char[8192];
         // CHECKSTYLE_ON: MagicNumber
         int len = 0;
         while ( ( len = r.read( buffer ) ) >= 0 )
@@ -289,20 +291,20 @@ public class LicenseDownloader implements AutoCloseable
         }
 
         String content = contentBuilder.toString();
-        for ( ContentSanitizer sanitizer : sanitizers )
+        for ( final ContentSanitizer sanitizer : sanitizers )
         {
             content = sanitizer.sanitize( content );
         }
-        byte[] bytes = content.getBytes( charset );
+        final byte[] bytes = content.getBytes( charset );
         Files.write( out.toPath(), bytes );
         final String sha1 = DigestUtils.sha1Hex( bytes );
         return LicenseDownloadResult.success( out, sha1, preferredFileName );
     }
 
-    List<ContentSanitizer> filterSanitizers( String licenseUrlString )
+    List<ContentSanitizer> filterSanitizers( final String licenseUrlString )
     {
-        ArrayList<ContentSanitizer> result = new ArrayList<>();
-        for ( ContentSanitizer s : contentSanitizers.values() )
+        final ArrayList<ContentSanitizer> result = new ArrayList<>();
+        for ( final ContentSanitizer s : this.contentSanitizers.values() )
         {
             if ( s.applies( licenseUrlString ) )
             {
@@ -312,7 +314,7 @@ public class LicenseDownloader implements AutoCloseable
         return result;
     }
 
-    static File updateFileExtension( File outputFile, String mimeType )
+    static File updateFileExtension( final File outputFile, final String mimeType )
     {
         String realExtension = FileUtil.toExtension( mimeType, false );
         if ( realExtension == null )
@@ -324,7 +326,7 @@ public class LicenseDownloader implements AutoCloseable
         final String oldFileName = outputFile.getName();
         if ( !oldFileName.endsWith( realExtension ) )
         {
-            final String newFileName = EXTENSION_PATTERN.matcher( oldFileName ).replaceAll( "" ) + realExtension;
+            final String newFileName = LicenseDownloader.EXTENSION_PATTERN.matcher( oldFileName ).replaceAll( "" ) + realExtension;
             return new File( outputFile.getParentFile(), newFileName );
         }
         return outputFile;
@@ -333,7 +335,7 @@ public class LicenseDownloader implements AutoCloseable
     @Override
     public void close() throws IOException
     {
-        client.close();
+        this.client.close();
     }
 
     /**
@@ -343,17 +345,17 @@ public class LicenseDownloader implements AutoCloseable
      */
     public static class LicenseDownloadResult
     {
-        public static LicenseDownloadResult success( File file, String sha1, boolean preferredFileName )
+        public static LicenseDownloadResult success( final File file, final String sha1, final boolean preferredFileName )
         {
             return new LicenseDownloadResult( file, sha1, preferredFileName, null );
         }
 
-        public static LicenseDownloadResult failure( String errorMessage )
+        public static LicenseDownloadResult failure( final String errorMessage )
         {
             return new LicenseDownloadResult( null, null, false, errorMessage );
         }
 
-        private LicenseDownloadResult( File file, String sha1, boolean preferredFileName, String errorMessage )
+        private LicenseDownloadResult( final File file, final String sha1, final boolean preferredFileName, final String errorMessage )
         {
             super();
             this.file = file;
@@ -372,32 +374,32 @@ public class LicenseDownloader implements AutoCloseable
 
         public File getFile()
         {
-            return file;
+            return this.file;
         }
 
         public String getErrorMessage()
         {
-            return errorMessage;
+            return this.errorMessage;
         }
 
         public boolean isSuccess()
         {
-            return errorMessage == null;
+            return this.errorMessage == null;
         }
 
         public boolean isPreferredFileName()
         {
-            return preferredFileName;
+            return this.preferredFileName;
         }
 
         public String getSha1()
         {
-            return sha1;
+            return this.sha1;
         }
 
-        public LicenseDownloadResult withFile( File otherFile )
+        public LicenseDownloadResult withFile( final File otherFile )
         {
-            return new LicenseDownloadResult( otherFile, sha1, preferredFileName, errorMessage );
+            return new LicenseDownloadResult( otherFile, this.sha1, this.preferredFileName, this.errorMessage );
         }
     }
 
