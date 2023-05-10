@@ -117,7 +117,7 @@
     <it.debug>true</it.debug>
 
     <version.httpcomponents.httpclient>4.5.13</version.httpcomponents.httpclient>
-    <version.httpcomponents.httpcore>4.4.8</version.httpcomponents.httpcore>
+    <version.httpcomponents.httpcore>4.4.16</version.httpcomponents.httpcore>
 
     <!-- license configuration -->
     <license.useMissingFile>true</license.useMissingFile>
