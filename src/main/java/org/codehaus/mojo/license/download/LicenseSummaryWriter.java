@@ -66,10 +66,7 @@ public class LicenseSummaryWriter
         Node dependenciesNode = doc.createElement( "dependencies" );
         root.appendChild( dependenciesNode );
 
-        for ( ProjectLicenseInfo dep : dependencies )
-        {
-            dependenciesNode.appendChild( createDependencyNode( doc, dep, writeVersions ) );
-        }
+        dependencies.forEach( dep -> dependenciesNode.appendChild( createDependencyNode( doc, dep, writeVersions ) ) );
 
         // Prepare the output file File
         try ( StringWriter sw = new StringWriter() )

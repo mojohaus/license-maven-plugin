@@ -442,10 +442,8 @@ public abstract class AbstractFileHeaderTransformer
         {
             if ( isTrimHeaderLine() )
             {
-              StringBuilder lineBuffer = new StringBuilder();
-              lineBuffer.append( getCommentLinePrefix() );
-              lineBuffer.append( line );
-              buffer.append( StringUtils.stripEnd( lineBuffer.toString(), null ) );
+                String lineBuffer = getCommentLinePrefix() + line;
+                buffer.append( StringUtils.stripEnd( lineBuffer, null ) );
             }
             else
             {

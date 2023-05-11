@@ -29,9 +29,7 @@ import org.codehaus.plexus.util.IOUtil;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -45,7 +43,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -240,15 +237,10 @@ public class FileUtil
     public static String readAsString( File file, String encoding )
         throws IOException
     {
-        FileInputStream inf = new FileInputStream( file );
-        BufferedReader in = new BufferedReader( new InputStreamReader( inf, encoding ) );
-        try
+        InputStream inf = Files.newInputStream( file.toPath() );
+        try ( BufferedReader in = new BufferedReader( new InputStreamReader( inf, encoding ) ) )
         {
             return IOUtil.toString( in );
-        }
-        finally
-        {
-            in.close();
         }
     }
 
@@ -265,11 +257,8 @@ public class FileUtil
     {
         createDirectoryIfNecessary( file.getParentFile() );
 
-        BufferedReader in;
-        PrintWriter out;
-        in =  new BufferedReader( new StringReader( content ) );
-        out = new PrintWriter( new BufferedWriter( new OutputStreamWriter( new FileOutputStream( file ), encoding ) ) );
-        try
+        try ( BufferedReader in =  new BufferedReader( new StringReader( content ) );
+              PrintWriter out = new PrintWriter( new BufferedWriter( new OutputStreamWriter( Files.newOutputStream( file.toPath() ), encoding ) ) ) )
         {
             String line;
             while ( ( line = in.readLine() ) != null )
@@ -277,23 +266,12 @@ public class FileUtil
                 out.println( line );
             }
         }
-        finally
-        {
-            in.close();
-            out.close();
-        }
     }
 
     public static List<File> orderFiles( Collection<File> files )
     {
         List<File> result = new ArrayList<>( files );
-        Collections.sort( result, new Comparator<File>()
-        {
-            public int compare( File o1, File o2 )
-            {
-                return o1.getAbsolutePath().compareTo( o2.getAbsolutePath() );
-            }
-        } );
+        result.sort( Comparator.comparing( File::getAbsolutePath ) );
         return result;
     }
 

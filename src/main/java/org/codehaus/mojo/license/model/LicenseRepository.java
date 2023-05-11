@@ -87,14 +87,12 @@ public class LicenseRepository
             throw new IllegalStateException( "no baseURL defined in " + this );
         }
 
-        URL definitionURL = MojoHelper.getUrl( getBaseURL(), REPOSITORY_DEFINITION_FILE );
-        return definitionURL;
+        return MojoHelper.getUrl( getBaseURL(), REPOSITORY_DEFINITION_FILE );
     }
 
     protected URL getLicenseBaseURL( String licenseName )
     {
-        URL licenseBaseURL = MojoHelper.getUrl( baseURL, licenseName );
-        return licenseBaseURL;
+        return MojoHelper.getUrl( baseURL, licenseName );
     }
 
     public void load()
@@ -177,13 +175,13 @@ public class LicenseRepository
         {
             result.add( license.getName() );
         }
-        return result.toArray( new String[result.size()] );
+        return result.toArray( new String[0] );
     }
 
     public License[] getLicenses()
     {
         checkInit( "getLicenses" );
-        return licenses.toArray( new License[licenses.size()] );
+        return licenses.toArray( new License[0] );
     }
 
     public License getLicense( String licenseName )

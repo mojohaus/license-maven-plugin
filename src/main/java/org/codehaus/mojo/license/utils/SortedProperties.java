@@ -88,7 +88,7 @@ public class SortedProperties
             // Attention, si les clef ne sont pas des string, ca ne marchera pas
             List<String> list = toGenericList( objects, String.class );
             Collections.sort( list );
-            result = new Vector<Object>( list );
+            result = new Vector<>( list );
         }
         catch ( IllegalArgumentException e )
         {
@@ -109,14 +109,9 @@ public class SortedProperties
     public SortedProperties load( File src )
         throws IOException
     {
-        FileInputStream reader = new FileInputStream( src );
-        try
+        try ( FileInputStream reader = new FileInputStream( src ) )
         {
             load( reader );
-        }
-        finally
-        {
-            reader.close();
         }
         return this;
     }
@@ -130,14 +125,9 @@ public class SortedProperties
     public void store( File dst )
         throws IOException
     {
-        OutputStream writer = new FileOutputStream( dst );
-        try
+        try ( OutputStream writer = new FileOutputStream( dst ) )
         {
             store( writer, null );
-        }
-        finally
-        {
-            writer.close();
         }
     }
 

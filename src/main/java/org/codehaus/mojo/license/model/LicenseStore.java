@@ -32,6 +32,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.StreamSupport;
 
 /**
  * The {@code LicenseStore} offers {@link License} coming from different {@link
@@ -90,11 +91,7 @@ public class LicenseStore
             }
             store.init();
         }
-        catch ( IllegalArgumentException ex )
-        {
-            throw new MojoExecutionException( "could not obtain the license repository", ex );
-        }
-        catch ( IOException ex )
+        catch ( IllegalArgumentException | IOException ex )
         {
             throw new MojoExecutionException( "could not obtain the license repository", ex );
         }
@@ -132,14 +129,9 @@ public class LicenseStore
     {
         checkInit( "getLicenseNames" );
         List<String> result = new ArrayList<>();
-        for ( LicenseRepository repository : this )
-        {
-            for ( License license : repository )
-            {
-                result.add( license.getName() );
-            }
-        }
-        return result.toArray( new String[result.size()] );
+        StreamSupport.stream(this.spliterator(), false)
+            .forEach( repository -> repository.forEach( license -> result.add( license.getName() ) ) );
+        return result.toArray( new String[0] );
     }
 
     public License[] getLicenses()
@@ -148,15 +140,10 @@ public class LicenseStore
         List<License> result = new ArrayList<>();
         if ( repositories != null )
         {
-            for ( LicenseRepository repository : this )
-            {
-                for ( License license : repository )
-                {
-                    result.add( license );
-                }
-            }
+            StreamSupport.stream(this.spliterator(), false)
+                .forEach( repository -> repository.forEach( result::add ) );
         }
-        return result.toArray( new License[result.size()] );
+        return result.toArray( new License[0] );
     }
 
     public License getLicense( String licenseName )

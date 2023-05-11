@@ -106,8 +106,8 @@
 
   <properties>
     <mavenVersion>3.5.4</mavenVersion>
-    <mojo.java.target>7</mojo.java.target>
-    <minimalJavaBuildVersion>1.7</minimalJavaBuildVersion>
+    <mojo.java.target>8</mojo.java.target>
+    <minimalJavaBuildVersion>1.8</minimalJavaBuildVersion>
 
     <processorVersion>1.3</processorVersion>
 

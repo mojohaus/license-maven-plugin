@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.apache.maven.plugin.MojoExecutionException;
 
@@ -67,10 +68,7 @@ public class LicenseMatchers
                 final List<ProjectLicenseInfo> replacements =
                     LicenseSummaryReader.parseLicenseSummary( licenseMatchersFile );
 
-                for ( ProjectLicenseInfo dependency : replacements )
-                {
-                    matchers.add( DependencyMatcher.of( dependency ) );
-                }
+                replacements.forEach( dependency -> matchers.add( DependencyMatcher.of( dependency ) ) );
             }
         }
         catch ( Exception e )
@@ -204,10 +202,7 @@ public class LicenseMatchers
                 final ArrayList<ProjectLicense> result = new ArrayList<>( licenses != null ? licenses.size() : 0 );
                 if ( licenses != null )
                 {
-                    for ( ProjectLicense license : licenses )
-                    {
-                        result.add( license.clone() );
-                    }
+                    result.addAll( licenses.stream().map( license -> license.clone() ).collect( Collectors.toList() ) );
                 }
                 return result;
             }
@@ -287,12 +282,9 @@ public class LicenseMatchers
             }
             else
             {
-                licenseMatchers = new ArrayList<>();
-                for ( ProjectLicense lic : rawMatchers )
-                {
-                    licenseMatchers.add( new LicenseMatcher( lic.getName(), lic.getUrl(), lic.getDistribution(),
-                                                             lic.getComments() ) );
-                }
+                licenseMatchers = rawMatchers.stream()
+                    .map( lic -> new LicenseMatcher( lic.getName(), lic.getUrl(), lic.getDistribution(), lic.getComments() ))
+                    .collect( Collectors.toList() );
             }
             return new LicenseListMatcher( licenseMatchers );
         }

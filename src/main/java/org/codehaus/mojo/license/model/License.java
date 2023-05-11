@@ -128,14 +128,9 @@ public class License
             throw new IllegalStateException( "no baseURL defined, can not obtain license content in " + this );
         }
 
-        Reader r = new BufferedReader( new InputStreamReader( getLicenseURL().openStream(), encoding ) );
-        try
+        try ( Reader r = new BufferedReader( new InputStreamReader( getLicenseURL().openStream(), encoding ) ) )
         {
             return IOUtil.toString( r );
-        }
-        finally
-        {
-            r.close();
         }
     }
 
@@ -146,14 +141,9 @@ public class License
         {
             throw new IllegalStateException( "no baseURL defined, can not obtain header content in " + this );
         }
-        Reader r = new BufferedReader( new InputStreamReader( getHeaderURL().openStream(), encoding ) );
-        try
+        try ( Reader r = new BufferedReader( new InputStreamReader( getHeaderURL().openStream(), encoding ) ) )
         {
             return IOUtil.toString( r );
-        }
-        finally
-        {
-            r.close();
         }
     }
 

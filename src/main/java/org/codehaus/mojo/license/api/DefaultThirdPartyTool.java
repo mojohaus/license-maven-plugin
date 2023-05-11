@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -252,11 +253,7 @@ public class DefaultThirdPartyTool
             loadGlobalLicenses( topLevelDependencies, remoteRepositories, unsafeDependencies,
                                 licenseMap, unsafeProjects, result );
         }
-        catch ( ArtifactNotFoundException e )
-        {
-            throw new ThirdPartyToolException( "Failed to load global licenses", e );
-        }
-        catch ( ArtifactResolutionException e )
+        catch ( ArtifactNotFoundException | ArtifactResolutionException e )
         {
             throw new ThirdPartyToolException( "Failed to load global licenses", e );
         }
@@ -356,7 +353,7 @@ public class DefaultThirdPartyTool
     /**
      * {@inheritDoc}
      */
-    public void addLicense( LicenseMap licenseMap, MavenProject project, List<?> licenses )
+    public void addLicense( LicenseMap licenseMap, MavenProject project, List<License> licenses )
     {
 
         if ( Artifact.SCOPE_SYSTEM.equals( project.getArtifact().getScope() ) )
@@ -374,15 +371,14 @@ public class DefaultThirdPartyTool
             return;
         }
 
-        for ( Object o : licenses )
+        for ( License license : licenses )
         {
             String id = MojoHelper.getArtifactId( project.getArtifact() );
-            if ( o == null )
+            if ( license == null )
             {
                 LOG.warn( "could not acquire the license for {}", id );
                 continue;
             }
-            License license = (License) o;
             String licenseKey = license.getName();
 
             // tchemit 2010-08-29 Ano #816 Check if the License object is well formed
@@ -505,9 +501,8 @@ public class DefaultThirdPartyTool
         // since GAV is good enough to qualify a license of any artifact of it...
         Map<String, String> migrateKeys = migrateMissingFileKeys( unsafeMappings.keySet() );
 
-        for ( Object o : migrateKeys.keySet() )
+        for ( String id : migrateKeys.keySet() )
         {
-            String id = (String) o;
             String migratedId = migrateKeys.get( id );
 
             MavenProject project = artifactCache.get( migratedId );
@@ -708,10 +703,10 @@ public class DefaultThirdPartyTool
         File propFile = resolveArtifact( dep.getGroupId(), dep.getArtifactId(), dep.getVersion(), dep.getType(),
                 dep.getClassifier(), remoteRepositories );
         LOG.info(
-                "Loading global license map from {}: {}", dep.toString(), propFile.getAbsolutePath() );
+                "Loading global license map from {}: {}", dep, propFile.getAbsolutePath() );
         SortedProperties props = new SortedProperties( "utf-8" );
 
-        try ( InputStream propStream = new FileInputStream( propFile ) )
+        try (InputStream propStream = Files.newInputStream( propFile.toPath() ) )
         {
             props.load( propStream );
         }
@@ -736,8 +731,7 @@ public class DefaultThirdPartyTool
 
     /**
      * @param project         not null
-     * @param localRepository not null
-     * @param repositories    not null
+     * \@param remoteRepositories    not null
      * @return the resolved site descriptor
      * @throws IOException                 if any
      * @throws ArtifactResolutionException if any

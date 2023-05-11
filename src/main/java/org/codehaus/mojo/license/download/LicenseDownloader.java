@@ -161,7 +161,7 @@ public class LicenseDownloader implements AutoCloseable
      * can be adjusted based on the mime type of the HTTP response.
      *
      * @param licenseUrlString the URL
-     * @param outputFile a hint where to store the license file
+     * @param fileNameEntry a hint where to store the license file
      * @return the path to the file where the downloaded license file was stored
      * @throws IOException
      * @throws URISyntaxException

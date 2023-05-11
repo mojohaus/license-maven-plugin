@@ -105,12 +105,9 @@ public class LicensedArtifact
             return false;
         if ( version == null )
         {
-            if ( other.version != null )
-                return false;
+            return other.version == null;
         }
-        else if ( !version.equals( other.version ) )
-            return false;
-        return true;
+        else return version.equals(other.version);
         // CHECKSTYLE_ON: NeedBraces
     }
 

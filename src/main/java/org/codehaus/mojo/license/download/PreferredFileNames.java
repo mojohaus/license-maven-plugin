@@ -34,6 +34,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -64,7 +65,7 @@ public class PreferredFileNames
     public static PreferredFileNames build( File licensesOutputDirectory, Map<String, String> licenseUrlFileNames )
     {
         final Map<String, Map.Entry<String, List<Pattern>>> fileNameToUrlPatterns = new LinkedHashMap<>();
-        final Map<String, String> sha1TofileName = new LinkedHashMap<String, String>();
+        final Map<String, String> sha1TofileName = new LinkedHashMap<>();
 
 
         if ( licenseUrlFileNames != null )
@@ -79,41 +80,39 @@ public class PreferredFileNames
                 final String fileName = en.getKey();
                 if ( fileName != null && !fileName.isEmpty() )
                 {
-                    if ( "spdx".equals( fileName ) )
-                    {
-                        // ignore
-                    }
-                    else if ( en.getValue() != null )
-                    {
-                        String[] rawPatters = en.getValue().split( "\\s+" );
-                        if ( rawPatters != null )
+                    if (!"spdx".equals(fileName)) {
+                        if ( en.getValue() != null )
                         {
-                            final List<Pattern> patterns = new ArrayList<>();
-                            String sha1 = null;
-                            for ( String rawPattern : rawPatters )
+                            String[] rawPatters = en.getValue().split( "\\s+" );
+                            if ( rawPatters != null )
                             {
-                                if ( rawPattern.startsWith( "sha1:" ) )
+                                final List<Pattern> patterns = new ArrayList<>();
+                                String sha1 = null;
+                                for ( String rawPattern : rawPatters )
                                 {
-                                    if ( sha1 != null )
+                                    if ( rawPattern.startsWith( "sha1:" ) )
                                     {
-                                        throw new IllegalStateException( "sha1 defined twice for licenseFileName '"
-                                            + fileName + "'" );
+                                        if ( sha1 != null )
+                                        {
+                                            throw new IllegalStateException( "sha1 defined twice for licenseFileName '"
+                                                + fileName + "'" );
+                                        }
+                                        sha1 = rawPattern.substring( 5 );
                                     }
-                                    sha1 = rawPattern.substring( 5 );
+                                    else
+                                    {
+                                        patterns.add( Pattern.compile( rawPattern, Pattern.CASE_INSENSITIVE ) );
+                                    }
                                 }
-                                else
+                                if ( sha1 != null )
                                 {
-                                    patterns.add( Pattern.compile( rawPattern, Pattern.CASE_INSENSITIVE ) );
+                                    sha1TofileName.put( sha1, fileName );
                                 }
+                                fileNameToUrlPatterns.put( fileName,
+                                        new AbstractMap.SimpleImmutableEntry<>(
+                                                        sha1,
+                                                        Collections.unmodifiableList( patterns ) ) );
                             }
-                            if ( sha1 != null )
-                            {
-                                sha1TofileName.put( sha1, fileName );
-                            }
-                            fileNameToUrlPatterns.put( fileName,
-                                    new AbstractMap.SimpleImmutableEntry<>(
-                                                    sha1,
-                                                    Collections.unmodifiableList( patterns ) ) );
                         }
                     }
                 }
@@ -149,20 +148,10 @@ public class PreferredFileNames
                         {
                             stableSha1s.add( sha1 );
                         }
-                        Set<String> licIds = sha1ToLicenseIds.get( sha1 );
-                        if ( licIds == null )
-                        {
-                            licIds = new TreeSet<>();
-                            sha1ToLicenseIds.put( sha1, licIds );
-                        }
+                        Set<String> licIds = sha1ToLicenseIds.computeIfAbsent(sha1, k -> new TreeSet<>());
                         licIds.add( lic.getLicenseId() );
 
-                        Set<String> urls = sha1ToUrls.get( sha1 );
-                        if ( urls == null )
-                        {
-                            urls = new TreeSet<>();
-                            sha1ToUrls.put( sha1, urls );
-                        }
+                        Set<String> urls = sha1ToUrls.computeIfAbsent(sha1, k -> new TreeSet<>());
                         urls.add( urlInfoEntry.getKey() );
                     }
                 }
@@ -189,12 +178,7 @@ public class PreferredFileNames
                     final String mimeType = urlInfo.getMimeType();
                     if ( sha1ToLicenseIds.containsKey( urlInfo.getSha1() ) && mimeType != null )
                     {
-                        Set<String> sha1s = mimeTypeToSha1.get( mimeType );
-                        if ( sha1s == null )
-                        {
-                            sha1s = new LinkedHashSet<>();
-                            mimeTypeToSha1.put( mimeType, sha1s );
-                        }
+                        Set<String> sha1s = mimeTypeToSha1.computeIfAbsent(mimeType, k -> new LinkedHashSet<>());
                         sha1s.add( urlInfo.getSha1() );
                     }
                 }
@@ -235,9 +219,7 @@ public class PreferredFileNames
                         fileNameToUrlPatterns.put( fileName,
                                                    new AbstractMap.SimpleImmutableEntry<>( useSha1, usePatterns ) );
                     }
-                    else if ( !( avail.getKey() == useSha1
-                        || ( avail.getKey() != null && avail.getKey().equals( useSha1 ) ) )
-                        || !isEqual( usePatterns, avail.getValue() ) )
+                    else if (!Objects.equals(avail.getKey(), useSha1) || !isEqual(usePatterns, avail.getValue()))
                     {
                         LOG.warn( "Available: {}, {}, {}", fileName, avail.getKey(), avail.getValue() );
                         LOG.warn( "To add   : {}, {}, {}", fileName, useSha1, patterns );
@@ -258,16 +240,16 @@ public class PreferredFileNames
                 final String fileName = en.getKey();
                 final String sha1 = en.getValue().getKey();
                 final List<Pattern> patterns = en.getValue().getValue();
-                sb.append( "  <" + fileName + ">\n" );
+                sb.append("  <").append( fileName ).append( ">\n" );
                 if ( sha1 != null )
                 {
-                    sb.append( "    sha1:" + sha1 + "\n" );
+                    sb.append("    sha1:").append( sha1 ).append( "\n" );
                 }
                 for ( Pattern pattern : patterns )
                 {
-                    sb.append( "    " + pattern.pattern() + "\n" );
+                    sb.append("    ").append( pattern.pattern() ).append( "\n" );
                 }
-                sb.append( "  </" + fileName + ">\n" );
+                sb.append("  </").append( fileName ).append( ">\n" );
 
             }
             sb.append( "</licenseUrlFileNames>\n" );

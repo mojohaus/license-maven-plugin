@@ -185,10 +185,10 @@ public class DefaultThirdPartyHelper
 
         LicenseMap licenseMap = new LicenseMap();
 
-        for ( MavenProject project : dependencies.values() )
-        {
-            thirdPartyTool.addLicense( licenseMap, project, project.getLicenses() );
-        }
+        dependencies.
+            values().
+            forEach(project -> thirdPartyTool.addLicense( licenseMap, project, project.getLicenses() ));
+
         return licenseMap;
     }
 
