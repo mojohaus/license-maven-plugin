@@ -44,6 +44,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,7 +102,12 @@ public class DefaultThirdPartyHelper
     /**
      * Cache of dependencies (as maven project) loaded.
      */
-    private static SortedMap<String, MavenProject> artifactCache;
+    private static final class ArtifactCacheHolder
+    {
+        private ArtifactCacheHolder() {}
+
+        private static final SortedMap<String, MavenProject> artifactCache = new ConcurrentSkipListMap<>();
+    }
 
     /**
      * Constructor of the helper.
@@ -136,11 +142,7 @@ public class DefaultThirdPartyHelper
      */
     public SortedMap<String, MavenProject> getArtifactCache()
     {
-        if ( artifactCache == null )
-        {
-            artifactCache = new TreeMap<>();
-        }
-        return artifactCache;
+        return ArtifactCacheHolder.artifactCache;
     }
 
     /**
