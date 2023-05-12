@@ -53,7 +53,7 @@ import org.codehaus.mojo.license.download.LicensedArtifact;
  * @since 1.0
  */
 @Mojo( name = "download-licenses", requiresDependencyResolution = ResolutionScope.TEST,
-    defaultPhase = LifecyclePhase.PACKAGE )
+    defaultPhase = LifecyclePhase.PACKAGE, threadSafe = true )
 public class DownloadLicensesMojo
     extends AbstractDownloadLicensesMojo
 {

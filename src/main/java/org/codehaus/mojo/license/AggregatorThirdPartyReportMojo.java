@@ -49,7 +49,8 @@ import java.util.List;
  * @author Tony Chemit - dev@tchemit.fr
  * @since 1.10
  */
-@Mojo( name = "aggregate-third-party-report", aggregator = true, requiresDependencyResolution = ResolutionScope.TEST )
+@Mojo( name = "aggregate-third-party-report", aggregator = true,
+    requiresDependencyResolution = ResolutionScope.TEST, threadSafe = true )
 public class AggregatorThirdPartyReportMojo
     extends AbstractThirdPartyReportMojo
 {
