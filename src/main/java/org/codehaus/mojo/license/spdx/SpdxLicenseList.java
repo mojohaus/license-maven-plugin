@@ -42,23 +42,15 @@ import org.codehaus.mojo.license.spdx.SpdxLicenseList.Attachments.UrlReplacement
  */
 public class SpdxLicenseList
 {
-    private static volatile SpdxLicenseList latest;
-
-    private static final Object LOCK = new Object();
+    private static final class LatestHolder
+    {
+        private LatestHolder() {}
+        private static final SpdxLicenseList latest = SpdxLicenseListData.createList();
+    }
 
     public static SpdxLicenseList getLatest()
     {
-        if ( latest == null )
-        {
-            synchronized ( LOCK )
-            {
-                if ( latest == null )
-                {
-                    latest = SpdxLicenseListData.createList();
-                }
-            }
-        }
-        return latest;
+        return LatestHolder.latest;
     }
 
     private final String licenseListVersion;
