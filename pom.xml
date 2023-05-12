@@ -111,7 +111,7 @@
 
     <processorVersion>1.3</processorVersion>
 
-    <doxiaVersion>1.8</doxiaVersion>
+    <doxiaVersion>1.12.0</doxiaVersion>
     <!-- ASF project maven-doxia-sitetools:1.8.1 has different release cycle and it is dependent on maven-doxia:1.8 -->
     <doxiaRendererVersion>1.8.1</doxiaRendererVersion>
     <it.debug>true</it.debug>
