@@ -53,6 +53,7 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.config.RequestConfig.Builder;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -97,6 +98,7 @@ public class LicenseDownloader implements AutoCloseable
         final Builder configBuilder = RequestConfig.copy( RequestConfig.DEFAULT ) //
                         .setConnectTimeout( connectTimeout ) //
                         .setSocketTimeout( socketTimeout ) //
+                        .setCookieSpec(CookieSpecs.STANDARD)
                         .setConnectionRequestTimeout( connectionRequestTimeout );
 
         if ( proxy != null )
