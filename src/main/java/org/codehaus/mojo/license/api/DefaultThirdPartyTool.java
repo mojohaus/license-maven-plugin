@@ -458,13 +458,16 @@ public class DefaultThirdPartyTool
     {
         Map<String, MavenProject> snapshots = new HashMap<>();
 
-        //find snapshot dependencies
-        for ( Map.Entry<String, MavenProject> entry : artifactCache.entrySet() )
+        synchronized ( artifactCache )
         {
-            MavenProject mavenProject = entry.getValue();
-            if ( mavenProject.getVersion().endsWith( Artifact.SNAPSHOT_VERSION ) )
+            //find snapshot dependencies
+            for ( Map.Entry<String, MavenProject> entry : artifactCache.entrySet() )
             {
-                snapshots.put( entry.getKey(), mavenProject );
+                MavenProject mavenProject = entry.getValue();
+                if ( mavenProject.getVersion().endsWith( Artifact.SNAPSHOT_VERSION ) )
+                {
+                    snapshots.put( entry.getKey(), mavenProject );
+                }
             }
         }
 
