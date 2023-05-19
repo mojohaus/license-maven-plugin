@@ -1,14 +1,5 @@
 package org.codehaus.mojo.license;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.SortedSet;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.maven.artifact.Artifact;
@@ -26,6 +17,16 @@ import org.codehaus.mojo.license.model.LicenseMap;
 import org.codehaus.mojo.license.utils.FileUtil;
 import org.codehaus.mojo.license.utils.MojoHelper;
 import org.codehaus.mojo.license.utils.SortedProperties;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.SortedSet;
 
 /*
  * #%L
@@ -146,9 +147,18 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
 
         boolean safeLicense = checkForbiddenLicenses();
 
+        final boolean unlistedDependencies = checkUnlistedDependencies();
+
         checkBlacklist(safeLicense);
 
+        checkDependenciesWhiteList(unlistedDependencies);
+
+        getPluginContext().put(AbstractDownloadLicensesMojo.LICENSE_MAP_KEY, licenseMap);
+
+        licenseMap.removeEmptyLicenses();
+
         writeThirdPartyFile();
+        writeThirdPartyDependenciesFile();
 
         if ( doGenerateMissing )
         {
@@ -176,7 +186,7 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
             getHelper().attachThirdPartyDescriptor( file );
         }
 
-        addResourceDir( getOutputDirectory(), "**/*.txt" );
+        addResourceDir( getOutputDirectory(), "**/*.txt", "**/*.json" );
     }
 
     // ----------------------------------------------------------------------

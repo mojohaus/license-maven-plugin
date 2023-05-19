@@ -156,6 +156,9 @@ public interface ThirdPartyTool
      */
     void overrideLicenses( LicenseMap licenseMap, SortedMap<String, MavenProject> artifactCache, String encoding, File overrideFile ) throws IOException;
 
+
+    void overrideLicenses(LicenseMap licenseMap, SortedMap<String, MavenProject> artifactCache, String encoding, String overrideFileUrl) throws IOException;
+
     /**
      * Add one or more licenses (name and url are {@code licenseNames}) to the given {@code licenseMap} for the given
      * {@code project}.
@@ -207,7 +210,7 @@ public interface ThirdPartyTool
      * @throws IOException if any probem while writing file
      */
     void writeThirdPartyFile( LicenseMap licenseMap, File thirdPartyFile, boolean verbose, String encoding,
-                              String template )
+                              String template, boolean custom)
             throws IOException;
 
     /**

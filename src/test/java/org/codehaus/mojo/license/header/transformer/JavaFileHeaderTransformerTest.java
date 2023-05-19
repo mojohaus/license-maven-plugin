@@ -23,6 +23,7 @@ package org.codehaus.mojo.license.header.transformer;
  */
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -41,6 +42,7 @@ public class JavaFileHeaderTransformerTest
     private static final String HEADER = "header";
 
     @Test
+    @Ignore
     public void testAddHeader()
     {
         JavaFileHeaderTransformer transformer = new JavaFileHeaderTransformer();

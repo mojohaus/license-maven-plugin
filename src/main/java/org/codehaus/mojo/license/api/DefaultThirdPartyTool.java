@@ -22,23 +22,6 @@ package org.codehaus.mojo.license.api;
  * #L%
  */
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.SortedSet;
-import java.util.TreeSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -53,13 +36,37 @@ import org.apache.maven.model.License;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 import org.codehaus.mojo.license.model.LicenseMap;
+import org.codehaus.mojo.license.nexus.LicenseProcessor;
 import org.codehaus.mojo.license.utils.FileUtil;
+import org.codehaus.mojo.license.utils.LicenseRegistryClient;
 import org.codehaus.mojo.license.utils.MojoHelper;
 import org.codehaus.mojo.license.utils.SortedProperties;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static org.codehaus.mojo.license.api.FreeMarkerHelper.TEMPLATE;
 
 /**
  * Default implementation of the third party tool.
@@ -357,10 +364,10 @@ public class DefaultThirdPartyTool
      */
     public void addLicense( LicenseMap licenseMap, MavenProject project, List<?> licenses )
     {
-
+        getLogger().debug("Processing " + project.toString());
         if ( Artifact.SCOPE_SYSTEM.equals( project.getArtifact().getScope() ) )
         {
-
+            getLogger().info("Ignoring " + project.toString() + " as SYSTEM");
             // do NOT treat system dependency
             return;
         }
@@ -369,6 +376,7 @@ public class DefaultThirdPartyTool
         {
 
             // no license found for the dependency
+            getLogger().debug("Unknown license for:" + project.toString()) ;
             licenseMap.put( LicenseMap.UNKNOWN_LICENSE_MESSAGE, project );
             return;
         }
@@ -378,7 +386,7 @@ public class DefaultThirdPartyTool
             String id = MojoHelper.getArtifactId( project.getArtifact() );
             if ( o == null )
             {
-                getLogger().warn( "could not acquire the license for " + id );
+                getLogger().warn( "could not acquire the license for " + id + " " + project.toString());
                 continue;
             }
             License license = (License) o;
@@ -397,7 +405,12 @@ public class DefaultThirdPartyTool
                 getLogger().warn( "No license url defined for " + id );
                 licenseKey = LicenseMap.UNKNOWN_LICENSE_MESSAGE;
             }
-            licenseMap.put( licenseKey, project );
+            LicenseProcessor licenseProcessor = new LicenseProcessor(null, null);
+            List<String> licenseList = licenseProcessor.parseLicense(licenseKey);
+            for (String licenseId : licenseList) {
+                getLogger().debug(licenseId + " -> " + project);
+                licenseMap.put(licenseId, project);
+            }
         }
     }
 
@@ -422,7 +435,6 @@ public class DefaultThirdPartyTool
                 getLogger().warn( "No license [" + mainLicense + "] found, will create it." );
             }
             mainSet = new TreeSet<MavenProject>( projectComparator );
-            licenseMap.put( mainLicense, mainSet );
         }
         for ( String license : licenses )
         {
@@ -444,6 +456,12 @@ public class DefaultThirdPartyTool
             set.clear();
             licenseMap.remove( license );
         }
+        if (!mainSet.isEmpty()) {
+            licenseMap.put( mainLicense, mainSet );
+        } else {
+            getLogger().debug("No artifacts for " + mainLicense + " are found at merge");
+        }
+
     }
 
     /**
@@ -527,7 +545,7 @@ public class DefaultThirdPartyTool
             // there is some unknown dependencies in the missing file, remove them
             for ( String id : unknownDependenciesId )
             {
-                getLogger().warn(
+                getLogger().debug(
                         "dependency [" + id + "] does not exist in project, remove it from the missing file." );
                 unsafeMappings.remove( id );
             }
@@ -543,7 +561,7 @@ public class DefaultThirdPartyTool
             MavenProject project = artifactCache.get( id );
             if ( project == null )
             {
-                getLogger().warn( "dependency [" + id + "] does not exist in project." );
+                getLogger().debug( "dependency [" + id + "] does not exist in project." );
                 continue;
             }
 
@@ -634,24 +652,72 @@ public class DefaultThirdPartyTool
             addLicense( licenseMap, project, licenses );
 
         }
+        licenseMap.removeEmptyLicenses();
+    }
 
+    @Override
+    public void overrideLicenses(LicenseMap licenseMap, SortedMap<String, MavenProject> artifactCache, String encoding, String customOverrideFile) {
+        SortedProperties overrideMappings = new SortedProperties( encoding );
 
+        // there is some unsafe dependencies
+        getLogger().info( "Load overrides from " + customOverrideFile);
+        getLogger().info("Artifact cache " + artifactCache);
+        // load the missing file
+        try {
+            overrideMappings.load(new StringReader(LicenseRegistryClient.getInstance().getFileContent(customOverrideFile)));
+        } catch (final IOException ioException) {
+            throw new IllegalStateException(ioException);
+        }
+
+        for ( Object o : overrideMappings.keySet() )
+        {
+            String id = (String) o;
+
+            MavenProject project = artifactCache.get( id );
+            if ( project == null )
+            {
+                getLogger().debug( "dependency [" + id + "] not found in project" );
+                continue;
+            }
+
+            String license = (String) overrideMappings.get( id );
+
+            String[] licenses = StringUtils.split( license, '|' );
+
+            if ( ArrayUtils.isEmpty( licenses ) )
+            {
+
+                // empty license means not fill, skip it
+                continue;
+            }
+            getLogger().info("overriding for " + project + ", " + Arrays.toString(licenses));
+            licenseMap.removeProject( project );
+
+            // add license in map
+            addLicense( licenseMap, project, licenses );
+
+        }
+        licenseMap.removeEmptyLicenses();
     }
 
     /**
      * {@inheritDoc}
      */
-    public void writeThirdPartyFile( LicenseMap licenseMap, File thirdPartyFile, boolean verbose, String encoding,
-                                     String lineFormat )
+    public void writeThirdPartyFile( LicenseMap licenseMap, File thirdPartyFile, boolean verbose, String encoding, String lineFormat, boolean custom)
             throws IOException
     {
-
         Logger log = getLogger();
-
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put( "licenseMap", licenseMap.entrySet() );
         properties.put( "dependencyMap", licenseMap.toDependencyMap().entrySet() );
-        String content = freeMarkerHelper.renderTemplate( lineFormat, properties );
+        final String content;
+        if (custom) {
+            getLogger().info("Get template from " +  lineFormat);
+            freeMarkerHelper = FreeMarkerHelper.newHelperFromContent(LicenseRegistryClient.getInstance().getFileContent(lineFormat));
+            content = freeMarkerHelper.renderTemplate(TEMPLATE, properties);
+        } else {
+            content = freeMarkerHelper.renderTemplate(lineFormat, properties);
+        }
 
         log.info( "Writing third-party file to " + thirdPartyFile );
         if ( verbose )

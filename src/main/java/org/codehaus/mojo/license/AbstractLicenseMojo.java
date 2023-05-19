@@ -50,6 +50,13 @@ public abstract class AbstractLicenseMojo
     // ----------------------------------------------------------------------
 
     /**
+     * @since 1.14.25
+     */
+    @Parameter(property = "license.skip", defaultValue = "false" )
+    private boolean skip;
+
+
+    /**
      * Flag to activate verbose mode.
      *
      * <b>Note:</b> Verbose mode is always on if you starts a debug maven instance
@@ -87,6 +94,9 @@ public abstract class AbstractLicenseMojo
     @Parameter( defaultValue = "${project}", readonly = true )
     MavenProject project;
 
+    @Parameter(property="license.proxy", readonly = true)
+    String proxyUrl;
+
     // ----------------------------------------------------------------------
     // Abstract methods
     // ----------------------------------------------------------------------
@@ -100,6 +110,19 @@ public abstract class AbstractLicenseMojo
      * @return {@code true} if goal will not be executed
      */
     public abstract boolean isSkip();
+
+    /**
+     * When is sets to {@code true}, will skip execution.
+     *
+     * This will take effect in at the very begin of the {@link #execute()}
+     * before any initialisation of goal.
+     *
+     * @return {@code true} if goal will not be executed
+     */
+    public final boolean isSkipAll() {
+        getLog().info("skip=" + skip);
+        return skip || isSkip();
+    }
 
     /**
      * Method to initialize the mojo before doing any concrete actions.
@@ -143,7 +166,7 @@ public abstract class AbstractLicenseMojo
                 setVerbose( true );
             }
 
-            boolean mustSkip = isSkip();
+            boolean mustSkip = isSkipAll();
 
             if ( mustSkip )
             {

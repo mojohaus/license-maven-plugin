@@ -1,0 +1,23 @@
+[
+  {
+    "groupId": "com.google.zxing",
+    "name": "ZXing Core",
+    "artifactId": "core",
+    "packaging": "jar",
+    "version": "2.1"
+  },
+  {
+    "groupId": "com.codeborne",
+    "name": "geo ip",
+    "artifactId": "geoip",
+    "packaging": "jar",
+    "version": "1.2"
+  },
+  {
+    "groupId": "play-codeborne",
+    "name": "Play 1.x PDF module",
+    "artifactId": "play-pdf",
+    "packaging": "jar",
+    "version": "1.3"
+  }
+]

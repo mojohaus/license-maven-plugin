@@ -51,7 +51,7 @@ public class StringToList
         this();
         for ( String s : data.split( "\\s*\\|\\s*" ) )
         {
-            addEntryToList( s );
+            addEntryToList( s.trim() );
         }
     }
 

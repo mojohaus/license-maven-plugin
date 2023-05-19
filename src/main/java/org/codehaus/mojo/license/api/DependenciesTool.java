@@ -22,12 +22,15 @@ package org.codehaus.mojo.license.api;
  * #L%
  */
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Map;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.mojo.license.model.Dependency;
 
 import java.util.List;
+import java.util.Set;
 import java.util.SortedMap;
 
 /**
@@ -42,7 +45,6 @@ public interface DependenciesTool
     /**
      * For a given {@code project}, obtain the universe of its dependencies after applying transitivity and
      * filtering rules given in the {@code configuration} object.
-     *
      * Result is given in a map where keys are unique artifact id
      *
      * @param project            the project to scann
@@ -68,6 +70,8 @@ public interface DependenciesTool
      * @param reactorProjectDependencies optional reactor projects dependencies indexed by their gav to resolve artifacts without fork mode (means artifacts may not exist)
      * @throws DependenciesToolException if could not load project dependencies
      */
-    void loadProjectArtifacts(ArtifactRepository localRepository, List remoteRepositories, MavenProject project , Map<String, List<Dependency>> reactorProjectDependencies )
+    void loadProjectArtifacts(ArtifactRepository localRepository, List remoteRepositories, MavenProject project , Map<String, List<org.apache.maven.model.Dependency>> reactorProjectDependencies )
         throws DependenciesToolException;
+
+    void writeThirdPartyDependenciesFile(File file, String listedDependenciesFilePath, Set<Dependency> listedDependencies) throws IOException;
 }

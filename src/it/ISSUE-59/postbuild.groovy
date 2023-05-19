@@ -20,7 +20,7 @@
  * #L%
  */
 
-file = new File(basedir, 'target/generated-sources/license/THIRD-PARTY.txt');
+file = new File(basedir, 'target/generated-sources/licenses/LICENSES.txt');
 assert file.exists();
 content = file.text;
 assert content.contains('(Public Domain) AOP alliance (aopalliance:aopalliance:1.0 - http://aopalliance.sourceforge.net)');

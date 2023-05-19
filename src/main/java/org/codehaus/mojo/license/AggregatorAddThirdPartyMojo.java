@@ -50,7 +50,7 @@ import org.codehaus.mojo.license.utils.SortedProperties;
  * plugin sets a specific name, 'add-third-party', for the forked executions in the
  * individual projects. From command level, then
  * even though the execution of this goal is named 'default-cli', the forked executions
- * have the name 'add-third-party'. Thus, to use the <tt>pluginManagement</tt> element of
+ * have the name 'add-third-party'. Thus, to use the <code>pluginManagement</code> element of
  * the POM to set options, you have to name the execution 'add-third-party',
  * not 'default-cli'.
  *

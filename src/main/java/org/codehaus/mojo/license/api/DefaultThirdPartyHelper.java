@@ -25,25 +25,21 @@ package org.codehaus.mojo.license.api;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.model.License;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
 import org.codehaus.mojo.license.model.LicenseMap;
+import org.codehaus.mojo.license.nexus.LicenseProcessor;
+import org.codehaus.mojo.license.utils.LicenseRegistryClient;
 import org.codehaus.mojo.license.utils.SortedProperties;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.SortedSet;
-import java.util.TreeMap;
+import java.util.*;
+
+import static org.codehaus.mojo.license.model.LicenseMap.UNKNOWN_LICENSE_MESSAGE;
 
 /**
  * Default implementation of the {@link org.codehaus.mojo.license.api.ThirdPartyHelper}.
@@ -180,16 +176,36 @@ public class DefaultThirdPartyHelper
     /**
      * {@inheritDoc}
      */
-    public LicenseMap createLicenseMap( SortedMap<String, MavenProject> dependencies )
+    public LicenseMap createLicenseMap( SortedMap<String, MavenProject> dependencies, String proxyUrl)
     {
+        Collection<MavenProject> values = dependencies.values();
+        return createLicenseMap(values, proxyUrl);
+    }
 
+
+    public LicenseMap createLicenseMap(Collection<MavenProject> dependencies, String proxyUrl) {
         LicenseMap licenseMap = new LicenseMap();
-
-        for ( MavenProject project : dependencies.values() )
+        for ( MavenProject project : dependencies)
         {
             thirdPartyTool.addLicense( licenseMap, project, project.getLicenses() );
         }
+        updateLicensesWithInfoFromNexus(licenseMap, proxyUrl);
         return licenseMap;
+    }
+
+    private void updateLicensesWithInfoFromNexus(LicenseMap licenseMap, String proxyUrl) {
+        SortedSet<MavenProject> mavenProjects = licenseMap.get(UNKNOWN_LICENSE_MESSAGE);
+        if (mavenProjects != null) {
+            Set<MavenProject> projectsToIterate = new TreeSet<>(mavenProjects);
+            for (MavenProject mavenProject : projectsToIterate) {
+                LicenseProcessor licenseProcessor = new LicenseProcessor(log, proxyUrl);
+                List<License> licences = licenseProcessor.getLicencesByProject(mavenProject);
+                if (!licences.isEmpty()) {
+                    mavenProjects.remove(mavenProject);
+                    thirdPartyTool.addLicense(licenseMap, mavenProject, licences);
+                }
+            }
+        }
     }
 
     /**
@@ -256,12 +272,18 @@ public class DefaultThirdPartyHelper
         return unsafeMappings;
     }
 
+
     /**
      * {@inheritDoc}
      */
     public void mergeLicenses( List<String> licenseMerges, LicenseMap licenseMap )
             throws MojoFailureException
     {
+        log.info("Loading merges from merges.txt");
+        Scanner mergesLines = new Scanner(LicenseRegistryClient.getInstance().getFileContent("merges.txt")).useDelimiter("\\n");
+        while (mergesLines.hasNext()) {
+            licenseMerges.add(mergesLines.next());
+        }
 
         Set<String> licenseFound = new HashSet<String>();
 

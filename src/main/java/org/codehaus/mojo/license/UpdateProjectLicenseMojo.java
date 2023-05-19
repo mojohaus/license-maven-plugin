@@ -32,7 +32,7 @@ import java.io.File;
 
 /**
  * Updates (or creates) the main project license file according to the given
- * license defines as {@link #licenseName}.
+ * license defines as licenseName.
  *
  * Can also generate a bundled license file (to avoid collision names in
  * class-path). This file is by default generated in
@@ -54,7 +54,6 @@ public class UpdateProjectLicenseMojo
      * Project license file to synchronize with main license defined in
      * descriptor file.
      *
-     * @required
      * @since 1.0
      */
     @Parameter( property = "license.licenceFile", defaultValue = "${basedir}/LICENSE.txt" )

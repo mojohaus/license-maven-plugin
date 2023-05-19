@@ -22,11 +22,10 @@ package org.codehaus.mojo.license.api;
  * #L%
  */
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -35,6 +34,8 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
@@ -45,12 +46,13 @@ import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
-import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.artifact.MavenMetadataSource;
+import org.codehaus.mojo.license.model.Dependency;
+import org.codehaus.mojo.license.utils.FileUtil;
 import org.codehaus.mojo.license.utils.MojoHelper;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -75,6 +77,7 @@ public class DefaultDependenciesTool
      */
     public static final String INVALID_PATTERN_MESSAGE =
         "The pattern specified by expression <%s> seems to be invalid.";
+    protected static final ObjectMapper MAPPER = new ObjectMapper();
 
     /**
      * Project builder.
@@ -149,12 +152,12 @@ public class DefaultDependenciesTool
 
         boolean verbose = configuration.isVerbose();
 
-        SortedMap<String, MavenProject> result = new TreeMap<String, MavenProject>();
+        SortedMap<String, MavenProject> result = new TreeMap<>();
 
-        Map<String, Artifact> excludeArtifacts = new HashMap<String, Artifact>();
-        Map<String, Artifact> includeArtifacts = new HashMap<String, Artifact>();
+        Map<String, Artifact> excludeArtifacts = new HashMap<>();
+        Map<String, Artifact> includeArtifacts = new HashMap<>();
 
-        SortedMap<String, MavenProject> localCache = new TreeMap<String, MavenProject>();
+        SortedMap<String, MavenProject> localCache = new TreeMap<>();
         if (cache != null)
         {
             localCache.putAll(cache);
@@ -291,7 +294,7 @@ public class DefaultDependenciesTool
      * {@inheritDoc}
      */
     public void loadProjectArtifacts( ArtifactRepository localRepository, List remoteRepositories,
-                                      MavenProject project , Map<String,List<Dependency>> reactorProjectDependencies )
+                                      MavenProject project , Map<String,List<org.apache.maven.model.Dependency>> reactorProjectDependencies )
         throws DependenciesToolException
 
     {
@@ -302,12 +305,12 @@ public class DefaultDependenciesTool
             Set dependenciesArtifacts;
             try
             {
-                List<Dependency> dependencies = new ArrayList<Dependency>(project.getDependencies());
+                List<org.apache.maven.model.Dependency> dependencies = new ArrayList<org.apache.maven.model.Dependency>(project.getDependencies());
                 if (reactorProjectDependencies!=null) {
 
-                    for (Dependency dependency : new ArrayList<Dependency>(dependencies)) {
+                    for (org.apache.maven.model.Dependency dependency : new ArrayList<>(dependencies)) {
                         String id = String.format("%s:%s", dependency.getGroupId(), dependency.getArtifactId());
-                        List<Dependency> projectDependencies = reactorProjectDependencies.get(id);
+                        List<org.apache.maven.model.Dependency> projectDependencies = reactorProjectDependencies.get(id);
                         if (projectDependencies!=null) {
                             dependencies.remove(dependency);
                             dependencies.addAll(projectDependencies);
@@ -346,6 +349,20 @@ public class DefaultDependenciesTool
 
         project.setArtifacts( result.getArtifacts() );
 
+    }
+
+    @Override
+    public void writeThirdPartyDependenciesFile(File outputDirectory, String listedDependenciesFilePath, Set<Dependency> listedDependencies) throws IOException {
+        final File thirdPartyDepsFile = FileUtil.getFile(outputDirectory, listedDependenciesFilePath);
+
+        if (listedDependencies.isEmpty()) {
+            getLogger().warn("There is no dependencies for write to " + thirdPartyDepsFile);
+            return;
+        }
+
+        getLogger().info( "Writing third-party dependencies file to " + thirdPartyDepsFile );
+        MAPPER.writerWithDefaultPrettyPrinter()
+                .writeValue(thirdPartyDepsFile, listedDependencies);
     }
 
     /**

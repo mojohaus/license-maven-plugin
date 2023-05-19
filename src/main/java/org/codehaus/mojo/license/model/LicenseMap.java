@@ -22,7 +22,6 @@ package org.codehaus.mojo.license.model;
  * #L%
  */
 
-import java.util.Collection;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.mojo.license.utils.MojoHelper;
 
@@ -171,8 +170,17 @@ public class LicenseMap
             {
                 if (project.equals( mavenProject )) {
                     get(entry.getKey()).remove( project);
-                    return;
+                    break;
                 }
+            }
+        }
+    }
+
+    public void removeEmptyLicenses() {
+        Set<String> keys = new HashSet<>(keySet());
+        for (String key : keys) {
+            if (get(key).isEmpty()) {
+                remove(key);
             }
         }
     }

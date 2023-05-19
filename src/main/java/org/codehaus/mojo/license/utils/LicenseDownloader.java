@@ -22,14 +22,17 @@ package org.codehaus.mojo.license.utils;
  * #L%
  */
 
+import org.apache.http.client.fluent.Request;
+import org.apache.http.client.fluent.Response;
+
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLConnection;
+import java.net.*;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Utilities for downloading remote license files.
@@ -39,25 +42,41 @@ import java.net.URLConnection;
  */
 public class LicenseDownloader
 {
-
+    private String proxyUrl;
     /**
      * Defines the connection timeout in milliseconds when attempting to download license files.
      */
     public static final int DEFAULT_CONNECTION_TIMEOUT = 5000;
 
-    public static void downloadLicense( String licenseUrlString, String loginPassword, File outputFile )
+    public LicenseDownloader(String proxyAddr) {
+            this.proxyUrl = proxyAddr;
+    }
+
+    public void downloadFromGitLab(String licenseUrlString, File outputFile) {
+        try {
+            System.out.println("Downloading " + licenseUrlString);
+            Response response = Request.Get(licenseUrlString)
+                    .execute();
+            response.saveContent(outputFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void downloadLicense( String licenseUrlString, String loginPassword, File outputFile )
         throws IOException
     {
+//        download2(licenseUrlString, outputFile);
+
         if ( licenseUrlString == null || licenseUrlString.length() == 0 )
         {
             return;
         }
 
-        InputStream licenseInputStream = null;
-        FileOutputStream fos = null;
-
-        try
-        {
+        final InputStream licenseInputStream;
+        if (!licenseUrlString.startsWith("http") ) {
+            licenseInputStream = new ByteArrayInputStream(LicenseRegistryClient.getInstance().getFileContent(licenseUrlString).getBytes(StandardCharsets.UTF_8));
+        } else {
             URLConnection connection = newConnection( licenseUrlString, loginPassword );
 
             boolean redirect = false;
@@ -66,7 +85,7 @@ public class LicenseDownloader
                 int status = ( (HttpURLConnection) connection ).getResponseCode();
 
                 redirect = HttpURLConnection.HTTP_MOVED_TEMP == status || HttpURLConnection.HTTP_MOVED_PERM == status ||
-                    HttpURLConnection.HTTP_SEE_OTHER == status;
+                        HttpURLConnection.HTTP_SEE_OTHER == status;
             }
 
             if ( redirect )
@@ -80,7 +99,15 @@ public class LicenseDownloader
             }
 
             licenseInputStream = connection.getInputStream();
-            fos = new FileOutputStream( updateFileExtension( outputFile, connection.getContentType() ) );
+            outputFile = updateFileExtension( outputFile, connection.getContentType() );
+
+        }
+
+        FileOutputStream fos = null;
+
+        try
+        {
+            fos = new FileOutputStream( outputFile );
             copyStream( licenseInputStream, fos );
             licenseInputStream.close();
             fos.close();
@@ -90,6 +117,7 @@ public class LicenseDownloader
             FileUtil.tryClose( licenseInputStream );
             FileUtil.tryClose( fos );
         }
+
 
     }
 
@@ -111,12 +139,19 @@ public class LicenseDownloader
         }
     }
 
-    private static URLConnection newConnection( String url, String loginPassword )
+    private URLConnection newConnection( String url, String loginPassword )
         throws IOException
     {
 
         URL licenseUrl = new URL( url );
-        URLConnection connection = licenseUrl.openConnection();
+        final Proxy proxy;
+        if (proxyUrl != null) {
+            URL purl = new URL(proxyUrl);
+            proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(purl.getHost(), purl.getPort()));
+        } else {
+            proxy = Proxy.NO_PROXY;
+        }
+        URLConnection connection = licenseUrl.openConnection(proxy);
 
         if ( loginPassword != null )
         {

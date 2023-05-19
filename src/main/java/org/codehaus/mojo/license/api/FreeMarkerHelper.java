@@ -57,6 +57,7 @@ public class FreeMarkerHelper
 
     protected final TemplateLoader templateLoader;
 
+
     /**
      * @return a default helper, if template is a file, then will use it as it, otherwise will have a look into
      * classloader in current package.
@@ -64,7 +65,7 @@ public class FreeMarkerHelper
     public static FreeMarkerHelper newDefaultHelper()
     {
         ClassTemplateLoader templateLoader = new ClassTemplateLoader( FreeMarkerHelper.class, "/" );
-        FreeMarkerHelper result = new FreeMarkerHelper( templateLoader );
+        FreeMarkerHelper result = new FreeMarkerHelper( templateLoader);
         return result;
     }
 
@@ -79,11 +80,11 @@ public class FreeMarkerHelper
         StringTemplateLoader templateLoader = new StringTemplateLoader();
         templateLoader.putTemplate( TEMPLATE, stringTemplate );
 
-        FreeMarkerHelper result = new FreeMarkerHelper( templateLoader );
+        FreeMarkerHelper result = new FreeMarkerHelper( templateLoader);
         return result;
     }
 
-    protected FreeMarkerHelper( TemplateLoader templateLoader )
+    protected FreeMarkerHelper(TemplateLoader templateLoader)
     {
         this.templateLoader = templateLoader;
         freemarkerConfiguration = new Configuration();
@@ -106,7 +107,6 @@ public class FreeMarkerHelper
         }
         else
         {
-
             // just use the classloader
             freemarkerConfiguration.setTemplateLoader( templateLoader );
         }

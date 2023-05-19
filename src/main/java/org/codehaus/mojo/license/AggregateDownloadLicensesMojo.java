@@ -6,10 +6,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.SortedMap;
+import java.util.*;
 
 /**
  * Download the license files of all aggregated dependencies of the current project, and generate a summary file containing a list
@@ -71,14 +68,14 @@ public class AggregateDownloadLicensesMojo
     /**
      * {@inheritDoc}
      */
-    protected Set<MavenProject> getDependencies()
+    protected SortedMap<String, MavenProject> getDependencies()
     {
-        Set<MavenProject> result = new HashSet<MavenProject>();
+        SortedMap<String, MavenProject>  result = new TreeMap<>();
 
         for ( MavenProject reactorProject : reactorProjects )
         {
             SortedMap<String, MavenProject> dependencies = getDependencies( reactorProject );
-            result.addAll( dependencies.values() );
+            result.putAll( dependencies);
         }
         return result;
     }

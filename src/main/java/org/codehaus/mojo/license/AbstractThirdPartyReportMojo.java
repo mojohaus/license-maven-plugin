@@ -478,7 +478,7 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport i
         SortedMap<String, MavenProject> projectDependencies = thirdPartyHelper.loadDependencies( this );
 
         // create licenseMap from it
-        LicenseMap licenseMap = thirdPartyHelper.createLicenseMap( projectDependencies );
+        LicenseMap licenseMap = thirdPartyHelper.createLicenseMap( projectDependencies, null );
 
         // Get unsafe dependencies (dependencies with no license in pom)
         SortedSet<MavenProject> dependenciesWithNoLicense = thirdPartyHelper.getProjectsWithNoLicense( licenseMap );
@@ -502,7 +502,7 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport i
         }
 
         // LicenseMap is now complete, let's merge licenses if necessary
-        thirdPartyHelper.mergeLicenses( licenseMerges, licenseMap );
+        thirdPartyHelper.mergeLicenses( licenseMerges, licenseMap);
 
         // Add override licenses
         thirdPartyTool.overrideLicenses( licenseMap, projectDependencies, encoding, overrideFile );

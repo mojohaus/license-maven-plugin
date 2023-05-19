@@ -1,0 +1,27 @@
+{  "componentIdentifier":{
+    "format":"maven",
+    "coordinates":{
+      "artifactId":"ojdbc6",
+      "extension":"jar",
+      "groupId":"com.oracle",
+      "version":"11.2.0.4.0-atlassian-hosted"
+    }
+  },
+  "securityVulnerabilities":[
+
+  ],
+  "declaredLicenses":[
+    {
+      "licenseId":"UNSPECIFIED",
+      "licenseName":"Not Provided"
+    }
+  ],
+  "observedLicenses":[
+    {
+      "licenseId":"UNSPECIFIED",
+      "licenseName":"Not Provided"
+    }
+  ],
+  "licenseThreatLevelId":"NOT-PROVIDED",
+  "licenseThreatName":"Not Provided"
+}

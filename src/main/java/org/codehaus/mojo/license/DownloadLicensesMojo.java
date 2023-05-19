@@ -69,10 +69,9 @@ public class DownloadLicensesMojo
         return skipDownloadLicenses;
     }
 
-    protected Set<MavenProject> getDependencies()
+    protected SortedMap<String, MavenProject>  getDependencies()
     {
-        SortedMap<String, MavenProject> dependencies = getDependencies( getProject() );
-        return new HashSet<MavenProject>( dependencies.values() );
+        return getDependencies( getProject() );
     }
 
 }

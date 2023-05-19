@@ -22,6 +22,7 @@ package org.codehaus.mojo.license.api;
  * #L%
  */
 
+import org.apache.http.HttpResponse;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
@@ -92,7 +93,8 @@ public interface ThirdPartyHelper
      * @param dependencies dependencies to store in the license map
      * @return the created license map fro the given dependencies
      */
-    LicenseMap createLicenseMap( SortedMap<String, MavenProject> dependencies );
+    LicenseMap createLicenseMap( SortedMap<String, MavenProject> dependencies, String proxyUrl );
+    LicenseMap createLicenseMap(Collection<MavenProject> dependencies, String proxyUrl);
 
     /**
      * Attach the third-party descriptor to the build.
@@ -126,7 +128,7 @@ public interface ThirdPartyHelper
      * <li>the 'missing' file.</li>
      * <li>additional property files attached to artifacts; these have classifier=third-party and are expected
      * to contain the license information the base artifact's dependencies. These are controlled by a parameter,</li>
-     * <li>declared dependencies of type <tt>license.properties</tt>. These are in the same format, and
+     * <li>declared dependencies of type <code>license.properties</code>. These are in the same format, and
      * provide global information.</li>
      * </ul>
      *
@@ -156,4 +158,5 @@ public interface ThirdPartyHelper
      *                              same name)
      */
     void mergeLicenses( List<String> licenseMerges, LicenseMap licenseMap ) throws MojoFailureException;
+
 }
