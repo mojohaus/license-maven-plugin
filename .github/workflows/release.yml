@@ -1,78 +1,8 @@
-name: Release
+name: Maven Release
 
-# Controls when the workflow will run
-on:
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
+on: workflow_dispatch
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-    environment: Prod
-    env:
-      BUILD_VERSION: ${{ github.event.inputs.BUILD_VERSION }}
-
-    steps:
-      - uses: actions/checkout@v1
-
-      - name: Get the tag version
-        id: tag_version
-        uses: oprypin/find-latest-tag@v1
-        with:
-          repository: ${{ github.repository }}
-          regex: '^v([0-9]+)\..*'
-      - uses: actions-ecosystem/action-regex-match@v2
-        id: version
-        name: Prepare a version from a tag
-        with:
-          text: ${{ steps.tag_version.outputs.tag }}
-          regex: '^v([0-9]+)\.?([0-9]+)?\.?([0-9]+)?'
-          flags: gm
-      - run: |
-          echo "MAJOR: ${{ steps.version.outputs.group1 }}"
-          echo "MINOR: ${{ steps.version.outputs.group2 }}"
-          echo "PATCH: ${{ steps.version.outputs.group3 }}"
-      - if: ${{ steps.version.outputs.group1 == ''}}
-        run: echo "BUILD_VERSION=2.0.0" >> $GITHUB_ENV
-      - if: ${{ steps.version.outputs.group2 == ''}}
-        run: echo "BUILD_VERSION=${{ steps.version.outputs.group1 }}.0.0" >> $GITHUB_ENV
-      - if: ${{ steps.version.outputs.group3 == ''}}
-        run: echo "BUILD_VERSION=${{ steps.version.outputs.group1 }}.${{ steps.version.outputs.group2 }}.0" >> $GITHUB_ENV
-      - if: ${{ steps.version.outputs.group3 != ''}}
-        run: |
-          VERSION_PATCH=${{ steps.version.outputs.group3 }}
-          echo "BUILD_VERSION=${{ steps.version.outputs.group1 }}.${{ steps.version.outputs.group2 }}.$(($VERSION_PATCH+1))" >> $GITHUB_ENV
-      - run: |
-          echo "BUILD_VERSION: ${{ env.BUILD_VERSION }}"
-
-      - name: Set Version
-        uses: qcastel/github-actions-maven-cmd@master
-        with:
-          maven-args: "org.codehaus.mojo:versions-maven-plugin:2.13.0:set -DnewVersion=${{env.BUILD_VERSION}}"
-
-      - name: Set up Maven Central Repository
-        uses: actions/setup-java@v3
-        with:
-          java-version: '8'
-          distribution: 'adopt'
-          server-id: ossrh
-          server-username: MAVEN_USERNAME
-          server-password: MAVEN_PASSWORD
-          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }} # gpg private key to import
-          gpg-passphrase: GPG_PASSPHRASE # env variable for gpg signing in deploy
-
-      - name: Publish package
-        run: mvn --batch-mode deploy -P gpg
-        env:
-          MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
-          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-
-      - name: Create Release
-        uses: "marvinpinto/action-automatic-releases@master"
-        with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          prerelease: false
-          automatic_release_tag: "v${{env.BUILD_VERSION}}"
-          files: |
-            pom.xml
+    uses: octopusden/octopus-base/.github/workflows/common-java-maven-release.yml@main
+    secrets: inherit
