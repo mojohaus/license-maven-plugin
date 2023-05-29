@@ -4,5 +4,5 @@ on: workflow_dispatch
 
 jobs:
   build:
-    uses: octopusden/octopus-base/.github/workflows/common-java-maven-release.yml@main
+    uses: octopusden/octopus-base/.github/workflows/common-java-maven-release.yml@v1.0
     secrets: inherit

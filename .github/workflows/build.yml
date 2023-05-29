@@ -4,7 +4,7 @@ on: [push, pull_request, workflow_dispatch]
 
 jobs:
   run-build-and-deploy:
-    uses: octopusden/octopus-base/.github/workflows/common-java-maven-build.yml@main
+    uses: octopusden/octopus-base/.github/workflows/common-java-maven-build.yml@v1.0
     with:
       java-version: "8"
     secrets: inherit
