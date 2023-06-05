@@ -79,6 +79,18 @@ public class UrlRequester
     }
 
     /**
+     * Check if URL point to external resource.
+     *
+     * @param url the URL as a string
+     * @return true if URL use external protocol
+     */
+    public static boolean isExternalUrl( String url )
+    {
+        String protocol = findProtocol( url );
+        return "http".equals( protocol ) || "https".equals( protocol ) || CLASSPATH_PROTOCOL.equals( protocol );
+    }
+
+    /**
      * Returns the content of the resource pointed by the given URL as a string.
      *
      * @param url the resource destination that is expected to contain pure text

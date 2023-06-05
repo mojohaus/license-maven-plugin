@@ -610,6 +610,9 @@ public class DefaultThirdPartyTool
             {
                 overrideMappings.load( reader );
             }
+
+            boolean isExternalUrl = UrlRequester.isExternalUrl(overrideUrl);
+
             for ( Object o : overrideMappings.keySet() )
             {
                 String id = (String) o;
@@ -618,8 +621,7 @@ public class DefaultThirdPartyTool
                 if ( project == null )
                 {
                     // Log at warn for local override files, but at debug for remote (presumably shared) override files.
-                    String protocol = UrlRequester.findProtocol( overrideUrl );
-                    if ( "http".equals( protocol ) || "https".equals( protocol ) )
+                    if ( isExternalUrl )
                     {
                         LOG.debug( "dependency [{}] does not exist in project.", id );
                     }
