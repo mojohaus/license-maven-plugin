@@ -701,7 +701,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
             LOG.warn( "No inceptionYear defined (will use current year)" );
         }
 
-        Copyright copyright = getCopyright( getCopyrightOwners() );
+        Copyright copyright = getCopyright( copyrightStringFormat, getCopyrightOwners() );
         header.setCopyright( copyright );
 
         String licenseContent = license.getHeaderContent( getEncoding() );
