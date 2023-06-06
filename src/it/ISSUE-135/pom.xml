@@ -7,7 +7,7 @@
 
   <groupId>org.codehaus.mojo.license.test</groupId>
   <artifactId>test-ISSUE-135</artifactId>
-  <version>@pom.version@</version>
+  <version>@project.version@</version>
   <name>License Test :: ISSUE-135</name>
   <packaging>jar</packaging>
 
@@ -28,7 +28,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.11.0</version>
+          <version>@maven-compiler-plugin.version@</version>
           <configuration>
             <source>1.7</source>
             <target>1.7</target>
@@ -42,7 +42,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>
-        <version>3.0.0</version>
+        <version>@build-helper-maven-plugin.version@</version>
         <executions>
           <execution>
             <id>add-generated-source-directory</id>
@@ -61,7 +61,7 @@
 
       <plugin>
         <artifactId>maven-resources-plugin</artifactId>
-        <version>3.1.0</version>
+        <version>@maven-resources-plugin.version@</version>
 
         <executions>
           <execution>
@@ -89,7 +89,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>license-maven-plugin</artifactId>
-        <version>@pom.version@</version>
+        <version>@project.version@</version>
 
         <executions>
           <execution>

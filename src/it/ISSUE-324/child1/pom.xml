@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.codehaus.mojo.license.test</groupId>
     <artifactId>test-ISSUE-324</artifactId>
-    <version>@pom.version@</version>
+    <version>@project.version@</version>
   </parent>
   <artifactId>test-ISSUE-324-child1</artifactId>
   <packaging>jar</packaging>
@@ -28,7 +28,7 @@
     <dependency>
       <groupId>org.codehaus.mojo.license.test</groupId>
       <artifactId>test-ISSUE-324-child2</artifactId>
-      <version>@pom.version@</version>
+      <version>@project.version@</version>
     </dependency>
   </dependencies>
 </project>

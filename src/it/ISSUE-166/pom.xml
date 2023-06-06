@@ -6,7 +6,7 @@
 
   <groupId>org.codehaus.mojo.license.test</groupId>
   <artifactId>ISSUE-166</artifactId>
-  <version>@pom.version@</version>
+  <version>@project.version@</version>
   <inceptionYear>2019</inceptionYear>
 
   <name>Test ISSUE-166</name>
@@ -36,7 +36,7 @@
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>license-maven-plugin</artifactId>
-          <version>@pom.version@</version>
+          <version>@project.version@</version>
         </plugin>
       </plugins>
     </pluginManagement>
