@@ -25,7 +25,6 @@ package org.codehaus.mojo.license;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-import org.apache.maven.doxia.siterenderer.Renderer;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
@@ -272,16 +271,6 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
      protected String licenseMergesUrl;
 
     /**
-     * The output directory for the report. Note that this parameter is only evaluated if the goal is run directly from
-     * the command line. If the goal is run indirectly as part of a site generation, the output directory configured in
-     * the Maven Site Plugin is used instead.
-     *
-     * @since 1.1
-     */
-    @Parameter( defaultValue = "${project.reporting.outputDirectory}", required = true )
-    private File outputDirectory;
-
-    /**
      * Flag to activate verbose mode.
      * <p>
      * <b>Note:</b> Verbose mode is always on if you starts a debug maven instance
@@ -303,25 +292,9 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
     @Parameter( property = "license.encoding", defaultValue = "${project.build.sourceEncoding}" )
     private String encoding;
 
-    /**
-     * The Maven Project.
-     *
-     * @since 1.1
-     */
-    @Parameter( defaultValue = "${project}", readonly = true )
-    private MavenProject project;
-
     // ----------------------------------------------------------------------
     // Plexus Components
     // ----------------------------------------------------------------------
-
-    /**
-     * Doxia Site Renderer component.
-     *
-     * @since 1.1
-     */
-    @Component
-    private Renderer siteRenderer;
 
     /**
      * Internationalization component.
@@ -461,35 +434,7 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
     /**
      * {@inheritDoc}
      */
-    protected MavenProject getProject()
-    {
-        return project;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected String getOutputDirectory()
-    {
-        if ( !outputDirectory.isAbsolute() )
-        {
-            outputDirectory = new File( project.getBasedir(), outputDirectory.getPath() );
-        }
-
-        return outputDirectory.getAbsolutePath();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected Renderer getSiteRenderer()
-    {
-        return siteRenderer;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
+    @Override
     public String getDescription( Locale locale )
     {
         return i18n.getString( getOutputName(), locale, "report.description" );
@@ -498,6 +443,7 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getName( Locale locale )
     {
         return i18n.getString( getOutputName(), locale, "report.title" );
@@ -510,6 +456,7 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isIncludeTransitiveDependencies()
     {
         return includeTransitiveDependencies;
@@ -518,12 +465,14 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isExcludeTransitiveDependencies()
     {
         return excludeTransitiveDependencies;
     }
 
     /** {@inheritDoc} */
+    @Override
     public ArtifactFilters getArtifactFilters()
     {
         if ( artifactFilters == null )
@@ -538,6 +487,7 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isVerbose()
     {
         return verbose;
