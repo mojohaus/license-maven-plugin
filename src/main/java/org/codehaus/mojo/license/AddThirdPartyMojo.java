@@ -441,7 +441,6 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
                 mojo.missingFile.getAbsolutePath().substring( absolutePath.length() ) );
         resolvedOverrideUrl  = mojo.resolvedOverrideUrl;
         missingLicensesFileArtifact = mojo.missingLicensesFileArtifact;
-        localRepository = mojo.localRepository;
         dependencies = new HashSet<>( mavenProject.getDependencyArtifacts() );
         licenseMerges = mojo.licenseMerges;
         licenseMergesFile = mojo.licenseMergesFile;
