@@ -154,7 +154,7 @@ public abstract class AbstractLicenseNameMojo
      * If not set, "Copyright (C) %1$s %2$s" is used where the copyright dates are
      * substituted for $1 and the copyright holder for $2.
      *
-     * @since 2.0.1
+     * @since 2.1.0
      */
     @Parameter( property = "license.copyrightStringFormat" )
     protected String copyrightStringFormat;
