@@ -33,7 +33,7 @@
   <parent>
     <groupId>org.codehaus.mojo.license.test</groupId>
     <artifactId>test-add-third-party-global-db</artifactId>
-    <version>@pom.version@</version>
+    <version>@project.version@</version>
   </parent>
 
   <name>License Test :: global-db - publish</name>
@@ -49,7 +49,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>
-        <version>1.7</version>
+        <version>@build-helper-maven-plugin.version@</version>
         <executions>
           <execution>
             <id>attach-artifacts</id>

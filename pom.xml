@@ -119,6 +119,8 @@
     <version.httpcomponents.httpclient>4.5.14</version.httpcomponents.httpclient>
     <version.httpcomponents.httpcore>4.4.16</version.httpcomponents.httpcore>
 
+    <build-helper-maven-plugin.version>3.4.0</build-helper-maven-plugin.version>
+
     <!-- license configuration -->
     <license.useMissingFile>true</license.useMissingFile>
     <license.failOnMissing>true</license.failOnMissing>
