@@ -32,6 +32,7 @@ import org.codehaus.plexus.i18n.I18N;
 
 import java.util.Collection;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Base class for report renderers.
@@ -311,13 +312,16 @@ public abstract class AbstractLicenseReportRenderer
         }
     }
 
-    protected void renderThirdPartyDetailTable( ThirdPartyDetails details )
+    protected void renderThirdPartyDetailTable( ThirdPartyDetails details,
+                                                Map<String, String> licenseLookup )
     {
-        renderThirdPartyDetailTable( details, true, true, true );
+        renderThirdPartyDetailTable( details, licenseLookup, true, true, true );
     }
 
-    protected void renderThirdPartyDetailTable( ThirdPartyDetails details, boolean includeScope,
-                                                boolean includeClassifier, boolean includeType )
+    protected void renderThirdPartyDetailTable( ThirdPartyDetails details,
+                                               Map<String, String> licenseLookup,
+                                               boolean includeScope, boolean includeClassifier,
+                                               boolean includeType )
     {
         final String cellWidth = "80%";
         final String headerWidth = "20%";
@@ -377,7 +381,7 @@ public abstract class AbstractLicenseReportRenderer
         }
         String[] licenses = details.getLicenses();
 
-        if ( details.hasPomLicenses() )
+        if ( details.hasPomLicenses() || details.hasThirdPartyLicenses() )
         {
             sink.tableRow();
             sinkHeaderCellText( headerWidth, getText( "report.licenses" ) );
@@ -389,25 +393,17 @@ public abstract class AbstractLicenseReportRenderer
                 {
                     sink.lineBreak();
                 }
-                sink.text( licenses[i] );
 
-            }
-            sink.tableCell_();
-            sink.tableRow_();
-        }
-        else if ( details.hasThirdPartyLicenses() )
-        {
-            sink.tableRow();
-            sinkHeaderCellText( headerWidth, getText( "report.licenses" ) );
-            sink.tableCell( attrs );
-            for ( int i = 0; i < licenses.length; i++ )
-            {
-                if ( i > 0 )
+                if ( licenseLookup.containsKey( licenses[i] ) )
                 {
-                    sink.lineBreak();
+                    sink.link( licenseLookup.get( licenses[i] ) );
+                    sink.text( licenses[i] );
+                    sink.link_();
                 }
-                sink.text( licenses[i] );
-
+                else
+                {
+                    sink.text( licenses[i] );
+                }
             }
             sink.tableCell_();
             sink.tableRow_();
