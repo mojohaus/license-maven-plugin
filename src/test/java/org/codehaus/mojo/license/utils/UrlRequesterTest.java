@@ -43,4 +43,10 @@ public class UrlRequesterTest
         Assert.assertTrue( "classpath protocol not registered", UrlRequester.isStringUrl( "classpath:" + RESOURCE_NAME ) );
     }
 
+    @Test
+    public void testClasspathIsAExternalUrl()
+    {
+        Assert.assertTrue( "classpath protocol as external", UrlRequester.isExternalUrl( "classpath:" + RESOURCE_NAME ) );
+    }
+
 }

@@ -4,6 +4,30 @@ package org.codehaus.mojo.license.utils;
  * #%L
  * License Maven Plugin
  * %%
+ * Copyright (C) 2008 - 2020 CodeLutin, Codehaus, Tony Chemit
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Lesser Public License for more details.
+ *
+ * You should have received a copy of the GNU General Lesser Public
+ * License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/lgpl-3.0.html>.
+ * #L%
+ */
+
+import org.apache.commons.collections.comparators.ComparatorChain;
+
+/*
+ * #%L
+ * License Maven Plugin
+ * %%
  * Copyright (C) 2010 - 2011 Codehaus
  * %%
  * This program is free software: you can redistribute it and/or modify
@@ -122,9 +146,10 @@ public class MojoHelper
 
     }
 
+    @SuppressWarnings( "unchecked" )
     public static Comparator<MavenProject> newMavenProjectComparatorByName()
     {
-        return new Comparator<MavenProject>()
+        Comparator<MavenProject> comparatorByName = new Comparator<MavenProject>()
         {
             /**
              * {@inheritDoc}
@@ -137,7 +162,9 @@ public class MojoHelper
                 return id1.compareToIgnoreCase( id2 );
             }
         };
-
+        //in case 2 project names are equal, compare by maven coordinates, to avoid losing
+        //projects with same name and different coordinates
+        return new ComparatorChain( Arrays.asList( comparatorByName, newMavenProjectComparator() ) );
     }
 
     protected static final double[] TIME_FACTORS = { 1000000, 1000, 60, 60, 24 };

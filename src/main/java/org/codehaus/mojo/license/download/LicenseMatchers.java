@@ -248,7 +248,7 @@ public class LicenseMatchers
             }
         };
 
-        public LicenseListMatcher( List<LicenseMatcher> licenseMatchers )
+        LicenseListMatcher( List<LicenseMatcher> licenseMatchers )
         {
             this.licenseMatchers = licenseMatchers;
         }

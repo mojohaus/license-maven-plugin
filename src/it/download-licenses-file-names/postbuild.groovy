@@ -35,11 +35,11 @@ return {
 
     final Path asl2 = outputBase.resolve('licenses/asl2.txt')
     assert Files.exists(asl2)
-    assert asl2.text.contains('Version 2.0, January 2004')
+    assert asl2.toFile().text.contains('Version 2.0, January 2004')
 
     final Path bsdAntlr = outputBase.resolve('licenses/bsd-antlr.html')
     assert Files.exists(bsdAntlr)
-    assert bsdAntlr.text.contains('Copyright (c) 2012 Terence Parr and Sam Harwell')
+    assert bsdAntlr.toFile().text.contains('Copyright (c) 2012 Terence Parr and Sam Harwell')
 
     final Path cddl = outputBase.resolve('licenses/cddl-gplv2-ce.txt')
     assert Files.exists(cddl)
@@ -47,7 +47,7 @@ return {
 
     final Path expectedLicensesXml = basePath.resolve('licenses-'+ id +'.expected.xml')
     final Path licensesXml = outputBase.resolve('licenses.xml')
-    assert expectedLicensesXml.text.equals(licensesXml.text)
+    assert expectedLicensesXml.toFile().text.equals(licensesXml.toFile().text)
     return true
 }() && {
     final String id = 'spdx'
@@ -55,11 +55,11 @@ return {
 
     final Path asl2 = outputBase.resolve('licenses/Apache-2.0.txt')
     assert Files.exists(asl2)
-    assert asl2.text.contains('Version 2.0, January 2004')
+    assert asl2.toFile().text.contains('Version 2.0, January 2004')
 
     final Path bsdAntlr = outputBase.resolve('licenses/bsd-antlr.html')
     assert Files.exists(bsdAntlr)
-    assert bsdAntlr.text.contains('Copyright (c) 2012 Terence Parr and Sam Harwell')
+    assert bsdAntlr.toFile().text.contains('Copyright (c) 2012 Terence Parr and Sam Harwell')
 
     final Path cddl = outputBase.resolve('licenses/cddl-gplv2-ce.txt')
     assert Files.exists(cddl)
@@ -67,7 +67,7 @@ return {
 
     final Path expectedLicensesXml = basePath.resolve('licenses-'+ id +'.expected.xml')
     final Path licensesXml = outputBase.resolve('licenses.xml')
-    assert expectedLicensesXml.text.equals(licensesXml.text)
+    assert expectedLicensesXml.toFile().text.equals(licensesXml.toFile().text)
     return true
 }() && {
 
@@ -77,11 +77,11 @@ return {
 
     final Path asl2 = outputBase.resolve('licenses/Apache-2.0.txt')
     assert Files.exists(asl2)
-    assert asl2.text.contains('Version 2.0, January 2004')
+    assert asl2.toFile().text.contains('Version 2.0, January 2004')
 
     final Path bsdAntlr = outputBase.resolve('licenses/bsd-license-from-config.html')
     assert Files.exists(bsdAntlr)
-    assert bsdAntlr.text.contains('Copyright (c) 2012 Terence Parr and Sam Harwell')
+    assert bsdAntlr.toFile().text.contains('Copyright (c) 2012 Terence Parr and Sam Harwell')
 
     final Path cddl = outputBase.resolve('licenses/cddl-gplv2-ce.txt')
     assert Files.exists(cddl)
@@ -89,7 +89,7 @@ return {
 
     final Path expectedLicensesXml = basePath.resolve('licenses-'+ id +'.expected.xml')
     final Path licensesXml = outputBase.resolve('licenses.xml')
-    assert expectedLicensesXml.text.equals(licensesXml.text)
+    assert expectedLicensesXml.toFile().text.equals(licensesXml.toFile().text)
 
     final Path foo = basePath.resolve('target/cleanLicDir/licenses/foo.txt')
     assert !Files.exists(foo)

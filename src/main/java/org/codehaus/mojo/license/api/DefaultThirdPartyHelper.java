@@ -36,6 +36,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -101,7 +102,10 @@ public class DefaultThirdPartyHelper
     /**
      * Cache of dependencies (as maven project) loaded.
      */
-    private static SortedMap<String, MavenProject> artifactCache;
+    private static volatile SortedMap<String, MavenProject> artifactCache;
+
+    // Mutex to guard lazy initialization of artifactCache
+    private static final Object ARTIFACT_CACHE_MUTEX = new Object();
 
     /**
      * Constructor of the helper.
@@ -138,7 +142,13 @@ public class DefaultThirdPartyHelper
     {
         if ( artifactCache == null )
         {
-            artifactCache = new TreeMap<>();
+            synchronized ( ARTIFACT_CACHE_MUTEX )
+            {
+                if ( artifactCache == null )
+                {
+                    artifactCache = Collections.synchronizedSortedMap( new TreeMap<String, MavenProject>() );
+                }
+            }
         }
         return artifactCache;
     }
@@ -185,9 +195,12 @@ public class DefaultThirdPartyHelper
 
         LicenseMap licenseMap = new LicenseMap();
 
-        for ( MavenProject project : dependencies.values() )
+        synchronized ( dependencies )
         {
-            thirdPartyTool.addLicense( licenseMap, project, project.getLicenses() );
+            for ( MavenProject project : dependencies.values() )
+            {
+                thirdPartyTool.addLicense( licenseMap, project, project.getLicenses() );
+            }
         }
         return licenseMap;
     }
@@ -234,7 +247,11 @@ public class DefaultThirdPartyHelper
 
                 // try to load missing third party files from dependencies
 
-                Collection<MavenProject> projects = new ArrayList<>( projectDependencies.values() );
+                Collection<MavenProject> projects;
+                synchronized ( projectDependencies )
+                {
+                    projects = new ArrayList<>( projectDependencies.values() );
+                }
                 projects.remove( project );
                 projects.removeAll( unsafeDependencies );
 

@@ -117,7 +117,10 @@ public class DependenciesTool
         SortedMap<String, MavenProject> localCache = new TreeMap<>();
         if ( cache != null )
         {
-            localCache.putAll( cache );
+            synchronized ( cache )
+            {
+                localCache.putAll( cache );
+            }
         }
         ProjectBuildingRequest projectBuildingRequest
                 = new DefaultProjectBuildingRequest( mavenSession.getProjectBuildingRequest() )

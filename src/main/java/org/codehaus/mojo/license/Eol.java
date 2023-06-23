@@ -73,7 +73,7 @@ public enum Eol
 
     private final String eolString;
 
-    private Eol( String eolString )
+    Eol( String eolString )
     {
         this.eolString = eolString;
     }
