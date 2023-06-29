@@ -20,9 +20,9 @@
  * #L%
  */
 
-file = new File(basedir, 'child2-overriding/target/generated-sources/license/THIRD-PARTY.txt');
-assert file.exists();
-content = file.text;
-assert content.contains('(Eclipse Public License 2.0) child1-multi-license (org.codehaus.mojo.license.test:child1-multi-license:1.0.0 - no url defined)');
-assert !content.contains('(TestLicense-01) (TestLicense-02) child1-multi-license (org.codehaus.mojo.license.test:child1-multi-license:1.0.0 - no url defined)');
-return true;
+file = new File(basedir, 'child2-overriding/target/generated-sources/license/THIRD-PARTY.txt')
+assert file.exists()
+content = file.text
+assert content.contains('(Eclipse Public License 2.0) child1-multi-license (org.codehaus.mojo.license.test:child1-multi-license:1.0.0 - no url defined)')
+assert !content.contains('(TestLicense-01) (TestLicense-02) child1-multi-license (org.codehaus.mojo.license.test:child1-multi-license:1.0.0 - no url defined)')
+return true

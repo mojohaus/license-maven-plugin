@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.codehaus.mojo.license.test</groupId>
     <artifactId>test-ISSUE-351</artifactId>
-    <version>@pom.version@</version>
+    <version>1.0.0</version>
   </parent>
   <artifactId>child2-overriding</artifactId>
   <packaging>jar</packaging>
@@ -14,20 +14,8 @@
     <license.useMissingFile>true</license.useMissingFile>
     <license.deployMissingFile>true</license.deployMissingFile>
     <license.useRepositoryMissingFiles>true</license.useRepositoryMissingFiles>
-    <license.failIfWarning>true</license.failIfWarning>
+    <license.failOnMissing>true</license.failOnMissing>
   </properties>
-
-  <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>license-maven-plugin</artifactId>
-          <version>@pom.version@</version>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-  </build>
 
   <dependencies>
     <dependency>

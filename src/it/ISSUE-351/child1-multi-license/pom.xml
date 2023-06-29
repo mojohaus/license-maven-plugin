@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.codehaus.mojo.license.test</groupId>
     <artifactId>test-ISSUE-351</artifactId>
-    <version>@pom.version@</version>
+    <version>1.0.0</version>
   </parent>
   <artifactId>child1-multi-license</artifactId>
   <packaging>jar</packaging>
