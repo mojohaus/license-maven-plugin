@@ -201,7 +201,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
     private boolean emptyLineAfterHeader;
 
     /**
-     * A flag to indicate if there should be an empty line after the header.
+     * A flag to indicate if trailing spaces should be trimmed.
      * <p>
      * Checkstyle usually requires no trailing whitespace.
      * If it is the case it could make sense to set this to true
@@ -701,7 +701,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo
             LOG.warn( "No inceptionYear defined (will use current year)" );
         }
 
-        Copyright copyright = getCopyright( getCopyrightOwners() );
+        Copyright copyright = getCopyright( copyrightStringFormat, getCopyrightOwners() );
         header.setCopyright( copyright );
 
         String licenseContent = license.getHeaderContent( getEncoding() );

@@ -26,7 +26,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
@@ -587,14 +586,6 @@ public abstract class AbstractAddThirdPartyMojo
     protected String fileTemplate;
 
     /**
-     * Local Repository.
-     *
-     * @since 1.0.0
-     */
-    @Parameter( property = "localRepository", required = true, readonly = true )
-    protected ArtifactRepository localRepository;
-
-    /**
      * The set of dependencies for the current project, used to locate license databases.
      */
     @Parameter( property = "project.artifacts", required = true, readonly = true )
@@ -766,9 +757,12 @@ public abstract class AbstractAddThirdPartyMojo
         }
         else if ( licenseMergesUrl != null )
         {
-            LOG.warn( "" );
-            LOG.warn( "licenseMerges will be overridden by licenseMergesUrl." );
-            LOG.warn( "" );
+            if ( licenseMerges != null )
+            {
+                LOG.warn( "" );
+                LOG.warn( "licenseMerges will be overridden by licenseMergesUrl." );
+                LOG.warn( "" );
+            }
             if ( UrlRequester.isStringUrl( licenseMergesUrl ) )
             {
                 licenseMerges = Arrays.asList( UrlRequester.getFromUrl( licenseMergesUrl ).split( "[\n\r]+" ) );

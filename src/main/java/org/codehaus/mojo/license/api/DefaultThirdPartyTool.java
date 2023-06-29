@@ -458,13 +458,16 @@ public class DefaultThirdPartyTool
     {
         Map<String, MavenProject> snapshots = new HashMap<>();
 
-        //find snapshot dependencies
-        for ( Map.Entry<String, MavenProject> entry : artifactCache.entrySet() )
+        synchronized ( artifactCache )
         {
-            MavenProject mavenProject = entry.getValue();
-            if ( mavenProject.getVersion().endsWith( Artifact.SNAPSHOT_VERSION ) )
+            //find snapshot dependencies
+            for ( Map.Entry<String, MavenProject> entry : artifactCache.entrySet() )
             {
-                snapshots.put( entry.getKey(), mavenProject );
+                MavenProject mavenProject = entry.getValue();
+                if ( mavenProject.getVersion().endsWith( Artifact.SNAPSHOT_VERSION ) )
+                {
+                    snapshots.put( entry.getKey(), mavenProject );
+                }
             }
         }
 
@@ -607,6 +610,9 @@ public class DefaultThirdPartyTool
             {
                 overrideMappings.load( reader );
             }
+
+            boolean isExternalUrl = UrlRequester.isExternalUrl(overrideUrl);
+
             for ( Object o : overrideMappings.keySet() )
             {
                 String id = (String) o;
@@ -614,7 +620,15 @@ public class DefaultThirdPartyTool
                 MavenProject project = artifactCache.get( id );
                 if ( project == null )
                 {
-                    LOG.warn( "dependency [{}] does not exist in project.", id );
+                    // Log at warn for local override files, but at debug for remote (presumably shared) override files.
+                    if ( isExternalUrl )
+                    {
+                        LOG.debug( "dependency [{}] does not exist in project.", id );
+                    }
+                    else
+                    {
+                        LOG.warn( "dependency [{}] does not exist in project.", id );
+                    }
                     continue;
                 }
 

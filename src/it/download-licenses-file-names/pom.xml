@@ -50,7 +50,7 @@
     <dependency>
       <groupId>commons-beanutils</groupId>
       <artifactId>commons-beanutils</artifactId>
-      <version>1.9.3</version>
+      <version>1.9.4</version>
       <exclusions>
         <exclusion>
           <groupId>*</groupId>
@@ -66,7 +66,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>license-maven-plugin</artifactId>
-        <version>@pom.version@</version>
+        <version>@project.version@</version>
         <executions>
           <execution>
             <id>basic</id>
@@ -88,7 +88,7 @@
               </licenseUrlReplacements>
               <licenseUrlFileNames>
                 <bsd-antlr.html>
-                    sha1:074f8d6e91730b40875178666513014472888247
+                    sha1:666518759e606772587886dcb54a9867bcf275e0
                     \Qhttp://www.antlr.org/license.html\E
                 </bsd-antlr.html>
                 <asl2.txt>
@@ -123,7 +123,7 @@
               <licenseUrlFileNames>
                 <spdx/>
                 <bsd-antlr.html>
-                    sha1:074f8d6e91730b40875178666513014472888247
+                    sha1:666518759e606772587886dcb54a9867bcf275e0
                     \Qhttp://www.antlr.org/license.html\E
                 </bsd-antlr.html>
                 <cddl-gplv2-ce.txt>

@@ -28,21 +28,21 @@
   <parent>
     <groupId>org.codehaus.mojo</groupId>
     <artifactId>mojo-parent</artifactId>
-    <version>50</version>
+    <version>75</version>
   </parent>
 
   <artifactId>license-maven-plugin</artifactId>
-  <version>2.0.1-SNAPSHOT</version>
+  <version>2.1.1-SNAPSHOT</version>
   <packaging>maven-plugin</packaging>
 
   <name>License Maven Plugin</name>
   <description>Maven plugin to download and collect license files from project dependencies.</description>
-  <url>http://www.mojohaus.org/license-maven-plugin</url>
+  <url>https://www.mojohaus.org/license-maven-plugin</url>
   <inceptionYear>2010</inceptionYear>
   <licenses>
     <license>
       <name>The GNU Lesser General Public License, Version 3.0</name>
-      <url>http://www.gnu.org/licenses/lgpl-3.0.txt</url>
+      <url>https://www.gnu.org/licenses/lgpl-3.0.txt</url>
       <distribution>repo</distribution>
     </license>
   </licenses>
@@ -92,7 +92,7 @@
   <scm>
     <connection>scm:git:https://github.com/mojohaus/license-maven-plugin.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/mojohaus/license-maven-plugin.git</developerConnection>
-    <url>https://github.com/mojohaus/license-maven-plugin</url>
+    <url>https://github.com/mojohaus/license-maven-plugin/tree/master</url>
     <tag>HEAD</tag>
   </scm>
   <issueManagement>
@@ -100,48 +100,39 @@
     <url>https://github.com/mojohaus/license-maven-plugin/issues/</url>
   </issueManagement>
   <ciManagement>
-    <system>Travis CI</system>
-    <url>https://travis-ci.org/mojohaus/license-maven-plugin</url>
+    <system>github</system>
+    <url>https://github.com/mojohaus/license-maven-plugin/actions</url>
   </ciManagement>
-  <distributionManagement>
-    <site>
-      <id>github</id>
-      <url>scm:git:git@github.com:mojohaus/license-maven-plugin.git</url>
-    </site>
-  </distributionManagement>
 
   <properties>
     <mavenVersion>3.5.4</mavenVersion>
-    <mojo.java.target>1.7</mojo.java.target>
+    <mojo.java.target>7</mojo.java.target>
+    <minimalJavaBuildVersion>1.7</minimalJavaBuildVersion>
 
     <processorVersion>1.3</processorVersion>
 
-    <doxiaVersion>1.8</doxiaVersion>
+    <doxiaVersion>1.12.0</doxiaVersion>
     <!-- ASF project maven-doxia-sitetools:1.8.1 has different release cycle and it is dependent on maven-doxia:1.8 -->
-    <doxiaRendererVersion>1.8.1</doxiaRendererVersion>
+    <doxiaRendererVersion>1.11.1</doxiaRendererVersion>
     <it.debug>true</it.debug>
 
-    <version.httpcomponents.httpclient>4.5.4</version.httpcomponents.httpclient>
-    <version.httpcomponents.httpcore>4.4.8</version.httpcomponents.httpcore>
+    <version.httpcomponents.httpclient>4.5.14</version.httpcomponents.httpclient>
+    <version.httpcomponents.httpcore>4.4.16</version.httpcomponents.httpcore>
+
+    <build-helper-maven-plugin.version>3.4.0</build-helper-maven-plugin.version>
 
     <!-- license configuration -->
     <license.useMissingFile>true</license.useMissingFile>
-    <license.failIfWarning>true</license.failIfWarning>
+    <license.failOnMissing>true</license.failOnMissing>
     <license.licenseName>lgpl_v3</license.licenseName>
-    <licensePluginVersion>1.14</licensePluginVersion>
 
-    <pluginPluginVersion>3.5.1</pluginPluginVersion>
-    <plexusComponentVersion>1.7.1</plexusComponentVersion>
+    <plexusComponentVersion>2.1.1</plexusComponentVersion>
     <maven-resolver.version>1.3.3</maven-resolver.version>
+    <project.build.outputTimestamp>2023-06-06T22:58:39Z</project.build.outputTimestamp>
   </properties>
 
   <dependencyManagement>
     <dependencies>
-      <dependency>
-        <groupId>org.apache.maven.plugin-tools</groupId>
-        <artifactId>maven-plugin-annotations</artifactId>
-        <version>${pluginPluginVersion}</version>
-      </dependency>
       <dependency>
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpclient</artifactId>
@@ -155,7 +146,7 @@
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
-        <version>1.7.26</version>
+        <version>1.7.36</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -164,11 +155,14 @@
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-plugin-api</artifactId>
+      <version>${mavenVersion}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-artifact</artifactId>
       <version>${mavenVersion}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.resolver</groupId>
@@ -179,35 +173,30 @@
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-model</artifactId>
       <version>${mavenVersion}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-core</artifactId>
       <version>${mavenVersion}</version>
       <scope>provided</scope>
-      <exclusions>
-
-        <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>jcl-over-slf4j</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>commons-cli</groupId>
-          <artifactId>commons-cli</artifactId>
-        </exclusion>
-
-      </exclusions>
     </dependency>
 
     <dependency>
       <groupId>org.apache.maven.reporting</groupId>
       <artifactId>maven-reporting-api</artifactId>
-      <version>3.0</version>
+      <version>3.1.1</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.reporting</groupId>
       <artifactId>maven-reporting-impl</artifactId>
-      <version>3.0.0</version>
+      <version>3.2.0</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-container-default</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <!-- Doxia -->
@@ -215,6 +204,12 @@
       <groupId>org.apache.maven.doxia</groupId>
       <artifactId>doxia-core</artifactId>
       <version>${doxiaVersion}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-container-default</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.doxia</groupId>
@@ -259,14 +254,12 @@
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
-      <version>3.1.0</version>
+      <version>4.0.0</version>
     </dependency>
-
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-container-default</artifactId>
-      <version>2.0.0</version>
-      <scope>provided</scope>
+      <artifactId>plexus-xml</artifactId>
+      <version>4.0.1</version>
     </dependency>
 
     <dependency>
@@ -278,7 +271,7 @@
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
-      <version>3.7</version>
+      <version>3.12.0</version>
     </dependency>
 
     <dependency>
@@ -295,13 +288,13 @@
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
-      <version>2.6</version>
+      <version>2.13.0</version>
     </dependency>
 
     <dependency>
       <groupId>org.freemarker</groupId>
       <artifactId>freemarker</artifactId>
-      <version>2.3.31</version>
+      <version>2.3.32</version>
     </dependency>
 
     <dependency>
@@ -325,18 +318,9 @@
     <pluginManagement>
       <plugins>
         <plugin>
-          <artifactId>maven-gpg-plugin</artifactId>
-          <version>1.6</version>
-          <configuration>
-            <!-- Temporary solution to get a release out using gpg version 1 -->
-            <useAgent>false</useAgent>
-          </configuration>
-        </plugin>
-
-        <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>build-helper-maven-plugin</artifactId>
-          <version>1.10</version>
+          <version>3.4.0</version>
         </plugin>
         <plugin>
           <groupId>org.codehaus.plexus</groupId>
@@ -347,47 +331,13 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
           <configuration>
-            <quiet>true</quiet>
-            <tagletArtifacts>
-              <tagletArtifact>
-                <groupId>org.apache.maven.plugin-tools</groupId>
-                <artifactId>maven-plugin-tools-javadoc</artifactId>
-                <version>${pluginPluginVersion}</version>
-              </tagletArtifact>
-              <tagletArtifact>
-                <groupId>org.codehaus.plexus</groupId>
-                <artifactId>plexus-component-javadoc</artifactId>
-                <version>${plexusComponentVersion}</version>
-              </tagletArtifact>
-            </tagletArtifacts>
+            <doclint>none</doclint>
           </configuration>
-        </plugin>
-        <plugin>
-          <artifactId>maven-plugin-plugin</artifactId>
-          <version>${pluginPluginVersion}</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-invoker-plugin</artifactId>
-          <version>3.0.0</version>
-          <configuration>
-            <scriptVariables>
-              <projectVersion>${project.version}</projectVersion>
-            </scriptVariables>
-            <environmentVariables>
-              <MAVEN_OPTS>-Duser.country=US -Duser.language=en</MAVEN_OPTS>
-            </environmentVariables>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.ec4j.maven</groupId>
-          <artifactId>editorconfig-maven-plugin</artifactId>
-          <version>0.0.10</version>
         </plugin>
         <plugin>
           <groupId>org.codehaus.gmaven</groupId>
           <artifactId>groovy-maven-plugin</artifactId>
-          <version>2.1</version>
+          <version>2.1.1</version>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -406,6 +356,8 @@
           </execution>
         </executions>
         <configuration>
+          <!-- TODO enable with spotless -->
+          <skip>true</skip>
           <headerLocation>config/checkstyle-header.txt</headerLocation>
           <excludes>**/HelpMojo.java,**/SpdxLicenseListData.java</excludes><!-- these are generated -->
         </configuration>
@@ -441,73 +393,6 @@
       </plugin>
 
       <plugin>
-        <artifactId>maven-plugin-plugin</artifactId>
-        <configuration>
-          <goalPrefix>license</goalPrefix>
-          <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
-        </configuration>
-        <executions>
-          <execution>
-            <id>mojo-descriptor</id>
-            <goals>
-              <goal>descriptor</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
-      <!--
-           To test reading third party data from an artifact, we need an artifact.
-           In the aggregate case, we can't depend on it in the reactor, since
-           there's no way to get any other reactor execution to create it
-           in the forked execution of aggregate-add-third-party, not unless
-           we want involved in a custom lifecycle. So this barnicle exists
-           so that the tests can use it. It's a pity it will end up on Central.
-      -->
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>build-helper-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>attach-artifacts</id>
-            <phase>package</phase>
-            <goals>
-              <goal>attach-artifact</goal>
-            </goals>
-            <configuration>
-              <artifacts>
-                <artifact>
-                  <file>src/license-test/test.license.properties</file>
-                  <type>license.properties</type>
-                  <classifier>test-third-party</classifier>
-                </artifact>
-              </artifacts>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.ec4j.maven</groupId>
-        <artifactId>editorconfig-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>check</id>
-            <phase>validate</phase>
-            <goals>
-              <goal>check</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <excludes>
-            <exclude>src/main/resources/META-INF/licenses/**</exclude>
-            <exclude>src/test/resources/newRepository/**</exclude>
-          </excludes>
-        </configuration>
-      </plugin>
-
-      <plugin>
         <groupId>org.codehaus.gmaven</groupId>
         <artifactId>groovy-maven-plugin</artifactId>
         <executions>
@@ -539,15 +424,40 @@
   <profiles>
     <profile>
       <id>run-its</id>
-      <activation>
-        <property>
-          <name>skipITs</name>
-          <value>!true</value>
-        </property>
-      </activation>
       <build>
         <defaultGoal>verify</defaultGoal>
         <plugins>
+          <!--
+         To test reading third party data from an artifact, we need an artifact.
+         In the aggregate case, we can't depend on it in the reactor, since
+         there's no way to get any other reactor execution to create it
+         in the forked execution of aggregate-add-third-party, not unless
+         we want involved in a custom lifecycle. So this barnicle exists
+         so that the tests can use it. It's a pity it will end up on Central.
+        -->
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>attach-artifacts</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>attach-artifact</goal>
+                </goals>
+                <configuration>
+                  <artifacts>
+                    <artifact>
+                      <file>src/license-test/test.license.properties</file>
+                      <type>license.properties</type>
+                      <classifier>test-third-party</classifier>
+                    </artifact>
+                  </artifacts>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
           <plugin>
             <groupId>org.codehaus.gmaven</groupId>
             <artifactId>groovy-maven-plugin</artifactId>
@@ -569,7 +479,7 @@
                 </goals>
                 <phase>post-integration-test</phase>
                 <configuration>
-                  <source>System.setProperty('LittleProxy.stop', 'true')</source>
+                  <source>System.setProperty('LittleProxy.stop', 'true'); Thread.sleep(250)</source>
                 </configuration>
               </execution>
             </executions>
@@ -587,6 +497,12 @@
               <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
               <settingsFile>src/it/settings.xml</settingsFile>
               <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
+              <environmentVariables>
+                <MAVEN_OPTS>-Duser.country=US -Duser.language=en</MAVEN_OPTS>
+              </environmentVariables>
+              <scriptVariables>
+                <projectVersion>${project.version}</projectVersion>
+              </scriptVariables>
             </configuration>
             <executions>
               <execution>
@@ -603,6 +519,9 @@
                   <pomExcludes>
                     <pomExclude>MLICENSE-4/pom.xml</pomExclude>
                     <pomExclude>download-licenses-proxy/pom.xml</pomExclude>
+                    <!-- failed test on GH use remote resources -->
+                    <pomExclude>download-licenses-basic/pom.xml</pomExclude>
+                    <pomExclude>download-licenses-force/pom.xml</pomExclude>
                   </pomExcludes>
                 </configuration>
               </execution>
@@ -675,15 +594,11 @@
 
     <profile>
       <id>mojo-release</id>
-      <properties>
-        <invoker.skip>true</invoker.skip>
-      </properties>
       <build>
         <plugins>
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>license-maven-plugin</artifactId>
-            <version>1.13</version>
             <executions>
               <execution>
                 <goals>
@@ -691,13 +606,6 @@
                 </goals>
               </execution>
             </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-javadoc-plugin</artifactId>
-            <configuration>
-              <additionalparam>-Xdoclint:none</additionalparam>
-            </configuration>
           </plugin>
         </plugins>
       </build>
@@ -714,14 +622,8 @@
       <reporting>
         <plugins>
           <plugin>
-            <artifactId>maven-invoker-plugin</artifactId>
-            <version>2.0.0</version>
-          </plugin>
-
-          <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>license-maven-plugin</artifactId>
-            <version>1.13</version>
             <reportSets>
               <reportSet>
                 <reports>
@@ -730,7 +632,6 @@
               </reportSet>
             </reportSets>
           </plugin>
-
         </plugins>
       </reporting>
     </profile>
