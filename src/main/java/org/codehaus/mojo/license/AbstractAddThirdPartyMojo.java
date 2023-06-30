@@ -716,26 +716,30 @@ public abstract class AbstractAddThirdPartyMojo
 
         thirdPartyFile = new File( outputDirectory, thirdPartyFilename );
 
-        long buildTimestamp = getBuildTimestamp();
+        File projectFile = project.getFile() != null ? project.getFile() : new File("");
 
-        LOG.debug( "Build start   at: {}", buildTimestamp );
-        LOG.debug( "third-party file: {}", thirdPartyFile.lastModified() );
+        LOG.debug( "project file: {} last modified: {}", projectFile, projectFile.lastModified() );
+        LOG.debug( "third-party file: {} last modified: {}", thirdPartyFile, thirdPartyFile.lastModified() );
 
-        doGenerate = force || !thirdPartyFile.exists() || buildTimestamp > thirdPartyFile.lastModified();
+        doGenerate = force || !thirdPartyFile.exists() || projectFile.lastModified() > thirdPartyFile.lastModified();
 
         if ( generateBundle )
         {
 
             File bundleFile = FileUtil.getFile( outputDirectory, bundleThirdPartyPath );
 
-            LOG.debug( "bundle third-party file: {}", bundleFile.lastModified() );
-            doGenerateBundle = force || !bundleFile.exists() || buildTimestamp > bundleFile.lastModified();
+            LOG.debug( "bundle third-party file: {} last modified: {}", bundleFile, bundleFile.lastModified() );
+            doGenerateBundle = force || !bundleFile.exists() || projectFile.lastModified() > bundleFile.lastModified();
         }
         else
         {
 
             // not generating bundled file
             doGenerateBundle = false;
+        }
+
+        if ( shouldSkip() ) {
+            return;
         }
 
         projectDependencies = loadDependencies();

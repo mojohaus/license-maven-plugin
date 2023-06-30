@@ -155,15 +155,9 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
      * {@inheritDoc}
      */
     @Override
-    protected boolean checkSkip()
+    protected boolean shouldSkip()
     {
-        if ( !doGenerate && !doGenerateBundle && !doGenerateMissing )
-        {
-
-            LOG.info( "All files are up to date, skip goal execution." );
-            return false;
-        }
-        return true;
+        return !doGenerate && !doGenerateBundle && !doGenerateMissing;
     }
 
     /**
