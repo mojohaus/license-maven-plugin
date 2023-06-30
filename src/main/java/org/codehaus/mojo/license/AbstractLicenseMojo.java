@@ -186,14 +186,9 @@ public abstract class AbstractLicenseMojo
             }
 
             // check if mojo can be skipped
-
-            canContinue = checkSkip();
-            if ( !canContinue )
+            if ( shouldSkip() )
             {
-                if ( isVerbose() )
-                {
-                    LOG.info( "Goal will not be executed." );
-                }
+                LOG.info( "All files are up to date, skip goal execution." );
                 return;
             }
 
@@ -279,14 +274,6 @@ public abstract class AbstractLicenseMojo
         return session;
     }
 
-    /**
-     * @return the build timestamp (used to have a unique timestamp all over a build).
-     */
-    public final long getBuildTimestamp()
-    {
-        return session.getStartTime().getTime();
-    }
-
     // ----------------------------------------------------------------------
     // Protected Methods
     // ----------------------------------------------------------------------
@@ -327,12 +314,12 @@ public abstract class AbstractLicenseMojo
     /**
      * Checks if the mojo execution should be skipped.
      *
-     * @return {@code false} if the mojo should not be executed.
+     * @return {@code true} if the mojo should not be executed.
      */
-    protected boolean checkSkip()
+    protected boolean shouldSkip()
     {
         // by default, never skip goal
-        return true;
+        return false;
     }
 
     /**

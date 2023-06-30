@@ -130,15 +130,9 @@ public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo
      * {@inheritDoc}
      */
     @Override
-    protected boolean checkSkip()
+    protected boolean shouldSkip()
     {
-        if ( !doGenerate && !doGenerateBundle )
-        {
-
-            LOG.info( "All files are up to date, skip goal execution." );
-            return false;
-        }
-        return super.checkSkip();
+        return !doGenerate && !doGenerateBundle;
     }
 
     @Override
