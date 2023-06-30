@@ -22,6 +22,11 @@ package org.codehaus.mojo.license.api;
  * #L%
  */
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.inject.Singleton;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -48,7 +53,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.License;
-import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 import org.codehaus.mojo.license.LicenseMojoUtils;
@@ -57,8 +61,7 @@ import org.codehaus.mojo.license.utils.FileUtil;
 import org.codehaus.mojo.license.utils.MojoHelper;
 import org.codehaus.mojo.license.utils.SortedProperties;
 import org.codehaus.mojo.license.utils.UrlRequester;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.artifact.DefaultArtifactType;
@@ -76,7 +79,8 @@ import org.slf4j.LoggerFactory;
  * @author <a href="mailto:tchemit@codelutin.com">Tony Chemit</a>
  * @version $Id$
  */
-@Component( role = ThirdPartyTool.class, hint = "default" )
+@Named
+@Singleton
 public class DefaultThirdPartyTool
         implements ThirdPartyTool
 {
@@ -112,22 +116,22 @@ public class DefaultThirdPartyTool
     /**
      * Maven Artifact Resolver repoSystem
      */
-    @Requirement
-    private org.eclipse.aether.RepositorySystem aetherRepoSystem;
+    @Inject
+    private RepositorySystem aetherRepoSystem;
 
-    @Requirement
-    private MavenSession mavenSession;
+    @Inject
+    private Provider<MavenSession> mavenSessionProvider;
 
     /**
      * Maven ProjectHelper.
      */
-    @Requirement
+    @Inject
     private MavenProjectHelper projectHelper;
 
     /**
      * freeMarker helper.
      */
-    private FreeMarkerHelper freeMarkerHelper = FreeMarkerHelper.newDefaultHelper();
+    private final FreeMarkerHelper freeMarkerHelper = FreeMarkerHelper.newDefaultHelper();
 
     /**
      * Maven project comparator.
@@ -247,16 +251,13 @@ public class DefaultThirdPartyTool
             }
 
         }
+
         try
         {
             loadGlobalLicenses( topLevelDependencies, remoteRepositories, unsafeDependencies,
                                 licenseMap, unsafeProjects, result );
         }
-        catch ( ArtifactNotFoundException e )
-        {
-            throw new ThirdPartyToolException( "Failed to load global licenses", e );
-        }
-        catch ( ArtifactResolutionException e )
+        catch ( ArtifactNotFoundException | ArtifactResolutionException e )
         {
             throw new ThirdPartyToolException( "Failed to load global licenses", e );
         }
@@ -312,20 +313,10 @@ public class DefaultThirdPartyTool
         {
             return resolveThirdPartyDescriptor( project, remoteRepositories );
         }
-        catch ( ArtifactNotFoundException e )
-        {
-            LOG.debug( "ArtifactNotFoundException: Unable to locate third party descriptor", e );
-            return null;
-        }
         catch ( ArtifactResolutionException e )
         {
             throw new ThirdPartyToolException(
                     "ArtifactResolutionException: Unable to locate third party descriptor: " + e.getMessage(), e );
-        }
-        catch ( IOException e )
-        {
-            throw new ThirdPartyToolException(
-                    "IOException: Unable to locate third party descriptor: " + e.getMessage(), e );
         }
     }
 
@@ -454,8 +445,7 @@ public class DefaultThirdPartyTool
                                                SortedMap<String, MavenProject> artifactCache,
                                                String encoding,
                                                File missingFile,
-                                               String missingFileUrl ) throws IOException, MojoExecutionException
-    {
+                                               String missingFileUrl ) throws IOException {
         Map<String, MavenProject> snapshots = new HashMap<>();
 
         synchronized ( artifactCache )
@@ -712,7 +702,7 @@ public class DefaultThirdPartyTool
                                    Map<String, MavenProject> unsafeProjects, Artifact dep,
                                    List<RemoteRepository> remoteRepositories,
                                    SortedProperties result )
-            throws IOException, ArtifactNotFoundException, ArtifactResolutionException
+            throws IOException, ArtifactResolutionException
     {
         File propFile = resolveArtifact( dep.getGroupId(), dep.getArtifactId(), dep.getVersion(), dep.getType(),
                 dep.getClassifier(), remoteRepositories );
@@ -745,15 +735,12 @@ public class DefaultThirdPartyTool
 
     /**
      * @param project         not null
-     * @param localRepository not null
-     * @param repositories    not null
-     * @return the resolved site descriptor
-     * @throws IOException                 if any
+     * @param remoteRepositories    not null
+     * @return the resolved third party descriptor
      * @throws ArtifactResolutionException if any
-     * @throws ArtifactNotFoundException   if any
      */
     private File resolveThirdPartyDescriptor( MavenProject project, List<RemoteRepository> remoteRepositories )
-            throws IOException, ArtifactResolutionException, ArtifactNotFoundException
+            throws ArtifactResolutionException
     {
         File result;
         try
@@ -792,7 +779,7 @@ public class DefaultThirdPartyTool
                  * repository, because the parent was already released
                  * (and snapshots are updated automatically if changed)
                  */
-                RepositorySystemSession aetherSession = mavenSession.getRepositorySession();
+                RepositorySystemSession aetherSession = mavenSessionProvider.get().getRepositorySession();
                 result = new File( aetherSession.getLocalRepository().getBasedir(),
                         aetherSession.getLocalRepositoryManager().getPathForLocalArtifact( artifact ) );
             }
@@ -823,7 +810,7 @@ public class DefaultThirdPartyTool
         ArtifactRequest artifactRequest = new ArtifactRequest()
                 .setArtifact( artifact2 )
                 .setRepositories( remoteRepositories );
-        ArtifactResult result = aetherRepoSystem.resolveArtifact( mavenSession.getRepositorySession(),
+        ArtifactResult result = aetherRepoSystem.resolveArtifact( mavenSessionProvider.get().getRepositorySession(),
                 artifactRequest );
 
         return result.getArtifact().getFile();
