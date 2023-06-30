@@ -22,12 +22,15 @@ package org.codehaus.mojo.license.api;
  * #L%
  */
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.inject.Singleton;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
 import org.codehaus.mojo.license.utils.MojoHelper;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +53,8 @@ import org.apache.maven.project.ProjectBuildingRequest;
  * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
-@Component( role = DependenciesTool.class, hint = "default" )
+@Named
+@Singleton
 public class DependenciesTool
 {
     private static final Logger LOG = LoggerFactory.getLogger( DependenciesTool.class );
@@ -64,11 +68,11 @@ public class DependenciesTool
     /**
      * Project builder.
      */
-    @Requirement
+    @Inject
     private ProjectBuilder mavenProjectBuilder;
 
-    @Requirement
-    private MavenSession mavenSession;
+    @Inject
+    private Provider<MavenSession> mavenSessionProvider;
 
     // CHECKSTYLE_OFF: MethodLength
     /**
@@ -123,7 +127,7 @@ public class DependenciesTool
             }
         }
         ProjectBuildingRequest projectBuildingRequest
-                = new DefaultProjectBuildingRequest( mavenSession.getProjectBuildingRequest() )
+                = new DefaultProjectBuildingRequest( mavenSessionProvider.get().getProjectBuildingRequest() )
                         .setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL )
                         //We already have the relevant part of the dependency tree
                         //Re-resolving risks including e.g. excluded artifacts

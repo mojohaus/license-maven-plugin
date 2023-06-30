@@ -22,6 +22,11 @@ package org.codehaus.mojo.license.download;
  * #L%
  */
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.inject.Singleton;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,8 +46,6 @@ import org.codehaus.mojo.license.api.DefaultThirdPartyTool;
 import org.codehaus.mojo.license.api.MavenProjectDependenciesConfigurator;
 import org.codehaus.mojo.license.api.ResolvedProjectDependencies;
 import org.codehaus.mojo.license.download.LicensedArtifact.Builder;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,7 +55,8 @@ import org.slf4j.LoggerFactory;
  * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
-@Component( role = LicensedArtifactResolver.class, hint = "default" )
+@Named
+@Singleton
 public class LicensedArtifactResolver
 {
     private static final Logger LOG = LoggerFactory.getLogger( LicensedArtifactResolver.class );
@@ -66,23 +70,19 @@ public class LicensedArtifactResolver
     /**
      * Project builder.
      */
-    @Requirement
+    @Inject
     private ProjectBuilder mavenProjectBuilder;
 
-    @Requirement
-    private MavenSession mavenSession;
+    @Inject
+    private Provider<MavenSession> mavenSessionProvider;
 
     // CHECKSTYLE_OFF: MethodLength
     /**
      * For a given {@code project}, obtain the universe of its dependencies after applying transitivity and filtering
      * rules given in the {@code configuration} object. Result is given in a map where keys are unique artifact id
      *
-     * @param dependencies the project dependencies
      * @param configuration the configuration
-     * @param localRepository local repository used to resolv dependencies
      * @param remoteRepositories remote repositories used to resolv dependencies
-     * @param cache a optional cache where to keep resolved dependencies
-     * @return the map of resolved dependencies indexed by their unique id.
      * @see MavenProjectDependenciesConfigurator
      */
     public void loadProjectDependencies( ResolvedProjectDependencies artifacts,
@@ -114,7 +114,7 @@ public class LicensedArtifactResolver
         final Map<String, Artifact> includeArtifacts = new HashMap<>();
 
         ProjectBuildingRequest projectBuildingRequest
-                = new DefaultProjectBuildingRequest( mavenSession.getProjectBuildingRequest() )
+                = new DefaultProjectBuildingRequest( mavenSessionProvider.get().getProjectBuildingRequest() )
                         .setRemoteRepositories( remoteRepositories )
                         .setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL )
                         .setResolveDependencies( false )
