@@ -158,7 +158,7 @@ public abstract class AbstractLicenseMojo
             boolean canContinue = checkPackaging();
             if ( !canContinue )
             {
-                LOG.warn( "The goal is skip due to packaging '{}'", getProject().getPackaging() );
+                LOG.info( "The goal is skip due to packaging '{}'", getProject().getPackaging() );
                 return;
             }
 
