@@ -4,7 +4,7 @@
 
   <groupId>org.codehaus.mojo.license.test</groupId>
   <artifactId>test-ISSUE-361</artifactId>
-  <version>@pom.version@</version>
+  <version>@project.version@</version>
   <name>License Test :: ISSUE-361</name>
   <packaging>jar</packaging>
 
