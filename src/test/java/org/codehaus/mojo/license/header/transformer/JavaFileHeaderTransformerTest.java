@@ -31,8 +31,7 @@ import org.junit.Test;
  * @author tchemit dev@tchemit.fr
  * @since 1.2
  */
-public class JavaFileHeaderTransformerTest
-{
+public class JavaFileHeaderTransformerTest {
 
     private static final String PACKAGE = "package org.codehaus.mojo.license.header.transformer;";
 
@@ -43,26 +42,23 @@ public class JavaFileHeaderTransformerTest
     private static final String LINE_SEPARATOR = "<eol>";
 
     @Test
-    public void testAddHeader()
-    {
+    public void testAddHeader() {
         JavaFileHeaderTransformer transformer = new JavaFileHeaderTransformer();
         transformer.setLineSeparator(LINE_SEPARATOR);
         transformer.setEmptyLineAfterHeader(false);
 
         String content = PACKAGE + FileHeaderTransformer.LINE_SEPARATOR + CONTENT;
 
-        transformer.setAddJavaLicenseAfterPackage( false );
+        transformer.setAddJavaLicenseAfterPackage(false);
 
-        String result = transformer.addHeader( HEADER, content );
-        Assert.assertEquals( HEADER + content, result );
+        String result = transformer.addHeader(HEADER, content);
+        Assert.assertEquals(HEADER + content, result);
 
-        transformer.setAddJavaLicenseAfterPackage( true );
+        transformer.setAddJavaLicenseAfterPackage(true);
 
         result = transformer.addHeader(HEADER, content);
-        Assert.assertEquals(PACKAGE + FileHeaderTransformer.LINE_SEPARATOR + transformer.getLineSeparator()
-                        + HEADER + CONTENT,
-                        result);
-
+        Assert.assertEquals(
+                PACKAGE + FileHeaderTransformer.LINE_SEPARATOR + transformer.getLineSeparator() + HEADER + CONTENT,
+                result);
     }
-
 }

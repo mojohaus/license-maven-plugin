@@ -22,16 +22,16 @@ package org.codehaus.mojo.license;
  * #L%
  */
 
+import java.util.Collection;
+import java.util.Locale;
+
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.doxia.sink.Sink;
-import org.apache.maven.doxia.sink.impl.SinkEventAttributeSet;
 import org.apache.maven.doxia.sink.SinkEventAttributes;
+import org.apache.maven.doxia.sink.impl.SinkEventAttributeSet;
 import org.apache.maven.reporting.AbstractMavenReportRenderer;
 import org.codehaus.mojo.license.api.ThirdPartyDetails;
 import org.codehaus.plexus.i18n.I18N;
-
-import java.util.Collection;
-import java.util.Locale;
 
 /**
  * Base class for report renderers.
@@ -39,9 +39,7 @@ import java.util.Locale;
  * @author tchemit dev@tchemit.fr
  * @since 1.1
  */
-public abstract class AbstractLicenseReportRenderer
-    extends AbstractMavenReportRenderer
-{
+public abstract class AbstractLicenseReportRenderer extends AbstractMavenReportRenderer {
     /**
      * Internationalization component.
      *
@@ -63,10 +61,9 @@ public abstract class AbstractLicenseReportRenderer
      */
     protected final String bundleName;
 
-    public AbstractLicenseReportRenderer( org.apache.maven.doxia.sink.Sink sink, String bundleName, I18N i18n,
-                                          Locale locale )
-    {
-        super( sink );
+    public AbstractLicenseReportRenderer(
+            org.apache.maven.doxia.sink.Sink sink, String bundleName, I18N i18n, Locale locale) {
+        super(sink);
         this.bundleName = bundleName;
         this.i18n = i18n;
         this.locale = locale;
@@ -75,9 +72,8 @@ public abstract class AbstractLicenseReportRenderer
     /**
      * {@inheritDoc}
      */
-    public String getTitle()
-    {
-        return getText( "report.title" );
+    public String getTitle() {
+        return getText("report.title");
     }
 
     /**
@@ -86,371 +82,301 @@ public abstract class AbstractLicenseReportRenderer
      * @param key the message key.
      * @return the message.
      */
-    public String getText( String key )
-    {
-        return i18n.getString( bundleName, locale, key );
+    public String getText(String key) {
+        return i18n.getString(bundleName, locale, key);
     }
 
-    protected void renderWarningIcon()
-    {
+    protected void renderWarningIcon() {
         sink.figure();
-        sink.figureGraphics( "images/icon_warning_sml.gif" );
+        sink.figureGraphics("images/icon_warning_sml.gif");
         sink.figure_();
     }
 
-    protected void renderErrorIcon()
-    {
+    protected void renderErrorIcon() {
         sink.figure();
-        sink.figureGraphics( "images/icon_error_sml.gif" );
+        sink.figureGraphics("images/icon_error_sml.gif");
         sink.figure_();
     }
 
-    protected void renderSuccessIcon()
-    {
+    protected void renderSuccessIcon() {
         sink.figure();
-        sink.figureGraphics( "images/icon_success_sml.gif" );
+        sink.figureGraphics("images/icon_success_sml.gif");
         sink.figure_();
     }
 
-    protected void renderInfoIcon()
-    {
+    protected void renderInfoIcon() {
         sink.figure();
-        sink.figureGraphics( "images/icon_info_sml.gif" );
+        sink.figureGraphics("images/icon_info_sml.gif");
         sink.figure_();
     }
 
-    protected String getGAV( ThirdPartyDetails details )
-    {
-        return ArtifactUtils.versionlessKey( details.getGroupId(), details.getArtifactId() ) + ":"
-                + details.getVersion();
+    protected String getGAV(ThirdPartyDetails details) {
+        return ArtifactUtils.versionlessKey(details.getGroupId(), details.getArtifactId()) + ":" + details.getVersion();
     }
 
-    protected void renderThirdPartySummaryTableHeader()
-    {
-        renderThirdPartySummaryTableHeader( true, true, true );
+    protected void renderThirdPartySummaryTableHeader() {
+        renderThirdPartySummaryTableHeader(true, true, true);
     }
 
-    protected void renderThirdPartySummaryTableHeader( boolean includeScope, boolean includeClassifier,
-                                                       boolean includeType )
-    {
+    protected void renderThirdPartySummaryTableHeader(
+            boolean includeScope, boolean includeClassifier, boolean includeType) {
         sink.tableRow();
-        sinkHeaderCellText( getText( "report.status" ) );
-        sinkHeaderCellText( getText( "report.gav" ) );
-//        sink.tableHeaderCell();
-//        sink.text( getText( "report.artifactId" ) );
-//        sink.tableHeaderCell_();
-//        sink.tableHeaderCell();
-//        sink.text( getText( "report.version" ) );
-//        sink.tableHeaderCell_();
-        if ( includeScope )
-        {
-            sinkHeaderCellText( getText( "report.scope" ) );
+        sinkHeaderCellText(getText("report.status"));
+        sinkHeaderCellText(getText("report.gav"));
+        //        sink.tableHeaderCell();
+        //        sink.text( getText( "report.artifactId" ) );
+        //        sink.tableHeaderCell_();
+        //        sink.tableHeaderCell();
+        //        sink.text( getText( "report.version" ) );
+        //        sink.tableHeaderCell_();
+        if (includeScope) {
+            sinkHeaderCellText(getText("report.scope"));
         }
-        if ( includeClassifier )
-        {
-            sinkHeaderCellText( getText( "report.classifier" ) );
+        if (includeClassifier) {
+            sinkHeaderCellText(getText("report.classifier"));
         }
-        if ( includeType )
-        {
-            sinkHeaderCellText( getText( "report.type" ) );
+        if (includeType) {
+            sinkHeaderCellText(getText("report.type"));
         }
-        sinkHeaderCellText( getText( "report.licenses" ) );
+        sinkHeaderCellText(getText("report.licenses"));
         sink.tableRow_();
     }
 
-    protected void renderThirdPartySummaryTableRow( ThirdPartyDetails details )
-    {
-        renderThirdPartySummaryTableRow( details, true, true, true );
+    protected void renderThirdPartySummaryTableRow(ThirdPartyDetails details) {
+        renderThirdPartySummaryTableRow(details, true, true, true);
     }
 
-    protected void sinkHeaderCellText( String text )
-    {
+    protected void sinkHeaderCellText(String text) {
         sink.tableHeaderCell();
-        sink.text( text );
+        sink.text(text);
         sink.tableHeaderCell_();
     }
 
-    protected void sinkHeaderCellText( String width, String text )
-    {
+    protected void sinkHeaderCellText(String width, String text) {
 
         SinkEventAttributes attrs = new SinkEventAttributeSet();
-        attrs.addAttribute( SinkEventAttributes.WIDTH, width );
+        attrs.addAttribute(SinkEventAttributes.WIDTH, width);
 
-        sink.tableHeaderCell( attrs );
-        sink.text( text );
+        sink.tableHeaderCell(attrs);
+        sink.text(text);
         sink.tableHeaderCell_();
     }
 
-    protected void sinkCellText( String width, String text )
-    {
+    protected void sinkCellText(String width, String text) {
         SinkEventAttributes attrs = new SinkEventAttributeSet();
-        attrs.addAttribute( SinkEventAttributes.WIDTH, width );
-        sink.tableCell( attrs );
-        sink.text( text );
+        attrs.addAttribute(SinkEventAttributes.WIDTH, width);
+        sink.tableCell(attrs);
+        sink.text(text);
         sink.tableCell_();
     }
 
-    protected void sinkCellText( String text )
-    {
+    protected void sinkCellText(String text) {
         sink.tableCell();
-        sink.text( text );
+        sink.text(text);
         sink.tableCell_();
     }
 
-    protected void renderThirdPartySummaryTableRow( ThirdPartyDetails details, boolean includeScope,
-                                                    boolean includeClassifier, boolean includeType )
-    {
+    protected void renderThirdPartySummaryTableRow(
+            ThirdPartyDetails details, boolean includeScope, boolean includeClassifier, boolean includeType) {
         sink.tableRow();
         sink.tableCell();
-        if ( details.hasPomLicenses() )
-        {
+        if (details.hasPomLicenses()) {
             renderSuccessIcon();
-        }
-        else if ( details.hasThirdPartyLicenses() )
-        {
+        } else if (details.hasThirdPartyLicenses()) {
             renderWarningIcon();
-        }
-        else
-        {
+        } else {
             renderErrorIcon();
         }
 
         sink.tableCell();
-        String gav = getGAV( details );
-        sink.link( "#" + gav );
-        sink.text( gav );
+        String gav = getGAV(details);
+        sink.link("#" + gav);
+        sink.text(gav);
         sink.link_();
 
         sink.tableCell_();
-        if ( includeScope )
-        {
-            sinkCellText( details.getScope() );
+        if (includeScope) {
+            sinkCellText(details.getScope());
         }
-        if ( includeClassifier )
-        {
-            sinkCellText( details.getClassifier() );
+        if (includeClassifier) {
+            sinkCellText(details.getClassifier());
         }
-        if ( includeType )
-        {
-            sinkCellText( details.getType() );
+        if (includeType) {
+            sinkCellText(details.getType());
         }
 
         sink.tableCell();
 
-        if ( details.hasLicenses() )
-        {
+        if (details.hasLicenses()) {
             String[] licenses = details.getLicenses();
-            for ( int i = 0; i < licenses.length; i++ )
-            {
-                if ( i > 0 )
-                {
+            for (int i = 0; i < licenses.length; i++) {
+                if (i > 0) {
                     sink.lineBreak();
                 }
-                sink.text( licenses[i] );
+                sink.text(licenses[i]);
             }
-        }
-        else
-        {
-            sink.text( "-" );
-
+        } else {
+            sink.text("-");
         }
         sink.tableCell_();
 
         sink.tableRow_();
     }
 
-    protected void safeBold()
-    {
-        try
-        {
+    protected void safeBold() {
+        try {
             sink.bold();
-        }
-        catch ( NoSuchMethodError e )
-        {
+        } catch (NoSuchMethodError e) {
             // ignore Maven 2.1.0
         }
     }
 
     // CHECKSTYLE_OFF: MethodName
-    protected void safeBold_()
-    {
+    protected void safeBold_() {
         // CHECKSTYLE_ON: MethodName
-        try
-        {
+        try {
             sink.bold_();
-        }
-        catch ( NoSuchMethodError e )
-        {
+        } catch (NoSuchMethodError e) {
             // ignore Maven 2.1.0
         }
     }
 
-    protected void safeItalic()
-    {
-        try
-        {
+    protected void safeItalic() {
+        try {
             sink.italic();
-        }
-        catch ( NoSuchMethodError e )
-        {
+        } catch (NoSuchMethodError e) {
             // ignore Maven 2.1.0
         }
     }
 
     // CHECKSTYLE_OFF: MethodName
-    protected void safeItalic_()
-    {
+    protected void safeItalic_() {
         // CHECKSTYLE_ON: MethodName
-        try
-        {
+        try {
             sink.italic_();
-        }
-        catch ( NoSuchMethodError e )
-        {
+        } catch (NoSuchMethodError e) {
             // ignore Maven 2.1.0
         }
     }
 
-    protected void renderThirdPartyDetailTable( ThirdPartyDetails details )
-    {
-        renderThirdPartyDetailTable( details, true, true, true );
+    protected void renderThirdPartyDetailTable(ThirdPartyDetails details) {
+        renderThirdPartyDetailTable(details, true, true, true);
     }
 
-    protected void renderThirdPartyDetailTable( ThirdPartyDetails details, boolean includeScope,
-                                                boolean includeClassifier, boolean includeType )
-    {
+    protected void renderThirdPartyDetailTable(
+            ThirdPartyDetails details, boolean includeScope, boolean includeClassifier, boolean includeType) {
         final String cellWidth = "80%";
         final String headerWidth = "20%";
         sink.table();
-        sink.tableRows( new int[]{ Sink.JUSTIFY_RIGHT, Sink.JUSTIFY_LEFT }, false );
+        sink.tableRows(new int[] {Sink.JUSTIFY_RIGHT, Sink.JUSTIFY_LEFT}, false);
         sink.tableRow();
-        sinkHeaderCellText( headerWidth, getText( "report.status" ) );
+        sinkHeaderCellText(headerWidth, getText("report.status"));
         SinkEventAttributes attrs = new SinkEventAttributeSet();
-        attrs.addAttribute( SinkEventAttributes.WIDTH, cellWidth );
-        sink.tableCell( attrs );
-        if ( details.hasPomLicenses() )
-        {
+        attrs.addAttribute(SinkEventAttributes.WIDTH, cellWidth);
+        sink.tableCell(attrs);
+        if (details.hasPomLicenses()) {
             renderSuccessIcon();
             sink.nonBreakingSpace();
-            sink.text( getText( "report.status.licenseFromPom" ) );
-        }
-        else if ( details.hasThirdPartyLicenses() )
-        {
+            sink.text(getText("report.status.licenseFromPom"));
+        } else if (details.hasThirdPartyLicenses()) {
             renderWarningIcon();
             sink.nonBreakingSpace();
-            sink.text( getText( "report.status.licenseFromThirdParty" ) );
-        }
-        else
-        {
+            sink.text(getText("report.status.licenseFromThirdParty"));
+        } else {
             renderErrorIcon();
             sink.nonBreakingSpace();
-            sink.text( getText( "report.status.noLicense" ) );
+            sink.text(getText("report.status.noLicense"));
         }
         sink.tableCell_();
         sink.tableRow_();
 
         sink.tableRow();
-        sinkHeaderCellText( headerWidth, getText( "report.gav" ) );
-        sinkCellText( cellWidth, getGAV( details ) );
+        sinkHeaderCellText(headerWidth, getText("report.gav"));
+        sinkCellText(cellWidth, getGAV(details));
         sink.tableRow_();
 
-        if ( includeScope )
-        {
+        if (includeScope) {
             sink.tableRow();
-            sinkHeaderCellText( headerWidth, getText( "report.scope" ) );
-            sinkCellText( cellWidth, details.getScope() );
+            sinkHeaderCellText(headerWidth, getText("report.scope"));
+            sinkCellText(cellWidth, details.getScope());
             sink.tableRow_();
         }
-        if ( includeClassifier )
-        {
+        if (includeClassifier) {
             sink.tableRow();
-            sinkHeaderCellText( headerWidth, getText( "report.classifier" ) );
-            sinkCellText( cellWidth, details.getClassifier() );
+            sinkHeaderCellText(headerWidth, getText("report.classifier"));
+            sinkCellText(cellWidth, details.getClassifier());
             sink.tableRow_();
         }
-        if ( includeType )
-        {
+        if (includeType) {
             sink.tableRow();
-            sinkHeaderCellText( headerWidth, getText( "report.type" ) );
-            sinkCellText( cellWidth, details.getType() );
+            sinkHeaderCellText(headerWidth, getText("report.type"));
+            sinkCellText(cellWidth, details.getType());
             sink.tableRow_();
         }
         String[] licenses = details.getLicenses();
 
-        if ( details.hasPomLicenses() )
-        {
+        if (details.hasPomLicenses()) {
             sink.tableRow();
-            sinkHeaderCellText( headerWidth, getText( "report.licenses" ) );
+            sinkHeaderCellText(headerWidth, getText("report.licenses"));
 
-            sink.tableCell( attrs );
-            for ( int i = 0; i < licenses.length; i++ )
-            {
-                if ( i > 0 )
-                {
+            sink.tableCell(attrs);
+            for (int i = 0; i < licenses.length; i++) {
+                if (i > 0) {
                     sink.lineBreak();
                 }
-                sink.text( licenses[i] );
-
+                sink.text(licenses[i]);
             }
             sink.tableCell_();
             sink.tableRow_();
-        }
-        else if ( details.hasThirdPartyLicenses() )
-        {
+        } else if (details.hasThirdPartyLicenses()) {
             sink.tableRow();
-            sinkHeaderCellText( headerWidth, getText( "report.licenses" ) );
-            sink.tableCell( attrs );
-            for ( int i = 0; i < licenses.length; i++ )
-            {
-                if ( i > 0 )
-                {
+            sinkHeaderCellText(headerWidth, getText("report.licenses"));
+            sink.tableCell(attrs);
+            for (int i = 0; i < licenses.length; i++) {
+                if (i > 0) {
                     sink.lineBreak();
                 }
-                sink.text( licenses[i] );
-
+                sink.text(licenses[i]);
             }
             sink.tableCell_();
             sink.tableRow_();
-        }
-        else
-        {
+        } else {
             sink.tableRow();
-            sinkHeaderCellText( headerWidth, getText( "report.licenses" ) );
-            sinkCellText( cellWidth, getText( "report.no.license" ) );
+            sinkHeaderCellText(headerWidth, getText("report.licenses"));
+            sinkCellText(cellWidth, getText("report.no.license"));
             sink.tableRow_();
         }
         sink.tableRows_();
         sink.table_();
     }
 
-    protected void renderThirdPartySummaryTable( Collection<ThirdPartyDetails> collection )
-    {
-        renderThirdPartySummaryTable( collection, true, true, true );
+    protected void renderThirdPartySummaryTable(Collection<ThirdPartyDetails> collection) {
+        renderThirdPartySummaryTable(collection, true, true, true);
     }
 
-    protected void renderThirdPartySummaryTable( Collection<ThirdPartyDetails> collection, boolean includeScope,
-                                                 boolean includeClassifier, boolean includeType )
-    {
+    protected void renderThirdPartySummaryTable(
+            Collection<ThirdPartyDetails> collection,
+            boolean includeScope,
+            boolean includeClassifier,
+            boolean includeType) {
         sink.table();
-        renderThirdPartySummaryTableHeader( includeScope, includeClassifier, includeType );
-        for ( ThirdPartyDetails details : collection )
-        {
-            renderThirdPartySummaryTableRow( details, includeScope, includeClassifier, includeType );
+        renderThirdPartySummaryTableHeader(includeScope, includeClassifier, includeType);
+        for (ThirdPartyDetails details : collection) {
+            renderThirdPartySummaryTableRow(details, includeScope, includeClassifier, includeType);
         }
-        renderThirdPartySummaryTableHeader( includeScope, includeClassifier, includeType );
+        renderThirdPartySummaryTableHeader(includeScope, includeClassifier, includeType);
         sink.table_();
     }
 
-    protected void renderPropertySummaryTableHeader()
-    {
+    protected void renderPropertySummaryTableHeader() {
         sink.tableRow();
-        sinkHeaderCellText( getText( "report.status" ) );
-        sinkHeaderCellText( getText( "report.property" ) );
-        sinkHeaderCellText( getText( "report.currentVersion" ) );
-        sinkHeaderCellText( getText( "report.nextVersion" ) );
-        sinkHeaderCellText( getText( "report.nextIncremental" ) );
-        sinkHeaderCellText( getText( "report.nextMinor" ) );
-        sinkHeaderCellText( getText( "report.nextMajor" ) );
+        sinkHeaderCellText(getText("report.status"));
+        sinkHeaderCellText(getText("report.property"));
+        sinkHeaderCellText(getText("report.currentVersion"));
+        sinkHeaderCellText(getText("report.nextVersion"));
+        sinkHeaderCellText(getText("report.nextIncremental"));
+        sinkHeaderCellText(getText("report.nextMinor"));
+        sinkHeaderCellText(getText("report.nextMajor"));
         sink.tableRow_();
     }
 }

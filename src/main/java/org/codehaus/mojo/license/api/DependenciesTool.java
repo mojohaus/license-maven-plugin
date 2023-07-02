@@ -22,14 +22,10 @@ package org.codehaus.mojo.license.api;
  * #L%
  */
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.ProjectBuildingException;
-import org.codehaus.mojo.license.utils.MojoHelper;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.inject.Singleton;
 
 import java.util.HashMap;
 import java.util.List;
@@ -37,12 +33,19 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
+import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
+import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.ProjectBuildingRequest;
+import org.codehaus.mojo.license.utils.MojoHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A tool to deal with dependencies of a project.
@@ -50,25 +53,25 @@ import org.apache.maven.project.ProjectBuildingRequest;
  * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
-@Component( role = DependenciesTool.class, hint = "default" )
-public class DependenciesTool
-{
-    private static final Logger LOG = LoggerFactory.getLogger( DependenciesTool.class );
+@Named
+@Singleton
+public class DependenciesTool {
+    private static final Logger LOG = LoggerFactory.getLogger(DependenciesTool.class);
 
     /**
      * Message used when an invalid expression pattern is found.
      */
     public static final String INVALID_PATTERN_MESSAGE =
-        "The pattern specified by expression <%s> seems to be invalid.";
+            "The pattern specified by expression <%s> seems to be invalid.";
 
     /**
      * Project builder.
      */
-    @Requirement
+    @Inject
     private ProjectBuilder mavenProjectBuilder;
 
-    @Requirement
-    private MavenSession mavenSession;
+    @Inject
+    private Provider<MavenSession> mavenSessionProvider;
 
     // CHECKSTYLE_OFF: MethodLength
     /**
@@ -84,11 +87,11 @@ public class DependenciesTool
      * @return the map of resolved dependencies indexed by their unique id.
      * @see MavenProjectDependenciesConfigurator
      */
-    public SortedMap<String, MavenProject> loadProjectDependencies( ResolvedProjectDependencies artifacts,
-                                                                    MavenProjectDependenciesConfigurator configuration,
-                                                                    List<ArtifactRepository> remoteRepositories,
-                                                                    SortedMap<String, MavenProject> cache )
-    {
+    public SortedMap<String, MavenProject> loadProjectDependencies(
+            ResolvedProjectDependencies artifacts,
+            MavenProjectDependenciesConfigurator configuration,
+            List<ArtifactRepository> remoteRepositories,
+            SortedMap<String, MavenProject> cache) {
 
         final ArtifactFilters artifactFilters = configuration.getArtifactFilters();
 
@@ -96,13 +99,10 @@ public class DependenciesTool
 
         final Set<Artifact> depArtifacts;
 
-        if ( configuration.isIncludeTransitiveDependencies() )
-        {
+        if (configuration.isIncludeTransitiveDependencies()) {
             // All project dependencies
             depArtifacts = artifacts.getAllDependencies();
-        }
-        else
-        {
+        } else {
             // Only direct project dependencies
             depArtifacts = artifacts.getDirectDependencies();
         }
@@ -115,135 +115,116 @@ public class DependenciesTool
         Map<String, Artifact> includeArtifacts = new HashMap<>();
 
         SortedMap<String, MavenProject> localCache = new TreeMap<>();
-        if ( cache != null )
-        {
-            localCache.putAll( cache );
+        if (cache != null) {
+            synchronized (cache) {
+                localCache.putAll(cache);
+            }
         }
-        ProjectBuildingRequest projectBuildingRequest
-                = new DefaultProjectBuildingRequest( mavenSession.getProjectBuildingRequest() )
-                        .setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL )
-                        //We already have the relevant part of the dependency tree
-                        //Re-resolving risks including e.g. excluded artifacts
-                        .setResolveDependencies( false )
-                        //We don't care about plugin licensing
-                        .setProcessPlugins( false )
-                        .setRemoteRepositories( remoteRepositories );
+        ProjectBuildingRequest projectBuildingRequest = new DefaultProjectBuildingRequest(
+                        mavenSessionProvider.get().getProjectBuildingRequest())
+                .setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL)
+                // We already have the relevant part of the dependency tree
+                // Re-resolving risks including e.g. excluded artifacts
+                .setResolveDependencies(false)
+                // We don't care about plugin licensing
+                .setProcessPlugins(false)
+                .setRemoteRepositories(remoteRepositories);
 
-        for ( Artifact artifact : depArtifacts )
-        {
+        for (Artifact artifact : depArtifacts) {
 
-            excludeArtifacts.put( artifact.getId(), artifact );
+            excludeArtifacts.put(artifact.getId(), artifact);
 
-            if ( DefaultThirdPartyTool.LICENSE_DB_TYPE.equals( artifact.getType() ) )
-            {
+            if (DefaultThirdPartyTool.LICENSE_DB_TYPE.equals(artifact.getType())) {
                 // the special dependencies for license databases don't count.
                 // Note that this will still see transitive deps of a license db; so using the build helper inside of
                 // another project to make them will be noisy.
                 continue;
             }
 
-            if ( !artifactFilters.isIncluded( artifact ) )
-            {
-                LOG.debug( "Excluding artifact {}", artifact );
+            if (!artifactFilters.isIncluded(artifact)) {
+                LOG.debug("Excluding artifact {}", artifact);
                 continue;
             }
 
-            String id = MojoHelper.getArtifactId( artifact );
+            String id = MojoHelper.getArtifactId(artifact);
 
-            if ( verbose )
-            {
-                LOG.info( "detected artifact {}", id );
+            if (verbose) {
+                LOG.info("detected artifact {}", id);
             }
 
             MavenProject depMavenProject;
 
             // try to get project from cache
-            depMavenProject = localCache.get( id );
+            depMavenProject = localCache.get(id);
 
-            if ( depMavenProject != null )
-            {
-                if ( verbose )
-                {
-                    LOG.info( "add dependency [{}] (from cache)", id  );
+            if (depMavenProject != null) {
+                if (verbose) {
+                    LOG.info("add dependency [{}] (from cache)", id);
                 }
-            }
-            else
-            {
+            } else {
                 // build project
 
-                try
-                {
-                    depMavenProject
-                            = mavenProjectBuilder.build( artifact, true, projectBuildingRequest ).getProject();
-                    depMavenProject.getArtifact().setScope( artifact.getScope() );
+                try {
+                    depMavenProject = mavenProjectBuilder
+                            .build(artifact, true, projectBuildingRequest)
+                            .getProject();
+                    depMavenProject.getArtifact().setScope(artifact.getScope());
 
                     // In case maven-metadata.xml has different artifactId, groupId or version.
-                    if ( !depMavenProject.getGroupId().equals( artifact.getGroupId() ) )
-                    {
-                        depMavenProject.setGroupId( artifact.getGroupId() );
-                        depMavenProject.getArtifact().setGroupId( artifact.getGroupId() );
+                    if (!depMavenProject.getGroupId().equals(artifact.getGroupId())) {
+                        depMavenProject.setGroupId(artifact.getGroupId());
+                        depMavenProject.getArtifact().setGroupId(artifact.getGroupId());
                     }
-                    if ( !depMavenProject.getArtifactId().equals( artifact.getArtifactId() ) )
-                    {
-                        depMavenProject.setArtifactId( artifact.getArtifactId() );
-                        depMavenProject.getArtifact().setArtifactId( artifact.getArtifactId() );
+                    if (!depMavenProject.getArtifactId().equals(artifact.getArtifactId())) {
+                        depMavenProject.setArtifactId(artifact.getArtifactId());
+                        depMavenProject.getArtifact().setArtifactId(artifact.getArtifactId());
                     }
-                    if ( !depMavenProject.getVersion().equals( artifact.getVersion() ) )
-                    {
-                        depMavenProject.setVersion( artifact.getVersion() );
-                        depMavenProject.getArtifact().setVersion( artifact.getVersion() );
+                    if (!depMavenProject.getVersion().equals(artifact.getVersion())) {
+                        depMavenProject.setVersion(artifact.getVersion());
+                        depMavenProject.getArtifact().setVersion(artifact.getVersion());
                     }
-                }
-                catch ( ProjectBuildingException e )
-                {
-                    LOG.warn( "Unable to obtain POM for artifact: {}", artifact, e );
+                } catch (ProjectBuildingException e) {
+                    LOG.warn("Unable to obtain POM for artifact: {}", artifact, e);
                     continue;
                 }
 
-                if ( verbose )
-                {
-                    LOG.info( "add dependency [{}]", id );
+                if (verbose) {
+                    LOG.info("add dependency [{}]", id);
                 }
 
                 // store it also in cache
-                localCache.put( id, depMavenProject );
+                localCache.put(id, depMavenProject);
             }
 
             // keep the project
-            result.put( id, depMavenProject );
+            result.put(id, depMavenProject);
 
-            excludeArtifacts.remove( artifact.getId() );
-            includeArtifacts.put( artifact.getId(), artifact );
+            excludeArtifacts.remove(artifact.getId());
+            includeArtifacts.put(artifact.getId(), artifact);
         }
 
         // exclude artifacts from the result that contain excluded artifacts in the dependency trail
-        if ( excludeTransitiveDependencies )
-        {
-            for ( Map.Entry<String, Artifact> entry : includeArtifacts.entrySet() )
-            {
+        if (excludeTransitiveDependencies) {
+            for (Map.Entry<String, Artifact> entry : includeArtifacts.entrySet()) {
                 List<String> dependencyTrail = entry.getValue().getDependencyTrail();
 
                 boolean remove = false;
 
-                for ( int i = 1; i < dependencyTrail.size() - 1; i++ )
-                {
-                    if ( excludeArtifacts.containsKey( dependencyTrail.get( i ) ) )
-                    {
+                for (int i = 1; i < dependencyTrail.size() - 1; i++) {
+                    if (excludeArtifacts.containsKey(dependencyTrail.get(i))) {
                         remove = true;
                         break;
                     }
                 }
 
-                if ( remove )
-                {
-                    result.remove( MojoHelper.getArtifactId( entry.getValue() ) );
+                if (remove) {
+                    result.remove(MojoHelper.getArtifactId(entry.getValue()));
                 }
             }
         }
 
-        if ( cache != null )
-        {
-            cache.putAll( result );
+        if (cache != null) {
+            cache.putAll(result);
         }
 
         return result;

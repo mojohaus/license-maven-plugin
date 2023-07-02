@@ -29,7 +29,7 @@
 
   <groupId>org.codehaus.mojo.license.test</groupId>
   <artifactId>add-third-party-missing-file</artifactId>
-  <version>@pom.version@</version>
+  <version>@project.version@</version>
 
   <name>License Test :: add-third-party-missing-file</name>
 
@@ -46,12 +46,12 @@
     <dependency>
       <groupId>org.codehaus.jettison</groupId>
       <artifactId>jettison</artifactId>
-      <version>1.1</version>
+      <version>1.5.4</version>
     </dependency>
     <dependency>
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
-      <version>20070829</version>
+      <version>20230227</version>
     </dependency>
     <dependency>
       <groupId>javax.resource</groupId>
@@ -66,7 +66,7 @@
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>license-maven-plugin</artifactId>
-          <version>@pom.version@</version>
+          <version>@project.version@</version>
           <dependencies>
             <dependency>
               <groupId>org.license</groupId>

@@ -29,7 +29,7 @@
 
   <groupId>org.codehaus.mojo.license.test</groupId>
   <artifactId>test-aggregate-third-party-report-merge-licenses</artifactId>
-  <version>@pom.version@</version>
+  <version>@project.version@</version>
 
   <modules>
     <module>child1</module>
@@ -53,7 +53,7 @@
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>license-maven-plugin</artifactId>
-          <version>@pom.version@</version>
+          <version>@project.version@</version>
           <executions>
             <execution>
               <id>nourl</id>

@@ -29,7 +29,7 @@
 
   <groupId>org.codehaus.mojo.license.test</groupId>
   <artifactId>test-aggregate-add-third-party-missing-file</artifactId>
-  <version>@pom.version@</version>
+  <version>@project.version@</version>
 
   <modules>
     <module>child</module>
@@ -50,7 +50,7 @@
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>license-maven-plugin</artifactId>
-          <version>@pom.version@</version>
+          <version>@project.version@</version>
           <configuration>
             <failOnMissing>true</failOnMissing>
             <verbose>true</verbose>

@@ -29,7 +29,7 @@
 
   <groupId>org.codehaus.mojo.license.test</groupId>
   <artifactId>MLICENSE-3</artifactId>
-  <version>@pom.version@</version>
+  <version>@project.version@</version>
 
   <name>License Test :: MLICENSE-3</name>
 
@@ -47,7 +47,7 @@
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>license-maven-plugin</artifactId>
-          <version>@pom.version@</version>
+          <version>@project.version@</version>
           <configuration>
             <verbose>true</verbose>
             <addSvnKeyWords>true</addSvnKeyWords>

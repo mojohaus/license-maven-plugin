@@ -35,9 +35,8 @@ import org.slf4j.LoggerFactory;
  *
  * @since 1.17
  */
-public final class LicenseMojoUtils
-{
-    private static final LoggerFacade LOG = new Slf4jLoggerFacade( LoggerFactory.getLogger( LicenseMojoUtils.class ) );
+public final class LicenseMojoUtils {
+    private static final LoggerFacade LOG = new Slf4jLoggerFacade(LoggerFactory.getLogger(LicenseMojoUtils.class));
 
     /** A special singleton to pass the information that the URL was not set. */
     static final String NO_URL = "file:///inexistent";
@@ -47,17 +46,14 @@ public final class LicenseMojoUtils
     /**
      * Hidden
      */
-    private LicenseMojoUtils()
-    {
-    }
+    private LicenseMojoUtils() {}
 
     /**
      * @param url the {@link URL} to check
      * @return {@code url != null && url != NO_URL}
      */
-    public static boolean isValid( String url )
-    {
-        return url != null && !NO_URL.equals( url );
+    public static boolean isValid(String url) {
+        return url != null && !NO_URL.equals(url);
     }
 
     /**
@@ -70,10 +66,9 @@ public final class LicenseMojoUtils
      * @param basedir {@code basedir} to resolve {@value #DEFAULT_OVERRIDE_THIRD_PARTY} against
      * @return a valid URL or {@link #NO_URL}, never {@code null}
      */
-    public static String prepareThirdPartyOverrideUrl( final String resolvedUrl, final File deprecatedFile,
-                                                       final String url, File basedir )
-    {
-        return prepareThirdPartyOverrideUrl( resolvedUrl, deprecatedFile, url, basedir, LOG );
+    public static String prepareThirdPartyOverrideUrl(
+            final String resolvedUrl, final File deprecatedFile, final String url, File basedir) {
+        return prepareThirdPartyOverrideUrl(resolvedUrl, deprecatedFile, url, basedir, LOG);
     }
 
     /**
@@ -86,128 +81,111 @@ public final class LicenseMojoUtils
      * @param log the log to write to
      * @return a valid URL or {@link #NO_URL}, never {@code null}
      */
-    static String prepareThirdPartyOverrideUrl( final String resolvedUrl, final File deprecatedFile, final String url,
-                                                File basedir, LoggerFacade log )
-    {
-        if ( deprecatedFile != null )
-        {
-            log.warn( "'overrideFile' mojo parameter is deprecated. Use 'overrideUrl' instead." );
+    static String prepareThirdPartyOverrideUrl(
+            final String resolvedUrl, final File deprecatedFile, final String url, File basedir, LoggerFacade log) {
+        if (deprecatedFile != null) {
+            log.warn("'overrideFile' mojo parameter is deprecated. Use 'overrideUrl' instead.");
         }
-        return prepareUrl( resolvedUrl, deprecatedFile, url, basedir, DEFAULT_OVERRIDE_THIRD_PARTY, log );
+        return prepareUrl(resolvedUrl, deprecatedFile, url, basedir, DEFAULT_OVERRIDE_THIRD_PARTY, log);
     }
 
-    private static String prepareUrl( final String resolvedUrl, final File deprecatedFile, final String url,
-                                      File basedir, String defaultFilePath, LoggerFacade log )
-    {
-        if ( resolvedUrl != null && !NO_URL.equals( resolvedUrl ) )
-        {
+    private static String prepareUrl(
+            final String resolvedUrl,
+            final File deprecatedFile,
+            final String url,
+            File basedir,
+            String defaultFilePath,
+            LoggerFacade log) {
+        if (resolvedUrl != null && !NO_URL.equals(resolvedUrl)) {
             return resolvedUrl;
         }
 
-        if ( deprecatedFile != null && url != null && !url.isEmpty() )
-        {
-            throw new IllegalArgumentException( "You can't use both overrideFile and overrideUrl" );
+        if (deprecatedFile != null && url != null && !url.isEmpty()) {
+            throw new IllegalArgumentException("You can't use both overrideFile and overrideUrl");
         }
 
-        if ( deprecatedFile != null )
-        {
-            if ( deprecatedFile.exists() )
-            {
+        if (deprecatedFile != null) {
+            if (deprecatedFile.exists()) {
                 String result = deprecatedFile.toURI().toString();
-                log.debug( "Loading overrides from file {}", result );
+                log.debug("Loading overrides from file {}", result);
                 return result;
-            }
-            else
-            {
-                log.warn( "overrideFile [{}] was configured but doesn't exist", deprecatedFile.getAbsolutePath() );
+            } else {
+                log.warn("overrideFile [{}] was configured but doesn't exist", deprecatedFile.getAbsolutePath());
             }
         }
 
-        if ( url != null )
-        {
-            if ( UrlRequester.isStringUrl( url ) )
-            {
-                log.debug( "Loading overrides from URL {}", url );
+        if (url != null) {
+            if (UrlRequester.isStringUrl(url)) {
+                log.debug("Loading overrides from URL {}", url);
                 return url;
-            }
-            else
-            {
-                log.warn( "Unsupported or invalid URL [{}] found in overrideUrl; "
-                    + "supported are 'classpath:' URLs and  anything your JVM supports "
-                    + "(file:, http: and https: should always work)", url );
+            } else {
+                log.warn(
+                        "Unsupported or invalid URL [{}] found in overrideUrl; "
+                                + "supported are 'classpath:' URLs and  anything your JVM supports "
+                                + "(file:, http: and https: should always work)",
+                        url);
             }
         }
 
         final Path basedirPath = basedir.toPath();
-        final Path defaultPath = basedirPath.resolve( defaultFilePath );
+        final Path defaultPath = basedirPath.resolve(defaultFilePath);
 
-        if ( Files.exists( defaultPath ) )
-        {
+        if (Files.exists(defaultPath)) {
             String result = defaultPath.toUri().toString();
-            log.debug( "Loading overrides from file {}", result );
+            log.debug("Loading overrides from file {}", result);
             return result;
         }
 
-        log.debug( "No (valid) URL and no file [{}] found; not loading any overrides", defaultPath.toAbsolutePath() );
+        log.debug("No (valid) URL and no file [{}] found; not loading any overrides", defaultPath.toAbsolutePath());
         return NO_URL;
     }
 
     /**
      * A {@link LoggerFacade} implementation backed by a SLF4J {@link Logger}.
      */
-    static class Slf4jLoggerFacade
-        implements LoggerFacade
-    {
+    static class Slf4jLoggerFacade implements LoggerFacade {
 
         private final Logger delegate;
 
-        public Slf4jLoggerFacade( Logger delegate )
-        {
+        Slf4jLoggerFacade(Logger delegate) {
             super();
             this.delegate = delegate;
         }
 
         @Override
-        public void warn( String message )
-        {
-            delegate.warn( message );
+        public void warn(String message) {
+            delegate.warn(message);
         }
 
         @Override
-        public void warn( String template, Object param )
-        {
-            delegate.warn( template, param );
+        public void warn(String template, Object param) {
+            delegate.warn(template, param);
         }
 
         @Override
-        public void debug( String template, Object param )
-        {
-            delegate.debug( template, param );
+        public void debug(String template, Object param) {
+            delegate.debug(template, param);
         }
-
     }
 
     /**
      * A simplified facade of {@link Logger} to be able to implement a test logger easily.
      */
-    interface LoggerFacade
-    {
+    interface LoggerFacade {
 
         /**
          * @see Logger#warn(String)
          */
-        void warn( String message );
+        void warn(String message);
 
         /**
          * @see Logger#warn(String, Object)
          */
-        void warn( String template, Object param );
+        void warn(String template, Object param);
 
         /**
          * @see Logger#debug(String, Object)
          */
-        void debug( String template, Object param );
-
+        void debug(String template, Object param);
     }
-
 }

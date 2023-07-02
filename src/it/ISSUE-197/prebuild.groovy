@@ -25,7 +25,7 @@ import java.nio.file.Files;
 
 Path basePath = basedir.toPath()
 
-basePath.resolve('target').deleteDir()
+basePath.resolve('target').toFile().deleteDir()
 
 Path src = basePath.resolve('src/license/licenses.xml')
 Path dest = basePath.resolve('target/generated-resources/licenses.xml')

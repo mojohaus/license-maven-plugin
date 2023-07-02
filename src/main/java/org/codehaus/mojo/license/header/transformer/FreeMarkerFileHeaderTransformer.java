@@ -22,7 +22,8 @@ package org.codehaus.mojo.license.header.transformer;
  * #L%
  */
 
-import org.codehaus.plexus.component.annotations.Component;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 /**
  * Implementation of {@link FileHeaderTransformer} for freemarker format.
@@ -30,24 +31,21 @@ import org.codehaus.plexus.component.annotations.Component;
  * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
-@Component( role = FileHeaderTransformer.class, hint = "ftl" )
-public class FreeMarkerFileHeaderTransformer
-    extends AbstractFileHeaderTransformer
-{
+@Named("ftl")
+@Singleton
+public class FreeMarkerFileHeaderTransformer extends AbstractFileHeaderTransformer {
 
     /**
      * Default constructor.
      */
-    public FreeMarkerFileHeaderTransformer()
-    {
-        super( "ftl", "header transformer with free marker comment style", "<#--", "-->", " " );
+    public FreeMarkerFileHeaderTransformer() {
+        super("ftl", "header transformer with free marker comment style", "<#--", "-->", " ");
     }
 
     /**
      * {@inheritDoc}
      */
-    public String[] getDefaultAcceptedExtensions()
-    {
-        return new String[]{ "ftl" };
+    public String[] getDefaultAcceptedExtensions() {
+        return new String[] {"ftl"};
     }
 }

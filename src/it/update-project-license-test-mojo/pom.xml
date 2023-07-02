@@ -29,7 +29,7 @@
 
   <groupId>org.codehaus.mojo.license.test</groupId>
   <artifactId>test-update-project-license</artifactId>
-  <version>@pom.version@</version>
+  <version>@project.version@</version>
 
   <name>License Test :: update-project-license</name>
 
@@ -56,7 +56,7 @@
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>license-maven-plugin</artifactId>
-          <version>@pom.version@</version>
+          <version>@project.version@</version>
         </plugin>
       </plugins>
     </pluginManagement>

@@ -22,11 +22,6 @@ package org.codehaus.mojo.license.model;
  * #L%
  */
 
-import org.apache.commons.lang3.StringUtils;
-import org.codehaus.mojo.license.utils.MojoHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -39,19 +34,22 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
+import org.codehaus.mojo.license.utils.MojoHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
-public class LicenseRepository
-    implements Iterable<License>
-{
-    private static final Logger LOG = LoggerFactory.getLogger( LicenseRepository.class );
+public class LicenseRepository implements Iterable<License> {
+    private static final Logger LOG = LoggerFactory.getLogger(LicenseRepository.class);
 
     public static final String REPOSITORY_DEFINITION_FILE = "licenses.properties";
 
     public static final Pattern LICENSE_DESCRIPTION_PATTERN =
-        Pattern.compile( "(.*)\\s*~~\\s*license\\s*:\\s*(.*)\\s*~~\\s*header\\s*:\\s*(.*)\\s*" );
+            Pattern.compile("(.*)\\s*~~\\s*license\\s*:\\s*(.*)\\s*~~\\s*header\\s*:\\s*(.*)\\s*");
 
     /**
      * the base url of the licenses repository.
@@ -69,136 +67,111 @@ public class LicenseRepository
      */
     protected boolean init;
 
-    public URL getBaseURL()
-    {
+    public URL getBaseURL() {
         return baseURL;
     }
 
-    public void setBaseURL( URL baseURL )
-    {
-        checkNotInit( "setBaseURL" );
+    public void setBaseURL(URL baseURL) {
+        checkNotInit("setBaseURL");
         this.baseURL = baseURL;
     }
 
-    protected URL getDefinitionURL()
-    {
-        if ( baseURL == null || StringUtils.isEmpty( baseURL.toString() ) )
-        {
-            throw new IllegalStateException( "no baseURL defined in " + this );
+    protected URL getDefinitionURL() {
+        if (baseURL == null || StringUtils.isEmpty(baseURL.toString())) {
+            throw new IllegalStateException("no baseURL defined in " + this);
         }
 
-        URL definitionURL = MojoHelper.getUrl( getBaseURL(), REPOSITORY_DEFINITION_FILE );
+        URL definitionURL = MojoHelper.getUrl(getBaseURL(), REPOSITORY_DEFINITION_FILE);
         return definitionURL;
     }
 
-    protected URL getLicenseBaseURL( String licenseName )
-    {
-        URL licenseBaseURL = MojoHelper.getUrl( baseURL, licenseName );
+    protected URL getLicenseBaseURL(String licenseName) {
+        URL licenseBaseURL = MojoHelper.getUrl(baseURL, licenseName);
         return licenseBaseURL;
     }
 
-    public void load()
-        throws IOException
-    {
-        checkNotInit( "load" );
-        try
-        {
+    public void load() throws IOException {
+        checkNotInit("load");
+        try {
 
             URL definitionURL = getDefinitionURL();
-            if ( licenses != null )
-            {
+            if (licenses != null) {
                 licenses.clear();
-            }
-            else
-            {
+            } else {
                 licenses = new ArrayList<>();
             }
 
-            if ( !checkExists( definitionURL ) )
-            {
+            if (!checkExists(definitionURL)) {
                 throw new IllegalArgumentException(
-                    "no licenses.properties found with url [" + definitionURL + "] for resolver " + this );
+                        "no licenses.properties found with url [" + definitionURL + "] for resolver " + this);
             }
             Properties p = new Properties();
-            p.load( definitionURL.openStream() );
+            p.load(definitionURL.openStream());
 
-            for ( Entry<Object, Object> entry : p.entrySet() )
-            {
+            for (Entry<Object, Object> entry : p.entrySet()) {
                 String licenseName = (String) entry.getKey();
                 licenseName = licenseName.trim().toLowerCase();
-                URL licenseBaseURL = getLicenseBaseURL( licenseName );
+                URL licenseBaseURL = getLicenseBaseURL(licenseName);
 
                 License license = new License();
-                license.setName( licenseName );
-                license.setBaseURL( licenseBaseURL );
+                license.setName(licenseName);
+                license.setBaseURL(licenseBaseURL);
 
                 String licenseDescription = (String) entry.getValue();
-                Matcher matcher = LICENSE_DESCRIPTION_PATTERN.matcher( licenseDescription );
+                Matcher matcher = LICENSE_DESCRIPTION_PATTERN.matcher(licenseDescription);
                 String licenseFile;
                 String headerFile;
 
-                if ( matcher.matches() )
-                {
-                    licenseDescription = matcher.group( 1 ).trim();
-                    licenseFile = matcher.group( 2 ).trim();
-                    headerFile = matcher.group( 3 ).trim();
-                }
-                else
-                {
+                if (matcher.matches()) {
+                    licenseDescription = matcher.group(1).trim();
+                    licenseFile = matcher.group(2).trim();
+                    headerFile = matcher.group(3).trim();
+                } else {
                     licenseFile = License.LICENSE_CONTENT_FILE;
                     headerFile = License.LICENSE_HEADER_FILE;
                 }
 
-                URL licenseFileURL = getFileURL( license, licenseFile );
-                license.setLicenseURL( licenseFileURL );
-                URL headerFileURL = getFileURL( license, headerFile );
-                license.setHeaderURL( headerFileURL );
+                URL licenseFileURL = getFileURL(license, licenseFile);
+                license.setLicenseURL(licenseFileURL);
+                URL headerFileURL = getFileURL(license, headerFile);
+                license.setHeaderURL(headerFileURL);
 
-                license.setDescription( licenseDescription );
+                license.setDescription(licenseDescription);
 
-                LOG.info( "register {}", license.getDescription() );
-                LOG.debug( "{}", license );
-                licenses.add( license );
+                LOG.info("register {}", license.getDescription());
+                LOG.debug("{}", license);
+                licenses.add(license);
             }
-            licenses = Collections.unmodifiableList( licenses );
-        }
-        finally
-        {
+            licenses = Collections.unmodifiableList(licenses);
+        } finally {
             // mark repository as available
             init = true;
         }
     }
 
-    public String[] getLicenseNames()
-    {
-        checkInit( "getLicenseNames" );
-        List<String> result = new ArrayList<>( licenses.size() );
-        for ( License license : this )
-        {
-            result.add( license.getName() );
+    public String[] getLicenseNames() {
+        checkInit("getLicenseNames");
+        List<String> result = new ArrayList<>(licenses.size());
+        for (License license : this) {
+            result.add(license.getName());
         }
-        return result.toArray( new String[result.size()] );
+        return result.toArray(new String[result.size()]);
     }
 
-    public License[] getLicenses()
-    {
-        checkInit( "getLicenses" );
-        return licenses.toArray( new License[licenses.size()] );
+    public License[] getLicenses() {
+        checkInit("getLicenses");
+        return licenses.toArray(new License[licenses.size()]);
     }
 
-    public License getLicense( String licenseName )
-    {
-        checkInit( "getLicense" );
-        if ( StringUtils.isEmpty( licenseName ) )
-        {
-            throw new IllegalArgumentException( "licenceName can not be null, nor empty" );
+    public License getLicense(String licenseName) {
+        checkInit("getLicense");
+        if (StringUtils.isEmpty(licenseName)) {
+            throw new IllegalArgumentException("licenceName can not be null, nor empty");
         }
 
         License license = null;
-        for ( License l : this )
-        {
-            if ( licenseName.equals( l.getName() ) )
-            {
+        for (License l : this) {
+            if (licenseName.equals(l.getName())) {
                 // got it
                 license = l;
                 break;
@@ -210,57 +183,43 @@ public class LicenseRepository
     /**
      * {@inheritDoc}
      */
-    public Iterator<License> iterator()
-    {
-        checkInit( "iterator" );
+    public Iterator<License> iterator() {
+        checkInit("iterator");
         return licenses.iterator();
     }
 
-    protected boolean checkExists( URL url )
-        throws IOException
-    {
+    protected boolean checkExists(URL url) throws IOException {
         URLConnection openConnection = url.openConnection();
         return openConnection.getContentLength() > 0;
     }
 
-    protected void checkInit( String operation )
-    {
-        if ( !init )
-        {
+    protected void checkInit(String operation) {
+        if (!init) {
             throw new IllegalStateException(
-                "repository " + this + " was not init, operation [" + operation + "] not possible." );
+                    "repository " + this + " was not init, operation [" + operation + "] not possible.");
         }
     }
 
-    protected void checkNotInit( String operation )
-    {
-        if ( init )
-        {
+    protected void checkNotInit(String operation) {
+        if (init) {
             throw new IllegalStateException(
-                "repository " + this + "was init, operation [" + operation + "+] not possible." );
+                    "repository " + this + "was init, operation [" + operation + "+] not possible.");
         }
     }
 
-    protected URL getFileURL( License license, String filename )
-        throws IOException
-    {
+    protected URL getFileURL(License license, String filename) throws IOException {
 
         URL licenseBaseURL = license.getBaseURL();
-        URL result = MojoHelper.getUrl( licenseBaseURL, filename );
-        if ( !checkExists( result ) )
-        {
+        URL result = MojoHelper.getUrl(licenseBaseURL, filename);
+        if (!checkExists(result)) {
             // let's try with a .ftl suffix
-            URL resultWithFtlSuffix = MojoHelper.getUrl( licenseBaseURL, filename + License.TEMPLATE_SUFFIX );
+            URL resultWithFtlSuffix = MojoHelper.getUrl(licenseBaseURL, filename + License.TEMPLATE_SUFFIX);
 
-            if ( checkExists( resultWithFtlSuffix ) )
-            {
+            if (checkExists(resultWithFtlSuffix)) {
                 result = resultWithFtlSuffix;
-            }
-            else
-            {
-                throw new IllegalArgumentException(
-                    "Could not find license (" + license + ") content file at [" + result + "], nor at ["
-                        + resultWithFtlSuffix + "] for resolver " + this );
+            } else {
+                throw new IllegalArgumentException("Could not find license (" + license + ") content file at [" + result
+                        + "], nor at [" + resultWithFtlSuffix + "] for resolver " + this);
             }
         }
         return result;

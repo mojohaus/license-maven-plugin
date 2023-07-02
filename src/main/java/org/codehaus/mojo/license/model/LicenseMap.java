@@ -22,9 +22,6 @@ package org.codehaus.mojo.license.model;
  * #L%
  */
 
-import org.apache.maven.project.MavenProject;
-import org.codehaus.mojo.license.utils.MojoHelper;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -37,15 +34,16 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.apache.maven.project.MavenProject;
+import org.codehaus.mojo.license.utils.MojoHelper;
+
 /**
- * Map of artifacts (stub in mavenproject) group by their license.
+ * Map of artifacts (stub in mavenproject) grouped by their license.
  *
  * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
-public class LicenseMap
-    extends TreeMap<String, SortedSet<MavenProject>>
-{
+public class LicenseMap extends TreeMap<String, SortedSet<MavenProject>> {
 
     private static final long serialVersionUID = 864199843545688069L;
 
@@ -56,36 +54,32 @@ public class LicenseMap
     /**
      * Default contructor.
      */
-    public LicenseMap()
-    {
-        this( MojoHelper.newMavenProjectComparator() );
+    public LicenseMap() {
+        this(MojoHelper.newMavenProjectComparator());
     }
 
-    public LicenseMap( Comparator<MavenProject> projectComparator )
-    {
+    public LicenseMap(Comparator<MavenProject> projectComparator) {
         this.projectComparator = projectComparator;
     }
 
     /**
      * Store in the license map a project to a given license.
      *
-     * @param key   the license on which to associate the gieven project
+     * @param key   the license on which to associate the given project
      * @param value project to register in the license map
      * @return the set of projects using the given license
      */
-    public SortedSet<MavenProject> put( String key, MavenProject value )
-    {
+    public SortedSet<MavenProject> put(String key, MavenProject value) {
 
         // handle multiple values as a set to avoid duplicates
-        SortedSet<MavenProject> valueList = get( key );
-        if ( valueList == null )
-        {
+        SortedSet<MavenProject> valueList = get(key);
+        if (valueList == null) {
 
-            valueList = new TreeSet<>( projectComparator );
+            valueList = new TreeSet<>(projectComparator);
         }
 
-        valueList.add( value );
-        return put( key, valueList );
+        valueList.add(value);
+        return put(key, valueList);
     }
 
     /**
@@ -93,25 +87,21 @@ public class LicenseMap
      *
      * @param licenseMap license map to put
      */
-    public void putAll( LicenseMap licenseMap )
-    {
-        for ( Map.Entry<String, SortedSet<MavenProject>> entry : licenseMap.entrySet() )
-        {
+    public void putAll(LicenseMap licenseMap) {
+        for (Map.Entry<String, SortedSet<MavenProject>> entry : licenseMap.entrySet()) {
 
             String key = entry.getKey();
 
             // handle multiple values as a set to avoid duplicates
-            SortedSet<MavenProject> valueList = get( key );
-            if ( valueList == null )
-            {
+            SortedSet<MavenProject> valueList = get(key);
+            if (valueList == null) {
 
-                valueList = new TreeSet<>( projectComparator );
+                valueList = new TreeSet<>(projectComparator);
             }
 
-            valueList.addAll( entry.getValue() );
-            put( key, valueList );
+            valueList.addAll(entry.getValue());
+            put(key, valueList);
         }
-
     }
 
     /**
@@ -120,57 +110,59 @@ public class LicenseMap
      *
      * @return the generated dependencies map
      */
-    public SortedMap<MavenProject, String[]> toDependencyMap()
-    {
-        SortedMap<MavenProject, Set<String>> tmp = new TreeMap<>( projectComparator );
+    public SortedMap<MavenProject, String[]> toDependencyMap() {
+        SortedMap<MavenProject, Set<String>> tmp = new TreeMap<>(projectComparator);
 
-        for ( Map.Entry<String, SortedSet<MavenProject>> entry : entrySet() )
-        {
+        for (Map.Entry<String, SortedSet<MavenProject>> entry : entrySet()) {
             String license = entry.getKey();
             SortedSet<MavenProject> set = entry.getValue();
-            for ( MavenProject p : set )
-            {
-                Set<String> list = tmp.get( p );
-                if ( list == null )
-                {
+            for (MavenProject p : set) {
+                Set<String> list = tmp.get(p);
+                if (list == null) {
                     list = new HashSet<>();
-                    tmp.put( p, list );
+                    tmp.put(p, list);
                 }
-                list.add( license );
+                list.add(license);
             }
         }
 
-        SortedMap<MavenProject, String[]> result = new TreeMap<>( projectComparator );
-        for ( Map.Entry<MavenProject, Set<String>> entry : tmp.entrySet() )
-        {
-            List<String> value = new ArrayList<>( entry.getValue() );
-            Collections.sort( value );
-            result.put( entry.getKey(), value.toArray( new String[value.size()] ) );
+        SortedMap<MavenProject, String[]> result = new TreeMap<>(projectComparator);
+        for (Map.Entry<MavenProject, Set<String>> entry : tmp.entrySet()) {
+            List<String> value = new ArrayList<>(entry.getValue());
+            Collections.sort(value);
+            result.put(entry.getKey(), value.toArray(new String[value.size()]));
         }
         tmp.clear();
         return result;
     }
 
-    public LicenseMap toLicenseMapOrderByName()
-    {
-        LicenseMap result = new LicenseMap( MojoHelper.newMavenProjectComparatorByName() );
-        result.putAll( this );
+    public LicenseMap toLicenseMapOrderByName() {
+        LicenseMap result = new LicenseMap(MojoHelper.newMavenProjectComparatorByName());
+        result.putAll(this);
         return result;
     }
 
-    public void removeProject( MavenProject project )
-    {
-        for ( Map.Entry<String, SortedSet<MavenProject>> entry : entrySet() )
-        {
+    /**
+     * Remove project from all licenses it is mapped to.
+     * @param project
+     * @return a List of license names that the given project was mapped to
+     */
+    public List<String> removeProject(MavenProject project) {
+        List<String> removedFrom = new ArrayList<>();
+        for (Map.Entry<String, SortedSet<MavenProject>> entry : entrySet()) {
             SortedSet<MavenProject> projects = entry.getValue();
-            for ( MavenProject mavenProject : projects )
-            {
-                if ( project.equals( mavenProject ) )
-                {
-                    get( entry.getKey() ).remove( project );
+            for (MavenProject mavenProject : projects) {
+                if (project.equals(mavenProject)) {
+                    removedFrom.add(entry.getKey());
                     break;
                 }
             }
         }
+
+        for (String r : removedFrom) {
+            get(r).remove(project);
+        }
+
+        return removedFrom;
     }
 }

@@ -24,7 +24,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.codehaus.mojo.license.test</groupId>
   <artifactId>test-add-third-party-global-db</artifactId>
-  <version>@pom.version@</version>
+  <version>@project.version@</version>
   <packaging>pom</packaging>
   <name>License Test :: global-db</name>
   <properties>
@@ -40,7 +40,7 @@
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>license-maven-plugin</artifactId>
-          <version>@pom.version@</version>
+          <version>@project.version@</version>
           <configuration>
             <useMissingFile>true</useMissingFile>
             <includeTransitiveDependencies>false</includeTransitiveDependencies>
@@ -52,7 +52,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-site-plugin</artifactId>
-          <version>3.1</version>
+          <version>@maven-site-plugin.version@</version>
         </plugin>
       </plugins>
     </pluginManagement>

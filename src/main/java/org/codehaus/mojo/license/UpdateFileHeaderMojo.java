@@ -37,9 +37,8 @@ import org.apache.maven.plugins.annotations.Parameter;
  * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
-@Mojo( name = "update-file-header", threadSafe = true )
-public class UpdateFileHeaderMojo extends AbstractFileHeaderMojo
-{
+@Mojo(name = "update-file-header", threadSafe = true)
+public class UpdateFileHeaderMojo extends AbstractFileHeaderMojo {
 
     // ----------------------------------------------------------------------
     // Mojo Parameters
@@ -53,7 +52,7 @@ public class UpdateFileHeaderMojo extends AbstractFileHeaderMojo
      *
      * @since 1.2
      */
-    @Parameter( property = "license.failOnMissingHeader", defaultValue = "false" )
+    @Parameter(property = "license.failOnMissingHeader", defaultValue = "false")
     private boolean failOnMissingHeader;
 
     /**
@@ -64,7 +63,7 @@ public class UpdateFileHeaderMojo extends AbstractFileHeaderMojo
      *
      * @since 1.2
      */
-    @Parameter( property = "license.failOnNotUptodateHeader", defaultValue = "false" )
+    @Parameter(property = "license.failOnNotUptodateHeader", defaultValue = "false")
     private boolean failOnNotUptodateHeader;
 
     /**
@@ -72,7 +71,7 @@ public class UpdateFileHeaderMojo extends AbstractFileHeaderMojo
      *
      * @since 1.0
      */
-    @Parameter( property = "license.skipUpdateLicense", defaultValue = "false" )
+    @Parameter(property = "license.skipUpdateLicense", defaultValue = "false")
     private boolean skipUpdateLicense;
 
     /**
@@ -80,7 +79,7 @@ public class UpdateFileHeaderMojo extends AbstractFileHeaderMojo
      *
      * @since 1.0
      */
-    @Parameter( property = "dryRun", defaultValue = "false" )
+    @Parameter(property = "dryRun", defaultValue = "false")
     private boolean dryRun;
 
     // ----------------------------------------------------------------------
@@ -88,8 +87,7 @@ public class UpdateFileHeaderMojo extends AbstractFileHeaderMojo
     // ----------------------------------------------------------------------
 
     @Override
-    public boolean isSkip()
-    {
+    public boolean isSkip() {
         return skipUpdateLicense;
     }
 
@@ -98,21 +96,17 @@ public class UpdateFileHeaderMojo extends AbstractFileHeaderMojo
     // ----------------------------------------------------------------------
 
     @Override
-    protected boolean isDryRun()
-    {
+    protected boolean isDryRun() {
         return dryRun;
     }
 
     @Override
-    protected boolean isFailOnMissingHeader()
-    {
+    protected boolean isFailOnMissingHeader() {
         return failOnMissingHeader;
     }
 
     @Override
-    protected boolean isFailOnNotUptodateHeader()
-    {
+    protected boolean isFailOnNotUptodateHeader() {
         return failOnNotUptodateHeader;
     }
-
 }
