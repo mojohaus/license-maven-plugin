@@ -22,7 +22,8 @@ package org.codehaus.mojo.license.header.transformer;
  * #L%
  */
 
-import org.codehaus.plexus.component.annotations.Component;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 /**
  * Implementation of {@link FileHeaderTransformer} for apt format.
@@ -30,24 +31,21 @@ import org.codehaus.plexus.component.annotations.Component;
  * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
-@Component( role = FileHeaderTransformer.class, hint = "apt" )
-public class AptFileHeaderTransformer
-    extends AbstractFileHeaderTransformer
-{
+@Named("apt")
+@Singleton
+public class AptFileHeaderTransformer extends AbstractFileHeaderTransformer {
 
     /**
      * Default constructor.
      */
-    public AptFileHeaderTransformer()
-    {
-        super( "apt", "header transformer with apt comment style", "~~~", "~~~", "~~ " );
+    public AptFileHeaderTransformer() {
+        super("apt", "header transformer with apt comment style", "~~~", "~~~", "~~ ");
     }
 
     /**
      * {@inheritDoc}
      */
-    public String[] getDefaultAcceptedExtensions()
-    {
-        return new String[]{ "apt" };
+    public String[] getDefaultAcceptedExtensions() {
+        return new String[] {"apt"};
     }
 }

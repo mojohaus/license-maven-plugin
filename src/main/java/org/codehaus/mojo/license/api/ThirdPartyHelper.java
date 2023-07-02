@@ -22,14 +22,6 @@ package org.codehaus.mojo.license.api;
  * #L%
  */
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.ProjectBuildingException;
-import org.codehaus.mojo.license.model.LicenseMap;
-import org.codehaus.mojo.license.utils.SortedProperties;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
@@ -38,14 +30,21 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.ProjectBuildingException;
+import org.codehaus.mojo.license.model.LicenseMap;
+import org.codehaus.mojo.license.utils.SortedProperties;
+
 /**
  * Helper class that provides common functionality required by both the mojos and the reports.
  *
  * @author tchemit dev@tchemit.fr
  * @since 1.1
  */
-public interface ThirdPartyHelper
-{
+public interface ThirdPartyHelper {
 
     /**
      * Load all dependencies given the configuration as {@link MavenProject}.
@@ -54,9 +53,8 @@ public interface ThirdPartyHelper
      * @param dependencyArtifacts the dependency artifacts of the project
      * @return the dictionary of loaded dependencies as {@link MavenProject} indexed by their gav.
      */
-    SortedMap<String, MavenProject> loadDependencies( MavenProjectDependenciesConfigurator configuration,
-                                                      ResolvedProjectDependencies dependencyArtifacts );
-
+    SortedMap<String, MavenProject> loadDependencies(
+            MavenProjectDependenciesConfigurator configuration, ResolvedProjectDependencies dependencyArtifacts);
 
     /**
      * Try to load maximum of unsafe license mapping using third-party descriptors (from maven repositories) and
@@ -70,10 +68,11 @@ public interface ThirdPartyHelper
      * @throws ThirdPartyToolException if any
      * @throws IOException             if any
      */
-    SortedProperties loadThirdPartyDescriptorForUnsafeMapping( Set<Artifact> topLevelDependencies,
-                                                               SortedSet<MavenProject> unsafeDependencies,
-                                                               Collection<MavenProject> projects,
-                                                               LicenseMap licenseMap )
+    SortedProperties loadThirdPartyDescriptorForUnsafeMapping(
+            Set<Artifact> topLevelDependencies,
+            SortedSet<MavenProject> unsafeDependencies,
+            Collection<MavenProject> projects,
+            LicenseMap licenseMap)
             throws ThirdPartyToolException, IOException;
 
     /**
@@ -89,9 +88,12 @@ public interface ThirdPartyHelper
      * @return the map of all unsafe mapping
      * @throws IOException if could not load missing file
      */
-    SortedProperties loadUnsafeMapping( LicenseMap licenseMap, File missingFile, String missingFileUrl,
-                                        SortedMap<String, MavenProject> projectDependencies )
-      throws IOException, MojoExecutionException;
+    SortedProperties loadUnsafeMapping(
+            LicenseMap licenseMap,
+            File missingFile,
+            String missingFileUrl,
+            SortedMap<String, MavenProject> projectDependencies)
+            throws IOException, MojoExecutionException;
 
     /**
      * Creates a license map from given dependencies.
@@ -99,14 +101,14 @@ public interface ThirdPartyHelper
      * @param dependencies dependencies to store in the license map
      * @return the created license map fro the given dependencies
      */
-    LicenseMap createLicenseMap( SortedMap<String, MavenProject> dependencies );
+    LicenseMap createLicenseMap(SortedMap<String, MavenProject> dependencies);
 
     /**
      * Attach the third-party descriptor to the build.
      *
      * @param file location of the third-party descriptor
      */
-    void attachThirdPartyDescriptor( File file );
+    void attachThirdPartyDescriptor(File file);
 
     /**
      * Obtains all dependencies with no license form the given license map.
@@ -114,7 +116,7 @@ public interface ThirdPartyHelper
      * @param licenseMap license map where to find
      * @return all dependencies with no license
      */
-    SortedSet<MavenProject> getProjectsWithNoLicense( LicenseMap licenseMap );
+    SortedSet<MavenProject> getProjectsWithNoLicense(LicenseMap licenseMap);
 
     /**
      * Obtains the cache of loaded dependencies indexed by their gav.
@@ -152,12 +154,15 @@ public interface ThirdPartyHelper
      * @throws IOException              if could not load missing file
      * @throws ThirdPartyToolException  if pb with third-party tool
      */
-    SortedProperties createUnsafeMapping( LicenseMap licenseMap, File missingFile, String missingFileUrl,
-                                          boolean useRepositoryMissingFiles,
-                                          SortedSet<MavenProject> unsafeDependencies,
-                                          SortedMap<String, MavenProject> projectDependencies,
-                                          Set<Artifact> dependencyArtifacts )
-      throws ProjectBuildingException, IOException, ThirdPartyToolException, MojoExecutionException;
+    SortedProperties createUnsafeMapping(
+            LicenseMap licenseMap,
+            File missingFile,
+            String missingFileUrl,
+            boolean useRepositoryMissingFiles,
+            SortedSet<MavenProject> unsafeDependencies,
+            SortedMap<String, MavenProject> projectDependencies,
+            Set<Artifact> dependencyArtifacts)
+            throws ProjectBuildingException, IOException, ThirdPartyToolException, MojoExecutionException;
 
     /**
      * Merges licenses.
@@ -168,5 +173,5 @@ public interface ThirdPartyHelper
      * @throws MojoFailureException if there is a bad license merge definition (says for example two license with
      *                              same name)
      */
-    void mergeLicenses( List<String> licenseMerges, LicenseMap licenseMap ) throws MojoFailureException;
+    void mergeLicenses(List<String> licenseMerges, LicenseMap licenseMap) throws MojoFailureException;
 }

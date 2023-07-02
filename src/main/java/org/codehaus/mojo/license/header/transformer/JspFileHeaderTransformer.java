@@ -22,7 +22,8 @@ package org.codehaus.mojo.license.header.transformer;
  * #L%
  */
 
-import org.codehaus.plexus.component.annotations.Component;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 /**
  * Implementation of {@link FileHeaderTransformer} for jsp format.
@@ -30,25 +31,21 @@ import org.codehaus.plexus.component.annotations.Component;
  * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
-@Component( role = FileHeaderTransformer.class, hint = "jsp" )
-public class JspFileHeaderTransformer
-    extends AbstractFileHeaderTransformer
-{
+@Named("jsp")
+@Singleton
+public class JspFileHeaderTransformer extends AbstractFileHeaderTransformer {
 
     /**
      * Default constructor.
      */
-    public JspFileHeaderTransformer()
-    {
-        super( "jsp", "header transformer with jsp comment style", "<%--", "  --%>", "  " );
+    public JspFileHeaderTransformer() {
+        super("jsp", "header transformer with jsp comment style", "<%--", "  --%>", "  ");
     }
 
     /**
      * {@inheritDoc}
      */
-    public String[] getDefaultAcceptedExtensions()
-    {
-        return new String[]{ "jsp", "jspx" };
+    public String[] getDefaultAcceptedExtensions() {
+        return new String[] {"jsp", "jspx"};
     }
-
 }

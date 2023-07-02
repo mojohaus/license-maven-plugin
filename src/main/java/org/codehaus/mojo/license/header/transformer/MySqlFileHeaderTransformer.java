@@ -22,7 +22,8 @@ package org.codehaus.mojo.license.header.transformer;
  * #L%
  */
 
-import org.codehaus.plexus.component.annotations.Component;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 /**
  * Implementation of {@link FileHeaderTransformer} for mysql format.
@@ -33,25 +34,21 @@ import org.codehaus.plexus.component.annotations.Component;
  * @author tchemit dev@tchemit.fr
  * @since 1.4
  */
-@Component( role = FileHeaderTransformer.class, hint = "mysql" )
-public class MySqlFileHeaderTransformer
-    extends AbstractFileHeaderTransformer
-{
+@Named("mysql")
+@Singleton
+public class MySqlFileHeaderTransformer extends AbstractFileHeaderTransformer {
 
     /**
      * Default constructor.
      */
-    public MySqlFileHeaderTransformer()
-    {
-        super( "mysql", "header transformer with mysql comment style", "-- -", "-- -", "-- " );
+    public MySqlFileHeaderTransformer() {
+        super("mysql", "header transformer with mysql comment style", "-- -", "-- -", "-- ");
     }
 
     /**
      * {@inheritDoc}
      */
-    public String[] getDefaultAcceptedExtensions()
-    {
-        return new String[]{ "mysql" };
+    public String[] getDefaultAcceptedExtensions() {
+        return new String[] {"mysql"};
     }
 }
-

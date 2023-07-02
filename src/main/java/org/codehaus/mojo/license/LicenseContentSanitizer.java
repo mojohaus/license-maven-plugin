@@ -26,8 +26,7 @@ package org.codehaus.mojo.license;
  * @author <a href="https://github.com/ppalaga">Peter Palaga</a>
  * @since 1.20
  */
-public class LicenseContentSanitizer
-{
+public class LicenseContentSanitizer {
     private String id;
 
     private String urlRegexp;
@@ -36,23 +35,19 @@ public class LicenseContentSanitizer
 
     private String contentReplacement;
 
-    public String getId()
-    {
+    public String getId() {
         return id;
     }
 
-    public String getUrlRegexp()
-    {
+    public String getUrlRegexp() {
         return urlRegexp;
     }
 
-    public String getContentRegexp()
-    {
+    public String getContentRegexp() {
         return contentRegexp;
     }
 
-    public String getContentReplacement()
-    {
+    public String getContentReplacement() {
         return contentReplacement;
     }
 }

@@ -5,7 +5,7 @@
 
   <groupId>org.codehaus.mojo.license.test</groupId>
   <artifactId>test-ISSUE-145-2</artifactId>
-  <version>@pom.version@</version>
+  <version>@project.version@</version>
   <name>License Test :: ISSUE-145-2</name>
   <packaging>pom</packaging>
 
@@ -40,7 +40,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.0</version>
+        <version>@maven-compiler-plugin.version@</version>
       </plugin>
     </plugins>
 
@@ -49,7 +49,7 @@
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>license-maven-plugin</artifactId>
-          <version>@pom.version@</version>
+          <version>@project.version@</version>
           <executions>
             <execution>
               <id>aggregate-add-third-party</id>

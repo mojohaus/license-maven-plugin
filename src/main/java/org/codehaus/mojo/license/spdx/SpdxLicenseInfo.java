@@ -38,8 +38,7 @@ import org.codehaus.mojo.license.spdx.SpdxLicenseInfo.Attachments.UrlInfo;
  * @author <a href="https://github.com/ppalaga">Peter Palaga</a>
  * @since 1.18
  */
-public class SpdxLicenseInfo
-{
+public class SpdxLicenseInfo {
     private final String reference;
 
     private final boolean isDeprecatedLicenseId;
@@ -58,16 +57,21 @@ public class SpdxLicenseInfo
 
     private final Attachments attachments;
 
-    public static Builder builder()
-    {
+    public static Builder builder() {
         return new Builder();
     }
 
     // CHECKSTYLE_OFF: ParameterNumber
-    public SpdxLicenseInfo( String reference, boolean isDeprecatedLicenseId, boolean isFsfLibre, String detailsUrl,
-                            String name, String licenseId, List<String> seeAlso,
-                            boolean isOsiApproved, Attachments attachments )
-    {
+    public SpdxLicenseInfo(
+            String reference,
+            boolean isDeprecatedLicenseId,
+            boolean isFsfLibre,
+            String detailsUrl,
+            String name,
+            String licenseId,
+            List<String> seeAlso,
+            boolean isOsiApproved,
+            Attachments attachments) {
         super();
         this.reference = reference;
         this.isDeprecatedLicenseId = isDeprecatedLicenseId;
@@ -80,51 +84,42 @@ public class SpdxLicenseInfo
         this.attachments = attachments;
     }
 
-    public boolean isFsfLibre()
-    {
+    public boolean isFsfLibre() {
         return isFsfLibre;
     }
 
-    public String getReference()
-    {
+    public String getReference() {
         return reference;
     }
 
-    public boolean isDeprecatedLicenseId()
-    {
+    public boolean isDeprecatedLicenseId() {
         return isDeprecatedLicenseId;
     }
 
-    public String getDetailsUrl()
-    {
+    public String getDetailsUrl() {
         return detailsUrl;
     }
 
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
-    public String getLicenseId()
-    {
+    public String getLicenseId() {
         return licenseId;
     }
 
-    public List<String> getSeeAlso()
-    {
+    public List<String> getSeeAlso() {
         return seeAlso;
     }
 
-    public boolean isOsiApproved()
-    {
+    public boolean isOsiApproved() {
         return isOsiApproved;
     }
 
     /**
      * @return the {@link Attachments} - i.e. the data that does not come directly from spdx.org
      */
-    public Attachments getAttachments()
-    {
+    public Attachments getAttachments() {
         return attachments;
     }
 
@@ -135,12 +130,10 @@ public class SpdxLicenseInfo
      *
      * @since 1.18
      */
-    public static class Attachments
-    {
+    public static class Attachments {
         private final Map<String, UrlInfo> urlInfos;
 
-        Attachments( Map<String, UrlInfo> urlInfos )
-        {
+        Attachments(Map<String, UrlInfo> urlInfos) {
             super();
             this.urlInfos = urlInfos;
         }
@@ -148,8 +141,7 @@ public class SpdxLicenseInfo
         /**
          * @return a {@link Map} from URLs to {@link UrlInfo}s
          */
-        public Map<String, UrlInfo> getUrlInfos()
-        {
+        public Map<String, UrlInfo> getUrlInfos() {
             return urlInfos;
         }
 
@@ -158,8 +150,7 @@ public class SpdxLicenseInfo
          *
          * @since 1.18
          */
-        public static class UrlInfo
-        {
+        public static class UrlInfo {
             private final String sha1;
 
             private final String mimeType;
@@ -168,8 +159,7 @@ public class SpdxLicenseInfo
 
             private final boolean sanitized;
 
-            public UrlInfo( String sha1, String mimeType, boolean stable, boolean sanitized )
-            {
+            public UrlInfo(String sha1, String mimeType, boolean stable, boolean sanitized) {
                 super();
                 this.sha1 = sha1;
                 this.mimeType = mimeType;
@@ -183,26 +173,22 @@ public class SpdxLicenseInfo
              *      {@link SpdxLicenseListData} and (2) for some sites it is set manually based on their historical
              *      behavior.
              */
-            public boolean isStable()
-            {
+            public boolean isStable() {
                 return stable;
             }
 
             /**
              * @return the checksum computed after applying sanitizers at {@link SpdxLicenseListData} generation time.
              */
-            public String getSha1()
-            {
+            public String getSha1() {
                 return sha1;
             }
 
-            public String getMimeType()
-            {
+            public String getMimeType() {
                 return mimeType;
             }
 
-            public boolean isSanitized()
-            {
+            public boolean isSanitized() {
                 return sanitized;
             }
         }
@@ -213,8 +199,7 @@ public class SpdxLicenseInfo
      *
      * @since 1.18
      */
-    public static class Builder
-    {
+    public static class Builder {
 
         private Boolean isDeprecatedLicenseId;
 
@@ -234,82 +219,78 @@ public class SpdxLicenseInfo
 
         private Map<String, UrlInfo> urlInfos = new LinkedHashMap<>();
 
-        public Builder isDeprecatedLicenseId( boolean isDeprecatedLicenseId )
-        {
+        public Builder isDeprecatedLicenseId(boolean isDeprecatedLicenseId) {
             this.isDeprecatedLicenseId = isDeprecatedLicenseId;
             return this;
         }
 
-        public Builder isFsfLibre( boolean isFsfLibre )
-        {
+        public Builder isFsfLibre(boolean isFsfLibre) {
             this.isFsfLibre = isFsfLibre;
             return this;
         }
 
-        public Builder detailsUrl( String detailsUrl )
-        {
+        public Builder detailsUrl(String detailsUrl) {
             this.detailsUrl = detailsUrl;
             return this;
         }
 
-        public Builder reference( String reference )
-        {
+        public Builder reference(String reference) {
             this.reference = reference;
             return this;
         }
 
-        public Builder name( String name )
-        {
+        public Builder name(String name) {
             this.name = name;
             return this;
         }
 
-        public Builder licenseId( String licenseId )
-        {
+        public Builder licenseId(String licenseId) {
             this.licenseId = licenseId;
             return this;
         }
 
-        public Builder seeAlso( String seeAlso )
-        {
-            this.seeAlso.add( seeAlso );
+        public Builder seeAlso(String seeAlso) {
+            this.seeAlso.add(seeAlso);
             return this;
         }
 
-        public Builder urlInfo( String url, String sha1, String mimeType, boolean stable, boolean sanitized )
-        {
-            this.urlInfos.put( url, new UrlInfo( sha1, mimeType, stable, sanitized ) );
+        public Builder urlInfo(String url, String sha1, String mimeType, boolean stable, boolean sanitized) {
+            this.urlInfos.put(url, new UrlInfo(sha1, mimeType, stable, sanitized));
             return this;
         }
 
-        public Builder isOsiApproved( boolean isOsiApproved )
-        {
+        public Builder isOsiApproved(boolean isOsiApproved) {
             this.isOsiApproved = isOsiApproved;
             return this;
         }
 
-        public SpdxLicenseInfo build()
-        {
-            Objects.requireNonNull( isDeprecatedLicenseId, "isDeprecatedLicenseId" );
-            Objects.requireNonNull( detailsUrl, "detailsUrl" );
-            Objects.requireNonNull( reference, "reference" );
-            Objects.requireNonNull( name, "name" );
-            Objects.requireNonNull( licenseId, "licenseId" );
-            Objects.requireNonNull( isOsiApproved, "isOsiApproved" );
-            if ( seeAlso.isEmpty() )
-            {
-                throw new IllegalStateException( "seeAlso cannot be empty" );
+        public SpdxLicenseInfo build() {
+            Objects.requireNonNull(isDeprecatedLicenseId, "isDeprecatedLicenseId");
+            Objects.requireNonNull(detailsUrl, "detailsUrl");
+            Objects.requireNonNull(reference, "reference");
+            Objects.requireNonNull(name, "name");
+            Objects.requireNonNull(licenseId, "licenseId");
+            Objects.requireNonNull(isOsiApproved, "isOsiApproved");
+            if (seeAlso.isEmpty()) {
+                throw new IllegalStateException("seeAlso cannot be empty");
             }
 
-            final List<String> sa = Collections.unmodifiableList( seeAlso );
+            final List<String> sa = Collections.unmodifiableList(seeAlso);
             seeAlso = null;
 
-            final Map<String, UrlInfo> uis = Collections.unmodifiableMap( urlInfos );
+            final Map<String, UrlInfo> uis = Collections.unmodifiableMap(urlInfos);
             urlInfos = null;
 
-            return new SpdxLicenseInfo( reference, isDeprecatedLicenseId, isFsfLibre, detailsUrl, name,
-                                        licenseId, sa, isOsiApproved, new Attachments( uis ) );
+            return new SpdxLicenseInfo(
+                    reference,
+                    isDeprecatedLicenseId,
+                    isFsfLibre,
+                    detailsUrl,
+                    name,
+                    licenseId,
+                    sa,
+                    isOsiApproved,
+                    new Attachments(uis));
         }
-
     }
 }

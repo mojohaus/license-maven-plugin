@@ -22,10 +22,22 @@ package org.codehaus.mojo.license;
  * #L%
  */
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-import org.apache.maven.doxia.siterenderer.Renderer;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
@@ -41,6 +53,7 @@ import org.codehaus.mojo.license.api.DefaultThirdPartyHelper;
 import org.codehaus.mojo.license.api.DependenciesTool;
 import org.codehaus.mojo.license.api.DependenciesToolException;
 import org.codehaus.mojo.license.api.MavenProjectDependenciesConfigurator;
+import org.codehaus.mojo.license.api.ResolvedProjectDependencies;
 import org.codehaus.mojo.license.api.ThirdPartyDetails;
 import org.codehaus.mojo.license.api.ThirdPartyHelper;
 import org.codehaus.mojo.license.api.ThirdPartyTool;
@@ -52,20 +65,6 @@ import org.codehaus.plexus.i18n.I18N;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.SortedSet;
-import java.util.TreeSet;
-import org.codehaus.mojo.license.api.ResolvedProjectDependencies;
-
 /**
  * Base class for third-party reports.
  *
@@ -73,9 +72,8 @@ import org.codehaus.mojo.license.api.ResolvedProjectDependencies;
  * @since 1.1
  */
 public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
-    implements MavenProjectDependenciesConfigurator
-{
-    private static final Logger LOG = LoggerFactory.getLogger( AbstractThirdPartyReportMojo.class );
+        implements MavenProjectDependenciesConfigurator {
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractThirdPartyReportMojo.class);
 
     // ----------------------------------------------------------------------
     // Mojo Parameters
@@ -86,7 +84,7 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
      *
      * @since 1.1
      */
-    @Parameter( property = "license.excludedScopes", defaultValue = "system" )
+    @Parameter(property = "license.excludedScopes", defaultValue = "system")
     private String excludedScopes;
 
     /**
@@ -94,7 +92,7 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
      *
      * @since 1.1
      */
-    @Parameter( property = "license.includedScopes" )
+    @Parameter(property = "license.includedScopes")
     private String includedScopes;
 
     /**
@@ -102,7 +100,7 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
      *
      * @since 1.15
      */
-    @Parameter( property = "license.excludedTypes" )
+    @Parameter(property = "license.excludedTypes")
     private String excludedTypes;
 
     /**
@@ -110,7 +108,7 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
      *
      * @since 1.15
      */
-    @Parameter( property = "license.includedTypes" )
+    @Parameter(property = "license.includedTypes")
     private String includedTypes;
 
     /**
@@ -118,7 +116,7 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
      *
      * @since 1.1
      */
-    @Parameter( property = "license.excludedGroups" )
+    @Parameter(property = "license.excludedGroups")
     private String excludedGroups;
 
     /**
@@ -126,7 +124,7 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
      *
      * @since 1.1
      */
-    @Parameter( property = "license.includedGroups" )
+    @Parameter(property = "license.includedGroups")
     private String includedGroups;
 
     /**
@@ -134,7 +132,7 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
      *
      * @since 1.1
      */
-    @Parameter( property = "license.excludedArtifacts" )
+    @Parameter(property = "license.excludedArtifacts")
     private String excludedArtifacts;
 
     /**
@@ -142,7 +140,7 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
      *
      * @since 1.1
      */
-    @Parameter( property = "license.includedArtifacts" )
+    @Parameter(property = "license.includedArtifacts")
     private String includedArtifacts;
 
     /**
@@ -150,7 +148,7 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
      *
      * @since 1.1
      */
-    @Parameter( property = "license.includeTransitiveDependencies", defaultValue = "true" )
+    @Parameter(property = "license.includeTransitiveDependencies", defaultValue = "true")
     private boolean includeTransitiveDependencies;
 
     /**
@@ -158,7 +156,7 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
      *
      * @since 1.13
      */
-    @Parameter( property = "license.excludeTransitiveDependencies", defaultValue = "false" )
+    @Parameter(property = "license.excludeTransitiveDependencies", defaultValue = "false")
     private boolean excludeTransitiveDependencies;
 
     /**
@@ -167,7 +165,7 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
      *
      * @since 1.19
      */
-    @Parameter( property = "license.includeOptional", defaultValue = "true" )
+    @Parameter(property = "license.includeOptional", defaultValue = "true")
     boolean includeOptional;
 
     /**
@@ -175,7 +173,7 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
      *
      * @since 1.1
      */
-    @Parameter( property = "license.useMissingFile", defaultValue = "false" )
+    @Parameter(property = "license.useMissingFile", defaultValue = "false")
     private boolean useMissingFile;
 
     /**
@@ -183,7 +181,7 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
      *
      * @since 1.1
      */
-    @Parameter( property = "license.missingFile", defaultValue = "src/license/THIRD-PARTY.properties" )
+    @Parameter(property = "license.missingFile", defaultValue = "src/license/THIRD-PARTY.properties")
     private File missingFile;
 
     /**
@@ -196,7 +194,7 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
      *
      * @since 1.15
      */
-    @Parameter( property = "license.missingFileUrl" )
+    @Parameter(property = "license.missingFileUrl")
     String missingFileUrl;
 
     /**
@@ -209,7 +207,7 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
      * @deprecated Use {@link #overrideUrl} instead
      */
     @Deprecated
-    @Parameter( property = "license.overrideFile" )
+    @Parameter(property = "license.overrideFile")
     private File overrideFile;
 
     /**
@@ -225,7 +223,7 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
      *
      * @since 1.17
      */
-    @Parameter( property = "license.overrideUrl" )
+    @Parameter(property = "license.overrideUrl")
     private String overrideUrl;
 
     /**
@@ -240,7 +238,7 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
      *
      * @since 1.0
      */
-    @Parameter( property = "license.useRepositoryMissingFiles", defaultValue = "true" )
+    @Parameter(property = "license.useRepositoryMissingFiles", defaultValue = "true")
     private boolean useRepositoryMissingFiles;
 
     /**
@@ -263,23 +261,13 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
     private List<String> licenseMerges;
 
     /**
-      * Location of file with the merge licenses in order to be used by command line.
-      * <b>Note:</b> This option overrides {@link #licenseMerges}.
-      *
-      * @since 1.18
-      */
-     @Parameter( property = "license.licenseMergesUrl" )
-     protected String licenseMergesUrl;
-
-    /**
-     * The output directory for the report. Note that this parameter is only evaluated if the goal is run directly from
-     * the command line. If the goal is run indirectly as part of a site generation, the output directory configured in
-     * the Maven Site Plugin is used instead.
+     * Location of file with the merge licenses in order to be used by command line.
+     * <b>Note:</b> This option overrides {@link #licenseMerges}.
      *
-     * @since 1.1
+     * @since 1.18
      */
-    @Parameter( defaultValue = "${project.reporting.outputDirectory}", required = true )
-    private File outputDirectory;
+    @Parameter(property = "license.licenseMergesUrl")
+    protected String licenseMergesUrl;
 
     /**
      * Flag to activate verbose mode.
@@ -289,7 +277,7 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
      *
      * @since 1.0
      */
-    @Parameter( property = "license.verbose", defaultValue = "${maven.verbose}" )
+    @Parameter(property = "license.verbose", defaultValue = "${maven.verbose}")
     private boolean verbose;
 
     /**
@@ -300,28 +288,12 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
      *
      * @since 1.0
      */
-    @Parameter( property = "license.encoding", defaultValue = "${project.build.sourceEncoding}" )
+    @Parameter(property = "license.encoding", defaultValue = "${project.build.sourceEncoding}")
     private String encoding;
-
-    /**
-     * The Maven Project.
-     *
-     * @since 1.1
-     */
-    @Parameter( defaultValue = "${project}", readonly = true )
-    private MavenProject project;
 
     // ----------------------------------------------------------------------
     // Plexus Components
     // ----------------------------------------------------------------------
-
-    /**
-     * Doxia Site Renderer component.
-     *
-     * @since 1.1
-     */
-    @Component
-    private Renderer siteRenderer;
 
     /**
      * Internationalization component.
@@ -364,7 +336,7 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
      *
      * @since 1.18
      */
-    @Parameter( property = "license.artifactFiltersUrl" )
+    @Parameter(property = "license.artifactFiltersUrl")
     private String artifactFiltersUrl;
 
     private ArtifactFilters artifactFilters;
@@ -374,9 +346,9 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
     // ----------------------------------------------------------------------
 
     protected abstract Collection<ThirdPartyDetails> createThirdPartyDetails()
-      throws IOException, ThirdPartyToolException, ProjectBuildingException, MojoFailureException,
-             InvalidDependencyVersionException, ArtifactNotFoundException, ArtifactResolutionException,
-             DependenciesToolException, MojoExecutionException;
+            throws IOException, ThirdPartyToolException, ProjectBuildingException, MojoFailureException,
+                    InvalidDependencyVersionException, ArtifactNotFoundException, ArtifactResolutionException,
+                    DependenciesToolException, MojoExecutionException;
 
     // ----------------------------------------------------------------------
     // AbstractMavenReport Implementation
@@ -388,17 +360,14 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
      * <b>Note:</b> The method is invoked before the {@link #executeReport()} method.
      * @throws IOException
      */
-    protected void init()
-            throws IOException
-    {
-        if ( licenseMergesUrl != null )
-        {
-            LOG.warn( "" );
-            LOG.warn( "licenseMerges will be overridden by licenseMergesUrl." );
-            LOG.warn( "" );
-            if ( UrlRequester.isStringUrl( licenseMergesUrl ) )
-            {
-                licenseMerges = Arrays.asList( UrlRequester.getFromUrl( licenseMergesUrl ).split( "[\n\r]+" ) );
+    protected void init() throws IOException {
+        if (licenseMergesUrl != null) {
+            LOG.warn("");
+            LOG.warn("licenseMerges will be overridden by licenseMergesUrl.");
+            LOG.warn("");
+            if (UrlRequester.isStringUrl(licenseMergesUrl)) {
+                licenseMerges =
+                        Arrays.asList(UrlRequester.getFromUrl(licenseMergesUrl).split("[\n\r]+"));
             }
         }
     }
@@ -406,101 +375,52 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
     /**
      * {@inheritDoc}
      */
-    protected void executeReport( Locale locale )
-            throws MavenReportException
-    {
-        resolvedOverrideUrl = LicenseMojoUtils.prepareThirdPartyOverrideUrl( resolvedOverrideUrl, overrideFile,
-                overrideUrl, project.getBasedir() );
+    protected void executeReport(Locale locale) throws MavenReportException {
+        resolvedOverrideUrl = LicenseMojoUtils.prepareThirdPartyOverrideUrl(
+                resolvedOverrideUrl, overrideFile, overrideUrl, project.getBasedir());
 
         Collection<ThirdPartyDetails> details;
 
-        try
-        {
+        try {
             init();
             details = createThirdPartyDetails();
-        }
-        catch ( IOException e )
-        {
-            throw new MavenReportException( e.getMessage(), e );
-        }
-        catch ( ThirdPartyToolException e )
-        {
-            throw new MavenReportException( e.getMessage(), e );
-        }
-        catch ( ProjectBuildingException e )
-        {
-            throw new MavenReportException( e.getMessage(), e );
-        }
-        catch ( ArtifactNotFoundException e )
-        {
-            throw new MavenReportException( e.getMessage(), e );
-        }
-        catch ( ArtifactResolutionException e )
-        {
-            throw new MavenReportException( e.getMessage(), e );
-        }
-        catch ( MojoFailureException e )
-        {
-            throw new MavenReportException( e.getMessage(), e );
-        }
-        catch ( DependenciesToolException e )
-        {
-            throw new MavenReportException( e.getMessage(), e );
-        }
-        catch ( MojoExecutionException e )
-        {
-            throw new MavenReportException( e.getMessage(), e );
+        } catch (IOException e) {
+            throw new MavenReportException(e.getMessage(), e);
+        } catch (ThirdPartyToolException e) {
+            throw new MavenReportException(e.getMessage(), e);
+        } catch (ProjectBuildingException e) {
+            throw new MavenReportException(e.getMessage(), e);
+        } catch (ArtifactNotFoundException e) {
+            throw new MavenReportException(e.getMessage(), e);
+        } catch (ArtifactResolutionException e) {
+            throw new MavenReportException(e.getMessage(), e);
+        } catch (MojoFailureException e) {
+            throw new MavenReportException(e.getMessage(), e);
+        } catch (DependenciesToolException e) {
+            throw new MavenReportException(e.getMessage(), e);
+        } catch (MojoExecutionException e) {
+            throw new MavenReportException(e.getMessage(), e);
         }
 
         ThirdPartyReportRenderer renderer =
-                new ThirdPartyReportRenderer( getSink(), i18n, getOutputName(), locale, details );
+                new ThirdPartyReportRenderer(getSink(), i18n, getOutputName(), locale, details);
         renderer.render();
-
     }
 
     /**
      * {@inheritDoc}
      */
-    protected MavenProject getProject()
-    {
-        return project;
+    @Override
+    public String getDescription(Locale locale) {
+        return i18n.getString(getOutputName(), locale, "report.description");
     }
 
     /**
      * {@inheritDoc}
      */
-    protected String getOutputDirectory()
-    {
-        if ( !outputDirectory.isAbsolute() )
-        {
-            outputDirectory = new File( project.getBasedir(), outputDirectory.getPath() );
-        }
-
-        return outputDirectory.getAbsolutePath();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected Renderer getSiteRenderer()
-    {
-        return siteRenderer;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getDescription( Locale locale )
-    {
-        return i18n.getString( getOutputName(), locale, "report.description" );
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getName( Locale locale )
-    {
-        return i18n.getString( getOutputName(), locale, "report.title" );
+    @Override
+    public String getName(Locale locale) {
+        return i18n.getString(getOutputName(), locale, "report.title");
     }
 
     // ----------------------------------------------------------------------
@@ -510,27 +430,35 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
     /**
      * {@inheritDoc}
      */
-    public boolean isIncludeTransitiveDependencies()
-    {
+    @Override
+    public boolean isIncludeTransitiveDependencies() {
         return includeTransitiveDependencies;
     }
 
     /**
      * {@inheritDoc}
      */
-    public boolean isExcludeTransitiveDependencies()
-    {
+    @Override
+    public boolean isExcludeTransitiveDependencies() {
         return excludeTransitiveDependencies;
     }
 
     /** {@inheritDoc} */
-    public ArtifactFilters getArtifactFilters()
-    {
-        if ( artifactFilters == null )
-        {
-            artifactFilters = ArtifactFilters.of( includedGroups, excludedGroups, includedArtifacts, excludedArtifacts,
-                                                  includedScopes, excludedScopes, includedTypes, excludedTypes,
-                                                  includeOptional, artifactFiltersUrl , getEncoding() );
+    @Override
+    public ArtifactFilters getArtifactFilters() {
+        if (artifactFilters == null) {
+            artifactFilters = ArtifactFilters.of(
+                    includedGroups,
+                    excludedGroups,
+                    includedArtifacts,
+                    excludedArtifacts,
+                    includedScopes,
+                    excludedScopes,
+                    includedTypes,
+                    excludedTypes,
+                    includeOptional,
+                    artifactFiltersUrl,
+                    getEncoding());
         }
         return artifactFilters;
     }
@@ -538,8 +466,8 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
     /**
      * {@inheritDoc}
      */
-    public boolean isVerbose()
-    {
+    @Override
+    public boolean isVerbose() {
         return verbose;
     }
 
@@ -547,97 +475,93 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
     // Protected Methods
     // ----------------------------------------------------------------------
 
-    Collection<ThirdPartyDetails> createThirdPartyDetails( MavenProject project, boolean loadArtifacts )
-      throws IOException, ThirdPartyToolException, ProjectBuildingException, MojoFailureException,
-             DependenciesToolException, MojoExecutionException
-    {
+    Collection<ThirdPartyDetails> createThirdPartyDetails(MavenProject project, boolean loadArtifacts)
+            throws IOException, ThirdPartyToolException, ProjectBuildingException, MojoFailureException,
+                    DependenciesToolException, MojoExecutionException {
 
         ResolvedProjectDependencies loadedDependencies;
-        if ( loadArtifacts )
-        {
-            loadedDependencies = 
-                    new ResolvedProjectDependencies( project.getArtifacts(), MojoHelper.getDependencyArtifacts( project ) );
-        }
-        else
-        {
-            loadedDependencies = new ResolvedProjectDependencies( getProject().getArtifacts(),
-                    MojoHelper.getDependencyArtifacts( project ) );
+        if (loadArtifacts) {
+            loadedDependencies =
+                    new ResolvedProjectDependencies(project.getArtifacts(), MojoHelper.getDependencyArtifacts(project));
+        } else {
+            loadedDependencies = new ResolvedProjectDependencies(
+                    getProject().getArtifacts(), MojoHelper.getDependencyArtifacts(project));
         }
 
-        ThirdPartyHelper thirdPartyHelper =
-                new DefaultThirdPartyHelper( project, encoding, verbose,
-                        dependenciesTool, thirdPartyTool,
-                        project.getRemoteArtifactRepositories(), project.getRemoteProjectRepositories() );
+        ThirdPartyHelper thirdPartyHelper = new DefaultThirdPartyHelper(
+                project,
+                encoding,
+                verbose,
+                dependenciesTool,
+                thirdPartyTool,
+                project.getRemoteArtifactRepositories(),
+                project.getRemoteProjectRepositories());
         // load dependencies of the project
-        SortedMap<String, MavenProject> projectDependencies = thirdPartyHelper.loadDependencies( this,
-                loadedDependencies );
+        SortedMap<String, MavenProject> projectDependencies =
+                thirdPartyHelper.loadDependencies(this, loadedDependencies);
 
         // create licenseMap from it
-        LicenseMap licenseMap = thirdPartyHelper.createLicenseMap( projectDependencies );
+        LicenseMap licenseMap = thirdPartyHelper.createLicenseMap(projectDependencies);
 
         // Get unsafe dependencies (dependencies with no license in pom)
-        SortedSet<MavenProject> dependenciesWithNoLicense = thirdPartyHelper.getProjectsWithNoLicense( licenseMap );
+        SortedSet<MavenProject> dependenciesWithNoLicense = thirdPartyHelper.getProjectsWithNoLicense(licenseMap);
 
         // compute safe dependencies (with pom licenses)
-        Set<MavenProject> dependenciesWithPomLicense =
-                new TreeSet<>( MojoHelper.newMavenProjectComparator() );
-        dependenciesWithPomLicense.addAll( projectDependencies.values() );
+        Set<MavenProject> dependenciesWithPomLicense = new TreeSet<>(MojoHelper.newMavenProjectComparator());
+        dependenciesWithPomLicense.addAll(projectDependencies.values());
 
-        if ( CollectionUtils.isNotEmpty( dependenciesWithNoLicense ) )
-        {
+        if (CollectionUtils.isNotEmpty(dependenciesWithNoLicense)) {
             // there is some unsafe dependencies, remove them from safe dependencies
-            dependenciesWithPomLicense.removeAll( dependenciesWithNoLicense );
+            dependenciesWithPomLicense.removeAll(dependenciesWithNoLicense);
 
-            if ( useMissingFile )
-            {
+            if (useMissingFile) {
                 // Resolve unsafe dependencies using missing files, this will update licenseMap and unsafeDependencies
-                thirdPartyHelper.createUnsafeMapping( licenseMap, missingFile, missingFileUrl,
-                        useRepositoryMissingFiles, dependenciesWithNoLicense,
-                        projectDependencies, loadedDependencies.getAllDependencies() );
+                thirdPartyHelper.createUnsafeMapping(
+                        licenseMap,
+                        missingFile,
+                        missingFileUrl,
+                        useRepositoryMissingFiles,
+                        dependenciesWithNoLicense,
+                        projectDependencies,
+                        loadedDependencies.getAllDependencies());
             }
         }
 
         // LicenseMap is now complete, let's merge licenses if necessary
-        thirdPartyHelper.mergeLicenses( licenseMerges, licenseMap );
+        thirdPartyHelper.mergeLicenses(licenseMerges, licenseMap);
 
         // Add override licenses
-        thirdPartyTool.overrideLicenses( licenseMap, projectDependencies, encoding, resolvedOverrideUrl );
+        thirdPartyTool.overrideLicenses(licenseMap, projectDependencies, encoding, resolvedOverrideUrl);
 
         // let's build third party details for each dependencies
         Collection<ThirdPartyDetails> details = new ArrayList<>();
 
-        for ( Map.Entry<MavenProject, String[]> entry : licenseMap.toDependencyMap().entrySet() )
-        {
+        for (Map.Entry<MavenProject, String[]> entry :
+                licenseMap.toDependencyMap().entrySet()) {
             MavenProject dependency = entry.getKey();
             String[] licenses = entry.getValue();
-            ThirdPartyDetails detail = new DefaultThirdPartyDetails( dependency );
-            details.add( detail );
-            if ( dependenciesWithPomLicense.contains( dependency ) )
-            {
+            ThirdPartyDetails detail = new DefaultThirdPartyDetails(dependency);
+            details.add(detail);
+            if (dependenciesWithPomLicense.contains(dependency)) {
 
                 // this is a pom licenses
-                detail.setPomLicenses( licenses );
-            }
-            else if ( !dependenciesWithNoLicense.contains( dependency ) )
-            {
+                detail.setPomLicenses(licenses);
+            } else if (!dependenciesWithNoLicense.contains(dependency)) {
 
                 // this is a third-party licenses
-                detail.setThirdPartyLicenses( licenses );
+                detail.setThirdPartyLicenses(licenses);
             }
         }
         return details;
     }
 
     /** {@inheritDoc} */
-    public String getArtifactFiltersUrl()
-    {
+    public String getArtifactFiltersUrl() {
         return artifactFiltersUrl;
     }
 
     /** {@inheritDoc} */
-    public String getEncoding()
-    {
+    public String getEncoding() {
         return encoding;
     }
-
 }

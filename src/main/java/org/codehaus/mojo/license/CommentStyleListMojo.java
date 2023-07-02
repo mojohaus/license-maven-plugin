@@ -22,6 +22,12 @@ package org.codehaus.mojo.license;
  * #L%
  */
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
@@ -31,23 +37,15 @@ import org.codehaus.mojo.license.header.transformer.FileHeaderTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
 /**
  * Displays all the available comment style to box file headers.
  *
  * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
-@Mojo( name = "comment-style-list", requiresProject = false, requiresDirectInvocation = true )
-public class CommentStyleListMojo
-    extends AbstractLicenseMojo
-{
-    private static final Logger LOG = LoggerFactory.getLogger( CommentStyleListMojo.class );
+@Mojo(name = "comment-style-list", requiresProject = false, requiresDirectInvocation = true)
+public class CommentStyleListMojo extends AbstractLicenseMojo {
+    private static final Logger LOG = LoggerFactory.getLogger(CommentStyleListMojo.class);
 
     // ----------------------------------------------------------------------
     // Mojo Parameters
@@ -58,7 +56,7 @@ public class CommentStyleListMojo
      *
      * @since 1.0
      */
-    @Parameter( property = "detail" )
+    @Parameter(property = "detail")
     private boolean detail;
 
     // ----------------------------------------------------------------------
@@ -70,7 +68,7 @@ public class CommentStyleListMojo
      *
      * @since 1.0
      */
-    @Component( role = FileHeaderTransformer.class )
+    @Component(role = FileHeaderTransformer.class)
     private Map<String, FileHeaderTransformer> transformers;
 
     // ----------------------------------------------------------------------
@@ -81,8 +79,7 @@ public class CommentStyleListMojo
      * {@inheritDoc}
      */
     @Override
-    public boolean isSkip()
-    {
+    public boolean isSkip() {
         // can't skip this goal since direct invocation is required
         return false;
     }
@@ -91,61 +88,54 @@ public class CommentStyleListMojo
      * {@inheritDoc}
      */
     @Override
-    protected void init()
-        throws Exception
-    {
-        //nothing to do
+    protected void init() throws Exception {
+        // nothing to do
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void doAction()
-        throws MojoExecutionException, MojoFailureException
-    {
+    public void doAction() throws MojoExecutionException, MojoFailureException {
 
         StringBuilder buffer = new StringBuilder();
-        if ( isVerbose() )
-        {
-            buffer.append( "\n\n-------------------------------------------------------------------------------\n" );
-            buffer.append( "                           license-maven-plugin\n" );
-            buffer.append( "-------------------------------------------------------------------------------\n\n" );
+        if (isVerbose()) {
+            buffer.append("\n\n-------------------------------------------------------------------------------\n");
+            buffer.append("                           license-maven-plugin\n");
+            buffer.append("-------------------------------------------------------------------------------\n\n");
         }
-        List<String> names = new ArrayList<>( transformers.keySet() );
-        Collections.sort( names );
+        List<String> names = new ArrayList<>(transformers.keySet());
+        Collections.sort(names);
 
         int maxLength = 0;
         int maxDLength = 0;
-        for ( String name : names )
-        {
-            if ( name.length() > maxLength )
-            {
+        for (String name : names) {
+            if (name.length() > maxLength) {
                 maxLength = name.length();
             }
-            FileHeaderTransformer transformer = transformers.get( name );
-            if ( transformer.getDescription().length() > maxDLength )
-            {
+            FileHeaderTransformer transformer = transformers.get(name);
+            if (transformer.getDescription().length() > maxDLength) {
                 maxDLength = transformer.getDescription().length();
             }
         }
 
         String pattern = " * %1$-" + maxLength + "s : %2$-" + maxDLength + "s, extensions : %3$s\n";
 
-        buffer.append( "Available comment styles:\n\n" );
-        for ( String transformerName : names )
-        {
-            FileHeaderTransformer transformer = transformers.get( transformerName );
-            buffer.append( String.format( pattern, transformerName, transformer.getDescription(),
-                                          Arrays.toString( transformer.getDefaultAcceptedExtensions() ) ) );
-            if ( detail )
-            {
-                buffer.append( "\n   example : \n" );
-                buffer.append( transformer.boxComment( "header", true ) );
-                buffer.append( '\n' );
+        buffer.append("Available comment styles:\n\n");
+        for (String transformerName : names) {
+            FileHeaderTransformer transformer = transformers.get(transformerName);
+            buffer.append(String.format(
+                    pattern,
+                    transformerName,
+                    transformer.getDescription(),
+                    Arrays.toString(transformer.getDefaultAcceptedExtensions())));
+            if (detail) {
+                buffer.append("\n   example : \n");
+                buffer.append(transformer.boxComment("header", true));
+                buffer.append('\n');
             }
         }
 
-        LOG.info( "{}", buffer );
+        LOG.info("{}", buffer);
     }
 }

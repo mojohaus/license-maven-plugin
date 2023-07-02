@@ -4,7 +4,7 @@
 
   <groupId>org.codehaus.mojo.license.test</groupId>
   <artifactId>test-ISSUE-324</artifactId>
-  <version>@pom.version@</version>
+  <version>@project.version@</version>
   <name>License Test :: ISSUE-324</name>
   <packaging>pom</packaging>
 
@@ -32,7 +32,7 @@
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>license-maven-plugin</artifactId>
         <inherited>false</inherited>
-        <version>@pom.version@</version>
+        <version>@project.version@</version>
         <configuration>
           <excludedScopes>system,test</excludedScopes>
         </configuration>

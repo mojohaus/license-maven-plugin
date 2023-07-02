@@ -27,4 +27,4 @@ final Path basePath = basedir.toPath()
 
 final Path log = basePath.resolve('build.log')
 assert Files.exists(log)
-assert log.text.contains('URL \'http://www.antlr.org/license.html\' returned content with unexpected sha1 \'074f8d6e91730b40875178666513014472888247\'; expected \'2b8b815229aa8a61e483fb4ba0588b8b6c491890\'')
+assert log.toFile().text.contains('URL \'http://www.antlr.org/license.html\' returned content with unexpected sha1 \'666518759e606772587886dcb54a9867bcf275e0\'; expected \'2b8b815229aa8a61e483fb4ba0588b8b6c491890\'')

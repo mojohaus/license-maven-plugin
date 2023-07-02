@@ -40,34 +40,28 @@ import org.slf4j.LoggerFactory;
  * @author <a href="https://github.com/ppalaga">Peter Palaga</a>
  * @since 1.20
  */
-public class UrlReplacements
-{
-    private static final Logger LOG = LoggerFactory.getLogger( UrlReplacements.class );
+public class UrlReplacements {
+    private static final Logger LOG = LoggerFactory.getLogger(UrlReplacements.class);
 
-    public static Builder builder()
-    {
+    public static Builder builder() {
         return new Builder();
     }
 
     private final List<UrlReplacement> replacements;
 
-    UrlReplacements( List<UrlReplacement> replacements )
-    {
+    UrlReplacements(List<UrlReplacement> replacements) {
         super();
         this.replacements = replacements;
     }
 
-    public String rewriteIfNecessary( final String originalLicenseUrl )
-    {
+    public String rewriteIfNecessary(final String originalLicenseUrl) {
         String resultUrl = originalLicenseUrl;
-        for ( UrlReplacement r : replacements )
-        {
-            resultUrl = r.getUrlPattern().matcher( resultUrl ).replaceAll( r.getReplacement() );
+        for (UrlReplacement r : replacements) {
+            resultUrl = r.getUrlPattern().matcher(resultUrl).replaceAll(r.getReplacement());
         }
 
-        if ( LOG.isDebugEnabled() && !resultUrl.equals( originalLicenseUrl ) )
-        {
-            LOG.debug( "Rewrote URL {} => {}", originalLicenseUrl, resultUrl );
+        if (LOG.isDebugEnabled() && !resultUrl.equals(originalLicenseUrl)) {
+            LOG.debug("Rewrote URL {} => {}", originalLicenseUrl, resultUrl);
         }
         return resultUrl;
     }
@@ -77,83 +71,70 @@ public class UrlReplacements
      *
      * @since 1.20
      */
-    public static class Builder
-    {
+    public static class Builder {
         private List<UrlReplacement> replacements = new ArrayList<>();
 
         private boolean useDefaults;
 
         private Set<String> ids = new HashSet<>();
 
-        public Builder replacement( String id, String urlPattern, String replacement )
-        {
+        public Builder replacement(String id, String urlPattern, String replacement) {
 
-            if ( id != null )
-            {
-                ids.add( id );
-            }
-            else
-            {
+            if (id != null) {
+                ids.add(id);
+            } else {
                 id = urlPattern + "_" + replacement;
             }
-            replacements.add( UrlReplacement.compile( id, urlPattern, replacement ) );
+            replacements.add(UrlReplacement.compile(id, urlPattern, replacement));
             return this;
         }
 
-        public Builder useDefaults( boolean useDefaults )
-        {
+        public Builder useDefaults(boolean useDefaults) {
             this.useDefaults = useDefaults;
             return this;
         }
 
-        public UrlReplacements build()
-        {
-            if ( useDefaults )
-            {
-                final Collection<UrlReplacement> defaults =
-                    SpdxLicenseList.getLatest().getAttachments().getUrlReplacements().values();
+        public UrlReplacements build() {
+            if (useDefaults) {
+                final Collection<UrlReplacement> defaults = SpdxLicenseList.getLatest()
+                        .getAttachments()
+                        .getUrlReplacements()
+                        .values();
                 int usedDefaults = 0;
-                for ( UrlReplacement r : defaults )
-                {
-                    if ( !ids.contains( r.getId() ) )
-                    {
-                        replacements.add( r );
+                for (UrlReplacement r : defaults) {
+                    if (!ids.contains(r.getId())) {
+                        replacements.add(r);
                         usedDefaults++;
                     }
                 }
 
-                if ( usedDefaults > 0 && LOG.isDebugEnabled() )
-                {
+                if (usedDefaults > 0 && LOG.isDebugEnabled()) {
                     final StringBuilder sb = new StringBuilder();
-                    sb.append( "Appending " + usedDefaults + " default licenseUrlReplacements:\n" )
-                    .append( "<licenseUrlReplacements>\n" );
+                    sb.append("Appending " + usedDefaults + " default licenseUrlReplacements:\n")
+                            .append("<licenseUrlReplacements>\n");
 
-                    for ( UrlReplacement r : defaults )
-                    {
-                        if ( !ids.contains( r.getId() ) )
-                        {
-                            sb
-                            .append( "  <licenseUrlReplacement>\n" )
-                            .append( "    <id>" ) //
-                            .append( r.getId() ) //
-                            .append( "</id>\n" ) //
-                            .append( "    <regexp>" ) //
-                            .append( r.getUrlPattern() ) //
-                            .append( "</regexp>\n" ) //
-                            .append( "    <replacement>" ) //
-                            .append( r.getReplacement() ) //
-                            .append( "</replacement>\n" ) //
-                            .append( "  <licenseUrlReplacement>\n" );
+                    for (UrlReplacement r : defaults) {
+                        if (!ids.contains(r.getId())) {
+                            sb.append("  <licenseUrlReplacement>\n")
+                                    .append("    <id>") //
+                                    .append(r.getId()) //
+                                    .append("</id>\n") //
+                                    .append("    <regexp>") //
+                                    .append(r.getUrlPattern()) //
+                                    .append("</regexp>\n") //
+                                    .append("    <replacement>") //
+                                    .append(r.getReplacement()) //
+                                    .append("</replacement>\n") //
+                                    .append("  <licenseUrlReplacement>\n");
                         }
                     }
-                    sb
-                    .append( "</licenseUrlReplacements>\n" );
-                    LOG.debug( sb.toString() );
+                    sb.append("</licenseUrlReplacements>\n");
+                    LOG.debug(sb.toString());
                 }
             }
-            List<UrlReplacement> rs = Collections.unmodifiableList( replacements );
+            List<UrlReplacement> rs = Collections.unmodifiableList(replacements);
             replacements = null;
-            return new UrlReplacements( rs );
+            return new UrlReplacements(rs);
         }
     }
 }

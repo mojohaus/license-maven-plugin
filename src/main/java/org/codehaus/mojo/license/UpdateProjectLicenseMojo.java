@@ -22,6 +22,8 @@ package org.codehaus.mojo.license;
  * #L%
  */
 
+import java.io.File;
+
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -29,8 +31,6 @@ import org.codehaus.mojo.license.model.License;
 import org.codehaus.mojo.license.utils.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
 
 /**
  * Updates (or creates) the main project license file according to the given
@@ -43,11 +43,9 @@ import java.io.File;
  * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
-@Mojo( name = "update-project-license", defaultPhase = LifecyclePhase.GENERATE_RESOURCES )
-public class UpdateProjectLicenseMojo
-    extends AbstractLicenseNameMojo
-{
-    private static final Logger LOG = LoggerFactory.getLogger( UpdateProjectLicenseMojo.class );
+@Mojo(name = "update-project-license", defaultPhase = LifecyclePhase.GENERATE_RESOURCES)
+public class UpdateProjectLicenseMojo extends AbstractLicenseNameMojo {
+    private static final Logger LOG = LoggerFactory.getLogger(UpdateProjectLicenseMojo.class);
 
     // ----------------------------------------------------------------------
     // Mojo Parameters
@@ -60,7 +58,7 @@ public class UpdateProjectLicenseMojo
      * @required
      * @since 1.0
      */
-    @Parameter( property = "license.licenceFile", defaultValue = "${basedir}/LICENSE.txt" )
+    @Parameter(property = "license.licenceFile", defaultValue = "${basedir}/LICENSE.txt")
     protected File licenseFile;
 
     /**
@@ -70,7 +68,7 @@ public class UpdateProjectLicenseMojo
      *
      * @since 1.0
      */
-    @Parameter( property = "license.outputDirectory", defaultValue = "target/generated-sources/license" )
+    @Parameter(property = "license.outputDirectory", defaultValue = "target/generated-sources/license")
     protected File outputDirectory;
 
     /**
@@ -86,7 +84,7 @@ public class UpdateProjectLicenseMojo
      *
      * @since 1.0
      */
-    @Parameter( property = "license.generateBundle", defaultValue = "false" )
+    @Parameter(property = "license.generateBundle", defaultValue = "false")
     protected boolean generateBundle;
 
     /**
@@ -97,7 +95,7 @@ public class UpdateProjectLicenseMojo
      *
      * @since 1.0
      */
-    @Parameter( property = "license.bundleLicensePath", defaultValue = "META-INF/${project.artifactId}-LICENSE.txt" )
+    @Parameter(property = "license.bundleLicensePath", defaultValue = "META-INF/${project.artifactId}-LICENSE.txt")
     protected String bundleLicensePath;
 
     /**
@@ -105,7 +103,7 @@ public class UpdateProjectLicenseMojo
      *
      * @since 1.0.0
      */
-    @Parameter( property = "license.force", defaultValue = "false" )
+    @Parameter(property = "license.force", defaultValue = "false")
     protected boolean force;
 
     /**
@@ -113,7 +111,7 @@ public class UpdateProjectLicenseMojo
      *
      * @since 1.0
      */
-    @Parameter( property = "license.skipUpdateProjectLicense", defaultValue = "false" )
+    @Parameter(property = "license.skipUpdateProjectLicense", defaultValue = "false")
     protected boolean skipUpdateProjectLicense;
 
     // ----------------------------------------------------------------------
@@ -133,8 +131,7 @@ public class UpdateProjectLicenseMojo
      * {@inheritDoc}
      */
     @Override
-    public boolean isSkip()
-    {
+    public boolean isSkip() {
         return skipUpdateProjectLicense;
     }
 
@@ -142,14 +139,11 @@ public class UpdateProjectLicenseMojo
      * {@inheritDoc}
      */
     @Override
-    protected void init()
-        throws Exception
-    {
+    protected void init() throws Exception {
         super.init();
 
         // must generate if file does not exist or pom never thant license file
-        if ( licenseFile != null )
-        {
+        if (licenseFile != null) {
             File pomFile = getProject().getFile();
 
             this.doGenerate = force || !licenseFile.exists() || licenseFile.lastModified() <= pomFile.lastModified();
@@ -160,67 +154,56 @@ public class UpdateProjectLicenseMojo
      * {@inheritDoc}
      */
     @Override
-    protected void doAction()
-        throws Exception
-    {
+    protected void doAction() throws Exception {
 
         License license = getLicense();
 
-        if ( doGenerate )
-        {
+        if (doGenerate) {
 
-            LOG.info( "Will create or update license file [{}] to {}", license.getName(), licenseFile );
-            if ( isVerbose() )
-            {
-                LOG.info( "detail of license :\n{}", license );
+            LOG.info("Will create or update license file [{}] to {}", license.getName(), licenseFile);
+            if (isVerbose()) {
+                LOG.info("detail of license :\n{}", license);
             }
 
-            if ( licenseFile.exists() && isKeepBackup() )
-            {
-                if ( isVerbose() )
-                {
-                    LOG.info( "backup {}", licenseFile );
+            if (licenseFile.exists() && isKeepBackup()) {
+                if (isVerbose()) {
+                    LOG.info("backup {}", licenseFile);
                 }
                 // copy it to backup file
-                FileUtil.backupFile( licenseFile );
+                FileUtil.backupFile(licenseFile);
             }
         }
 
         // obtain license content
-        String licenseContent = license.getLicenseContent( getEncoding() );
+        String licenseContent = license.getLicenseContent(getEncoding());
 
-        if ( license.isLicenseContentTemplateAware() )
-        {
+        if (license.isLicenseContentTemplateAware()) {
 
-            licenseContent = processLicenseContext( licenseContent );
+            licenseContent = processLicenseContext(licenseContent);
         }
-        if ( doGenerate )
-        {
+        if (doGenerate) {
 
             // writes it root main license file
-            FileUtil.printString( licenseFile, licenseContent, getEncoding() );
+            FileUtil.printString(licenseFile, licenseContent, getEncoding());
         }
 
-        if ( hasClassPath() )
-        {
+        if (hasClassPath()) {
 
             // copy the license file to the resources directory
-            File resourceTarget = new File( outputDirectory, licenseFile.getName() );
-            FileUtil.copyFile( this.licenseFile, resourceTarget );
+            File resourceTarget = new File(outputDirectory, licenseFile.getName());
+            FileUtil.copyFile(this.licenseFile, resourceTarget);
 
-            addResourceDir( outputDirectory, "**/" + resourceTarget.getName() );
+            addResourceDir(outputDirectory, "**/" + resourceTarget.getName());
 
-            if ( generateBundle )
-            {
+            if (generateBundle) {
 
                 // creates the bundled license file
-                File bundleTarget = FileUtil.getFile( outputDirectory, bundleLicensePath );
-                FileUtil.copyFile( licenseFile, bundleTarget );
+                File bundleTarget = FileUtil.getFile(outputDirectory, bundleLicensePath);
+                FileUtil.copyFile(licenseFile, bundleTarget);
 
-                if ( !resourceTarget.getName().equals( bundleTarget.getName() ) )
-                {
+                if (!resourceTarget.getName().equals(bundleTarget.getName())) {
 
-                    addResourceDir( outputDirectory, "**/" + bundleTarget.getName() );
+                    addResourceDir(outputDirectory, "**/" + bundleTarget.getName());
                 }
             }
         }

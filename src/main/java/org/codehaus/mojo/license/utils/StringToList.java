@@ -22,12 +22,11 @@ package org.codehaus.mojo.license.utils;
  * #L%
  */
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.maven.plugin.MojoExecutionException;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.maven.plugin.MojoExecutionException;
 
 /**
  * Object to convert in mojo a parameter from a some simple String to a List.
@@ -37,52 +36,40 @@ import java.util.List;
  * @author tchemit dev@tchemit.fr
  * @since 1.4
  */
-public class StringToList
-{
+public class StringToList {
 
     /**
      * List of data.
      */
     private final List<String> data;
 
-    public StringToList()
-    {
+    public StringToList() {
         data = new ArrayList<>();
     }
 
-   /**
-    * @param data a list of licenses or a URL
-    */
-    public StringToList( String data ) throws MojoExecutionException
-    {
-      this();
-      if ( !UrlRequester.isStringUrl( data ) )
-      {
-        for ( String s : data.split( "\\s*\\|\\s*" ) )
-        {
-          addEntryToList( s );
+    /**
+     * @param data a list of licenses or a URL
+     */
+    public StringToList(String data) throws MojoExecutionException {
+        this();
+        if (!UrlRequester.isStringUrl(data)) {
+            for (String s : data.split("\\s*\\|\\s*")) {
+                addEntryToList(s);
+            }
+        } else {
+            for (String license : UrlRequester.downloadList(data)) {
+                if (data != null && StringUtils.isNotBlank(license) && !this.data.contains(license)) {
+                    this.data.add(license);
+                }
+            }
         }
-      }
-      else
-      {
-        for ( String license : UrlRequester.downloadList( data ) )
-        {
-          if ( data != null && StringUtils.isNotBlank( license ) && !this.data.contains( license ) )
-          {
-            this.data.add( license );
-          }
-        }
-      }
     }
 
-    public List<String> getData()
-    {
+    public List<String> getData() {
         return data;
     }
 
-    protected void addEntryToList( String data )
-    {
-        this.data.add( data );
+    protected void addEntryToList(String data) {
+        this.data.add(data);
     }
-
 }

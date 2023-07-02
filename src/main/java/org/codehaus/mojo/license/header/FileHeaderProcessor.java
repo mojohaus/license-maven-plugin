@@ -30,6 +30,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
+
 import org.codehaus.mojo.license.header.transformer.FileHeaderTransformer;
 import org.nuiton.processor.Processor;
 
@@ -39,37 +40,31 @@ import org.nuiton.processor.Processor;
  * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
-public class FileHeaderProcessor extends Processor
-{
+public class FileHeaderProcessor extends Processor {
     /**
      * internal file header filter.
      */
     private final FileHeaderFilter filter;
 
-    public FileHeaderProcessor( FileHeaderFilter filter, FileHeader fileHeader, FileHeaderTransformer transformer )
-    {
-        if ( filter == null )
-        {
-            throw new IllegalStateException( "no file header filter set." );
+    public FileHeaderProcessor(FileHeaderFilter filter, FileHeader fileHeader, FileHeaderTransformer transformer) {
+        if (filter == null) {
+            throw new IllegalStateException("no file header filter set.");
         }
-        if ( fileHeader == null )
-        {
-            throw new IllegalStateException( "no file header set." );
+        if (fileHeader == null) {
+            throw new IllegalStateException("no file header set.");
         }
-        if ( transformer == null )
-        {
-            throw new IllegalStateException( "no file header transformer set." );
+        if (transformer == null) {
+            throw new IllegalStateException("no file header transformer set.");
         }
         this.filter = filter;
-        setInputFilter( filter );
-        filter.setFileHeader( fileHeader );
-        filter.setTransformer( transformer );
+        setInputFilter(filter);
+        filter.setFileHeader(fileHeader);
+        filter.setTransformer(transformer);
         filter.resetContent();
     }
 
-    public String addHeader( String content )
-    {
-        return filter.getTransformer().addHeader( filter.getFullHeaderContent(), content );
+    public String addHeader(String content) {
+        return filter.getTransformer().addHeader(filter.getFullHeaderContent(), content);
     }
 
     /**
@@ -77,8 +72,7 @@ public class FileHeaderProcessor extends Processor
      * fully found), {@code false} otherwise
      * @see FileHeaderFilter#isTouched()
      */
-    public boolean isTouched()
-    {
+    public boolean isTouched() {
         return filter.isTouched();
     }
 
@@ -87,8 +81,7 @@ public class FileHeaderProcessor extends Processor
      * fully found and content changed), {@code false} otherwise
      * @see FileHeaderFilter#isModified()
      */
-    public boolean isModified()
-    {
+    public boolean isModified() {
         return filter.isModified();
     }
 
@@ -96,43 +89,33 @@ public class FileHeaderProcessor extends Processor
      * @return {@code true} if header of header was detected
      * @see FileHeaderFilter#isDetectHeader()
      */
-    public boolean isDetectHeader()
-    {
+    public boolean isDetectHeader() {
         return filter.isDetectHeader();
     }
 
-    public synchronized void process( String inputContent, File outputFile, String encoding ) throws IOException
-    {
+    public synchronized void process(String inputContent, File outputFile, String encoding) throws IOException {
 
         filter.reset();
 
-        Reader input = new InputStreamReader( new ByteArrayInputStream( inputContent.getBytes( encoding ) ), encoding );
-        try
-        {
-            Writer output = new OutputStreamWriter( new FileOutputStream( outputFile ), encoding );
-            try
-            {
-                process( input, output );
-            }
-            finally
-            {
+        Reader input = new InputStreamReader(new ByteArrayInputStream(inputContent.getBytes(encoding)), encoding);
+        try {
+            Writer output = new OutputStreamWriter(new FileOutputStream(outputFile), encoding);
+            try {
+                process(input, output);
+            } finally {
                 output.close();
             }
-        }
-        finally
-        {
+        } finally {
             input.close();
         }
     }
 
-    public String getFileHeaderDescription()
-    {
+    public String getFileHeaderDescription() {
         return filter.getFileHeader().getDescription();
     }
 
-    public void updateDescription( String description )
-    {
-        filter.getFileHeader().setDescription( description );
+    public void updateDescription(String description) {
+        filter.getFileHeader().setDescription(description);
         filter.resetContent();
     }
 }

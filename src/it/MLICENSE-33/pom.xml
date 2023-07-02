@@ -29,7 +29,7 @@
 
   <groupId>org.codehaus.mojo.license.test</groupId>
   <artifactId>test-MLICENSE-33</artifactId>
-  <version>@pom.version@</version>
+  <version>@project.version@</version>
 
   <name>License Test :: MLICENSE-33</name>
 
@@ -89,12 +89,12 @@
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>license-maven-plugin</artifactId>
-          <version>@pom.version@</version>
+          <version>@project.version@</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-site-plugin</artifactId>
-          <version>3.3</version>
+          <version>@maven-site-plugin.version@</version>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -106,7 +106,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>license-maven-plugin</artifactId>
-        <version>@pom.version@</version>
+        <version>@project.version@</version>
         <reportSets>
           <reportSet>
             <reports>

@@ -377,6 +377,7 @@ org.jboss.xnio--xnio-api--3.3.6.Final=The Apache Software License, Version 2.0
   Use the <<includedLicenses>> (whitelist of licenses) or/and <<excludedLicenses>> (blacklist of licenses).
 
   These parameters contains licenses separated by <<|>>:
+
 -------------------------------------------------------------------------------
   <configuration>
     ...
@@ -387,6 +388,7 @@ org.jboss.xnio--xnio-api--3.3.6.Final=The Apache Software License, Version 2.0
 -------------------------------------------------------------------------------
 
   Since version <1.4>, you can also use a list format:
+
 -------------------------------------------------------------------------------
   <configuration>
     ...
@@ -404,8 +406,8 @@ org.jboss.xnio--xnio-api--3.3.6.Final=The Apache Software License, Version 2.0
 
   Note that any extra space at the start or end of a license will be removed.
 
-  If parameter <<failIfWarning>> is set to <true>, then build will fail if one license is not in whiltelist or is in
-  blacklist.
+  If parameter <<failOnBlacklist>> is set to <true>, then build will fail if one license is not in <<includedLicenses>> or is in
+  <<excludedLicenses>>.
 
 * Filter the dependencies
 

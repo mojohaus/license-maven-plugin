@@ -29,7 +29,7 @@
 
   <groupId>org.codehaus.mojo.license.test</groupId>
   <artifactId>test-ISSUE-159</artifactId>
-  <version>@pom.version@</version>
+  <version>@project.version@</version>
 
   <name>License Test :: ISSUE-159</name>
 
@@ -57,7 +57,7 @@
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>license-maven-plugin</artifactId>
-          <version>@pom.version@</version>
+          <version>@project.version@</version>
           <configuration>
             <licenseMerges>
               <licenseMerge>The Apache Software License, Version 2.0|The Apache Software License, Version 2.0
