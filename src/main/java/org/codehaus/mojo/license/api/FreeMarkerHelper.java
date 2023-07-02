@@ -22,6 +22,11 @@ package org.codehaus.mojo.license.api;
  * #L%
  */
 
+import java.io.File;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.Map;
+
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.cache.FileTemplateLoader;
 import freemarker.cache.StringTemplateLoader;
@@ -32,19 +37,13 @@ import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.Map;
-
 /**
  * A helper to deal with freemarker templating.
  *
  * @author tchemit dev@tchemit.fr
  * @since 1.1
  */
-public class FreeMarkerHelper
-{
+public class FreeMarkerHelper {
 
     public static final String TEMPLATE = "template";
 
@@ -61,10 +60,9 @@ public class FreeMarkerHelper
      * @return a default helper, if template is a file, then will use it as it, otherwise will have a look into
      * classloader in current package.
      */
-    public static FreeMarkerHelper newDefaultHelper()
-    {
-        ClassTemplateLoader templateLoader = new ClassTemplateLoader( FreeMarkerHelper.class, "/" );
-        FreeMarkerHelper result = new FreeMarkerHelper( templateLoader );
+    public static FreeMarkerHelper newDefaultHelper() {
+        ClassTemplateLoader templateLoader = new ClassTemplateLoader(FreeMarkerHelper.class, "/");
+        FreeMarkerHelper result = new FreeMarkerHelper(templateLoader);
         return result;
     }
 
@@ -73,73 +71,57 @@ public class FreeMarkerHelper
      * @param stringTemplate template
      * @return a helper, if template is a file, then will use it as it, otherwise will use the given template
      */
-    public static FreeMarkerHelper newHelperFromContent( String stringTemplate )
-    {
+    public static FreeMarkerHelper newHelperFromContent(String stringTemplate) {
 
         StringTemplateLoader templateLoader = new StringTemplateLoader();
-        templateLoader.putTemplate( TEMPLATE, stringTemplate );
+        templateLoader.putTemplate(TEMPLATE, stringTemplate);
 
-        FreeMarkerHelper result = new FreeMarkerHelper( templateLoader );
+        FreeMarkerHelper result = new FreeMarkerHelper(templateLoader);
         return result;
     }
 
-    protected FreeMarkerHelper( TemplateLoader templateLoader )
-    {
+    protected FreeMarkerHelper(TemplateLoader templateLoader) {
         this.templateLoader = templateLoader;
         freemarkerConfiguration = new Configuration();
-        freemarkerConfiguration.setTemplateLoader( templateLoader );
+        freemarkerConfiguration.setTemplateLoader(templateLoader);
         BeansWrapper objectWrapper = new DefaultObjectWrapper();
-        freemarkerConfiguration.setObjectWrapper( objectWrapper );
+        freemarkerConfiguration.setObjectWrapper(objectWrapper);
     }
 
-    public Template getTemplate( String templateName )
-        throws IOException
-    {
+    public Template getTemplate(String templateName) throws IOException {
 
-        File file = new File( templateName );
-        if ( file.exists() )
-        {
+        File file = new File(templateName);
+        if (file.exists()) {
 
             // this is a file
-            freemarkerConfiguration.setTemplateLoader( new FileTemplateLoader( file.getParentFile() ) );
+            freemarkerConfiguration.setTemplateLoader(new FileTemplateLoader(file.getParentFile()));
             templateName = file.getName();
-        }
-        else
-        {
+        } else {
 
             // just use the classloader
-            freemarkerConfiguration.setTemplateLoader( templateLoader );
+            freemarkerConfiguration.setTemplateLoader(templateLoader);
         }
-        Template template = freemarkerConfiguration.getTemplate( templateName );
+        Template template = freemarkerConfiguration.getTemplate(templateName);
 
-        if ( template == null )
-        {
-            throw new IOException( "Could not find template " + templateName );
+        if (template == null) {
+            throw new IOException("Could not find template " + templateName);
         }
         return template;
     }
 
-    public String renderTemplate( String templateName, Map<String, Object> parameters )
-        throws IOException
-    {
+    public String renderTemplate(String templateName, Map<String, Object> parameters) throws IOException {
 
-        Template template = getTemplate( templateName );
-        return renderTemplate( template, parameters );
+        Template template = getTemplate(templateName);
+        return renderTemplate(template, parameters);
     }
 
-    public String renderTemplate( Template template, Map<String, Object> parameters )
-        throws IOException
-    {
+    public String renderTemplate(Template template, Map<String, Object> parameters) throws IOException {
 
         StringWriter out = new StringWriter();
-        try
-        {
-            template.process( parameters, out );
-        }
-        catch ( TemplateException e )
-        {
-            throw new IOException( "Could not render template " + template.getName() + " for reason "
-                    + e.getMessage() );
+        try {
+            template.process(parameters, out);
+        } catch (TemplateException e) {
+            throw new IOException("Could not render template " + template.getName() + " for reason " + e.getMessage());
         }
         return out.toString();
     }

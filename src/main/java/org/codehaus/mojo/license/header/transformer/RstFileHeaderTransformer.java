@@ -33,23 +33,19 @@ import javax.inject.Singleton;
  */
 @Named("rst")
 @Singleton
-public class RstFileHeaderTransformer
-    extends AbstractFileHeaderTransformer
-{
+public class RstFileHeaderTransformer extends AbstractFileHeaderTransformer {
 
     /**
      * Default constructor.
      */
-    public RstFileHeaderTransformer()
-    {
-        super( "rst", "header transformer with rst comment style", ".. -", ".. -", ".. * " );
+    public RstFileHeaderTransformer() {
+        super("rst", "header transformer with rst comment style", ".. -", ".. -", ".. * ");
     }
 
     /**
      * {@inheritDoc}
      */
-    public String[] getDefaultAcceptedExtensions()
-    {
-        return new String[]{ "rst" };
+    public String[] getDefaultAcceptedExtensions() {
+        return new String[] {"rst"};
     }
 }

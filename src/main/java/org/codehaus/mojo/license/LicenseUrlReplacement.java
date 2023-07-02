@@ -29,8 +29,7 @@ import java.util.regex.Pattern;
  *
  * @since 1.17
  */
-public class LicenseUrlReplacement
-{
+public class LicenseUrlReplacement {
     /**
      * Regular expression used to identify license urls that are to be replaced.
      *
@@ -64,26 +63,21 @@ public class LicenseUrlReplacement
      */
     private String id;
 
-    public String getRegexp()
-    {
+    public String getRegexp() {
         return regexp;
     }
 
-    public String getReplacement()
-    {
+    public String getReplacement() {
         return replacement;
     }
 
-    public String getId()
-    {
+    public String getId() {
         return id;
     }
 
-    public Pattern getPattern()
-    {
-        if ( pattern == null && regexp != null )
-        {
-            pattern = Pattern.compile( regexp );
+    public Pattern getPattern() {
+        if (pattern == null && regexp != null) {
+            pattern = Pattern.compile(regexp);
         }
         return pattern;
     }

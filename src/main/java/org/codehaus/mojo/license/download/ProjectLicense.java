@@ -29,9 +29,7 @@ import org.apache.maven.model.License;
  *
  * @since 1.17
  */
-public class ProjectLicense implements Cloneable
-{
-
+public class ProjectLicense implements Cloneable {
 
     /**
      * The full legal name of the license.
@@ -74,9 +72,7 @@ public class ProjectLicense implements Cloneable
     /**
      * The default constructor.
      */
-    public ProjectLicense()
-    {
-    }
+    public ProjectLicense() {}
 
     /**
      * Equivalent to {@code new ProjectLicense( license.getName(), license.getUrl(), license.getDistribution(),
@@ -84,9 +80,8 @@ public class ProjectLicense implements Cloneable
      *
      * @param license the license to get name, URL, ditribution and comments from
      */
-    public ProjectLicense( License license )
-    {
-        this( license.getName(), license.getUrl(), license.getDistribution(), license.getComments(), null );
+    public ProjectLicense(License license) {
+        this(license.getName(), license.getUrl(), license.getDistribution(), license.getComments(), null);
     }
 
     /**
@@ -98,8 +93,7 @@ public class ProjectLicense implements Cloneable
      * @param comments additional information related to this license
      * @param file file name without path
      */
-    public ProjectLicense( String name, String url, String distribution, String comments, String file )
-    {
+    public ProjectLicense(String name, String url, String distribution, String comments, String file) {
         super();
         this.name = name;
         this.url = url;
@@ -113,8 +107,7 @@ public class ProjectLicense implements Cloneable
      *
      * @return String
      */
-    public String getComments()
-    {
+    public String getComments() {
         return this.comments;
     }
 
@@ -132,8 +125,7 @@ public class ProjectLicense implements Cloneable
      *
      * @return String
      */
-    public String getDistribution()
-    {
+    public String getDistribution() {
         return this.distribution;
     }
 
@@ -142,8 +134,7 @@ public class ProjectLicense implements Cloneable
      *
      * @return String
      */
-    public String getName()
-    {
+    public String getName() {
         return this.name;
     }
 
@@ -152,8 +143,7 @@ public class ProjectLicense implements Cloneable
      *
      * @return String
      */
-    public String getUrl()
-    {
+    public String getUrl() {
         return this.url;
     }
 
@@ -162,8 +152,7 @@ public class ProjectLicense implements Cloneable
      *
      * @return a path or {@code null}
      */
-    public String getFile()
-    {
+    public String getFile() {
         return this.file;
     }
 
@@ -172,8 +161,7 @@ public class ProjectLicense implements Cloneable
      *
      * @param comments
      */
-    public void setComments( String comments )
-    {
+    public void setComments(String comments) {
         this.comments = comments;
     }
 
@@ -191,8 +179,7 @@ public class ProjectLicense implements Cloneable
      *
      * @param distribution
      */
-    public void setDistribution( String distribution )
-    {
+    public void setDistribution(String distribution) {
         this.distribution = distribution;
     }
 
@@ -201,8 +188,7 @@ public class ProjectLicense implements Cloneable
      *
      * @param name
      */
-    public void setName( String name )
-    {
+    public void setName(String name) {
         this.name = name;
     }
 
@@ -211,8 +197,7 @@ public class ProjectLicense implements Cloneable
      *
      * @param url
      */
-    public void setUrl( String url )
-    {
+    public void setUrl(String url) {
         this.url = url;
     }
 
@@ -221,79 +206,50 @@ public class ProjectLicense implements Cloneable
      *
      * @param file the path to set
      */
-    public void setFile( String file )
-    {
+    public void setFile(String file) {
         this.file = file;
     }
 
     @Override
-    public ProjectLicense clone()
-        throws CloneNotSupportedException
-    {
+    public ProjectLicense clone() throws CloneNotSupportedException {
         return (ProjectLicense) super.clone();
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ( ( comments == null ) ? 0 : comments.hashCode() );
-        result = prime * result + ( ( distribution == null ) ? 0 : distribution.hashCode() );
-        result = prime * result + ( ( file == null ) ? 0 : file.hashCode() );
-        result = prime * result + ( ( name == null ) ? 0 : name.hashCode() );
-        result = prime * result + ( ( url == null ) ? 0 : url.hashCode() );
+        result = prime * result + ((comments == null) ? 0 : comments.hashCode());
+        result = prime * result + ((distribution == null) ? 0 : distribution.hashCode());
+        result = prime * result + ((file == null) ? 0 : file.hashCode());
+        result = prime * result + ((name == null) ? 0 : name.hashCode());
+        result = prime * result + ((url == null) ? 0 : url.hashCode());
         return result;
     }
 
     @Override
-    public boolean equals( Object obj )
-    {
+    public boolean equals(Object obj) {
         // CHECKSTYLE_OFF: NeedBraces
-        if ( this == obj )
-            return true;
-        if ( obj == null )
-            return false;
-        if ( getClass() != obj.getClass() )
-            return false;
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (getClass() != obj.getClass()) return false;
         ProjectLicense other = (ProjectLicense) obj;
-        if ( comments == null )
-        {
-            if ( other.comments != null )
-                return false;
-        }
-        else if ( !comments.equals( other.comments ) )
-            return false;
-        if ( distribution == null )
-        {
-            if ( other.distribution != null )
-                return false;
-        }
-        else if ( !distribution.equals( other.distribution ) )
-            return false;
-        if ( file == null )
-        {
-            if ( other.file != null )
-                return false;
-        }
-        else if ( !file.equals( other.file ) )
-            return false;
-        if ( name == null )
-        {
-            if ( other.name != null )
-                return false;
-        }
-        else if ( !name.equals( other.name ) )
-            return false;
-        if ( url == null )
-        {
-            if ( other.url != null )
-                return false;
-        }
-        else if ( !url.equals( other.url ) )
-            return false;
+        if (comments == null) {
+            if (other.comments != null) return false;
+        } else if (!comments.equals(other.comments)) return false;
+        if (distribution == null) {
+            if (other.distribution != null) return false;
+        } else if (!distribution.equals(other.distribution)) return false;
+        if (file == null) {
+            if (other.file != null) return false;
+        } else if (!file.equals(other.file)) return false;
+        if (name == null) {
+            if (other.name != null) return false;
+        } else if (!name.equals(other.name)) return false;
+        if (url == null) {
+            if (other.url != null) return false;
+        } else if (!url.equals(other.url)) return false;
         return true;
         // CHECKSTYLE_ON: NeedBraces
     }
-
 }

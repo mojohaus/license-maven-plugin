@@ -22,12 +22,12 @@ package org.codehaus.mojo.license.model;
  * #L%
  */
 
-import static org.junit.Assert.assertEquals;
-
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.apache.maven.project.MavenProject;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class LicenseMapTest {
     // licenses must be equal
@@ -38,7 +38,7 @@ public class LicenseMapTest {
     private static final String ARTIFACT_ID_FIRST = "artifactId1";
     private static final String ARTIFACT_ID_SECOND = "artifactId2";
 
-    //unit test for #361
+    // unit test for #361
     @Test
     public void licenseMapOrderByName() {
         LicenseMap licenseMap = new LicenseMap();
@@ -48,7 +48,7 @@ public class LicenseMapTest {
         assertEquals(2, orderedMap.get(LICENSE_KEY).size());
     }
 
-    //it's a re-assurance test for default unsorted behavior
+    // it's a re-assurance test for default unsorted behavior
     @Test
     public void licenseMapDefaultState() {
         LicenseMap licenseMap = new LicenseMap();
@@ -59,7 +59,8 @@ public class LicenseMapTest {
 
     private MavenProject projectForArtifact(String projectName, String artifactId1) {
         MavenProject project = new MavenProject();
-        project.setArtifact(new DefaultArtifact("groupId", artifactId1, "1.0.0", "compile", "jar", null, new DefaultArtifactHandler()));
+        project.setArtifact(new DefaultArtifact(
+                "groupId", artifactId1, "1.0.0", "compile", "jar", null, new DefaultArtifactHandler()));
         project.setName(projectName);
         return project;
     }

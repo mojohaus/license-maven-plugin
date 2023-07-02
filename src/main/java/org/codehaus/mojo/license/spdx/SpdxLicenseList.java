@@ -40,20 +40,15 @@ import org.codehaus.mojo.license.spdx.SpdxLicenseList.Attachments.UrlReplacement
  * @author <a href="https://github.com/ppalaga">Peter Palaga</a>
  * @since 1.18
  */
-public class SpdxLicenseList
-{
+public class SpdxLicenseList {
     private static volatile SpdxLicenseList latest;
 
     private static final Object LOCK = new Object();
 
-    public static SpdxLicenseList getLatest()
-    {
-        if ( latest == null )
-        {
-            synchronized ( LOCK )
-            {
-                if ( latest == null )
-                {
+    public static SpdxLicenseList getLatest() {
+        if (latest == null) {
+            synchronized (LOCK) {
+                if (latest == null) {
                     latest = SpdxLicenseListData.createList();
                 }
             }
@@ -69,14 +64,15 @@ public class SpdxLicenseList
 
     private final Attachments attachments;
 
-    public static Builder builder()
-    {
+    public static Builder builder() {
         return new Builder();
     }
 
-    SpdxLicenseList( String licenseListVersion, Map<String, SpdxLicenseInfo> licenses, String releaseDate,
-                            Attachments attachments )
-    {
+    SpdxLicenseList(
+            String licenseListVersion,
+            Map<String, SpdxLicenseInfo> licenses,
+            String releaseDate,
+            Attachments attachments) {
         super();
         this.licenseListVersion = licenseListVersion;
         this.licenses = licenses;
@@ -84,26 +80,22 @@ public class SpdxLicenseList
         this.attachments = attachments;
     }
 
-    public String getLicenseListVersion()
-    {
+    public String getLicenseListVersion() {
         return licenseListVersion;
     }
 
     /**
      * @return an unmodifiable {@link Map} from license IDs to {@link SpdxLicenseInfo}.
      */
-    public Map<String, SpdxLicenseInfo> getLicenses()
-    {
+    public Map<String, SpdxLicenseInfo> getLicenses() {
         return licenses;
     }
 
-    public String getReleaseDate()
-    {
+    public String getReleaseDate() {
         return releaseDate;
     }
 
-    public Attachments getAttachments()
-    {
+    public Attachments getAttachments() {
         return attachments;
     }
 
@@ -111,83 +103,75 @@ public class SpdxLicenseList
      *
      * @since 1.20
      */
-    public static class Attachments
-    {
+    public static class Attachments {
         private final Map<String, ContentSanitizer> contentSanitizers;
         private final Map<String, UrlReplacement> urlReplacements;
 
-        Attachments( Map<String, ContentSanitizer> contentSanitizers, Map<String, UrlReplacement> urlReplacements )
-        {
+        Attachments(Map<String, ContentSanitizer> contentSanitizers, Map<String, UrlReplacement> urlReplacements) {
             super();
             this.contentSanitizers = contentSanitizers;
             this.urlReplacements = urlReplacements;
         }
 
-        public Map<String, ContentSanitizer> getContentSanitizers()
-        {
+        public Map<String, ContentSanitizer> getContentSanitizers() {
             return contentSanitizers;
         }
 
-        public Map<String, UrlReplacement> getUrlReplacements()
-        {
+        public Map<String, UrlReplacement> getUrlReplacements() {
             return urlReplacements;
         }
 
         /**
          * @since 1.20
          */
-        public static class UrlReplacement
-        {
-            public static UrlReplacement compile( String id, String urlPattern, String replacement )
-            {
-                Objects.requireNonNull( id, "id" );
-                Objects.requireNonNull( urlPattern, "urlPattern" );
+        public static class UrlReplacement {
+            public static UrlReplacement compile(String id, String urlPattern, String replacement) {
+                Objects.requireNonNull(id, "id");
+                Objects.requireNonNull(urlPattern, "urlPattern");
                 replacement = replacement == null ? "" : replacement;
-                return new UrlReplacement( id, Pattern.compile( urlPattern, Pattern.CASE_INSENSITIVE ), replacement );
+                return new UrlReplacement(id, Pattern.compile(urlPattern, Pattern.CASE_INSENSITIVE), replacement);
             }
+
             private final String id;
             private final Pattern urlPattern;
             private final String replacement;
-            public UrlReplacement( String id, Pattern urlPattern, String replacement )
-            {
+
+            public UrlReplacement(String id, Pattern urlPattern, String replacement) {
                 super();
                 this.id = id;
                 this.urlPattern = urlPattern;
                 this.replacement = replacement;
             }
-            public String getId()
-            {
+
+            public String getId() {
                 return id;
             }
-            public Pattern getUrlPattern()
-            {
+
+            public Pattern getUrlPattern() {
                 return urlPattern;
             }
-            public String getReplacement()
-            {
+
+            public String getReplacement() {
                 return replacement;
             }
-
         }
 
         /**
          * @since 1.20
          */
-        public static class ContentSanitizer
-        {
-            public static ContentSanitizer compile( String id, String urlPattern, String contentPattern,
-                                                    String contentReplacement )
-            {
-                Objects.requireNonNull( id, "id" );
-                Objects.requireNonNull( urlPattern, "urlPattern" );
-                Objects.requireNonNull( contentPattern, "contentPattern" );
+        public static class ContentSanitizer {
+            public static ContentSanitizer compile(
+                    String id, String urlPattern, String contentPattern, String contentReplacement) {
+                Objects.requireNonNull(id, "id");
+                Objects.requireNonNull(urlPattern, "urlPattern");
+                Objects.requireNonNull(contentPattern, "contentPattern");
                 contentReplacement = contentReplacement == null ? "" : contentReplacement;
-                contentReplacement = StringEscapeUtils.unescapeJava( contentReplacement );
-                return new ContentSanitizer( id,
-                                             Pattern.compile( urlPattern, Pattern.CASE_INSENSITIVE ),
-                                             Pattern.compile( contentPattern,
-                                                              Pattern.CASE_INSENSITIVE ),
-                                             contentReplacement );
+                contentReplacement = StringEscapeUtils.unescapeJava(contentReplacement);
+                return new ContentSanitizer(
+                        id,
+                        Pattern.compile(urlPattern, Pattern.CASE_INSENSITIVE),
+                        Pattern.compile(contentPattern, Pattern.CASE_INSENSITIVE),
+                        contentReplacement);
             }
 
             private final String id;
@@ -195,50 +179,42 @@ public class SpdxLicenseList
             private final Pattern contentPattern;
             private final String contentReplacement;
 
-            public ContentSanitizer( String id, Pattern urlPattern, Pattern contentPattern, String contentReplacement )
-            {
+            public ContentSanitizer(String id, Pattern urlPattern, Pattern contentPattern, String contentReplacement) {
                 super();
-                Objects.requireNonNull( id, "id" );
-                Objects.requireNonNull( urlPattern, "urlPattern" );
-                Objects.requireNonNull( contentPattern, "contentPattern" );
-                Objects.requireNonNull( contentReplacement, "contentReplacement" );
+                Objects.requireNonNull(id, "id");
+                Objects.requireNonNull(urlPattern, "urlPattern");
+                Objects.requireNonNull(contentPattern, "contentPattern");
+                Objects.requireNonNull(contentReplacement, "contentReplacement");
                 this.id = id;
                 this.urlPattern = urlPattern;
                 this.contentPattern = contentPattern;
                 this.contentReplacement = contentReplacement;
             }
 
-            public boolean applies( String url )
-            {
-                return urlPattern.matcher( url ).matches();
+            public boolean applies(String url) {
+                return urlPattern.matcher(url).matches();
             }
 
-            public String sanitize( String content )
-            {
-                if ( content == null )
-                {
+            public String sanitize(String content) {
+                if (content == null) {
                     return null;
                 }
-                return contentPattern.matcher( content ).replaceAll( contentReplacement );
+                return contentPattern.matcher(content).replaceAll(contentReplacement);
             }
 
-            public String getId()
-            {
+            public String getId() {
                 return id;
             }
 
-            public Pattern getUrlPattern()
-            {
+            public Pattern getUrlPattern() {
                 return urlPattern;
             }
 
-            public Pattern getContentPattern()
-            {
+            public Pattern getContentPattern() {
                 return contentPattern;
             }
 
-            public String getContentReplacement()
-            {
+            public String getContentReplacement() {
                 return contentReplacement;
             }
         }
@@ -249,8 +225,7 @@ public class SpdxLicenseList
      *
      * @since 1.18
      */
-    public static class Builder
-    {
+    public static class Builder {
         private String licenseListVersion;
 
         private String releaseDate;
@@ -260,56 +235,49 @@ public class SpdxLicenseList
         private Map<String, ContentSanitizer> contentSanitizers = new TreeMap<>();
         private Map<String, UrlReplacement> urlReplacements = new TreeMap<>();
 
-        public SpdxLicenseList build()
-        {
-            Objects.requireNonNull( licenseListVersion, "isDeprecatedLicenseId" );
-            Objects.requireNonNull( releaseDate, "detailsUrl" );
-            if ( licenses.isEmpty() )
-            {
-                throw new IllegalStateException( "licenses cannot be empty" );
+        public SpdxLicenseList build() {
+            Objects.requireNonNull(licenseListVersion, "isDeprecatedLicenseId");
+            Objects.requireNonNull(releaseDate, "detailsUrl");
+            if (licenses.isEmpty()) {
+                throw new IllegalStateException("licenses cannot be empty");
             }
-            final Map<String, SpdxLicenseInfo> lics = Collections.unmodifiableMap( licenses );
+            final Map<String, SpdxLicenseInfo> lics = Collections.unmodifiableMap(licenses);
             this.licenses = null;
 
-            final Map<String, ContentSanitizer> sanitizers = Collections.unmodifiableMap( contentSanitizers );
+            final Map<String, ContentSanitizer> sanitizers = Collections.unmodifiableMap(contentSanitizers);
             this.contentSanitizers = null;
 
-            final Map<String, UrlReplacement> replacements = Collections.unmodifiableMap( urlReplacements );
+            final Map<String, UrlReplacement> replacements = Collections.unmodifiableMap(urlReplacements);
             this.urlReplacements = null;
 
-            return new SpdxLicenseList( licenseListVersion, lics, releaseDate,
-                                        new Attachments( sanitizers, replacements ) );
+            return new SpdxLicenseList(
+                    licenseListVersion, lics, releaseDate, new Attachments(sanitizers, replacements));
         }
 
-        public Builder licenseListVersion( String licenseListVersion )
-        {
+        public Builder licenseListVersion(String licenseListVersion) {
             this.licenseListVersion = licenseListVersion;
             return this;
         }
 
-        public Builder releaseDate( String releaseDate )
-        {
+        public Builder releaseDate(String releaseDate) {
             this.releaseDate = releaseDate;
             return this;
         }
 
-        public Builder license( SpdxLicenseInfo license )
-        {
-            this.licenses.put( license.getLicenseId(), license );
+        public Builder license(SpdxLicenseInfo license) {
+            this.licenses.put(license.getLicenseId(), license);
             return this;
         }
 
-        public Builder contentSanitizer( String id, String urlPattern, String contentPattern,
-                                         String contentReplacement )
-        {
-            this.contentSanitizers.put( id, ContentSanitizer.compile( id, urlPattern, contentPattern,
-                                                                      contentReplacement ) );
+        public Builder contentSanitizer(
+                String id, String urlPattern, String contentPattern, String contentReplacement) {
+            this.contentSanitizers.put(
+                    id, ContentSanitizer.compile(id, urlPattern, contentPattern, contentReplacement));
             return this;
         }
 
-        public Builder urlReplacement( String id, String urlPattern, String replacement )
-        {
-            this.urlReplacements.put( id, UrlReplacement.compile( id, urlPattern, replacement ) );
+        public Builder urlReplacement(String id, String urlPattern, String replacement) {
+            this.urlReplacements.put(id, UrlReplacement.compile(id, urlPattern, replacement));
             return this;
         }
     }

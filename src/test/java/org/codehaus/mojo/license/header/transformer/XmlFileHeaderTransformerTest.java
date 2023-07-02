@@ -33,8 +33,7 @@ import org.junit.Test;
  * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
-public class XmlFileHeaderTransformerTest
-{
+public class XmlFileHeaderTransformerTest {
 
     protected XmlFileHeaderTransformer transformer;
 
@@ -43,29 +42,25 @@ public class XmlFileHeaderTransformerTest
     private static final String HEADER = "header";
 
     @Before
-    public void setUp()
-    {
+    public void setUp() {
         transformer = new XmlFileHeaderTransformer();
     }
 
     @After
-    public void tearDown()
-    {
+    public void tearDown() {
         transformer = null;
     }
 
     @Test
-    public void testAddHeaderWithNoProlog()
-    {
+    public void testAddHeaderWithNoProlog() {
         String header = HEADER;
         String content = CONTENT;
-        String result = transformer.addHeader( header, content );
-        Assert.assertEquals( header + content, result );
+        String result = transformer.addHeader(header, content);
+        Assert.assertEquals(header + content, result);
     }
 
-      @Test
-      public void testAddHeaderWithProlog()
-      {
+    @Test
+    public void testAddHeaderWithProlog() {
         String header = HEADER;
         String prolog = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
         String content = prolog + CONTENT;
@@ -76,5 +71,5 @@ public class XmlFileHeaderTransformerTest
         content = "  " + prolog + CONTENT;
         result = transformer.addHeader(header, content);
         Assert.assertEquals("  " + prolog + FileHeaderTransformer.LINE_SEPARATOR + header + CONTENT, result);
-      }
+    }
 }

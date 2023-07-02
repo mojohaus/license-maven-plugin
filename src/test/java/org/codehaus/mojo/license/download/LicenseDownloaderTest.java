@@ -27,20 +27,17 @@ import java.io.File;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class LicenseDownloaderTest
-{
+public class LicenseDownloaderTest {
 
     @Test
     public void updateFileExtension() {
-        assertExtension( "path/to/file.html", "path/to/file.php", "text/html" );
-        assertExtension( "path/to/file.txt", "path/to/file", null );
+        assertExtension("path/to/file.html", "path/to/file.php", "text/html");
+        assertExtension("path/to/file.txt", "path/to/file", null);
     }
 
-    private static void assertExtension( String expected, String input, String mimeType )
-    {
-        final File in = new File( input );
-        final File result = LicenseDownloader.updateFileExtension( in, mimeType );
-        Assert.assertEquals( expected, result.getPath().replace( '\\', '/' ) );
+    private static void assertExtension(String expected, String input, String mimeType) {
+        final File in = new File(input);
+        final File result = LicenseDownloader.updateFileExtension(in, mimeType);
+        Assert.assertEquals(expected, result.getPath().replace('\\', '/'));
     }
-
 }

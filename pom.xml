@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
   #%L
   License Maven Plugin
@@ -21,7 +20,6 @@
   <http://www.gnu.org/licenses/lgpl-3.0.html>.
   #L%
 -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
@@ -52,11 +50,11 @@
     <developer>
       <name>Tony Chemit</name>
       <email>dev@tchemit.fr</email>
+      <organization>Ultreia.io</organization>
+      <organizationUrl>https://www.ultreia.io</organizationUrl>
       <roles>
         <role>Lead Developer</role>
       </roles>
-      <organization>Ultreia.io</organization>
-      <organizationUrl>https://www.ultreia.io</organizationUrl>
       <timezone>Europe/Paris</timezone>
     </developer>
     <developer>
@@ -94,8 +92,8 @@
   <scm>
     <connection>scm:git:https://github.com/mojohaus/license-maven-plugin.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/mojohaus/license-maven-plugin.git</developerConnection>
-    <url>https://github.com/mojohaus/license-maven-plugin/tree/master</url>
     <tag>HEAD</tag>
+    <url>https://github.com/mojohaus/license-maven-plugin/tree/master</url>
   </scm>
 
   <issueManagement>
@@ -339,6 +337,13 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <!-- TODO enable with spotless -->
+          <skip>true</skip>
+          <headerLocation>config/checkstyle-header.txt</headerLocation>
+          <excludes>**/HelpMojo.java,**/SpdxLicenseListData.java</excludes>
+          <!-- these are generated -->
+        </configuration>
         <executions>
           <execution>
             <id>checkstyle-check</id>
@@ -348,23 +353,10 @@
             <phase>verify</phase>
           </execution>
         </executions>
-        <configuration>
-          <!-- TODO enable with spotless -->
-          <skip>true</skip>
-          <headerLocation>config/checkstyle-header.txt</headerLocation>
-          <excludes>**/HelpMojo.java,**/SpdxLicenseListData.java</excludes><!-- these are generated -->
-        </configuration>
       </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>animal-sniffer-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>check</goal>
-            </goals>
-          </execution>
-        </executions>
         <configuration>
           <signature>
             <groupId>org.codehaus.mojo.signature</groupId>
@@ -372,6 +364,13 @@
             <version>1.0</version>
           </signature>
         </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>org.eclipse.sisu</groupId>
@@ -381,6 +380,13 @@
       <plugin>
         <groupId>org.codehaus.gmaven</groupId>
         <artifactId>groovy-maven-plugin</artifactId>
+        <dependencies>
+          <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>${version.httpcomponents.httpclient}</version>
+          </dependency>
+        </dependencies>
         <executions>
           <execution>
             <!-- Not bound to any phase. Invoke manually using -->
@@ -395,13 +401,6 @@
             </configuration>
           </execution>
         </executions>
-        <dependencies>
-          <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>${version.httpcomponents.httpclient}</version>
-          </dependency>
-        </dependencies>
       </plugin>
 
     </plugins>
@@ -427,10 +426,10 @@
             <executions>
               <execution>
                 <id>attach-artifacts</id>
-                <phase>package</phase>
                 <goals>
                   <goal>attach-artifact</goal>
                 </goals>
+                <phase>package</phase>
                 <configuration>
                   <artifacts>
                     <artifact>
@@ -447,6 +446,13 @@
           <plugin>
             <groupId>org.codehaus.gmaven</groupId>
             <artifactId>groovy-maven-plugin</artifactId>
+            <dependencies>
+              <dependency>
+                <groupId>org.littleshoot</groupId>
+                <artifactId>littleproxy</artifactId>
+                <version>1.1.2</version>
+              </dependency>
+            </dependencies>
             <executions>
               <execution>
                 <id>LittleProxyStart</id>
@@ -469,13 +475,6 @@
                 </configuration>
               </execution>
             </executions>
-            <dependencies>
-              <dependency>
-                <groupId>org.littleshoot</groupId>
-                <artifactId>littleproxy</artifactId>
-                <version>1.1.2</version>
-              </dependency>
-            </dependencies>
           </plugin>
           <plugin>
             <artifactId>maven-invoker-plugin</artifactId>
@@ -555,6 +554,7 @@
               <settingsFile>src/it/settings.xml</settingsFile>
               <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
             </configuration>
+            <dependencies />
             <executions>
               <execution>
                 <id>one-integration-test</id>
@@ -570,9 +570,6 @@
                 </configuration>
               </execution>
             </executions>
-            <dependencies>
-
-            </dependencies>
           </plugin>
         </plugins>
       </build>

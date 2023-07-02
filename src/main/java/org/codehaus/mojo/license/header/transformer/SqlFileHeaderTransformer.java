@@ -33,23 +33,19 @@ import javax.inject.Singleton;
  */
 @Named("sql")
 @Singleton
-public class SqlFileHeaderTransformer
-    extends AbstractFileHeaderTransformer
-{
+public class SqlFileHeaderTransformer extends AbstractFileHeaderTransformer {
 
     /**
      * Default constructor.
      */
-    public SqlFileHeaderTransformer()
-    {
-        super( "sql", "header transformer with sql comment style", "---", "---", "-- " );
+    public SqlFileHeaderTransformer() {
+        super("sql", "header transformer with sql comment style", "---", "---", "-- ");
     }
 
     /**
      * {@inheritDoc}
      */
-    public String[] getDefaultAcceptedExtensions()
-    {
-        return new String[]{ "sql" };
+    public String[] getDefaultAcceptedExtensions() {
+        return new String[] {"sql"};
     }
 }

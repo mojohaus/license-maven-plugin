@@ -27,12 +27,10 @@ package org.codehaus.mojo.license.spdx;
  * <a href="https://raw.githubusercontent.com/spdx/license-list-data/v3.5/json/licenses.json">
  * https://raw.githubusercontent.com/spdx/license-list-data/v3.5/json/licenses.json</a>
  */
-public class SpdxLicenseListDataTest
-{
+public class SpdxLicenseListDataTest {
     @org.junit.Test
-    public void getInstance()
-    {
+    public void getInstance() {
         SpdxLicenseList list = SpdxLicenseList.getLatest();
-        org.junit.Assert.assertEquals( 388, list.getLicenses().size() );
+        org.junit.Assert.assertEquals(388, list.getLicenses().size());
     }
 }

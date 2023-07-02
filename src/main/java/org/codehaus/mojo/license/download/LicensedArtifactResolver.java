@@ -57,15 +57,14 @@ import org.slf4j.LoggerFactory;
  */
 @Named
 @Singleton
-public class LicensedArtifactResolver
-{
-    private static final Logger LOG = LoggerFactory.getLogger( LicensedArtifactResolver.class );
+public class LicensedArtifactResolver {
+    private static final Logger LOG = LoggerFactory.getLogger(LicensedArtifactResolver.class);
 
     /**
      * Message used when an invalid expression pattern is found.
      */
     public static final String INVALID_PATTERN_MESSAGE =
-        "The pattern specified by expression <%s> seems to be invalid.";
+            "The pattern specified by expression <%s> seems to be invalid.";
 
     /**
      * Project builder.
@@ -85,11 +84,11 @@ public class LicensedArtifactResolver
      * @param remoteRepositories remote repositories used to resolv dependencies
      * @see MavenProjectDependenciesConfigurator
      */
-    public void loadProjectDependencies( ResolvedProjectDependencies artifacts,
-                                                                  MavenProjectDependenciesConfigurator configuration,
-                                                                  List<ArtifactRepository> remoteRepositories,
-                                                                  Map<String, LicensedArtifact> result )
-    {
+    public void loadProjectDependencies(
+            ResolvedProjectDependencies artifacts,
+            MavenProjectDependenciesConfigurator configuration,
+            List<ArtifactRepository> remoteRepositories,
+            Map<String, LicensedArtifact> result) {
 
         final ArtifactFilters artifactFilters = configuration.getArtifactFilters();
 
@@ -97,13 +96,10 @@ public class LicensedArtifactResolver
 
         final Set<Artifact> depArtifacts;
 
-        if ( configuration.isIncludeTransitiveDependencies() )
-        {
+        if (configuration.isIncludeTransitiveDependencies()) {
             // All project dependencies
             depArtifacts = artifacts.getAllDependencies();
-        }
-        else
-        {
+        } else {
             // Only direct project dependencies
             depArtifacts = artifacts.getDirectDependencies();
         }
@@ -113,114 +109,94 @@ public class LicensedArtifactResolver
         final Map<String, Artifact> excludeArtifacts = new HashMap<>();
         final Map<String, Artifact> includeArtifacts = new HashMap<>();
 
-        ProjectBuildingRequest projectBuildingRequest
-                = new DefaultProjectBuildingRequest( mavenSessionProvider.get().getProjectBuildingRequest() )
-                        .setRemoteRepositories( remoteRepositories )
-                        .setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL )
-                        .setResolveDependencies( false )
-                        .setProcessPlugins( false );
+        ProjectBuildingRequest projectBuildingRequest = new DefaultProjectBuildingRequest(
+                        mavenSessionProvider.get().getProjectBuildingRequest())
+                .setRemoteRepositories(remoteRepositories)
+                .setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL)
+                .setResolveDependencies(false)
+                .setProcessPlugins(false);
 
-        for ( Artifact artifact : depArtifacts )
-        {
+        for (Artifact artifact : depArtifacts) {
 
-            excludeArtifacts.put( artifact.getId(), artifact );
+            excludeArtifacts.put(artifact.getId(), artifact);
 
-            if ( DefaultThirdPartyTool.LICENSE_DB_TYPE.equals( artifact.getType() ) )
-            {
+            if (DefaultThirdPartyTool.LICENSE_DB_TYPE.equals(artifact.getType())) {
                 // the special dependencies for license databases don't count.
                 // Note that this will still see transitive deps of a license db; so using the build helper inside of
                 // another project to make them will be noisy.
                 continue;
             }
 
-            if ( !artifactFilters.isIncluded( artifact ) )
-            {
-                LOG.debug( "Excluding artifact {}", artifact );
+            if (!artifactFilters.isIncluded(artifact)) {
+                LOG.debug("Excluding artifact {}", artifact);
                 continue;
             }
 
             final String id = artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getVersion();
 
-            if ( verbose )
-            {
-                LOG.info( "detected artifact {}", id );
+            if (verbose) {
+                LOG.info("detected artifact {}", id);
             }
 
             LicensedArtifact depMavenProject;
 
             // try to get project from cache
-            depMavenProject = result.get( id );
+            depMavenProject = result.get(id);
 
-            if ( depMavenProject != null )
-            {
-                LOG.debug( "Dependency [{}] already present in the result", id );
-            }
-            else
-            {
+            if (depMavenProject != null) {
+                LOG.debug("Dependency [{}] already present in the result", id);
+            } else {
                 // build project
-                final Builder laBuilder =
-                    LicensedArtifact.builder( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion() );
-                try
-                {
+                final Builder laBuilder = LicensedArtifact.builder(
+                        artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion());
+                try {
                     final MavenProject project = mavenProjectBuilder
-                            .build( artifact, true, projectBuildingRequest )
+                            .build(artifact, true, projectBuildingRequest)
                             .getProject();
                     List<org.apache.maven.model.License> lics = project.getLicenses();
-                    if ( lics != null )
-                    {
-                        for ( org.apache.maven.model.License lic : lics )
-                        {
-                            laBuilder.license( new License( lic.getName(), lic.getUrl(), lic.getDistribution(),
-                                                            lic.getComments() ) );
+                    if (lics != null) {
+                        for (org.apache.maven.model.License lic : lics) {
+                            laBuilder.license(
+                                    new License(lic.getName(), lic.getUrl(), lic.getDistribution(), lic.getComments()));
                         }
                     }
-                }
-                catch ( ProjectBuildingException e )
-                {
-                    laBuilder.errorMessage( "Could not create effective POM for '" + id + "': "
-                        + e.getClass().getSimpleName() + ": " + e.getMessage() );
+                } catch (ProjectBuildingException e) {
+                    laBuilder.errorMessage("Could not create effective POM for '" + id + "': "
+                            + e.getClass().getSimpleName() + ": " + e.getMessage());
                 }
 
                 depMavenProject = laBuilder.build();
 
-                if ( verbose )
-                {
-                    LOG.info( "add dependency [{}]", id );
+                if (verbose) {
+                    LOG.info("add dependency [{}]", id);
                 }
 
-                result.put( id, depMavenProject );
+                result.put(id, depMavenProject);
             }
 
-
-            excludeArtifacts.remove( artifact.getId() );
-            includeArtifacts.put( artifact.getId(), artifact );
+            excludeArtifacts.remove(artifact.getId());
+            includeArtifacts.put(artifact.getId(), artifact);
         }
 
         // exclude artifacts from the result that contain excluded artifacts in the dependency trail
-        if ( excludeTransitiveDependencies )
-        {
-            for ( Map.Entry<String, Artifact> entry : includeArtifacts.entrySet() )
-            {
+        if (excludeTransitiveDependencies) {
+            for (Map.Entry<String, Artifact> entry : includeArtifacts.entrySet()) {
                 List<String> dependencyTrail = entry.getValue().getDependencyTrail();
 
                 boolean remove = false;
 
-                for ( int i = 1; i < dependencyTrail.size() - 1; i++ )
-                {
-                    if ( excludeArtifacts.containsKey( dependencyTrail.get( i ) ) )
-                    {
+                for (int i = 1; i < dependencyTrail.size() - 1; i++) {
+                    if (excludeArtifacts.containsKey(dependencyTrail.get(i))) {
                         remove = true;
                         break;
                     }
                 }
 
-                if ( remove )
-                {
-                    result.remove( entry.getKey() );
+                if (remove) {
+                    result.remove(entry.getKey());
                 }
             }
         }
-
     }
     // CHECKSTYLE_ON: MethodLength
 }

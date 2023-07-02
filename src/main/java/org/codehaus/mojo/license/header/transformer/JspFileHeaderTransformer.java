@@ -33,24 +33,19 @@ import javax.inject.Singleton;
  */
 @Named("jsp")
 @Singleton
-public class JspFileHeaderTransformer
-    extends AbstractFileHeaderTransformer
-{
+public class JspFileHeaderTransformer extends AbstractFileHeaderTransformer {
 
     /**
      * Default constructor.
      */
-    public JspFileHeaderTransformer()
-    {
-        super( "jsp", "header transformer with jsp comment style", "<%--", "  --%>", "  " );
+    public JspFileHeaderTransformer() {
+        super("jsp", "header transformer with jsp comment style", "<%--", "  --%>", "  ");
     }
 
     /**
      * {@inheritDoc}
      */
-    public String[] getDefaultAcceptedExtensions()
-    {
-        return new String[]{ "jsp", "jspx" };
+    public String[] getDefaultAcceptedExtensions() {
+        return new String[] {"jsp", "jspx"};
     }
-
 }
