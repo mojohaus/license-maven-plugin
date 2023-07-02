@@ -22,6 +22,10 @@ package org.codehaus.mojo.license;
  * #L%
  */
 
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -29,10 +33,6 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.mojo.license.api.ResolvedProjectDependencies;
 import org.codehaus.mojo.license.download.LicensedArtifact;
-
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * Download the license files of all aggregated dependencies of the current project, and generate a summary file
@@ -56,11 +56,12 @@ import java.util.TreeMap;
  * @author Tony Chemit - dev@tchemit.fr
  * @since 1.10
  */
-@Mojo( name = "aggregate-download-licenses", requiresDependencyResolution = ResolutionScope.TEST,
-    defaultPhase = LifecyclePhase.PACKAGE, aggregator = true )
-public class AggregateDownloadLicensesMojo
-    extends AbstractDownloadLicensesMojo
-{
+@Mojo(
+        name = "aggregate-download-licenses",
+        requiresDependencyResolution = ResolutionScope.TEST,
+        defaultPhase = LifecyclePhase.PACKAGE,
+        aggregator = true)
+public class AggregateDownloadLicensesMojo extends AbstractDownloadLicensesMojo {
 
     // ----------------------------------------------------------------------
     // Mojo Parameters
@@ -71,7 +72,7 @@ public class AggregateDownloadLicensesMojo
      *
      * @since 1.10
      */
-    @Parameter( property = "license.skipAggregateDownloadLicenses", defaultValue = "false" )
+    @Parameter(property = "license.skipAggregateDownloadLicenses", defaultValue = "false")
     private boolean skipAggregateDownloadLicenses;
 
     /**
@@ -81,8 +82,10 @@ public class AggregateDownloadLicensesMojo
      *
      * @since 1.10
      */
-    @Parameter( property = "license.executeOnlyOnRootModule",
-            alias = "aggregateDownloadLicenses.executeOnlyOnRootModule", defaultValue = "true" )
+    @Parameter(
+            property = "license.executeOnlyOnRootModule",
+            alias = "aggregateDownloadLicenses.executeOnlyOnRootModule",
+            defaultValue = "true")
     private boolean executeOnlyOnRootModule;
 
     /**
@@ -90,7 +93,7 @@ public class AggregateDownloadLicensesMojo
      *
      * @since 1.10
      */
-    @Parameter( property = "reactorProjects", readonly = true, required = true )
+    @Parameter(property = "reactorProjects", readonly = true, required = true)
     private List<MavenProject> reactorProjects;
 
     // ----------------------------------------------------------------------
@@ -100,23 +103,23 @@ public class AggregateDownloadLicensesMojo
     /**
      * {@inheritDoc}
      */
-    protected boolean isSkip()
-    {
-        return skipAggregateDownloadLicenses || ( executeOnlyOnRootModule && !getProject().isExecutionRoot() );
+    protected boolean isSkip() {
+        return skipAggregateDownloadLicenses
+                || (executeOnlyOnRootModule && !getProject().isExecutionRoot());
     }
 
     /**
      * {@inheritDoc}
      */
-    protected Map<String, LicensedArtifact> getDependencies()
-    {
+    protected Map<String, LicensedArtifact> getDependencies() {
         final Map<String, LicensedArtifact> result = new TreeMap<>();
 
-        for ( MavenProject p : reactorProjects )
-        {
-            licensedArtifactResolver.loadProjectDependencies( new ResolvedProjectDependencies( p.getArtifacts(),
-                                                                                       p.getDependencyArtifacts() ),
-                                                      this, remoteRepositories, result );
+        for (MavenProject p : reactorProjects) {
+            licensedArtifactResolver.loadProjectDependencies(
+                    new ResolvedProjectDependencies(p.getArtifacts(), p.getDependencyArtifacts()),
+                    this,
+                    remoteRepositories,
+                    result);
         }
         return result;
     }

@@ -26,8 +26,7 @@ package org.codehaus.mojo.license.download;
  * @author <a href="https://github.com/ppalaga">Peter Palaga</a>
  * @since 1.20
  */
-public class License
-{
+public class License {
 
     /**
      * The full legal name of the license.
@@ -55,8 +54,7 @@ public class License
      */
     private final String comments;
 
-    public License( String name, String url, String distribution, String comments )
-    {
+    public License(String name, String url, String distribution, String comments) {
         super();
         this.name = name;
         this.url = url;
@@ -64,24 +62,19 @@ public class License
         this.comments = comments;
     }
 
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
-    public String getUrl()
-    {
+    public String getUrl() {
         return url;
     }
 
-    public String getDistribution()
-    {
+    public String getDistribution() {
         return distribution;
     }
 
-    public String getComments()
-    {
+    public String getComments() {
         return comments;
     }
-
 }

@@ -31,9 +31,8 @@ import org.apache.maven.plugins.annotations.Parameter;
  * @author tchemit dev@tchemit.fr
  * @since 1.2
  */
-@Mojo( name = "check-file-header", threadSafe = true )
-public class CheckFileHeaderMojo extends AbstractFileHeaderMojo
-{
+@Mojo(name = "check-file-header", threadSafe = true)
+public class CheckFileHeaderMojo extends AbstractFileHeaderMojo {
 
     // ----------------------------------------------------------------------
     // Mojo Parameters
@@ -44,7 +43,7 @@ public class CheckFileHeaderMojo extends AbstractFileHeaderMojo
      *
      * @since 1.2
      */
-    @Parameter( property = "license.failOnMissingHeader", defaultValue = "false" )
+    @Parameter(property = "license.failOnMissingHeader", defaultValue = "false")
     private boolean failOnMissingHeader;
 
     /**
@@ -52,7 +51,7 @@ public class CheckFileHeaderMojo extends AbstractFileHeaderMojo
      *
      * @since 1.2
      */
-    @Parameter( property = "license.failOnNotUptodateHeader", defaultValue = "false" )
+    @Parameter(property = "license.failOnNotUptodateHeader", defaultValue = "false")
     private boolean failOnNotUptodateHeader;
 
     /**
@@ -60,7 +59,7 @@ public class CheckFileHeaderMojo extends AbstractFileHeaderMojo
      *
      * @since 1.2
      */
-    @Parameter( property = "license.skipCheckLicense", defaultValue = "false" )
+    @Parameter(property = "license.skipCheckLicense", defaultValue = "false")
     private boolean skipCheckLicense;
 
     // ----------------------------------------------------------------------
@@ -68,8 +67,7 @@ public class CheckFileHeaderMojo extends AbstractFileHeaderMojo
     // ----------------------------------------------------------------------
 
     @Override
-    public boolean isSkip()
-    {
+    public boolean isSkip() {
         return skipCheckLicense;
     }
 
@@ -78,21 +76,18 @@ public class CheckFileHeaderMojo extends AbstractFileHeaderMojo
     // ----------------------------------------------------------------------
 
     @Override
-    protected boolean isDryRun()
-    {
+    protected boolean isDryRun() {
         // this mojo should never update any files.
         return true;
     }
 
     @Override
-    protected boolean isFailOnMissingHeader()
-    {
+    protected boolean isFailOnMissingHeader() {
         return failOnMissingHeader;
     }
 
     @Override
-    protected boolean isFailOnNotUptodateHeader()
-    {
+    protected boolean isFailOnNotUptodateHeader() {
         return failOnNotUptodateHeader;
     }
 }

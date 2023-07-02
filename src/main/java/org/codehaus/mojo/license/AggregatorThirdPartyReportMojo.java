@@ -22,6 +22,11 @@ package org.codehaus.mojo.license;
  * #L%
  */
 
+import java.io.IOException;
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.List;
+
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -36,11 +41,6 @@ import org.codehaus.mojo.license.api.DependenciesToolException;
 import org.codehaus.mojo.license.api.ThirdPartyDetails;
 import org.codehaus.mojo.license.api.ThirdPartyToolException;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.List;
-
 /**
  * Generates a report of all third-parties detected in the module.
  *
@@ -49,10 +49,8 @@ import java.util.List;
  * @author Tony Chemit - dev@tchemit.fr
  * @since 1.10
  */
-@Mojo( name = "aggregate-third-party-report", aggregator = true, requiresDependencyResolution = ResolutionScope.TEST )
-public class AggregatorThirdPartyReportMojo
-    extends AbstractThirdPartyReportMojo
-{
+@Mojo(name = "aggregate-third-party-report", aggregator = true, requiresDependencyResolution = ResolutionScope.TEST)
+public class AggregatorThirdPartyReportMojo extends AbstractThirdPartyReportMojo {
 
     // ----------------------------------------------------------------------
     // Mojo Parameters
@@ -63,7 +61,7 @@ public class AggregatorThirdPartyReportMojo
      *
      * @since 1.10
      */
-    @Parameter( property = "license.skipAggregateThirdPartyReport", defaultValue = "false" )
+    @Parameter(property = "license.skipAggregateThirdPartyReport", defaultValue = "false")
     private boolean skipAggregateThirdPartyReport;
 
     /**
@@ -73,8 +71,10 @@ public class AggregatorThirdPartyReportMojo
      *
      * @since 1.10
      */
-    @Parameter( property = "license.executeOnlyOnRootModule",
-            alias = "aggregateThirdPartyReport.executeOnlyOnRootModule", defaultValue = "true" )
+    @Parameter(
+            property = "license.executeOnlyOnRootModule",
+            alias = "aggregateThirdPartyReport.executeOnlyOnRootModule",
+            defaultValue = "true")
     private boolean executeOnlyOnRootModule;
 
     /**
@@ -82,7 +82,7 @@ public class AggregatorThirdPartyReportMojo
      *
      * @since 1.10
      */
-    @Parameter( property = "reactorProjects", readonly = true, required = true )
+    @Parameter(property = "reactorProjects", readonly = true, required = true)
     private List<MavenProject> reactorProjects;
 
     // ----------------------------------------------------------------------
@@ -92,8 +92,7 @@ public class AggregatorThirdPartyReportMojo
     /**
      * {@inheritDoc}
      */
-    public String getOutputName()
-    {
+    public String getOutputName() {
         return "aggregate-third-party-report";
     }
 
@@ -101,9 +100,9 @@ public class AggregatorThirdPartyReportMojo
      * {@inheritDoc}
      */
     @Override
-    public boolean canGenerateReport()
-    {
-        return !skipAggregateThirdPartyReport && ( !executeOnlyOnRootModule || getProject().isExecutionRoot() );
+    public boolean canGenerateReport() {
+        return !skipAggregateThirdPartyReport
+                && (!executeOnlyOnRootModule || getProject().isExecutionRoot());
     }
 
     // ----------------------------------------------------------------------
@@ -114,22 +113,18 @@ public class AggregatorThirdPartyReportMojo
      * {@inheritDoc}
      */
     protected Collection<ThirdPartyDetails> createThirdPartyDetails()
-      throws IOException, ThirdPartyToolException, ProjectBuildingException, MojoFailureException,
-             InvalidDependencyVersionException, ArtifactNotFoundException, ArtifactResolutionException,
-             DependenciesToolException, MojoExecutionException
-    {
+            throws IOException, ThirdPartyToolException, ProjectBuildingException, MojoFailureException,
+                    InvalidDependencyVersionException, ArtifactNotFoundException, ArtifactResolutionException,
+                    DependenciesToolException, MojoExecutionException {
 
         Collection<ThirdPartyDetails> details = new LinkedHashSet<>();
 
-        for ( MavenProject reactorProject : reactorProjects )
-        {
+        for (MavenProject reactorProject : reactorProjects) {
 
-            Collection<ThirdPartyDetails> thirdPartyDetails = createThirdPartyDetails( reactorProject, true );
-            details.addAll( thirdPartyDetails );
-
+            Collection<ThirdPartyDetails> thirdPartyDetails = createThirdPartyDetails(reactorProject, true);
+            details.addAll(thirdPartyDetails);
         }
 
         return details;
     }
-
 }

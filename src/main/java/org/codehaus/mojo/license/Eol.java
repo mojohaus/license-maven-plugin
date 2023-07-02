@@ -32,21 +32,18 @@ import java.nio.file.Path;
  *
  * @since 1.17
  */
-public enum Eol
-{
+public enum Eol {
     /** Unix {@code \n} */
-    LF( "\n" ),
+    LF("\n"),
 
     /** Windows {@code \r\n} */
-    CRLF ( "\r\n" ),
+    CRLF("\r\n"),
 
     /** Autodetect the end of line value based on some existing file using {@link #autodetect(Path, Charset)} */
-    AUTODETECT ( null )
-    {
-        public String getEolString()
-        {
-            throw new IllegalStateException( "You need to autodetect the end of line value using "
-                    + Eol.class.getName() + ".autodetect(Path, Charset)" );
+    AUTODETECT(null) {
+        public String getEolString() {
+            throw new IllegalStateException("You need to autodetect the end of line value using " + Eol.class.getName()
+                    + ".autodetect(Path, Charset)");
         }
     },
 
@@ -57,29 +54,24 @@ public enum Eol
      * makes your build irreproducible on other platforms.
      */
     @Deprecated
-    PLATFORM ( null )
-    {
-        public String getEolString()
-        {
-            return System.getProperty( "line.separator" );
+    PLATFORM(null) {
+        public String getEolString() {
+            return System.getProperty("line.separator");
         }
     };
 
-    public static Eol autodetect( Path file, Charset charset ) throws IOException
-    {
-        final String content = new String( Files.readAllBytes( file ), charset );
-        return content.indexOf( '\r' ) >= 0 ? Eol.CRLF : Eol.LF;
+    public static Eol autodetect(Path file, Charset charset) throws IOException {
+        final String content = new String(Files.readAllBytes(file), charset);
+        return content.indexOf('\r') >= 0 ? Eol.CRLF : Eol.LF;
     }
 
     private final String eolString;
 
-    Eol( String eolString )
-    {
+    Eol(String eolString) {
         this.eolString = eolString;
     }
 
-    public String getEolString()
-    {
+    public String getEolString() {
         return eolString;
     }
 }

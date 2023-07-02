@@ -34,24 +34,19 @@ import javax.inject.Singleton;
  */
 @Named("php")
 @Singleton
-public class PhpFileHeaderTransformer
-    extends AbstractFileHeaderTransformer
-{
+public class PhpFileHeaderTransformer extends AbstractFileHeaderTransformer {
 
     /**
      * Default constructor.
      */
-    public PhpFileHeaderTransformer()
-    {
-        super( "php", "header transformer with php comment style", "<?php /*", " */ ?>", " * " );
+    public PhpFileHeaderTransformer() {
+        super("php", "header transformer with php comment style", "<?php /*", " */ ?>", " * ");
     }
 
     /**
      * {@inheritDoc}
      */
-    public String[] getDefaultAcceptedExtensions()
-    {
-        return new String[]{ "php" };
+    public String[] getDefaultAcceptedExtensions() {
+        return new String[] {"php"};
     }
-
 }

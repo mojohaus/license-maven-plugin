@@ -36,24 +36,19 @@ import javax.inject.Singleton;
  */
 @Named("mysql")
 @Singleton
-public class MySqlFileHeaderTransformer
-    extends AbstractFileHeaderTransformer
-{
+public class MySqlFileHeaderTransformer extends AbstractFileHeaderTransformer {
 
     /**
      * Default constructor.
      */
-    public MySqlFileHeaderTransformer()
-    {
-        super( "mysql", "header transformer with mysql comment style", "-- -", "-- -", "-- " );
+    public MySqlFileHeaderTransformer() {
+        super("mysql", "header transformer with mysql comment style", "-- -", "-- -", "-- ");
     }
 
     /**
      * {@inheritDoc}
      */
-    public String[] getDefaultAcceptedExtensions()
-    {
-        return new String[]{ "mysql" };
+    public String[] getDefaultAcceptedExtensions() {
+        return new String[] {"mysql"};
     }
 }
-

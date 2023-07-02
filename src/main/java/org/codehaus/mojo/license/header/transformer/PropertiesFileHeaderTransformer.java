@@ -33,64 +33,54 @@ import javax.inject.Singleton;
  */
 @Named("properties")
 @Singleton
-public class PropertiesFileHeaderTransformer
-    extends AbstractFileHeaderTransformer
-{
+public class PropertiesFileHeaderTransformer extends AbstractFileHeaderTransformer {
 
     /**
      * Default constructor.
      */
-    public PropertiesFileHeaderTransformer()
-    {
-        super( "properties", "header transformer with properties file comment style", "###", "###", "# " );
+    public PropertiesFileHeaderTransformer() {
+        super("properties", "header transformer with properties file comment style", "###", "###", "# ");
     }
 
     /**
      * {@inheritDoc}
      */
-    public String[] getDefaultAcceptedExtensions()
-    {
-        return new String[]{ "properties", "sh", "py", "rb", "pl", "pm" };
+    public String[] getDefaultAcceptedExtensions() {
+        return new String[] {"properties", "sh", "py", "rb", "pl", "pm"};
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public String addHeader( String header, String content )
-    {
+    public String addHeader(String header, String content) {
 
         String result;
 
         String prolog = null;
-        int startProlog = content.indexOf( "#!" );
-        if ( startProlog > -1 )
-        {
+        int startProlog = content.indexOf("#!");
+        if (startProlog > -1) {
 
             // shebang was detected
 
-            int endProlog = content.indexOf( '\n', startProlog );
+            int endProlog = content.indexOf('\n', startProlog);
 
-            if ( endProlog > -1 )
-            {
+            if (endProlog > -1) {
 
                 // prolog end was detected
-                prolog = content.substring( 0, endProlog + 1 );
+                prolog = content.substring(0, endProlog + 1);
             }
         }
 
-        if ( prolog == null )
-        {
+        if (prolog == null) {
 
             // no shebang detected
-            result = super.addHeader( header, content );
-        }
-        else
-        {
+            result = super.addHeader(header, content);
+        } else {
 
             // shebang detected
-            content = content.substring( prolog.length() );
-            result = super.addHeader( prolog + getLineSeparator() + header, content );
+            content = content.substring(prolog.length());
+            result = super.addHeader(prolog + getLineSeparator() + header, content);
         }
         return result;
     }

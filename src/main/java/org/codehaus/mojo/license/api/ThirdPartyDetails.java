@@ -28,8 +28,7 @@ package org.codehaus.mojo.license.api;
  * @author tchemit dev@tchemit.fr
  * @since 1.1
  */
-public interface ThirdPartyDetails
-{
+public interface ThirdPartyDetails {
 
     /**
      * @return the groupId of the dependency
@@ -86,7 +85,7 @@ public interface ThirdPartyDetails
      *
      * @param pomLicenses licenses loaded from the pom file
      */
-    void setPomLicenses( String[] pomLicenses );
+    void setPomLicenses(String[] pomLicenses);
 
     /**
      * @return the licenses defined in the third-party file.
@@ -98,7 +97,7 @@ public interface ThirdPartyDetails
      *
      * @param thirdPartyLicenses licenses loaded from the third-party file
      */
-    void setThirdPartyLicenses( String[] thirdPartyLicenses );
+    void setThirdPartyLicenses(String[] thirdPartyLicenses);
 
     /**
      * @return {@code true} if the project has his licenses defined in the third-party file.

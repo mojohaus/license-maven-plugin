@@ -30,6 +30,7 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
@@ -40,14 +41,12 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.maven.plugin.MojoExecutionException;
 
-
 /**
  * This class should be used to load the content from a URL.
  * <p>
  * Supported URL protocols are those standards plus classpath protocol.
  */
-public class UrlRequester
-{
+public class UrlRequester {
 
     public static final String CLASSPATH_PROTOCOL = "classpath";
 
@@ -57,23 +56,17 @@ public class UrlRequester
      * @param data the license string or a URL
      * @return true if URL, false else
      */
-    public static boolean isStringUrl( String data )
-    {
-        if ( StringUtils.isBlank( data ) )
-        {
+    public static boolean isStringUrl(String data) {
+        if (StringUtils.isBlank(data)) {
             return false;
         }
-        if ( data.startsWith( CLASSPATH_PROTOCOL + ':' ) )
-        {
+        if (data.startsWith(CLASSPATH_PROTOCOL + ':')) {
             return true;
         }
-        try
-        {
-            new URL( data );
+        try {
+            new URL(data);
             return true;
-        }
-        catch ( MalformedURLException e )
-        {
+        } catch (MalformedURLException e) {
             return false;
         }
     }
@@ -84,10 +77,9 @@ public class UrlRequester
      * @param url the URL as a string
      * @return true if URL use external protocol
      */
-    public static boolean isExternalUrl( String url )
-    {
-        String protocol = findProtocol( url );
-        return "http".equals( protocol ) || "https".equals( protocol ) || CLASSPATH_PROTOCOL.equals( protocol );
+    public static boolean isExternalUrl(String url) {
+        String protocol = findProtocol(url);
+        return "http".equals(protocol) || "https".equals(protocol) || CLASSPATH_PROTOCOL.equals(protocol);
     }
 
     /**
@@ -97,9 +89,8 @@ public class UrlRequester
      * @return the string representation of the resource at the given URL
      * @throws IOException If an I/O error occurs when retrieve of the content URL
      */
-    public static String getFromUrl( String url ) throws IOException
-    {
-        return getFromUrl( url, "UTF-8" );
+    public static String getFromUrl(String url) throws IOException {
+        return getFromUrl(url, "UTF-8");
     }
 
     /**
@@ -110,10 +101,9 @@ public class UrlRequester
      * @param url the URL as a string.
      * @return the protocol from the URL.
      */
-    public static String findProtocol( String url )
-    {
+    public static String findProtocol(String url) {
         // Here could not be used the URL parser because classpath does not have a registered Handler
-        return StringUtils.substringBefore( url, ":" ).toLowerCase();
+        return StringUtils.substringBefore(url, ":").toLowerCase();
     }
 
     /**
@@ -124,61 +114,46 @@ public class UrlRequester
      * @return the string representation of the resource at the given URL
      * @throws IOException If an I/O error occurs when retrieve of the content URL
      */
-    public static String getFromUrl( String url, String encoding ) throws IOException
-    {
-        String protocol = findProtocol( url );
-        Charset charset = Charset.forName( encoding );
+    public static String getFromUrl(String url, String encoding) throws IOException {
+        String protocol = findProtocol(url);
+        Charset charset = Charset.forName(encoding);
 
         String result = null;
-        if ( CLASSPATH_PROTOCOL.equals( protocol ) )
-        {
+        if (CLASSPATH_PROTOCOL.equals(protocol)) {
             ClassLoader classLoader = UrlRequester.class.getClassLoader();
 
-            String resource = url.substring( CLASSPATH_PROTOCOL.length() + 1 );
-            URL resourceUrl = classLoader.getResource( resource );
-            if ( resourceUrl != null )
-            {
-                result = IOUtils.toString( resourceUrl, charset );
+            String resource = url.substring(CLASSPATH_PROTOCOL.length() + 1);
+            URL resourceUrl = classLoader.getResource(resource);
+            if (resourceUrl != null) {
+                result = IOUtils.toString(resourceUrl, charset);
+            } else {
+                throw new IOException("The resource " + resource + " was not found in the maven plugin classpath");
             }
-            else
-            {
-                throw new IOException( "The resource " + resource
-                        + " was not found in the maven plugin classpath" );
-            }
-        }
-        else if ( "http".equals( protocol ) || "https".equals( protocol ) )
-        {
-            try ( CloseableHttpClient httpClient = HttpClientBuilder.create().build() )
-            {
-                HttpGet get = new HttpGet( url );
-                try ( CloseableHttpResponse response = httpClient.execute( get ) )
-                {
+        } else if ("http".equals(protocol) || "https".equals(protocol)) {
+            try (CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
+                HttpGet get = new HttpGet(url);
+                try (CloseableHttpResponse response = httpClient.execute(get)) {
                     int responseCode = response.getStatusLine().getStatusCode();
                     // CHECKSTYLE_OFF: MagicNumber
-                    if ( responseCode >= 200 && responseCode < 300 )
+                    if (responseCode >= 200 && responseCode < 300)
                     // CHECKSTYLE_ON: MagicNumber
                     {
                         // server has response and there might be a not empty payload
                         HttpEntity entity = response.getEntity();
-                        ContentType contentType = ContentType.get( entity );
-                        if ( contentType != null )
-                        {
+                        ContentType contentType = ContentType.get(entity);
+                        if (contentType != null) {
                             charset = contentType.getCharset();
                         }
 
-                        result = IOUtils.toString( entity.getContent(),  charset );
-                    }
-                    else
-                    {
-                        throw new IOException( "For the URL (" + url + ") the server responded with "
-                                + response.getStatusLine() );
+                        result = IOUtils.toString(entity.getContent(), charset);
+                    } else {
+                        throw new IOException(
+                                "For the URL (" + url + ") the server responded with " + response.getStatusLine());
                     }
                 }
             }
-        }
-        else
-        {
-            result = IOUtils.toString( new URL( url ).openStream(), charset );
+        } else {
+            result = IOUtils.toString(new URL(url).openStream(), charset);
         }
         return result;
     }
@@ -195,37 +170,26 @@ public class UrlRequester
      * @param url the URL to the external resource
      * @return a new list with all license entries from the remote resource
      */
-    public static List<String> downloadList( String url ) throws MojoExecutionException
-    {
+    public static List<String> downloadList(String url) throws MojoExecutionException {
         List<String> list = new ArrayList<>();
         BufferedReader bufferedReader = null;
-        try
-        {
-            bufferedReader = new BufferedReader( new CharArrayReader( getFromUrl( url ).toCharArray() ) );
+        try {
+            bufferedReader =
+                    new BufferedReader(new CharArrayReader(getFromUrl(url).toCharArray()));
             String line;
-            while ( ( line = bufferedReader.readLine() ) != null )
-            {
-                if ( StringUtils.isNotBlank( line ) && !StringUtils.startsWith( line, "#" ) && !list.contains( line ) )
-                {
-                    list.add( line );
+            while ((line = bufferedReader.readLine()) != null) {
+                if (StringUtils.isNotBlank(line) && !StringUtils.startsWith(line, "#") && !list.contains(line)) {
+                    list.add(line);
                 }
             }
-        }
-        catch ( IOException e )
-        {
-            throw new MojoExecutionException( "Could not open connection to URL: " + url, e );
-        }
-        finally
-        {
-            if ( bufferedReader != null )
-            {
-                try
-                {
+        } catch (IOException e) {
+            throw new MojoExecutionException("Could not open connection to URL: " + url, e);
+        } finally {
+            if (bufferedReader != null) {
+                try {
                     bufferedReader.close();
-                }
-                catch ( IOException e )
-                {
-                    throw new MojoExecutionException( e.getMessage(), e );
+                } catch (IOException e) {
+                    throw new MojoExecutionException(e.getMessage(), e);
                 }
             }
         }

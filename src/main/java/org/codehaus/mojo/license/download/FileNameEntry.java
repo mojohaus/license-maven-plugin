@@ -31,10 +31,8 @@ import java.io.File;
  * @author <a href="https://github.com/ppalaga">Peter Palaga</a>
  * @since 1.18
  */
-public class FileNameEntry
-{
-    public FileNameEntry( File file, boolean preferred, String sha1 )
-    {
+public class FileNameEntry {
+    public FileNameEntry(File file, boolean preferred, String sha1) {
         super();
         this.file = file;
         this.preferred = preferred;
@@ -47,18 +45,15 @@ public class FileNameEntry
 
     private final String sha1;
 
-    public File getFile()
-    {
+    public File getFile() {
         return file;
     }
 
-    public boolean isPreferred()
-    {
+    public boolean isPreferred() {
         return preferred;
     }
 
-    public String getSha1()
-    {
+    public String getSha1() {
         return sha1;
     }
 }

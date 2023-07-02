@@ -33,64 +33,53 @@ import javax.inject.Singleton;
  */
 @Named("xml")
 @Singleton
-public class XmlFileHeaderTransformer
-    extends AbstractFileHeaderTransformer
-{
+public class XmlFileHeaderTransformer extends AbstractFileHeaderTransformer {
 
     /**
      * Default constructor.
      */
-    public XmlFileHeaderTransformer()
-    {
-        super( "xml", "header transformer with xml comment style", "<!--", "  -->", "  " );
+    public XmlFileHeaderTransformer() {
+        super("xml", "header transformer with xml comment style", "<!--", "  -->", "  ");
     }
 
     /**
      * {@inheritDoc}
      */
-    public String[] getDefaultAcceptedExtensions()
-    {
-        return new String[]{ "pom", "xml", "mxlm", "dtd", "fml", "xsl", "jaxx", "kml", "gsp",
-            "tml", "svg" };
+    public String[] getDefaultAcceptedExtensions() {
+        return new String[] {"pom", "xml", "mxlm", "dtd", "fml", "xsl", "jaxx", "kml", "gsp", "tml", "svg"};
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public String addHeader( String header, String content )
-    {
+    public String addHeader(String header, String content) {
 
         String result;
 
         String prolog = null;
-        int startProlog = content.indexOf( "<?xml" );
-        if ( startProlog > -1 )
-        {
+        int startProlog = content.indexOf("<?xml");
+        if (startProlog > -1) {
 
             // prolog start was detected
-            int endProlog = content.indexOf( "?>", startProlog );
+            int endProlog = content.indexOf("?>", startProlog);
 
-            if ( endProlog > -1 )
-            {
+            if (endProlog > -1) {
 
                 // prolog end was detected
-                prolog = content.substring( 0, endProlog + 2 );
+                prolog = content.substring(0, endProlog + 2);
             }
         }
 
-        if ( prolog == null )
-        {
+        if (prolog == null) {
 
             // no prolog detected
-            result = super.addHeader( header, content );
-        }
-        else
-        {
+            result = super.addHeader(header, content);
+        } else {
 
             // prolog detected
-            content = content.substring( prolog.length() );
-            result = super.addHeader( prolog + LINE_SEPARATOR + header, content );
+            content = content.substring(prolog.length());
+            result = super.addHeader(prolog + LINE_SEPARATOR + header, content);
         }
         return result;
     }

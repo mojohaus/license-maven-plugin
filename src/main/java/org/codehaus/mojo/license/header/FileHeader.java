@@ -40,8 +40,7 @@ import org.codehaus.mojo.license.model.Copyright;
  * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
-public class FileHeader
-{
+public class FileHeader {
 
     /**
      * Description of the project or module to add in header.
@@ -62,16 +61,14 @@ public class FileHeader
      * @return the project name, or nay other common informations for all
      * files of a project (or module)
      */
-    public String getDescription()
-    {
+    public String getDescription() {
         return description;
     }
 
     /**
      * @return the copyright model.
      */
-    public Copyright getCopyright()
-    {
+    public Copyright getCopyright() {
         return copyright;
     }
 
@@ -79,23 +76,19 @@ public class FileHeader
      * @return the license content (this is not the fully license content,
      * but just a per file license resume)
      */
-    public String getLicense()
-    {
+    public String getLicense() {
         return license;
     }
 
-    public void setCopyright( Copyright copyright )
-    {
+    public void setCopyright(Copyright copyright) {
         this.copyright = copyright;
     }
 
-    public void setDescription( String description )
-    {
+    public void setDescription(String description) {
         this.description = description;
     }
 
-    public void setLicense( String license )
-    {
+    public void setLicense(String license) {
         this.license = license;
     }
 }

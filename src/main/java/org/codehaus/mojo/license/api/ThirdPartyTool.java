@@ -22,13 +22,6 @@ package org.codehaus.mojo.license.api;
  * #L%
  */
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.model.License;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.project.MavenProject;
-import org.codehaus.mojo.license.model.LicenseMap;
-import org.codehaus.mojo.license.utils.SortedProperties;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
@@ -36,6 +29,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
+
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.model.License;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.project.MavenProject;
+import org.codehaus.mojo.license.model.LicenseMap;
+import org.codehaus.mojo.license.utils.SortedProperties;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.transfer.ArtifactNotFoundException;
@@ -48,8 +48,7 @@ import org.eclipse.aether.transfer.ArtifactNotFoundException;
  * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
-public interface ThirdPartyTool
-{
+public interface ThirdPartyTool {
 
     /**
      * Plexus Role.
@@ -70,7 +69,7 @@ public interface ThirdPartyTool
      * @param verbose new verbose mode to set
      * @since 1.4
      */
-    void setVerbose( boolean verbose );
+    void setVerbose(boolean verbose);
 
     /**
      * Collect license information from property file, 'third-party' classified artifacts, and .license.properties
@@ -86,11 +85,13 @@ public interface ThirdPartyTool
      * @throws ThirdPartyToolException if any
      * @throws IOException             if any
      */
-    SortedProperties loadThirdPartyDescriptorsForUnsafeMapping( Set<Artifact> dependencies, String encoding,
-                                                                Collection<MavenProject> projects,
-                                                                SortedSet<MavenProject> unsafeProjects,
-                                                                LicenseMap licenseMap,
-                                                                List<RemoteRepository> remoteRepositories )
+    SortedProperties loadThirdPartyDescriptorsForUnsafeMapping(
+            Set<Artifact> dependencies,
+            String encoding,
+            Collection<MavenProject> projects,
+            SortedSet<MavenProject> unsafeProjects,
+            LicenseMap licenseMap,
+            List<RemoteRepository> remoteRepositories)
             throws ThirdPartyToolException, IOException;
 
     /**
@@ -101,7 +102,7 @@ public interface ThirdPartyTool
      * @param project the project on which to attch the third-party file
      * @param file    the third-party file to attach.
      */
-    void attachThirdPartyDescriptor( MavenProject project, File file );
+    void attachThirdPartyDescriptor(MavenProject project, File file);
 
     /**
      * Obtain the third party file from the repository.
@@ -113,11 +114,11 @@ public interface ThirdPartyTool
      * @return the locale file resolved into the local repository
      * @throws ThirdPartyToolException if any
      */
-    File resolvThirdPartyDescriptor( MavenProject project, List<RemoteRepository> remoteRepositories )
+    File resolvThirdPartyDescriptor(MavenProject project, List<RemoteRepository> remoteRepositories)
             throws ThirdPartyToolException;
 
-    File resolveMissingLicensesDescriptor( String groupId, String artifactId, String version,
-                                     List<RemoteRepository> remoteRepositories )
+    File resolveMissingLicensesDescriptor(
+            String groupId, String artifactId, String version, List<RemoteRepository> remoteRepositories)
             throws IOException, ArtifactResolutionException, ArtifactNotFoundException;
 
     /**
@@ -127,7 +128,7 @@ public interface ThirdPartyTool
      * @param doLog      a flag to add debug logs
      * @return the set of projects with no license
      */
-    SortedSet<MavenProject> getProjectsWithNoLicense( LicenseMap licenseMap );
+    SortedSet<MavenProject> getProjectsWithNoLicense(LicenseMap licenseMap);
 
     /**
      * Loads unsafe mapping and returns it.
@@ -141,8 +142,12 @@ public interface ThirdPartyTool
      * @return the unsafe mapping
      * @throws IOException if pb while reading missing file
      */
-    SortedProperties loadUnsafeMapping( LicenseMap licenseMap, SortedMap<String, MavenProject> artifactCache,
-                                        String encoding, File missingFile, String missingFileUrl )
+    SortedProperties loadUnsafeMapping(
+            LicenseMap licenseMap,
+            SortedMap<String, MavenProject> artifactCache,
+            String encoding,
+            File missingFile,
+            String missingFileUrl)
             throws IOException, MojoExecutionException;
 
     /**
@@ -155,8 +160,9 @@ public interface ThirdPartyTool
      *                      hoster
      * @throws IOException if pb while reading override file
      */
-    void overrideLicenses( LicenseMap licenseMap, SortedMap<String, MavenProject> artifactCache, String encoding,
-            String overrideUrl ) throws IOException;
+    void overrideLicenses(
+            LicenseMap licenseMap, SortedMap<String, MavenProject> artifactCache, String encoding, String overrideUrl)
+            throws IOException;
 
     /**
      * Add one or more licenses (name and url are {@code licenseNames}) to the given {@code licenseMap} for the given
@@ -166,7 +172,7 @@ public interface ThirdPartyTool
      * @param project      the project
      * @param licenseNames the names of the licenses
      */
-    void addLicense( LicenseMap licenseMap, MavenProject project, String... licenseNames );
+    void addLicense(LicenseMap licenseMap, MavenProject project, String... licenseNames);
 
     /**
      * Add a given {@code license} to the given {@code licenseMap} for the given {@code project}.
@@ -175,7 +181,7 @@ public interface ThirdPartyTool
      * @param project    the project
      * @param license    the license to add
      */
-    void addLicense( LicenseMap licenseMap, MavenProject project, License license );
+    void addLicense(LicenseMap licenseMap, MavenProject project, License license);
 
     /**
      * Add a given {@code licenses} to the given {@code licenseMap} for the given {@code project}.
@@ -184,7 +190,7 @@ public interface ThirdPartyTool
      * @param project    the project
      * @param licenses   the licenses to add
      */
-    void addLicense( LicenseMap licenseMap, MavenProject project, List<?> licenses );
+    void addLicense(LicenseMap licenseMap, MavenProject project, List<?> licenses);
 
     /**
      * For a given {@code licenseMap}, merge all {@code licenses}.
@@ -196,7 +202,7 @@ public interface ThirdPartyTool
      * @param mainLicense     the main license to keep
      * @param licensesToMerge all the licenses to merge
      */
-    void mergeLicenses( LicenseMap licenseMap, String mainLicense, Set<String> licensesToMerge );
+    void mergeLicenses(LicenseMap licenseMap, String mainLicense, Set<String> licensesToMerge);
 
     /**
      * Write the content of the third-party file.
@@ -208,8 +214,8 @@ public interface ThirdPartyTool
      * @param template       the location of the freemarker template used to generate the file content
      * @throws IOException if any probem while writing file
      */
-    void writeThirdPartyFile( LicenseMap licenseMap, File thirdPartyFile, boolean verbose, String encoding,
-                              String template )
+    void writeThirdPartyFile(
+            LicenseMap licenseMap, File thirdPartyFile, boolean verbose, String encoding, String template)
             throws IOException;
 
     /**
@@ -220,6 +226,6 @@ public interface ThirdPartyTool
      * @param bundleThirdPartyPath relative end path of the file to generate
      * @throws IOException if any problem while writing file
      */
-    void writeBundleThirdPartyFile( File thirdPartyFile, File outputDirectory, String bundleThirdPartyPath )
+    void writeBundleThirdPartyFile(File thirdPartyFile, File outputDirectory, String bundleThirdPartyPath)
             throws IOException;
 }

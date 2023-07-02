@@ -22,16 +22,6 @@ package org.codehaus.mojo.license.api;
  * #L%
  */
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.ProjectBuildingException;
-import org.codehaus.mojo.license.model.LicenseMap;
-import org.codehaus.mojo.license.utils.SortedProperties;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -45,6 +35,16 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.ProjectBuildingException;
+import org.codehaus.mojo.license.model.LicenseMap;
+import org.codehaus.mojo.license.utils.SortedProperties;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,10 +55,8 @@ import org.slf4j.LoggerFactory;
  * @author tchemit dev@tchemit.fr
  * @since 1.1
  */
-public class DefaultThirdPartyHelper
-        implements ThirdPartyHelper
-{
-    private static final Logger LOG = LoggerFactory.getLogger( DefaultThirdPartyHelper.class );
+public class DefaultThirdPartyHelper implements ThirdPartyHelper {
+    private static final Logger LOG = LoggerFactory.getLogger(DefaultThirdPartyHelper.class);
 
     /**
      * DependenciesTool to load dependencies.
@@ -119,11 +117,14 @@ public class DefaultThirdPartyHelper
      * @param remoteRepositories maven remote repositories
      */
     // CHECKSTYLE_OFF: ParameterNumber
-    public DefaultThirdPartyHelper( MavenProject project, String encoding, boolean verbose,
-                                    DependenciesTool dependenciesTool, ThirdPartyTool thirdPartyTool,
-                                    List<ArtifactRepository> remoteRepositoriesCoreApi,
-                                    List<RemoteRepository> remoteRepositories )
-    {
+    public DefaultThirdPartyHelper(
+            MavenProject project,
+            String encoding,
+            boolean verbose,
+            DependenciesTool dependenciesTool,
+            ThirdPartyTool thirdPartyTool,
+            List<ArtifactRepository> remoteRepositoriesCoreApi,
+            List<RemoteRepository> remoteRepositories) {
         // CHECKSTYLE_ON: ParameterNumber
         this.project = project;
         this.encoding = encoding;
@@ -132,21 +133,17 @@ public class DefaultThirdPartyHelper
         this.thirdPartyTool = thirdPartyTool;
         this.remoteRepositoriesCoreApi = remoteRepositoriesCoreApi;
         this.remoteRepositories = remoteRepositories;
-        this.thirdPartyTool.setVerbose( verbose );
+        this.thirdPartyTool.setVerbose(verbose);
     }
 
     /**
      * {@inheritDoc}
      */
-    public SortedMap<String, MavenProject> getArtifactCache()
-    {
-        if ( artifactCache == null )
-        {
-            synchronized ( ARTIFACT_CACHE_MUTEX )
-            {
-                if ( artifactCache == null )
-                {
-                    artifactCache = Collections.synchronizedSortedMap( new TreeMap<String, MavenProject>() );
+    public SortedMap<String, MavenProject> getArtifactCache() {
+        if (artifactCache == null) {
+            synchronized (ARTIFACT_CACHE_MUTEX) {
+                if (artifactCache == null) {
+                    artifactCache = Collections.synchronizedSortedMap(new TreeMap<String, MavenProject>());
                 }
             }
         }
@@ -156,50 +153,47 @@ public class DefaultThirdPartyHelper
     /**
      * {@inheritDoc}
      */
-    public SortedMap<String, MavenProject> loadDependencies( MavenProjectDependenciesConfigurator configuration,
-                                                             ResolvedProjectDependencies dependencyArtifacts )
-    {
-        return dependenciesTool.loadProjectDependencies( dependencyArtifacts, configuration,
-                remoteRepositoriesCoreApi, getArtifactCache() );
+    public SortedMap<String, MavenProject> loadDependencies(
+            MavenProjectDependenciesConfigurator configuration, ResolvedProjectDependencies dependencyArtifacts) {
+        return dependenciesTool.loadProjectDependencies(
+                dependencyArtifacts, configuration, remoteRepositoriesCoreApi, getArtifactCache());
     }
 
     /**
      * {@inheritDoc}
      */
-    public SortedProperties loadThirdPartyDescriptorForUnsafeMapping( Set<Artifact> topLevelDependencies,
-                                                                      SortedSet<MavenProject> unsafeDependencies,
-                                                                      Collection<MavenProject> projects,
-                                                                      LicenseMap licenseMap )
-            throws ThirdPartyToolException, IOException
-    {
-        return thirdPartyTool.loadThirdPartyDescriptorsForUnsafeMapping( topLevelDependencies, encoding, projects,
-                unsafeDependencies, licenseMap, remoteRepositories );
+    public SortedProperties loadThirdPartyDescriptorForUnsafeMapping(
+            Set<Artifact> topLevelDependencies,
+            SortedSet<MavenProject> unsafeDependencies,
+            Collection<MavenProject> projects,
+            LicenseMap licenseMap)
+            throws ThirdPartyToolException, IOException {
+        return thirdPartyTool.loadThirdPartyDescriptorsForUnsafeMapping(
+                topLevelDependencies, encoding, projects, unsafeDependencies, licenseMap, remoteRepositories);
     }
 
     /**
      * {@inheritDoc}
      */
-    public SortedProperties loadUnsafeMapping( LicenseMap licenseMap, File missingFile, String missingFileUrl,
-                                               SortedMap<String, MavenProject> projectDependencies )
-      throws IOException, MojoExecutionException
-    {
-        return thirdPartyTool.loadUnsafeMapping( licenseMap, projectDependencies, encoding, missingFile,
-                missingFileUrl );
+    public SortedProperties loadUnsafeMapping(
+            LicenseMap licenseMap,
+            File missingFile,
+            String missingFileUrl,
+            SortedMap<String, MavenProject> projectDependencies)
+            throws IOException, MojoExecutionException {
+        return thirdPartyTool.loadUnsafeMapping(licenseMap, projectDependencies, encoding, missingFile, missingFileUrl);
     }
 
     /**
      * {@inheritDoc}
      */
-    public LicenseMap createLicenseMap( SortedMap<String, MavenProject> dependencies )
-    {
+    public LicenseMap createLicenseMap(SortedMap<String, MavenProject> dependencies) {
 
         LicenseMap licenseMap = new LicenseMap();
 
-        synchronized ( dependencies )
-        {
-            for ( MavenProject project : dependencies.values() )
-            {
-                thirdPartyTool.addLicense( licenseMap, project, project.getLicenses() );
+        synchronized (dependencies) {
+            for (MavenProject project : dependencies.values()) {
+                thirdPartyTool.addLicense(licenseMap, project, project.getLicenses());
             }
         }
         return licenseMap;
@@ -208,64 +202,57 @@ public class DefaultThirdPartyHelper
     /**
      * {@inheritDoc}
      */
-    public void attachThirdPartyDescriptor( File file )
-    {
+    public void attachThirdPartyDescriptor(File file) {
 
-        thirdPartyTool.attachThirdPartyDescriptor( project, file );
-    }
-
-
-    /**
-     * {@inheritDoc}
-     */
-    public SortedSet<MavenProject> getProjectsWithNoLicense( LicenseMap licenseMap )
-    {
-        return thirdPartyTool.getProjectsWithNoLicense( licenseMap );
+        thirdPartyTool.attachThirdPartyDescriptor(project, file);
     }
 
     /**
      * {@inheritDoc}
      */
-    public SortedProperties createUnsafeMapping( LicenseMap licenseMap, File missingFile, String missingFileUrl,
-                                                 boolean useRepositoryMissingFiles,
-                                                 SortedSet<MavenProject> unsafeDependencies,
-                                                 SortedMap<String, MavenProject> projectDependencies,
-                                                 Set<Artifact> dependencyArtifacts )
-      throws ProjectBuildingException, IOException, ThirdPartyToolException, MojoExecutionException
-    {
+    public SortedSet<MavenProject> getProjectsWithNoLicense(LicenseMap licenseMap) {
+        return thirdPartyTool.getProjectsWithNoLicense(licenseMap);
+    }
 
-        SortedProperties unsafeMappings = loadUnsafeMapping( licenseMap, missingFile, missingFileUrl,
-                                                             projectDependencies );
+    /**
+     * {@inheritDoc}
+     */
+    public SortedProperties createUnsafeMapping(
+            LicenseMap licenseMap,
+            File missingFile,
+            String missingFileUrl,
+            boolean useRepositoryMissingFiles,
+            SortedSet<MavenProject> unsafeDependencies,
+            SortedMap<String, MavenProject> projectDependencies,
+            Set<Artifact> dependencyArtifacts)
+            throws ProjectBuildingException, IOException, ThirdPartyToolException, MojoExecutionException {
 
-        if ( CollectionUtils.isNotEmpty( unsafeDependencies ) )
-        {
+        SortedProperties unsafeMappings =
+                loadUnsafeMapping(licenseMap, missingFile, missingFileUrl, projectDependencies);
+
+        if (CollectionUtils.isNotEmpty(unsafeDependencies)) {
 
             // there is some unresolved license
 
-            if ( useRepositoryMissingFiles )
-            {
+            if (useRepositoryMissingFiles) {
 
                 // try to load missing third party files from dependencies
 
                 Collection<MavenProject> projects;
-                synchronized ( projectDependencies )
-                {
-                    projects = new ArrayList<>( projectDependencies.values() );
+                synchronized (projectDependencies) {
+                    projects = new ArrayList<>(projectDependencies.values());
                 }
-                projects.remove( project );
-                projects.removeAll( unsafeDependencies );
+                projects.remove(project);
+                projects.removeAll(unsafeDependencies);
 
-                SortedProperties resolvedUnsafeMapping =
-                        loadThirdPartyDescriptorForUnsafeMapping( dependencyArtifacts, unsafeDependencies, projects,
-                                                                  licenseMap );
+                SortedProperties resolvedUnsafeMapping = loadThirdPartyDescriptorForUnsafeMapping(
+                        dependencyArtifacts, unsafeDependencies, projects, licenseMap);
 
                 // push back resolved unsafe mappings (only for project dependencies)
-                for ( Object coord : resolvedUnsafeMapping.keySet() )
-                {
+                for (Object coord : resolvedUnsafeMapping.keySet()) {
                     String s = (String) coord;
-                    if ( projectDependencies.containsKey( s ) )
-                    {
-                        unsafeMappings.put( s, resolvedUnsafeMapping.get( s ) );
+                    if (projectDependencies.containsKey(s)) {
+                        unsafeMappings.put(s, resolvedUnsafeMapping.get(s));
                     }
                 }
             }
@@ -277,83 +264,70 @@ public class DefaultThirdPartyHelper
     /**
      * {@inheritDoc}
      */
-    public void mergeLicenses( List<String> licenseMerges, LicenseMap licenseMap )
-            throws MojoFailureException
-    {
+    public void mergeLicenses(List<String> licenseMerges, LicenseMap licenseMap) throws MojoFailureException {
 
         Set<String> licenseFound = new HashSet<>();
 
-        if ( !CollectionUtils.isEmpty( licenseMerges ) )
-        {
+        if (!CollectionUtils.isEmpty(licenseMerges)) {
 
             // check where is not multi licenses merged main licenses (see MLICENSE-23)
             Map<String, Set<String>> mergedLicenses = new HashMap<>();
 
-            for ( String merge : licenseMerges )
-            {
+            for (String merge : licenseMerges) {
                 merge = merge.trim();
-                String[] split = merge.split( "\\s*\\|\\s*" );
+                String[] split = merge.split("\\s*\\|\\s*");
 
                 String mainLicense = split[0];
 
                 Set<String> mergeList;
 
-                if ( mergedLicenses.containsKey( mainLicense ) )
-                {
+                if (mergedLicenses.containsKey(mainLicense)) {
 
-                    mergeList = mergedLicenses.get( mainLicense );
-                }
-                else
-                {
+                    mergeList = mergedLicenses.get(mainLicense);
+                } else {
                     mergeList = new HashSet<>();
                 }
 
-                for ( int i = 0; i < split.length; i++ )
-                {
+                for (int i = 0; i < split.length; i++) {
                     String licenseToAdd = split[i];
-                    if ( i == 0 )
-                    {
+                    if (i == 0) {
                         // mainLicense will not be merged (to itself)
                         continue;
                     }
 
                     // check license not already described to be merged
-                    if ( mergeList.contains( licenseToAdd ) || licenseFound.contains( licenseToAdd )
-                            || mainLicense.equals( licenseToAdd ) )
-                    {
+                    if (mergeList.contains(licenseToAdd)
+                            || licenseFound.contains(licenseToAdd)
+                            || mainLicense.equals(licenseToAdd)) {
 
                         // this license to merge was already described, fail the build...
 
-                        throw new MojoFailureException(
-                                "The license " + licenseToAdd + " was already registered in the "
-                                        + "configuration, please use only one such entry as described in the example "
-                                        + "http://mojohaus.org/license-maven-plugin/examples/"
-                                        + "example-thirdparty.html#Merge_licenses" );
+                        throw new MojoFailureException("The license " + licenseToAdd + " was already registered in the "
+                                + "configuration, please use only one such entry as described in the example "
+                                + "http://mojohaus.org/license-maven-plugin/examples/"
+                                + "example-thirdparty.html#Merge_licenses");
                     }
 
                     // can add this license for merge
-                    mergeList.add( licenseToAdd );
-                    licenseFound.add( licenseToAdd );
+                    mergeList.add(licenseToAdd);
+                    licenseFound.add(licenseToAdd);
                 }
 
                 // push back licenses to merge for this main license
-                mergedLicenses.put( mainLicense, mergeList );
+                mergedLicenses.put(mainLicense, mergeList);
             }
 
             // merge licenses in license map
 
-            for ( Map.Entry<String, Set<String>> entry : mergedLicenses.entrySet() )
-            {
+            for (Map.Entry<String, Set<String>> entry : mergedLicenses.entrySet()) {
                 String mainLicense = entry.getKey();
                 Set<String> mergedLicense = entry.getValue();
-                if ( verbose )
-                {
-                    LOG.info( "Will merge to '{}', licenses: {}", mainLicense, mergedLicense );
+                if (verbose) {
+                    LOG.info("Will merge to '{}', licenses: {}", mainLicense, mergedLicense);
                 }
 
-                thirdPartyTool.mergeLicenses( licenseMap, mainLicense, mergedLicense );
+                thirdPartyTool.mergeLicenses(licenseMap, mainLicense, mergedLicense);
             }
         }
     }
-
 }

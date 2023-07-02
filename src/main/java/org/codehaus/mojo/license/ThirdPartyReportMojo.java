@@ -22,6 +22,9 @@ package org.codehaus.mojo.license;
  * #L%
  */
 
+import java.io.IOException;
+import java.util.Collection;
+
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -32,18 +35,14 @@ import org.codehaus.mojo.license.api.DependenciesToolException;
 import org.codehaus.mojo.license.api.ThirdPartyDetails;
 import org.codehaus.mojo.license.api.ThirdPartyToolException;
 
-import java.io.IOException;
-import java.util.Collection;
-
 /**
  * Generates a report of all third-parties detected in the module.
  *
  * @author tchemit dev@tchemit.fr
  * @since 1.1
  */
-@Mojo( name = "third-party-report", requiresDependencyResolution = ResolutionScope.TEST )
-public class ThirdPartyReportMojo extends AbstractThirdPartyReportMojo
-{
+@Mojo(name = "third-party-report", requiresDependencyResolution = ResolutionScope.TEST)
+public class ThirdPartyReportMojo extends AbstractThirdPartyReportMojo {
 
     // ----------------------------------------------------------------------
     // Mojo Parameters
@@ -54,7 +53,7 @@ public class ThirdPartyReportMojo extends AbstractThirdPartyReportMojo
      *
      * @since 1.1
      */
-    @Parameter( property = "license.skipThirdPartyReport", defaultValue = "false" )
+    @Parameter(property = "license.skipThirdPartyReport", defaultValue = "false")
     private boolean skipThirdPartyReport;
 
     // ----------------------------------------------------------------------
@@ -64,14 +63,12 @@ public class ThirdPartyReportMojo extends AbstractThirdPartyReportMojo
     /**
      * {@inheritDoc}
      */
-    public String getOutputName()
-    {
+    public String getOutputName() {
         return "third-party-report";
     }
 
     @Override
-    public boolean canGenerateReport()
-    {
+    public boolean canGenerateReport() {
         return !skipThirdPartyReport;
     }
 
@@ -84,9 +81,8 @@ public class ThirdPartyReportMojo extends AbstractThirdPartyReportMojo
      */
     @Override
     protected Collection<ThirdPartyDetails> createThirdPartyDetails()
-      throws IOException, ThirdPartyToolException, ProjectBuildingException, MojoFailureException,
-             DependenciesToolException, MojoExecutionException
-    {
-        return createThirdPartyDetails( getProject(), false );
+            throws IOException, ThirdPartyToolException, ProjectBuildingException, MojoFailureException,
+                    DependenciesToolException, MojoExecutionException {
+        return createThirdPartyDetails(getProject(), false);
     }
 }

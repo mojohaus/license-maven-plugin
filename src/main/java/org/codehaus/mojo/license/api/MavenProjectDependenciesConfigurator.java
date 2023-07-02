@@ -32,8 +32,7 @@ package org.codehaus.mojo.license.api;
  * @see DependenciesTool
  * @since 1.0
  */
-public interface MavenProjectDependenciesConfigurator
-{
+public interface MavenProjectDependenciesConfigurator {
 
     /**
      * @return {@code true} if should include transitive dependencies, {@code false} to include only direct

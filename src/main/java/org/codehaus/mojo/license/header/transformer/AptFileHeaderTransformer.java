@@ -33,23 +33,19 @@ import javax.inject.Singleton;
  */
 @Named("apt")
 @Singleton
-public class AptFileHeaderTransformer
-    extends AbstractFileHeaderTransformer
-{
+public class AptFileHeaderTransformer extends AbstractFileHeaderTransformer {
 
     /**
      * Default constructor.
      */
-    public AptFileHeaderTransformer()
-    {
-        super( "apt", "header transformer with apt comment style", "~~~", "~~~", "~~ " );
+    public AptFileHeaderTransformer() {
+        super("apt", "header transformer with apt comment style", "~~~", "~~~", "~~ ");
     }
 
     /**
      * {@inheritDoc}
      */
-    public String[] getDefaultAcceptedExtensions()
-    {
-        return new String[]{ "apt" };
+    public String[] getDefaultAcceptedExtensions() {
+        return new String[] {"apt"};
     }
 }

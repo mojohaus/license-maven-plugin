@@ -33,23 +33,19 @@ import javax.inject.Singleton;
  */
 @Named("ftl")
 @Singleton
-public class FreeMarkerFileHeaderTransformer
-    extends AbstractFileHeaderTransformer
-{
+public class FreeMarkerFileHeaderTransformer extends AbstractFileHeaderTransformer {
 
     /**
      * Default constructor.
      */
-    public FreeMarkerFileHeaderTransformer()
-    {
-        super( "ftl", "header transformer with free marker comment style", "<#--", "-->", " " );
+    public FreeMarkerFileHeaderTransformer() {
+        super("ftl", "header transformer with free marker comment style", "<#--", "-->", " ");
     }
 
     /**
      * {@inheritDoc}
      */
-    public String[] getDefaultAcceptedExtensions()
-    {
-        return new String[]{ "ftl" };
+    public String[] getDefaultAcceptedExtensions() {
+        return new String[] {"ftl"};
     }
 }

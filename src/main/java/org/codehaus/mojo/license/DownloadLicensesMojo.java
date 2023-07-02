@@ -52,11 +52,11 @@ import org.codehaus.mojo.license.download.LicensedArtifact;
  * @author Paul Gier
  * @since 1.0
  */
-@Mojo( name = "download-licenses", requiresDependencyResolution = ResolutionScope.TEST,
-    defaultPhase = LifecyclePhase.PACKAGE )
-public class DownloadLicensesMojo
-    extends AbstractDownloadLicensesMojo
-{
+@Mojo(
+        name = "download-licenses",
+        requiresDependencyResolution = ResolutionScope.TEST,
+        defaultPhase = LifecyclePhase.PACKAGE)
+public class DownloadLicensesMojo extends AbstractDownloadLicensesMojo {
 
     // ----------------------------------------------------------------------
     // Mojo Parameters
@@ -67,7 +67,7 @@ public class DownloadLicensesMojo
      *
      * @since 1.5
      */
-    @Parameter( property = "license.skipDownloadLicenses", defaultValue = "false" )
+    @Parameter(property = "license.skipDownloadLicenses", defaultValue = "false")
     protected boolean skipDownloadLicenses;
 
     // ----------------------------------------------------------------------
@@ -77,18 +77,17 @@ public class DownloadLicensesMojo
     /**
      * {@inheritDoc}
      */
-    protected boolean isSkip()
-    {
+    protected boolean isSkip() {
         return skipDownloadLicenses;
     }
 
-    protected Map<String, LicensedArtifact> getDependencies()
-    {
+    protected Map<String, LicensedArtifact> getDependencies() {
         final Map<String, LicensedArtifact> result = new TreeMap<>();
         licensedArtifactResolver.loadProjectDependencies(
-                new ResolvedProjectDependencies( project.getArtifacts(), project.getDependencyArtifacts() ),
-                this, remoteRepositories, result );
+                new ResolvedProjectDependencies(project.getArtifacts(), project.getDependencyArtifacts()),
+                this,
+                remoteRepositories,
+                result);
         return result;
     }
-
 }
