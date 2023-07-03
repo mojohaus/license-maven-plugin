@@ -48,6 +48,7 @@ import org.codehaus.mojo.license.api.ResolvedProjectDependencies;
 import org.codehaus.mojo.license.api.ThirdPartyToolException;
 import org.codehaus.mojo.license.model.LicenseMap;
 import org.codehaus.mojo.license.utils.FileUtil;
+import org.codehaus.mojo.license.utils.MojoHelper;
 import org.codehaus.mojo.license.utils.SortedProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -225,10 +226,10 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
         }
         if (isAggregatorBuild) {
             dependencyArtifacts =
-                    new ResolvedProjectDependencies(project.getArtifacts(), project.getDependencyArtifacts());
+                    new ResolvedProjectDependencies(project.getArtifacts(), MojoHelper.getDependencyArtifacts(project));
         } else {
             dependencyArtifacts =
-                    new ResolvedProjectDependencies(project.getArtifacts(), project.getDependencyArtifacts());
+                    new ResolvedProjectDependencies(project.getArtifacts(), MojoHelper.getDependencyArtifacts(project));
         }
         return dependencyArtifacts;
     }

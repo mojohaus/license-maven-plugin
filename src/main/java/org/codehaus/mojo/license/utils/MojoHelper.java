@@ -27,13 +27,17 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.collections.comparators.ComparatorChain;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Resource;
 import org.apache.maven.project.MavenProject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Mojo helper methods.
@@ -42,6 +46,7 @@ import org.apache.maven.project.MavenProject;
  * @since 1.0
  */
 public class MojoHelper {
+    private static final Logger LOG = LoggerFactory.getLogger(MojoHelper.class);
 
     /**
      * Add the directory as a resource of the given project.
@@ -214,5 +219,26 @@ public class MojoHelper {
     public static List<String> getParams(String params) {
         String[] split = params == null ? new String[0] : params.split(",");
         return Arrays.asList(split);
+    }
+
+    /**
+     * {@link MavenProject#getDependencyArtifacts()} is deprecated.
+     *
+     * <p>
+     * This method checks if the dependency artifacts is {@code null} and returns an empty {@code HashSet} to avoid the
+     * {@code NullPointerException}s caused by the {@link MavenProject#getDependencyArtifacts()} returning {@code null}.
+     * </p>
+     *
+     * @param project the MavenProject to retrieve artifacts from
+     * @return a HashSet of dependencies or an empty set
+     */
+    public static Set<Artifact> getDependencyArtifacts(MavenProject project) {
+        if (project == null || project.getDependencyArtifacts() == null) {
+            LOG.warn("");
+            LOG.warn("Non-transitive dependencies cannot be found. ");
+            LOG.warn("");
+            return Collections.emptySet();
+        }
+        return project.getDependencyArtifacts();
     }
 }
