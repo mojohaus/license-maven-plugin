@@ -41,6 +41,9 @@ Update File Header Examples
 
     * customize description section: Define a template to change the description section of a file header.
 
+    * lineSeparator: Use a custom chain of character as line separator. Providing "LF" and "CRLF" will instead use the
+    characters "\n" and "\r\n", respectively.
+
   To see all extensions accepted run the <<comment-style-list>> goal.
 
 -------------------------------------------------------------------------------
