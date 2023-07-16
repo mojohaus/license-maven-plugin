@@ -396,6 +396,20 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo {
      */
     protected abstract boolean isFailOnNotUptodateHeader();
 
+    /**
+     * Converts line ending string, like LF or CRLF, to proper line separator character.
+     *
+     * @param lineSeparator Line separator that may be converted.
+     */
+    public void setLineSeparator(String lineSeparator) {
+        try {
+            this.lineSeparator = Eol.valueOf(lineSeparator).getEolString();
+        } catch (IllegalArgumentException e) {
+            LOG.warn("Unable to parse lineSeparator '{}', using it as-is.", lineSeparator);
+            this.lineSeparator = lineSeparator;
+        }
+    }
+
     // ----------------------------------------------------------------------
     // AbstractLicenseMojo Implementaton
     // ----------------------------------------------------------------------
