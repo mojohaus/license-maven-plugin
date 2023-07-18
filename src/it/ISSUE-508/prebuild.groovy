@@ -2,7 +2,7 @@
  * #%L
  * License Maven Plugin
  * %%
- * Copyright (C) 2008 - 2011 CodeLutin, Codehaus, Tony Chemit
+ * Copyright (C) 2008 - 2011 CodeLutin, Codehaus, Tony Chemit, Tony chemit
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -19,5 +19,20 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
-file = new File(basedir, 'target/generated-sources/license/THIRD-PARTY.txt')
-assert file.exists()
+
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.attribute.FileTime
+import java.time.LocalDateTime
+import java.time.ZoneOffset
+
+Path basePath = basedir.toPath()
+
+// create a THIRD-PARTY.txt
+Files.createFile(basePath.resolve('THIRD-PARTY.txt'))
+
+// project file in child must is older then THIRD-PARTY.txt
+def fileTime = FileTime.from(LocalDateTime.now().minusDays(1L).toInstant(ZoneOffset.UTC))
+Files.setLastModifiedTime(basePath.resolve('module-a/pom.xml'), fileTime)
+
+return true
