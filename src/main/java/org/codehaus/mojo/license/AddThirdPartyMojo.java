@@ -98,14 +98,6 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
     private boolean doGenerateMissing;
 
     /**
-     * Whether this is an aggregate build, or a single-project goal. This setting determines which dependency artifacts
-     * will be examined by the plugin. AddThirdParty needs to load dependencies only for the single project it is run
-     * for, while AggregateAddThirdParty needs to load dependencies for the parent project, as well as all child
-     * projects in the reactor.
-     */
-    private boolean isAggregatorBuild = false;
-
-    /**
      * The reactor projects. When resolving dependencies, the aggregator goal needs to do custom handling
      * of sibling dependencies for projects in the reactor,
      * to avoid trying to load artifacts for projects that haven't been built/published yet.
@@ -224,13 +216,8 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
         if (dependencyArtifacts != null) {
             return dependencyArtifacts;
         }
-        if (isAggregatorBuild) {
-            dependencyArtifacts =
-                    new ResolvedProjectDependencies(project.getArtifacts(), MojoHelper.getDependencyArtifacts(project));
-        } else {
-            dependencyArtifacts =
-                    new ResolvedProjectDependencies(project.getArtifacts(), MojoHelper.getDependencyArtifacts(project));
-        }
+        dependencyArtifacts =
+                new ResolvedProjectDependencies(project.getArtifacts(), MojoHelper.getDependencyArtifacts(project));
         return dependencyArtifacts;
     }
 
@@ -390,6 +377,7 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
         }
     }
 
+    // magic method - to refactor
     void initFromMojo(AggregatorAddThirdPartyMojo mojo, MavenProject mavenProject, List<MavenProject> reactorProjects)
             throws Exception {
         project = mavenProject;
@@ -420,7 +408,6 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
         excludedLicenses = mojo.excludedLicenses;
         bundleThirdPartyPath = mojo.bundleThirdPartyPath;
         generateBundle = mojo.generateBundle;
-        force = mojo.force;
         failIfWarning = mojo.failIfWarning;
         failOnMissing = mojo.failOnMissing;
         failOnBlacklist = mojo.failOnBlacklist;
@@ -432,11 +419,15 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
 
         setLog(mojo.getLog());
 
-        isAggregatorBuild = true;
         reactorProjectDependencies = reactorProjects;
 
+        // magic used by AggregatorAddThirdPartyMojo - only by build dependencies map for child projects
+        // so actions in init should be always executed
+        force = true;
         init();
 
+        // consolidate should comply original flag
+        force = mojo.force;
         consolidate();
     }
 }
