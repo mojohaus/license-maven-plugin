@@ -7,7 +7,9 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,9 +34,10 @@ public class LicenseSummaryTest {
     public void testReadLicenseSummary() throws IOException, SAXException, ParserConfigurationException {
         File licenseSummaryFile = new File("src/test/resources/license-summary-test.xml");
         Assert.assertTrue(licenseSummaryFile.exists());
-        FileInputStream fis = new FileInputStream(licenseSummaryFile);
-        List<ProjectLicenseInfo> list = LicenseSummaryReader.parseLicenseSummary(fis);
-        fis.close();
+        List<ProjectLicenseInfo> list;
+        try (InputStream fis = Files.newInputStream(licenseSummaryFile.toPath())) {
+            list = LicenseSummaryReader.parseLicenseSummary(fis);
+        }
         ProjectLicenseInfo dep = list.get(0);
         Assert.assertEquals("org.codehaus.mojo", dep.getGroupId());
         Assert.assertEquals("junk", dep.getArtifactId());

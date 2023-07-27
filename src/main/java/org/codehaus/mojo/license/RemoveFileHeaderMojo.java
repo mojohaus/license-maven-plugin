@@ -24,6 +24,7 @@ package org.codehaus.mojo.license;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashSet;
@@ -490,7 +491,7 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo {
             if (doFinalize) {
                 finalizeFile(file, processFile);
             } else {
-                FileUtil.deleteFile(processFile);
+                Files.deleteIfExists(processFile.toPath());
             }
         }
     }
@@ -509,11 +510,8 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo {
         if (isKeepBackup() && !isDryRun()) {
             File backupFile = FileUtil.getBackupFile(file);
 
-            if (backupFile.exists()) {
-
-                // always delete backup file, before the renaming
-                FileUtil.deleteFile(backupFile);
-            }
+            // always delete backup file, before the renaming
+            Files.deleteIfExists(backupFile.toPath());
 
             LOG.debug(" - backup original file {}", file);
             FileUtil.renameFile(file, backupFile);
@@ -522,10 +520,9 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo {
         if (isDryRun()) {
 
             // dry run, delete temporary file
-            FileUtil.deleteFile(processFile);
+            Files.deleteIfExists(processFile.toPath());
         } else {
             try {
-
                 // replace file with the updated one
                 FileUtil.renameFile(processFile, file);
             } catch (IOException e) {

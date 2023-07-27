@@ -991,12 +991,11 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
                     FileUtils.cleanDirectory(licensesOutputDirectory);
                 }
             } else {
-                FileUtil.createDirectoryIfNecessary(licensesOutputDirectory);
+                Files.createDirectories(licensesOutputDirectory.toPath());
             }
 
-            FileUtil.createDirectoryIfNecessary(licensesOutputFile.getParentFile());
-
-            FileUtil.createDirectoryIfNecessary(licensesErrorsFile.getParentFile());
+            Files.createDirectories(licensesOutputFile.getParentFile().toPath());
+            Files.createDirectories(licensesErrorsFile.getParentFile().toPath());
         } catch (IOException e) {
             throw new MojoExecutionException("Unable to create a directory...", e);
         }

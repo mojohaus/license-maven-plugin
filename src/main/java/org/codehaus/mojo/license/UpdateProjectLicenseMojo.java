@@ -198,7 +198,7 @@ public class UpdateProjectLicenseMojo extends AbstractLicenseNameMojo {
             if (generateBundle) {
 
                 // creates the bundled license file
-                File bundleTarget = FileUtil.getFile(outputDirectory, bundleLicensePath);
+                File bundleTarget = new File(outputDirectory, bundleLicensePath);
                 FileUtil.copyFile(licenseFile, bundleTarget);
 
                 if (!resourceTarget.getName().equals(bundleTarget.getName())) {

@@ -25,16 +25,13 @@ package org.codehaus.mojo.license.utils;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringReader;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
@@ -58,76 +55,6 @@ import org.codehaus.plexus.util.IOUtil;
  * @since 1.0
  */
 public class FileUtil {
-
-    public static void tryClose(InputStream is) {
-        if (is == null) {
-            return;
-        }
-        try {
-            is.close();
-        } catch (IOException e) {
-            // do nothing
-        }
-    }
-
-    public static void tryClose(OutputStream os) {
-        if (os == null) {
-            return;
-        }
-        try {
-            os.close();
-        } catch (IOException e) {
-            // do nothing
-        }
-    }
-
-    /**
-     * Creates the directory (and his parents) if necessary.
-     *
-     * @param dir the directory to create if not exisiting
-     * @return {@code true} if directory was created, {@code false} if was no
-     *         need to create it
-     * @throws IOException if could not create directory
-     */
-    public static boolean createDirectoryIfNecessary(File dir) throws IOException {
-        if (!dir.exists()) {
-            boolean b = dir.mkdirs();
-            if (!b) {
-                throw new IOException("Could not create directory " + dir);
-            }
-            return true;
-        }
-        return false;
-    }
-
-    public static boolean createNewFile(File file) throws IOException {
-        createDirectoryIfNecessary(file.getParentFile());
-        if (!file.exists()) {
-            boolean b = file.createNewFile();
-            if (!b) {
-                throw new IOException("Could not create new file " + file);
-            }
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Delete the given file.
-     *
-     * @param file the file to delete
-     * @throws IOException if could not delete the file
-     */
-    public static void deleteFile(File file) throws IOException {
-        if (!file.exists()) {
-            // file does not exist, can not delete it
-            return;
-        }
-        boolean b = file.delete();
-        if (!b) {
-            throw new IOException("could not delete file " + file);
-        }
-    }
 
     /**
      * Rename the given file to a new destination.
@@ -158,16 +85,8 @@ public class FileUtil {
      * @throws IOException if could not copy file.
      */
     public static void copyFile(File source, File target) throws IOException {
-        createDirectoryIfNecessary(target.getParentFile());
+        Files.createDirectories(target.getParentFile().toPath());
         FileUtils.copyFile(source, target);
-    }
-
-    public static File getFile(File base, String... paths) {
-        StringBuilder buffer = new StringBuilder();
-        for (String path : paths) {
-            buffer.append(File.separator).append(path);
-        }
-        return new File(base, buffer.substring(1));
     }
 
     /**
@@ -200,12 +119,9 @@ public class FileUtil {
      * @throws IOException if IO pb
      */
     public static String readAsString(File file, String encoding) throws IOException {
-        FileInputStream inf = new FileInputStream(file);
-        BufferedReader in = new BufferedReader(new InputStreamReader(inf, encoding));
-        try {
+
+        try (BufferedReader in = Files.newBufferedReader(file.toPath(), Charset.forName(encoding))) {
             return IOUtil.toString(in);
-        } finally {
-            in.close();
         }
     }
 
@@ -218,7 +134,7 @@ public class FileUtil {
      * @throws IOException if IO pb
      */
     public static void printString(File file, String content, String encoding) throws IOException {
-        createDirectoryIfNecessary(file.getParentFile());
+        Files.createDirectories(file.getParentFile().toPath());
 
         BufferedReader in;
         PrintWriter out;

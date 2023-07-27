@@ -29,11 +29,11 @@ import javax.inject.Singleton;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -599,7 +599,7 @@ public class DefaultThirdPartyTool implements ThirdPartyTool {
             throws IOException {
 
         // creates the bundled license file
-        File bundleTarget = FileUtil.getFile(outputDirectory, bundleThirdPartyPath);
+        File bundleTarget = new File(outputDirectory, bundleThirdPartyPath);
         LOG.info("Writing bundled third-party file to {}", bundleTarget);
         FileUtil.copyFile(thirdPartyFile, bundleTarget);
     }
@@ -637,7 +637,7 @@ public class DefaultThirdPartyTool implements ThirdPartyTool {
         LOG.info("Loading global license map from {}: {}", dep.toString(), propFile.getAbsolutePath());
         SortedProperties props = new SortedProperties("utf-8");
 
-        try (InputStream propStream = new FileInputStream(propFile)) {
+        try (InputStream propStream = Files.newInputStream(propFile.toPath())) {
             props.load(propStream);
         } catch (IOException e) {
             throw new IOException("Unable to load " + propFile.getAbsolutePath(), e);

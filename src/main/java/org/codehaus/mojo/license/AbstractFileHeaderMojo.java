@@ -704,7 +704,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo {
             if (doFinalize) {
                 finalizeFile(file, processFile);
             } else {
-                FileUtil.deleteFile(processFile);
+                Files.deleteIfExists(processFile.toPath());
             }
         }
     }
@@ -836,11 +836,8 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo {
         if (isKeepBackup() && !isDryRun()) {
             File backupFile = FileUtil.getBackupFile(file);
 
-            if (backupFile.exists()) {
-
-                // always delete backup file, before the renaming
-                FileUtil.deleteFile(backupFile);
-            }
+            // always delete backup file, before the renaming
+            Files.deleteIfExists(backupFile.toPath());
 
             LOG.debug(" - backup original file {}", file);
             Files.copy(file.toPath(), backupFile.toPath(), StandardCopyOption.COPY_ATTRIBUTES);
@@ -849,13 +846,13 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo {
         if (isDryRun()) {
 
             // dry run, delete temporary file
-            FileUtil.deleteFile(processFile);
+            Files.deleteIfExists(processFile.toPath());
         } else {
             try {
                 // replace file with the updated one
                 String updatedContent = FileUtil.readAsString(processFile, getEncoding());
                 FileUtil.printString(file, updatedContent, getEncoding());
-                FileUtil.deleteFile(processFile);
+                Files.deleteIfExists(processFile.toPath());
             } catch (IOException e) {
                 LOG.warn("Error updating {} -> {}", processFile, file, e);
             }

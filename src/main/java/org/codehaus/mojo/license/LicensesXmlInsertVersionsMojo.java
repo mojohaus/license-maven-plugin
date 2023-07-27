@@ -23,6 +23,7 @@ package org.codehaus.mojo.license;
  */
 
 import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
@@ -41,7 +42,6 @@ import org.codehaus.mojo.license.api.ResolvedProjectDependencies;
 import org.codehaus.mojo.license.download.LicenseSummaryReader;
 import org.codehaus.mojo.license.download.LicensedArtifact;
 import org.codehaus.mojo.license.download.ProjectLicenseInfo;
-import org.codehaus.mojo.license.utils.FileUtil;
 import org.codehaus.mojo.license.utils.MojoHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,7 +88,7 @@ public class LicensesXmlInsertVersionsMojo extends AbstractLicensesXmlMojo {
         }
 
         try {
-            FileUtil.createDirectoryIfNecessary(licensesOutputFile.getParentFile());
+            Files.createDirectories(licensesOutputFile.getParentFile().toPath());
 
             final List<ProjectLicenseInfo> projectLicenseInfos =
                     LicenseSummaryReader.parseLicenseSummary(licensesInputFile);

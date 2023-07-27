@@ -25,6 +25,7 @@ package org.codehaus.mojo.license;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -47,7 +48,6 @@ import org.codehaus.mojo.license.api.MavenProjectDependenciesConfigurator;
 import org.codehaus.mojo.license.api.ResolvedProjectDependencies;
 import org.codehaus.mojo.license.api.ThirdPartyToolException;
 import org.codehaus.mojo.license.model.LicenseMap;
-import org.codehaus.mojo.license.utils.FileUtil;
 import org.codehaus.mojo.license.utils.MojoHelper;
 import org.codehaus.mojo.license.utils.SortedProperties;
 import org.slf4j.Logger;
@@ -181,7 +181,7 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
 
             // there is no missing dependencies, but still a missing file, delete it
             LOG.info("There is no dependency to put in missing file, delete it at {}", missingFile);
-            FileUtil.deleteFile(missingFile);
+            Files.deleteIfExists(missingFile.toPath());
         }
 
         if (!unsafe && deployMissingFile && MapUtils.isNotEmpty(unsafeMappings)) {
@@ -354,7 +354,7 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
      */
     private void writeMissingFile() throws IOException {
 
-        FileUtil.createDirectoryIfNecessary(missingFile.getParentFile());
+        Files.createDirectories(missingFile.getParentFile().toPath());
         LOG.info("Regenerate missing license file {}", missingFile);
 
         FileOutputStream writer = new FileOutputStream(missingFile);

@@ -50,7 +50,6 @@ import org.codehaus.mojo.license.api.ThirdPartyHelper;
 import org.codehaus.mojo.license.api.ThirdPartyTool;
 import org.codehaus.mojo.license.api.ThirdPartyToolException;
 import org.codehaus.mojo.license.model.LicenseMap;
-import org.codehaus.mojo.license.utils.FileUtil;
 import org.codehaus.mojo.license.utils.MojoHelper;
 import org.codehaus.mojo.license.utils.SortedProperties;
 import org.codehaus.mojo.license.utils.StringToList;
@@ -723,7 +722,7 @@ public abstract class AbstractAddThirdPartyMojo extends AbstractLicenseMojo {
 
         if (generateBundle) {
 
-            File bundleFile = FileUtil.getFile(outputDirectory, bundleThirdPartyPath);
+            File bundleFile = new File(outputDirectory, bundleThirdPartyPath);
 
             LOG.debug("bundle third-party file: {} last modified: {}", bundleFile, bundleFile.lastModified());
             doGenerateBundle = force || !bundleFile.exists() || projectFile.lastModified() > bundleFile.lastModified();
