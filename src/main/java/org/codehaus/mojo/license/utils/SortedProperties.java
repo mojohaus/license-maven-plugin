@@ -23,10 +23,10 @@ package org.codehaus.mojo.license.utils;
  */
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
@@ -95,11 +95,8 @@ public class SortedProperties extends Properties {
      * @throws java.io.IOException if any io pb
      */
     public SortedProperties load(File src) throws IOException {
-        FileInputStream reader = new FileInputStream(src);
-        try {
+        try (InputStream reader = Files.newInputStream(src.toPath())) {
             load(reader);
-        } finally {
-            reader.close();
         }
         return this;
     }
@@ -111,11 +108,8 @@ public class SortedProperties extends Properties {
      * @throws java.io.IOException if any io pb
      */
     public void store(File dst) throws IOException {
-        OutputStream writer = new FileOutputStream(dst);
-        try {
+        try (OutputStream writer = Files.newOutputStream(dst.toPath())) {
             store(writer, null);
-        } finally {
-            writer.close();
         }
     }
 
