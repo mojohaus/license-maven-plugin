@@ -481,6 +481,15 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo {
         if (isVerbose()) {
             LOG.info("Will use sectionDelimiter: {}", sectionDelimiter);
         }
+        if (isVerbose()) {
+            String verboseLineSeparator;
+            try {
+                verboseLineSeparator = Eol.from(lineSeparator).name();
+            } catch (IllegalArgumentException e) {
+                verboseLineSeparator = lineSeparator;
+            }
+            LOG.info("Will use lineSeparator: {}", verboseLineSeparator);
+        }
 
         // add default extensions from header transformers
         for (Map.Entry<String, FileHeaderTransformer> entry : transformers.entrySet()) {
