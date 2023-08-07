@@ -98,7 +98,8 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo {
     private String sectionDelimiter;
 
     /**
-     * To specify a line separator to use.
+     * To specify a line separator to use. Providing "LF" and "CRLF" will instead use the characters "\n" and "\r\n",
+     * respectively.
      *
      * If not set, will use system property {@code line.separator}.
      */
