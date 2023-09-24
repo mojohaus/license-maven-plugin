@@ -22,7 +22,8 @@ package org.codehaus.mojo.license.header.transformer;
  * #L%
  */
 
-import org.codehaus.plexus.component.annotations.Component;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 /**
  * Implementation of {@link FileHeaderTransformer} for apt format.
@@ -30,24 +31,21 @@ import org.codehaus.plexus.component.annotations.Component;
  * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
-@Component( role = FileHeaderTransformer.class, hint = "rst" )
-public class RstFileHeaderTransformer
-    extends AbstractFileHeaderTransformer
-{
+@Named("rst")
+@Singleton
+public class RstFileHeaderTransformer extends AbstractFileHeaderTransformer {
 
     /**
      * Default constructor.
      */
-    public RstFileHeaderTransformer()
-    {
-        super( "rst", "header transformer with rst comment style", ".. -", ".. -", ".. * " );
+    public RstFileHeaderTransformer() {
+        super("rst", "header transformer with rst comment style", ".. -", ".. -", ".. * ");
     }
 
     /**
      * {@inheritDoc}
      */
-    public String[] getDefaultAcceptedExtensions()
-    {
-        return new String[]{ "rst" };
+    public String[] getDefaultAcceptedExtensions() {
+        return new String[] {"rst"};
     }
 }

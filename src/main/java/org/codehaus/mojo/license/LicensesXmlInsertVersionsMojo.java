@@ -23,6 +23,7 @@ package org.codehaus.mojo.license;
  */
 
 import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
@@ -41,7 +42,7 @@ import org.codehaus.mojo.license.api.ResolvedProjectDependencies;
 import org.codehaus.mojo.license.download.LicenseSummaryReader;
 import org.codehaus.mojo.license.download.LicensedArtifact;
 import org.codehaus.mojo.license.download.ProjectLicenseInfo;
-import org.codehaus.mojo.license.utils.FileUtil;
+import org.codehaus.mojo.license.utils.MojoHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,12 +52,12 @@ import org.slf4j.LoggerFactory;
  *
  * @since 1.19
  */
-@Mojo( name = "licenses-xml-insert-versions", requiresDependencyResolution = ResolutionScope.TEST,
-    defaultPhase = LifecyclePhase.PACKAGE )
-public class LicensesXmlInsertVersionsMojo
-    extends AbstractLicensesXmlMojo
-{
-    private static final Logger LOG = LoggerFactory.getLogger( LicensesXmlInsertVersionsMojo.class );
+@Mojo(
+        name = "licenses-xml-insert-versions",
+        requiresDependencyResolution = ResolutionScope.TEST,
+        defaultPhase = LifecyclePhase.PACKAGE)
+public class LicensesXmlInsertVersionsMojo extends AbstractLicensesXmlMojo {
+    private static final Logger LOG = LoggerFactory.getLogger(LicensesXmlInsertVersionsMojo.class);
 
     /**
      * The file whose XML content will be used as a base for adding versions. Defaults to
@@ -64,7 +65,7 @@ public class LicensesXmlInsertVersionsMojo
      *
      * @since 1.19
      */
-    @Parameter( property = "license.licensesInputFile" )
+    @Parameter(property = "license.licensesInputFile")
     protected File licensesInputFile;
 
     /**
@@ -72,110 +73,90 @@ public class LicensesXmlInsertVersionsMojo
      *
      * @since 1.19
      */
-    @Parameter( property = "license.skipDownloadLicenses", defaultValue = "false" )
+    @Parameter(property = "license.skipDownloadLicenses", defaultValue = "false")
     private boolean skipDownloadLicenses;
 
-    public void execute()
-        throws MojoExecutionException, MojoFailureException
-    {
+    public void execute() throws MojoExecutionException, MojoFailureException {
 
-        if ( skipDownloadLicenses )
-        {
-            LOG.info( "Skipping due to skipDownloadLicenses = true" );
+        if (skipDownloadLicenses) {
+            LOG.info("Skipping due to skipDownloadLicenses = true");
             return;
         }
 
-        if ( licensesInputFile == null )
-        {
+        if (licensesInputFile == null) {
             licensesInputFile = licensesOutputFile;
         }
 
-        try
-        {
-            FileUtil.createDirectoryIfNecessary( licensesOutputFile.getParentFile() );
+        try {
+            Files.createDirectories(licensesOutputFile.getParentFile().toPath());
 
             final List<ProjectLicenseInfo> projectLicenseInfos =
-                LicenseSummaryReader.parseLicenseSummary( licensesInputFile );
+                    LicenseSummaryReader.parseLicenseSummary(licensesInputFile);
 
-            if ( projectLicenseInfos.isEmpty() && licensesInputFile.equals( licensesOutputFile ) )
-            {
-                LOG.info( "Nothing to do. The licensesInputFile \"{}\" is either empty or does not exist.",
-                        licensesInputFile );
+            if (projectLicenseInfos.isEmpty() && licensesInputFile.equals(licensesOutputFile)) {
+                LOG.info(
+                        "Nothing to do. The licensesInputFile \"{}\" is either empty or does not exist.",
+                        licensesInputFile);
                 return;
             }
 
             final ArtifactFilters.Builder artifactFiltersBuilder = ArtifactFilters.buidler();
-            for ( ProjectLicenseInfo dep : projectLicenseInfos )
-            {
-                artifactFiltersBuilder.includeGa( "\\Q" + dep.getGroupId() + ":" + dep.getArtifactId() + "\\E" );
+            for (ProjectLicenseInfo dep : projectLicenseInfos) {
+                artifactFiltersBuilder.includeGa("\\Q" + dep.getGroupId() + ":" + dep.getArtifactId() + "\\E");
             }
             final ArtifactFilters artifactFilters = artifactFiltersBuilder.build();
 
-            final MavenProjectDependenciesConfigurator config = new MavenProjectDependenciesConfigurator()
-            {
+            final MavenProjectDependenciesConfigurator config = new MavenProjectDependenciesConfigurator() {
 
                 @Override
-                public boolean isVerbose()
-                {
+                public boolean isVerbose() {
                     return getLog().isDebugEnabled();
                 }
 
                 @Override
-                public boolean isIncludeTransitiveDependencies()
-                {
+                public boolean isIncludeTransitiveDependencies() {
                     return true;
                 }
 
                 @Override
-                public boolean isExcludeTransitiveDependencies()
-                {
+                public boolean isExcludeTransitiveDependencies() {
                     return false;
                 }
 
                 @Override
-                public ArtifactFilters getArtifactFilters()
-                {
+                public ArtifactFilters getArtifactFilters() {
                     return artifactFilters;
                 }
             };
             final Map<String, LicensedArtifact> resolvedDeps = new TreeMap<String, LicensedArtifact>();
             licensedArtifactResolver.loadProjectDependencies(
-                    new ResolvedProjectDependencies( project.getArtifacts(), project.getDependencyArtifacts() ),
+                    new ResolvedProjectDependencies( project.getArtifacts(), MojoHelper.getDependencyArtifacts(project) ),
                                                      config, remoteRepositories, resolvedDeps, false );
-            final Map<String, LicensedArtifact> resolvedDepsMap = new HashMap<>( resolvedDeps.size() );
-            for ( LicensedArtifact dep : resolvedDeps.values() )
-            {
-                resolvedDepsMap.put( dep.getGroupId() + ":" + dep.getArtifactId(), dep );
+            final Map<String, LicensedArtifact> resolvedDepsMap = new HashMap<>(resolvedDeps.size());
+            for (LicensedArtifact dep : resolvedDeps.values()) {
+                resolvedDepsMap.put(dep.getGroupId() + ":" + dep.getArtifactId(), dep);
             }
 
-            for ( ProjectLicenseInfo dependencyLicenseInfo : projectLicenseInfos )
-            {
-                LOG.debug( "Checking licenses for project {}", dependencyLicenseInfo );
+            for (ProjectLicenseInfo dependencyLicenseInfo : projectLicenseInfos) {
+                LOG.debug("Checking licenses for project {}", dependencyLicenseInfo);
                 final String id = dependencyLicenseInfo.getId();
-                final LicensedArtifact dependency = resolvedDepsMap.get( id );
-                if ( dependency == null )
-                {
-                    throw new MojoFailureException( "Could not resolve version of " + id + " in file "
-                        + licensesOutputFile );
+                final LicensedArtifact dependency = resolvedDepsMap.get(id);
+                if (dependency == null) {
+                    throw new MojoFailureException(
+                            "Could not resolve version of " + id + " in file " + licensesOutputFile);
                 }
-                dependencyLicenseInfo.setVersion( dependency.getVersion() );
+                dependencyLicenseInfo.setVersion(dependency.getVersion());
             }
 
-            writeLicenseSummary( projectLicenseInfos, licensesOutputFile, true );
-        }
-        catch ( MojoFailureException e )
-        {
+            writeLicenseSummary(projectLicenseInfos, licensesOutputFile, true);
+        } catch (MojoFailureException e) {
             throw e;
-        }
-        catch ( Exception e )
-        {
-            throw new MojoExecutionException( "Unable to write license summary file: " + licensesOutputFile, e );
+        } catch (Exception e) {
+            throw new MojoExecutionException("Unable to write license summary file: " + licensesOutputFile, e);
         }
     }
 
-    protected Path[] getAutodetectEolFiles()
-    {
-        return new Path[] { licensesInputFile.toPath(), licensesOutputFile.toPath() };
+    protected Path[] getAutodetectEolFiles() {
+        return new Path[] {licensesInputFile.toPath(), licensesOutputFile.toPath()};
     }
-
 }

@@ -31,20 +31,15 @@ import java.net.URL;
  * @author Tony Chemit - dev@tchemit.fr
  * @since 1.9
  */
-public class RootPackageClassPathLicenseRepository
-    extends LicenseRepository
-{
+public class RootPackageClassPathLicenseRepository extends LicenseRepository {
 
     @Override
-    protected URL getDefinitionURL()
-    {
-        return getClass().getClassLoader().getResource( REPOSITORY_DEFINITION_FILE );
+    protected URL getDefinitionURL() {
+        return getClass().getClassLoader().getResource(REPOSITORY_DEFINITION_FILE);
     }
 
     @Override
-    protected URL getLicenseBaseURL( String licenseName )
-    {
-        return getClass().getClassLoader().getResource( licenseName );
+    protected URL getLicenseBaseURL(String licenseName) {
+        return getClass().getClassLoader().getResource(licenseName);
     }
-
 }

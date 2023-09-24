@@ -29,14 +29,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import org.apache.maven.artifact.Artifact;
+
 /**
  * Contains the license information for a single project/dependency
  *
  * @author pgier
  * @since 1.0
  */
-public class ProjectLicenseInfo
-{
+public class ProjectLicenseInfo {
     private String groupId;
 
     private String artifactId;
@@ -57,94 +58,75 @@ public class ProjectLicenseInfo
     /**
      * Default constructor.
      */
-    public ProjectLicenseInfo()
-    {
+    public ProjectLicenseInfo() {}
 
-    }
-
-    public ProjectLicenseInfo( String groupId, String artifactId, String version, ExtendedInfo extendedInfo )
-    {
+    public ProjectLicenseInfo( String groupId, String artifactId, String version, ExtendedInfo extendedInfo ) {
         this.groupId = groupId;
         this.artifactId = artifactId;
         this.version = version;
         this.extendedInfo = extendedInfo;
     }
 
-    public ProjectLicenseInfo( String groupId, String artifactId, String version, boolean hasMatchLicenses )
-    {
+    public ProjectLicenseInfo(String groupId, String artifactId, String version, boolean hasMatchLicenses) {
         this.groupId = groupId;
         this.artifactId = artifactId;
         this.version = version;
         this.hasMatchLicenses = hasMatchLicenses;
     }
 
-    public String getGroupId()
-    {
+    public String getGroupId() {
         return groupId;
     }
 
-    public void setGroupId( String groupId )
-    {
+    public void setGroupId(String groupId) {
         this.groupId = groupId;
     }
 
-    public String getArtifactId()
-    {
+    public String getArtifactId() {
         return artifactId;
     }
 
-    public void setArtifactId( String artifactId )
-    {
+    public void setArtifactId(String artifactId) {
         this.artifactId = artifactId;
     }
 
-    public String getVersion()
-    {
+    public String getVersion() {
         return version;
     }
 
-    public void setVersion( String version )
-    {
+    public void setVersion(String version) {
         this.version = version;
     }
 
-    public List<ProjectLicense> getLicenses()
-    {
+    public List<ProjectLicense> getLicenses() {
         return licenses;
     }
 
-    public void setLicenses( List<ProjectLicense> licenses )
-    {
+    public void setLicenses(List<ProjectLicense> licenses) {
         this.licenses = licenses;
     }
 
-    public void addLicense( ProjectLicense license )
-    {
-        licenses.add( license );
+    public void addLicense(ProjectLicense license) {
+        licenses.add(license);
     }
 
-    public List<ProjectLicense> getMatchLicenses()
-    {
+    public List<ProjectLicense> getMatchLicenses() {
         return matchLicenses;
     }
 
-    public void setMatchLicenses( List<ProjectLicense> matchLicenses )
-    {
+    public void setMatchLicenses(List<ProjectLicense> matchLicenses) {
         this.matchLicenses = matchLicenses;
     }
 
-    public void addMatchLicense( ProjectLicense license )
-    {
-        matchLicenses.add( license );
+    public void addMatchLicense(ProjectLicense license) {
+        matchLicenses.add(license);
     }
 
-    public boolean hasMatchLicenses()
-    {
+    public boolean hasMatchLicenses() {
         return hasMatchLicenses;
     }
 
-    public void setHasMatchLicenses( boolean hasMatchLicenses )
-    {
+    public void setHasMatchLicenses(boolean hasMatchLicenses) {
         this.hasMatchLicenses = hasMatchLicenses;
     }
 
@@ -153,108 +135,89 @@ public class ProjectLicenseInfo
      *
      * @return String containing "groupId:artifactId"
      */
-    public String getId()
-    {
+    public String getId() {
         return groupId + ":" + artifactId;
     }
 
-    public List<String> getDownloaderMessages()
-    {
+    public List<String> getDownloaderMessages() {
         return downloaderMessages;
     }
 
-    public void addDownloaderMessage( String message )
-    {
-        downloaderMessages.add( message );
+    public void addDownloaderMessage(String message) {
+        downloaderMessages.add(message);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public String toString()
-    {
+    public String toString() {
         return getId();
     }
 
-    public String toGavString()
-    {
-        return groupId + ":" + artifactId + ( version == null ? "" : ( ":" + version ) );
+    public String toGavString() {
+        return groupId + ":" + artifactId + (version == null ? "" : (":" + version));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public boolean equals( Object compareTo )
-    {
-        if ( compareTo instanceof ProjectLicenseInfo )
-        {
+    public boolean equals(Object compareTo) {
+        if (compareTo instanceof ProjectLicenseInfo) {
             ProjectLicenseInfo compare = (ProjectLicenseInfo) compareTo;
-            if ( groupId.equals( compare.getGroupId() ) && artifactId.equals( compare.getArtifactId() ) )
-            {
+            if (groupId.equals(compare.getGroupId()) && artifactId.equals(compare.getArtifactId())) {
                 return true;
             }
         }
-        if ( compareTo instanceof Artifact )
-        {
+        if (compareTo instanceof Artifact) {
             Artifact compare = (Artifact) compareTo;
-            if ( groupId.equals( compare.getGroupId() ) && artifactId.equals( compare.getArtifactId() ) )
-            {
+            if (groupId.equals(compare.getGroupId()) && artifactId.equals(compare.getArtifactId())) {
                 return true;
             }
         }
         return false;
     }
 
-    public boolean deepEquals( ProjectLicenseInfo other )
-    {
-        return Objects.equals( groupId, other.groupId ) && Objects.equals( artifactId, other.artifactId )
-            && Objects.equals( version, other.version ) && Objects.equals( licenses, other.licenses )
-            && Objects.equals( matchLicenses, other.matchLicenses )
-            && Objects.equals( downloaderMessages, other.downloaderMessages );
+    public boolean deepEquals(ProjectLicenseInfo other) {
+        return Objects.equals(groupId, other.groupId)
+                && Objects.equals(artifactId, other.artifactId)
+                && Objects.equals(version, other.version)
+                && Objects.equals(licenses, other.licenses)
+                && Objects.equals(matchLicenses, other.matchLicenses)
+                && Objects.equals(downloaderMessages, other.downloaderMessages);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         return getId().hashCode();
     }
-
 
     /**
      * @return a deep clone of {@link #licenses}
      */
-    public List<ProjectLicense> cloneLicenses()
-    {
-        try
-        {
-            final ArrayList<ProjectLicense> result = new ArrayList<>( licenses != null ? licenses.size() : 0 );
-            if ( licenses != null )
-            {
-                for ( ProjectLicense license : licenses )
-                {
-                    result.add( license.clone() );
+    public List<ProjectLicense> cloneLicenses() {
+        try {
+            final ArrayList<ProjectLicense> result = new ArrayList<>(licenses != null ? licenses.size() : 0);
+            if (licenses != null) {
+                for (ProjectLicense license : licenses) {
+                    result.add(license.clone());
                 }
             }
             return result;
-        }
-        catch ( CloneNotSupportedException e )
-        {
-            throw new RuntimeException( e );
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    public void setApproved( boolean approved )
-    {
+    public void setApproved(boolean approved) {
         this.approved = approved;
     }
 
-    public boolean isApproved()
-    {
+    public boolean isApproved() {
         return approved;
     }
 

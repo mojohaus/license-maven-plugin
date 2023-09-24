@@ -22,12 +22,11 @@ package org.codehaus.mojo.license.utils;
  * #L%
  */
 
-
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
@@ -41,9 +40,7 @@ import java.util.Vector;
  * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
-public class SortedProperties
-    extends Properties
-{
+public class SortedProperties extends Properties {
 
     private static final long serialVersionUID = -1147150444452577558L;
 
@@ -57,44 +54,35 @@ public class SortedProperties
      */
     protected boolean removeHeader;
 
-
-    public SortedProperties( String encoding )
-    {
-        this( encoding, true );
+    public SortedProperties(String encoding) {
+        this(encoding, true);
     }
 
-
-    public SortedProperties( String encoding, boolean removeHeader )
-    {
+    public SortedProperties(String encoding, boolean removeHeader) {
         this.encoding = encoding;
         this.removeHeader = removeHeader;
     }
 
-    public SortedProperties( Properties defaults )
-    {
-        super( defaults );
+    public SortedProperties(Properties defaults) {
+        super(defaults);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Enumeration<Object> keys()
-    {
-        List<Object> objects = Collections.list( super.keys() );
+    public Enumeration<Object> keys() {
+        List<Object> objects = Collections.list(super.keys());
         Vector<Object> result;
-        try
-        {
+        try {
             // Attention, si les clef ne sont pas des string, ca ne marchera pas
-            List<String> list = toGenericList( objects, String.class );
-            Collections.sort( list );
-            result = new Vector<Object>( list );
-        }
-        catch ( IllegalArgumentException e )
-        {
+            List<String> list = toGenericList(objects, String.class);
+            Collections.sort(list);
+            result = new Vector<Object>(list);
+        } catch (IllegalArgumentException e) {
             // keys are not string !!!
             // can not sort keys
-            result = new Vector<>( objects );
+            result = new Vector<>(objects);
         }
         return result.elements();
     }
@@ -106,17 +94,9 @@ public class SortedProperties
      * @return l'instance du properties
      * @throws java.io.IOException if any io pb
      */
-    public SortedProperties load( File src )
-        throws IOException
-    {
-        FileInputStream reader = new FileInputStream( src );
-        try
-        {
-            load( reader );
-        }
-        finally
-        {
-            reader.close();
+    public SortedProperties load(File src) throws IOException {
+        try (InputStream reader = Files.newInputStream(src.toPath())) {
+            load(reader);
         }
         return this;
     }
@@ -127,17 +107,9 @@ public class SortedProperties
      * @param dst the fichier de destination
      * @throws java.io.IOException if any io pb
      */
-    public void store( File dst )
-        throws IOException
-    {
-        OutputStream writer = new FileOutputStream( dst );
-        try
-        {
-            store( writer, null );
-        }
-        finally
-        {
-            writer.close();
+    public void store(File dst) throws IOException {
+        try (OutputStream writer = Files.newOutputStream(dst.toPath())) {
+            store(writer, null);
         }
     }
 
@@ -158,23 +130,17 @@ public class SortedProperties
      *                                  n'est pas en adequation avec le type
      *                                  voulue.
      */
-    @SuppressWarnings( { "unchecked" } )
-    public static <O> List<O> toGenericList( List<?> list, Class<O> type )
-        throws IllegalArgumentException
-    {
-        if ( list.isEmpty() )
-        {
+    @SuppressWarnings({"unchecked"})
+    public static <O> List<O> toGenericList(List<?> list, Class<O> type) throws IllegalArgumentException {
+        if (list.isEmpty()) {
             return (List<O>) list;
         }
-        for ( Object o : list )
-        {
-            if ( !type.isAssignableFrom( o.getClass() ) )
-            {
+        for (Object o : list) {
+            if (!type.isAssignableFrom(o.getClass())) {
                 throw new IllegalArgumentException(
-                    "can not cast List with object of type " + o.getClass() + " to " + type + " type!" );
+                        "can not cast List with object of type " + o.getClass() + " to " + type + " type!");
             }
         }
         return (List<O>) list;
     }
-
 }

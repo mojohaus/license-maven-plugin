@@ -25,6 +25,7 @@ package org.codehaus.mojo.license.api;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+
 import org.apache.maven.artifact.Artifact;
 
 /**
@@ -38,26 +39,21 @@ import org.apache.maven.artifact.Artifact;
  * replace B with its dependencies when processing A. This field stores that modified view of the project's
  * dependencies.
  */
-public class ResolvedProjectDependencies
-{
+public class ResolvedProjectDependencies {
 
     private final Set<Artifact> allDependencies;
     private final Set<Artifact> directDependencies;
 
-    public ResolvedProjectDependencies( Set<Artifact> allDependencies, Set<Artifact> directDependencies )
-    {
-        this.allDependencies = Collections.unmodifiableSet( new HashSet<>( allDependencies ) );
-        this.directDependencies = Collections.unmodifiableSet( new HashSet<>( directDependencies ) );
+    public ResolvedProjectDependencies(Set<Artifact> allDependencies, Set<Artifact> directDependencies) {
+        this.allDependencies = Collections.unmodifiableSet(new HashSet<>(allDependencies));
+        this.directDependencies = Collections.unmodifiableSet(new HashSet<>(directDependencies));
     }
 
-    public Set<Artifact> getAllDependencies()
-    {
+    public Set<Artifact> getAllDependencies() {
         return allDependencies;
     }
 
-    public Set<Artifact> getDirectDependencies()
-    {
+    public Set<Artifact> getDirectDependencies() {
         return directDependencies;
     }
-
 }

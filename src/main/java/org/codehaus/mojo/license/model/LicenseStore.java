@@ -22,16 +22,16 @@ package org.codehaus.mojo.license.model;
  * #L%
  */
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The {@code LicenseStore} offers {@link License} coming from different {@link
@@ -40,14 +40,12 @@ import java.util.List;
  * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
-public class LicenseStore
-    implements Iterable<LicenseRepository>
-{
+public class LicenseStore implements Iterable<LicenseRepository> {
 
     /**
      * Logger.
      */
-    private static final Logger LOG = LoggerFactory.getLogger( LicenseStore.class );
+    private static final Logger LOG = LoggerFactory.getLogger(LicenseStore.class);
 
     /**
      * class-path directory where is the licenses repository.
@@ -69,202 +67,152 @@ public class LicenseStore
      */
     protected boolean init;
 
-    public static LicenseStore createLicenseStore( String... extraResolver )
-        throws MojoExecutionException
-    {
+    public static LicenseStore createLicenseStore(String... extraResolver) throws MojoExecutionException {
         LicenseStore store;
-        try
-        {
+        try {
             store = new LicenseStore();
             store.addJarRepository();
-            if ( extraResolver != null )
-            {
-                for ( String s : extraResolver )
-                {
-                    if ( StringUtils.isNotEmpty( s ) )
-                    {
-                        LOG.info( "adding extra resolver {}", s );
-                        store.addRepository( s );
+            if (extraResolver != null) {
+                for (String s : extraResolver) {
+                    if (StringUtils.isNotEmpty(s)) {
+                        LOG.info("adding extra resolver {}", s);
+                        store.addRepository(s);
                     }
                 }
             }
             store.init();
-        }
-        catch ( IllegalArgumentException ex )
-        {
-            throw new MojoExecutionException( "could not obtain the license repository", ex );
-        }
-        catch ( IOException ex )
-        {
-            throw new MojoExecutionException( "could not obtain the license repository", ex );
+        } catch (IllegalArgumentException ex) {
+            throw new MojoExecutionException("could not obtain the license repository", ex);
+        } catch (IOException ex) {
+            throw new MojoExecutionException("could not obtain the license repository", ex);
         }
         return store;
     }
 
-    public void init()
-        throws IOException
-    {
-        checkNotInit( "init" );
-        try
-        {
-            if ( repositories == null )
-            {
+    public void init() throws IOException {
+        checkNotInit("init");
+        try {
+            if (repositories == null) {
                 // adding the default class-path repository
                 addJarRepository();
             }
-            for ( LicenseRepository r : this )
-            {
+            for (LicenseRepository r : this) {
                 r.load();
             }
-        }
-        finally
-        {
+        } finally {
             init = true;
         }
     }
 
-    public List<LicenseRepository> getRepositories()
-    {
+    public List<LicenseRepository> getRepositories() {
         return repositories;
     }
 
-    public String[] getLicenseNames()
-    {
-        checkInit( "getLicenseNames" );
+    public String[] getLicenseNames() {
+        checkInit("getLicenseNames");
         List<String> result = new ArrayList<>();
-        for ( LicenseRepository repository : this )
-        {
-            for ( License license : repository )
-            {
-                result.add( license.getName() );
+        for (LicenseRepository repository : this) {
+            for (License license : repository) {
+                result.add(license.getName());
             }
         }
-        return result.toArray( new String[result.size()] );
+        return result.toArray(new String[result.size()]);
     }
 
-    public License[] getLicenses()
-    {
-        checkInit( "getLicenses" );
+    public License[] getLicenses() {
+        checkInit("getLicenses");
         List<License> result = new ArrayList<>();
-        if ( repositories != null )
-        {
-            for ( LicenseRepository repository : this )
-            {
-                for ( License license : repository )
-                {
-                    result.add( license );
+        if (repositories != null) {
+            for (LicenseRepository repository : this) {
+                for (License license : repository) {
+                    result.add(license);
                 }
             }
         }
-        return result.toArray( new License[result.size()] );
+        return result.toArray(new License[result.size()]);
     }
 
-    public License getLicense( String licenseName )
-    {
-        checkInit( "getLicense" );
+    public License getLicense(String licenseName) {
+        checkInit("getLicense");
         Iterator<LicenseRepository> itr = iterator();
         License result = null;
-        while ( itr.hasNext() )
-        {
+        while (itr.hasNext()) {
             LicenseRepository licenseRepository = itr.next();
-            License license = licenseRepository.getLicense( licenseName );
-            if ( license != null )
-            {
+            License license = licenseRepository.getLicense(licenseName);
+            if (license != null) {
                 result = license;
                 break;
             }
         }
-        if ( result == null )
-        {
-            LOG.debug( "could not find license named '{}'", licenseName );
+        if (result == null) {
+            LOG.debug("could not find license named '{}'", licenseName);
         }
         return result;
     }
 
-    public void addRepository( String extraResolver )
-        throws IOException
-    {
+    public void addRepository(String extraResolver) throws IOException {
 
-        if ( extraResolver.equals( CLASSPATH_PROTOCOL ) )
-        {
+        if (extraResolver.equals(CLASSPATH_PROTOCOL)) {
             addRootPackageClassPathRepository();
-        }
-        else if ( extraResolver.startsWith( CLASSPATH_PROTOCOL ) )
-        {
-            extraResolver = extraResolver.substring( CLASSPATH_PROTOCOL.length() );
-            LOG.info( "Using classpath extraresolver: {}", extraResolver );
-            URL baseURL = getClass().getClassLoader().getResource( extraResolver );
-            addRepository( baseURL );
-        }
-        else
-        {
-            URL baseURL = new URL( extraResolver );
-            addRepository( baseURL );
+        } else if (extraResolver.startsWith(CLASSPATH_PROTOCOL)) {
+            extraResolver = extraResolver.substring(CLASSPATH_PROTOCOL.length());
+            LOG.info("Using classpath extraresolver: {}", extraResolver);
+            URL baseURL = getClass().getClassLoader().getResource(extraResolver);
+            addRepository(baseURL);
+        } else {
+            URL baseURL = new URL(extraResolver);
+            addRepository(baseURL);
         }
     }
 
-    public void addRepository( URL baseURL )
-        throws IOException
-    {
-        checkNotInit( "addRepository" );
+    public void addRepository(URL baseURL) throws IOException {
+        checkNotInit("addRepository");
         LicenseRepository repository = new LicenseRepository();
-        repository.setBaseURL( baseURL );
-        LOG.debug( "Adding a license repository {}", repository );
-        addRepository( repository );
+        repository.setBaseURL(baseURL);
+        LOG.debug("Adding a license repository {}", repository);
+        addRepository(repository);
     }
 
-    public void addJarRepository()
-        throws IOException
-    {
-        checkNotInit( "addJarRepository" );
-        URL baseURL = getClass().getResource( JAR_LICENSE_REPOSITORY );
+    public void addJarRepository() throws IOException {
+        checkNotInit("addJarRepository");
+        URL baseURL = getClass().getResource(JAR_LICENSE_REPOSITORY);
         LicenseRepository repository = new LicenseRepository();
-        repository.setBaseURL( baseURL );
-        LOG.debug( "Adding a jar license repository {}", repository );
-        addRepository( repository );
+        repository.setBaseURL(baseURL);
+        LOG.debug("Adding a jar license repository {}", repository);
+        addRepository(repository);
     }
 
-    public void addRootPackageClassPathRepository()
-        throws IOException
-    {
-        checkNotInit( "addRootPackageClassPathRepository" );
-        LOG.debug( "Adding a no package class path license repository " );
-        addRepository( new RootPackageClassPathLicenseRepository() );
+    public void addRootPackageClassPathRepository() throws IOException {
+        checkNotInit("addRootPackageClassPathRepository");
+        LOG.debug("Adding a no package class path license repository ");
+        addRepository(new RootPackageClassPathLicenseRepository());
     }
 
     /**
      * {@inheritDoc}
      */
-    public Iterator<LicenseRepository> iterator()
-    {
+    public Iterator<LicenseRepository> iterator() {
         return getRepositories().iterator();
     }
 
-    protected void addRepository( LicenseRepository repository )
-    {
-        checkNotInit( "addRepository" );
-        if ( repositories == null )
-        {
+    protected void addRepository(LicenseRepository repository) {
+        checkNotInit("addRepository");
+        if (repositories == null) {
             repositories = new ArrayList<>();
-
         }
-        LOG.info( "Adding a license repository {}", repository.getBaseURL() );
-        repositories.add( repository );
+        LOG.info("Adding a license repository {}", repository.getBaseURL());
+        repositories.add(repository);
     }
 
-    protected void checkInit( String operation )
-    {
-        if ( !init )
-        {
-            throw new IllegalStateException( "store was not init, operation [" + operation + "] not possible." );
+    protected void checkInit(String operation) {
+        if (!init) {
+            throw new IllegalStateException("store was not init, operation [" + operation + "] not possible.");
         }
     }
 
-    protected void checkNotInit( String operation )
-    {
-        if ( init )
-        {
-            throw new IllegalStateException( "store was init, operation [" + operation + "+] not possible." );
+    protected void checkNotInit(String operation) {
+        if (init) {
+            throw new IllegalStateException("store was init, operation [" + operation + "+] not possible.");
         }
     }
 }

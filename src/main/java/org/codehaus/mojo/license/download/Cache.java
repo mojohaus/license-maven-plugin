@@ -37,8 +37,7 @@ import org.slf4j.LoggerFactory;
  * @author <a href="https://github.com/ppalaga">Peter Palaga</a>
  * @since 1.18
  */
-public class Cache
-{
+public class Cache {
     private static final Logger LOG = LoggerFactory.getLogger( Cache.class );
 
     private final Map<String, LicenseDownloadResult> urlToFile = new HashMap<>();
@@ -49,8 +48,7 @@ public class Cache
 
     private final boolean enforcingUniqueSha1s;
 
-    public Cache( boolean enforcingUniqueSha1s )
-    {
+    public Cache(boolean enforcingUniqueSha1s) {
         super();
         this.enforcingUniqueSha1s = enforcingUniqueSha1s;
     }
@@ -60,9 +58,8 @@ public class Cache
      * @return the {@link LicenseDownloadResult} bound to the given {@code url} or {@code null} if no entry is bound to
      *         the given {@code url}
      */
-    public LicenseDownloadResult get( String url )
-    {
-        return urlToFile.get( url );
+    public LicenseDownloadResult get(String url) {
+        return urlToFile.get(url);
     }
 
     /**
@@ -85,35 +82,27 @@ public class Cache
      * @param url the URL the given {@code entry} comes from
      * @param entry the result of downloading from {@code url}
      */
-    public void put( String url, LicenseDownloadResult entry )
-    {
-        if ( entry.isSuccess() )
-        {
+    public void put(String url, LicenseDownloadResult entry) {
+        if (entry.isSuccess()) {
             final String sha1 = entry.getSha1();
             final File entryFile = entry.getFile();
-            final LicenseDownloadResult existing = sha1ToFile.get( sha1 );
-            if ( existing == null )
-            {
-                sha1ToFile.put( sha1, entry );
-            }
-            else if ( enforcingUniqueSha1s && !existing.getFile().equals( entryFile ) )
-            {
+            final LicenseDownloadResult existing = sha1ToFile.get(sha1);
+            if (existing == null) {
+                sha1ToFile.put(sha1, entry);
+            } else if (enforcingUniqueSha1s && !existing.getFile().equals(entryFile)) {
                 final File existingFile = existing.getFile();
                 final StringBuilder sb = new StringBuilder();
-                for ( Entry<String, LicenseDownloadResult> en : urlToFile.entrySet() )
-                {
-                    if ( existingFile.equals( en.getValue().getFile() ) )
-                    {
-                        if ( sb.length() > 0 )
-                        {
-                            sb.append( ", " );
+                for (Entry<String, LicenseDownloadResult> en : urlToFile.entrySet()) {
+                    if (existingFile.equals(en.getValue().getFile())) {
+                        if (sb.length() > 0) {
+                            sb.append(", ");
                         }
-                        sb.append( en.getKey() );
+                        sb.append(en.getKey());
                     }
                 }
-                throw new IllegalStateException( "URL '" + url
-                    + "' should belong to licenseUrlFileName having key '" + existingFile.getName()
-                    + "' together with URLs '" + sb.toString() + "'" );
+                throw new IllegalStateException("URL '" + url
+                        + "' should belong to licenseUrlFileName having key '" + existingFile.getName()
+                        + "' together with URLs '" + sb.toString() + "'");
             }
             final String normalizedContentChecksum = entry.getNormalizedContentChecksum();
             if ( normalizedContentChecksum != null )
@@ -125,6 +114,6 @@ public class Cache
                 LOG.warn( "Couldn't find normalized content checksum for license download " + entry );
             }
         }
-        urlToFile.put( url, entry );
+        urlToFile.put(url, entry);
     }
 }

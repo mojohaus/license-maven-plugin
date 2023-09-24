@@ -22,18 +22,6 @@ package org.codehaus.mojo.license;
  * #L%
  */
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.maven.plugins.annotations.Parameter;
-import org.codehaus.mojo.license.api.FreeMarkerHelper;
-import org.codehaus.mojo.license.header.transformer.FileHeaderTransformer;
-import org.codehaus.mojo.license.model.Copyright;
-import org.codehaus.mojo.license.model.License;
-import org.codehaus.mojo.license.model.LicenseStore;
-import org.codehaus.plexus.util.DirectoryScanner;
-import org.codehaus.plexus.util.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -46,6 +34,18 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.codehaus.mojo.license.api.FreeMarkerHelper;
+import org.codehaus.mojo.license.header.transformer.FileHeaderTransformer;
+import org.codehaus.mojo.license.model.Copyright;
+import org.codehaus.mojo.license.model.License;
+import org.codehaus.mojo.license.model.LicenseStore;
+import org.codehaus.plexus.util.DirectoryScanner;
+import org.codehaus.plexus.util.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Abstract mojo which using a {@link #licenseName} and owns a
  * {@link #licenseStore}.
@@ -53,25 +53,35 @@ import java.util.Set;
  * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
-public abstract class AbstractLicenseNameMojo
-        extends AbstractLicenseMojo
-{
-    private static final Logger LOG = LoggerFactory.getLogger( AbstractLicenseNameMojo.class );
+public abstract class AbstractLicenseNameMojo extends AbstractLicenseMojo {
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractLicenseNameMojo.class);
 
     // ----------------------------------------------------------------------
     // Constants
     // ----------------------------------------------------------------------
 
-    protected static final String[] DEFAULT_INCLUDES = new String[]{"**/*"};
+    protected static final String[] DEFAULT_INCLUDES = new String[] {"**/*"};
 
-    protected static final String[] DEFAULT_EXCLUDES =
-            new String[]{"**/*.zargo", "**/*.uml", "**/*.umldi", "**/*.xmi", /* modelisation */
-                    "**/*.img", "**/*.png", "**/*.jpg", "**/*.jpeg", "**/*.gif", /* images */
-                    "**/*.zip", "**/*.jar", "**/*.war", "**/*.ear", "**/*.tgz", "**/*.gz"};
+    protected static final String[] DEFAULT_EXCLUDES = new String[] {
+        "**/*.zargo",
+        "**/*.uml",
+        "**/*.umldi",
+        "**/*.xmi", /* modelisation */
+        "**/*.img",
+        "**/*.png",
+        "**/*.jpg",
+        "**/*.jpeg",
+        "**/*.gif", /* images */
+        "**/*.zip",
+        "**/*.jar",
+        "**/*.war",
+        "**/*.ear",
+        "**/*.tgz",
+        "**/*.gz"
+    };
 
     protected static final String[] DEFAULT_ROOTS =
-            new String[]{"src", "target/generated-sources", "target/processed-sources"};
-
+            new String[] {"src", "target/generated-sources", "target/processed-sources"};
 
     // ----------------------------------------------------------------------
     // Mojo Parameters
@@ -88,7 +98,7 @@ public abstract class AbstractLicenseNameMojo
      *
      * @since 1.0
      */
-    @Parameter( property = "license.licenseResolver" )
+    @Parameter(property = "license.licenseResolver")
     private String licenseResolver;
 
     /**
@@ -96,7 +106,7 @@ public abstract class AbstractLicenseNameMojo
      *
      * @since 1.0
      */
-    @Parameter( property = "license.keepBackup", defaultValue = "false" )
+    @Parameter(property = "license.keepBackup", defaultValue = "false")
     private boolean keepBackup;
 
     /**
@@ -105,7 +115,7 @@ public abstract class AbstractLicenseNameMojo
      * @parameter property="license.licenseName"
      * @since 1.0
      */
-    @Parameter( property = "license.licenseName" )
+    @Parameter(property = "license.licenseName")
     private String licenseName;
 
     /**
@@ -115,17 +125,17 @@ public abstract class AbstractLicenseNameMojo
      *
      * @since 1.0
      */
-    @Parameter( property = "license.projectName", defaultValue = "${project.name}", required = true )
+    @Parameter(property = "license.projectName", defaultValue = "${project.name}", required = true)
     protected String projectName;
 
     /**
      * Name of project's organization.
      * <p>
-     * Will be used as copyrigth's holder in new header.
+     * Will be used as copyright's holder in new header.
      *
      * @since 1.0
      */
-    @Parameter( property = "license.organizationName", defaultValue = "${project.organization.name}", required = true )
+    @Parameter(property = "license.organizationName", defaultValue = "${project.organization.name}", required = true)
     protected String organizationName;
 
     /**
@@ -135,7 +145,7 @@ public abstract class AbstractLicenseNameMojo
      *
      * @since 1.0
      */
-    @Parameter( property = "license.inceptionYear", defaultValue = "${project.inceptionYear}", required = true )
+    @Parameter(property = "license.inceptionYear", defaultValue = "${project.inceptionYear}", required = true)
     protected Integer inceptionYear;
 
     /**
@@ -145,8 +155,19 @@ public abstract class AbstractLicenseNameMojo
      *
      * @since 1.6
      */
-    @Parameter( property = "license.copyrightOwners" )
+    @Parameter(property = "license.copyrightOwners")
     protected String copyrightOwners;
+
+    /**
+     * optional copyright string format
+     * <p>
+     * If not set, "Copyright (C) %1$s %2$s" is used where the copyright dates are
+     * substituted for $1 and the copyright holder for $2.
+     *
+     * @since 2.1.0
+     */
+    @Parameter(property = "license.copyrightStringFormat")
+    protected String copyrightStringFormat;
 
     /**
      * optional extra templates parameters.
@@ -181,18 +202,15 @@ public abstract class AbstractLicenseNameMojo
      * {@inheritDoc}
      */
     @Override
-    protected void init()
-            throws Exception
-    {
+    protected void init() throws Exception {
 
         // init licenses store
-        licenseStore = LicenseStore.createLicenseStore( licenseResolver );
+        licenseStore = LicenseStore.createLicenseStore(licenseResolver);
 
         // check licenseName exists
-        license = getLicense( licenseName, true );
+        license = getLicense(licenseName, true);
 
-        if ( StringUtils.isBlank( copyrightOwners ) )
-        {
+        if (StringUtils.isBlank(copyrightOwners)) {
             copyrightOwners = organizationName;
         }
     }
@@ -201,76 +219,64 @@ public abstract class AbstractLicenseNameMojo
     // Protected Methods
     // ----------------------------------------------------------------------
 
-    protected License getLicense( String licenseName, boolean checkIfExists )
-    {
-        if ( StringUtils.isEmpty( licenseName ) )
-        {
-            throw new IllegalArgumentException( "licenseName can not be null, nor empty" );
+    protected License getLicense(String licenseName, boolean checkIfExists) {
+        if (StringUtils.isEmpty(licenseName)) {
+            throw new IllegalArgumentException("licenseName can not be null, nor empty");
         }
-        if ( licenseStore == null )
-        {
-            throw new IllegalStateException( "No license store initialized!" );
+        if (licenseStore == null) {
+            throw new IllegalStateException("No license store initialized!");
         }
-        License result = licenseStore.getLicense( licenseName );
-        if ( checkIfExists && result == null )
-        {
-            throw new IllegalArgumentException( "License named '" + licenseName + "' is unknown, use one of "
-                    + Arrays.toString( licenseStore.getLicenseNames() ) );
+        License result = licenseStore.getLicense(licenseName);
+        if (checkIfExists && result == null) {
+            throw new IllegalArgumentException("License named '" + licenseName + "' is unknown, use one of "
+                    + Arrays.toString(licenseStore.getLicenseNames()));
         }
         return result;
     }
 
-    protected boolean isKeepBackup()
-    {
+    protected boolean isKeepBackup() {
         return keepBackup;
     }
 
-    protected String getLicenseName()
-    {
+    protected String getLicenseName() {
         return licenseName;
     }
 
-    protected License getLicense()
-    {
+    protected License getLicense() {
         return license;
     }
 
-    protected String getCopyrightOwners()
-    {
+    protected String getCopyrightOwners() {
 
         String holder = copyrightOwners;
 
-        if ( holder == null )
-        {
+        if (holder == null) {
             holder = organizationName;
         }
         return holder;
     }
 
-    protected String processLicenseContext( String licenseContent )
-            throws IOException
-    {
-        FreeMarkerHelper licenseFreeMarkerHelper = FreeMarkerHelper.newHelperFromContent( licenseContent );
+    protected String processLicenseContext(String licenseContent) throws IOException {
+        FreeMarkerHelper licenseFreeMarkerHelper = FreeMarkerHelper.newHelperFromContent(licenseContent);
 
         Map<String, Object> templateParameters = new HashMap<>();
 
-        addPropertiesToContext( System.getProperties(), "env_", templateParameters );
-        addPropertiesToContext( getProject().getProperties(), "project_", templateParameters );
+        addPropertiesToContext(System.getProperties(), "env_", templateParameters);
+        addPropertiesToContext(getProject().getProperties(), "project_", templateParameters);
 
-        templateParameters.put( "project", getProject().getModel() );
+        templateParameters.put("project", getProject().getModel());
 
-        templateParameters.put( "organizationName", organizationName );
-        templateParameters.put( "inceptionYear", inceptionYear );
-        templateParameters.put( "copyright", getCopyright( getCopyrightOwners() ) );
-        templateParameters.put( "projectName", projectName );
+        templateParameters.put("organizationName", organizationName);
+        templateParameters.put("inceptionYear", inceptionYear);
+        templateParameters.put("copyright", getCopyright(copyrightStringFormat, getCopyrightOwners()));
+        templateParameters.put("projectName", projectName);
 
-        addPropertiesToContext( extraTemplateParameters, "extra_", templateParameters );
-        return licenseFreeMarkerHelper.renderTemplate( FreeMarkerHelper.TEMPLATE, templateParameters );
+        addPropertiesToContext(extraTemplateParameters, "extra_", templateParameters);
+        return licenseFreeMarkerHelper.renderTemplate(FreeMarkerHelper.TEMPLATE, templateParameters);
     }
 
-    Copyright getCopyright( String holder )
-    {
-        return Copyright.newCopyright( inceptionYear, holder );
+    Copyright getCopyright(String copyrightStringFormat, String holder) {
+        return Copyright.newCopyright(copyrightStringFormat, inceptionYear, holder);
     }
 
     /**
@@ -281,52 +287,46 @@ public abstract class AbstractLicenseNameMojo
      * @param roots    root directories to treat
      * @param files    cache of file detected indexed by their root directory
      */
-    void getFilesToTreatForRoots( String[] includes, String[] excludes, List<String> roots, Map<File, String[]> files )
-    {
+    void getFilesToTreatForRoots(String[] includes, String[] excludes, List<String> roots, Map<File, String[]> files) {
 
         DirectoryScanner ds = new DirectoryScanner();
-        ds.setIncludes( includes );
-        if ( excludes != null )
-        {
-            ds.setExcludes( excludes );
+        ds.setIncludes(includes);
+        if (excludes != null) {
+            ds.setExcludes(excludes);
         }
-        for ( String src : roots )
-        {
+        for (String src : roots) {
 
-            File f = new File( src );
-            if ( !f.exists() )
-            {
+            File f = new File(src);
+            if (!f.exists()) {
                 // do nothing on a non-existent
                 continue;
             }
 
-            LOG.debug( "discovering source files in {}", src );
+            LOG.debug("discovering source files in {}", src);
 
-            ds.setBasedir( f );
+            ds.setBasedir(f);
             // scan
             ds.scan();
 
             // get files
             String[] tmp = ds.getIncludedFiles();
 
-            if ( tmp.length < 1 )
-            {
+            if (tmp.length < 1) {
                 // no files found
                 continue;
             }
 
             List<String> toTreate = new ArrayList<>();
 
-            Collections.addAll( toTreate, tmp );
+            Collections.addAll(toTreate, tmp);
 
-            if ( toTreate.isEmpty() )
-            {
+            if (toTreate.isEmpty()) {
                 // no file or all are up-to-date
                 continue;
             }
 
             // register files
-            files.put( f, toTreate.toArray( new String[toTreate.size()] ) );
+            files.put(f, toTreate.toArray(new String[toTreate.size()]));
         }
     }
 
@@ -337,20 +337,16 @@ public abstract class AbstractLicenseNameMojo
      * @param defaultValue the default value to use if value is empty
      * @return the trim value (or default value if value is empty)
      */
-    String cleanHeaderConfiguration( String value, String defaultValue )
-    {
+    String cleanHeaderConfiguration(String value, String defaultValue) {
         String resultHeader;
-        if ( StringUtils.isEmpty( value ) )
-        {
+        if (StringUtils.isEmpty(value)) {
 
             // use default value
             resultHeader = defaultValue;
-        }
-        else
-        {
+        } else {
 
             // clean all spaces of it
-            resultHeader = value.replaceAll( "\\s", "" );
+            resultHeader = value.replaceAll("\\s", "");
         }
         return resultHeader;
     }
@@ -361,21 +357,17 @@ public abstract class AbstractLicenseNameMojo
      * @param transformerName the name of the transformer to find
      * @return the transformer for the givne tramsformer name
      */
-    FileHeaderTransformer getTransformer( Map<String, FileHeaderTransformer> transformers, String transformerName )
-    {
-        if ( StringUtils.isEmpty( transformerName ) )
-        {
-            throw new IllegalArgumentException( "transformerName can not be null, nor empty!" );
+    FileHeaderTransformer getTransformer(Map<String, FileHeaderTransformer> transformers, String transformerName) {
+        if (StringUtils.isEmpty(transformerName)) {
+            throw new IllegalArgumentException("transformerName can not be null, nor empty!");
         }
-        if ( transformers == null )
-        {
-            throw new IllegalStateException( "No transformers initialized!" );
+        if (transformers == null) {
+            throw new IllegalStateException("No transformers initialized!");
         }
-        FileHeaderTransformer transformer = transformers.get( transformerName );
-        if ( transformer == null )
-        {
+        FileHeaderTransformer transformer = transformers.get(transformerName);
+        if (transformer == null) {
             throw new IllegalArgumentException(
-                    "transformerName " + transformerName + " is unknow, use one this one : " + transformers.keySet() );
+                    "transformerName " + transformerName + " is unknow, use one this one : " + transformers.keySet());
         }
         return transformer;
     }
@@ -386,40 +378,31 @@ public abstract class AbstractLicenseNameMojo
      * @param state  state of file to report
      * @param buffer where to report
      */
-    void reportType( EnumMap<FileState, Set<File>> result, FileState state, StringBuilder buffer )
-    {
+    void reportType(EnumMap<FileState, Set<File>> result, FileState state, StringBuilder buffer) {
         String operation = state.name();
 
-        Set<File> set = getFiles( result, state );
-        if ( set == null || set.isEmpty() )
-        {
-            if ( isVerbose() )
-            {
-                buffer.append( "\n * no header to " );
-                buffer.append( operation );
-                buffer.append( "." );
+        Set<File> set = getFiles(result, state);
+        if (set == null || set.isEmpty()) {
+            if (isVerbose()) {
+                buffer.append("\n * no header to ");
+                buffer.append(operation);
+                buffer.append(".");
             }
             return;
         }
-        buffer.append( "\n * " ).append( operation ).append( " header on " );
-        buffer.append( set.size() );
-        if ( set.size() == 1 )
-        {
-            buffer.append( " file." );
+        buffer.append("\n * ").append(operation).append(" header on ");
+        buffer.append(set.size());
+        if (set.size() == 1) {
+            buffer.append(" file.");
+        } else {
+            buffer.append(" files.");
         }
-        else
-        {
-            buffer.append( " files." );
-        }
-        if ( isVerbose() )
-        {
-            for ( File file : set )
-            {
-                buffer.append( "\n   - " ).append( file );
+        if (isVerbose()) {
+            for (File file : set) {
+                buffer.append("\n   - ").append(file);
             }
         }
     }
-
 
     /**
      * Gets all files to process indexed by their comment style.
@@ -432,79 +415,69 @@ public abstract class AbstractLicenseNameMojo
      * @param extensionToCommentStyle
      * @param transformers
      */
-    Map<String, List<File>> obtainFilesToProcessByCommentStyle( Map<String, String> extraFiles, String[] roots,
-            String[] includes, String[] excludes, Map<String, String> extensionToCommentStyle, Map<String,
-            FileHeaderTransformer> transformers )
-    {
+    Map<String, List<File>> obtainFilesToProcessByCommentStyle(
+            Map<String, String> extraFiles,
+            String[] roots,
+            String[] includes,
+            String[] excludes,
+            Map<String, String> extensionToCommentStyle,
+            Map<String, FileHeaderTransformer> transformers) {
 
         Map<String, List<File>> results = new HashMap<>();
 
         // add for all known comment style (says transformer) a empty list
         // this permits not to have to test if there is an already list each time
         // we wants to add a new file...
-        for ( String commentStyle : transformers.keySet() )
-        {
-            results.put( commentStyle, new ArrayList<File>() );
+        for (String commentStyle : transformers.keySet()) {
+            results.put(commentStyle, new ArrayList<File>());
         }
 
-        List<String> rootsList = new ArrayList<>( roots.length );
-        for ( String root : roots )
-        {
-            File f = new File( root );
-            if ( f.isAbsolute() )
-            {
-                rootsList.add( f.getAbsolutePath() );
+        List<String> rootsList = new ArrayList<>(roots.length);
+        for (String root : roots) {
+            File f = new File(root);
+            if (f.isAbsolute()) {
+                rootsList.add(f.getAbsolutePath());
+            } else {
+                f = new File(getProject().getBasedir(), root);
             }
-            else
-            {
-                f = new File( getProject().getBasedir(), root );
-            }
-            if ( f.exists() )
-            {
-                LOG.info( "Will search files to update from root {}", f );
-                rootsList.add( f.getAbsolutePath() );
-            }
-            else
-            {
-                if ( isVerbose() )
-                {
-                    LOG.info( "Skip not found root {}", f );
+            if (f.exists()) {
+                LOG.info("Will search files to update from root {}", f);
+                rootsList.add(f.getAbsolutePath());
+            } else {
+                if (isVerbose()) {
+                    LOG.info("Skip not found root {}", f);
                 }
             }
         }
 
         // Obtain all files to treat
         Map<File, String[]> allFiles = new HashMap<>();
-        getFilesToTreatForRoots( includes, excludes, rootsList, allFiles );
+        getFilesToTreatForRoots(includes, excludes, rootsList, allFiles);
 
         // filter all these files according to their extension
 
-        for ( Map.Entry<File, String[]> entry : allFiles.entrySet() )
-        {
+        for (Map.Entry<File, String[]> entry : allFiles.entrySet()) {
             File root = entry.getKey();
             String[] filesPath = entry.getValue();
 
             // sort them by the associated comment style to their extension
-            for ( String path : filesPath )
-            {
-                String extension = FileUtils.extension( path );
-                String commentStyle = extensionToCommentStyle.get( extension );
-                if ( StringUtils.isEmpty( commentStyle ) )
-                {
+            for (String path : filesPath) {
+                String extension = FileUtils.extension(path);
+                String commentStyle = extensionToCommentStyle.get(extension);
+                if (StringUtils.isEmpty(commentStyle)) {
 
                     // unknown extension, try with extra files
-                    File file = new File( root, path );
-                    commentStyle = extraFiles.get( file.getName() );
-                    if ( StringUtils.isEmpty( commentStyle ) )
-                    {
+                    File file = new File(root, path);
+                    commentStyle = extraFiles.get(file.getName());
+                    if (StringUtils.isEmpty(commentStyle)) {
                         // do not treat this file
                         continue;
                     }
                 }
                 //
-                File file = new File( root, path );
-                List<File> files = results.get( commentStyle );
-                files.add( file );
+                File file = new File(root, path);
+                List<File> files = results.get(commentStyle);
+                files.add(file);
             }
         }
         return results;
@@ -516,32 +489,26 @@ public abstract class AbstractLicenseNameMojo
      * @param state state of files to get
      * @return all files of the given state
      */
-    private Set<File> getFiles( EnumMap<FileState, Set<File>> result, FileState state )
-    {
-        return result.get( state );
+    private Set<File> getFiles(EnumMap<FileState, Set<File>> result, FileState state) {
+        return result.get(state);
     }
-
 
     // ----------------------------------------------------------------------
     // Private Methods
     // ----------------------------------------------------------------------
 
-    private void addPropertiesToContext( Properties properties, String prefix, Map<String, Object> context )
-    {
-        @SuppressWarnings( { "rawtypes", "unchecked" } )
+    private void addPropertiesToContext(Properties properties, String prefix, Map<String, Object> context) {
+        @SuppressWarnings({"rawtypes", "unchecked"})
         Map<String, String> cast = (Map) properties;
-        addPropertiesToContext( cast, prefix, context );
+        addPropertiesToContext(cast, prefix, context);
     }
 
-    private void addPropertiesToContext( Map<String, String> properties, String prefix, Map<String, Object> context )
-    {
-        if ( properties != null )
-        {
-            for ( Object o : properties.keySet() )
-            {
+    private void addPropertiesToContext(Map<String, String> properties, String prefix, Map<String, Object> context) {
+        if (properties != null) {
+            for (Object o : properties.keySet()) {
                 String nextKey = (String) o;
-                Object nextValue = properties.get( nextKey );
-                context.put( prefix + nextKey, nextValue.toString() );
+                Object nextValue = properties.get(nextKey);
+                context.put(prefix + nextKey, nextValue.toString());
             }
         }
     }

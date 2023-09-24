@@ -31,25 +31,20 @@ import java.io.IOException;
  * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
-public class InvalideFileHeaderException
-    extends IOException
-{
+public class InvalideFileHeaderException extends IOException {
     private static final long serialVersionUID = 1L;
 
     /**
      * Default constructor.
      */
-    public InvalideFileHeaderException()
-    {
-    }
+    public InvalideFileHeaderException() {}
 
     /**
      * Constructor with a message.
      *
      * @param message message of the error
      */
-    public InvalideFileHeaderException( String message )
-    {
-        super( message );
+    public InvalideFileHeaderException(String message) {
+        super(message);
     }
 }

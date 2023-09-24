@@ -32,5 +32,5 @@ assert Files.exists(licensesXmlPath)
 assert Files.exists(aslPath20)
 assert Files.exists(aslPath11)
 
-assert aslPath20.text.contains(' Version 2.0, January 2004')
-assert aslPath11.text.contains('The Apache Software License, Version 1.1')
+assert aslPath20.toFile().text.contains(' Version 2.0, January 2004')
+assert aslPath11.toFile().text.contains('The Apache Software License, Version 1.1')

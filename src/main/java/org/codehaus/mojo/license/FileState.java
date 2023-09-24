@@ -33,8 +33,7 @@ import java.util.Set;
  * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
-public enum FileState
-{
+public enum FileState {
 
     /**
      * file was updated
@@ -71,14 +70,12 @@ public enum FileState
      * @param file    file to add
      * @param results dictionary to update
      */
-    public void addFile( File file, EnumMap<FileState, Set<File>> results )
-    {
-        Set<File> fileSet = results.get( this );
-        if ( fileSet == null )
-        {
+    public void addFile(File file, EnumMap<FileState, Set<File>> results) {
+        Set<File> fileSet = results.get(this);
+        if (fileSet == null) {
             fileSet = new HashSet<>();
-            results.put( this, fileSet );
+            results.put(this, fileSet);
         }
-        fileSet.add( file );
+        fileSet.add(file);
     }
 }

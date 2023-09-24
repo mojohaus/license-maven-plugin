@@ -41,6 +41,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -53,6 +54,10 @@ import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.codehaus.mojo.license.Eol;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+
 /**
  * A LicenseSummaryWriter.
  *
@@ -60,83 +65,70 @@ import java.util.regex.Pattern;
  * @version $Revision$
  * @since 1.0
  */
-public class LicenseSummaryWriter
-{
-    public static void writeLicenseSummary( List<ProjectLicenseInfo> dependencies, File outputFile, Charset charset,
-            Eol eol, boolean writeVersions )
-        throws ParserConfigurationException, TransformerException, IOException
-    {
+public class LicenseSummaryWriter {
+    public static void writeLicenseSummary(
+            List<ProjectLicenseInfo> dependencies, File outputFile, Charset charset, Eol eol, boolean writeVersions)
+            throws ParserConfigurationException, TransformerException, IOException {
         DocumentBuilderFactory fact = DocumentBuilderFactory.newInstance();
         DocumentBuilder parser = fact.newDocumentBuilder();
         Document doc = parser.newDocument();
 
-        Node root = doc.createElement( "licenseSummary" );
-        doc.appendChild( root );
-        Node dependenciesNode = doc.createElement( "dependencies" );
-        root.appendChild( dependenciesNode );
+        Node root = doc.createElement("licenseSummary");
+        doc.appendChild(root);
+        Node dependenciesNode = doc.createElement("dependencies");
+        root.appendChild(dependenciesNode);
 
-        for ( ProjectLicenseInfo dep : dependencies )
-        {
-            dependenciesNode.appendChild( createDependencyNode( doc, dep, writeVersions ) );
+        for (ProjectLicenseInfo dep : dependencies) {
+            dependenciesNode.appendChild(createDependencyNode(doc, dep, writeVersions));
         }
 
         // Prepare the output file File
-        try ( StringWriter sw = new StringWriter() )
-        {
+        try (StringWriter sw = new StringWriter()) {
             Transformer xformer = TransformerFactory.newInstance().newTransformer();
-            xformer.setOutputProperty( OutputKeys.INDENT, "yes" );
-            xformer.setOutputProperty( "{http://xml.apache.org/xslt}indent-amount", "2" );
-            xformer.transform( new DOMSource( doc ), new StreamResult( sw ) );
+            xformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            xformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+            xformer.transform(new DOMSource(doc), new StreamResult(sw));
 
             final String platformEol = Eol.PLATFORM.getEolString();
-            final String outputString = !platformEol.equals( eol.getEolString() )
-                        ? sw.toString().replace( platformEol, eol.getEolString() )
-                        : sw.toString();
-            Files.write( outputFile.toPath(), outputString.getBytes( charset ) );
+            final String outputString = !platformEol.equals(eol.getEolString())
+                    ? sw.toString().replace(platformEol, eol.getEolString())
+                    : sw.toString();
+            Files.write(outputFile.toPath(), outputString.getBytes(charset));
         }
     }
 
-    public static Node createDependencyNode( Document doc, ProjectLicenseInfo dep, boolean writeVersions )
-    {
+    public static Node createDependencyNode(Document doc, ProjectLicenseInfo dep, boolean writeVersions) {
         final List<String> messages = dep.getDownloaderMessages();
         final boolean hasDownloaderMessages = messages != null && !messages.isEmpty();
 
-        final Node depNode = doc.createElement( "dependency" );
+        final Node depNode = doc.createElement("dependency");
 
-        final Node groupIdNode = doc.createElement( "groupId" );
-        groupIdNode.appendChild( doc.createTextNode( patternOrText( dep.getGroupId(), hasDownloaderMessages ) ) );
-        depNode.appendChild( groupIdNode );
+        final Node groupIdNode = doc.createElement("groupId");
+        groupIdNode.appendChild(doc.createTextNode(patternOrText(dep.getGroupId(), hasDownloaderMessages)));
+        depNode.appendChild(groupIdNode);
 
-        final Node artifactIdNode = doc.createElement( "artifactId" );
-        artifactIdNode.appendChild( doc.createTextNode( patternOrText( dep.getArtifactId(), hasDownloaderMessages ) ) );
-        depNode.appendChild( artifactIdNode );
+        final Node artifactIdNode = doc.createElement("artifactId");
+        artifactIdNode.appendChild(doc.createTextNode(patternOrText(dep.getArtifactId(), hasDownloaderMessages)));
+        depNode.appendChild(artifactIdNode);
 
-        if ( writeVersions )
-        {
-            final Node versionNode = doc.createElement( "version" );
-            versionNode.appendChild( doc.createTextNode( patternOrText( dep.getVersion(), hasDownloaderMessages ) ) );
-            depNode.appendChild( versionNode );
-        }
-        else if ( hasDownloaderMessages  )
-        {
-            depNode.appendChild( doc.createComment( " <version>" + dep.getVersion() + "</version> " ) );
+        if (writeVersions) {
+            final Node versionNode = doc.createElement("version");
+            versionNode.appendChild(doc.createTextNode(patternOrText(dep.getVersion(), hasDownloaderMessages)));
+            depNode.appendChild(versionNode);
+        } else if (hasDownloaderMessages) {
+            depNode.appendChild(doc.createComment(" <version>" + dep.getVersion() + "</version> "));
         }
 
-        if ( hasDownloaderMessages  )
-        {
-            Node matchLicensesNode = doc.createElement( "matchLicenses" );
-            if ( dep.getLicenses() == null || dep.getLicenses().size() == 0 )
-            {
-                matchLicensesNode.appendChild( doc.createComment( " Match dependency with no licenses " ) );
-            }
-            else
-            {
-                for ( ProjectLicense lic : dep.getLicenses() )
-                {
-                    matchLicensesNode.appendChild( createLicenseNode( doc, lic, true ) );
+        if (hasDownloaderMessages) {
+            Node matchLicensesNode = doc.createElement("matchLicenses");
+            if (dep.getLicenses() == null || dep.getLicenses().size() == 0) {
+                matchLicensesNode.appendChild(doc.createComment(" Match dependency with no licenses "));
+            } else {
+                for (ProjectLicense lic : dep.getLicenses()) {
+                    matchLicensesNode.appendChild(createLicenseNode(doc, lic, true));
                 }
             }
-            depNode.appendChild( matchLicensesNode );
+            depNode.appendChild(matchLicensesNode);
         }
 
         if ( dep.getExtendedInfo() != null )
@@ -167,36 +159,30 @@ public class LicenseSummaryWriter
             addTextPropertyIfSet( doc, depNode, "url", extendedInfo.getUrl() );
         }
 
-        Node licensesNode = doc.createElement( "licenses" );
+        Node licensesNode = doc.createElement("licenses");
         if ( CollectionUtils.isEmpty( dep.getLicenses() ) )
         {
             final String comment =
                 hasDownloaderMessages ? " Manually add license elements here: " : " No license information available. ";
-            licensesNode.appendChild( doc.createComment( comment ) );
-        }
-        else
-        {
-            if ( hasDownloaderMessages )
-            {
-                licensesNode.appendChild( doc.createComment( " Manually fix the existing license nodes: " ) );
+            licensesNode.appendChild(doc.createComment(comment));
+        } else {
+            if (hasDownloaderMessages) {
+                licensesNode.appendChild(doc.createComment(" Manually fix the existing license nodes: "));
             }
-            for ( ProjectLicense lic : dep.getLicenses() )
-            {
-                licensesNode.appendChild( createLicenseNode( doc, lic, false ) );
+            for (ProjectLicense lic : dep.getLicenses()) {
+                licensesNode.appendChild(createLicenseNode(doc, lic, false));
             }
         }
-        depNode.appendChild( licensesNode );
+        depNode.appendChild(licensesNode);
 
-        if ( hasDownloaderMessages )
-        {
-            final Node downloaderMessagesNode = doc.createElement( "downloaderMessages" );
-            for ( String msg : messages )
-            {
-                final Node downloaderMessageNode = doc.createElement( "downloaderMessage" );
-                downloaderMessageNode.appendChild( doc.createTextNode( msg ) );
-                downloaderMessagesNode.appendChild( downloaderMessageNode );
+        if (hasDownloaderMessages) {
+            final Node downloaderMessagesNode = doc.createElement("downloaderMessages");
+            for (String msg : messages) {
+                final Node downloaderMessageNode = doc.createElement("downloaderMessage");
+                downloaderMessageNode.appendChild(doc.createTextNode(msg));
+                downloaderMessagesNode.appendChild(downloaderMessageNode);
             }
-            depNode.appendChild( downloaderMessagesNode );
+            depNode.appendChild(downloaderMessagesNode);
         }
 
         return depNode;
@@ -226,43 +212,37 @@ public class LicenseSummaryWriter
         }
     }
 
-    public static Node createLicenseNode( Document doc, ProjectLicense lic, boolean isMatcher )
-    {
-        Node licenseNode = doc.createElement( "license" );
+    public static Node createLicenseNode(Document doc, ProjectLicense lic, boolean isMatcher) {
+        Node licenseNode = doc.createElement("license");
 
-        if ( lic.getName() != null )
-        {
-            Node licNameNode = doc.createElement( "name" );
-            licNameNode.appendChild( doc.createTextNode( patternOrText( lic.getName(), isMatcher ) ) );
-            licenseNode.appendChild( licNameNode );
+        if (lic.getName() != null) {
+            Node licNameNode = doc.createElement("name");
+            licNameNode.appendChild(doc.createTextNode(patternOrText(lic.getName(), isMatcher)));
+            licenseNode.appendChild(licNameNode);
         }
 
-        if ( lic.getUrl() != null )
-        {
-            Node licUrlNode = doc.createElement( "url" );
-            licUrlNode.appendChild( doc.createTextNode( patternOrText( lic.getUrl(), isMatcher ) ) );
-            licenseNode.appendChild( licUrlNode );
+        if (lic.getUrl() != null) {
+            Node licUrlNode = doc.createElement("url");
+            licUrlNode.appendChild(doc.createTextNode(patternOrText(lic.getUrl(), isMatcher)));
+            licenseNode.appendChild(licUrlNode);
         }
 
-        if ( lic.getDistribution() != null )
-        {
-            Node licDistNode = doc.createElement( "distribution" );
-            licDistNode.appendChild( doc.createTextNode( patternOrText( lic.getDistribution(), isMatcher ) ) );
-            licenseNode.appendChild( licDistNode );
+        if (lic.getDistribution() != null) {
+            Node licDistNode = doc.createElement("distribution");
+            licDistNode.appendChild(doc.createTextNode(patternOrText(lic.getDistribution(), isMatcher)));
+            licenseNode.appendChild(licDistNode);
         }
 
-        if ( lic.getFile() != null )
-        {
-            Node licFileNode = doc.createElement( "file" );
-            licFileNode.appendChild( doc.createTextNode( patternOrText( lic.getFile(), isMatcher ) ) );
-            licenseNode.appendChild( licFileNode );
+        if (lic.getFile() != null) {
+            Node licFileNode = doc.createElement("file");
+            licFileNode.appendChild(doc.createTextNode(patternOrText(lic.getFile(), isMatcher)));
+            licenseNode.appendChild(licFileNode);
         }
 
-        if ( lic.getComments() != null )
-        {
-            Node licCommentsNode = doc.createElement( "comments" );
-            licCommentsNode.appendChild( doc.createTextNode( patternOrText( lic.getComments(), isMatcher ) ) );
-            licenseNode.appendChild( licCommentsNode );
+        if (lic.getComments() != null) {
+            Node licCommentsNode = doc.createElement("comments");
+            licCommentsNode.appendChild(doc.createTextNode(patternOrText(lic.getComments(), isMatcher)));
+            licenseNode.appendChild(licCommentsNode);
         }
 
         return licenseNode;
@@ -334,34 +314,26 @@ public class LicenseSummaryWriter
         }
     }
 
-    private static final Pattern WHITESPACE_PATTERN = Pattern.compile( "\\s{2,}" );
+    private static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\s{2,}");
 
-    static String patternOrText( String value, boolean isMatcher )
-    {
-        if ( value != null && !value.isEmpty() && isMatcher )
-        {
+    static String patternOrText(String value, boolean isMatcher) {
+        if (value != null && !value.isEmpty() && isMatcher) {
             final StringBuilder result = new StringBuilder();
-            final Matcher m = WHITESPACE_PATTERN.matcher( value );
+            final Matcher m = WHITESPACE_PATTERN.matcher(value);
             int offset = 0;
-            while ( m.find() )
-            {
-                if ( m.start() > offset )
-                {
-                    result.append( Pattern.quote( value.substring( offset, m.start() ) ) );
+            while (m.find()) {
+                if (m.start() > offset) {
+                    result.append(Pattern.quote(value.substring(offset, m.start())));
                 }
-                result.append( "\\s+" );
+                result.append("\\s+");
                 offset = m.end();
             }
-            if ( offset < value.length() )
-            {
-                result.append( Pattern.quote( value.substring( offset ) ) );
+            if (offset < value.length()) {
+                result.append(Pattern.quote(value.substring(offset)));
             }
             return result.toString();
-        }
-        else
-        {
+        } else {
             return value;
         }
     }
-
 }

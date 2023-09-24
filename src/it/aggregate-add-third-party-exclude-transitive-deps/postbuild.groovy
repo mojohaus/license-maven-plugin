@@ -32,6 +32,6 @@ assert !content.contains('org.nuiton.i18n:nuiton-i18n:1.2.2');
 assert !content.contains('junit:junit:3.8.1');
 
 assert content.contains('org.nuiton:maven-helper-plugin:1.2.3');
-assert content.contains('junit:junit:4.8.1');
+assert content.contains('junit:junit:4.13.1');
 
 return true

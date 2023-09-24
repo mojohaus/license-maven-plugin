@@ -28,9 +28,7 @@ package org.codehaus.mojo.license.api;
  * @author <a href="mailto:tchemit@codelutin.com">tony chemit</a>
  * @version $Id$
  */
-public class ThirdPartyToolException
-    extends Exception
-{
+public class ThirdPartyToolException extends Exception {
     /**
      * Construct a new <code>ThirdPartyToolException</code> exception wrapping an underlying <code>Exception</code>
      * and providing a <code>message</code>.
@@ -38,9 +36,8 @@ public class ThirdPartyToolException
      * @param message could be null
      * @param cause   could be null
      */
-    public ThirdPartyToolException( String message, Exception cause )
-    {
-        super( message, cause );
+    public ThirdPartyToolException(String message, Exception cause) {
+        super(message, cause);
     }
 
     /**
@@ -50,9 +47,8 @@ public class ThirdPartyToolException
      * @param message could be null
      * @param cause   could be null
      */
-    public ThirdPartyToolException( String message, Throwable cause )
-    {
-        super( message, cause );
+    public ThirdPartyToolException(String message, Throwable cause) {
+        super(message, cause);
     }
 
     /**
@@ -60,8 +56,7 @@ public class ThirdPartyToolException
      *
      * @param message could be null
      */
-    public ThirdPartyToolException( String message )
-    {
-        super( message );
+    public ThirdPartyToolException(String message) {
+        super(message);
     }
 }

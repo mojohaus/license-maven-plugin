@@ -22,12 +22,12 @@ package org.codehaus.mojo.license.model;
  * #L%
  */
 
+import java.io.IOException;
+import java.net.URL;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.io.IOException;
-import java.net.URL;
 
 /**
  * Tests {@link LicenseRepository}.
@@ -35,70 +35,60 @@ import java.net.URL;
  * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
-public class LicenseRepositoryTest
-{
+public class LicenseRepositoryTest {
 
     protected LicenseRepository repository;
 
     @Before
-    public void setUp()
-    {
+    public void setUp() {
         repository = null;
     }
 
     @Test
-    public void testJarRepository()
-        throws IOException
-    {
+    public void testJarRepository() throws IOException {
 
         repository = new LicenseRepository();
-        URL baseURL = getClass().getResource( LicenseStore.JAR_LICENSE_REPOSITORY );
-        repository.setBaseURL( baseURL );
+        URL baseURL = getClass().getResource(LicenseStore.JAR_LICENSE_REPOSITORY);
+        repository.setBaseURL(baseURL);
         repository.load();
 
         License[] licenses = repository.getLicenses();
-        Assert.assertNotNull( licenses );
-        Assert.assertEquals( LicenseStoreTest.DEFAULT_LICENSES.size(), licenses.length );
+        Assert.assertNotNull(licenses);
+        Assert.assertEquals(LicenseStoreTest.DEFAULT_LICENSES.size(), licenses.length);
 
-        for ( String licenseName : LicenseStoreTest.DEFAULT_LICENSES )
-        {
-            License license = repository.getLicense( licenseName );
-            Assert.assertNotNull( license );
-            Assert.assertNotNull( license.getHeaderURL() );
-            Assert.assertNotNull( license.getLicenseURL() );
+        for (String licenseName : LicenseStoreTest.DEFAULT_LICENSES) {
+            License license = repository.getLicense(licenseName);
+            Assert.assertNotNull(license);
+            Assert.assertNotNull(license.getHeaderURL());
+            Assert.assertNotNull(license.getLicenseURL());
         }
 
-        for ( String licenseName : repository.getLicenseNames() )
-        {
-            Assert.assertTrue( LicenseStoreTest.DEFAULT_LICENSES.contains( licenseName ) );
+        for (String licenseName : repository.getLicenseNames()) {
+            Assert.assertTrue(LicenseStoreTest.DEFAULT_LICENSES.contains(licenseName));
         }
     }
 
     @Test
-    public void testUserRepository()
-        throws IOException
-    {
+    public void testUserRepository() throws IOException {
 
         repository = new LicenseRepository();
-        URL baseURL = getClass().getResource( "/newRepository" );
-        repository.setBaseURL( baseURL );
+        URL baseURL = getClass().getResource("/newRepository");
+        repository.setBaseURL(baseURL);
         repository.load();
 
         License[] licenses = repository.getLicenses();
-        Assert.assertNotNull( licenses );
-        Assert.assertEquals( LicenseStoreTest.NEW_LICENSES.size(), licenses.length );
+        Assert.assertNotNull(licenses);
+        Assert.assertEquals(LicenseStoreTest.NEW_LICENSES.size(), licenses.length);
 
-        for ( String licenseName : LicenseStoreTest.NEW_LICENSES )
-        {
-            License license = repository.getLicense( licenseName );
-            Assert.assertNotNull( license );
-            Assert.assertNotNull( license.getHeaderURL() );
-            Assert.assertNotNull( license.getLicenseURL() );
+        for (String licenseName : LicenseStoreTest.NEW_LICENSES) {
+            License license = repository.getLicense(licenseName);
+            Assert.assertNotNull(license);
+            Assert.assertNotNull(license.getHeaderURL());
+            Assert.assertNotNull(license.getLicenseURL());
         }
 
-        for ( String licenseName : repository.getLicenseNames() )
-        {
-            Assert.assertTrue( LicenseStoreTest.NEW_LICENSES.contains( licenseName ) );
+        for (String licenseName : repository.getLicenseNames()) {
+            Assert.assertTrue(LicenseStoreTest.NEW_LICENSES.contains(licenseName));
         }
     }
 }

@@ -22,6 +22,17 @@ package org.codehaus.mojo.license;
  * #L%
  */
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+
 import freemarker.template.Template;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugins.annotations.Component;
@@ -35,26 +46,15 @@ import org.codehaus.plexus.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-
 /**
  * The goal to remove the header on project source files.
  *
  * @author tchemit dev@tchemit.fr
  * @since 1.11
  */
-@Mojo( name = "remove-file-header", threadSafe = true )
-public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo
-{
-    private static final Logger LOG = LoggerFactory.getLogger( RemoveFileHeaderMojo.class );
+@Mojo(name = "remove-file-header", threadSafe = true)
+public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo {
+    private static final Logger LOG = LoggerFactory.getLogger(RemoveFileHeaderMojo.class);
 
     // ----------------------------------------------------------------------
     // Mojo Parameters
@@ -65,7 +65,7 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo
      *
      * @since 1.11
      */
-    @Parameter( property = "license.skipRemoveLicense", defaultValue = "false" )
+    @Parameter(property = "license.skipRemoveLicense", defaultValue = "false")
     private boolean skipRemoveLicense;
 
     /**
@@ -73,7 +73,7 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo
      *
      * @since 1.11
      */
-    @Parameter( property = "dryRun", defaultValue = "false" )
+    @Parameter(property = "dryRun", defaultValue = "false")
     private boolean dryRun;
 
     /**
@@ -85,7 +85,7 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo
      *
      * @since 1.11
      */
-    @Parameter( property = "license.ignoreNoFileToScan", defaultValue = "false" )
+    @Parameter(property = "license.ignoreNoFileToScan", defaultValue = "false")
     private boolean ignoreNoFileToScan;
 
     /**
@@ -100,7 +100,7 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo
      *
      * @since 1.11
      */
-    @Parameter( property = "license.roots" )
+    @Parameter(property = "license.roots")
     private String[] roots;
 
     /**
@@ -108,7 +108,7 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo
      *
      * @since 1.11
      */
-    @Parameter( property = "license.includes" )
+    @Parameter(property = "license.includes")
     private String[] includes;
 
     /**
@@ -121,7 +121,7 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo
      *
      * @since 1.11
      */
-    @Parameter( property = "license.excludes" )
+    @Parameter(property = "license.excludes")
     private String[] excludes;
 
     /**
@@ -173,7 +173,7 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo
      *
      * @since 1.0
      */
-    @Parameter( property = "license.ignoreTag" )
+    @Parameter(property = "license.ignoreTag")
     private String ignoreTag;
 
     // ----------------------------------------------------------------------
@@ -185,7 +185,7 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo
      *
      * @since 1.0
      */
-    @Component( role = FileHeaderTransformer.class )
+    @Component(role = FileHeaderTransformer.class)
     private Map<String, FileHeaderTransformer> transformers;
 
     // ----------------------------------------------------------------------
@@ -224,8 +224,7 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo
     // ----------------------------------------------------------------------
 
     @Override
-    public boolean isSkip()
-    {
+    public boolean isSkip() {
         return skipRemoveLicense;
     }
 
@@ -234,30 +233,26 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo
     // ----------------------------------------------------------------------
 
     @Override
-    public void init() throws Exception
-    {
+    public void init() throws Exception {
 
-        if ( StringUtils.isEmpty( ignoreTag ) )
-        {
+        if (StringUtils.isEmpty(ignoreTag)) {
 
             // use default value
             this.ignoreTag = "%" + "%Ignore-License";
         }
 
-        if ( isVerbose() )
-        {
+        if (isVerbose()) {
 
             // print available comment styles (transformers)
             StringBuilder buffer = new StringBuilder();
-            buffer.append( "config - available comment styles :" );
+            buffer.append("config - available comment styles :");
             String commentFormat = "\n  * %1$s (%2$s)";
-            for ( String transformerName : transformers.keySet() )
-            {
-                FileHeaderTransformer aTransformer = getTransformer( transformers, transformerName );
-                String str = String.format( commentFormat, aTransformer.getName(), aTransformer.getDescription() );
-                buffer.append( str );
+            for (String transformerName : transformers.keySet()) {
+                FileHeaderTransformer aTransformer = getTransformer(transformers, transformerName);
+                String str = String.format(commentFormat, aTransformer.getName(), aTransformer.getDescription());
+                buffer.append(str);
             }
-            LOG.info( "{}", buffer );
+            LOG.info("{}", buffer);
         }
 
         // set timestamp used for temporary files
@@ -265,146 +260,120 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo
 
         super.init();
 
-        if ( roots == null || roots.length == 0 )
-        {
+        if (roots == null || roots.length == 0) {
             roots = DEFAULT_ROOTS;
-            if ( isVerbose() )
-            {
-                LOG.info( "Will use default roots {}", ( Object ) roots );
+            if (isVerbose()) {
+                LOG.info("Will use default roots {}", (Object) roots);
             }
         }
 
-        if ( includes == null || includes.length == 0 )
-        {
+        if (includes == null || includes.length == 0) {
             includes = DEFAULT_INCLUDES;
-            if ( isVerbose() )
-            {
-                LOG.info( "Will use default includes {}", ( Object ) includes );
+            if (isVerbose()) {
+                LOG.info("Will use default includes {}", (Object) includes);
             }
         }
 
-        if ( excludes == null || excludes.length == 0 )
-        {
+        if (excludes == null || excludes.length == 0) {
             excludes = DEFAULT_EXCLUDES;
-            if ( isVerbose() )
-            {
-                LOG.info( "Will use default excludes {}", ( Object ) excludes );
+            if (isVerbose()) {
+                LOG.info("Will use default excludes {}", (Object) excludes);
             }
         }
 
         Map<String, String> extensionToCommentStyle = new TreeMap<>();
 
         // add default extensions from header transformers
-        for ( Map.Entry<String, FileHeaderTransformer> entry : transformers.entrySet() )
-        {
+        for (Map.Entry<String, FileHeaderTransformer> entry : transformers.entrySet()) {
             String commentStyle = entry.getKey();
             FileHeaderTransformer aTransformer = entry.getValue();
             String[] extensions = aTransformer.getDefaultAcceptedExtensions();
-            for ( String extension : extensions )
-            {
-                if ( isVerbose() )
-                {
-                    LOG.info( "Associate extension '{}' to comment style '{}'", extension, commentStyle );
+            for (String extension : extensions) {
+                if (isVerbose()) {
+                    LOG.info("Associate extension '{}' to comment style '{}'", extension, commentStyle);
                 }
-                extensionToCommentStyle.put( extension, commentStyle );
+                extensionToCommentStyle.put(extension, commentStyle);
             }
         }
 
-        if ( extraExtensions != null )
-        {
+        if (extraExtensions != null) {
 
             // fill extra extensions for each transformer
-            for ( Map.Entry<String, String> entry : extraExtensions.entrySet() )
-            {
+            for (Map.Entry<String, String> entry : extraExtensions.entrySet()) {
                 String extension = entry.getKey();
-                if ( extensionToCommentStyle.containsKey( extension ) )
-                {
+                if (extensionToCommentStyle.containsKey(extension)) {
 
                     // override existing extension mapping
-                    LOG.warn( "The extension '{}' is already accepted for comment style '{}'",
-                            extension, extensionToCommentStyle.get( extension ) );
+                    LOG.warn(
+                            "The extension '{}' is already accepted for comment style '{}'",
+                            extension,
+                            extensionToCommentStyle.get(extension));
                 }
                 String commentStyle = entry.getValue();
 
                 // check transformer exists
-                getTransformer( transformers, commentStyle );
+                getTransformer(transformers, commentStyle);
 
-                if ( isVerbose() )
-                {
-                    LOG.info( "Associate extension '{}' to comment style '{}'", extension, commentStyle );
+                if (isVerbose()) {
+                    LOG.info("Associate extension '{}' to comment style '{}'", extension, commentStyle);
                 }
-                extensionToCommentStyle.put( extension, commentStyle );
+                extensionToCommentStyle.put(extension, commentStyle);
             }
         }
 
-        if ( extraFiles == null )
-        {
+        if (extraFiles == null) {
             extraFiles = Collections.emptyMap();
         }
 
         // get all files to treat indexed by their comment style
-        filesToTreatByCommentStyle = obtainFilesToProcessByCommentStyle( extraFiles, roots, includes, excludes,
-                extensionToCommentStyle, transformers );
+        filesToTreatByCommentStyle = obtainFilesToProcessByCommentStyle(
+                extraFiles, roots, includes, excludes, extensionToCommentStyle, transformers);
     }
 
     @Override
-    public void doAction() throws Exception
-    {
+    public void doAction() throws Exception {
 
         long t0 = System.nanoTime();
 
         processedFiles = new HashSet<>();
-        result = new EnumMap<>( FileState.class );
+        result = new EnumMap<>(FileState.class);
 
-        try
-        {
+        try {
 
-            for ( Map.Entry<String, List<File>> commentStyleFiles : filesToTreatByCommentStyle.entrySet() )
-            {
+            for (Map.Entry<String, List<File>> commentStyleFiles : filesToTreatByCommentStyle.entrySet()) {
 
                 String commentStyle = commentStyleFiles.getKey();
                 List<File> files = commentStyleFiles.getValue();
 
-                processCommentStyle( commentStyle, files );
+                processCommentStyle(commentStyle, files);
             }
 
-        }
-        finally
-        {
+        } finally {
             int nbFiles = processedFiles.size();
-            if ( nbFiles == 0 && !ignoreNoFileToScan )
-            {
-                LOG.warn( "No file to scan." );
-            }
-            else
-            {
-                String delay = MojoHelper.convertTime( System.nanoTime() - t0 );
-                LOG.info( "Scanned {} file headers in {}.", nbFiles, delay );
+            if (nbFiles == 0 && !ignoreNoFileToScan) {
+                LOG.warn("No file to scan.");
+            } else {
+                String delay = MojoHelper.convertTime(System.nanoTime() - t0);
+                LOG.info("Scanned {} file headers in {}.", nbFiles, delay);
             }
             Set<FileState> states = result.keySet();
-            if ( states.size() == 1 && states.contains( FileState.uptodate ) )
-            {
+            if (states.size() == 1 && states.contains(FileState.uptodate)) {
                 // all files where up to date
-                LOG.info( "All files are up-to-date." );
-            }
-            else
-            {
+                LOG.info("All files are up-to-date.");
+            } else {
 
                 StringBuilder buffer = new StringBuilder();
-                for ( FileState state : FileState.values() )
-                {
+                for (FileState state : FileState.values()) {
 
-                    reportType( result, state, buffer );
+                    reportType(result, state, buffer);
                 }
 
-                LOG.info( "{}", buffer );
+                LOG.info("{}", buffer);
             }
-
         }
     }
 
-    private boolean isDryRun()
-    {
+    private boolean isDryRun() {
         return dryRun;
     }
 
@@ -415,89 +384,75 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo
      * @param filesToTreat files using this comment style to treat
      * @throws IOException if any IO error while processing files
      */
-    private void processCommentStyle( String commentStyle, List<File> filesToTreat ) throws IOException
-    {
+    private void processCommentStyle(String commentStyle, List<File> filesToTreat) throws IOException {
 
         // obtain license from definition
-        License license = getLicense( getLicenseName(), true );
+        License license = getLicense(getLicenseName(), true);
 
-        if ( isVerbose() )
-        {
-            LOG.info( "Process header '{}'", commentStyle );
-            LOG.info( " - using {}", license.getDescription() );
+        if (isVerbose()) {
+            LOG.info("Process header '{}'", commentStyle);
+            LOG.info(" - using {}", license.getDescription());
         }
 
         // use header transformer according to comment style given in header
-        FileHeaderTransformer transformer = getTransformer( transformers, commentStyle );
+        FileHeaderTransformer transformer = getTransformer(transformers, commentStyle);
 
-
-        for ( File file : filesToTreat )
-        {
-            processFile( transformer, file );
+        for (File file : filesToTreat) {
+            processFile(transformer, file);
         }
         filesToTreat.clear();
     }
 
-    private boolean processFile( FileHeaderTransformer transformer, File file, File processFile ) throws IOException
-    {
+    private boolean processFile(FileHeaderTransformer transformer, File file, File processFile) throws IOException {
 
         String content;
 
-        try
-        {
-            content = FileUtil.readAsString( file, getEncoding() );
-        }
-        catch ( IOException e )
-        {
-            throw new IOException( "Could not obtain content of file " + file );
+        try {
+            content = FileUtil.readAsString(file, getEncoding());
+        } catch (IOException e) {
+            throw new IOException("Could not obtain content of file " + file);
         }
 
-        //check that file is not marked to be ignored
-        if ( content.contains( ignoreTag ) )
-        {
-            LOG.info( " - ignore file (detected {}) {}", ignoreTag, file );
+        // check that file is not marked to be ignored
+        if (content.contains(ignoreTag)) {
+            LOG.info(" - ignore file (detected {}) {}", ignoreTag, file);
 
-            FileState.ignore.addFile( file, result );
+            FileState.ignore.addFile(file, result);
 
             return false;
         }
 
         String commentStartTag = transformer.getCommentStartTag();
-        int firstIndex = content.indexOf( commentStartTag );
-        if ( firstIndex == -1 )
-        {
+        int firstIndex = content.indexOf(commentStartTag);
+        if (firstIndex == -1) {
 
-            FileState.uptodate.addFile( file, result );
+            FileState.uptodate.addFile(file, result);
             return false;
         }
 
         char lastchar = ' ';
-        while ( lastchar != '\n' && firstIndex > 0 )
-        {
-            lastchar = content.charAt( ( --firstIndex ) );
+        while (lastchar != '\n' && firstIndex > 0) {
+            lastchar = content.charAt((--firstIndex));
         }
         String commentEndTag = transformer.getCommentEndTag();
-        int lastIndex = content.indexOf( commentEndTag );
-        if ( lastIndex == -1 )
-        {
-            FileState.uptodate.addFile( file, result );
+        int lastIndex = content.indexOf(commentEndTag);
+        if (lastIndex == -1) {
+            FileState.uptodate.addFile(file, result);
             return false;
         }
         lastchar = ' ';
-        while ( lastchar != '\n' )
-        {
-            lastchar = content.charAt( ( ++lastIndex ) );
+        while (lastchar != '\n') {
+            lastchar = content.charAt((++lastIndex));
         }
 
-        if ( isVerbose() )
-        {
-            LOG.info( " - header was removed for {}", file );
+        if (isVerbose()) {
+            LOG.info(" - header was removed for {}", file);
         }
 
-        String contentWithoutHeader = content.substring( 0, firstIndex ) + content.substring( lastIndex + 1 );
+        String contentWithoutHeader = content.substring(0, firstIndex) + content.substring(lastIndex + 1);
 
-        FileUtils.fileWrite( processFile, contentWithoutHeader );
-        FileState.remove.addFile( file, result );
+        FileUtils.fileWrite(processFile, contentWithoutHeader);
+        FileState.remove.addFile(file, result);
         return true;
     }
 
@@ -508,44 +463,35 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo
      * @param file        original file to process
      * @throws IOException if any IO error while processing this file
      */
-    private void processFile( FileHeaderTransformer transformer, File file ) throws IOException
-    {
+    private void processFile(FileHeaderTransformer transformer, File file) throws IOException {
 
-        if ( processedFiles.contains( file ) )
-        {
-            LOG.info( " - skip already processed file {}", file );
+        if (processedFiles.contains(file)) {
+            LOG.info(" - skip already processed file {}", file);
             return;
         }
 
         // output file
-        File processFile = new File( file.getAbsolutePath() + "_" + timestamp );
+        File processFile = new File(file.getAbsolutePath() + "_" + timestamp);
         boolean doFinalize = false;
-        try
-        {
-            doFinalize = processFile( transformer, file, processFile );
-        }
-        catch ( Exception e )
-        {
-            LOG.warn( "skip failed file: {}{}",
-                   e.getMessage(),
-                   e.getCause() == null ? "" : " Cause : " + e.getCause().getMessage(),
-                   e );
-            FileState.fail.addFile( file, result );
+        try {
+            doFinalize = processFile(transformer, file, processFile);
+        } catch (Exception e) {
+            LOG.warn(
+                    "skip failed file: {}{}",
+                    e.getMessage(),
+                    e.getCause() == null ? "" : " Cause : " + e.getCause().getMessage(),
+                    e);
+            FileState.fail.addFile(file, result);
             doFinalize = false;
-        }
-        finally
-        {
+        } finally {
 
             // whatever was the result, this file is treated.
-            processedFiles.add( file );
+            processedFiles.add(file);
 
-            if ( doFinalize )
-            {
-                finalizeFile( file, processFile );
-            }
-            else
-            {
-                FileUtil.deleteFile( processFile );
+            if (doFinalize) {
+                finalizeFile(file, processFile);
+            } else {
+                Files.deleteIfExists(processFile.toPath());
             }
         }
     }
@@ -559,43 +505,29 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo
      * @param processFile the processed file
      * @throws IOException if any IO error while finalizing file
      */
-    private void finalizeFile( File file, File processFile ) throws IOException
-    {
+    private void finalizeFile(File file, File processFile) throws IOException {
 
-        if ( isKeepBackup() && !isDryRun() )
-        {
-            File backupFile = FileUtil.getBackupFile( file );
+        if (isKeepBackup() && !isDryRun()) {
+            File backupFile = FileUtil.getBackupFile(file);
 
-            if ( backupFile.exists() )
-            {
+            // always delete backup file, before the renaming
+            Files.deleteIfExists(backupFile.toPath());
 
-                // always delete backup file, before the renaming
-                FileUtil.deleteFile( backupFile );
-            }
-
-            LOG.debug( " - backup original file {}", file );
-            FileUtil.renameFile( file, backupFile );
+            LOG.debug(" - backup original file {}", file);
+            FileUtil.renameFile(file, backupFile);
         }
 
-        if ( isDryRun() )
-        {
+        if (isDryRun()) {
 
             // dry run, delete temporary file
-            FileUtil.deleteFile( processFile );
-        }
-        else
-        {
-            try
-            {
-
+            Files.deleteIfExists(processFile.toPath());
+        } else {
+            try {
                 // replace file with the updated one
-                FileUtil.renameFile( processFile, file );
-            }
-            catch ( IOException e )
-            {
-                LOG.warn( e.getMessage(), e );
+                FileUtil.renameFile(processFile, file);
+            } catch (IOException e) {
+                LOG.warn(e.getMessage(), e);
             }
         }
     }
-
 }

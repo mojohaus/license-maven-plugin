@@ -22,7 +22,8 @@ package org.codehaus.mojo.license.header.transformer;
  * #L%
  */
 
-import org.codehaus.plexus.component.annotations.Component;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 /**
  * Implementation of {@link FileHeaderTransformer} for sql format.
@@ -30,24 +31,21 @@ import org.codehaus.plexus.component.annotations.Component;
  * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
-@Component( role = FileHeaderTransformer.class, hint = "sql" )
-public class SqlFileHeaderTransformer
-    extends AbstractFileHeaderTransformer
-{
+@Named("sql")
+@Singleton
+public class SqlFileHeaderTransformer extends AbstractFileHeaderTransformer {
 
     /**
      * Default constructor.
      */
-    public SqlFileHeaderTransformer()
-    {
-        super( "sql", "header transformer with sql comment style", "---", "---", "-- " );
+    public SqlFileHeaderTransformer() {
+        super("sql", "header transformer with sql comment style", "---", "---", "-- ");
     }
 
     /**
      * {@inheritDoc}
      */
-    public String[] getDefaultAcceptedExtensions()
-    {
-        return new String[]{ "sql" };
+    public String[] getDefaultAcceptedExtensions() {
+        return new String[] {"sql"};
     }
 }

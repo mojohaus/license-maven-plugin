@@ -29,4 +29,4 @@ Files.move(basePath.resolve('target-initial'), basePath.resolve('target'))
 
 Path asl2 = basePath.resolve('target/generated-resources/licenses/apache license 2.0 - license-2.0.txt')
 assert Files.exists(asl2)
-assert asl2.text.contains('This content is fake.')
+assert asl2.toFile().text.contains('This content is fake.')

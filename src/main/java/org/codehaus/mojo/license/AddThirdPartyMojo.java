@@ -25,12 +25,14 @@ package org.codehaus.mojo.license;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.SortedSet;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -46,7 +48,7 @@ import org.codehaus.mojo.license.api.MavenProjectDependenciesConfigurator;
 import org.codehaus.mojo.license.api.ResolvedProjectDependencies;
 import org.codehaus.mojo.license.api.ThirdPartyToolException;
 import org.codehaus.mojo.license.model.LicenseMap;
-import org.codehaus.mojo.license.utils.FileUtil;
+import org.codehaus.mojo.license.utils.MojoHelper;
 import org.codehaus.mojo.license.utils.SortedProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,11 +68,13 @@ import org.slf4j.LoggerFactory;
  * @since 1.0
  */
 // CHECKSTYLE_ON: LineLength
-@Mojo( name = "add-third-party", requiresDependencyResolution = ResolutionScope.TEST,
-       defaultPhase = LifecyclePhase.GENERATE_RESOURCES )
-public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements MavenProjectDependenciesConfigurator
-{
-    private static final Logger LOG = LoggerFactory.getLogger( AddThirdPartyMojo.class );
+@Mojo(
+        name = "add-third-party",
+        requiresDependencyResolution = ResolutionScope.TEST,
+        defaultPhase = LifecyclePhase.GENERATE_RESOURCES,
+        threadSafe = true)
+public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements MavenProjectDependenciesConfigurator {
+    private static final Logger LOG = LoggerFactory.getLogger(AddThirdPartyMojo.class);
 
     // ----------------------------------------------------------------------
     // Mojo Parameters
@@ -81,7 +85,7 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
      *
      * @since 1.5
      */
-    @Parameter( property = "license.skipAddThirdParty", defaultValue = "false" )
+    @Parameter(property = "license.skipAddThirdParty", defaultValue = "false")
     private boolean skipAddThirdParty;
 
     // ----------------------------------------------------------------------
@@ -92,14 +96,6 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
      * Internal flag to know if missing file must be generated.
      */
     private boolean doGenerateMissing;
-
-    /**
-     * Whether this is an aggregate build, or a single-project goal. This setting determines which dependency artifacts
-     * will be examined by the plugin. AddThirdParty needs to load dependencies only for the single project it is run
-     * for, while AggregateAddThirdParty needs to load dependencies for the parent project, as well as all child
-     * projects in the reactor.
-     */
-    private boolean isAggregatorBuild = false;
 
     /**
      * The reactor projects. When resolving dependencies, the aggregator goal needs to do custom handling
@@ -129,8 +125,7 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
      * {@inheritDoc}
      */
     @Override
-    public boolean isSkip()
-    {
+    public boolean isSkip() {
         return skipAddThirdParty;
     }
 
@@ -138,41 +133,30 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
      * {@inheritDoc}
      */
     @Override
-    protected boolean checkPackaging()
-    {
-        if ( acceptPomPackaging )
-        {
+    protected boolean checkPackaging() {
+        if (acceptPomPackaging) {
 
             // rejects nothing
             return true;
         }
 
         // can reject pom packaging
-        return rejectPackaging( "pom" );
+        return rejectPackaging("pom");
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected boolean checkSkip()
-    {
-        if ( !doGenerate && !doGenerateBundle && !doGenerateMissing )
-        {
-
-            LOG.info( "All files are up to date, skip goal execution." );
-            return false;
-        }
-        return true;
+    protected boolean shouldSkip() {
+        return !doGenerate && !doGenerateBundle && !doGenerateMissing;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void doAction()
-            throws Exception
-    {
+    protected void doAction() throws Exception {
 
         consolidate();
 
@@ -180,37 +164,34 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
 
         boolean safeLicense = checkForbiddenLicenses();
 
-        checkBlacklist( safeLicense );
+        checkBlacklist(safeLicense);
 
         writeThirdPartyFile();
 
-        if ( doGenerateMissing )
-        {
+        if (doGenerateMissing) {
 
             writeMissingFile();
         }
 
-        boolean unsafe = CollectionUtils.isNotEmpty( unsafeDependencies );
+        boolean unsafe = CollectionUtils.isNotEmpty(unsafeDependencies);
 
-        checkMissing( unsafe );
+        checkMissing(unsafe);
 
-        if ( !unsafe && useMissingFile && MapUtils.isEmpty( unsafeMappings ) && missingFile.exists() )
-        {
+        if (!unsafe && useMissingFile && MapUtils.isEmpty(unsafeMappings) && missingFile.exists()) {
 
             // there is no missing dependencies, but still a missing file, delete it
-            LOG.info( "There is no dependency to put in missing file, delete it at {}", missingFile );
-            FileUtil.deleteFile( missingFile );
+            LOG.info("There is no dependency to put in missing file, delete it at {}", missingFile);
+            Files.deleteIfExists(missingFile.toPath());
         }
 
-        if ( !unsafe && deployMissingFile && MapUtils.isNotEmpty( unsafeMappings ) )
-        {
+        if (!unsafe && deployMissingFile && MapUtils.isNotEmpty(unsafeMappings)) {
 
             // can deploy missing file
-            LOG.info( "Will attach third party file from {}", missingFile );
-            getHelper().attachThirdPartyDescriptor( missingFile );
+            LOG.info("Will attach third party file from {}", missingFile);
+            getHelper().attachThirdPartyDescriptor(missingFile);
         }
 
-        addResourceDir( outputDirectory, "**/*.txt" );
+        addResourceDir(outputDirectory, "**/*.txt");
     }
 
     // ----------------------------------------------------------------------
@@ -221,9 +202,8 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
      * {@inheritDoc}
      */
     @Override
-    protected SortedMap<String, MavenProject> loadDependencies() throws DependenciesToolException
-    {
-        return getHelper().loadDependencies( this, resolveDependencyArtifacts() );
+    protected SortedMap<String, MavenProject> loadDependencies() throws DependenciesToolException {
+        return getHelper().loadDependencies(this, resolveDependencyArtifacts());
     }
 
     /**
@@ -232,22 +212,12 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
      * @return The set of all dependencies, and the set of only direct dependency artifacts.
      * @throws org.codehaus.mojo.license.api.DependenciesToolException if the dependencies could not be resolved
      */
-    protected ResolvedProjectDependencies resolveDependencyArtifacts() throws DependenciesToolException
-    {
-        if ( dependencyArtifacts != null )
-        {
+    protected ResolvedProjectDependencies resolveDependencyArtifacts() throws DependenciesToolException {
+        if (dependencyArtifacts != null) {
             return dependencyArtifacts;
         }
-        if ( isAggregatorBuild )
-        {
-            dependencyArtifacts =
-                    new ResolvedProjectDependencies( project.getArtifacts(), project.getDependencyArtifacts() );
-        }
-        else
-        {
-            dependencyArtifacts = new ResolvedProjectDependencies( project.getArtifacts(),
-                    project.getDependencyArtifacts() );
-        }
+        dependencyArtifacts =
+                new ResolvedProjectDependencies(project.getArtifacts(), MojoHelper.getDependencyArtifacts(project));
         return dependencyArtifacts;
     }
 
@@ -256,42 +226,39 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
      */
     @Override
     protected SortedProperties createUnsafeMapping()
-      throws ProjectBuildingException, IOException, ThirdPartyToolException,
-            MojoExecutionException, DependenciesToolException
-    {
+            throws ProjectBuildingException, IOException, ThirdPartyToolException, MojoExecutionException,
+                    DependenciesToolException {
 
-        SortedProperties unsafeMappings =
-                getHelper().createUnsafeMapping( licenseMap, missingFile, missingFileUrl,
-                                                 useRepositoryMissingFiles, unsafeDependencies,
-                                                 projectDependencies,
-                                                 resolveDependencyArtifacts().getAllDependencies() );
-        if ( isVerbose() )
-        {
-            LOG.info( "found {} unsafe mappings", unsafeMappings.size() );
+        SortedProperties unsafeMappings = getHelper()
+                .createUnsafeMapping(
+                        licenseMap,
+                        missingFile,
+                        missingFileUrl,
+                        useRepositoryMissingFiles,
+                        unsafeDependencies,
+                        projectDependencies,
+                        resolveDependencyArtifacts().getAllDependencies());
+        if (isVerbose()) {
+            LOG.info("found {} unsafe mappings", unsafeMappings.size());
         }
 
         // compute if missing file should be (re)-generate
-        doGenerateMissing = computeDoGenerateMissingFile( unsafeMappings, unsafeDependencies );
+        doGenerateMissing = computeDoGenerateMissingFile(unsafeMappings, unsafeDependencies);
 
-        if ( doGenerateMissing && isVerbose() )
-        {
+        if (doGenerateMissing && isVerbose()) {
             StringBuilder sb = new StringBuilder();
-            sb.append( "Will use " );
-            sb.append( unsafeMappings.size() );
-            sb.append( " dependencies from missingFile:" );
-            for ( Map.Entry<Object, Object> entry : unsafeMappings.entrySet() )
-            {
+            sb.append("Will use ");
+            sb.append(unsafeMappings.size());
+            sb.append(" dependencies from missingFile:");
+            for (Map.Entry<Object, Object> entry : unsafeMappings.entrySet()) {
                 String id = (String) entry.getKey();
                 String license = (String) entry.getValue();
-                sb.append( "\n - " ).append( id ).append( " - " ).append( license );
+                sb.append("\n - ").append(id).append(" - ").append(license);
             }
-            LOG.info( "{}", sb );
-        }
-        else
-        {
-            if ( useMissingFile && !unsafeMappings.isEmpty() )
-            {
-                LOG.info( "Missing file {} is up-to-date.", missingFile );
+            LOG.info("{}", sb);
+        } else {
+            if (useMissingFile && !unsafeMappings.isEmpty()) {
+                LOG.info("Missing file {} is up-to-date.", missingFile);
             }
         }
         return unsafeMappings;
@@ -304,27 +271,32 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
     /**
      * {@inheritDoc}
      */
-    public boolean isIncludeTransitiveDependencies()
-    {
+    public boolean isIncludeTransitiveDependencies() {
         return includeTransitiveDependencies;
     }
 
     /**
      * {@inheritDoc}
      */
-    public boolean isExcludeTransitiveDependencies()
-    {
+    public boolean isExcludeTransitiveDependencies() {
         return excludeTransitiveDependencies;
     }
 
     /** {@inheritDoc} */
-    public ArtifactFilters getArtifactFilters()
-    {
-        if ( artifactFilters == null )
-        {
-            artifactFilters = ArtifactFilters.of( includedGroups, excludedGroups, includedArtifacts, excludedArtifacts,
-                                                  includedScopes, excludedScopes, includedTypes, excludedTypes,
-                                                  includeOptional, artifactFiltersUrl , getEncoding() );
+    public ArtifactFilters getArtifactFilters() {
+        if (artifactFilters == null) {
+            artifactFilters = ArtifactFilters.of(
+                    includedGroups,
+                    excludedGroups,
+                    includedArtifacts,
+                    excludedArtifacts,
+                    includedScopes,
+                    excludedScopes,
+                    includedTypes,
+                    excludedTypes,
+                    includeOptional,
+                    artifactFiltersUrl,
+                    getEncoding());
         }
         return artifactFilters;
     }
@@ -340,34 +312,29 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
      * @throws IOException if any IO problem
      * @since 1.0
      */
-    private boolean computeDoGenerateMissingFile( SortedProperties unsafeMappings,
-                                                  SortedSet<MavenProject> unsafeDependencies ) throws IOException
-    {
+    private boolean computeDoGenerateMissingFile(
+            SortedProperties unsafeMappings, SortedSet<MavenProject> unsafeDependencies) throws IOException {
 
-        if ( !useMissingFile )
-        {
+        if (!useMissingFile) {
 
             // never use the missing file
             return false;
         }
 
-        if ( force )
-        {
+        if (force) {
 
             // the mapping for missing file is not empty, regenerate it
-            return !CollectionUtils.isEmpty( unsafeMappings.keySet() );
+            return !CollectionUtils.isEmpty(unsafeMappings.keySet());
         }
 
-        if ( !CollectionUtils.isEmpty( unsafeDependencies ) )
-        {
+        if (!CollectionUtils.isEmpty(unsafeDependencies)) {
 
             // there is some unsafe dependencies from the project, must
             // regenerate missing file
             return true;
         }
 
-        if ( !missingFile.exists() )
-        {
+        if (!missingFile.exists()) {
 
             // the missing file does not exists, this happens when
             // using remote missing file from dependencies
@@ -375,9 +342,9 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
         }
 
         // check if the missing file has changed
-        SortedProperties oldUnsafeMappings = new SortedProperties( getEncoding() );
-        oldUnsafeMappings.load( missingFile );
-        return !unsafeMappings.equals( oldUnsafeMappings );
+        SortedProperties oldUnsafeMappings = new SortedProperties(getEncoding());
+        oldUnsafeMappings.load(missingFile);
+        return !unsafeMappings.equals(oldUnsafeMappings);
     }
 
     /**
@@ -385,41 +352,34 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
      *
      * @throws IOException if error while writing missing file
      */
-    private void writeMissingFile()
-            throws IOException
-    {
+    private void writeMissingFile() throws IOException {
 
-        FileUtil.createDirectoryIfNecessary( missingFile.getParentFile() );
-        LOG.info( "Regenerate missing license file {}", missingFile );
+        Files.createDirectories(missingFile.getParentFile().toPath());
+        LOG.info("Regenerate missing license file {}", missingFile);
 
-        FileOutputStream writer = new FileOutputStream( missingFile );
-        try
-        {
-            StringBuilder sb = new StringBuilder( " Generated by " + getClass().getName() );
-            List<String> licenses = new ArrayList<>( licenseMap.keySet() );
-            licenses.remove( LicenseMap.UNKNOWN_LICENSE_MESSAGE );
-            if ( !licenses.isEmpty() )
-            {
-                sb.append( "\n-------------------------------------------------------------------------------" );
-                sb.append( "\n Already used licenses in project :" );
-                for ( String license : licenses )
-                {
-                    sb.append( "\n - " ).append( license );
+        FileOutputStream writer = new FileOutputStream(missingFile);
+        try {
+            StringBuilder sb = new StringBuilder(" Generated by " + getClass().getName());
+            List<String> licenses = new ArrayList<>(licenseMap.keySet());
+            licenses.remove(LicenseMap.UNKNOWN_LICENSE_MESSAGE);
+            if (!licenses.isEmpty()) {
+                sb.append("\n-------------------------------------------------------------------------------");
+                sb.append("\n Already used licenses in project :");
+                for (String license : licenses) {
+                    sb.append("\n - ").append(license);
                 }
             }
-            sb.append( "\n-------------------------------------------------------------------------------" );
-            sb.append( "\n Please fill the missing licenses for dependencies :\n\n" );
-            unsafeMappings.store( writer, sb.toString() );
-        }
-        finally
-        {
+            sb.append("\n-------------------------------------------------------------------------------");
+            sb.append("\n Please fill the missing licenses for dependencies :\n\n");
+            unsafeMappings.store(writer, sb.toString());
+        } finally {
             writer.close();
         }
     }
 
-    void initFromMojo( AggregatorAddThirdPartyMojo mojo, MavenProject mavenProject,
-            List<MavenProject> reactorProjects ) throws Exception
-    {
+    // magic method - to refactor
+    void initFromMojo(AggregatorAddThirdPartyMojo mojo, MavenProject mavenProject, List<MavenProject> reactorProjects)
+            throws Exception {
         project = mavenProject;
         deployMissingFile = mojo.deployMissingFile;
         useRepositoryMissingFiles = mojo.useRepositoryMissingFiles;
@@ -437,19 +397,17 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
         useMissingFile = mojo.useMissingFile;
         String absolutePath = mojo.getProject().getBasedir().getAbsolutePath();
 
-        missingFile = new File( project.getBasedir(),
-                mojo.missingFile.getAbsolutePath().substring( absolutePath.length() ) );
-        resolvedOverrideUrl  = mojo.resolvedOverrideUrl;
+        missingFile = new File(
+                project.getBasedir(), mojo.missingFile.getAbsolutePath().substring(absolutePath.length()));
+        resolvedOverrideUrl = mojo.resolvedOverrideUrl;
         missingLicensesFileArtifact = mojo.missingLicensesFileArtifact;
-        localRepository = mojo.localRepository;
-        dependencies = new HashSet<>( mavenProject.getDependencyArtifacts() );
+        dependencies = new HashSet<>(mavenProject.getDependencyArtifacts());
         licenseMerges = mojo.licenseMerges;
         licenseMergesFile = mojo.licenseMergesFile;
         includedLicenses = mojo.includedLicenses;
         excludedLicenses = mojo.excludedLicenses;
         bundleThirdPartyPath = mojo.bundleThirdPartyPath;
         generateBundle = mojo.generateBundle;
-        force = mojo.force;
         failIfWarning = mojo.failIfWarning;
         failOnMissing = mojo.failOnMissing;
         failOnBlacklist = mojo.failOnBlacklist;
@@ -459,13 +417,17 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
         verbose = mojo.verbose;
         encoding = mojo.encoding;
 
-        setLog( mojo.getLog() );
+        setLog(mojo.getLog());
 
-        isAggregatorBuild = true;
         reactorProjectDependencies = reactorProjects;
 
+        // magic used by AggregatorAddThirdPartyMojo - only by build dependencies map for child projects
+        // so actions in init should be always executed
+        force = true;
         init();
 
+        // consolidate should comply original flag
+        force = mojo.force;
         consolidate();
     }
 }

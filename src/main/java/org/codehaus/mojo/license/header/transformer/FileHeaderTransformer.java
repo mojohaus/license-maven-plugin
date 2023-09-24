@@ -44,8 +44,7 @@ import org.codehaus.mojo.license.header.FileHeader;
  * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
-public interface FileHeaderTransformer
-{
+public interface FileHeaderTransformer {
 
     /**
      * default section delimiter.
@@ -65,7 +64,7 @@ public interface FileHeaderTransformer
     /**
      * Line separator.
      */
-    String LINE_SEPARATOR = System.getProperty( "line.separator" );
+    String LINE_SEPARATOR = System.getProperty("line.separator");
 
     /**
      * @return the name of the transformer
@@ -155,7 +154,7 @@ public interface FileHeaderTransformer
      * @param content content of original file
      * @return the new full file content beginning with header
      */
-    String addHeader( String header, String content );
+    String addHeader(String header, String content);
 
     /**
      * Box the given {@code header} in a comment.
@@ -164,7 +163,7 @@ public interface FileHeaderTransformer
      * @param withTags flag to add start and end comment tags.
      * @return the header content WITH comment boxing
      */
-    String boxComment( String header, boolean withTags );
+    String boxComment(String header, boolean withTags);
 
     /**
      * Unbox the given boxed {@code boxedHeader} to obtain the header content.
@@ -172,7 +171,7 @@ public interface FileHeaderTransformer
      * @param boxedHeader the boxed header
      * @return the unboxed header.
      */
-    String unboxComent( String boxedHeader );
+    String unboxComent(String boxedHeader);
 
     /**
      * Box the given {@code header} between process tags.
@@ -182,7 +181,7 @@ public interface FileHeaderTransformer
      * @see #getProcessStartTag()
      * @see #getProcessEndTag()
      */
-    String boxProcessTag( String header );
+    String boxProcessTag(String header);
 
     /**
      * Unbox the process tag on the given boxed {@code boxedHeader} to obtain
@@ -193,7 +192,7 @@ public interface FileHeaderTransformer
      * @see #getProcessStartTag()
      * @see #getProcessEndTag()
      */
-    String unboxProcessTag( String boxedHeader );
+    String unboxProcessTag(String boxedHeader);
 
     /**
      * Build a {@link FileHeader} from an UNBOXED header content.
@@ -201,7 +200,7 @@ public interface FileHeaderTransformer
      * @param header unboxed header content
      * @return The model of the header content
      */
-    FileHeader toFileHeader( String header );
+    FileHeader toFileHeader(String header);
 
     /**
      * Build a UNBOXED header content from the given {@code model}.
@@ -209,7 +208,7 @@ public interface FileHeaderTransformer
      * @param model the model of the file header (can not be null)
      * @return the UNBOXED header content
      */
-    String toString( FileHeader model );
+    String toString(FileHeader model);
 
     /**
      * Build a fully boxed header content from the given {@code model}.
@@ -217,7 +216,7 @@ public interface FileHeaderTransformer
      * @param model the model of the file header (can not be null)
      * @return the fully boxed header content
      */
-    String toHeaderContent( FileHeader model );
+    String toHeaderContent(FileHeader model);
 
     /**
      * Tests if the description of the two models are equals.
@@ -226,7 +225,7 @@ public interface FileHeaderTransformer
      * @param header2 the second header
      * @return {@code true} if headers description are stricly the same
      */
-    boolean isDescriptionEquals( FileHeader header1, FileHeader header2 );
+    boolean isDescriptionEquals(FileHeader header1, FileHeader header2);
 
     /**
      * Tests if the copyright of the two models are equals.
@@ -235,7 +234,7 @@ public interface FileHeaderTransformer
      * @param header2 the second header
      * @return {@code true} if headers copyright are stricly the same
      */
-    boolean isCopyrightEquals( FileHeader header1, FileHeader header2 );
+    boolean isCopyrightEquals(FileHeader header1, FileHeader header2);
 
     /**
      * Tests if the license of the two models are equals.
@@ -244,21 +243,21 @@ public interface FileHeaderTransformer
      * @param header2 the second header
      * @return {@code true} if headers license are stricly the same (WITHOUT ANY space)
      */
-    boolean isLicenseEquals( FileHeader header1, FileHeader header2 );
+    boolean isLicenseEquals(FileHeader header1, FileHeader header2);
 
     /**
      * Changes the name of the transformer.
      *
      * @param name the new name of the transformer
      */
-    void setName( String name );
+    void setName(String name);
 
     /**
      * Chages the description of the transformer.
      *
      * @param description the new description of the transformer
      */
-    void setDescription( String description );
+    void setDescription(String description);
 
     /**
      * Sets the header section delimiter.
@@ -267,56 +266,56 @@ public interface FileHeaderTransformer
      *
      * @param headerSectionDelimiter the new delimiter
      */
-    void setSectionDelimiter( String headerSectionDelimiter );
+    void setSectionDelimiter(String headerSectionDelimiter);
 
     /**
      * Changes the process start tag.
      *
      * @param tag the new start tag
      */
-    void setProcessStartTag( String tag );
+    void setProcessStartTag(String tag);
 
     /**
      * Changes the process end tag.
      *
      * @param tag the new endtag
      */
-    void setProcessEndTag( String tag );
+    void setProcessEndTag(String tag);
 
     /**
      * Changes the comment start tag.
      *
      * @param commentStartTag the new comment start tag
      */
-    void setCommentStartTag( String commentStartTag );
+    void setCommentStartTag(String commentStartTag);
 
     /**
      * Changes the comment end tag.
      *
      * @param commentEndTag the new comment end tag
      */
-    void setCommentEndTag( String commentEndTag );
+    void setCommentEndTag(String commentEndTag);
 
     /**
      * Changes the comment prefix line.
      *
      * @param commentLinePrefix the new comment prefix line
      */
-    void setCommentLinePrefix( String commentLinePrefix );
+    void setCommentLinePrefix(String commentLinePrefix);
 
     /**
      * Set flag if there should be an empty line after the header.
      *
      * @param emptyLine flag if there should be an empty line after the header
      */
-    void setEmptyLineAfterHeader( boolean emptyLine );
+    void setEmptyLineAfterHeader(boolean emptyLine);
 
     /**
      * Set flag if header line should be right trimmed when written.
      *
      * @param trimLine flag if header line should be right trimmed when written
      */
-    void setTrimHeaderLine( boolean trimLine );
+    void setTrimHeaderLine(boolean trimLine);
 
-    void setLineSeparator( String lineSeparator );
+    void setLineSeparator(String lineSeparator);
 }

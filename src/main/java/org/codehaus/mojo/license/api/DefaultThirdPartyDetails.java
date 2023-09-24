@@ -32,9 +32,7 @@ import org.apache.maven.project.MavenProject;
  * @author tchemit dev@tchemit.fr
  * @since 1.1
  */
-public class DefaultThirdPartyDetails
-    implements ThirdPartyDetails
-{
+public class DefaultThirdPartyDetails implements ThirdPartyDetails {
 
     private String[] pomLicenses;
 
@@ -42,79 +40,67 @@ public class DefaultThirdPartyDetails
 
     private final MavenProject project;
 
-    public DefaultThirdPartyDetails( MavenProject project )
-    {
+    public DefaultThirdPartyDetails(MavenProject project) {
         this.project = project;
     }
 
     /**
      * {@inheritDoc}
      */
-    public String getGroupId()
-    {
+    public String getGroupId() {
         return project.getArtifact().getGroupId();
     }
 
     /**
      * {@inheritDoc}
      */
-    public String getArtifactId()
-    {
+    public String getArtifactId() {
         return project.getArtifact().getArtifactId();
     }
 
     /**
      * {@inheritDoc}
      */
-    public String getVersion()
-    {
+    public String getVersion() {
         return project.getArtifact().getVersion();
     }
 
     /**
      * {@inheritDoc}
      */
-    public String getType()
-    {
+    public String getType() {
         return project.getArtifact().getType();
     }
 
     /**
      * {@inheritDoc}
      */
-    public String getClassifier()
-    {
+    public String getClassifier() {
         return project.getArtifact().getClassifier();
     }
 
     /**
      * {@inheritDoc}
      */
-    public String getScope()
-    {
+    public String getScope() {
         return project.getArtifact().getScope();
     }
 
     /**
      * {@inheritDoc}
      */
-    public boolean hasPomLicenses()
-    {
+    public boolean hasPomLicenses() {
         return pomLicenses != null && pomLicenses.length > 0;
     }
 
     /**
      * {@inheritDoc}
      */
-    public String[] getLicenses()
-    {
+    public String[] getLicenses() {
         String[] result = null;
-        if ( hasPomLicenses() )
-        {
+        if (hasPomLicenses()) {
             result = getPomLicenses();
-        }
-        else if ( hasThirdPartyLicenses() )
-        {
+        } else if (hasThirdPartyLicenses()) {
             result = getThirdPartyLicenses();
         }
         return result;
@@ -123,48 +109,42 @@ public class DefaultThirdPartyDetails
     /**
      * {@inheritDoc}
      */
-    public boolean hasLicenses()
-    {
+    public boolean hasLicenses() {
         return hasPomLicenses() || hasThirdPartyLicenses();
     }
 
     /**
      * {@inheritDoc}
      */
-    public String[] getPomLicenses()
-    {
+    public String[] getPomLicenses() {
         return pomLicenses;
     }
 
     /**
      * {@inheritDoc}
      */
-    public void setPomLicenses( String[] pomLicenses )
-    {
+    public void setPomLicenses(String[] pomLicenses) {
         this.pomLicenses = pomLicenses;
     }
 
     /**
      * {@inheritDoc}
      */
-    public String[] getThirdPartyLicenses()
-    {
+    public String[] getThirdPartyLicenses() {
         return thirdPartyLicenses;
     }
 
     /**
      * {@inheritDoc}
      */
-    public boolean hasThirdPartyLicenses()
-    {
+    public boolean hasThirdPartyLicenses() {
         return thirdPartyLicenses != null && thirdPartyLicenses.length > 0;
     }
 
     /**
      * {@inheritDoc}
      */
-    public void setThirdPartyLicenses( String[] thirdPartyLicenses )
-    {
+    public void setThirdPartyLicenses(String[] thirdPartyLicenses) {
         this.thirdPartyLicenses = thirdPartyLicenses;
     }
 
@@ -172,24 +152,22 @@ public class DefaultThirdPartyDetails
      * {@inheritDoc}
      */
     @Override
-    public boolean equals( Object o )
-    {
-        if ( this == o )
-        {
+    public boolean equals(Object o) {
+        if (this == o) {
             return true;
         }
 
-        if ( o == null || getClass() != o.getClass() )
-        {
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
 
         DefaultThirdPartyDetails that = (DefaultThirdPartyDetails) o;
 
-        return new EqualsBuilder().append( getGroupId(), that.getGroupId() )
-                .append( getArtifactId(), that.getArtifactId() )
-                .append( getVersion(), that.getVersion() )
-                .append( getClassifier(), that.getClassifier() )
+        return new EqualsBuilder()
+                .append(getGroupId(), that.getGroupId())
+                .append(getArtifactId(), that.getArtifactId())
+                .append(getVersion(), that.getVersion())
+                .append(getClassifier(), that.getClassifier())
                 .isEquals();
     }
 
@@ -197,9 +175,12 @@ public class DefaultThirdPartyDetails
      * {@inheritDoc}
      */
     @Override
-    public int hashCode()
-    {
-        return new HashCodeBuilder( 17, 37 ).append( getGroupId() ).append( getArtifactId() ).append(
-            getVersion() ).append( getClassifier() ).toHashCode();
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(getGroupId())
+                .append(getArtifactId())
+                .append(getVersion())
+                .append(getClassifier())
+                .toHashCode();
     }
 }

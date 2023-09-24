@@ -22,6 +22,11 @@ package org.codehaus.mojo.license;
  * #L%
  */
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -31,22 +36,15 @@ import org.codehaus.mojo.license.model.LicenseStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 /**
  * Display all available licenses.
  *
  * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
-@Mojo( name = "license-list", requiresProject = false, requiresDirectInvocation = true )
-public class LicenseListMojo
-    extends AbstractLicenseMojo
-{
-    private static final Logger LOG = LoggerFactory.getLogger( LicenseListMojo.class );
+@Mojo(name = "license-list", requiresProject = false, requiresDirectInvocation = true)
+public class LicenseListMojo extends AbstractLicenseMojo {
+    private static final Logger LOG = LoggerFactory.getLogger(LicenseListMojo.class);
 
     // ----------------------------------------------------------------------
     // Mojo Parameters
@@ -60,7 +58,7 @@ public class LicenseListMojo
      * </p>
      * @since 1.0
      */
-    @Parameter( property = "extraResolver" )
+    @Parameter(property = "extraResolver")
     private String extraResolver;
 
     /**
@@ -68,7 +66,7 @@ public class LicenseListMojo
      *
      * @since 1.0
      */
-    @Parameter( property = "detail" )
+    @Parameter(property = "detail")
     private boolean detail;
 
     // ----------------------------------------------------------------------
@@ -88,8 +86,7 @@ public class LicenseListMojo
      * {@inheritDoc}
      */
     @Override
-    public boolean isSkip()
-    {
+    public boolean isSkip() {
         // can't skip this goal since direct invocation is required
         return false;
     }
@@ -98,64 +95,52 @@ public class LicenseListMojo
      * {@inheritDoc}
      */
     @Override
-    protected void init()
-        throws Exception
-    {
+    protected void init() throws Exception {
 
         // obtain licenses store
-        licenseStore = LicenseStore.createLicenseStore( extraResolver );
+        licenseStore = LicenseStore.createLicenseStore(extraResolver);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void doAction()
-        throws MojoExecutionException, MojoFailureException
-    {
+    public void doAction() throws MojoExecutionException, MojoFailureException {
         StringBuilder buffer = new StringBuilder();
 
-        if ( isVerbose() )
-        {
-            buffer.append( "\n\n-------------------------------------------------------------------------------\n" );
-            buffer.append( "                           maven-license-plugin\n" );
-            buffer.append( "-------------------------------------------------------------------------------\n\n" );
+        if (isVerbose()) {
+            buffer.append("\n\n-------------------------------------------------------------------------------\n");
+            buffer.append("                           maven-license-plugin\n");
+            buffer.append("-------------------------------------------------------------------------------\n\n");
         }
-        buffer.append( "Available licenses :\n\n" );
+        buffer.append("Available licenses :\n\n");
 
-        List<String> names = Arrays.asList( licenseStore.getLicenseNames() );
+        List<String> names = Arrays.asList(licenseStore.getLicenseNames());
 
         int maxLength = 0;
-        for ( String name : names )
-        {
-            if ( name.length() > maxLength )
-            {
+        for (String name : names) {
+            if (name.length() > maxLength) {
                 maxLength = name.length();
             }
         }
-        Collections.sort( names );
+        Collections.sort(names);
 
         String pattern = " * %1$-" + maxLength + "s : %2$s\n";
-        for ( String licenseName : names )
-        {
-            License license = licenseStore.getLicense( licenseName );
-            buffer.append( String.format( pattern, licenseName, license.getDescription() ) );
-            if ( detail )
-            {
-                try
-                {
-                    buffer.append( "\n" );
-                    buffer.append( license.getHeaderContent( getEncoding() ) );
-                    buffer.append( "\n\n" );
-                }
-                catch ( IOException ex )
-                {
+        for (String licenseName : names) {
+            License license = licenseStore.getLicense(licenseName);
+            buffer.append(String.format(pattern, licenseName, license.getDescription()));
+            if (detail) {
+                try {
+                    buffer.append("\n");
+                    buffer.append(license.getHeaderContent(getEncoding()));
+                    buffer.append("\n\n");
+                } catch (IOException ex) {
                     throw new MojoExecutionException(
-                        "could not instanciate license with name " + licenseName + " for reason " + ex.getMessage(),
-                        ex );
+                            "could not instanciate license with name " + licenseName + " for reason " + ex.getMessage(),
+                            ex);
                 }
             }
         }
-        LOG.info( "{}", buffer );
+        LOG.info("{}", buffer);
     }
 }

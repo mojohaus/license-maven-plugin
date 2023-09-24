@@ -37,17 +37,15 @@ import org.apache.maven.plugin.MojoExecutionException;
  * @author <a href="https://github.com/ppalaga">Peter Palaga</a>
  * @since 1.18
  */
-public class LicenseMatchers
-{
+public class LicenseMatchers {
 
-    private static final Pattern MATCH_EMPTY_PATTERN = Pattern.compile( "" );
-    private static final Pattern MATCH_ALL_PATTERN = Pattern.compile( ".*" );
+    private static final Pattern MATCH_EMPTY_PATTERN = Pattern.compile("");
+    private static final Pattern MATCH_ALL_PATTERN = Pattern.compile(".*");
 
     /**
      * @return a new {@link Builder}
      */
-    public static Builder builder()
-    {
+    public static Builder builder() {
         return new Builder();
     }
 
@@ -56,46 +54,40 @@ public class LicenseMatchers
      * @return new {@link LicenseMatchers} configured from the given {@code licenseMatchersFile}
      * @throws MojoExecutionException
      */
-    public static LicenseMatchers load( File licenseMatchersFile )
-        throws MojoExecutionException
-    {
+    public static LicenseMatchers load(File licenseMatchersFile) throws MojoExecutionException {
         final List<DependencyMatcher> matchers = new ArrayList<>();
-        try
-        {
-            if ( licenseMatchersFile != null && licenseMatchersFile.exists() )
-            {
+        try {
+            if (licenseMatchersFile != null && licenseMatchersFile.exists()) {
                 final List<ProjectLicenseInfo> replacements =
-                    LicenseSummaryReader.parseLicenseSummary( licenseMatchersFile );
+                        LicenseSummaryReader.parseLicenseSummary(licenseMatchersFile);
 
-                for ( ProjectLicenseInfo dependency : replacements )
-                {
-                    matchers.add( DependencyMatcher.of( dependency ) );
+                for (ProjectLicenseInfo dependency : replacements) {
+                    matchers.add(DependencyMatcher.of(dependency));
                 }
             }
+        } catch (Exception e) {
+            throw new MojoExecutionException("Could not parse licensesReplacementsFile " + licenseMatchersFile, e);
         }
-        catch ( Exception e )
-        {
-            throw new MojoExecutionException( "Could not parse licensesReplacementsFile " + licenseMatchersFile, e );
-        }
-        return new LicenseMatchers( matchers );
+        return new LicenseMatchers(matchers);
     }
 
-    private static boolean match( Pattern pattern, String string )
-    {
-        return string == null ? pattern.matcher( "" ).matches() : pattern.matcher( string ).matches();
+    private static boolean match(Pattern pattern, String string) {
+        return string == null
+                ? pattern.matcher("").matches()
+                : pattern.matcher(string).matches();
     }
 
-    private static Pattern pattern( String string, boolean isPre118Match )
-    {
-        return string == null || string.isEmpty() ? MATCH_EMPTY_PATTERN
-                        : isPre118Match ? Pattern.compile( Pattern.quote( string ) )
-                                        : Pattern.compile( string, Pattern.CASE_INSENSITIVE );
+    private static Pattern pattern(String string, boolean isPre118Match) {
+        return string == null || string.isEmpty()
+                ? MATCH_EMPTY_PATTERN
+                : isPre118Match
+                        ? Pattern.compile(Pattern.quote(string))
+                        : Pattern.compile(string, Pattern.CASE_INSENSITIVE);
     }
 
     private final List<DependencyMatcher> matchers;
 
-    private LicenseMatchers( List<DependencyMatcher> matchers )
-    {
+    private LicenseMatchers(List<DependencyMatcher> matchers) {
         super();
         this.matchers = matchers;
     }
@@ -105,21 +97,15 @@ public class LicenseMatchers
      *
      * @param dependency
      */
-    public void replaceMatches( ProjectLicenseInfo dependency )
-    {
-        for ( DependencyMatcher matcher : matchers )
-        {
-            if ( matcher.matches( dependency ) )
-            {
-                if ( matcher.isApproved() )
-                {
+    public void replaceMatches(ProjectLicenseInfo dependency) {
+        for (DependencyMatcher matcher : matchers) {
+            if (matcher.matches(dependency)) {
+                if (matcher.isApproved()) {
                     /* do nothing */
+                } else {
+                    dependency.setLicenses(matcher.cloneLicenses());
                 }
-                else
-                {
-                    dependency.setLicenses( matcher.cloneLicenses() );
-                }
-                dependency.setApproved( true );
+                dependency.setApproved(true);
                 dependency.getDownloaderMessages().clear();
             }
         }
@@ -128,21 +114,18 @@ public class LicenseMatchers
     /**
      * A {@link LicenseMatchers} builder
      */
-    public static class Builder
-    {
+    public static class Builder {
         private List<DependencyMatcher> matchers = new ArrayList<>();
 
-        public Builder matcher( DependencyMatcher matcher )
-        {
-            matchers.add( matcher );
+        public Builder matcher(DependencyMatcher matcher) {
+            matchers.add(matcher);
             return this;
         }
 
-        public LicenseMatchers build()
-        {
+        public LicenseMatchers build() {
             final List<DependencyMatcher> ms = matchers;
             matchers = null;
-            return new LicenseMatchers( ms );
+            return new LicenseMatchers(ms);
         }
     }
 
@@ -151,19 +134,20 @@ public class LicenseMatchers
      *
      * @since 1.18
      */
-    static class DependencyMatcher
-    {
+    static class DependencyMatcher {
 
-        public static DependencyMatcher of( ProjectLicenseInfo dependency )
-        {
+        public static DependencyMatcher of(ProjectLicenseInfo dependency) {
             final String version = dependency.getVersion();
             final boolean isPre118Match = !dependency.hasMatchLicenses();
-            return new DependencyMatcher( pattern( dependency.getGroupId(), isPre118Match ),
-                                          pattern( dependency.getArtifactId(), isPre118Match ),
-                                          isPre118Match || version == null || version.isEmpty() ? MATCH_ALL_PATTERN
-                                                          : Pattern.compile( version, Pattern.CASE_INSENSITIVE ),
-                                          LicenseListMatcher.of( dependency ), dependency.cloneLicenses(),
-                                          dependency.isApproved() );
+            return new DependencyMatcher(
+                    pattern(dependency.getGroupId(), isPre118Match),
+                    pattern(dependency.getArtifactId(), isPre118Match),
+                    isPre118Match || version == null || version.isEmpty()
+                            ? MATCH_ALL_PATTERN
+                            : Pattern.compile(version, Pattern.CASE_INSENSITIVE),
+                    LicenseListMatcher.of(dependency),
+                    dependency.cloneLicenses(),
+                    dependency.isApproved());
         }
 
         private final Pattern artifactId;
@@ -177,9 +161,13 @@ public class LicenseMatchers
 
         private final Pattern version;
 
-        DependencyMatcher( Pattern groupId, Pattern artifactId, Pattern version, LicenseListMatcher licenseListMatcher,
-                           List<ProjectLicense> licenses, boolean approved )
-        {
+        DependencyMatcher(
+                Pattern groupId,
+                Pattern artifactId,
+                Pattern version,
+                LicenseListMatcher licenseListMatcher,
+                List<ProjectLicense> licenses,
+                boolean approved) {
             super();
             this.groupId = groupId;
             this.artifactId = artifactId;
@@ -189,45 +177,37 @@ public class LicenseMatchers
             this.approved = approved;
         }
 
-        public List<ProjectLicense> getLicenseMatchers()
-        {
+        public List<ProjectLicense> getLicenseMatchers() {
             return null;
         }
 
         /**
          * @return a deep clone of {@link #licenses}
          */
-        public List<ProjectLicense> cloneLicenses()
-        {
-            try
-            {
-                final ArrayList<ProjectLicense> result = new ArrayList<>( licenses != null ? licenses.size() : 0 );
-                if ( licenses != null )
-                {
-                    for ( ProjectLicense license : licenses )
-                    {
-                        result.add( license.clone() );
+        public List<ProjectLicense> cloneLicenses() {
+            try {
+                final ArrayList<ProjectLicense> result = new ArrayList<>(licenses != null ? licenses.size() : 0);
+                if (licenses != null) {
+                    for (ProjectLicense license : licenses) {
+                        result.add(license.clone());
                     }
                 }
                 return result;
-            }
-            catch ( CloneNotSupportedException e )
-            {
-                throw new RuntimeException( e );
+            } catch (CloneNotSupportedException e) {
+                throw new RuntimeException(e);
             }
         }
 
-        public boolean matches( ProjectLicenseInfo dependency )
-        {
-            return match( groupId, dependency.getGroupId() ) && match( artifactId, dependency.getArtifactId() )
-                && match( version, dependency.getVersion() ) && licenseListMatcher.matches( dependency.getLicenses() );
+        public boolean matches(ProjectLicenseInfo dependency) {
+            return match(groupId, dependency.getGroupId())
+                    && match(artifactId, dependency.getArtifactId())
+                    && match(version, dependency.getVersion())
+                    && licenseListMatcher.matches(dependency.getLicenses());
         }
 
-        public boolean isApproved()
-        {
+        public boolean isApproved() {
             return approved;
         }
-
     }
 
     /**
@@ -235,66 +215,52 @@ public class LicenseMatchers
      *
      * @since 1.18
      */
-    static class LicenseListMatcher
-    {
+    static class LicenseListMatcher {
         private final List<LicenseMatcher> licenseMatchers;
 
-        private static final LicenseListMatcher MATCHES_ALL_LICENSE_LIST_MATCHER = new LicenseListMatcher( null )
-        {
+        private static final LicenseListMatcher MATCHES_ALL_LICENSE_LIST_MATCHER = new LicenseListMatcher(null) {
             @Override
-            public boolean matches( List<ProjectLicense> licenses )
-            {
+            public boolean matches(List<ProjectLicense> licenses) {
                 return true;
             }
         };
 
-        public LicenseListMatcher( List<LicenseMatcher> licenseMatchers )
-        {
+        LicenseListMatcher(List<LicenseMatcher> licenseMatchers) {
             this.licenseMatchers = licenseMatchers;
         }
 
-        public boolean matches( List<ProjectLicense> licenses )
-        {
+        public boolean matches(List<ProjectLicense> licenses) {
             final int licsSize = licenses == null ? 0 : licenses.size();
-            if ( licenseMatchers.size() != licsSize )
-            {
+            if (licenseMatchers.size() != licsSize) {
                 return false;
             }
             final Iterator<LicenseMatcher> matchersIt = licenseMatchers.iterator();
             final Iterator<ProjectLicense> licsIt = licenses.iterator();
-            while ( matchersIt.hasNext() )
-            {
-                if ( !matchersIt.next().matches( licsIt.next() ) )
-                {
+            while (matchersIt.hasNext()) {
+                if (!matchersIt.next().matches(licsIt.next())) {
                     return false;
                 }
             }
             return true;
         }
 
-        public static LicenseListMatcher of( ProjectLicenseInfo dependency )
-        {
-            if ( !dependency.hasMatchLicenses() )
-            {
+        public static LicenseListMatcher of(ProjectLicenseInfo dependency) {
+            if (!dependency.hasMatchLicenses()) {
                 return MATCHES_ALL_LICENSE_LIST_MATCHER;
             }
 
             final List<LicenseMatcher> licenseMatchers;
             final List<ProjectLicense> rawMatchers = dependency.getMatchLicenses();
-            if ( rawMatchers == null || rawMatchers.isEmpty() )
-            {
+            if (rawMatchers == null || rawMatchers.isEmpty()) {
                 licenseMatchers = Collections.emptyList();
-            }
-            else
-            {
+            } else {
                 licenseMatchers = new ArrayList<>();
-                for ( ProjectLicense lic : rawMatchers )
-                {
-                    licenseMatchers.add( new LicenseMatcher( lic.getName(), lic.getUrl(), lic.getDistribution(),
-                                                             lic.getComments() ) );
+                for (ProjectLicense lic : rawMatchers) {
+                    licenseMatchers.add(
+                            new LicenseMatcher(lic.getName(), lic.getUrl(), lic.getDistribution(), lic.getComments()));
                 }
             }
-            return new LicenseListMatcher( licenseMatchers );
+            return new LicenseListMatcher(licenseMatchers);
         }
     }
 
@@ -303,16 +269,14 @@ public class LicenseMatchers
      *
      * @since 1.18
      */
-    static class LicenseMatcher
-    {
+    static class LicenseMatcher {
 
         private final Pattern comments;
         private final Pattern distribution;
         private final Pattern name;
         private final Pattern url;
 
-        LicenseMatcher( Pattern name, Pattern url, Pattern distribution, Pattern comments )
-        {
+        LicenseMatcher(Pattern name, Pattern url, Pattern distribution, Pattern comments) {
             super();
             this.name = name;
             this.url = url;
@@ -320,21 +284,19 @@ public class LicenseMatchers
             this.comments = comments;
         }
 
-        LicenseMatcher( String name, String url, String distribution, String comments )
-        {
+        LicenseMatcher(String name, String url, String distribution, String comments) {
             super();
-            this.name = pattern( name, false );
-            this.url = pattern( url, false );
-            this.distribution = pattern( distribution, false );
-            this.comments = pattern( comments, false );
+            this.name = pattern(name, false);
+            this.url = pattern(url, false);
+            this.distribution = pattern(distribution, false);
+            this.comments = pattern(comments, false);
         }
 
-        public boolean matches( ProjectLicense license )
-        {
-            return match( name, license.getName() ) && match( url, license.getUrl() )
-                && match( distribution, license.getDistribution() ) && match( comments, license.getComments() );
+        public boolean matches(ProjectLicense license) {
+            return match(name, license.getName())
+                    && match(url, license.getUrl())
+                    && match(distribution, license.getDistribution())
+                    && match(comments, license.getComments());
         }
-
     }
-
 }

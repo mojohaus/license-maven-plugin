@@ -31,6 +31,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.codehaus.mojo.license.api.ResolvedProjectDependencies;
 import org.codehaus.mojo.license.download.LicensedArtifact;
+import org.codehaus.mojo.license.utils.MojoHelper;
 
 /**
  * Download the license files of all the current project's dependencies, and generate a summary file containing a list
@@ -52,11 +53,11 @@ import org.codehaus.mojo.license.download.LicensedArtifact;
  * @author Paul Gier
  * @since 1.0
  */
-@Mojo( name = "download-licenses", requiresDependencyResolution = ResolutionScope.TEST,
-    defaultPhase = LifecyclePhase.PACKAGE )
-public class DownloadLicensesMojo
-    extends AbstractDownloadLicensesMojo
-{
+@Mojo(
+        name = "download-licenses",
+        requiresDependencyResolution = ResolutionScope.TEST,
+        defaultPhase = LifecyclePhase.PACKAGE)
+public class DownloadLicensesMojo extends AbstractDownloadLicensesMojo {
 
     // ----------------------------------------------------------------------
     // Mojo Parameters
@@ -67,7 +68,7 @@ public class DownloadLicensesMojo
      *
      * @since 1.5
      */
-    @Parameter( property = "license.skipDownloadLicenses", defaultValue = "false" )
+    @Parameter(property = "license.skipDownloadLicenses", defaultValue = "false")
     protected boolean skipDownloadLicenses;
 
     // ----------------------------------------------------------------------
@@ -77,18 +78,15 @@ public class DownloadLicensesMojo
     /**
      * {@inheritDoc}
      */
-    protected boolean isSkip()
-    {
+    protected boolean isSkip() {
         return skipDownloadLicenses;
     }
 
-    protected Map<String, LicensedArtifact> getDependencies()
-    {
+    protected Map<String, LicensedArtifact> getDependencies() {
         final Map<String, LicensedArtifact> result = new TreeMap<>();
         licensedArtifactResolver.loadProjectDependencies(
-                new ResolvedProjectDependencies( project.getArtifacts(), project.getDependencyArtifacts() ),
+                new ResolvedProjectDependencies( project.getArtifacts(), MojoHelper.getDependencyArtifacts(project) ),
                 this, remoteRepositories, result, false );
         return result;
     }
-
 }
