@@ -22,6 +22,26 @@ package org.codehaus.mojo.license.download;
  * #L%
  */
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
+
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
@@ -54,26 +74,6 @@ import org.codehaus.mojo.license.spdx.SpdxLicenseList.Attachments.ContentSanitiz
 import org.codehaus.mojo.license.utils.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Pattern;
 
 /**
  * Utilities for downloading remote license files.
@@ -306,8 +306,8 @@ public class LicenseDownloader implements AutoCloseable {
      */
     public static class LicenseDownloadResult {
         public static LicenseDownloadResult success(File file, String sha1, boolean preferredFileName) {
-            final LicenseDownloadResult licenseDownloadResult
-                = new LicenseDownloadResult( file, sha1, preferredFileName, null );
+            final LicenseDownloadResult licenseDownloadResult =
+                    new LicenseDownloadResult(file, sha1, preferredFileName, null);
             licenseDownloadResult.calculateFileChecksum();
             return licenseDownloadResult;
         }
@@ -367,8 +367,7 @@ public class LicenseDownloader implements AutoCloseable {
             return sha1;
         }
 
-        public String getNormalizedContentChecksum()
-        {
+        public String getNormalizedContentChecksum() {
             return normalizedContentChecksum;
         }
 
@@ -376,14 +375,12 @@ public class LicenseDownloader implements AutoCloseable {
             return new LicenseDownloadResult(otherFile, sha1, preferredFileName, errorMessage);
         }
 
-        public void calculateFileChecksum()
-        {
-            normalizedContentChecksum = LicenseDownloader.calculateFileChecksum( file );
+        public void calculateFileChecksum() {
+            normalizedContentChecksum = LicenseDownloader.calculateFileChecksum(file);
         }
 
         @Override
-        public String toString()
-        {
+        public String toString() {
             return "LicenseDownloadResult{"
                     + "file=" + file
                     + ", errorMessage='" + errorMessage + '\''
@@ -394,51 +391,42 @@ public class LicenseDownloader implements AutoCloseable {
         }
     }
 
-    private static String calculateFileChecksum( File file )
-    {
-        try ( InputStream inputStream = new FileInputStream( file ) )
-        {
-            byte[] content = IOUtils.readFully( inputStream, (int) file.length() );
-            String contentString = new String( content );
-            return calculateStringChecksum( contentString );
-        }
-        catch ( IOException e )
-        {
-            LOG.error( "Error reading license file and normalizing it ", e );
+    private static String calculateFileChecksum(File file) {
+        try (InputStream inputStream = new FileInputStream(file)) {
+            byte[] content = IOUtils.readFully(inputStream, (int) file.length());
+            String contentString = new String(content);
+            return calculateStringChecksum(contentString);
+        } catch (IOException e) {
+            LOG.error("Error reading license file and normalizing it ", e);
             return null;
         }
     }
 
-    public static String calculateStringChecksum( String contentString )
-    {
-        contentString = normalizeString( contentString );
-        try
-        {
-            final MessageDigest md = MessageDigest.getInstance( "SHA-1" );
-            return Hex.encodeHexString( md.digest( contentString.getBytes() ) );
-        }
-        catch ( NoSuchAlgorithmException e )
-        {
-            LOG.error( "Error fetching SHA-1 hashsum generator ", e );
+    public static String calculateStringChecksum(String contentString) {
+        contentString = normalizeString(contentString);
+        try {
+            final MessageDigest md = MessageDigest.getInstance("SHA-1");
+            return Hex.encodeHexString(md.digest(contentString.getBytes()));
+        } catch (NoSuchAlgorithmException e) {
+            LOG.error("Error fetching SHA-1 hashsum generator ", e);
             return null;
         }
     }
 
-    private static String normalizeString( String contentString )
-    {
+    private static String normalizeString(String contentString) {
         return contentString
                 // Windows
-                .replace( "\r\n", " " )
+                .replace("\r\n", " ")
                 // Classic MacOS
-                .replace( "\r", " " )
+                .replace("\r", " ")
                 // *nix
-                .replace( "\n", " " )
+                .replace("\n", " ")
                 // Set all spaces, tabs, etc. to one space width
-                .replaceAll( "\\s\\s+", " " )
+                .replaceAll("\\s\\s+", " ")
                 /* License files exist which are completely identical, except that someone changed
                 <http://fsf.org/> to <https://fsf.org/>.
                  */
-                .replace( "http://", "https://" )
+                .replace("http://", "https://")
                 // All to lowercase
                 .toLowerCase();
     }

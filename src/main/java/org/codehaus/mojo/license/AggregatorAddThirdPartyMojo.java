@@ -46,14 +46,6 @@ import org.codehaus.mojo.license.utils.SortedProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.SortedSet;
-
 /**
  * This goal forks executions of the add-third-party goal for all the leaf projects
  * of the tree of modules below the point where it is executed. Note that this

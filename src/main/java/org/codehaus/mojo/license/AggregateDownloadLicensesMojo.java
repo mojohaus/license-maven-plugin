@@ -105,7 +105,7 @@ public class AggregateDownloadLicensesMojo extends AbstractDownloadLicensesMojo 
      *
      * @since 2.1
      */
-    @Parameter( property = "license.extendedInfo", defaultValue = "false" )
+    @Parameter(property = "license.extendedInfo", defaultValue = "false")
     private boolean extendedInfo;
 
     // ----------------------------------------------------------------------
@@ -126,11 +126,13 @@ public class AggregateDownloadLicensesMojo extends AbstractDownloadLicensesMojo 
     protected Map<String, LicensedArtifact> getDependencies() {
         final Map<String, LicensedArtifact> result = new TreeMap<>();
 
-        for ( MavenProject p : reactorProjects )
-        {
-            licensedArtifactResolver.loadProjectDependencies( new ResolvedProjectDependencies( p.getArtifacts(),
-                                                                                       p.getDependencyArtifacts() ),
-                                                      this, remoteRepositories, result, extendedInfo );
+        for (MavenProject p : reactorProjects) {
+            licensedArtifactResolver.loadProjectDependencies(
+                    new ResolvedProjectDependencies(p.getArtifacts(), MojoHelper.getDependencyArtifacts(p)),
+                    this,
+                    remoteRepositories,
+                    result,
+                    extendedInfo);
         }
         return result;
     }

@@ -22,21 +22,19 @@ package org.codehaus.mojo.license.extended;
  * #L%
  */
 
-import org.codehaus.mojo.license.download.LicenseDownloader;
-
 import java.util.HashSet;
 import java.util.Set;
+
+import org.codehaus.mojo.license.download.LicenseDownloader;
 
 /**
  * Information about a NOTICE or LICENSE file.
  */
-public class InfoFile
-{
+public class InfoFile {
     /**
      * The type of the source for the info file.
      */
-    public enum Type
-    {
+    public enum Type {
         /**
          * Generic ...NOTICE....txt file.
          */
@@ -58,49 +56,40 @@ public class InfoFile
 
     private String normalizedContent;
 
-    public String getFileName()
-    {
+    public String getFileName() {
         return fileName;
     }
 
-    public void setFileName( String fileName )
-    {
+    public void setFileName(String fileName) {
         this.fileName = fileName;
     }
 
-    public String getContent()
-    {
+    public String getContent() {
         return content;
     }
 
-    public void setContent( String content )
-    {
+    public void setContent(String content) {
         this.content = content;
-        this.normalizedContent = LicenseDownloader.calculateStringChecksum( content );
+        this.normalizedContent = LicenseDownloader.calculateStringChecksum(content);
     }
 
-    public Set<String> getExtractedCopyrightLines()
-    {
+    public Set<String> getExtractedCopyrightLines() {
         return extractedCopyrightLines;
     }
 
-    public void setExtractedCopyrightLines( Set<String> extractedCopyrightLines )
-    {
+    public void setExtractedCopyrightLines(Set<String> extractedCopyrightLines) {
         this.extractedCopyrightLines = extractedCopyrightLines;
     }
 
-    public Type getType()
-    {
+    public Type getType() {
         return type;
     }
 
-    public void setType( Type type )
-    {
+    public void setType(Type type) {
         this.type = type;
     }
 
-    public String getNormalizedContent()
-    {
+    public String getNormalizedContent() {
         return normalizedContent;
     }
 }

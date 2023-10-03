@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
  * @since 1.18
  */
 public class Cache {
-    private static final Logger LOG = LoggerFactory.getLogger( Cache.class );
+    private static final Logger LOG = LoggerFactory.getLogger(Cache.class);
 
     private final Map<String, LicenseDownloadResult> urlToFile = new HashMap<>();
 
@@ -68,9 +68,8 @@ public class Cache {
      * @param normalizedContentChecksum Normalized file content.
      * @return If the cache has a license file with the same normalized content.
      */
-    public boolean hasNormalizedContent( String normalizedContentChecksum )
-    {
-        return normalizedContentToFile.get( normalizedContentChecksum ) != null;
+    public boolean hasNormalizedContent(String normalizedContentChecksum) {
+        return normalizedContentToFile.get(normalizedContentChecksum) != null;
     }
 
     /**
@@ -105,13 +104,10 @@ public class Cache {
                         + "' together with URLs '" + sb.toString() + "'");
             }
             final String normalizedContentChecksum = entry.getNormalizedContentChecksum();
-            if ( normalizedContentChecksum != null )
-            {
-                normalizedContentToFile.put( normalizedContentChecksum, entry );
-            }
-            else
-            {
-                LOG.warn( "Couldn't find normalized content checksum for license download " + entry );
+            if (normalizedContentChecksum != null) {
+                normalizedContentToFile.put(normalizedContentChecksum, entry);
+            } else {
+                LOG.warn("Couldn't find normalized content checksum for license download " + entry);
             }
         }
         urlToFile.put(url, entry);

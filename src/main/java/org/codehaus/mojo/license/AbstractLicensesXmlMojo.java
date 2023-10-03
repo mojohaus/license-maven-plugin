@@ -158,9 +158,9 @@ public abstract class AbstractLicensesXmlMojo extends AbstractMojo {
     }
 
     protected void writeLicenseSummary(List<ProjectLicenseInfo> deps, File licensesOutputFile, boolean writeVersions)
-        throws ParserConfigurationException, TransformerException, IOException {
+            throws ParserConfigurationException, TransformerException, IOException {
         initEncoding();
         LicenseSummaryWriter.writeLicenseSummary(
-            deps, licensesOutputFile, charset, licensesOutputFileEol, writeVersions);
+                deps, licensesOutputFile, charset, licensesOutputFileEol, writeVersions);
     }
 }

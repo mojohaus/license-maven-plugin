@@ -85,8 +85,11 @@ public class DownloadLicensesMojo extends AbstractDownloadLicensesMojo {
     protected Map<String, LicensedArtifact> getDependencies() {
         final Map<String, LicensedArtifact> result = new TreeMap<>();
         licensedArtifactResolver.loadProjectDependencies(
-                new ResolvedProjectDependencies( project.getArtifacts(), MojoHelper.getDependencyArtifacts(project) ),
-                this, remoteRepositories, result, false );
+                new ResolvedProjectDependencies(project.getArtifacts(), MojoHelper.getDependencyArtifacts(project)),
+                this,
+                remoteRepositories,
+                result,
+                false);
         return result;
     }
 }

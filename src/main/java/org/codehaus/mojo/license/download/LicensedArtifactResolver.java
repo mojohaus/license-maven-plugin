@@ -93,8 +93,7 @@ public class LicensedArtifactResolver {
             MavenProjectDependenciesConfigurator configuration,
             List<ArtifactRepository> remoteRepositories,
             Map<String, LicensedArtifact> result,
-            boolean extendedInfo )
-    {
+            boolean extendedInfo) {
         final ArtifactFilters artifactFilters = configuration.getArtifactFilters();
 
         final boolean excludeTransitiveDependencies = configuration.isExcludeTransitiveDependencies();
@@ -152,20 +151,18 @@ public class LicensedArtifactResolver {
                 LOG.debug("Dependency [{}] already present in the result", id);
             } else {
                 // build project
-                final Builder laBuilder = LicensedArtifact.builder( artifact, extendedInfo );
-                try
-                {
+                final Builder laBuilder = LicensedArtifact.builder(artifact, extendedInfo);
+                try {
                     final MavenProject project = mavenProjectBuilder
                             .build(artifact, true, projectBuildingRequest)
                             .getProject();
-                    if ( extendedInfo )
-                    {
-                        laBuilder.setName( project.getName() );
-                        laBuilder.setInceptionYear( project.getInceptionYear() );
-                        laBuilder.setOrganization( project.getOrganization() );
-                        laBuilder.setDevelopers( project.getDevelopers() );
-                        laBuilder.setUrl( project.getUrl() );
-                        laBuilder.setScm( project.getScm() );
+                    if (extendedInfo) {
+                        laBuilder.setName(project.getName());
+                        laBuilder.setInceptionYear(project.getInceptionYear());
+                        laBuilder.setOrganization(project.getOrganization());
+                        laBuilder.setDevelopers(project.getDevelopers());
+                        laBuilder.setUrl(project.getUrl());
+                        laBuilder.setScm(project.getScm());
                     }
                     List<org.apache.maven.model.License> lics = project.getLicenses();
                     if (lics != null) {

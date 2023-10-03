@@ -22,14 +22,12 @@ package org.codehaus.mojo.license.download;
  * #L%
  */
 
-import org.apache.maven.artifact.Artifact;
-import org.codehaus.mojo.license.extended.ExtendedInfo;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 import org.apache.maven.artifact.Artifact;
+import org.codehaus.mojo.license.extended.ExtendedInfo;
 
 /**
  * Contains the license information for a single project/dependency
@@ -60,7 +58,7 @@ public class ProjectLicenseInfo {
      */
     public ProjectLicenseInfo() {}
 
-    public ProjectLicenseInfo( String groupId, String artifactId, String version, ExtendedInfo extendedInfo ) {
+    public ProjectLicenseInfo(String groupId, String artifactId, String version, ExtendedInfo extendedInfo) {
         this.groupId = groupId;
         this.artifactId = artifactId;
         this.version = version;
@@ -221,8 +219,7 @@ public class ProjectLicenseInfo {
         return approved;
     }
 
-    public ExtendedInfo getExtendedInfo()
-    {
+    public ExtendedInfo getExtendedInfo() {
         return extendedInfo;
     }
 }
