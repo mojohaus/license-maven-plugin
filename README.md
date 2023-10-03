@@ -34,7 +34,7 @@ and `writeExcelFile`):
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>license-maven-plugin</artifactId>
-                    <version>2.1.0-SNAPSHOT</version>
+                    <version>2.2.1-SNAPSHOT</version>
                     <configuration>
                         <!-- New -->
                         <extendedInfo>true</extendedInfo>
