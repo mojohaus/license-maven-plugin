@@ -4,6 +4,6 @@ on: [push, pull_request, workflow_dispatch]
 
 jobs:
   build:
-    uses: octopusden/octopus-base/.github/workflows/common-java-maven-build.yml@v2.0
+    uses: octopusden/octopus-base/.github/workflows/common-java-maven-build.yml@v2.1.7
     with:
       java-version: '8'

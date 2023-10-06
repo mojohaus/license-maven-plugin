@@ -1,0 +1,17 @@
+# .github/release.yml
+
+changelog:
+  categories:
+    - title: New features and enhancements
+      labels:
+        - '*'
+      exclude:
+        labels:
+          - dependencies
+          - bug
+    - title: Bugfixes
+      labels:
+        - bug
+    - title: Dependencies
+      labels:
+        - dependencies
