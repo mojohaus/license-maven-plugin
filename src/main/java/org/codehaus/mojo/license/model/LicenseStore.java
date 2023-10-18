@@ -156,7 +156,7 @@ public class LicenseStore implements Iterable<LicenseRepository> {
             addRootPackageClassPathRepository();
         } else if (extraResolver.startsWith(CLASSPATH_PROTOCOL)) {
             extraResolver = extraResolver.substring(CLASSPATH_PROTOCOL.length());
-            LOG.info("Using classpath extraresolver: {}", extraResolver);
+            LOG.debug("Using classpath extraresolver: {}", extraResolver);
             URL baseURL = getClass().getClassLoader().getResource(extraResolver);
             addRepository(baseURL);
         } else {
