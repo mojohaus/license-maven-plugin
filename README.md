@@ -40,7 +40,8 @@ and `writeExcelFile`):
                         <extendedInfo>true</extendedInfo>
                         <!-- New -->
                         <writeExcelFile>true</writeExcelFile>
-                        ...
+                        <!-- New -->
+                        <writeCalcFile>true</writeCalcFile>
 
                         <!-- Not needed, but a suggestion -->
                         <!-- Makes it more readable, licenses are the same with different names -->
