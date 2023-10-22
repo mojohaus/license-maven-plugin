@@ -67,6 +67,7 @@ import org.codehaus.mojo.license.download.ProjectLicense;
 import org.codehaus.mojo.license.download.ProjectLicenseInfo;
 import org.codehaus.mojo.license.download.UrlReplacements;
 import org.codehaus.mojo.license.extended.InfoFile;
+import org.codehaus.mojo.license.extended.spreadsheet.CalcFileWriter;
 import org.codehaus.mojo.license.extended.spreadsheet.ExcelFileWriter;
 import org.codehaus.mojo.license.spdx.SpdxLicenseList;
 import org.codehaus.mojo.license.spdx.SpdxLicenseList.Attachments.ContentSanitizer;
@@ -680,26 +681,66 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
     private boolean useDefaultContentSanitizers;
 
     /**
-     * Write Excel file (XLSX) for goal license:aggregate-download-licenses.
+     * Write Microsoft Office Excel file (XLSX) for goal license:aggregate-download-licenses.
      *
-     * @since 2.1
+     * @since 2.2.1
      */
     @Parameter(property = "license.writeExcelFile", defaultValue = "false")
     private boolean writeExcelFile;
 
     /**
-     * The excel output file used if {@link #writeExcelFile} is true,
+     * Write LibreOffice Calc file (ODS) for goal license:aggregate-download-licenses.
+     *
+     * @since 2.2.1
+     */
+    @Parameter(property = "license.writeExcelFile", defaultValue = "false")
+    private boolean writeCalcFile;
+
+    /**
+     * To merge licenses in the Excel file.
+     * <p>
+     * Each entry represents a merge (first license is main license to keep), licenses are separated by {@code |}.
+     * <p>
+     * Example:
+     * <p>
+     * <pre>
+     * &lt;licenseMerges&gt;
+     * &lt;licenseMerge&gt;The Apache Software License|Version 2.0,Apache License, Version 2.0&lt;/licenseMerge&gt;
+     * &lt;/licenseMerges&gt;
+     * &lt;/pre&gt;
+     *
+     * @since 2.2.1
+     */
+    @Parameter
+    List<String> licenseMerges;
+
+    /**
+     * The Excel output file used if {@link #writeExcelFile} is true,
      * containing a mapping between each dependency and it's license information.
      * With extended information, if available.
      *
      * @see AbstractDownloadLicensesMojo#writeExcelFile
      * @see AggregateDownloadLicensesMojo#extendedInfo
-     * @since 2.1
+     * @since 2.2.1
      */
     @Parameter(
             property = "licensesExcelOutputFile",
             defaultValue = "${project.build.directory}/generated-resources/licenses.xlsx")
     protected File licensesExcelOutputFile;
+
+    /**
+     * The Calc output file used if {@link #writeCalcFile} is true,
+     * containing a mapping between each dependency and it's license information.
+     * With extended information, if available.
+     *
+     * @see AbstractDownloadLicensesMojo#writeCalcFile
+     * @see AggregateDownloadLicensesMojo#extendedInfo
+     * @since 2.2.1
+     */
+    @Parameter(
+            property = "licensesCalcOutputFile",
+            defaultValue = "${project.build.directory}/generated-resources/licenses.ods")
+    protected File licensesCalcOutputFile;
 
     // ----------------------------------------------------------------------
     // Plexus Components
@@ -833,9 +874,9 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
             }
 
             List<ProjectLicenseInfo> depProjectLicensesWithErrors = filterErrors(depProjectLicenses);
-            writeLicenseSummaries(depProjectLicenses, licensesOutputFile, licensesExcelOutputFile);
+            writeLicenseSummaries(depProjectLicenses);
             if (!CollectionUtils.isEmpty(depProjectLicensesWithErrors)) {
-                writeLicenseSummaries(depProjectLicensesWithErrors, licensesErrorsFile, licensesExcelErrorFile);
+                writeLicenseSummaries(depProjectLicensesWithErrors);
             }
 
             removeOrphanFiles(depProjectLicenses);
@@ -862,12 +903,14 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
         }
     }
 
-    private void writeLicenseSummaries(
-            List<ProjectLicenseInfo> depProjectLicenses, File licensesOutputFile, File licensesExcelOutputFile)
+    private void writeLicenseSummaries(List<ProjectLicenseInfo> depProjectLicenses)
             throws ParserConfigurationException, TransformerException, IOException {
         writeLicenseSummary(depProjectLicenses, licensesOutputFile, writeVersions);
         if (writeExcelFile) {
             ExcelFileWriter.write(depProjectLicenses, licensesExcelOutputFile);
+        }
+        if (writeCalcFile) {
+            CalcFileWriter.write(depProjectLicenses, licensesCalcOutputFile);
         }
     }
 

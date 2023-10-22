@@ -324,11 +324,19 @@
       <version>6.0.0</version>
     </dependency>
 
-    <!-- Excel export -->
+    <!-- Microsoft Excel XLSX export -->
     <dependency>
       <groupId>org.apache.poi</groupId>
       <artifactId>poi-ooxml</artifactId>
       <version>5.2.4</version>
+    </dependency>
+
+    <!-- LibreOffice Calc ODT export -->
+    <dependency>
+      <groupId>org.odftoolkit</groupId>
+      <artifactId>odfdom-java</artifactId>
+      <!-- There are later versions, but that versions need JDKs after version 8 -->
+      <version>0.9.0</version>
     </dependency>
   </dependencies>
 
@@ -512,10 +520,17 @@
               </scriptVariables>
             </configuration>
             <dependencies>
+              <!-- Microsoft Excel XLSX export -->
               <dependency>
                 <groupId>org.apache.poi</groupId>
                 <artifactId>poi-ooxml</artifactId>
                 <version>5.2.4</version>
+              </dependency>
+              <!-- LibreOffice Calc ODT export -->
+              <dependency>
+                <groupId>org.odftoolkit</groupId>
+                <artifactId>odfdom-java</artifactId>
+                <version>0.9.0</version>
               </dependency>
               <dependency>
                 <groupId>commons-io</groupId>
@@ -589,10 +604,17 @@
               <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
             </configuration>
             <dependencies>
+              <!-- Microsoft Excel XLSX export -->
               <dependency>
                 <groupId>org.apache.poi</groupId>
                 <artifactId>poi-ooxml</artifactId>
                 <version>5.2.4</version>
+              </dependency>
+              <!-- LibreOffice Calc ODT export -->
+              <dependency>
+                <groupId>org.odftoolkit</groupId>
+                <artifactId>odfdom-java</artifactId>
+                <version>0.9.0</version>
               </dependency>
               <dependency>
                 <groupId>commons-io</groupId>

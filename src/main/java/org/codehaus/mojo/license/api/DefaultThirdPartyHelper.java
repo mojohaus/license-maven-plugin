@@ -45,6 +45,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
 import org.codehaus.mojo.license.model.LicenseMap;
 import org.codehaus.mojo.license.utils.SortedProperties;
+import org.codehaus.mojo.license.utils.StringToList;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -275,7 +276,7 @@ public class DefaultThirdPartyHelper implements ThirdPartyHelper {
 
             for (String merge : licenseMerges) {
                 merge = merge.trim();
-                String[] split = merge.split("\\s*\\|\\s*");
+                String[] split = merge.split(StringToList.LIST_OF_LICENSES_REG_EX);
 
                 String mainLicense = split[0];
 

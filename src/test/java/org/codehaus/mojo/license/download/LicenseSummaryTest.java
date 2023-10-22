@@ -21,6 +21,7 @@ import org.apache.maven.model.Scm;
 import org.codehaus.mojo.license.Eol;
 import org.codehaus.mojo.license.extended.ExtendedInfo;
 import org.codehaus.mojo.license.extended.InfoFile;
+import org.codehaus.mojo.license.extended.spreadsheet.CalcFileWriter;
 import org.codehaus.mojo.license.extended.spreadsheet.ExcelFileWriter;
 import org.junit.Assert;
 import org.junit.Test;
@@ -137,6 +138,9 @@ public class LicenseSummaryTest {
 
         File licensesExcelOutputFile = File.createTempFile("licExcel", ".xlsx");
         ExcelFileWriter.write(licSummary, licensesExcelOutputFile);
+
+        File licensesCalcOutputFile = File.createTempFile("licCalc", ".ods");
+        CalcFileWriter.write(licSummary, licensesCalcOutputFile);
     }
 
     private static ExtendedInfo buildExtendedInfo(int suffix) {

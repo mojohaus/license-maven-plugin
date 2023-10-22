@@ -89,7 +89,8 @@ public class DownloadLicensesMojo extends AbstractDownloadLicensesMojo {
                 this,
                 remoteRepositories,
                 result,
-                false);
+                false,
+                licenseMerges);
         return result;
     }
 }

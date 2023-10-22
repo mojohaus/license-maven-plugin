@@ -384,9 +384,14 @@ public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
         try {
             init();
             details = createThirdPartyDetails();
-        } catch (IOException | ThirdPartyToolException | ArtifactNotFoundException | ArtifactResolutionException |
-                 ProjectBuildingException | MojoFailureException | DependenciesToolException |
-                 MojoExecutionException e) {
+        } catch (IOException
+                | ThirdPartyToolException
+                | ArtifactNotFoundException
+                | ArtifactResolutionException
+                | ProjectBuildingException
+                | MojoFailureException
+                | DependenciesToolException
+                | MojoExecutionException e) {
             throw new MavenReportException(e.getMessage(), e);
         }
 

@@ -32,17 +32,30 @@
     <artifactId>test-aggregate-download-licenses-extended-excel</artifactId>
     <version>@project.version@</version>
   </parent>
-  <artifactId>test-aggregate-download-licenses-extended-excel-child1</artifactId>
+  <artifactId>test-aggregate-download-licenses-extended-spreadsheet-child2</artifactId>
 
-  <name>License Test :: aggregate-download-licenses - Extended Excel - child 1</name>
+  <name>License Test :: aggregate-download-licenses - Extended Spreadsheet — child 2</name>
 
   <dependencies>
 
-    <!-- use license 'The Apache Software License, Version 2.0' -->
+    <!-- use license 'Apache License, Version 2.0' -->
     <dependency>
-      <groupId>commons-logging</groupId>
-      <artifactId>commons-logging</artifactId>
-      <version>1.1.1</version>
+      <groupId>com.jhlabs</groupId>
+      <artifactId>filters</artifactId>
+      <version>2.0.235</version>
+    </dependency>
+
+    <!-- use license 'Apache Public License 2.0' -->
+    <dependency>
+      <groupId>org.sonatype.plexus</groupId>
+      <artifactId>plexus-cipher</artifactId>
+      <version>1.7</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <version>5.10.0</version>
     </dependency>
   </dependencies>
 

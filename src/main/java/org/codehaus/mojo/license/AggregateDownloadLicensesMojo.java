@@ -103,7 +103,7 @@ public class AggregateDownloadLicensesMojo extends AbstractDownloadLicensesMojo 
      * <p/>
      * This means it will read infos from the JAR's MANIFEST.MF file, look for NOTICE.txt and similar files.
      *
-     * @since 2.1
+     * @since 2.2.1
      */
     @Parameter(property = "license.extendedInfo", defaultValue = "false")
     private boolean extendedInfo;
@@ -132,7 +132,8 @@ public class AggregateDownloadLicensesMojo extends AbstractDownloadLicensesMojo 
                     this,
                     remoteRepositories,
                     result,
-                    extendedInfo);
+                    extendedInfo,
+                    licenseMerges);
         }
         return result;
     }

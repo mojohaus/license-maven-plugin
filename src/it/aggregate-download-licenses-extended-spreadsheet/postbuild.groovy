@@ -19,6 +19,10 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
+
+import org.odftoolkit.odfdom.doc.OdfSpreadsheetDocument
+import org.odftoolkit.odfdom.doc.table.OdfTable
+
 import java.util.logging.Level
 import java.util.logging.Logger
 
@@ -28,10 +32,10 @@ import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.WorkbookFactory
 
-log = Logger.getLogger("test-aggregate-download-licenses-extended-excel")
+log = Logger.getLogger("test-aggregate-download-licenses-extended-spreadsheet")
 
 static boolean searchText(Sheet sheet, String searchText) {
-    def log2 = Logger.getLogger("test-aggregate-download-licenses-extended-excel-search")
+    def log2 = Logger.getLogger("test-aggregate-download-licenses-extended-spreadsheet-search")
 
     for (Iterator<Row> rowIterator = sheet.rowIterator(); rowIterator.hasNext();) {
         Row row = rowIterator.next()
@@ -50,19 +54,31 @@ static boolean searchText(Sheet sheet, String searchText) {
     return false
 }
 
-file = new File(basedir, 'target/generated-resources/licenses.xlsx');
-assert file.exists()
-assert file.length() > 100
+// -------------- Excel ----------------------
 
-searchText = "YourSearchText"
-input = new FileInputStream(file)
-// So it can be easily opened and inspected manually. In a modern IDE it's just a (double-)click in the log output.
-log.log(Level.FINE, "Excel export at: {}", file.absolutePath)
-workbook = WorkbookFactory.create(input)
-Sheet sheet = workbook.getSheetAt(0)
+excelFile = new File(basedir, 'target/generated-resources/licenses.xlsx')
+assert excelFile.exists()
+assert excelFile.length() > 100
 
-assert searchText(sheet, "Maven information")
-assert searchText(sheet, "Apache Software Foundation")
-assert searchText(sheet, "The Apache Software Foundation")
+try (InputStream input = new FileInputStream(excelFile)) {
+    // So it can be easily opened and inspected manually. In a modern IDE it's just a (double-)click in the log output.
+    log.log(Level.FINE, "Excel export at: {}", excelFile.absolutePath)
+    workbook = WorkbookFactory.create(input)
+    Sheet sheet = workbook.getSheetAt(0)
 
-input.close()
+    assert searchText(sheet, "Maven information")
+    assert searchText(sheet, "The Apache Software License, Version 2.0")
+    assert searchText(sheet, "The Apache Software Foundation")
+}
+
+// -------------- Calc -----------------
+
+calcFile = new File(basedir, 'target/generated-resources/licenses.ods')
+assert calcFile.exists()
+assert calcFile.length() > 100
+
+try (OdfSpreadsheetDocument spreadsheet = OdfSpreadsheetDocument.loadDocument(calcFile)) {
+    List<OdfTable> tableList = spreadsheet.getTableList()
+    OdfTable table = tableList.get(0)
+    assert table.getRowCount() >= 3
+}
