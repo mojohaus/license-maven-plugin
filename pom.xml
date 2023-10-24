@@ -322,11 +322,6 @@
     <pluginManagement>
       <plugins>
         <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>build-helper-maven-plugin</artifactId>
-          <version>3.4.0</version>
-        </plugin>
-        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
           <configuration>
@@ -502,7 +497,8 @@
                 <id>all-integration-test</id>
                 <goals>
                   <goal>install</goal>
-                  <goal>run</goal>
+                  <goal>integration-test</goal>
+                  <goal>verify</goal>
                 </goals>
                 <configuration>
                   <skipInvocation />
@@ -510,71 +506,10 @@
                     <extraArtifact>${project.groupId}:${project.artifactId}:${project.version}:license.properties:test-third-party</extraArtifact>
                   </extraArtifacts>
                   <pomExcludes>
-                    <pomExclude>MLICENSE-4/pom.xml</pomExclude>
-                    <pomExclude>download-licenses-proxy/pom.xml</pomExclude>
                     <!-- failed test on GH use remote resources -->
                     <pomExclude>download-licenses-basic/pom.xml</pomExclude>
                     <pomExclude>download-licenses-force/pom.xml</pomExclude>
                   </pomExcludes>
-                </configuration>
-              </execution>
-              <!-- as this it is run in offline, then execute it after the previous its... -->
-              <execution>
-                <id>integration-test-offline</id>
-                <goals>
-                  <goal>run</goal>
-                </goals>
-                <configuration>
-                  <pomIncludes>
-                    <pomInclude>MLICENSE-4/pom.xml</pomInclude>
-                  </pomIncludes>
-                  <cloneProjectsTo>${project.build.directory}/it-offline</cloneProjectsTo>
-                </configuration>
-              </execution>
-              <execution>
-                <id>integration-test-proxy</id>
-                <goals>
-                  <goal>run</goal>
-                </goals>
-                <configuration>
-                  <settingsFile>src/it/settings-proxy.xml</settingsFile>
-                  <pomIncludes>
-                    <pomInclude>download-licenses-proxy/pom.xml</pomInclude>
-                  </pomIncludes>
-                  <cloneProjectsTo>${project.build.directory}/it-proxy</cloneProjectsTo>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <profile>
-      <id>run-one-it</id>
-      <build>
-        <defaultGoal>verify</defaultGoal>
-        <plugins>
-          <plugin>
-            <artifactId>maven-invoker-plugin</artifactId>
-            <configuration>
-              <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
-              <settingsFile>src/it/settings.xml</settingsFile>
-              <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
-            </configuration>
-            <dependencies />
-            <executions>
-              <execution>
-                <id>one-integration-test</id>
-                <goals>
-                  <goal>install</goal>
-                  <goal>run</goal>
-                </goals>
-                <configuration>
-                  <streamLogs>true</streamLogs>
-                  <pomIncludes>
-                    <pomInclude>${itName}/pom.xml</pomInclude>
-                  </pomIncludes>
                 </configuration>
               </execution>
             </executions>
