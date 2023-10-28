@@ -128,24 +128,24 @@ public class ExcelFileWriter {
 
         // Create Maven header cell
         createMergedCellsInRow(
-            sheet,
-            SpreadsheetUtil.MAVEN_START_COLUMN,
-            SpreadsheetUtil.MAVEN_END_COLUMN,
-            headerCellStyle,
-            mavenJarRow,
-            "Maven information",
-            0);
+                sheet,
+                SpreadsheetUtil.MAVEN_START_COLUMN,
+                SpreadsheetUtil.MAVEN_END_COLUMN,
+                headerCellStyle,
+                mavenJarRow,
+                "Maven information",
+                0);
 
         if (hasExtendedInfo) {
             // Create JAR header cell
             createMergedCellsInRow(
-                sheet,
-                SpreadsheetUtil.EXTENDED_INFO_START_COLUMN,
-                SpreadsheetUtil.EXTENDED_INFO_END_COLUMN,
-                headerCellStyle,
-                mavenJarRow,
-                "JAR Content",
-                0);
+                    sheet,
+                    SpreadsheetUtil.EXTENDED_INFO_START_COLUMN,
+                    SpreadsheetUtil.EXTENDED_INFO_END_COLUMN,
+                    headerCellStyle,
+                    mavenJarRow,
+                    "JAR Content",
+                    0);
         }
 
         // Create 2nd header row
@@ -153,111 +153,111 @@ public class ExcelFileWriter {
 
         // Create Maven "General" header
         createMergedCellsInRow(
-            sheet,
-            SpreadsheetUtil.GENERAL_START_COLUMN,
-            SpreadsheetUtil.GENERAL_END_COLUMN,
-            headerCellStyle,
-            secondHeaderRow,
-            "General",
-            1);
+                sheet,
+                SpreadsheetUtil.GENERAL_START_COLUMN,
+                SpreadsheetUtil.GENERAL_END_COLUMN,
+                headerCellStyle,
+                secondHeaderRow,
+                "General",
+                1);
 
         // Create Maven "Plugin ID" header
         createMergedCellsInRow(
-            sheet,
-            SpreadsheetUtil.PLUGIN_ID_START_COLUMN,
-            SpreadsheetUtil.PLUGIN_ID_END_COLUMN,
-            headerCellStyle,
-            secondHeaderRow,
-            "Plugin ID",
-            1);
+                sheet,
+                SpreadsheetUtil.PLUGIN_ID_START_COLUMN,
+                SpreadsheetUtil.PLUGIN_ID_END_COLUMN,
+                headerCellStyle,
+                secondHeaderRow,
+                "Plugin ID",
+                1);
 
         // Gap "General" <-> "Plugin ID".
         sheet.setColumnWidth(SpreadsheetUtil.GENERAL_END_COLUMN, SpreadsheetUtil.GAP_WIDTH);
 
         // Create Maven "Licenses" header
         createMergedCellsInRow(
-            sheet,
-            SpreadsheetUtil.LICENSES_START_COLUMN,
-            SpreadsheetUtil.LICENSES_END_COLUMN,
-            headerCellStyle,
-            secondHeaderRow,
-            "Licenses",
-            1);
+                sheet,
+                SpreadsheetUtil.LICENSES_START_COLUMN,
+                SpreadsheetUtil.LICENSES_END_COLUMN,
+                headerCellStyle,
+                secondHeaderRow,
+                "Licenses",
+                1);
 
         // Gap "Plugin ID" <-> "Licenses".
         sheet.setColumnWidth(SpreadsheetUtil.PLUGIN_ID_END_COLUMN, SpreadsheetUtil.GAP_WIDTH);
 
         // Create Maven "Developers" header
         createMergedCellsInRow(
-            sheet,
-            SpreadsheetUtil.DEVELOPERS_START_COLUMN,
-            SpreadsheetUtil.DEVELOPERS_END_COLUMN,
-            headerCellStyle,
-            secondHeaderRow,
-            "Developers",
-            1);
+                sheet,
+                SpreadsheetUtil.DEVELOPERS_START_COLUMN,
+                SpreadsheetUtil.DEVELOPERS_END_COLUMN,
+                headerCellStyle,
+                secondHeaderRow,
+                "Developers",
+                1);
 
         // Gap "Licenses" <-> "Developers".
         sheet.setColumnWidth(SpreadsheetUtil.LICENSES_END_COLUMN, SpreadsheetUtil.GAP_WIDTH);
 
         // Create Maven "Miscellaneous" header
         createMergedCellsInRow(
-            sheet,
-            SpreadsheetUtil.MISC_START_COLUMN,
-            SpreadsheetUtil.MISC_END_COLUMN,
-            headerCellStyle,
-            secondHeaderRow,
-            "Miscellaneous",
-            1);
+                sheet,
+                SpreadsheetUtil.MISC_START_COLUMN,
+                SpreadsheetUtil.MISC_END_COLUMN,
+                headerCellStyle,
+                secondHeaderRow,
+                "Miscellaneous",
+                1);
 
         // Gap "Developers" <-> "Miscellaneous".
         sheet.setColumnWidth(SpreadsheetUtil.DEVELOPERS_END_COLUMN, SpreadsheetUtil.GAP_WIDTH);
 
         if (hasExtendedInfo) {
             createMergedCellsInRow(
-                sheet,
-                SpreadsheetUtil.MANIFEST_START_COLUMN,
-                SpreadsheetUtil.MANIFEST_END_COLUMN,
-                headerCellStyle,
-                secondHeaderRow,
-                "MANIFEST.MF",
-                1);
+                    sheet,
+                    SpreadsheetUtil.MANIFEST_START_COLUMN,
+                    SpreadsheetUtil.MANIFEST_END_COLUMN,
+                    headerCellStyle,
+                    secondHeaderRow,
+                    "MANIFEST.MF",
+                    1);
 
             // Gap "Miscellaneous" <-> "MANIFEST.MF".
             sheet.setColumnWidth(SpreadsheetUtil.DEVELOPERS_END_COLUMN, SpreadsheetUtil.GAP_WIDTH);
 
             createMergedCellsInRow(
-                sheet,
-                SpreadsheetUtil.INFO_NOTICES_START_COLUMN,
-                SpreadsheetUtil.INFO_NOTICES_END_COLUMN,
-                headerCellStyle,
-                secondHeaderRow,
-                "Notices text files",
-                1);
+                    sheet,
+                    SpreadsheetUtil.INFO_NOTICES_START_COLUMN,
+                    SpreadsheetUtil.INFO_NOTICES_END_COLUMN,
+                    headerCellStyle,
+                    secondHeaderRow,
+                    "Notices text files",
+                    1);
 
             // Gap "MANIFEST.MF" <-> "Notice text files".
             sheet.setColumnWidth(SpreadsheetUtil.MANIFEST_END_COLUMN, SpreadsheetUtil.GAP_WIDTH);
 
             createMergedCellsInRow(
-                sheet,
-                SpreadsheetUtil.INFO_LICENSES_START_COLUMN,
-                SpreadsheetUtil.INFO_LICENSES_END_COLUMN,
-                headerCellStyle,
-                secondHeaderRow,
-                "License text files",
-                1);
+                    sheet,
+                    SpreadsheetUtil.INFO_LICENSES_START_COLUMN,
+                    SpreadsheetUtil.INFO_LICENSES_END_COLUMN,
+                    headerCellStyle,
+                    secondHeaderRow,
+                    "License text files",
+                    1);
 
             // Gap "Notice text files" <-> "License text files".
             sheet.setColumnWidth(SpreadsheetUtil.INFO_NOTICES_END_COLUMN, SpreadsheetUtil.GAP_WIDTH);
 
             createMergedCellsInRow(
-                sheet,
-                SpreadsheetUtil.INFO_SPDX_START_COLUMN,
-                SpreadsheetUtil.INFO_SPDX_END_COLUMN,
-                headerCellStyle,
-                secondHeaderRow,
-                "SPDX license id matched",
-                1);
+                    sheet,
+                    SpreadsheetUtil.INFO_SPDX_START_COLUMN,
+                    SpreadsheetUtil.INFO_SPDX_END_COLUMN,
+                    headerCellStyle,
+                    secondHeaderRow,
+                    "SPDX license id matched",
+                    1);
 
             // Gap "License text files" <-> "SPDX license matches".
             sheet.setColumnWidth(SpreadsheetUtil.INFO_LICENSES_END_COLUMN, SpreadsheetUtil.GAP_WIDTH);
@@ -271,62 +271,62 @@ public class ExcelFileWriter {
         createCellsInRow(thirdHeaderRow, SpreadsheetUtil.GENERAL_START_COLUMN, headerCellStyle, "Name");
         // Plugin ID
         createCellsInRow(
-            thirdHeaderRow,
-            SpreadsheetUtil.PLUGIN_ID_START_COLUMN,
-            headerCellStyle,
-            "Group ID",
-            "Artifact ID",
-            "Version");
+                thirdHeaderRow,
+                SpreadsheetUtil.PLUGIN_ID_START_COLUMN,
+                headerCellStyle,
+                "Group ID",
+                "Artifact ID",
+                "Version");
         // Licenses
         createCellsInRow(
-            thirdHeaderRow,
-            SpreadsheetUtil.LICENSES_START_COLUMN,
-            headerCellStyle,
-            "Name",
-            "URL",
-            "Distribution",
-            "Comments",
-            "File");
+                thirdHeaderRow,
+                SpreadsheetUtil.LICENSES_START_COLUMN,
+                headerCellStyle,
+                "Name",
+                "URL",
+                "Distribution",
+                "Comments",
+                "File");
         // Developers
         createCellsInRow(
-            thirdHeaderRow,
-            SpreadsheetUtil.DEVELOPERS_START_COLUMN,
-            headerCellStyle,
-            "Id",
-            "Email",
-            "Name",
-            "Organization",
-            "Organization URL",
-            "URL",
-            "Timezone");
+                thirdHeaderRow,
+                SpreadsheetUtil.DEVELOPERS_START_COLUMN,
+                headerCellStyle,
+                "Id",
+                "Email",
+                "Name",
+                "Organization",
+                "Organization URL",
+                "URL",
+                "Timezone");
         // Miscellaneous
         createCellsInRow(
-            thirdHeaderRow,
-            SpreadsheetUtil.MISC_START_COLUMN,
-            headerCellStyle,
-            "Inception Year",
-            "Organization",
-            "SCM",
-            "URL");
+                thirdHeaderRow,
+                SpreadsheetUtil.MISC_START_COLUMN,
+                headerCellStyle,
+                "Inception Year",
+                "Organization",
+                "SCM",
+                "URL");
 
         int headerLineCount = 3;
 
         if (hasExtendedInfo) {
             // MANIFEST.MF
             createCellsInRow(
-                thirdHeaderRow,
-                SpreadsheetUtil.MANIFEST_START_COLUMN,
-                headerCellStyle,
-                "Bundle license",
-                "Bundle vendor",
-                "Implementation vendor");
+                    thirdHeaderRow,
+                    SpreadsheetUtil.MANIFEST_START_COLUMN,
+                    headerCellStyle,
+                    "Bundle license",
+                    "Bundle vendor",
+                    "Implementation vendor");
             // 3 InfoFile groups: Notices, Licenses and SPDX-Licenses.
             createInfoFileCellsInRow(
-                thirdHeaderRow,
-                headerCellStyle,
-                SpreadsheetUtil.INFO_NOTICES_START_COLUMN,
-                SpreadsheetUtil.INFO_LICENSES_START_COLUMN,
-                SpreadsheetUtil.INFO_SPDX_START_COLUMN);
+                    thirdHeaderRow,
+                    headerCellStyle,
+                    SpreadsheetUtil.INFO_NOTICES_START_COLUMN,
+                    SpreadsheetUtil.INFO_LICENSES_START_COLUMN,
+                    SpreadsheetUtil.INFO_SPDX_START_COLUMN);
 
             sheet.createFreezePane(SpreadsheetUtil.EXTENDED_INFO_END_COLUMN, headerLineCount);
         } else {
@@ -339,10 +339,10 @@ public class ExcelFileWriter {
     // TODO: Clean this method up. Too many parameters, too complicated parameters/DTO pattern. But keep it still
     // threadsafe.
     private static void writeData(
-        List<ProjectLicenseInfo> projectLicenseInfos,
-        XSSFWorkbook wb,
-        Sheet sheet,
-        XSSFColor alternatingRowsColor) {
+            List<ProjectLicenseInfo> projectLicenseInfos,
+            XSSFWorkbook wb,
+            Sheet sheet,
+            XSSFColor alternatingRowsColor) {
         final int firstRowIndex = 3;
         int currentRowIndex = firstRowIndex;
         final Map<Integer, Row> rowMap = new HashMap<>();
@@ -372,89 +372,89 @@ public class ExcelFileWriter {
             rowMap.put(currentRowIndex, currentRow);
             // Plugin ID
             createDataCellsInRow(
-                currentRow,
-                SpreadsheetUtil.PLUGIN_ID_START_COLUMN,
-                cellStyle,
-                projectInfo.getGroupId(),
-                projectInfo.getArtifactId(),
-                projectInfo.getVersion());
+                    currentRow,
+                    SpreadsheetUtil.PLUGIN_ID_START_COLUMN,
+                    cellStyle,
+                    projectInfo.getGroupId(),
+                    projectInfo.getArtifactId(),
+                    projectInfo.getVersion());
             // Licenses
             final CellListParameter cellListParameter = new CellListParameter(sheet, rowMap, cellStyle);
             SpreadsheetUtil.CurrentRowData currentRowData =
-                new SpreadsheetUtil.CurrentRowData(currentRowIndex, extraRows, hasExtendedInfo);
+                    new SpreadsheetUtil.CurrentRowData(currentRowIndex, extraRows, hasExtendedInfo);
             extraRows = addList(
-                cellListParameter,
-                currentRowData,
-                SpreadsheetUtil.LICENSES_START_COLUMN,
-                SpreadsheetUtil.LICENSES_COLUMNS,
-                projectInfo.getLicenses(),
-                (Row licenseRow, ProjectLicense license) -> {
-                    Cell[] licenses = createDataCellsInRow(
-                        licenseRow,
-                        SpreadsheetUtil.LICENSES_START_COLUMN,
-                        cellStyle,
-                        license.getName(),
-                        license.getUrl(),
-                        license.getDistribution(),
-                        license.getComments(),
-                        license.getFile());
-                    addHyperlinkIfExists(wb, licenses[1], hyperlinkStyle, HyperlinkType.URL);
-                });
+                    cellListParameter,
+                    currentRowData,
+                    SpreadsheetUtil.LICENSES_START_COLUMN,
+                    SpreadsheetUtil.LICENSES_COLUMNS,
+                    projectInfo.getLicenses(),
+                    (Row licenseRow, ProjectLicense license) -> {
+                        Cell[] licenses = createDataCellsInRow(
+                                licenseRow,
+                                SpreadsheetUtil.LICENSES_START_COLUMN,
+                                cellStyle,
+                                license.getName(),
+                                license.getUrl(),
+                                license.getDistribution(),
+                                license.getComments(),
+                                license.getFile());
+                        addHyperlinkIfExists(wb, licenses[1], hyperlinkStyle, HyperlinkType.URL);
+                    });
 
             final ExtendedInfo extendedInfo = projectInfo.getExtendedInfo();
             if (extendedInfo != null) {
                 hasExtendedInfo = true;
                 // General
                 createDataCellsInRow(
-                    currentRow, SpreadsheetUtil.GENERAL_START_COLUMN, cellStyle, extendedInfo.getName());
+                        currentRow, SpreadsheetUtil.GENERAL_START_COLUMN, cellStyle, extendedInfo.getName());
                 // Developers
                 currentRowData = new SpreadsheetUtil.CurrentRowData(currentRowIndex, extraRows, hasExtendedInfo);
                 extraRows = addList(
-                    cellListParameter,
-                    currentRowData,
-                    SpreadsheetUtil.DEVELOPERS_START_COLUMN,
-                    SpreadsheetUtil.DEVELOPERS_COLUMNS,
-                    extendedInfo.getDevelopers(),
-                    (Row developerRow, Developer developer) -> {
-                        Cell[] licenses = createDataCellsInRow(
-                            developerRow,
-                            SpreadsheetUtil.DEVELOPERS_START_COLUMN,
-                            cellStyle,
-                            developer.getId(),
-                            developer.getEmail(),
-                            developer.getName(),
-                            developer.getOrganization(),
-                            developer.getOrganizationUrl(),
-                            developer.getUrl(),
-                            developer.getTimezone());
-                        addHyperlinkIfExists(wb, licenses[1], hyperlinkStyle, HyperlinkType.EMAIL);
-                        addHyperlinkIfExists(wb, licenses[4], hyperlinkStyle, HyperlinkType.URL);
-                        addHyperlinkIfExists(wb, licenses[5], hyperlinkStyle, HyperlinkType.URL);
-                    });
+                        cellListParameter,
+                        currentRowData,
+                        SpreadsheetUtil.DEVELOPERS_START_COLUMN,
+                        SpreadsheetUtil.DEVELOPERS_COLUMNS,
+                        extendedInfo.getDevelopers(),
+                        (Row developerRow, Developer developer) -> {
+                            Cell[] licenses = createDataCellsInRow(
+                                    developerRow,
+                                    SpreadsheetUtil.DEVELOPERS_START_COLUMN,
+                                    cellStyle,
+                                    developer.getId(),
+                                    developer.getEmail(),
+                                    developer.getName(),
+                                    developer.getOrganization(),
+                                    developer.getOrganizationUrl(),
+                                    developer.getUrl(),
+                                    developer.getTimezone());
+                            addHyperlinkIfExists(wb, licenses[1], hyperlinkStyle, HyperlinkType.EMAIL);
+                            addHyperlinkIfExists(wb, licenses[4], hyperlinkStyle, HyperlinkType.URL);
+                            addHyperlinkIfExists(wb, licenses[5], hyperlinkStyle, HyperlinkType.URL);
+                        });
                 // Miscellaneous
                 Cell[] miscCells = createDataCellsInRow(
-                    currentRow,
-                    SpreadsheetUtil.MISC_START_COLUMN,
-                    cellStyle,
-                    extendedInfo.getInceptionYear(),
-                    Optional.ofNullable(extendedInfo.getOrganization())
-                        .map(Organization::getName)
-                        .orElse(null),
-                    Optional.ofNullable(extendedInfo.getScm())
-                        .map(Scm::getUrl)
-                        .orElse(null),
-                    extendedInfo.getUrl());
+                        currentRow,
+                        SpreadsheetUtil.MISC_START_COLUMN,
+                        cellStyle,
+                        extendedInfo.getInceptionYear(),
+                        Optional.ofNullable(extendedInfo.getOrganization())
+                                .map(Organization::getName)
+                                .orElse(null),
+                        Optional.ofNullable(extendedInfo.getScm())
+                                .map(Scm::getUrl)
+                                .orElse(null),
+                        extendedInfo.getUrl());
                 addHyperlinkIfExists(wb, miscCells[2], hyperlinkStyle, HyperlinkType.URL);
                 addHyperlinkIfExists(wb, miscCells[3], hyperlinkStyle, HyperlinkType.URL);
 
                 // MANIFEST.MF
                 createDataCellsInRow(
-                    currentRow,
-                    SpreadsheetUtil.MANIFEST_START_COLUMN,
-                    cellStyle,
-                    extendedInfo.getBundleLicense(),
-                    extendedInfo.getBundleVendor(),
-                    extendedInfo.getImplementationVendor());
+                        currentRow,
+                        SpreadsheetUtil.MANIFEST_START_COLUMN,
+                        cellStyle,
+                        extendedInfo.getBundleLicense(),
+                        extendedInfo.getBundleVendor(),
+                        extendedInfo.getImplementationVendor());
 
                 // Info files
                 if (!CollectionUtils.isEmpty(extendedInfo.getInfoFiles())) {
@@ -480,43 +480,43 @@ public class ExcelFileWriter {
                     // InfoFile notices text file
                     currentRowData = new SpreadsheetUtil.CurrentRowData(currentRowIndex, extraRows, hasExtendedInfo);
                     extraRows = addInfoFileList(
-                        cellListParameter,
-                        currentRowData,
-                        SpreadsheetUtil.INFO_NOTICES_START_COLUMN,
-                        SpreadsheetUtil.INFO_NOTICES_COLUMNS,
-                        notices);
+                            cellListParameter,
+                            currentRowData,
+                            SpreadsheetUtil.INFO_NOTICES_START_COLUMN,
+                            SpreadsheetUtil.INFO_NOTICES_COLUMNS,
+                            notices);
                     // InfoFile licenses text file
                     currentRowData = new SpreadsheetUtil.CurrentRowData(currentRowIndex, extraRows, hasExtendedInfo);
                     extraRows = addInfoFileList(
-                        cellListParameter,
-                        currentRowData,
-                        SpreadsheetUtil.INFO_LICENSES_START_COLUMN,
-                        SpreadsheetUtil.INFO_LICENSES_COLUMNS,
-                        licenses);
+                            cellListParameter,
+                            currentRowData,
+                            SpreadsheetUtil.INFO_LICENSES_START_COLUMN,
+                            SpreadsheetUtil.INFO_LICENSES_COLUMNS,
+                            licenses);
                     // InfoFile spdx licenses text file
                     currentRowData = new SpreadsheetUtil.CurrentRowData(currentRowIndex, extraRows, hasExtendedInfo);
                     extraRows = addInfoFileList(
-                        cellListParameter,
-                        currentRowData,
-                        SpreadsheetUtil.INFO_SPDX_START_COLUMN,
-                        SpreadsheetUtil.INFO_SPDX_COLUMNS,
-                        spdxs);
+                            cellListParameter,
+                            currentRowData,
+                            SpreadsheetUtil.INFO_SPDX_START_COLUMN,
+                            SpreadsheetUtil.INFO_SPDX_COLUMNS,
+                            spdxs);
                 } else if (cellListParameter.cellStyle != null) {
                     setStyleOnEmptyCells(
-                        cellListParameter,
-                        currentRowData,
-                        SpreadsheetUtil.INFO_NOTICES_START_COLUMN,
-                        SpreadsheetUtil.INFO_NOTICES_COLUMNS);
+                            cellListParameter,
+                            currentRowData,
+                            SpreadsheetUtil.INFO_NOTICES_START_COLUMN,
+                            SpreadsheetUtil.INFO_NOTICES_COLUMNS);
                     setStyleOnEmptyCells(
-                        cellListParameter,
-                        currentRowData,
-                        SpreadsheetUtil.INFO_LICENSES_START_COLUMN,
-                        SpreadsheetUtil.INFO_LICENSES_COLUMNS);
+                            cellListParameter,
+                            currentRowData,
+                            SpreadsheetUtil.INFO_LICENSES_START_COLUMN,
+                            SpreadsheetUtil.INFO_LICENSES_COLUMNS);
                     setStyleOnEmptyCells(
-                        cellListParameter,
-                        currentRowData,
-                        SpreadsheetUtil.INFO_SPDX_START_COLUMN,
-                        SpreadsheetUtil.INFO_SPDX_COLUMNS);
+                            cellListParameter,
+                            currentRowData,
+                            SpreadsheetUtil.INFO_SPDX_START_COLUMN,
+                            SpreadsheetUtil.INFO_SPDX_COLUMNS);
                 }
             }
             currentRowIndex += extraRows + 1;
@@ -540,25 +540,25 @@ public class ExcelFileWriter {
 
     private static void autosizeColumns(Sheet sheet, boolean hasExtendedInfo) {
         autosizeColumns(
-            sheet,
-            new ImmutablePair<>(SpreadsheetUtil.GENERAL_START_COLUMN, SpreadsheetUtil.GENERAL_END_COLUMN),
-            new ImmutablePair<>(SpreadsheetUtil.PLUGIN_ID_START_COLUMN, SpreadsheetUtil.PLUGIN_ID_END_COLUMN),
-            new ImmutablePair<>(SpreadsheetUtil.LICENSES_START_COLUMN, SpreadsheetUtil.LICENSES_END_COLUMN),
-            new ImmutablePair<>(SpreadsheetUtil.DEVELOPERS_START_COLUMN, SpreadsheetUtil.DEVELOPERS_END_COLUMN - 1),
-            new ImmutablePair<>(SpreadsheetUtil.MISC_START_COLUMN + 1, SpreadsheetUtil.MISC_END_COLUMN));
+                sheet,
+                new ImmutablePair<>(SpreadsheetUtil.GENERAL_START_COLUMN, SpreadsheetUtil.GENERAL_END_COLUMN),
+                new ImmutablePair<>(SpreadsheetUtil.PLUGIN_ID_START_COLUMN, SpreadsheetUtil.PLUGIN_ID_END_COLUMN),
+                new ImmutablePair<>(SpreadsheetUtil.LICENSES_START_COLUMN, SpreadsheetUtil.LICENSES_END_COLUMN),
+                new ImmutablePair<>(SpreadsheetUtil.DEVELOPERS_START_COLUMN, SpreadsheetUtil.DEVELOPERS_END_COLUMN - 1),
+                new ImmutablePair<>(SpreadsheetUtil.MISC_START_COLUMN + 1, SpreadsheetUtil.MISC_END_COLUMN));
         // The column header widths are most likely wider than the actual cells content.
         sheet.setColumnWidth(SpreadsheetUtil.DEVELOPERS_END_COLUMN - 1, SpreadsheetUtil.TIMEZONE_WIDTH);
         sheet.setColumnWidth(SpreadsheetUtil.MISC_START_COLUMN, SpreadsheetUtil.INCEPTION_YEAR_WIDTH);
         if (hasExtendedInfo) {
             autosizeColumns(
-                sheet,
-                new ImmutablePair<>(SpreadsheetUtil.MANIFEST_START_COLUMN, SpreadsheetUtil.MANIFEST_END_COLUMN),
-                new ImmutablePair<>(
-                    SpreadsheetUtil.INFO_NOTICES_START_COLUMN + 2, SpreadsheetUtil.INFO_NOTICES_END_COLUMN),
-                new ImmutablePair<>(
-                    SpreadsheetUtil.INFO_LICENSES_START_COLUMN + 2, SpreadsheetUtil.INFO_LICENSES_END_COLUMN),
-                new ImmutablePair<>(
-                    SpreadsheetUtil.INFO_SPDX_START_COLUMN + 2, SpreadsheetUtil.INFO_SPDX_END_COLUMN));
+                    sheet,
+                    new ImmutablePair<>(SpreadsheetUtil.MANIFEST_START_COLUMN, SpreadsheetUtil.MANIFEST_END_COLUMN),
+                    new ImmutablePair<>(
+                            SpreadsheetUtil.INFO_NOTICES_START_COLUMN + 2, SpreadsheetUtil.INFO_NOTICES_END_COLUMN),
+                    new ImmutablePair<>(
+                            SpreadsheetUtil.INFO_LICENSES_START_COLUMN + 2, SpreadsheetUtil.INFO_LICENSES_END_COLUMN),
+                    new ImmutablePair<>(
+                            SpreadsheetUtil.INFO_SPDX_START_COLUMN + 2, SpreadsheetUtil.INFO_SPDX_END_COLUMN));
         }
     }
 
@@ -572,38 +572,38 @@ public class ExcelFileWriter {
     }
 
     private static int addInfoFileList(
-        CellListParameter cellListParameter,
-        SpreadsheetUtil.CurrentRowData currentRowData,
-        int startColumn,
-        int columnsToFill,
-        List<InfoFile> infoFiles) {
+            CellListParameter cellListParameter,
+            SpreadsheetUtil.CurrentRowData currentRowData,
+            int startColumn,
+            int columnsToFill,
+            List<InfoFile> infoFiles) {
         return addList(
-            cellListParameter,
-            currentRowData,
-            startColumn,
-            columnsToFill,
-            infoFiles,
-            (Row infoFileRow, InfoFile infoFile) -> {
-                final String copyrightLines = Optional.ofNullable(infoFile.getExtractedCopyrightLines())
-                    .map(strings -> String.join(SpreadsheetUtil.COPYRIGHT_JOIN_SEPARATOR, strings))
-                    .orElse(null);
-                createDataCellsInRow(
-                    infoFileRow,
-                    startColumn,
-                    cellListParameter.getCellStyle(),
-                    infoFile.getContent(),
-                    copyrightLines,
-                    infoFile.getFileName());
-            });
+                cellListParameter,
+                currentRowData,
+                startColumn,
+                columnsToFill,
+                infoFiles,
+                (Row infoFileRow, InfoFile infoFile) -> {
+                    final String copyrightLines = Optional.ofNullable(infoFile.getExtractedCopyrightLines())
+                            .map(strings -> String.join(SpreadsheetUtil.COPYRIGHT_JOIN_SEPARATOR, strings))
+                            .orElse(null);
+                    createDataCellsInRow(
+                            infoFileRow,
+                            startColumn,
+                            cellListParameter.getCellStyle(),
+                            infoFile.getContent(),
+                            copyrightLines,
+                            infoFile.getFileName());
+                });
     }
 
     private static <T> int addList(
-        CellListParameter cellListParameter,
-        SpreadsheetUtil.CurrentRowData currentRowData,
-        int startColumn,
-        int columnsToFill,
-        List<T> list,
-        BiConsumer<Row, T> biConsumer) {
+            CellListParameter cellListParameter,
+            SpreadsheetUtil.CurrentRowData currentRowData,
+            int startColumn,
+            int columnsToFill,
+            List<T> list,
+            BiConsumer<Row, T> biConsumer) {
         if (!CollectionUtils.isEmpty(list)) {
             for (int i = 0; i < list.size(); i++) {
                 T type = list.get(i);
@@ -615,35 +615,35 @@ public class ExcelFileWriter {
                     if (cellListParameter.getCellStyle() != null) {
                         // Style all empty left cells, in the columns left from this
                         createAndStyleCells(
-                            row,
-                            cellListParameter.getCellStyle(),
-                            new ImmutablePair<>(
-                                SpreadsheetUtil.GENERAL_START_COLUMN, SpreadsheetUtil.GENERAL_END_COLUMN),
-                            new ImmutablePair<>(
-                                SpreadsheetUtil.PLUGIN_ID_START_COLUMN, SpreadsheetUtil.PLUGIN_ID_END_COLUMN),
-                            new ImmutablePair<>(
-                                SpreadsheetUtil.LICENSES_START_COLUMN, SpreadsheetUtil.LICENSES_END_COLUMN));
-                        if (currentRowData.isHasExtendedInfo()) {
-                            createAndStyleCells(
                                 row,
                                 cellListParameter.getCellStyle(),
                                 new ImmutablePair<>(
-                                    SpreadsheetUtil.DEVELOPERS_START_COLUMN,
-                                    SpreadsheetUtil.DEVELOPERS_END_COLUMN),
+                                        SpreadsheetUtil.GENERAL_START_COLUMN, SpreadsheetUtil.GENERAL_END_COLUMN),
                                 new ImmutablePair<>(
-                                    SpreadsheetUtil.MISC_START_COLUMN, SpreadsheetUtil.MISC_END_COLUMN),
-                                // JAR
+                                        SpreadsheetUtil.PLUGIN_ID_START_COLUMN, SpreadsheetUtil.PLUGIN_ID_END_COLUMN),
                                 new ImmutablePair<>(
-                                    SpreadsheetUtil.MANIFEST_START_COLUMN, SpreadsheetUtil.MANIFEST_END_COLUMN),
-                                new ImmutablePair<>(
-                                    SpreadsheetUtil.INFO_LICENSES_START_COLUMN,
-                                    SpreadsheetUtil.INFO_LICENSES_END_COLUMN),
-                                new ImmutablePair<>(
-                                    SpreadsheetUtil.INFO_NOTICES_START_COLUMN,
-                                    SpreadsheetUtil.INFO_NOTICES_END_COLUMN),
-                                new ImmutablePair<>(
-                                    SpreadsheetUtil.INFO_SPDX_START_COLUMN,
-                                    SpreadsheetUtil.INFO_SPDX_END_COLUMN));
+                                        SpreadsheetUtil.LICENSES_START_COLUMN, SpreadsheetUtil.LICENSES_END_COLUMN));
+                        if (currentRowData.isHasExtendedInfo()) {
+                            createAndStyleCells(
+                                    row,
+                                    cellListParameter.getCellStyle(),
+                                    new ImmutablePair<>(
+                                            SpreadsheetUtil.DEVELOPERS_START_COLUMN,
+                                            SpreadsheetUtil.DEVELOPERS_END_COLUMN),
+                                    new ImmutablePair<>(
+                                            SpreadsheetUtil.MISC_START_COLUMN, SpreadsheetUtil.MISC_END_COLUMN),
+                                    // JAR
+                                    new ImmutablePair<>(
+                                            SpreadsheetUtil.MANIFEST_START_COLUMN, SpreadsheetUtil.MANIFEST_END_COLUMN),
+                                    new ImmutablePair<>(
+                                            SpreadsheetUtil.INFO_LICENSES_START_COLUMN,
+                                            SpreadsheetUtil.INFO_LICENSES_END_COLUMN),
+                                    new ImmutablePair<>(
+                                            SpreadsheetUtil.INFO_NOTICES_START_COLUMN,
+                                            SpreadsheetUtil.INFO_NOTICES_END_COLUMN),
+                                    new ImmutablePair<>(
+                                            SpreadsheetUtil.INFO_SPDX_START_COLUMN,
+                                            SpreadsheetUtil.INFO_SPDX_END_COLUMN));
                         }
                     }
                     currentRowData.setExtraRows(currentRowData.getExtraRows() + 1);
@@ -666,10 +666,10 @@ public class ExcelFileWriter {
      * @param columnsToFill     How many columns to set the style on, starting from 'startColumn'.
      */
     private static void setStyleOnEmptyCells(
-        CellListParameter cellListParameter,
-        SpreadsheetUtil.CurrentRowData currentRowData,
-        int startColumn,
-        int columnsToFill) {
+            CellListParameter cellListParameter,
+            SpreadsheetUtil.CurrentRowData currentRowData,
+            int startColumn,
+            int columnsToFill) {
         Row row = cellListParameter.getRows().get(currentRowData.getCurrentRowIndex());
         for (int i = 0; i < columnsToFill; i++) {
             Cell cell = row.createCell(startColumn + i, CellType.STRING);
@@ -688,7 +688,7 @@ public class ExcelFileWriter {
     }
 
     private static void addHyperlinkIfExists(
-        Workbook workbook, Cell cell, CellStyle hyperlinkStyle, HyperlinkType hyperlinkType) {
+            Workbook workbook, Cell cell, CellStyle hyperlinkStyle, HyperlinkType hyperlinkType) {
         final String link = cell.getStringCellValue();
         if (!StringUtils.isEmpty(link)) {
             Hyperlink hyperlink = workbook.getCreationHelper().createHyperlink(hyperlinkType);
@@ -698,8 +698,10 @@ public class ExcelFileWriter {
                 cell.setHyperlink(hyperlink);
                 cell.setCellStyle(hyperlinkStyle);
             } catch (IllegalArgumentException e) {
-                LOG.debug("Can't set Hyperlink for cell value " + link
-                    + " (" + modifiedLink + ") it gets rejected as URI", e);
+                LOG.debug(
+                        "Can't set Hyperlink for cell value " + link + " (" + modifiedLink
+                                + ") it gets rejected as URI",
+                        e);
             }
         }
     }
@@ -774,7 +776,7 @@ public class ExcelFileWriter {
     }
 
     private static void createMergedCellsInRow(
-        Sheet sheet, int startColumn, int endColumn, CellStyle cellStyle, Row row, String cellValue, int rowIndex) {
+            Sheet sheet, int startColumn, int endColumn, CellStyle cellStyle, Row row, String cellValue, int rowIndex) {
         Cell cell = createCellsInRow(startColumn, endColumn, row);
         final boolean merge = endColumn - 1 > startColumn;
         CellRangeAddress mergeAddress = null;
@@ -792,7 +794,7 @@ public class ExcelFileWriter {
     }
 
     private static void setBorderAroundRegion(
-        Sheet sheet, CellRangeAddress licensesHeaderAddress, BorderStyle borderStyle) {
+            Sheet sheet, CellRangeAddress licensesHeaderAddress, BorderStyle borderStyle) {
         RegionUtil.setBorderLeft(borderStyle, licensesHeaderAddress, sheet);
         RegionUtil.setBorderTop(borderStyle, licensesHeaderAddress, sheet);
         RegionUtil.setBorderRight(borderStyle, licensesHeaderAddress, sheet);

@@ -15,7 +15,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.model.Developer;
 import org.apache.maven.model.Organization;
 import org.apache.maven.model.Scm;
@@ -617,8 +616,7 @@ public class CalcFileWriter {
         autosizeColumns(table, hasExtendedInfo, currentRowIndex);
     }
 
-    private static OdfStyle createHyperlinkStyle(
-            OdfSpreadsheetDocument wb, String name, @Nullable Color backgroundColor) {
+    private static OdfStyle createHyperlinkStyle(OdfSpreadsheetDocument wb, String name, Color backgroundColor) {
         OdfOfficeStyles styles = wb.getOrCreateDocumentStyles();
         OdfStyle hyperlinkStyle = styles.newStyle(name, OdfStyleFamily.TableCell);
 
@@ -800,16 +798,12 @@ public class CalcFileWriter {
         node.appendChild(aElement);
     }
 
-    private static void addHyperlinkIfExists(
-            OdfTable table, OdfTableCell cell, OdfStyle hyperlinkStyle) {
+    private static void addHyperlinkIfExists(OdfTable table, OdfTableCell cell, OdfStyle hyperlinkStyle) {
         addHyperlinkIfExists(table, cell, hyperlinkStyle, false);
     }
 
     private static void addHyperlinkIfExists(
-            OdfTable table,
-            OdfTableCell cell,
-            OdfStyle hyperlinkStyle,
-            boolean isEmail) {
+            OdfTable table, OdfTableCell cell, OdfStyle hyperlinkStyle, boolean isEmail) {
         if (!StringUtils.isEmpty(cell.getStringValue())) {
             try {
                 cell.getOdfElement().setStyleName(getCellStyleName(hyperlinkStyle));
@@ -867,8 +861,7 @@ public class CalcFileWriter {
      * @param cellStyle   Cell style.
      * @param count       Number of columns to set.
      */
-    private static void createDataCellsInRow(
-        OdfTableRow row, int startColumn, OdfStyle cellStyle, int count) {
+    private static void createDataCellsInRow(OdfTableRow row, int startColumn, OdfStyle cellStyle, int count) {
         for (int i = 0; i < count; i++) {
             OdfTableCell cell = row.getCellByIndex(startColumn + i);
             cell.setValueType("string");

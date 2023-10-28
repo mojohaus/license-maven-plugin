@@ -32,8 +32,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
@@ -216,8 +214,7 @@ public class LicensedArtifactResolver {
     }
     // CHECKSTYLE_ON: MethodLength
 
-    @Nonnull
-    private static Map<String, String> buildMergedLicenses(@Nullable List<String> licenseMerges) {
+    private static Map<String, String> buildMergedLicenses(List<String> licenseMerges) {
         final Map<String, String> mergedLicenses = new HashMap<>();
         if (licenseMerges != null) {
             for (String licenseMerge : licenseMerges) {
