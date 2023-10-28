@@ -138,7 +138,7 @@ public class LicenseRepository implements Iterable<License> {
 
                 license.setDescription(licenseDescription);
 
-                LOG.info("register {}", license.getDescription());
+                LOG.debug("register {}", license.getDescription());
                 LOG.debug("{}", license);
                 licenses.add(license);
             }

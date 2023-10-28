@@ -26,11 +26,11 @@
   <parent>
     <groupId>org.codehaus.mojo</groupId>
     <artifactId>mojo-parent</artifactId>
-    <version>76</version>
+    <version>77</version>
   </parent>
 
   <artifactId>license-maven-plugin</artifactId>
-  <version>2.2.1-SNAPSHOT</version>
+  <version>2.3.1-SNAPSHOT</version>
   <packaging>maven-plugin</packaging>
 
   <name>License Maven Plugin</name>
@@ -138,7 +138,7 @@
 
     <plexusComponentVersion>2.1.1</plexusComponentVersion>
     <maven-resolver.version>1.3.3</maven-resolver.version>
-    <project.build.outputTimestamp>2023-07-03T12:13:11Z</project.build.outputTimestamp>
+    <project.build.outputTimestamp>2023-10-24T21:30:44Z</project.build.outputTimestamp>
   </properties>
 
   <dependencyManagement>
@@ -263,7 +263,7 @@
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-xml</artifactId>
-      <version>4.0.2</version>
+      <version>3.0.0</version>
     </dependency>
 
     <dependency>
@@ -292,7 +292,7 @@
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
-      <version>2.13.0</version>
+      <version>2.15.0</version>
     </dependency>
 
     <dependency>
@@ -344,11 +344,6 @@
     <pluginManagement>
       <plugins>
         <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>build-helper-maven-plugin</artifactId>
-          <version>3.4.0</version>
-        </plugin>
-        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
           <configuration>
@@ -390,7 +385,7 @@
         <configuration>
           <signature>
             <groupId>org.codehaus.mojo.signature</groupId>
-            <artifactId>java18</artifactId>
+            <artifactId>java17</artifactId>
             <version>1.0</version>
           </signature>
         </configuration>
@@ -543,7 +538,8 @@
                 <id>all-integration-test</id>
                 <goals>
                   <goal>install</goal>
-                  <goal>run</goal>
+                  <goal>integration-test</goal>
+                  <goal>verify</goal>
                 </goals>
                 <configuration>
                   <skipInvocation />
@@ -551,38 +547,10 @@
                     <extraArtifact>${project.groupId}:${project.artifactId}:${project.version}:license.properties:test-third-party</extraArtifact>
                   </extraArtifacts>
                   <pomExcludes>
-                    <pomExclude>MLICENSE-4/pom.xml</pomExclude>
-                    <pomExclude>download-licenses-proxy/pom.xml</pomExclude>
                     <!-- failed test on GH use remote resources -->
                     <pomExclude>download-licenses-basic/pom.xml</pomExclude>
                     <pomExclude>download-licenses-force/pom.xml</pomExclude>
                   </pomExcludes>
-                </configuration>
-              </execution>
-              <!-- as this it is run in offline, then execute it after the previous its... -->
-              <execution>
-                <id>integration-test-offline</id>
-                <goals>
-                  <goal>run</goal>
-                </goals>
-                <configuration>
-                  <pomIncludes>
-                    <pomInclude>MLICENSE-4/pom.xml</pomInclude>
-                  </pomIncludes>
-                  <cloneProjectsTo>${project.build.directory}/it-offline</cloneProjectsTo>
-                </configuration>
-              </execution>
-              <execution>
-                <id>integration-test-proxy</id>
-                <goals>
-                  <goal>run</goal>
-                </goals>
-                <configuration>
-                  <settingsFile>src/it/settings-proxy.xml</settingsFile>
-                  <pomIncludes>
-                    <pomInclude>download-licenses-proxy/pom.xml</pomInclude>
-                  </pomIncludes>
-                  <cloneProjectsTo>${project.build.directory}/it-proxy</cloneProjectsTo>
                 </configuration>
               </execution>
             </executions>
