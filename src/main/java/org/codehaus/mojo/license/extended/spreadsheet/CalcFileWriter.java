@@ -609,7 +609,7 @@ public class CalcFileWriter {
                         cellListParameter,
                         currentRowData,
                         downloadColumn,
-                        SpreadsheetUtil.DOWNLOAD_COLUMNS,
+                        SpreadsheetUtil.DOWNLOAD_MESSAGE_COLUMNS,
                         projectInfo.getDownloaderMessages(),
                         (OdfTableRow licenseRow, String message) -> {
                             OdfTableCell[] licenses =

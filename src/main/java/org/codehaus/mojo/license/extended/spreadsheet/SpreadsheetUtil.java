@@ -55,9 +55,9 @@ class SpreadsheetUtil {
     static final int EXTENDED_INFO_END_COLUMN = EXTENDED_INFO_START_COLUMN + EXTENDED_INFO_COLUMNS;
     static final int INFO_SPDX_END_COLUMN = INFO_SPDX_START_COLUMN + INFO_SPDX_COLUMNS;
 
-    static final int DOWNLOAD_EXTENDED_COLUMN = INFO_SPDX_END_COLUMN + 1;
-    static final int DOWNLOAD_NOT_EXTENDED_COLUMN = MANIFEST_END_COLUMN + 1;
-    static final int DOWNLOAD_COLUMNS = 1;
+    static final int DOWNLOAD_MESSAGE_EXTENDED_COLUMN = INFO_SPDX_END_COLUMN + 1;
+    static final int DOWNLOAD_MESSAGE_NOT_EXTENDED_COLUMN = MANIFEST_START_COLUMN;
+    static final int DOWNLOAD_MESSAGE_COLUMNS = 1;
 
     // Width of gap columns
     private static final int EXCEL_WIDTH_SCALE = 256;
@@ -74,8 +74,8 @@ class SpreadsheetUtil {
 
     static int getDownloadColumn(boolean hasExtendedInfo) {
         return hasExtendedInfo
-                ? SpreadsheetUtil.DOWNLOAD_EXTENDED_COLUMN
-                : SpreadsheetUtil.DOWNLOAD_NOT_EXTENDED_COLUMN;
+                ? SpreadsheetUtil.DOWNLOAD_MESSAGE_EXTENDED_COLUMN
+                : SpreadsheetUtil.DOWNLOAD_MESSAGE_NOT_EXTENDED_COLUMN;
     }
 
     /**

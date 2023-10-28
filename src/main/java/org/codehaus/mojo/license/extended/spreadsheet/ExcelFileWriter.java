@@ -532,13 +532,13 @@ public class ExcelFileWriter {
                 currentRowData = new SpreadsheetUtil.CurrentRowData(currentRowIndex, extraRows, hasExtendedInfo);
 
                 int startColumn = hasExtendedInfo
-                        ? SpreadsheetUtil.DOWNLOAD_EXTENDED_COLUMN
-                        : SpreadsheetUtil.DOWNLOAD_NOT_EXTENDED_COLUMN;
+                        ? SpreadsheetUtil.DOWNLOAD_MESSAGE_EXTENDED_COLUMN
+                        : SpreadsheetUtil.DOWNLOAD_MESSAGE_NOT_EXTENDED_COLUMN;
                 extraRows = addList(
                         cellListParameter,
                         currentRowData,
                         startColumn,
-                        SpreadsheetUtil.DOWNLOAD_COLUMNS,
+                        SpreadsheetUtil.DOWNLOAD_MESSAGE_COLUMNS,
                         projectInfo.getDownloaderMessages(),
                         (Row licenseRow, String message) -> {
                             Cell[] licenses = createDataCellsInRow(licenseRow, startColumn, cellStyle, message);
@@ -592,7 +592,7 @@ public class ExcelFileWriter {
                 sheet,
                 new ImmutablePair<>(
                         getDownloadColumn(hasExtendedInfo),
-                        getDownloadColumn(hasExtendedInfo) + SpreadsheetUtil.DOWNLOAD_COLUMNS));
+                        getDownloadColumn(hasExtendedInfo) + SpreadsheetUtil.DOWNLOAD_MESSAGE_COLUMNS));
     }
 
     @SafeVarargs
