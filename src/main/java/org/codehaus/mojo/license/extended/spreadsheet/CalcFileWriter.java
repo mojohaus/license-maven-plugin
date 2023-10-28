@@ -56,7 +56,7 @@ public class CalcFileWriter {
     private static final String HYPERLINK_GRAY_STYLE = "hyperlinkGrayStyle";
     private static final String GRAY_CELL_STYLE = "grayCellStyle";
     private static final String NORMAL_CELL_STYLE = "normalCellStyle";
-    public static final String TABLE_NAME = "License information";
+    private static final int DOWNLOAD_COLUMN_WIDTH = 6_000;
 
     public static void write(List<ProjectLicenseInfo> projectLicenseInfos, final File licensesCalcOutputFile) {
         if (CollectionUtils.isEmpty(projectLicenseInfos)) {
@@ -69,7 +69,6 @@ public class CalcFileWriter {
             final OdfTable table;
             if (!tableList.isEmpty()) {
                 table = tableList.get(0);
-                table.setTableName(TABLE_NAME);
             } else {
                 table = OdfTable.newTable(spreadsheet);
             }
@@ -92,8 +91,8 @@ public class CalcFileWriter {
         }
     }
 
-    private static Color convertToOdfColor(java.awt.Color color) {
-        return new Color(color.getRed(), color.getGreen(), color.getBlue());
+    private static Color convertToOdfColor(final int[] color) {
+        return new Color(color[0], color[1], color[2]);
     }
 
     private static void createHeader(
@@ -231,6 +230,9 @@ public class CalcFileWriter {
         }
         //        sheet.setColumnGroupCollapsed();
 
+        setColumnWidth(table, getDownloadColumn(hasExtendedInfo) - 1, GAP_WIDTH);
+        setColumnWidth(table, getDownloadColumn(hasExtendedInfo), DOWNLOAD_COLUMN_WIDTH);
+
         // General
         createCellsInRow(thirdHeaderRow, GENERAL_START_COLUMN, HEADER_CELL_STYLE, "Name");
         // Plugin ID
@@ -281,9 +283,9 @@ public class CalcFileWriter {
                     INFO_LICENSES_START_COLUMN,
                     INFO_SPDX_START_COLUMN);
 
-            createFreezePane(spreadsheet, table, EXTENDED_INFO_END_COLUMN, headerLineCount);
+            createFreezePane(spreadsheet, table, getDownloadColumn(true) - 1, headerLineCount);
         } else {
-            createFreezePane(spreadsheet, table, MAVEN_END_COLUMN, headerLineCount);
+            createFreezePane(spreadsheet, table, getDownloadColumn(false) - 1, headerLineCount);
         }
 
         createFreezePane(spreadsheet, table, GENERAL_END_COLUMN, headerLineCount);
@@ -293,28 +295,15 @@ public class CalcFileWriter {
         table.getColumnByIndex(column)
                 .getOdfElement()
                 .setProperty(OdfTableColumnProperties.ColumnWidth, (width / 100) + "mm");
-
-        // table.getColumnByIndex(column).getOdfElement().setProperty(OdfTableColumnProperties.ColumnWidth,
-        // "001.2000in");
-        // table.getColumnByIndex(column).setWidth(width);
     }
 
     private static void createFreezePane(
             OdfSpreadsheetDocument spreadsheet, OdfTable table, int column, int lineCount) {
-        // TODO: Implement
+        // TODO: Find out why this perfect XML is ignored. Use FreezePane function from ODFToolkit after they add it.
 
         final OdfSettingsDom settingsDom;
         try {
             settingsDom = spreadsheet.getSettingsDom();
-
-            //            NodeList childNodes = settingsDom.getChildNodes();
-            //            for (int i = 0; i < childNodes.getLength(); i++) {
-            //                Node node = childNodes.item(i);
-            //                System.out.println(node);
-            //
-            //                System.out.println(node.getChildNodes());
-            //            }
-            //            System.out.println(childNodes);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -433,8 +422,10 @@ public class CalcFileWriter {
         headerStyle.setProperty(StyleTableCellPropertiesElement.Border, "1.0pt solid #000000");
     }
 
-    // TODO: Clean this method up. Too many parameters, too complicated parameters/DTO pattern. But keep it still
-    // threadsafe.
+    /* Improvement: Clean this method up.
+    Reduce parameters, complicated parameters/DTO pattern.
+    But keep it still threadsafe.
+     */
     private static void writeData(
             List<ProjectLicenseInfo> projectLicenseInfos,
             OdfSpreadsheetDocument wb,
@@ -609,6 +600,29 @@ public class CalcFileWriter {
                 createDataCellsInRow(currentRow, GENERAL_START_COLUMN, cellStyle, 1);
                 createDataCellsInRow(currentRow, DEVELOPERS_START_COLUMN, cellStyle, DEVELOPERS_COLUMNS);
                 createDataCellsInRow(currentRow, MISC_START_COLUMN, cellStyle, MISC_COLUMNS);
+            }
+
+            final int downloadColumn = getDownloadColumn(hasExtendedInfo);
+            if (CollectionUtils.isNotEmpty(projectInfo.getDownloaderMessages())) {
+                currentRowData = new SpreadsheetUtil.CurrentRowData(currentRowIndex, extraRows, hasExtendedInfo);
+                extraRows = addList(
+                        cellListParameter,
+                        currentRowData,
+                        downloadColumn,
+                        SpreadsheetUtil.DOWNLOAD_COLUMNS,
+                        projectInfo.getDownloaderMessages(),
+                        (OdfTableRow licenseRow, String message) -> {
+                            OdfTableCell[] licenses =
+                                    createDataCellsInRow(licenseRow, downloadColumn, cellStyle, message);
+                            if (message.matches(SpreadsheetUtil.VALID_LINK)) {
+                                addHyperlinkIfExists(table, licenses[0], hyperlinkStyle);
+                            }
+                        });
+            } else {
+                // Add empty cell, so it doesn't copy the previous row cell.
+                OdfTableCell cell = currentRow.getCellByIndex(downloadColumn);
+                cell.setValueType("string");
+                cell.getOdfElement().setStyleName(getCellStyleName(cellStyle));
             }
             currentRowIndex += extraRows + 1;
         }
@@ -918,18 +932,7 @@ public class CalcFileWriter {
         cell.setStringValue(cellValue);
         cell.getOdfElement().setStyleName(styleName);
 
-        // TODO: Add grouping correct with a hierarchy.
-        // if (merge) {
-        // TableTableColumnGroupElement groupElement = table.getOdfElement().newTableTableColumnGroupElement();
-        // for (int i = startColumn; i < endColumn - 1; i++) {
-        //     TableTableColumnElement columnElement = groupElement.newTableTableColumnElement();
-        //     // Add style to "columnElement"?
-        // }
-        // }
-    }
-
-    private static String convertIndexToLetter(int column) {
-        return String.valueOf((char) ('A' + column));
+        // TODO: Add grouping, with a hierarchy, after ODFToolkit offers it.
     }
 
     private static OdfTableCell createCellsInRow(int startColumn, int exclusiveEndColumn, OdfTableRow inRow) {

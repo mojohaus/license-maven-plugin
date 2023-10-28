@@ -255,6 +255,19 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
     private File licensesExcelErrorFile;
 
     /**
+     * A file containing dependencies whose licenses could not be downloaded for some reason. The format is similar to
+     * {@link #licensesCalcOutputFile} but the entries in {@link #licensesCalcErrorFile} have
+     * {@code <downloaderMessage>} elements attached to them. Those should explain what kind of error happened during
+     * the processing of the given dependency.
+     *
+     * @since 2.1
+     */
+    @Parameter(
+            property = "license.licensesCalcErrorFile",
+            defaultValue = "${project.build.directory}/generated-resources/licenses-errors.ods")
+    private File licensesCalcErrorFile;
+
+    /**
      * A filter to exclude some scopes.
      *
      * @since 1.0
@@ -683,7 +696,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
     /**
      * Write Microsoft Office Excel file (XLSX) for goal license:aggregate-download-licenses.
      *
-     * @since 2.2.1
+     * @since 2.3.1
      */
     @Parameter(property = "license.writeExcelFile", defaultValue = "false")
     private boolean writeExcelFile;
@@ -691,9 +704,9 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
     /**
      * Write LibreOffice Calc file (ODS) for goal license:aggregate-download-licenses.
      *
-     * @since 2.2.1
+     * @since 2.3.1
      */
-    @Parameter(property = "license.writeExcelFile", defaultValue = "false")
+    @Parameter(property = "license.writeCalcFile", defaultValue = "false")
     private boolean writeCalcFile;
 
     /**
@@ -716,29 +729,29 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
 
     /**
      * The Excel output file used if {@link #writeExcelFile} is true,
-     * containing a mapping between each dependency and it's license information.
+     * containing a mapping between each dependency and its license information.
      * With extended information, if available.
      *
      * @see AbstractDownloadLicensesMojo#writeExcelFile
      * @see AggregateDownloadLicensesMojo#extendedInfo
-     * @since 2.2.1
+     * @since 2.3.1
      */
     @Parameter(
-            property = "licensesExcelOutputFile",
+            property = "license.licensesExcelOutputFile",
             defaultValue = "${project.build.directory}/generated-resources/licenses.xlsx")
     protected File licensesExcelOutputFile;
 
     /**
      * The Calc output file used if {@link #writeCalcFile} is true,
-     * containing a mapping between each dependency and it's license information.
+     * containing a mapping between each dependency and its license information.
      * With extended information, if available.
      *
      * @see AbstractDownloadLicensesMojo#writeCalcFile
      * @see AggregateDownloadLicensesMojo#extendedInfo
-     * @since 2.2.1
+     * @since 2.3.1
      */
     @Parameter(
-            property = "licensesCalcOutputFile",
+            property = "license.licensesCalcOutputFile",
             defaultValue = "${project.build.directory}/generated-resources/licenses.ods")
     protected File licensesCalcOutputFile;
 
@@ -874,9 +887,14 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
             }
 
             List<ProjectLicenseInfo> depProjectLicensesWithErrors = filterErrors(depProjectLicenses);
-            writeLicenseSummaries(depProjectLicenses);
+            writeLicenseSummaries(
+                    depProjectLicenses, licensesOutputFile, licensesExcelOutputFile, licensesCalcOutputFile);
             if (!CollectionUtils.isEmpty(depProjectLicensesWithErrors)) {
-                writeLicenseSummaries(depProjectLicensesWithErrors);
+                writeLicenseSummaries(
+                        depProjectLicensesWithErrors,
+                        licensesErrorsFile,
+                        licensesExcelErrorFile,
+                        licensesCalcErrorFile);
             }
 
             removeOrphanFiles(depProjectLicenses);
@@ -903,14 +921,15 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
         }
     }
 
-    private void writeLicenseSummaries(List<ProjectLicenseInfo> depProjectLicenses)
+    private void writeLicenseSummaries(
+            List<ProjectLicenseInfo> depProjectLicenses, File outputFile, File excelOutputFile, File calcOutputFile)
             throws ParserConfigurationException, TransformerException, IOException {
-        writeLicenseSummary(depProjectLicenses, licensesOutputFile, writeVersions);
+        writeLicenseSummary(depProjectLicenses, outputFile, writeVersions);
         if (writeExcelFile) {
-            ExcelFileWriter.write(depProjectLicenses, licensesExcelOutputFile);
+            ExcelFileWriter.write(depProjectLicenses, excelOutputFile);
         }
         if (writeCalcFile) {
-            CalcFileWriter.write(depProjectLicenses, licensesCalcOutputFile);
+            CalcFileWriter.write(depProjectLicenses, calcOutputFile);
         }
     }
 

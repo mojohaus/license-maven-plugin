@@ -1,11 +1,12 @@
 package org.codehaus.mojo.license.extended.spreadsheet;
 
-import java.awt.Color;
-
 /**
  * Utility class to build spreadsheets.
  */
 class SpreadsheetUtil {
+    static final String TABLE_NAME = "License information";
+    static final String VALID_LINK = "\\bhttps?://\\S+";
+
     // Columns values for Maven data, including separator gaps for data grouping.
     static final int GENERAL_START_COLUMN = 0;
     private static final int GENERAL_COLUMNS = 1;
@@ -53,18 +54,29 @@ class SpreadsheetUtil {
             + MANIFEST_GAPS;
     static final int EXTENDED_INFO_END_COLUMN = EXTENDED_INFO_START_COLUMN + EXTENDED_INFO_COLUMNS;
     static final int INFO_SPDX_END_COLUMN = INFO_SPDX_START_COLUMN + INFO_SPDX_COLUMNS;
+
+    static final int DOWNLOAD_EXTENDED_COLUMN = INFO_SPDX_END_COLUMN + 1;
+    static final int DOWNLOAD_NOT_EXTENDED_COLUMN = MANIFEST_END_COLUMN + 1;
+    static final int DOWNLOAD_COLUMNS = 1;
+
     // Width of gap columns
     private static final int EXCEL_WIDTH_SCALE = 256;
     static final int INCEPTION_YEAR_WIDTH = " Inception Year ".length() * EXCEL_WIDTH_SCALE;
     static final int TIMEZONE_WIDTH = " Timezone ".length() * EXCEL_WIDTH_SCALE;
     static final int GAP_WIDTH = 3 * EXCEL_WIDTH_SCALE;
     /**
-     * Color must be dark enough for low contrast monitors.
-     * <br>If you get a compile error here, make sure you're using Java 8, not higher.
+     * Color must be dark enough for low-contrast monitors.
+     * <br>If you get a compiler error here, make sure you're using Java 8, not higher.
      */
-    static final java.awt.Color ALTERNATING_ROWS_COLOR = new Color(220, 220, 220);
+    static final int[] ALTERNATING_ROWS_COLOR = new int[] {220, 220, 220};
 
     static final String COPYRIGHT_JOIN_SEPARATOR = "§";
+
+    static int getDownloadColumn(boolean hasExtendedInfo) {
+        return hasExtendedInfo
+                ? SpreadsheetUtil.DOWNLOAD_EXTENDED_COLUMN
+                : SpreadsheetUtil.DOWNLOAD_NOT_EXTENDED_COLUMN;
+    }
 
     /**
      * Parameters which may change constantly.

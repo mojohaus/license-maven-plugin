@@ -83,8 +83,7 @@ public class LicensedArtifactResolver {
      * @param configuration      the configuration
      * @param remoteRepositories remote repositories used to resolve dependencies
      * @param result             Map with Key/Value = PluginID/LicensedArtifact
-     * @param licenseMerges
-     * @return the map of resolved dependencies indexed by their unique id.
+     * @param licenseMerges      List of license names to merge.
      * @see MavenProjectDependenciesConfigurator
      */
     public void loadProjectDependencies(

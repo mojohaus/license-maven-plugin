@@ -78,6 +78,8 @@ public class LicenseSummaryTest {
         List<ProjectLicenseInfo> licSummary = new ArrayList<>();
         ProjectLicenseInfo dep1 = new ProjectLicenseInfo("org.test", "test1", "1.0", buildExtendedInfo(1));
         ProjectLicenseInfo dep2 = new ProjectLicenseInfo("org.test", "test2", "2.0", buildExtendedInfo(2));
+        ProjectLicenseInfo dep3 = new ProjectLicenseInfo("com.test", "test3", "3.0", buildExtendedInfo(3));
+        ProjectLicenseInfo dep4 = new ProjectLicenseInfo("dk.test", "test4", "4.0", buildExtendedInfo(4));
 
         ProjectLicense lic = new ProjectLicense();
         lic.setName("lgpl");
@@ -86,9 +88,16 @@ public class LicenseSummaryTest {
         lic.setComments("lgpl version 3.0");
         dep1.addLicense(lic);
         dep2.addLicense(lic);
+        dep3.addLicense(lic);
+
+        dep2.addDownloaderMessage("There were server problems");
+        // Skip dependency 3, to test correct empty cell filling of ODS export.
+        dep4.addDownloaderMessage("http://google.de");
 
         licSummary.add(dep1);
         licSummary.add(dep2);
+        licSummary.add(dep3);
+        licSummary.add(dep4);
 
         {
             File licenseSummaryFile = File.createTempFile("licSummary", "tmp");

@@ -385,7 +385,7 @@
         <configuration>
           <signature>
             <groupId>org.codehaus.mojo.signature</groupId>
-            <artifactId>java17</artifactId>
+            <artifactId>java18</artifactId>
             <version>1.0</version>
           </signature>
         </configuration>
@@ -594,8 +594,7 @@
               <execution>
                 <id>one-integration-test</id>
                 <goals>
-                  <goal>install</goal>
-                  <goal>run</goal>
+                  <goal>integration-test</goal>
                 </goals>
                 <configuration>
                   <streamLogs>true</streamLogs>

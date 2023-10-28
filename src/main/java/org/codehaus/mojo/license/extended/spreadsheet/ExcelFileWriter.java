@@ -26,11 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.BiConsumer;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -68,6 +64,9 @@ import org.codehaus.mojo.license.extended.InfoFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.GAP_WIDTH;
+import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.getDownloadColumn;
+
 /**
  * Writes project license infos into Excel file.
  */
@@ -76,7 +75,7 @@ public class ExcelFileWriter {
     private static final Logger LOG = LoggerFactory.getLogger(ExcelFileWriter.class);
 
     /**
-     * Writes list of projects into excel file.
+     * Writes a list of projects into Excel file.
      *
      * @param projectLicenseInfos     Project license infos to write.
      * @param licensesExcelOutputFile Excel output file in latest format (OOXML).
@@ -88,10 +87,16 @@ public class ExcelFileWriter {
         }
 
         final XSSFWorkbook wb = new XSSFWorkbook();
-        final Sheet sheet = wb.createSheet(WorkbookUtil.createSafeSheetName("License information"));
+        final Sheet sheet = wb.createSheet(WorkbookUtil.createSafeSheetName(SpreadsheetUtil.TABLE_NAME));
 
         final IndexedColorMap colorMap = wb.getStylesSource().getIndexedColors();
-        final XSSFColor alternatingRowsColor = new XSSFColor(SpreadsheetUtil.ALTERNATING_ROWS_COLOR, colorMap);
+        final XSSFColor alternatingRowsColor = new XSSFColor(
+                new byte[] {
+                    (byte) SpreadsheetUtil.ALTERNATING_ROWS_COLOR[0],
+                    (byte) SpreadsheetUtil.ALTERNATING_ROWS_COLOR[1],
+                    (byte) SpreadsheetUtil.ALTERNATING_ROWS_COLOR[2]
+                },
+                colorMap);
 
         createHeader(projectLicenseInfos, wb, sheet);
 
@@ -264,6 +269,8 @@ public class ExcelFileWriter {
         }
         //        sheet.setColumnGroupCollapsed();
 
+        sheet.setColumnWidth(getDownloadColumn(hasExtendedInfo) - 1, GAP_WIDTH);
+
         // Create 3rd header row
         Row thirdHeaderRow = sheet.createRow(2);
 
@@ -328,16 +335,18 @@ public class ExcelFileWriter {
                     SpreadsheetUtil.INFO_LICENSES_START_COLUMN,
                     SpreadsheetUtil.INFO_SPDX_START_COLUMN);
 
-            sheet.createFreezePane(SpreadsheetUtil.EXTENDED_INFO_END_COLUMN, headerLineCount);
+            sheet.createFreezePane(getDownloadColumn(true) - 1, headerLineCount);
         } else {
-            sheet.createFreezePane(SpreadsheetUtil.MAVEN_END_COLUMN, headerLineCount);
+            sheet.createFreezePane(getDownloadColumn(false) - 1, headerLineCount);
         }
 
         sheet.createFreezePane(SpreadsheetUtil.GENERAL_END_COLUMN, headerLineCount);
     }
 
-    // TODO: Clean this method up. Too many parameters, too complicated parameters/DTO pattern. But keep it still
-    // threadsafe.
+    /* Possible improvement:
+    Clean this method up.
+    Reduce parameters, complicated parameters/DTO pattern.
+    But keep it still threadsafe. */
     private static void writeData(
             List<ProjectLicenseInfo> projectLicenseInfos,
             XSSFWorkbook wb,
@@ -519,6 +528,25 @@ public class ExcelFileWriter {
                             SpreadsheetUtil.INFO_SPDX_COLUMNS);
                 }
             }
+            if (CollectionUtils.isNotEmpty(projectInfo.getDownloaderMessages())) {
+                currentRowData = new SpreadsheetUtil.CurrentRowData(currentRowIndex, extraRows, hasExtendedInfo);
+
+                int startColumn = hasExtendedInfo
+                        ? SpreadsheetUtil.DOWNLOAD_EXTENDED_COLUMN
+                        : SpreadsheetUtil.DOWNLOAD_NOT_EXTENDED_COLUMN;
+                extraRows = addList(
+                        cellListParameter,
+                        currentRowData,
+                        startColumn,
+                        SpreadsheetUtil.DOWNLOAD_COLUMNS,
+                        projectInfo.getDownloaderMessages(),
+                        (Row licenseRow, String message) -> {
+                            Cell[] licenses = createDataCellsInRow(licenseRow, startColumn, cellStyle, message);
+                            if (message.matches(SpreadsheetUtil.VALID_LINK)) {
+                                addHyperlinkIfExists(wb, licenses[0], hyperlinkStyle, HyperlinkType.URL);
+                            }
+                        });
+            }
             currentRowIndex += extraRows + 1;
         }
 
@@ -560,6 +588,11 @@ public class ExcelFileWriter {
                     new ImmutablePair<>(
                             SpreadsheetUtil.INFO_SPDX_START_COLUMN + 2, SpreadsheetUtil.INFO_SPDX_END_COLUMN));
         }
+        autosizeColumns(
+                sheet,
+                new ImmutablePair<>(
+                        getDownloadColumn(hasExtendedInfo),
+                        getDownloadColumn(hasExtendedInfo) + SpreadsheetUtil.DOWNLOAD_COLUMNS));
     }
 
     @SafeVarargs
