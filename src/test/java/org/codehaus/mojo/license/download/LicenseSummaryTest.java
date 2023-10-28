@@ -76,14 +76,10 @@ public class LicenseSummaryTest {
             throws IOException, SAXException, ParserConfigurationException, TransformerFactoryConfigurationError,
                     TransformerException {
         List<ProjectLicenseInfo> licSummary = new ArrayList<>();
-        ProjectLicenseInfo dep1 = new ProjectLicenseInfo("org.test", "test1", "1.0",
-            buildExtendedInfo(1));
-        ProjectLicenseInfo dep2 = new ProjectLicenseInfo("org.test", "test2", "2.0",
-            buildExtendedInfo(2));
-        ProjectLicenseInfo dep3 = new ProjectLicenseInfo("com.test", "test3", "3.0",
-            buildExtendedInfo(3));
-        ProjectLicenseInfo dep4 = new ProjectLicenseInfo("dk.test", "test4", "4.0",
-            buildExtendedInfo(4));
+        ProjectLicenseInfo dep1 = new ProjectLicenseInfo("org.test", "test1", "1.0", buildExtendedInfo(1));
+        ProjectLicenseInfo dep2 = new ProjectLicenseInfo("org.test", "test2", "2.0", buildExtendedInfo(2));
+        ProjectLicenseInfo dep3 = new ProjectLicenseInfo("com.test", "test3", "3.0", buildExtendedInfo(3));
+        ProjectLicenseInfo dep4 = new ProjectLicenseInfo("dk.test", "test4", "4.0", buildExtendedInfo(4));
 
         ProjectLicense lic = new ProjectLicense();
         lic.setName("lgpl");
