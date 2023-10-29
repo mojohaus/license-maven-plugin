@@ -34,7 +34,7 @@ and `writeExcelFile`):
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>license-maven-plugin</artifactId>
-                    <version>2.2.1-SNAPSHOT</version>
+                    <version>2.3.1-SNAPSHOT</version>
                     <configuration>
                         <!-- New -->
                         <extendedInfo>true</extendedInfo>
@@ -80,7 +80,7 @@ solved, install it by adding:
             <plugins>
                 <plugin>
                     <artifactId>maven-install-plugin</artifactId>
-                    <version>3.0.0-M1</version>
+                    <version>3.1.1</version>
                     <configuration>
                         <updateReleaseInfo>true</updateReleaseInfo>
                     </configuration>
@@ -100,10 +100,10 @@ solved, install it by adding:
                             <goal>install-file</goal>
                         </goals>
                         <configuration>
-                            <file>${third.party.dir}/license-maven-plugin-2.1.0-SNAPSHOT.jar</file>
+                            <file>${third.party.dir}/license-maven-plugin-2.3.1-SNAPSHOT.jar</file>
                             <groupId>org.codehaus.mojo</groupId>
                             <artifactId>license-maven-plugin</artifactId>
-                            <version>2.1.0-SNAPSHOT</version>
+                            <version>2.3.1-SNAPSHOT</version>
                             <packaging>jar</packaging>
                         </configuration>
                     </execution>
