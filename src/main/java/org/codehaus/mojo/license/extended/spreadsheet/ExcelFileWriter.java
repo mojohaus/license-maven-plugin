@@ -85,6 +85,7 @@ public class ExcelFileWriter {
             LOG.debug("Nothing to write to excel, no project data.");
             return;
         }
+        LOG.debug("Write Microsoft Excel file " + licensesExcelOutputFile);
 
         final XSSFWorkbook wb = new XSSFWorkbook();
         final Sheet sheet = wb.createSheet(WorkbookUtil.createSafeSheetName(SpreadsheetUtil.TABLE_NAME));
@@ -104,8 +105,9 @@ public class ExcelFileWriter {
 
         try (OutputStream fileOut = Files.newOutputStream(licensesExcelOutputFile.toPath())) {
             wb.write(fileOut);
+            LOG.debug("Written Microsoft Excel file " + licensesExcelOutputFile);
         } catch (IOException e) {
-            LOG.error("Error on storing Excel file with license and other information", e);
+            LOG.error("Error on storing Microsoft Excel file with license and other information", e);
         }
     }
 
@@ -367,6 +369,8 @@ public class ExcelFileWriter {
 
         for (ProjectLicenseInfo projectInfo : projectLicenseInfos) {
             final CellStyle cellStyle, hyperlinkStyle;
+            LOG.debug("Writing " + projectInfo.getGroupId() + ":" + projectInfo.getArtifactId()
+                    + " into Microsoft Excel file");
             if (grayBackground) {
                 cellStyle = styleGray;
                 hyperlinkStyle = hyperlinkStyleGray;

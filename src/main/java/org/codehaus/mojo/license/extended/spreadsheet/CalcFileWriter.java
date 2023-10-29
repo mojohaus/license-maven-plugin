@@ -63,6 +63,7 @@ public class CalcFileWriter {
             LOG.debug("Nothing to write to excel, no project data.");
             return;
         }
+        LOG.debug("Write LibreOffice Calc file " + licensesCalcOutputFile);
 
         try (OdfSpreadsheetDocument spreadsheet = OdfSpreadsheetDocument.newSpreadsheetDocument()) {
             List<OdfTable> tableList = spreadsheet.getTableList();
@@ -83,11 +84,12 @@ public class CalcFileWriter {
 
             try (OutputStream fileOut = Files.newOutputStream(licensesCalcOutputFile.toPath())) {
                 spreadsheet.save(fileOut);
+                LOG.debug("Written LibreOffice Calc file " + licensesCalcOutputFile);
             } catch (IOException e) {
-                LOG.error("Error on storing Calc file with license and other information", e);
+                LOG.error("Error on storing LibreOffice Calc file with license and other information", e);
             }
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            LOG.error("Error on creating LibreOffice Calc file with license and other information", e);
         }
     }
 
@@ -452,6 +454,8 @@ public class CalcFileWriter {
 
         for (ProjectLicenseInfo projectInfo : projectLicenseInfos) {
             final OdfStyle cellStyle, hyperlinkStyle;
+            LOG.debug("Writing " + projectInfo.getGroupId() + ":" + projectInfo.getArtifactId()
+                    + " into LibreOffice calc file");
             if (grayBackground) {
                 cellStyle = styleGray;
                 hyperlinkStyle = hyperlinkStyleGray;
@@ -711,7 +715,8 @@ public class CalcFileWriter {
                             infoFileRow,
                             startColumn,
                             cellListParameter.getCellStyle(),
-                            infoFile.getContent(),
+                            // This would otherwise lead to invalid XML characters in the ODS file content.
+                            infoFile.getContent().replace("\f", "\n"),
                             copyrightLines,
                             infoFile.getFileName());
                 });

@@ -298,7 +298,7 @@ public class LicenseSummaryWriter {
      * @return The properly prepared string.
      */
     private static String prepareCdata(String property) {
-        return property.replace("\r\n", "\n");
+        return property.replace("\r\n", "\n").replace("\f", "\n");
     }
 
     private static void addPropertyIfSet(
