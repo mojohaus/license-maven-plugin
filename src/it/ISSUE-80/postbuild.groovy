@@ -20,7 +20,14 @@
  * #L%
  */
 
+import org.custommonkey.xmlunit.*
+XMLUnit.setIgnoreWhitespace(true)
+
 file = new File(basedir, 'target/licenses.xml');
 expectedFile = new File(basedir, 'expected_licenses.xml');
-assert expectedFile.text.equals(file.text);
+
+def xmlDiff = new Diff(file.text, expectedFile.text)
+assert xmlDiff.similar()
+assert xmlDiff.identical()
+
 return true;
