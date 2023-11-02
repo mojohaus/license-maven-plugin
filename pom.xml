@@ -560,56 +560,6 @@
     </profile>
 
     <profile>
-      <id>run-one-it</id>
-      <build>
-        <defaultGoal>verify</defaultGoal>
-        <plugins>
-          <plugin>
-            <artifactId>maven-invoker-plugin</artifactId>
-            <configuration>
-              <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
-              <settingsFile>src/it/settings.xml</settingsFile>
-              <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
-            </configuration>
-            <dependencies>
-              <!-- Microsoft Excel XLSX export -->
-              <dependency>
-                <groupId>org.apache.poi</groupId>
-                <artifactId>poi-ooxml</artifactId>
-                <version>5.2.4</version>
-              </dependency>
-              <!-- LibreOffice Calc ODT export -->
-              <dependency>
-                <groupId>org.odftoolkit</groupId>
-                <artifactId>odfdom-java</artifactId>
-                <version>0.9.0</version>
-              </dependency>
-              <dependency>
-                <groupId>commons-io</groupId>
-                <artifactId>commons-io</artifactId>
-                <version>2.13.0</version>
-              </dependency>
-            </dependencies>
-            <executions>
-              <execution>
-                <id>one-integration-test</id>
-                <goals>
-                  <goal>integration-test</goal>
-                </goals>
-                <configuration>
-                  <streamLogs>true</streamLogs>
-                  <pomIncludes>
-                    <pomInclude>${itName}/pom.xml</pomInclude>
-                  </pomIncludes>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <profile>
       <id>mojo-release</id>
       <build>
         <plugins>
