@@ -26,7 +26,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -55,7 +59,6 @@ import org.apache.poi.ss.util.WorkbookUtil;
 import org.apache.poi.xssf.usermodel.IndexedColorMap;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFColor;
-import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.codehaus.mojo.license.download.ProjectLicense;
 import org.codehaus.mojo.license.download.ProjectLicenseInfo;
@@ -74,6 +77,8 @@ public class ExcelFileWriter {
     private static final BorderStyle HEADER_CELLS_BORDER_STYLE = BorderStyle.MEDIUM;
     private static final Logger LOG = LoggerFactory.getLogger(ExcelFileWriter.class);
 
+    private ExcelFileWriter() {}
+
     /**
      * Writes a list of projects into Excel file.
      *
@@ -85,7 +90,7 @@ public class ExcelFileWriter {
             LOG.debug("Nothing to write to excel, no project data.");
             return;
         }
-        LOG.debug("Write Microsoft Excel file " + licensesExcelOutputFile);
+        LOG.debug("Write Microsoft Excel file {}", licensesExcelOutputFile);
 
         final XSSFWorkbook wb = new XSSFWorkbook();
         final Sheet sheet = wb.createSheet(WorkbookUtil.createSafeSheetName(SpreadsheetUtil.TABLE_NAME));
@@ -105,7 +110,7 @@ public class ExcelFileWriter {
 
         try (OutputStream fileOut = Files.newOutputStream(licensesExcelOutputFile.toPath())) {
             wb.write(fileOut);
-            LOG.debug("Written Microsoft Excel file " + licensesExcelOutputFile);
+            LOG.debug("Written Microsoft Excel file {}", licensesExcelOutputFile);
         } catch (IOException e) {
             LOG.error("Error on storing Microsoft Excel file with license and other information", e);
         }
@@ -369,8 +374,7 @@ public class ExcelFileWriter {
 
         for (ProjectLicenseInfo projectInfo : projectLicenseInfos) {
             final CellStyle cellStyle, hyperlinkStyle;
-            LOG.debug("Writing " + projectInfo.getGroupId() + ":" + projectInfo.getArtifactId()
-                    + " into Microsoft Excel file");
+            LOG.debug("Writing {}:{} into Microsoft Excel file", projectInfo.getGroupId(), projectInfo.getArtifactId());
             if (grayBackground) {
                 cellStyle = styleGray;
                 hyperlinkStyle = hyperlinkStyleGray;
@@ -559,7 +563,7 @@ public class ExcelFileWriter {
 
     private static CellStyle createHyperlinkStyle(XSSFWorkbook wb, XSSFColor backgroundColor) {
         Font hyperlinkFont = wb.createFont();
-        hyperlinkFont.setUnderline(XSSFFont.U_SINGLE);
+        hyperlinkFont.setUnderline(Font.U_SINGLE);
         hyperlinkFont.setColor(IndexedColors.BLUE.getIndex());
         XSSFCellStyle hyperlinkStyle = wb.createCellStyle();
         if (backgroundColor != null) {
@@ -757,7 +761,7 @@ public class ExcelFileWriter {
             // Replace all "bla com" with "bla.com".
             link = link.replace(" at ", "@");
             if (link.contains("@") && link.matches(".*\\s[a-zA-Z]{2,3}$")) {
-                modifiedLink = link.replaceAll(" ", ".");
+                modifiedLink = link.replace(" ", ".");
             } else {
                 modifiedLink = link;
             }
@@ -815,6 +819,9 @@ public class ExcelFileWriter {
     private static void createMergedCellsInRow(
             Sheet sheet, int startColumn, int endColumn, CellStyle cellStyle, Row row, String cellValue, int rowIndex) {
         Cell cell = createCellsInRow(startColumn, endColumn, row);
+        if (cell == null) {
+            return;
+        }
         final boolean merge = endColumn - 1 > startColumn;
         CellRangeAddress mergeAddress = null;
         if (merge) {

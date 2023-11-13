@@ -10,7 +10,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.*;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
@@ -145,11 +149,11 @@ public class LicenseSummaryTest {
             Assert.assertEquals("lgpl version 3.0", lic0.getComments());
         }
 
-        File licensesExcelOutputFile = File.createTempFile("licExcel", ".xlsx");
-        ExcelFileWriter.write(licSummary, licensesExcelOutputFile);
+        Path licensesExcelOutputFile = Files.createTempFile("licExcel", ".xlsx");
+        ExcelFileWriter.write(licSummary, licensesExcelOutputFile.toFile());
 
-        File licensesCalcOutputFile = File.createTempFile("licCalc", ".ods");
-        CalcFileWriter.write(licSummary, licensesCalcOutputFile);
+        Path licensesCalcOutputFile = Files.createTempFile("licCalc", ".ods");
+        CalcFileWriter.write(licSummary, licensesCalcOutputFile.toFile());
     }
 
     private static ExtendedInfo buildExtendedInfo(int suffix) {

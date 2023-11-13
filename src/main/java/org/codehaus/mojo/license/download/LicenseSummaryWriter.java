@@ -127,6 +127,38 @@ public class LicenseSummaryWriter {
             depNode.appendChild(matchLicensesNode);
         }
 
+        addExtendedInfo(doc, dep, depNode);
+
+        Node licensesNode = doc.createElement("licenses");
+        if (CollectionUtils.isEmpty(dep.getLicenses())) {
+            final String comment = hasDownloaderMessages
+                    ? " Manually add license elements here: "
+                    : " No license information available. ";
+            licensesNode.appendChild(doc.createComment(comment));
+        } else {
+            if (hasDownloaderMessages) {
+                licensesNode.appendChild(doc.createComment(" Manually fix the existing license nodes: "));
+            }
+            for (ProjectLicense lic : dep.getLicenses()) {
+                licensesNode.appendChild(createLicenseNode(doc, lic, false));
+            }
+        }
+        depNode.appendChild(licensesNode);
+
+        if (hasDownloaderMessages) {
+            final Node downloaderMessagesNode = doc.createElement("downloaderMessages");
+            for (String msg : messages) {
+                final Node downloaderMessageNode = doc.createElement("downloaderMessage");
+                downloaderMessageNode.appendChild(doc.createTextNode(msg));
+                downloaderMessagesNode.appendChild(downloaderMessageNode);
+            }
+            depNode.appendChild(downloaderMessagesNode);
+        }
+
+        return depNode;
+    }
+
+    private static void addExtendedInfo(Document doc, ProjectLicenseInfo dep, Node depNode) {
         if (dep.getExtendedInfo() != null) {
             ExtendedInfo extendedInfo = dep.getExtendedInfo();
             addTextPropertyIfSet(doc, depNode, "name", extendedInfo.getName());
@@ -162,34 +194,6 @@ public class LicenseSummaryWriter {
                     Optional.ofNullable(extendedInfo.getScm()).map(Scm::getUrl).orElse(null));
             addTextPropertyIfSet(doc, depNode, "url", extendedInfo.getUrl());
         }
-
-        Node licensesNode = doc.createElement("licenses");
-        if (CollectionUtils.isEmpty(dep.getLicenses())) {
-            final String comment = hasDownloaderMessages
-                    ? " Manually add license elements here: "
-                    : " No license information available. ";
-            licensesNode.appendChild(doc.createComment(comment));
-        } else {
-            if (hasDownloaderMessages) {
-                licensesNode.appendChild(doc.createComment(" Manually fix the existing license nodes: "));
-            }
-            for (ProjectLicense lic : dep.getLicenses()) {
-                licensesNode.appendChild(createLicenseNode(doc, lic, false));
-            }
-        }
-        depNode.appendChild(licensesNode);
-
-        if (hasDownloaderMessages) {
-            final Node downloaderMessagesNode = doc.createElement("downloaderMessages");
-            for (String msg : messages) {
-                final Node downloaderMessageNode = doc.createElement("downloaderMessage");
-                downloaderMessageNode.appendChild(doc.createTextNode(msg));
-                downloaderMessagesNode.appendChild(downloaderMessageNode);
-            }
-            depNode.appendChild(downloaderMessagesNode);
-        }
-
-        return depNode;
     }
 
     /**

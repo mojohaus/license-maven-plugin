@@ -8,7 +8,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -23,7 +27,11 @@ import org.codehaus.mojo.license.download.ProjectLicenseInfo;
 import org.codehaus.mojo.license.extended.ExtendedInfo;
 import org.codehaus.mojo.license.extended.InfoFile;
 import org.odftoolkit.odfdom.doc.OdfSpreadsheetDocument;
-import org.odftoolkit.odfdom.doc.table.*;
+import org.odftoolkit.odfdom.doc.table.OdfTable;
+import org.odftoolkit.odfdom.doc.table.OdfTableCell;
+import org.odftoolkit.odfdom.doc.table.OdfTableCellRange;
+import org.odftoolkit.odfdom.doc.table.OdfTableColumn;
+import org.odftoolkit.odfdom.doc.table.OdfTableRow;
 import org.odftoolkit.odfdom.dom.OdfContentDom;
 import org.odftoolkit.odfdom.dom.OdfSettingsDom;
 import org.odftoolkit.odfdom.dom.element.config.ConfigConfigItemElement;
@@ -43,7 +51,41 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.*;
+import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.COPYRIGHT_JOIN_SEPARATOR;
+import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.CurrentRowData;
+import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.DEVELOPERS_COLUMNS;
+import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.DEVELOPERS_END_COLUMN;
+import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.DEVELOPERS_START_COLUMN;
+import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.EXTENDED_INFO_END_COLUMN;
+import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.EXTENDED_INFO_START_COLUMN;
+import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.GAP_WIDTH;
+import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.GENERAL_END_COLUMN;
+import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.GENERAL_START_COLUMN;
+import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.INCEPTION_YEAR_WIDTH;
+import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.INFO_LICENSES_COLUMNS;
+import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.INFO_LICENSES_END_COLUMN;
+import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.INFO_LICENSES_START_COLUMN;
+import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.INFO_NOTICES_COLUMNS;
+import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.INFO_NOTICES_END_COLUMN;
+import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.INFO_NOTICES_START_COLUMN;
+import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.INFO_SPDX_COLUMNS;
+import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.INFO_SPDX_END_COLUMN;
+import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.INFO_SPDX_START_COLUMN;
+import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.LICENSES_COLUMNS;
+import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.LICENSES_END_COLUMN;
+import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.LICENSES_START_COLUMN;
+import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.MANIFEST_END_COLUMN;
+import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.MANIFEST_START_COLUMN;
+import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.MAVEN_END_COLUMN;
+import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.MAVEN_START_COLUMN;
+import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.MISC_COLUMNS;
+import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.MISC_END_COLUMN;
+import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.MISC_START_COLUMN;
+import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.PLUGIN_ID_END_COLUMN;
+import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.PLUGIN_ID_START_COLUMN;
+import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.TABLE_NAME;
+import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.TIMEZONE_WIDTH;
+import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.getDownloadColumn;
 
 /**
  * Writes LibreOffices Calc ODS file.
@@ -57,13 +99,17 @@ public class CalcFileWriter {
     private static final String GRAY_CELL_STYLE = "grayCellStyle";
     private static final String NORMAL_CELL_STYLE = "normalCellStyle";
     private static final int DOWNLOAD_COLUMN_WIDTH = 6_000;
+    private static final String VALUE_TYPE_STRING = "string";
+    private static final String CONFIG_TYPE_SHORT = "short";
+
+    private CalcFileWriter() {}
 
     public static void write(List<ProjectLicenseInfo> projectLicenseInfos, final File licensesCalcOutputFile) {
         if (CollectionUtils.isEmpty(projectLicenseInfos)) {
             LOG.debug("Nothing to write to excel, no project data.");
             return;
         }
-        LOG.debug("Write LibreOffice Calc file " + licensesCalcOutputFile);
+        LOG.debug("Write LibreOffice Calc file {}", licensesCalcOutputFile);
 
         try (OdfSpreadsheetDocument spreadsheet = OdfSpreadsheetDocument.newSpreadsheetDocument()) {
             List<OdfTable> tableList = spreadsheet.getTableList();
@@ -84,7 +130,7 @@ public class CalcFileWriter {
 
             try (OutputStream fileOut = Files.newOutputStream(licensesCalcOutputFile.toPath())) {
                 spreadsheet.save(fileOut);
-                LOG.debug("Written LibreOffice Calc file " + licensesCalcOutputFile);
+                LOG.debug("Written LibreOffice Calc file {}", licensesCalcOutputFile);
             } catch (IOException e) {
                 LOG.error("Error on storing LibreOffice Calc file with license and other information", e);
             }
@@ -358,13 +404,13 @@ public class CalcFileWriter {
             if (list instanceof ConfigConfigItemMapEntryElement) {
                 ConfigConfigItemMapEntryElement entryElement = (ConfigConfigItemMapEntryElement) list;
 
-                appendConfigItemElement(entryElement, "HorizontalSplitMode", "short", "2");
-                appendConfigItemElement(entryElement, "VerticalSplitMode", "short", "2");
+                appendConfigItemElement(entryElement, "HorizontalSplitMode", CONFIG_TYPE_SHORT, "2");
+                appendConfigItemElement(entryElement, "VerticalSplitMode", CONFIG_TYPE_SHORT, "2");
 
                 appendConfigItemElement(entryElement, "HorizontalSplitPosition", "int", "1");
                 appendConfigItemElement(entryElement, "VerticalSplitPosition", "int", "3");
 
-                appendConfigItemElement(entryElement, "ActiveSplitRange", "short", "3");
+                appendConfigItemElement(entryElement, "ActiveSplitRange", CONFIG_TYPE_SHORT, "3");
 
                 appendConfigItemElement(entryElement, "PositionLeft", "int", "0");
                 appendConfigItemElement(entryElement, "PositionRight", "int", "1");
@@ -454,8 +500,8 @@ public class CalcFileWriter {
 
         for (ProjectLicenseInfo projectInfo : projectLicenseInfos) {
             final OdfStyle cellStyle, hyperlinkStyle;
-            LOG.debug("Writing " + projectInfo.getGroupId() + ":" + projectInfo.getArtifactId()
-                    + " into LibreOffice calc file");
+            LOG.debug(
+                    "Writing {}:{} into LibreOffice calc file", projectInfo.getGroupId(), projectInfo.getArtifactId());
             if (grayBackground) {
                 cellStyle = styleGray;
                 hyperlinkStyle = hyperlinkStyleGray;
@@ -625,7 +671,7 @@ public class CalcFileWriter {
             } else {
                 // Add empty cell, so it doesn't copy the previous row cell.
                 OdfTableCell cell = currentRow.getCellByIndex(downloadColumn);
-                cell.setValueType("string");
+                cell.setValueType(VALUE_TYPE_STRING);
                 cell.getOdfElement().setStyleName(getCellStyleName(cellStyle));
             }
             currentRowIndex += extraRows + 1;
@@ -681,7 +727,7 @@ public class CalcFileWriter {
                 // Get max width by taking the max string length multiplied by sizeFactor.
                 for (int row = 0; row < rows; row++) {
                     OdfTableCell cell = sheet.getCellByPosition(i, row);
-                    if ("string".equals(cell.getValueType())) {
+                    if (VALUE_TYPE_STRING.equals(cell.getValueType())) {
                         String stringValue = cell.getStringValue();
                         size = Math.max(stringValue.length() * sizeFactor, size);
                     }
@@ -782,7 +828,7 @@ public class CalcFileWriter {
         OdfTableRow row = cellListParameter.getRows().get(currentRowData.getCurrentRowIndex());
         for (int i = 0; i < columnsToFill; i++) {
             OdfTableCell cell = row.getCellByIndex(startColumn + i);
-            cell.setValueType("string");
+            cell.setValueType(VALUE_TYPE_STRING);
             cell.getOdfElement().setStyleName(getCellStyleName(cellListParameter.getCellStyle()));
         }
     }
@@ -792,7 +838,7 @@ public class CalcFileWriter {
         for (Pair<Integer, Integer> range : ranges) {
             for (int i = range.getLeft(); i < range.getRight(); i++) {
                 OdfTableCell cell = row.getCellByIndex(i);
-                cell.setValueType("string");
+                cell.setValueType(VALUE_TYPE_STRING);
                 cell.getOdfElement().setStyleName(getCellStyleName(cellStyle));
             }
         }
@@ -807,7 +853,7 @@ public class CalcFileWriter {
         if (isEmail) {
             hyperlink = hyperlink.replace(" at ", "@");
             if (hyperlink.contains("@") && hyperlink.matches(".*\\s[a-zA-Z]{2,3}$")) {
-                hyperlink = hyperlink.replaceAll(" ", ".");
+                hyperlink = hyperlink.replace(" ", ".");
             }
         }
         aElement.setXlinkHrefAttribute(isEmail ? "mailto:" + hyperlink : hyperlink);
@@ -852,7 +898,7 @@ public class CalcFileWriter {
         OdfTableCell[] result = new OdfTableCell[names.length];
         for (int i = 0; i < names.length; i++) {
             OdfTableCell cell = row.getCellByIndex(startColumn + i);
-            cell.setValueType("string");
+            cell.setValueType(VALUE_TYPE_STRING);
             if (cellStyle != null) {
                 cell.getOdfElement().setStyleName(getCellStyleName(cellStyle));
             }
@@ -883,7 +929,7 @@ public class CalcFileWriter {
     private static void createDataCellsInRow(OdfTableRow row, int startColumn, OdfStyle cellStyle, int count) {
         for (int i = 0; i < count; i++) {
             OdfTableCell cell = row.getCellByIndex(startColumn + i);
-            cell.setValueType("string");
+            cell.setValueType(VALUE_TYPE_STRING);
             if (cellStyle != null) {
                 cell.getOdfElement().setStyleName(getCellStyleName(cellStyle));
             }
@@ -911,7 +957,7 @@ public class CalcFileWriter {
     private static void createCellsInRow(OdfTableRow row, int startColumn, String styleName, String... names) {
         for (int i = 0; i < names.length; i++) {
             OdfTableCell cell = row.getCellByIndex(startColumn + i);
-            cell.setValueType("string");
+            cell.setValueType(VALUE_TYPE_STRING);
             cell.getOdfElement().setStyleName(styleName);
             cell.setStringValue(names[i]);
         }
@@ -926,6 +972,9 @@ public class CalcFileWriter {
             int rowIndex,
             String styleName) {
         OdfTableCell cell = createCellsInRow(startColumn, endColumn, row);
+        if (cell == null) {
+            return;
+        }
         final boolean merge = endColumn - 1 > startColumn;
 
         if (merge) {

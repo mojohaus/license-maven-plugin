@@ -54,7 +54,7 @@ public class InfoFile {
     private Set<String> extractedCopyrightLines = new HashSet<>();
     private Type type;
 
-    private String normalizedContent;
+    private String contentChecksum;
 
     public String getFileName() {
         return fileName;
@@ -70,7 +70,7 @@ public class InfoFile {
 
     public void setContent(String content) {
         this.content = content;
-        this.normalizedContent = LicenseDownloader.calculateStringChecksum(content);
+        this.contentChecksum = LicenseDownloader.calculateStringChecksum(content);
     }
 
     public Set<String> getExtractedCopyrightLines() {
@@ -89,7 +89,7 @@ public class InfoFile {
         this.type = type;
     }
 
-    public String getNormalizedContent() {
-        return normalizedContent;
+    public String getContentChecksum() {
+        return contentChecksum;
     }
 }

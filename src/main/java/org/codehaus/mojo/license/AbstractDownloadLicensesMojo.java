@@ -247,7 +247,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
      * {@code <downloaderMessage>} elements attached to them. Those should explain what kind of error happened during
      * the processing of the given dependency.
      *
-     * @since 2.1
+     * @since 2.4
      */
     @Parameter(
             property = "license.licensesExcelErrorFile",
@@ -260,7 +260,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
      * {@code <downloaderMessage>} elements attached to them. Those should explain what kind of error happened during
      * the processing of the given dependency.
      *
-     * @since 2.1
+     * @since 2.4
      */
     @Parameter(
             property = "license.licensesCalcErrorFile",
@@ -696,7 +696,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
     /**
      * Write Microsoft Office Excel file (XLSX) for goal license:aggregate-download-licenses.
      *
-     * @since 2.3.1
+     * @since 2.4
      */
     @Parameter(property = "license.writeExcelFile", defaultValue = "false")
     private boolean writeExcelFile;
@@ -704,7 +704,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
     /**
      * Write LibreOffice Calc file (ODS) for goal license:aggregate-download-licenses.
      *
-     * @since 2.3.1
+     * @since 2.4
      */
     @Parameter(property = "license.writeCalcFile", defaultValue = "false")
     private boolean writeCalcFile;
@@ -734,7 +734,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
      *
      * @see AbstractDownloadLicensesMojo#writeExcelFile
      * @see AggregateDownloadLicensesMojo#extendedInfo
-     * @since 2.3.1
+     * @since 2.4
      */
     @Parameter(
             property = "license.licensesExcelOutputFile",
@@ -748,7 +748,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
      *
      * @see AbstractDownloadLicensesMojo#writeCalcFile
      * @see AggregateDownloadLicensesMojo#extendedInfo
-     * @since 2.3.1
+     * @since 2.4
      */
     @Parameter(
             property = "license.licensesCalcOutputFile",
@@ -848,7 +848,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
                 contentSanitizers(),
                 getCharset())) {
             for (LicensedArtifact artifact : dependencies.values()) {
-                LOG.debug("Checking licenses for project " + artifact);
+                LOG.debug("Checking licenses for project {}", artifact);
                 final ProjectLicenseInfo depProject = createDependencyProject(artifact);
                 matchers.replaceMatches(depProject);
 
@@ -948,10 +948,11 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
             }
             List<InfoFile> infoFiles = projectLicenseInfo.getExtendedInfo().getInfoFiles();
             for (InfoFile infoFile : infoFiles) {
-                if (cache.hasNormalizedContent(infoFile.getNormalizedContent())) {
-                    LOG.debug("Removed extracted copyright lines for "
-                            + projectLicenseInfo.getExtendedInfo().getName()
-                            + " (" + projectLicenseInfo.toGavString() + ")");
+                if (cache.hasNormalizedContentChecksum(infoFile.getContentChecksum())) {
+                    LOG.debug(
+                            "Removed extracted copyright lines for {} ({})",
+                            projectLicenseInfo.getExtendedInfo().getName(),
+                            projectLicenseInfo.toGavString());
                     infoFile.setExtractedCopyrightLines(null);
                 }
             }

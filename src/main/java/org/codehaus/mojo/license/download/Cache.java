@@ -65,10 +65,10 @@ public class Cache {
     /**
      * If this cache has a normalized version of a license file.
      *
-     * @param normalizedContentChecksum Normalized file content.
+     * @param normalizedContentChecksum Normalized file content checksum.
      * @return If the cache has a license file with the same normalized content.
      */
-    public boolean hasNormalizedContent(String normalizedContentChecksum) {
+    public boolean hasNormalizedContentChecksum(String normalizedContentChecksum) {
         return normalizedContentToFile.get(normalizedContentChecksum) != null;
     }
 

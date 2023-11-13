@@ -24,7 +24,6 @@ package org.codehaus.mojo.license.download;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,6 +31,7 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -44,7 +44,6 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpException;
 import org.apache.http.HttpHost;
@@ -306,10 +305,7 @@ public class LicenseDownloader implements AutoCloseable {
      */
     public static class LicenseDownloadResult {
         public static LicenseDownloadResult success(File file, String sha1, boolean preferredFileName) {
-            final LicenseDownloadResult licenseDownloadResult =
-                    new LicenseDownloadResult(file, sha1, preferredFileName, null);
-            licenseDownloadResult.calculateFileChecksum();
-            return licenseDownloadResult;
+            return new LicenseDownloadResult(file, sha1, preferredFileName, null);
         }
 
         public static LicenseDownloadResult failure(String errorMessage) {
@@ -322,6 +318,7 @@ public class LicenseDownloader implements AutoCloseable {
             this.errorMessage = errorMessage;
             this.sha1 = sha1;
             this.preferredFileName = preferredFileName;
+            this.normalizedContentChecksum = LicenseDownloader.calculateFileChecksum(file);
         }
 
         private final File file;
@@ -338,7 +335,7 @@ public class LicenseDownloader implements AutoCloseable {
          * <br/>
          * Normalized means: Removal of all newlines - in all formats, lines trimmed, all chars converted to lowercase.
          */
-        private String normalizedContentChecksum;
+        private final String normalizedContentChecksum;
 
         private final boolean preferredFileName;
 
@@ -375,10 +372,6 @@ public class LicenseDownloader implements AutoCloseable {
             return new LicenseDownloadResult(otherFile, sha1, preferredFileName, errorMessage);
         }
 
-        public void calculateFileChecksum() {
-            normalizedContentChecksum = LicenseDownloader.calculateFileChecksum(file);
-        }
-
         @Override
         public String toString() {
             return "LicenseDownloadResult{"
@@ -392,9 +385,11 @@ public class LicenseDownloader implements AutoCloseable {
     }
 
     private static String calculateFileChecksum(File file) {
-        try (InputStream inputStream = new FileInputStream(file)) {
-            byte[] content = IOUtils.readFully(inputStream, (int) file.length());
-            String contentString = new String(content);
+        if (file == null) {
+            return null;
+        }
+        try {
+            String contentString = new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8);
             return calculateStringChecksum(contentString);
         } catch (IOException e) {
             LOG.error("Error reading license file and normalizing it ", e);
