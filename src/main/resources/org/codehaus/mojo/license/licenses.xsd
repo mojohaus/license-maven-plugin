@@ -22,16 +22,22 @@
   -->
 
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-  targetNamespace="http://mojo.codehaus.org/" xmlns="http://mojo.codehaus.org/"
+  targetNamespace="" xmlns=""
   elementFormDefault="qualified" >
 
 <xs:element name="licenseSummary">
   <xs:complexType>
     <xs:sequence>
-      <xs:element name="dependency" type="Dependency"  minOccurs="0" />
+      <xs:element name="dependencies" type="Dependencies"  minOccurs="0" />
     </xs:sequence>
   </xs:complexType>
 </xs:element>
+
+<xs:complexType name="Dependencies">
+  <xs:sequence>
+    <xs:element name="dependency" type="Dependency" minOccurs="0" maxOccurs="unbounded"/>
+  </xs:sequence>
+</xs:complexType>
 
 <xs:complexType name="Dependency">
   <xs:sequence>
