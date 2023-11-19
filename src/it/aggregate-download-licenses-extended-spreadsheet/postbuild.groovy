@@ -47,7 +47,7 @@ static boolean searchTextInExcel(Sheet sheet, String searchText) {
                 if (cellValue == searchText) {
                     return true
                 } else {
-                    log2.log(Level.FINEST, "Cell Value: {}", cellValue)
+                    log2.log(Level.FINEST, "Cell Value: {0}", cellValue)
                 }
             }
         }
@@ -56,7 +56,6 @@ static boolean searchTextInExcel(Sheet sheet, String searchText) {
 }
 
 // -------------- Excel ----------------------
-
 excelFile = new File(basedir, 'target/generated-resources/licenses.xlsx')
 assert excelFile.exists()
 assert excelFile.length() > 100
@@ -85,3 +84,7 @@ try (OdfSpreadsheetDocument spreadsheet = OdfSpreadsheetDocument.loadDocument(ca
     OdfTable table = tableList.get(0)
     assert table.getRowCount() >= 3
 }
+
+// ----------- Check for XSD file ----------------
+licensesXsd = new File(basedir, 'target/generated-resources/licenses.xsd')
+assert licensesXsd.exists()

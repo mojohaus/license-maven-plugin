@@ -34,9 +34,13 @@ import javax.xml.transform.stream.StreamResult;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -51,7 +55,10 @@ import org.apache.maven.model.Scm;
 import org.codehaus.mojo.license.Eol;
 import org.codehaus.mojo.license.extended.ExtendedInfo;
 import org.codehaus.mojo.license.extended.InfoFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 /**
@@ -62,14 +69,44 @@ import org.w3c.dom.Node;
  * @since 1.0
  */
 public class LicenseSummaryWriter {
+
+    private static final Logger LOG = LoggerFactory.getLogger(LicenseSummaryWriter.class);
+
+    static final String LICENSES_XSD_FILE = "licenses.xsd";
+    private static final String LICENSE_FOLDER = "/org/codehaus/mojo/license/";
+    static final String LICENSE_PATH = LICENSE_FOLDER + LICENSES_XSD_FILE;
+
     public static void writeLicenseSummary(
-            List<ProjectLicenseInfo> dependencies, File outputFile, Charset charset, Eol eol, boolean writeVersions)
+            List<ProjectLicenseInfo> dependencies,
+            File outputFile,
+            Charset charset,
+            Eol eol,
+            boolean writeVersions,
+            boolean useXsd)
             throws ParserConfigurationException, TransformerException, IOException {
         DocumentBuilderFactory fact = DocumentBuilderFactory.newInstance();
         DocumentBuilder parser = fact.newDocumentBuilder();
         Document doc = parser.newDocument();
 
-        Node root = doc.createElement("licenseSummary");
+        Element root = doc.createElement("licenseSummary");
+
+        if (useXsd) {
+            root.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
+            root.setAttribute("xsi:noNamespaceSchemaLocation", LICENSES_XSD_FILE);
+            Path targetXsd = Paths.get(outputFile.toPath().getParent().toFile().getAbsolutePath(), LICENSES_XSD_FILE);
+            File targetFile = targetXsd.toFile();
+            if (targetFile.exists()) {
+                LOG.debug("Target XSD file {} already does exist", targetXsd);
+            } else {
+                try (InputStream inputStream = LicenseSummaryWriter.class.getResourceAsStream(LICENSE_PATH)) {
+                    if (inputStream == null) {
+                        throw new NoSuchFileException(LICENSE_PATH);
+                    }
+                    Files.copy(inputStream, targetXsd);
+                }
+            }
+        }
+
         doc.appendChild(root);
         Node dependenciesNode = doc.createElement("dependencies");
         root.appendChild(dependenciesNode);

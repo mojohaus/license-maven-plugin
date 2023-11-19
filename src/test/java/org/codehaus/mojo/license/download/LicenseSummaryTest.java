@@ -1,8 +1,14 @@
 package org.codehaus.mojo.license.download;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,6 +17,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -29,12 +36,19 @@ import org.codehaus.mojo.license.extended.spreadsheet.CalcFileWriter;
 import org.codehaus.mojo.license.extended.spreadsheet.ExcelFileWriter;
 import org.junit.Assert;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
+
+import static org.codehaus.mojo.license.download.LicenseSummaryWriter.LICENSES_XSD_FILE;
+import static org.codehaus.mojo.license.download.LicenseSummaryWriter.LICENSE_PATH;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @since 1.0
  */
 public class LicenseSummaryTest {
+    private static final Logger LOG = LoggerFactory.getLogger(LicenseSummaryTest.class);
 
     /**
      * Test reading the license summary xml file into ProjectLicenseInfo objects
@@ -46,7 +60,7 @@ public class LicenseSummaryTest {
     @Test
     public void testReadLicenseSummary() throws IOException, SAXException, ParserConfigurationException {
         File licenseSummaryFile = new File("src/test/resources/license-summary-test.xml");
-        Assert.assertTrue(licenseSummaryFile.exists());
+        assertTrue(licenseSummaryFile.exists());
         List<ProjectLicenseInfo> list;
         try (InputStream fis = Files.newInputStream(licenseSummaryFile.toPath())) {
             list = LicenseSummaryReader.parseLicenseSummary(fis);
@@ -106,9 +120,9 @@ public class LicenseSummaryTest {
         {
             File licenseSummaryFile = File.createTempFile("licSummary", "tmp");
             LicenseSummaryWriter.writeLicenseSummary(
-                    licSummary, licenseSummaryFile, StandardCharsets.UTF_8, Eol.LF, true);
+                    licSummary, licenseSummaryFile, StandardCharsets.UTF_8, Eol.LF, true, true);
 
-            Assert.assertTrue(licenseSummaryFile.exists());
+            assertTrue(licenseSummaryFile.exists());
             FileInputStream fis = new FileInputStream(licenseSummaryFile);
             List<ProjectLicenseInfo> list = LicenseSummaryReader.parseLicenseSummary(fis);
             fis.close();
@@ -124,14 +138,22 @@ public class LicenseSummaryTest {
             Assert.assertEquals("http://www.gnu.org/licenses/lgpl-3.0.txt", lic0.getUrl());
             Assert.assertEquals("lgpl-3.0.txt", lic0.getFile());
             Assert.assertEquals("lgpl version 3.0", lic0.getComments());
+
+            validateXml(licenseSummaryFile);
+
+            // Check if the LICENSES_XSD_FILE was copied to the target directory.
+            Path targetXsd =
+                    Paths.get(licenseSummaryFile.toPath().getParent().toFile().getAbsolutePath(), LICENSES_XSD_FILE);
+            File targetFile = targetXsd.toFile();
+            assertTrue(targetFile.exists());
         }
 
         {
-            File licenseSummaryFile = File.createTempFile("licSummaryNoVersion", "tmp");
+            File licenseSummaryFile = File.createTempFile("licSummaryNoVersionNoXsd", "tmp");
             LicenseSummaryWriter.writeLicenseSummary(
-                    licSummary, licenseSummaryFile, StandardCharsets.UTF_8, Eol.LF, false);
+                    licSummary, licenseSummaryFile, StandardCharsets.UTF_8, Eol.LF, false, false);
 
-            Assert.assertTrue(licenseSummaryFile.exists());
+            assertTrue(licenseSummaryFile.exists());
             FileInputStream fis = new FileInputStream(licenseSummaryFile);
             List<ProjectLicenseInfo> list = LicenseSummaryReader.parseLicenseSummary(fis);
             fis.close();
@@ -147,6 +169,8 @@ public class LicenseSummaryTest {
             Assert.assertEquals("http://www.gnu.org/licenses/lgpl-3.0.txt", lic0.getUrl());
             Assert.assertEquals("lgpl-3.0.txt", lic0.getFile());
             Assert.assertEquals("lgpl version 3.0", lic0.getComments());
+
+            validateXml(licenseSummaryFile);
         }
 
         Path licensesExcelOutputFile = Files.createTempFile("licExcel", ".xlsx");
@@ -154,6 +178,24 @@ public class LicenseSummaryTest {
 
         Path licensesCalcOutputFile = Files.createTempFile("licCalc", ".ods");
         CalcFileWriter.write(licSummary, licensesCalcOutputFile.toFile());
+    }
+
+    /**
+     * Validate XML against XSD.
+     *
+     * @param licenseSummaryFile License summary file.
+     * @throws SAXException SAX exception, validation problem.
+     * @throws IOException  I/O exception, file problem.
+     */
+    private static void validateXml(File licenseSummaryFile) throws SAXException, IOException {
+        SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        try (InputStream inputStream = LicenseSummaryTest.class.getResourceAsStream(LICENSE_PATH)) {
+            Source schemaSource = new StreamSource(inputStream);
+            Schema schema = schemaFactory.newSchema(schemaSource);
+            Validator validator = schema.newValidator();
+            Source xmlSource = new StreamSource(licenseSummaryFile);
+            validator.validate(xmlSource);
+        }
     }
 
     private static ExtendedInfo buildExtendedInfo(int suffix) {
