@@ -17,7 +17,6 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -40,7 +39,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
-import static org.codehaus.mojo.license.download.LicenseSummaryWriter.LICENSES_XSD_FILE;
 import static org.codehaus.mojo.license.download.LicenseSummaryWriter.LICENSE_PATH;
 import static org.junit.Assert.assertTrue;
 
@@ -120,7 +118,7 @@ public class LicenseSummaryTest {
         {
             File licenseSummaryFile = File.createTempFile("licSummary", "tmp");
             LicenseSummaryWriter.writeLicenseSummary(
-                    licSummary, licenseSummaryFile, StandardCharsets.UTF_8, Eol.LF, true, true);
+                    licSummary, licenseSummaryFile, StandardCharsets.UTF_8, Eol.LF, true);
 
             assertTrue(licenseSummaryFile.exists());
             FileInputStream fis = new FileInputStream(licenseSummaryFile);
@@ -140,18 +138,12 @@ public class LicenseSummaryTest {
             Assert.assertEquals("lgpl version 3.0", lic0.getComments());
 
             validateXml(licenseSummaryFile);
-
-            // Check if the LICENSES_XSD_FILE was copied to the target directory.
-            Path targetXsd =
-                    Paths.get(licenseSummaryFile.toPath().getParent().toFile().getAbsolutePath(), LICENSES_XSD_FILE);
-            File targetFile = targetXsd.toFile();
-            assertTrue(targetFile.exists());
         }
 
         {
             File licenseSummaryFile = File.createTempFile("licSummaryNoVersionNoXsd", "tmp");
             LicenseSummaryWriter.writeLicenseSummary(
-                    licSummary, licenseSummaryFile, StandardCharsets.UTF_8, Eol.LF, false, false);
+                    licSummary, licenseSummaryFile, StandardCharsets.UTF_8, Eol.LF, false);
 
             assertTrue(licenseSummaryFile.exists());
             FileInputStream fis = new FileInputStream(licenseSummaryFile);

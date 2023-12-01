@@ -76,15 +76,6 @@ public class LicensesXmlInsertVersionsMojo extends AbstractLicensesXmlMojo {
     @Parameter(property = "license.skipDownloadLicenses", defaultValue = "false")
     private boolean skipDownloadLicenses;
 
-    /**
-     * If {@code true}, a <code>licenses.xsd</code> file will be written in the same directory as the
-     * XML file, and be referenced in the XML file.
-     *
-     * @since 2.4
-     */
-    @Parameter(property = "license.useXsd", defaultValue = "false")
-    private boolean useXsd;
-
     public void execute() throws MojoExecutionException, MojoFailureException {
 
         if (skipDownloadLicenses) {
@@ -161,7 +152,7 @@ public class LicensesXmlInsertVersionsMojo extends AbstractLicensesXmlMojo {
                 dependencyLicenseInfo.setVersion(dependency.getVersion());
             }
 
-            writeLicenseSummary(projectLicenseInfos, licensesOutputFile, true, useXsd);
+            writeLicenseSummary(projectLicenseInfos, licensesOutputFile, true);
         } catch (MojoFailureException e) {
             throw e;
         } catch (Exception e) {

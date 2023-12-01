@@ -157,11 +157,10 @@ public abstract class AbstractLicensesXmlMojo extends AbstractMojo {
         return new Path[] {licensesOutputFile.toPath()};
     }
 
-    protected void writeLicenseSummary(
-            List<ProjectLicenseInfo> deps, File licensesOutputFile, boolean writeVersions, boolean useXsd)
+    protected void writeLicenseSummary(List<ProjectLicenseInfo> deps, File licensesOutputFile, boolean writeVersions)
             throws ParserConfigurationException, TransformerException, IOException {
         initEncoding();
         LicenseSummaryWriter.writeLicenseSummary(
-                deps, licensesOutputFile, charset, licensesOutputFileEol, writeVersions, useXsd);
+                deps, licensesOutputFile, charset, licensesOutputFileEol, writeVersions);
     }
 }
