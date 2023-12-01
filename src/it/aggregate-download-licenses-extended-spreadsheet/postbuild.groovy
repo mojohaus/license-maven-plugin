@@ -84,7 +84,3 @@ try (OdfSpreadsheetDocument spreadsheet = OdfSpreadsheetDocument.loadDocument(ca
     OdfTable table = tableList.get(0)
     assert table.getRowCount() >= 3
 }
-
-// ----------- Check for XSD file ----------------
-licensesXsd = new File(basedir, 'target/generated-resources/licenses.xsd')
-assert licensesXsd.exists()

@@ -615,15 +615,6 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
     private boolean writeVersions;
 
     /**
-     * If {@code true}, a <code>licenses.xsd</code> file will be written in the same directory as the
-     * XML file, and be referenced in the XML file.
-     *
-     * @since 2.4
-     */
-    @Parameter(property = "license.useXsd", defaultValue = "false")
-    private boolean useXsd;
-
-    /**
      * Connect timeout in milliseconds passed to the HTTP client when downloading licenses from remote URLs.
      *
      * @since 1.18
@@ -933,7 +924,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
     private void writeLicenseSummaries(
             List<ProjectLicenseInfo> depProjectLicenses, File outputFile, File excelOutputFile, File calcOutputFile)
             throws ParserConfigurationException, TransformerException, IOException {
-        writeLicenseSummary(depProjectLicenses, outputFile, writeVersions, useXsd);
+        writeLicenseSummary(depProjectLicenses, outputFile, writeVersions);
         if (writeExcelFile) {
             ExcelFileWriter.write(depProjectLicenses, excelOutputFile);
         }

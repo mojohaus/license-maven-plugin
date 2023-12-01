@@ -56,7 +56,6 @@
             <extendedInfo>true</extendedInfo>
             <writeCalcFile>true</writeCalcFile>
             <writeExcelFile>true</writeExcelFile>
-            <useXsd>true</useXsd>
             <licenseMerges>
               <licenseMerge>The Apache Software License, Version 2.0|Apache License, Version 2.0|Apache Public License
                 2.0
