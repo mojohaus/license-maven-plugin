@@ -1,7 +1,8 @@
 # license-maven-plugin
 
-This is the [license-maven-plugin](http://www.mojohaus.org/license-maven-plugin/). It has been forked and extended with the option
-to extract more license information from the dependencies. It can also write a report to an Excel file.
+This is the [license-maven-plugin](http://www.mojohaus.org/license-maven-plugin/).
+It has been forked and extended with the option to extract more license information from the dependencies.
+It can also write a report to an Excel file.
 
 Information about the source project (the license stays of course the same):
 
@@ -34,7 +35,7 @@ and `writeExcelFile`):
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>license-maven-plugin</artifactId>
-                    <version>2.3.1-SNAPSHOT</version>
+                    <version>2.4.0-SNAPSHOT</version>
                     <configuration>
                         <!-- New -->
                         <extendedInfo>true</extendedInfo>
