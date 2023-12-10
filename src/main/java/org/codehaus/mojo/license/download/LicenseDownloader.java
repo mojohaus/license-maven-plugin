@@ -31,6 +31,7 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -155,7 +156,7 @@ public class LicenseDownloader implements AutoCloseable {
      * can be adjusted based on the mime type of the HTTP response.
      *
      * @param licenseUrlString the URL
-     * @param outputFile a hint where to store the license file
+     * @param fileNameEntry a hint where to store the license file
      * @return the path to the file where the downloaded license file was stored
      * @throws IOException
      * @throws URISyntaxException
@@ -164,7 +165,7 @@ public class LicenseDownloader implements AutoCloseable {
     public LicenseDownloadResult downloadLicense(String licenseUrlString, FileNameEntry fileNameEntry)
             throws IOException, URISyntaxException, MojoFailureException {
         final File outputFile = fileNameEntry.getFile();
-        if (licenseUrlString == null || licenseUrlString.length() == 0) {
+        if (licenseUrlString == null || licenseUrlString.isEmpty()) {
             throw new IllegalArgumentException("Null URL for file " + outputFile.getPath());
         }
 
@@ -317,13 +318,24 @@ public class LicenseDownloader implements AutoCloseable {
             this.errorMessage = errorMessage;
             this.sha1 = sha1;
             this.preferredFileName = preferredFileName;
+            this.normalizedContentChecksum = LicenseDownloader.calculateFileChecksum(file);
         }
 
         private final File file;
 
         private final String errorMessage;
 
+        /**
+         * Checksum to file name.
+         */
         private final String sha1;
+
+        /**
+         * Checksum to "normalized" content of the file.
+         * <br/>
+         * Normalized means: Removal of all newlines - in all formats, lines trimmed, all chars converted to lowercase.
+         */
+        private final String normalizedContentChecksum;
 
         private final boolean preferredFileName;
 
@@ -335,6 +347,11 @@ public class LicenseDownloader implements AutoCloseable {
             return errorMessage;
         }
 
+        /**
+         * Is true when no errorMessage is set.
+         *
+         * @return If errorMessage is set.
+         */
         public boolean isSuccess() {
             return errorMessage == null;
         }
@@ -347,8 +364,65 @@ public class LicenseDownloader implements AutoCloseable {
             return sha1;
         }
 
+        public String getNormalizedContentChecksum() {
+            return normalizedContentChecksum;
+        }
+
         public LicenseDownloadResult withFile(File otherFile) {
             return new LicenseDownloadResult(otherFile, sha1, preferredFileName, errorMessage);
         }
+
+        @Override
+        public String toString() {
+            return "LicenseDownloadResult{"
+                    + "file=" + file
+                    + ", errorMessage='" + errorMessage + '\''
+                    + ", sha1='" + sha1 + '\''
+                    + ", normalizedContentChecksum='" + normalizedContentChecksum + '\''
+                    + ", preferredFileName=" + preferredFileName
+                    + '}';
+        }
+    }
+
+    private static String calculateFileChecksum(File file) {
+        if (file == null) {
+            return null;
+        }
+        try {
+            String contentString = new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8);
+            return calculateStringChecksum(contentString);
+        } catch (IOException e) {
+            LOG.error("Error reading license file and normalizing it ", e);
+            return null;
+        }
+    }
+
+    public static String calculateStringChecksum(String contentString) {
+        contentString = normalizeString(contentString);
+        try {
+            final MessageDigest md = MessageDigest.getInstance("SHA-1");
+            return Hex.encodeHexString(md.digest(contentString.getBytes()));
+        } catch (NoSuchAlgorithmException e) {
+            LOG.error("Error fetching SHA-1 hashsum generator ", e);
+            return null;
+        }
+    }
+
+    private static String normalizeString(String contentString) {
+        return contentString
+                // Windows
+                .replace("\r\n", " ")
+                // Classic MacOS
+                .replace("\r", " ")
+                // *nix
+                .replace("\n", " ")
+                // Set all spaces, tabs, etc. to one space width
+                .replaceAll("\\s\\s+", " ")
+                /* License files exist which are completely identical, except that someone changed
+                <http://fsf.org/> to <https://fsf.org/>.
+                 */
+                .replace("http://", "https://")
+                // All to lowercase
+                .toLowerCase();
     }
 }

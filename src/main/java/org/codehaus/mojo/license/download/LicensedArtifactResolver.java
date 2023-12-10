@@ -47,6 +47,7 @@ import org.codehaus.mojo.license.api.MavenProjectDependenciesConfigurator;
 import org.codehaus.mojo.license.api.ResolvedProjectDependencies;
 import org.codehaus.mojo.license.download.LicensedArtifact.Builder;
 import org.codehaus.mojo.license.utils.MojoHelper;
+import org.codehaus.mojo.license.utils.StringToList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,16 +82,20 @@ public class LicensedArtifactResolver {
      * For a given {@code project}, obtain the universe of its dependencies after applying transitivity and filtering
      * rules given in the {@code configuration} object. Result is given in a map where keys are unique artifact id
      *
-     * @param configuration the configuration
-     * @param remoteRepositories remote repositories used to resolv dependencies
+     * @param artifacts          Dependencies
+     * @param configuration      the configuration
+     * @param remoteRepositories remote repositories used to resolve dependencies
+     * @param result             Map with Key/Value = PluginID/LicensedArtifact
+     * @param licenseMerges      List of license names to merge.
      * @see MavenProjectDependenciesConfigurator
      */
     public void loadProjectDependencies(
             ResolvedProjectDependencies artifacts,
             MavenProjectDependenciesConfigurator configuration,
             List<ArtifactRepository> remoteRepositories,
-            Map<String, LicensedArtifact> result) {
-
+            Map<String, LicensedArtifact> result,
+            boolean extendedInfo,
+            List<String> licenseMerges) {
         final ArtifactFilters artifactFilters = configuration.getArtifactFilters();
 
         final boolean excludeTransitiveDependencies = configuration.isExcludeTransitiveDependencies();
@@ -116,6 +121,8 @@ public class LicensedArtifactResolver {
                 .setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL)
                 .setResolveDependencies(false)
                 .setProcessPlugins(false);
+
+        final Map<String, String> mergedLicenses = buildMergedLicenses(licenseMerges);
 
         for (Artifact artifact : depArtifacts) {
 
@@ -148,17 +155,25 @@ public class LicensedArtifactResolver {
                 LOG.debug("Dependency [{}] already present in the result", id);
             } else {
                 // build project
-                final Builder laBuilder = LicensedArtifact.builder(
-                        artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion());
+                final Builder laBuilder = LicensedArtifact.builder(artifact, extendedInfo);
                 try {
                     final MavenProject project = mavenProjectBuilder
                             .build(artifact, true, projectBuildingRequest)
                             .getProject();
+                    if (extendedInfo) {
+                        laBuilder.setName(project.getName());
+                        laBuilder.setInceptionYear(project.getInceptionYear());
+                        laBuilder.setOrganization(project.getOrganization());
+                        laBuilder.setDevelopers(project.getDevelopers());
+                        laBuilder.setUrl(project.getUrl());
+                        laBuilder.setScm(project.getScm());
+                    }
                     List<org.apache.maven.model.License> lics = project.getLicenses();
                     if (lics != null) {
                         for (org.apache.maven.model.License lic : lics) {
+                            final String mergedLicense = mergedLicenses.getOrDefault(lic.getName(), lic.getName());
                             laBuilder.license(
-                                    new License(lic.getName(), lic.getUrl(), lic.getDistribution(), lic.getComments()));
+                                    new License(mergedLicense, lic.getUrl(), lic.getDistribution(), lic.getComments()));
                         }
                     }
                 } catch (ProjectBuildingException e) {
@@ -200,4 +215,23 @@ public class LicensedArtifactResolver {
         }
     }
     // CHECKSTYLE_ON: MethodLength
+
+    private static Map<String, String> buildMergedLicenses(List<String> licenseMerges) {
+        final Map<String, String> mergedLicenses = new HashMap<>();
+        if (licenseMerges != null) {
+            for (String licenseMerge : licenseMerges) {
+                String[] splited = licenseMerge
+                        .trim()
+                        // Replace newlines
+                        .replace('\n', ' ')
+                        // Replace multiple spaces with one.
+                        .replaceAll(" +", " ")
+                        .split(StringToList.LIST_OF_LICENSES_REG_EX);
+                for (String split : splited) {
+                    mergedLicenses.put(split, splited[0]);
+                }
+            }
+        }
+        return mergedLicenses;
+    }
 }

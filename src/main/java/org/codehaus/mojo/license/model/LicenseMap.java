@@ -40,6 +40,11 @@ import org.codehaus.mojo.license.utils.MojoHelper;
 /**
  * Map of artifacts (stub in mavenproject) grouped by their license.
  *
+ * <ul>
+ *     <li><code>key</code> is the license on which to associate the given project.</li>
+ *     <li><code>value</code> list of projects belonging to the license.</li>
+ * </ul>
+ *
  * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
@@ -52,7 +57,7 @@ public class LicenseMap extends TreeMap<String, SortedSet<MavenProject>> {
     private final Comparator<MavenProject> projectComparator;
 
     /**
-     * Default contructor.
+     * Default constructor.
      */
     public LicenseMap() {
         this(MojoHelper.newMavenProjectComparator());

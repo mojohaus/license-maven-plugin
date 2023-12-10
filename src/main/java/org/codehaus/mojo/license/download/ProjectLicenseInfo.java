@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Objects;
 
 import org.apache.maven.artifact.Artifact;
+import org.codehaus.mojo.license.extended.ExtendedInfo;
 
 /**
  * Contains the license information for a single project/dependency
@@ -50,15 +51,18 @@ public class ProjectLicenseInfo {
 
     private boolean approved;
 
+    private ExtendedInfo extendedInfo;
+
     /**
      * Default constructor.
      */
     public ProjectLicenseInfo() {}
 
-    public ProjectLicenseInfo(String groupId, String artifactId, String version) {
+    public ProjectLicenseInfo(String groupId, String artifactId, String version, ExtendedInfo extendedInfo) {
         this.groupId = groupId;
         this.artifactId = artifactId;
         this.version = version;
+        this.extendedInfo = extendedInfo;
     }
 
     public ProjectLicenseInfo(String groupId, String artifactId, String version, boolean hasMatchLicenses) {
@@ -213,5 +217,9 @@ public class ProjectLicenseInfo {
 
     public boolean isApproved() {
         return approved;
+    }
+
+    public ExtendedInfo getExtendedInfo() {
+        return extendedInfo;
     }
 }

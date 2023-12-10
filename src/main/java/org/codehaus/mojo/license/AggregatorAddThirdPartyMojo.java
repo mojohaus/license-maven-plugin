@@ -255,7 +255,7 @@ public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo {
     }
 
     // ----------------------------------------------------------------------
-    // AbstractAddThirdPartyMojo Implementaton
+    // AbstractAddThirdPartyMojo Implementation
     // ----------------------------------------------------------------------
 
     /**

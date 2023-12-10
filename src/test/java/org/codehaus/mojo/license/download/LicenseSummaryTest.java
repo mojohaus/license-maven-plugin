@@ -1,8 +1,14 @@
 package org.codehaus.mojo.license.download;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -10,18 +16,37 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.DefaultArtifact;
+import org.apache.maven.artifact.handler.DefaultArtifactHandler;
+import org.apache.maven.model.Developer;
+import org.apache.maven.model.Organization;
+import org.apache.maven.model.Scm;
 import org.codehaus.mojo.license.Eol;
+import org.codehaus.mojo.license.extended.ExtendedInfo;
+import org.codehaus.mojo.license.extended.InfoFile;
+import org.codehaus.mojo.license.extended.spreadsheet.CalcFileWriter;
+import org.codehaus.mojo.license.extended.spreadsheet.ExcelFileWriter;
 import org.junit.Assert;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
+
+import static org.codehaus.mojo.license.download.LicenseSummaryWriter.LICENSE_PATH;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @since 1.0
  */
 public class LicenseSummaryTest {
+    private static final Logger LOG = LoggerFactory.getLogger(LicenseSummaryTest.class);
 
     /**
      * Test reading the license summary xml file into ProjectLicenseInfo objects
@@ -33,7 +58,7 @@ public class LicenseSummaryTest {
     @Test
     public void testReadLicenseSummary() throws IOException, SAXException, ParserConfigurationException {
         File licenseSummaryFile = new File("src/test/resources/license-summary-test.xml");
-        Assert.assertTrue(licenseSummaryFile.exists());
+        assertTrue(licenseSummaryFile.exists());
         List<ProjectLicenseInfo> list;
         try (InputStream fis = Files.newInputStream(licenseSummaryFile.toPath())) {
             list = LicenseSummaryReader.parseLicenseSummary(fis);
@@ -67,8 +92,10 @@ public class LicenseSummaryTest {
             throws IOException, SAXException, ParserConfigurationException, TransformerFactoryConfigurationError,
                     TransformerException {
         List<ProjectLicenseInfo> licSummary = new ArrayList<>();
-        ProjectLicenseInfo dep1 = new ProjectLicenseInfo("org.test", "test1", "1.0");
-        ProjectLicenseInfo dep2 = new ProjectLicenseInfo("org.test", "test2", "2.0");
+        ProjectLicenseInfo dep1 = new ProjectLicenseInfo("org.test", "test1", "1.0", buildExtendedInfo(1));
+        ProjectLicenseInfo dep2 = new ProjectLicenseInfo("org.test", "test2", "2.0", buildExtendedInfo(2));
+        ProjectLicenseInfo dep3 = new ProjectLicenseInfo("com.test", "test3", "3.0", buildExtendedInfo(3));
+        ProjectLicenseInfo dep4 = new ProjectLicenseInfo("dk.test", "test4", "4.0", buildExtendedInfo(4));
 
         ProjectLicense lic = new ProjectLicense();
         lic.setName("lgpl");
@@ -77,16 +104,23 @@ public class LicenseSummaryTest {
         lic.setComments("lgpl version 3.0");
         dep1.addLicense(lic);
         dep2.addLicense(lic);
+        dep3.addLicense(lic);
+
+        dep2.addDownloaderMessage("There were server problems");
+        // Skip dependency 3, to test correct empty cell filling of ODS export.
+        dep4.addDownloaderMessage("http://google.de");
 
         licSummary.add(dep1);
         licSummary.add(dep2);
+        licSummary.add(dep3);
+        licSummary.add(dep4);
 
         {
             File licenseSummaryFile = File.createTempFile("licSummary", "tmp");
             LicenseSummaryWriter.writeLicenseSummary(
                     licSummary, licenseSummaryFile, StandardCharsets.UTF_8, Eol.LF, true);
 
-            Assert.assertTrue(licenseSummaryFile.exists());
+            assertTrue(licenseSummaryFile.exists());
             FileInputStream fis = new FileInputStream(licenseSummaryFile);
             List<ProjectLicenseInfo> list = LicenseSummaryReader.parseLicenseSummary(fis);
             fis.close();
@@ -102,14 +136,16 @@ public class LicenseSummaryTest {
             Assert.assertEquals("http://www.gnu.org/licenses/lgpl-3.0.txt", lic0.getUrl());
             Assert.assertEquals("lgpl-3.0.txt", lic0.getFile());
             Assert.assertEquals("lgpl version 3.0", lic0.getComments());
+
+            validateXml(licenseSummaryFile);
         }
 
         {
-            File licenseSummaryFile = File.createTempFile("licSummaryNoVersion", "tmp");
+            File licenseSummaryFile = File.createTempFile("licSummaryNoVersionNoXsd", "tmp");
             LicenseSummaryWriter.writeLicenseSummary(
                     licSummary, licenseSummaryFile, StandardCharsets.UTF_8, Eol.LF, false);
 
-            Assert.assertTrue(licenseSummaryFile.exists());
+            assertTrue(licenseSummaryFile.exists());
             FileInputStream fis = new FileInputStream(licenseSummaryFile);
             List<ProjectLicenseInfo> list = LicenseSummaryReader.parseLicenseSummary(fis);
             fis.close();
@@ -125,7 +161,92 @@ public class LicenseSummaryTest {
             Assert.assertEquals("http://www.gnu.org/licenses/lgpl-3.0.txt", lic0.getUrl());
             Assert.assertEquals("lgpl-3.0.txt", lic0.getFile());
             Assert.assertEquals("lgpl version 3.0", lic0.getComments());
+
+            validateXml(licenseSummaryFile);
         }
+
+        Path licensesExcelOutputFile = Files.createTempFile("licExcel", ".xlsx");
+        ExcelFileWriter.write(licSummary, licensesExcelOutputFile.toFile());
+
+        Path licensesCalcOutputFile = Files.createTempFile("licCalc", ".ods");
+        CalcFileWriter.write(licSummary, licensesCalcOutputFile.toFile());
+    }
+
+    /**
+     * Validate XML against XSD.
+     *
+     * @param licenseSummaryFile License summary file.
+     * @throws SAXException SAX exception, validation problem.
+     * @throws IOException  I/O exception, file problem.
+     */
+    private static void validateXml(File licenseSummaryFile) throws SAXException, IOException {
+        SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        try (InputStream inputStream = LicenseSummaryTest.class.getResourceAsStream(LICENSE_PATH)) {
+            Source schemaSource = new StreamSource(inputStream);
+            Schema schema = schemaFactory.newSchema(schemaSource);
+            Validator validator = schema.newValidator();
+            Source xmlSource = new StreamSource(licenseSummaryFile);
+            validator.validate(xmlSource);
+        }
+    }
+
+    private static ExtendedInfo buildExtendedInfo(int suffix) {
+        ExtendedInfo extendedInfo = new ExtendedInfo();
+        Artifact artifact = new DefaultArtifact(
+                "org.test", "test" + suffix, "2.0", "compile", "jar", null, new DefaultArtifactHandler());
+        extendedInfo.setArtifact(artifact);
+        extendedInfo.setBundleLicense("Bundle Test License " + suffix);
+        extendedInfo.setBundleVendor("Bundle Test Vendor " + suffix);
+
+        List<Developer> developers = new ArrayList<>();
+        Developer developer = createDeveloper(suffix);
+        developers.add(developer);
+        extendedInfo.setDevelopers(developers);
+        extendedInfo.setImplementationVendor("Implementation vendor " + suffix);
+        extendedInfo.setInceptionYear((2021 + suffix) + "");
+
+        List<InfoFile> infoFiles = new ArrayList<>();
+        for (InfoFile.Type license : InfoFile.Type.values()) {
+            infoFiles.add(createInfoFile(license, suffix));
+        }
+        extendedInfo.setInfoFiles(infoFiles);
+
+        extendedInfo.setName("Test Project " + suffix);
+
+        Organization organization = new Organization();
+        organization.setName("Test Organization " + suffix);
+        organization.setUrl("www.github.com/" + suffix);
+        extendedInfo.setOrganization(organization);
+
+        Scm scm = new Scm();
+        scm.setUrl("www.github.com/" + suffix);
+        extendedInfo.setScm(scm);
+
+        extendedInfo.setUrl("www.google.de/" + suffix);
+        return extendedInfo;
+    }
+
+    private static InfoFile createInfoFile(InfoFile.Type noticeType, int suffix) {
+        InfoFile infoFile = new InfoFile();
+        infoFile.setContent("This is " + noticeType.name() + " test content " + suffix);
+        infoFile.setExtractedCopyrightLines(
+                new HashSet<>(Collections.singletonList("Test " + noticeType.name() + suffix)));
+        infoFile.setFileName(noticeType.name() + " " + suffix + ".txt");
+        infoFile.setType(noticeType);
+        return infoFile;
+    }
+
+    private static Developer createDeveloper(int suffix) {
+        Developer developer = new Developer();
+        developer.setEmail("developer" + suffix + "@google.com ");
+        developer.setId("developer.id " + suffix);
+        developer.setName("Top developer " + suffix);
+        developer.setOrganization("Developer Organization " + suffix);
+        developer.setOrganizationUrl("Test Organization " + suffix);
+        developer.setRoles(Collections.singletonList("Lead Developer " + suffix));
+        developer.setTimezone("UTC+2");
+        developer.setUrl("www.github.com");
+        return developer;
     }
 
     @Test

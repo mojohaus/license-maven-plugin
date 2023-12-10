@@ -22,6 +22,9 @@ package org.codehaus.mojo.license;
  * #L%
  */
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -41,6 +44,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -62,6 +66,9 @@ import org.codehaus.mojo.license.download.PreferredFileNames;
 import org.codehaus.mojo.license.download.ProjectLicense;
 import org.codehaus.mojo.license.download.ProjectLicenseInfo;
 import org.codehaus.mojo.license.download.UrlReplacements;
+import org.codehaus.mojo.license.extended.InfoFile;
+import org.codehaus.mojo.license.extended.spreadsheet.CalcFileWriter;
+import org.codehaus.mojo.license.extended.spreadsheet.ExcelFileWriter;
 import org.codehaus.mojo.license.spdx.SpdxLicenseList;
 import org.codehaus.mojo.license.spdx.SpdxLicenseList.Attachments.ContentSanitizer;
 import org.codehaus.mojo.license.utils.FileUtil;
@@ -233,6 +240,32 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
             property = "license.licensesErrorsFile",
             defaultValue = "${project.build.directory}/generated-resources/licenses-errors.xml")
     private File licensesErrorsFile;
+
+    /**
+     * A file containing dependencies whose licenses could not be downloaded for some reason. The format is similar to
+     * {@link #licensesExcelOutputFile} but the entries in {@link #licensesExcelErrorFile} have
+     * {@code <downloaderMessage>} elements attached to them. Those should explain what kind of error happened during
+     * the processing of the given dependency.
+     *
+     * @since 2.4
+     */
+    @Parameter(
+            property = "license.licensesExcelErrorFile",
+            defaultValue = "${project.build.directory}/generated-resources/licenses-errors.xlsx")
+    private File licensesExcelErrorFile;
+
+    /**
+     * A file containing dependencies whose licenses could not be downloaded for some reason. The format is similar to
+     * {@link #licensesCalcOutputFile} but the entries in {@link #licensesCalcErrorFile} have
+     * {@code <downloaderMessage>} elements attached to them. Those should explain what kind of error happened during
+     * the processing of the given dependency.
+     *
+     * @since 2.4
+     */
+    @Parameter(
+            property = "license.licensesCalcErrorFile",
+            defaultValue = "${project.build.directory}/generated-resources/licenses-errors.ods")
+    private File licensesCalcErrorFile;
 
     /**
      * A filter to exclude some scopes.
@@ -660,6 +693,68 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
     @Parameter(property = "license.useDefaultContentSanitizers", defaultValue = "false")
     private boolean useDefaultContentSanitizers;
 
+    /**
+     * Write Microsoft Office Excel file (XLSX) for goal license:aggregate-download-licenses.
+     *
+     * @since 2.4
+     */
+    @Parameter(property = "license.writeExcelFile", defaultValue = "false")
+    private boolean writeExcelFile;
+
+    /**
+     * Write LibreOffice Calc file (ODS) for goal license:aggregate-download-licenses.
+     *
+     * @since 2.4
+     */
+    @Parameter(property = "license.writeCalcFile", defaultValue = "false")
+    private boolean writeCalcFile;
+
+    /**
+     * To merge licenses in the Excel file.
+     * <p>
+     * Each entry represents a merge (first license is main license to keep), licenses are separated by {@code |}.
+     * <p>
+     * Example:
+     * <p>
+     * <pre>
+     * &lt;licenseMerges&gt;
+     * &lt;licenseMerge&gt;The Apache Software License|Version 2.0,Apache License, Version 2.0&lt;/licenseMerge&gt;
+     * &lt;/licenseMerges&gt;
+     * &lt;/pre&gt;
+     *
+     * @since 2.2.1
+     */
+    @Parameter
+    List<String> licenseMerges;
+
+    /**
+     * The Excel output file used if {@link #writeExcelFile} is true,
+     * containing a mapping between each dependency and its license information.
+     * With extended information, if available.
+     *
+     * @see AbstractDownloadLicensesMojo#writeExcelFile
+     * @see AggregateDownloadLicensesMojo#extendedInfo
+     * @since 2.4
+     */
+    @Parameter(
+            property = "license.licensesExcelOutputFile",
+            defaultValue = "${project.build.directory}/generated-resources/licenses.xlsx")
+    protected File licensesExcelOutputFile;
+
+    /**
+     * The Calc output file used if {@link #writeCalcFile} is true,
+     * containing a mapping between each dependency and its license information.
+     * With extended information, if available.
+     *
+     * @see AbstractDownloadLicensesMojo#writeCalcFile
+     * @see AggregateDownloadLicensesMojo#extendedInfo
+     * @since 2.4
+     */
+    @Parameter(
+            property = "license.licensesCalcOutputFile",
+            defaultValue = "${project.build.directory}/generated-resources/licenses.ods")
+    protected File licensesCalcOutputFile;
+
     // ----------------------------------------------------------------------
     // Plexus Components
     // ----------------------------------------------------------------------
@@ -753,7 +848,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
                 contentSanitizers(),
                 getCharset())) {
             for (LicensedArtifact artifact : dependencies.values()) {
-                LOG.debug("Checking licenses for project " + artifact);
+                LOG.debug("Checking licenses for project {}", artifact);
                 final ProjectLicenseInfo depProject = createDependencyProject(artifact);
                 matchers.replaceMatches(depProject);
 
@@ -780,6 +875,8 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
                     downloadLicenses(licenseDownloader, depProject, false);
                 }
             }
+
+            filterCopyrightLines(depProjectLicenses);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -790,9 +887,14 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
             }
 
             List<ProjectLicenseInfo> depProjectLicensesWithErrors = filterErrors(depProjectLicenses);
-            writeLicenseSummary(depProjectLicenses, licensesOutputFile, writeVersions);
-            if (depProjectLicensesWithErrors != null && !depProjectLicensesWithErrors.isEmpty()) {
-                writeLicenseSummary(depProjectLicensesWithErrors, licensesErrorsFile, writeVersions);
+            writeLicenseSummaries(
+                    depProjectLicenses, licensesOutputFile, licensesExcelOutputFile, licensesCalcOutputFile);
+            if (!CollectionUtils.isEmpty(depProjectLicensesWithErrors)) {
+                writeLicenseSummaries(
+                        depProjectLicensesWithErrors,
+                        licensesErrorsFile,
+                        licensesExcelErrorFile,
+                        licensesCalcErrorFile);
             }
 
             removeOrphanFiles(depProjectLicenses);
@@ -815,6 +917,44 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
                 default:
                     throw new IllegalStateException(
                             "Unexpected value of " + ErrorRemedy.class.getName() + ": " + errorRemedy);
+            }
+        }
+    }
+
+    private void writeLicenseSummaries(
+            List<ProjectLicenseInfo> depProjectLicenses, File outputFile, File excelOutputFile, File calcOutputFile)
+            throws ParserConfigurationException, TransformerException, IOException {
+        writeLicenseSummary(depProjectLicenses, outputFile, writeVersions);
+        if (writeExcelFile) {
+            ExcelFileWriter.write(depProjectLicenses, excelOutputFile);
+        }
+        if (writeCalcFile) {
+            CalcFileWriter.write(depProjectLicenses, calcOutputFile);
+        }
+    }
+
+    /**
+     * Removes all extracted copyright lines if the license is an unmodified original license.<br/>
+     * So no actual copyright lines are contained in the extracted copyright lines.
+     *
+     * @param depProjectLicenses Projects with extracted copyright lines.
+     */
+    private void filterCopyrightLines(List<ProjectLicenseInfo> depProjectLicenses) {
+        for (ProjectLicenseInfo projectLicenseInfo : depProjectLicenses) {
+            if (projectLicenseInfo.getExtendedInfo() == null
+                    || CollectionUtils.isEmpty(
+                            projectLicenseInfo.getExtendedInfo().getInfoFiles())) {
+                continue;
+            }
+            List<InfoFile> infoFiles = projectLicenseInfo.getExtendedInfo().getInfoFiles();
+            for (InfoFile infoFile : infoFiles) {
+                if (cache.hasNormalizedContentChecksum(infoFile.getContentChecksum())) {
+                    LOG.debug(
+                            "Removed extracted copyright lines for {} ({})",
+                            projectLicenseInfo.getExtendedInfo().getName(),
+                            projectLicenseInfo.toGavString());
+                    infoFile.setExtractedCopyrightLines(null);
+                }
             }
         }
     }
@@ -907,7 +1047,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
         while (it.hasNext()) {
             final ProjectLicenseInfo dep = it.next();
             final List<String> messages = dep.getDownloaderMessages();
-            if (messages != null && !messages.isEmpty()) {
+            if (CollectionUtils.isNotEmpty(messages)) {
                 it.remove();
                 result.add(dep);
             }
@@ -1026,7 +1166,10 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
      */
     private ProjectLicenseInfo createDependencyProject(LicensedArtifact depMavenProject) throws MojoFailureException {
         final ProjectLicenseInfo dependencyProject = new ProjectLicenseInfo(
-                depMavenProject.getGroupId(), depMavenProject.getArtifactId(), depMavenProject.getVersion());
+                depMavenProject.getGroupId(),
+                depMavenProject.getArtifactId(),
+                depMavenProject.getVersion(),
+                depMavenProject.getExtendedInfos());
         final List<org.codehaus.mojo.license.download.License> licenses = depMavenProject.getLicenses();
         for (org.codehaus.mojo.license.download.License license : licenses) {
             dependencyProject.addLicense(new ProjectLicense(

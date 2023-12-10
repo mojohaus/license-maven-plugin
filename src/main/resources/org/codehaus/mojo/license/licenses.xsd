@@ -22,109 +22,234 @@
   -->
 
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-  targetNamespace="" xmlns=""
-  elementFormDefault="qualified" >
+           elementFormDefault="qualified">
 
-<xs:element name="licenseSummary">
-  <xs:complexType>
-    <xs:sequence>
-      <xs:element name="dependencies" type="Dependencies"  minOccurs="0" />
-    </xs:sequence>
-  </xs:complexType>
-</xs:element>
-
-<xs:complexType name="Dependencies">
-  <xs:sequence>
-    <xs:element name="dependency" type="Dependency" minOccurs="0" maxOccurs="unbounded"/>
-  </xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="Dependency">
-  <xs:sequence>
-    <xs:element name="groupId" type="xs:string" />
-    <xs:element name="artifactId" type="xs:string" />
-    <xs:element name="version" type="xs:string" />
-    <xs:element name="licenses" type="Licenses"  minOccurs="0"/>
-  </xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="Licenses">
-  <xs:annotation>
-    <xs:documentation source="version">1.0+</xs:documentation>
-    <xs:documentation source="description">
-      This element describes all of the licenses for this project.  Each license is described by a
-      <code>license</code> element, which is then described by additional elements.  Projects should
-      only list the license(s) that applies to the project and not the licenses that apply to
-      dependencies.  If multiple licenses are listed, it is assumed that the user can select
-      any of them, not that they must accept all.
-    </xs:documentation>
-  </xs:annotation>
-    <xs:sequence>
-      <xs:element name="license" minOccurs="0" maxOccurs="unbounded" type="License" />
-    </xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="License">
-  <xs:annotation>
-    <xs:documentation source="version">3.0.0+</xs:documentation>
-    <xs:documentation source="description">
-
-      Describes the licenses for this project. This is used to generate
-      the license page of the project's web site, as well as being taken into
-      consideration in other reporting and
-      validation. The licenses listed for the project are that of the project itself,
-      and not of dependencies.
-
-    </xs:documentation>
-  </xs:annotation>
-  <xs:sequence>
-    <xs:element name="name" minOccurs="0" type="xs:string">
-      <xs:annotation>
-        <xs:documentation source="version">3.0.0+</xs:documentation>
-        <xs:documentation source="description">The full legal name of
-          the license.</xs:documentation>
-      </xs:annotation>
+    <xs:element name="licenseSummary">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="dependencies" type="Dependencies" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
     </xs:element>
-    <xs:element name="url" minOccurs="0" type="xs:string">
-      <xs:annotation>
-        <xs:documentation source="version">3.0.0+</xs:documentation>
-        <xs:documentation source="description">The official url for
-          the license text.</xs:documentation>
-      </xs:annotation>
-    </xs:element>
-    <xs:element name="distribution" minOccurs="0" type="xs:string">
-      <xs:annotation>
-        <xs:documentation source="version">3.0.0+</xs:documentation>
-        <xs:documentation source="description">
 
-          The primary method by which this project may be distributed.
-          <dl>
-            <dt>repo</dt>
-            <dd>may be downloaded from the Maven repository</dd>
-            <dt>manual</dt>
-            <dd>user must manually download and install the dependency.</dd>
-          </dl>
+    <xs:complexType name="Dependencies">
+        <xs:sequence>
+            <xs:element name="dependency" type="Dependency" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
 
-        </xs:documentation>
-      </xs:annotation>
-    </xs:element>
-    <xs:element name="file" minOccurs="0" type="xs:string">
-      <xs:annotation>
-        <xs:documentation source="version">3.0.0+</xs:documentation>
-        <xs:documentation source="description">A name of the license file
-          (without path) downloaded from {@link #url}. This path is
-          relative to the licenses.xml file.</xs:documentation>
-      </xs:annotation>
-    </xs:element>
-    <xs:element name="comments" minOccurs="0" type="xs:string">
-      <xs:annotation>
-        <xs:documentation source="version">3.0.0+</xs:documentation>
-        <xs:documentation source="description">
-          Addendum information pertaining to this license.
-        </xs:documentation>
-      </xs:annotation>
-    </xs:element>
-  </xs:sequence>
-</xs:complexType>
+    <xs:complexType name="Dependency">
+        <xs:sequence>
+            <xs:element name="groupId" type="xs:string"/>
+            <xs:element name="artifactId" type="xs:string"/>
+            <xs:element name="version" type="xs:string" minOccurs="0"/>
+            <xs:element name="matchLicenses" type="Licenses" minOccurs="0"/>
+            <xs:element name="name" type="xs:string" minOccurs="0"/>
+            <xs:element name="bundleLicense" type="xs:string" minOccurs="0"/>
+            <xs:element name="bundleVendor" type="xs:string" minOccurs="0"/>
+            <xs:element name="developers" type="Developers" minOccurs="0"/>
+            <xs:element name="implementationVendor" type="xs:string" minOccurs="0"/>
+            <xs:element name="inceptionYear" type="xs:string" minOccurs="0"/>
+            <xs:element name="infoFiles" type="InfoFiles" minOccurs="0"/>
+            <xs:element name="organization" type="Organization" minOccurs="0"/>
+            <xs:element name="scm" type="xs:string" minOccurs="0"/>
+            <xs:element name="url" type="xs:string" minOccurs="0"/>
+            <xs:element name="licenses" type="Licenses" minOccurs="0"/>
+            <xs:element name="downloaderMessages" type="DownloaderMessages" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="Licenses">
+        <xs:annotation>
+            <xs:documentation source="version">1.0+</xs:documentation>
+            <xs:documentation source="description">
+                This element describes all of the licenses for this project. Each license is described by a
+                <code>license</code>
+                element, which is then described by additional elements. Projects should
+                only list the license(s) that applies to the project and not the licenses that apply to
+                dependencies. If multiple licenses are listed, it is assumed that the user can select
+                any of them, not that they must accept all.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="license" minOccurs="0" maxOccurs="unbounded" type="License"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="License">
+        <xs:annotation>
+            <xs:documentation source="version">3.0.0+</xs:documentation>
+            <xs:documentation source="description">
+
+                Describes the licenses for this project. This is used to generate
+                the license page of the project's web site, as well as being taken into
+                consideration in other reporting and
+                validation. The licenses listed for the project are that of the project itself,
+                and not of dependencies.
+
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="name" minOccurs="0" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation source="version">3.0.0+</xs:documentation>
+                    <xs:documentation source="description">The full legal name of
+                        the license.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="url" minOccurs="0" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation source="version">3.0.0+</xs:documentation>
+                    <xs:documentation source="description">The official url for
+                        the license text.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="distribution" minOccurs="0" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation source="version">3.0.0+</xs:documentation>
+                    <xs:documentation source="description">
+
+                        The primary method by which this project may be distributed.
+                        <dl>
+                            <dt>repo</dt>
+                            <dd>may be downloaded from the Maven repository</dd>
+                            <dt>manual</dt>
+                            <dd>user must manually download and install the dependency.</dd>
+                        </dl>
+
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="file" minOccurs="0" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation source="version">3.0.0+</xs:documentation>
+                    <xs:documentation source="description">A name of the license file
+                        (without path) downloaded from {@link #url}. This path is
+                        relative to the licenses.xml file.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="comments" minOccurs="0" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation source="version">3.0.0+</xs:documentation>
+                    <xs:documentation source="description">
+                        Addendum information pertaining to this license.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="DownloaderMessages">
+        <xs:annotation>
+            <xs:documentation source="description">
+
+                Downloader messages, probably errors
+
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="downloaderMessage" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="Developers">
+        <xs:annotation>
+            <xs:documentation source="description">
+
+                Information about the dependency developers
+
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="developer" type="Developer" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+
+    <xs:complexType name="Developer">
+        <xs:annotation>
+            <xs:documentation source="description">
+
+                Information about the dependency developer
+
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="id" type="xs:string" minOccurs="0"/>
+            <xs:element name="email" type="xs:string" minOccurs="0"/>
+            <xs:element name="name" type="xs:string" minOccurs="0"/>
+            <xs:element name="organization" type="xs:string" minOccurs="0"/>
+            <xs:element name="organizationUrl" type="xs:string" minOccurs="0"/>
+            <xs:element name="url" type="xs:string" minOccurs="0"/>
+            <xs:element name="timezone" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="InfoFiles">
+        <xs:annotation>
+            <xs:documentation source="description">
+
+                Information extracted from files in the JAR.
+
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="infoFile" type="InfoFile" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:simpleType name="InfoFileType" final="restriction">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="NOTICE"/>
+            <xs:enumeration value="LICENSE"/>
+            <xs:enumeration value="SPDX_LICENSE"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="InfoFile">
+        <xs:annotation>
+            <xs:documentation source="description">
+
+                Information extracted from a file in the JAR.
+
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="content" type="xs:string"/>
+            <xs:element name="extractedCopyrightLines" type="ExtractedCopyrightLines" minOccurs="0"/>
+            <xs:element name="fileName" type="xs:string"/>
+            <xs:element name="type" type="InfoFileType"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="ExtractedCopyrightLines">
+        <xs:annotation>
+            <xs:documentation source="description">
+
+                Copyright lines extracted from the file in the JAR.
+
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="line" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="Organization">
+        <xs:annotation>
+            <xs:documentation source="description">
+
+                Organization info
+
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="name" type="xs:string" minOccurs="0"/>
+            <xs:element name="url" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
 
 </xs:schema>

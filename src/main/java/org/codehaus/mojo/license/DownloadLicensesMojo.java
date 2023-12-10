@@ -88,7 +88,9 @@ public class DownloadLicensesMojo extends AbstractDownloadLicensesMojo {
                 new ResolvedProjectDependencies(project.getArtifacts(), MojoHelper.getDependencyArtifacts(project)),
                 this,
                 remoteRepositories,
-                result);
+                result,
+                false,
+                licenseMerges);
         return result;
     }
 }

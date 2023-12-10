@@ -316,6 +316,28 @@
       <artifactId>junit</artifactId>
       <scope>test</scope>
     </dependency>
+
+    <!-- Needed for extended constants in JARs MANIFEST.MF -->
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.core</artifactId>
+      <version>6.0.0</version>
+    </dependency>
+
+    <!-- Microsoft Excel XLSX export -->
+    <dependency>
+      <groupId>org.apache.poi</groupId>
+      <artifactId>poi-ooxml</artifactId>
+      <version>5.2.4</version>
+    </dependency>
+
+    <!-- LibreOffice Calc ODT export -->
+    <dependency>
+      <groupId>org.odftoolkit</groupId>
+      <artifactId>odfdom-java</artifactId>
+      <!-- There are later versions, but that versions need JDKs after version 8 -->
+      <version>0.9.0</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -363,7 +385,7 @@
         <configuration>
           <signature>
             <groupId>org.codehaus.mojo.signature</groupId>
-            <artifactId>java17</artifactId>
+            <artifactId>java18</artifactId>
             <version>1.0</version>
           </signature>
         </configuration>
@@ -492,6 +514,25 @@
                 <projectVersion>${project.version}</projectVersion>
               </scriptVariables>
             </configuration>
+            <dependencies>
+              <!-- Microsoft Excel XLSX export -->
+              <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi-ooxml</artifactId>
+                <version>5.2.4</version>
+              </dependency>
+              <!-- LibreOffice Calc ODT export -->
+              <dependency>
+                <groupId>org.odftoolkit</groupId>
+                <artifactId>odfdom-java</artifactId>
+                <version>0.9.0</version>
+              </dependency>
+              <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>2.13.0</version>
+              </dependency>
+            </dependencies>
             <executions>
               <execution>
                 <id>all-integration-test</id>

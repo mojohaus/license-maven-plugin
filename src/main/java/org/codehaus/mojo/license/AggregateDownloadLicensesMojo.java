@@ -97,6 +97,17 @@ public class AggregateDownloadLicensesMojo extends AbstractDownloadLicensesMojo 
     @Parameter(property = "reactorProjects", readonly = true, required = true)
     private List<MavenProject> reactorProjects;
 
+    /**
+     * Extract and use non-maven data for license, copyright and vendor information,
+     * including the plugins' archive file content.
+     * <p/>
+     * This means it will read info from the JAR's MANIFEST.MF file, look for NOTICE.txt and similar files.
+     *
+     * @since 2.4
+     */
+    @Parameter(property = "license.extendedInfo", defaultValue = "false")
+    private boolean extendedInfo;
+
     // ----------------------------------------------------------------------
     // AbstractDownloadLicensesMojo Implementation
     // ----------------------------------------------------------------------
@@ -120,7 +131,9 @@ public class AggregateDownloadLicensesMojo extends AbstractDownloadLicensesMojo 
                     new ResolvedProjectDependencies(p.getArtifacts(), MojoHelper.getDependencyArtifacts(p)),
                     this,
                     remoteRepositories,
-                    result);
+                    result,
+                    extendedInfo,
+                    licenseMerges);
         }
         return result;
     }

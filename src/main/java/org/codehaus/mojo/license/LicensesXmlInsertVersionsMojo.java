@@ -133,7 +133,9 @@ public class LicensesXmlInsertVersionsMojo extends AbstractLicensesXmlMojo {
                     new ResolvedProjectDependencies(project.getArtifacts(), MojoHelper.getDependencyArtifacts(project)),
                     config,
                     remoteRepositories,
-                    resolvedDeps);
+                    resolvedDeps,
+                    false,
+                    null);
             final Map<String, LicensedArtifact> resolvedDepsMap = new HashMap<>(resolvedDeps.size());
             for (LicensedArtifact dep : resolvedDeps.values()) {
                 resolvedDepsMap.put(dep.getGroupId() + ":" + dep.getArtifactId(), dep);

@@ -352,7 +352,7 @@ public abstract class AbstractAddThirdPartyMojo extends AbstractLicenseMojo {
     /**
      * A URL prepared either our of {@link #overrideFile} or {@link #overrideUrl} or the default value.
      *
-     * @see LicenseMojoUtils#prepareThirdPartyOverrideUrl(URL, File, String, File)
+     * @see LicenseMojoUtils#prepareThirdPartyOverrideUrl(String, File, String, File)
      */
     protected String resolvedOverrideUrl;
 

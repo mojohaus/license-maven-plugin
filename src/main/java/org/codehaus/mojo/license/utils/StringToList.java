@@ -37,6 +37,10 @@ import org.apache.maven.plugin.MojoExecutionException;
  * @since 1.4
  */
 public class StringToList {
+    /**
+     * Regular expression to split license list.
+     */
+    public static final String LIST_OF_LICENSES_REG_EX = "\\s*\\|\\s*";
 
     /**
      * List of data.
@@ -53,7 +57,7 @@ public class StringToList {
     public StringToList(String data) throws MojoExecutionException {
         this();
         if (!UrlRequester.isStringUrl(data)) {
-            for (String s : data.split("\\s*\\|\\s*")) {
+            for (String s : data.split(LIST_OF_LICENSES_REG_EX)) {
                 addEntryToList(s);
             }
         } else {
