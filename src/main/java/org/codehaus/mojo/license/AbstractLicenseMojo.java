@@ -25,7 +25,6 @@ package org.codehaus.mojo.license;
 import java.io.File;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -70,14 +69,6 @@ public abstract class AbstractLicenseMojo extends AbstractMojo {
      */
     @Parameter(property = "license.encoding", defaultValue = "${project.build.sourceEncoding}")
     String encoding;
-
-    /**
-     * Current maven session. (used to launch certain mojo once by build).
-     *
-     * @since 1.0
-     */
-    @Parameter(defaultValue = "${session}", readonly = true)
-    MavenSession session;
 
     /**
      * The reacted project.
@@ -232,13 +223,6 @@ public abstract class AbstractLicenseMojo extends AbstractMojo {
      */
     public final void setVerbose(boolean verbose) {
         this.verbose = verbose;
-    }
-
-    /**
-     * @return the {@link MavenSession}.
-     */
-    public final MavenSession getSession() {
-        return session;
     }
 
     // ----------------------------------------------------------------------

@@ -601,7 +601,7 @@ public abstract class AbstractAddThirdPartyMojo extends AbstractLicenseMojo {
      * @since 1.0
      */
     @Component
-    private ThirdPartyTool thirdPartyTool;
+    ThirdPartyTool thirdPartyTool;
 
     /**
      * Dependencies tool. (pluggable component to find dependencies that match up with
@@ -610,7 +610,7 @@ public abstract class AbstractAddThirdPartyMojo extends AbstractLicenseMojo {
      * @since 1.1
      */
     @Component
-    protected DependenciesTool dependenciesTool;
+    DependenciesTool dependenciesTool;
 
     // ----------------------------------------------------------------------
     // Private fields
