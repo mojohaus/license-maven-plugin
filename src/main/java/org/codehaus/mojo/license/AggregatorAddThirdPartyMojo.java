@@ -24,7 +24,6 @@ package org.codehaus.mojo.license;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
@@ -215,10 +214,8 @@ public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo {
                 continue;
             }
 
-            AddThirdPartyMojo mojo =
-                    (AddThirdPartyMojo) getSession().lookup(AddThirdPartyMojo.ROLE, addThirdPartyRoleHint);
-
-            mojo.initFromMojo(this, reactorProject, new ArrayList<>(this.reactorProjects));
+            AddThirdPartyMojo mojo = new AddThirdPartyMojo();
+            mojo.initFromMojo(this, reactorProject);
 
             LicenseMap childLicenseMap = mojo.licenseMap;
             if (isVerbose()) {

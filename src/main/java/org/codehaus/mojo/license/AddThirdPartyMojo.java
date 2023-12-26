@@ -98,13 +98,6 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
     private boolean doGenerateMissing;
 
     /**
-     * The reactor projects. When resolving dependencies, the aggregator goal needs to do custom handling
-     * of sibling dependencies for projects in the reactor,
-     * to avoid trying to load artifacts for projects that haven't been built/published yet.
-     */
-    private List<MavenProject> reactorProjectDependencies;
-
-    /**
      * Copies of the project's dependency sets. AddThirdParty needs to load dependencies only for the single project it
      * is run for, while AggregateAddThirdParty needs to load dependencies for the parent project, as well as all child
      * projects in the reactor.
@@ -378,8 +371,7 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
     }
 
     // magic method - to refactor
-    void initFromMojo(AggregatorAddThirdPartyMojo mojo, MavenProject mavenProject, List<MavenProject> reactorProjects)
-            throws Exception {
+    void initFromMojo(AggregatorAddThirdPartyMojo mojo, MavenProject mavenProject) throws Exception {
         project = mavenProject;
         deployMissingFile = mojo.deployMissingFile;
         useRepositoryMissingFiles = mojo.useRepositoryMissingFiles;
@@ -413,13 +405,12 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
         failOnBlacklist = mojo.failOnBlacklist;
         sortArtifactByName = mojo.sortArtifactByName;
         fileTemplate = mojo.fileTemplate;
-        session = mojo.session;
         verbose = mojo.verbose;
         encoding = mojo.encoding;
+        thirdPartyTool = mojo.thirdPartyTool;
+        dependenciesTool = mojo.dependenciesTool;
 
         setLog(mojo.getLog());
-
-        reactorProjectDependencies = reactorProjects;
 
         // magic used by AggregatorAddThirdPartyMojo - only by build dependencies map for child projects
         // so actions in init should be always executed
