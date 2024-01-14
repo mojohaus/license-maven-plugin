@@ -1,2 +1,1 @@
 _extends: .github
-tag-template: license-maven-plugin-$NEXT_MINOR_VERSION
