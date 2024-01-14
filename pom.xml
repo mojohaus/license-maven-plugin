@@ -118,7 +118,7 @@
   </ciManagement>
 
   <properties>
-    <mavenVersion>3.5.4</mavenVersion>
+    <mavenVersion>3.6.3</mavenVersion>
     <recommendedJavaBuildVersion>11</recommendedJavaBuildVersion>
     <mojo.java.target>8</mojo.java.target>
 
@@ -357,6 +357,29 @@
           <groupId>org.codehaus.gmaven</groupId>
           <artifactId>groovy-maven-plugin</artifactId>
           <version>2.1.1</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-plugin-report-plugin</artifactId>
+          <configuration>
+            <requirementsHistories>
+              <requirementsHistory>
+                <version>2.3.0</version>
+                <maven>3.5.4</maven>
+                <jdk>1.8</jdk>
+              </requirementsHistory>
+              <requirementsHistory>
+                <version>2.0.0</version>
+                <maven>3.5.4</maven>
+                <jdk>1.7</jdk>
+              </requirementsHistory>
+              <requirementsHistory>
+                <version>1.20</version>
+                <maven>2.2.1</maven>
+                <jdk>1.7</jdk>
+              </requirementsHistory>
+            </requirementsHistories>
+          </configuration>
         </plugin>
       </plugins>
     </pluginManagement>
