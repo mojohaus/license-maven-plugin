@@ -302,14 +302,14 @@ public class LicenseSummaryWriter {
     }
 
     /**
-     * Fix string to being written as CDATA under windows, also compatible with *nix systems.<br/>
+     * Fix string to being written as CDATA under windows or mac os, also compatible with *nix systems.<br/>
      * See https://bugs.openjdk.java.net/browse/JDK-8133452
      *
      * @param property Property to prepare being written as XML CDATA
      * @return The properly prepared string.
      */
     private static String prepareCdata(String property) {
-        return property.replace("\r\n", "\n").replace("\f", "\n");
+        return property.replace("\r\n", "\n").replace("\f", "\n").replace("\r", "\n");
     }
 
     private static void addPropertyIfSet(

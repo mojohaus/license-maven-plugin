@@ -46,7 +46,7 @@ import org.codehaus.mojo.license.utils.MojoHelper;
  * If the license information (license name and license URL) is missing or otherwise broken in a dependency POM, this
  * mojo offers several fallback options:
  * <ul>
- * <li>{@link AbstractDownloadLicensesMojo#licensesConfigFile}</li>
+ * <li>{@link AbstractDownloadLicensesMojo#licensesConfigFiles}</li>
  * <li>{@link AbstractDownloadLicensesMojo#errorRemedy}</li>
  * <li>{@link AbstractDownloadLicensesMojo#licenseUrlReplacements}</li>
  * <li>{@link AbstractDownloadLicensesMojo#licenseUrlFileNames}</li>
@@ -108,6 +108,28 @@ public class AggregateDownloadLicensesMojo extends AbstractDownloadLicensesMojo 
     @Parameter(property = "license.extendedInfo", defaultValue = "false")
     private boolean extendedInfo;
 
+    /**
+     * Exclude modules from processing.
+     * <p/>
+     * Comma separated list of relative module paths. Exclusions are not recursive.
+     *
+     * @since 2.1
+     */
+    @Parameter(property = "license.excludedModules")
+    private String excludedModules;
+
+    /**
+     * Includes modules from processing.
+     * <p/>
+     * Comma separated list of relative module paths. Inclusions are not recursive.
+     *
+     * Includes all modules if left empty
+     *
+     * @since 2.1
+     */
+    @Parameter(property = "license.includedModules")
+    private String includedModules;
+
     // ----------------------------------------------------------------------
     // AbstractDownloadLicensesMojo Implementation
     // ----------------------------------------------------------------------
@@ -126,14 +148,27 @@ public class AggregateDownloadLicensesMojo extends AbstractDownloadLicensesMojo 
     protected Map<String, LicensedArtifact> getDependencies() {
         final Map<String, LicensedArtifact> result = new TreeMap<>();
 
+        List<String> includedModules = MojoHelper.getParams(this.includedModules);
+        List<String> excludedModules = MojoHelper.getParams(this.excludedModules);
+
         for (MavenProject p : reactorProjects) {
-            licensedArtifactResolver.loadProjectDependencies(
-                    new ResolvedProjectDependencies(p.getArtifacts(), MojoHelper.getDependencyArtifacts(p)),
-                    this,
-                    remoteRepositories,
-                    result,
-                    extendedInfo,
-                    licenseMerges);
+            String modulePath = getProject()
+                    .getBasedir()
+                    .toPath()
+                    .relativize(p.getBasedir().toPath())
+                    .toString();
+            if ((includedModules.isEmpty() || includedModules.contains(modulePath))
+                    && !excludedModules.contains(modulePath)) {
+                licensedArtifactResolver.loadProjectDependencies(
+                        new ResolvedProjectDependencies(p.getArtifacts(), MojoHelper.getDependencyArtifacts(p)),
+                        this,
+                        remoteRepositories,
+                        result,
+                        extendedInfo,
+                        licenseMerges);
+            } else {
+                getLog().info("Skipping excluded module " + p);
+            }
         }
         return result;
     }
