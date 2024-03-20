@@ -159,8 +159,8 @@ If your build successfully passes, you are most likely clean. Congratulations!
 If your build fails with message like this:
 ``` 
 [INFO] Included licenses (whitelist): [BSD, CDDL, Eclipse Public License - v 1.0, Public Domain, The Apache Software License, Version 2.0]
-[WARNING] There is 1 forbidden licenses used:
-[WARNING] License MIT used by 2 dependencies:
+[ERROR] There is 1 forbidden licenses used:
+[ERROR] License MIT used by 2 dependencies:
 ...
 [INFO] ------------------------------------------------------------------------
 [INFO] Reactor Summary:
