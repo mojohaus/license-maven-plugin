@@ -1233,8 +1233,8 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
             licenseFileName = licenseFileName.replaceAll("\\s+", " ");
         }
 
-        // lower case and (back)slash removal
-        licenseFileName = licenseFileName.toLowerCase(Locale.US).replaceAll("[\\\\/]+", "_");
+        // lower case and invalid filename characters removal
+        licenseFileName = licenseFileName.toLowerCase(Locale.US).replaceAll("[\\\\/:*?\"<>|]+", "_");
 
         licenseFileName = sanitize(licenseFileName);
 
