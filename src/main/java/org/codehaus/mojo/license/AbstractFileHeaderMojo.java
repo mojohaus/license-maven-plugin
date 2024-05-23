@@ -24,16 +24,17 @@ package org.codehaus.mojo.license;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import freemarker.template.Template;
 import org.apache.commons.lang3.StringUtils;
@@ -360,7 +361,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo {
     /**
      * Dictionary of treated files indexed by their state.
      */
-    EnumMap<FileState, Set<File>> result;
+    Map<FileState, Set<File>> result;
 
     /**
      * Dictionary of files to treat indexed by their CommentStyle.
@@ -533,7 +534,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo {
 
         long t0 = System.nanoTime();
 
-        processedFiles = new HashSet<>();
+        processedFiles = ConcurrentHashMap.newKeySet();
         result = new EnumMap<>(FileState.class);
 
         try {
@@ -586,7 +587,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo {
      * @param result processed files by their status
      * @throws MojoFailureException if check is not ok (some file with no header or to update)
      */
-    private void checkResults(EnumMap<FileState, Set<File>> result) throws MojoFailureException {
+    private void checkResults(Map<FileState, Set<File>> result) throws MojoFailureException {
         Set<FileState> states = result.keySet();
 
         StringBuilder builder = new StringBuilder();
@@ -633,10 +634,18 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo {
 
         // use header transformer according to comment style given in header
         FileHeaderTransformer transformer = getTransformer(transformers, commentStyle);
-        FileHeaderProcessor processor = getFileHeaderProcessor(license, transformer);
 
-        for (File file : filesToTreat) {
-            processFile(processor, file);
+        try {
+            filesToTreat.parallelStream().forEach(file -> {
+                try {
+                    FileHeaderProcessor processor = getFileHeaderProcessor(license, transformer);
+                    processFile(processor, file);
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            });
+        } catch (UncheckedIOException e) {
+            throw e.getCause();
         }
         filesToTreat.clear();
     }

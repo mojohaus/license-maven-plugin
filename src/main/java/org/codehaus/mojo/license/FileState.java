@@ -23,9 +23,9 @@ package org.codehaus.mojo.license;
  */
 
 import java.io.File;
-import java.util.EnumMap;
-import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Defines state of a file after process.
@@ -70,12 +70,7 @@ public enum FileState {
      * @param file    file to add
      * @param results dictionary to update
      */
-    public void addFile(File file, EnumMap<FileState, Set<File>> results) {
-        Set<File> fileSet = results.get(this);
-        if (fileSet == null) {
-            fileSet = new HashSet<>();
-            results.put(this, fileSet);
-        }
-        fileSet.add(file);
+    public void addFile(File file, Map<FileState, Set<File>> results) {
+        results.computeIfAbsent(this, k -> ConcurrentHashMap.newKeySet()).add(file);
     }
 }

@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -388,7 +387,7 @@ public abstract class AbstractLicenseNameMojo extends AbstractLicenseMojo {
      * @param state  state of file to report
      * @param buffer where to report
      */
-    void reportType(EnumMap<FileState, Set<File>> result, FileState state, StringBuilder buffer) {
+    void reportType(Map<FileState, Set<File>> result, FileState state, StringBuilder buffer) {
         String operation = state.name();
 
         Set<File> set = getFiles(result, state);
@@ -499,7 +498,7 @@ public abstract class AbstractLicenseNameMojo extends AbstractLicenseMojo {
      * @param state state of files to get
      * @return all files of the given state
      */
-    private Set<File> getFiles(EnumMap<FileState, Set<File>> result, FileState state) {
+    private Set<File> getFiles(Map<FileState, Set<File>> result, FileState state) {
         return result.get(state);
     }
 
