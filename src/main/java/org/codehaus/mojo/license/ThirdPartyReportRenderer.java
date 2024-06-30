@@ -172,6 +172,7 @@ public class ThirdPartyReportRenderer extends AbstractLicenseReportRenderer {
             }
         }
         sink.table();
+        sink.tableRows(null, false);
 
         sink.tableRow();
         sink.tableCell();
@@ -204,6 +205,7 @@ public class ThirdPartyReportRenderer extends AbstractLicenseReportRenderer {
         sinkCellText(getText("report.overview.numWithNoLicense"));
         sinkCellText(Integer.toString(numWithNoLicense));
         sink.tableRow_();
+        sink.tableRows_();
         sink.table_();
     }
 
