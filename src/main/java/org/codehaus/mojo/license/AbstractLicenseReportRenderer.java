@@ -360,11 +360,13 @@ public abstract class AbstractLicenseReportRenderer extends AbstractMavenReportR
             boolean includeClassifier,
             boolean includeType) {
         sink.table();
+        sink.tableRows(null, false);
         renderThirdPartySummaryTableHeader(includeScope, includeClassifier, includeType);
         for (ThirdPartyDetails details : collection) {
             renderThirdPartySummaryTableRow(details, includeScope, includeClassifier, includeType);
         }
         renderThirdPartySummaryTableHeader(includeScope, includeClassifier, includeType);
+        sink.tableRows_();
         sink.table_();
     }
 
