@@ -26,7 +26,7 @@
   <parent>
     <groupId>org.codehaus.mojo</groupId>
     <artifactId>mojo-parent</artifactId>
-    <version>80</version>
+    <version>84</version>
   </parent>
 
   <artifactId>license-maven-plugin</artifactId>
@@ -119,7 +119,6 @@
 
   <properties>
     <mavenVersion>3.6.3</mavenVersion>
-    <recommendedJavaBuildVersion>11</recommendedJavaBuildVersion>
     <mojo.java.target>8</mojo.java.target>
 
     <processorVersion>1.3</processorVersion>
@@ -127,20 +126,17 @@
     <doxiaVersion>1.12.0</doxiaVersion>
     <!-- ASF project maven-doxia-sitetools:1.8.1 has different release cycle and it is dependent on maven-doxia:1.8 -->
     <doxiaRendererVersion>1.11.1</doxiaRendererVersion>
-    <it.debug>true</it.debug>
 
     <version.httpcomponents.httpclient>4.5.14</version.httpcomponents.httpclient>
     <version.httpcomponents.httpcore>4.4.16</version.httpcomponents.httpcore>
-
-    <build-helper-maven-plugin.version>3.4.0</build-helper-maven-plugin.version>
 
     <!-- license configuration -->
     <license.useMissingFile>true</license.useMissingFile>
     <license.failOnMissing>true</license.failOnMissing>
     <license.licenseName>lgpl_v3</license.licenseName>
 
-    <plexusComponentVersion>2.1.1</plexusComponentVersion>
-    <maven-resolver.version>1.3.3</maven-resolver.version>
+    <!-- the same version as in Maven core -->
+    <maven-resolver.version>1.4.1</maven-resolver.version>
     <project.build.outputTimestamp>2024-01-23T22:42:18Z</project.build.outputTimestamp>
   </properties>
 

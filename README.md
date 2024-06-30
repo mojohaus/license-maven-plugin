@@ -18,3 +18,4 @@ For publishing the site do the following:
 cd target/checkout
 mvn verify site -DperformRelease scm-publish:publish-scm
 ```
+
