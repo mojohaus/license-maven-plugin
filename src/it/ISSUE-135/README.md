@@ -17,3 +17,4 @@ the content after the package declaration (the import) is wrongly truncated.
 - The directory target/generated-sources is added as a source of the project
 - The update-file-header goal is executed on that directory
 - the build fails with compile errors
+
