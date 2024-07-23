@@ -88,6 +88,17 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
     @Parameter(property = "license.skipAddThirdParty", defaultValue = "false")
     private boolean skipAddThirdParty;
 
+    /**
+     * Add the output directory as resource directory.
+     * <p>
+     * If this is set to <code>false</code> the generated files are no longer added automatically to the final artifact.
+     * </p>
+     *
+     * @since 2.5
+     */
+    @Parameter(property = "license.addOutputDirectoryAsResourceDir", defaultValue = "true")
+    private boolean addOutputDirectoryAsResourceDir;
+
     // ----------------------------------------------------------------------
     // Private Fields
     // ----------------------------------------------------------------------
@@ -184,7 +195,10 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
             getHelper().attachThirdPartyDescriptor(missingFile);
         }
 
-        addResourceDir(outputDirectory, "**/*.txt");
+        if (addOutputDirectoryAsResourceDir) {
+
+            addResourceDir(outputDirectory, "**/*.txt");
+        }
     }
 
     // ----------------------------------------------------------------------
