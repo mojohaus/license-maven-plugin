@@ -47,7 +47,6 @@ import java.util.regex.Pattern;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -1277,11 +1276,11 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
 
         int licenseIndex = 0;
         for (ProjectLicense license : licenses) {
-            if (matchingUrlsOnly && StringUtils.isNotBlank(license.getUrl())) {
+            if (matchingUrlsOnly && license.getUrl() == null) {
                 handleError(
                         depProject,
                         "No URL for license at index " + licenseIndex + " in dependency " + depProject.toGavString());
-            } else if (StringUtils.isNotBlank(license.getUrl())) {
+            } else if (license.getUrl() != null) {
                 final String licenseUrl = urlReplacements.rewriteIfNecessary(license.getUrl());
 
                 final LicenseDownloadResult cachedResult = cache.get(licenseUrl);
