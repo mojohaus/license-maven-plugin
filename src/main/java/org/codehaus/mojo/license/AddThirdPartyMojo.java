@@ -94,7 +94,7 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
      * If this is set to <code>false</code> the generated files are no longer added automatically to the final artifact.
      * </p>
      *
-     * @since 2.5
+     * @since 2.5.0
      */
     @Parameter(property = "license.addOutputDirectoryAsResourceDir", defaultValue = "true")
     private boolean addOutputDirectoryAsResourceDir;
@@ -196,7 +196,6 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
         }
 
         if (addOutputDirectoryAsResourceDir) {
-
             addResourceDir(outputDirectory, "**/*.txt");
         }
     }
