@@ -143,6 +143,7 @@ public class CalcFileWriter {
         return new Color(color[0], color[1], color[2]);
     }
 
+    @SuppressWarnings("checkstyle:MethodLength")
     private static void createHeader(
             List<ProjectLicenseInfo> projectLicenseInfos, OdfSpreadsheetDocument spreadsheet, OdfTable table) {
         boolean hasExtendedInfo = false;
@@ -474,6 +475,7 @@ public class CalcFileWriter {
     Reduce parameters, complicated parameters/DTO pattern.
     But keep it still threadsafe.
      */
+    @SuppressWarnings("checkstyle:MethodLength")
     private static void writeData(
             List<ProjectLicenseInfo> projectLicenseInfos,
             OdfSpreadsheetDocument wb,

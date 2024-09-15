@@ -8,7 +8,7 @@ import org.codehaus.mojo.license.LicenseMojoUtils.LoggerFacade;
 public class MockLogger implements LoggerFacade {
     private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("\\Q{}\\E");
 
-    private static final String format(String template, Object param) {
+    private static String format(String template, Object param) {
         return PLACEHOLDER_PATTERN.matcher(template).replaceFirst(Matcher.quoteReplacement(String.valueOf(param)));
     }
 
