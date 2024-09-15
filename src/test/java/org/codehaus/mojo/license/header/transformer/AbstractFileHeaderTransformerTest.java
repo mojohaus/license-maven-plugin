@@ -32,7 +32,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.codehaus.mojo.license.header.transformer.AbstractFileHeaderTransformer.COPYRIGHT_PATTERN;
-import static org.codehaus.mojo.license.header.transformer.FileHeaderTransformer.*;
+import static org.codehaus.mojo.license.header.transformer.FileHeaderTransformer.DEFAULT_PROCESS_END_TAG;
+import static org.codehaus.mojo.license.header.transformer.FileHeaderTransformer.DEFAULT_PROCESS_START_TAG;
+import static org.codehaus.mojo.license.header.transformer.FileHeaderTransformer.DEFAULT_SECTION_DELIMITER;
+import static org.codehaus.mojo.license.header.transformer.FileHeaderTransformer.LINE_SEPARATOR;
 
 /**
  * Tests the {@link AbstractFileHeaderTransformer}.

@@ -116,6 +116,7 @@ public class ExcelFileWriter {
         }
     }
 
+    @SuppressWarnings("checkstyle:MethodLength")
     private static void createHeader(List<ProjectLicenseInfo> projectLicenseInfos, Workbook wb, Sheet sheet) {
         boolean hasExtendedInfo = false;
         for (ProjectLicenseInfo projectLicenseInfo : projectLicenseInfos) {
@@ -354,6 +355,7 @@ public class ExcelFileWriter {
     Clean this method up.
     Reduce parameters, complicated parameters/DTO pattern.
     But keep it still threadsafe. */
+    @SuppressWarnings("checkstyle:MethodLength")
     private static void writeData(
             List<ProjectLicenseInfo> projectLicenseInfos,
             XSSFWorkbook wb,
