@@ -22,6 +22,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.maven.model.Developer;
 import org.apache.maven.model.Organization;
 import org.apache.maven.model.Scm;
+import org.codehaus.mojo.license.AbstractDownloadLicensesMojo;
 import org.codehaus.mojo.license.download.ProjectLicense;
 import org.codehaus.mojo.license.download.ProjectLicenseInfo;
 import org.codehaus.mojo.license.extended.ExtendedInfo;
@@ -104,7 +105,8 @@ public class CalcFileWriter {
 
     private CalcFileWriter() {}
 
-    public static void write(List<ProjectLicenseInfo> projectLicenseInfos, final File licensesCalcOutputFile) {
+    public static void write(List<ProjectLicenseInfo> projectLicenseInfos, final File licensesCalcOutputFile,
+                             AbstractDownloadLicensesMojo.DataFormatting dataFormatting) {
         if (CollectionUtils.isEmpty(projectLicenseInfos)) {
             LOG.debug("Nothing to write to excel, no project data.");
             return;
@@ -126,7 +128,8 @@ public class CalcFileWriter {
             createHeader(projectLicenseInfos, spreadsheet, table);
 
             writeData(
-                    projectLicenseInfos, spreadsheet, table, convertToOdfColor(SpreadsheetUtil.ALTERNATING_ROWS_COLOR));
+                    projectLicenseInfos, spreadsheet, table, convertToOdfColor(SpreadsheetUtil.ALTERNATING_ROWS_COLOR),
+                dataFormatting);
 
             try (OutputStream fileOut = Files.newOutputStream(licensesCalcOutputFile.toPath())) {
                 spreadsheet.save(fileOut);
@@ -480,7 +483,8 @@ public class CalcFileWriter {
             List<ProjectLicenseInfo> projectLicenseInfos,
             OdfSpreadsheetDocument wb,
             OdfTable table,
-            Color alternatingRowsColor) {
+            Color alternatingRowsColor,
+            AbstractDownloadLicensesMojo.DataFormatting dataFormatting) {
         final int firstRowIndex = 3;
         int currentRowIndex = firstRowIndex;
         final Map<Integer, OdfTableRow> rowMap = new HashMap<>();
@@ -552,8 +556,9 @@ public class CalcFileWriter {
                 // General
                 createDataCellsInRow(currentRow, GENERAL_START_COLUMN, cellStyle, extendedInfo.getName());
                 // Developers
-                currentRowData = new CurrentRowData(currentRowIndex, extraRows, hasExtendedInfo);
-                extraRows = addList(
+                if (!dataFormatting.skipDevelopers) {
+                    currentRowData = new CurrentRowData(currentRowIndex, extraRows, hasExtendedInfo);
+                    extraRows = addList(
                         cellListParameter,
                         currentRowData,
                         DEVELOPERS_START_COLUMN,
@@ -561,20 +566,21 @@ public class CalcFileWriter {
                         extendedInfo.getDevelopers(),
                         (OdfTableRow developerRow, Developer developer) -> {
                             OdfTableCell[] licenses = createDataCellsInRow(
-                                    developerRow,
-                                    DEVELOPERS_START_COLUMN,
-                                    cellStyle,
-                                    developer.getId(),
-                                    developer.getEmail(),
-                                    developer.getName(),
-                                    developer.getOrganization(),
-                                    developer.getOrganizationUrl(),
-                                    developer.getUrl(),
-                                    developer.getTimezone());
+                                developerRow,
+                                DEVELOPERS_START_COLUMN,
+                                cellStyle,
+                                developer.getId(),
+                                developer.getEmail(),
+                                developer.getName(),
+                                developer.getOrganization(),
+                                developer.getOrganizationUrl(),
+                                developer.getUrl(),
+                                developer.getTimezone());
                             addHyperlinkIfExists(table, licenses[1], hyperlinkStyle, true);
                             addHyperlinkIfExists(table, licenses[4], hyperlinkStyle);
                             addHyperlinkIfExists(table, licenses[5], hyperlinkStyle);
                         });
+                }
                 // Miscellaneous
                 OdfTableCell[] miscCells = createDataCellsInRow(
                         currentRow,

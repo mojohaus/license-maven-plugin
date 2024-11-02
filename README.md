@@ -47,17 +47,25 @@ and `writeExcelFile`):
                         <!-- Not needed, but a suggestion -->
                         <!-- Makes it more readable, licenses are the same with different names -->
                         <licenseMerges>
-                            <licenseMerge>Apache License, Version 2.0|Apache 2.0|Apache 2|Apache License 2.0|The Apache
-                                Software License, Version 2.0|Apache
-                                License, version 2.0|AL 2.0|ASF 2.0
+                            <licenseMerge>Apache License, Version 2.0
+                                |Apache 2.0
+                                |Apache 2
+                                |Apache License 2.0
+                                |The Apache Software License, Version 2.0
+                                |Apache License, version 2.0|AL 2.0
+                                |ASF 2.0
                             </licenseMerge>
                             <licenseMerge>MIT License|The MIT License|The MIT License (MIT)</licenseMerge>
-                            <licenseMerge>GNU Lesser General Public License|GNU Lesser General Public Licence|GNU LESSER
-                                GENERAL PUBLIC LICENSE|GNU Lesser
-                                Public License|Lesser General Public License (LGPL)
+                            <licenseMerge>GNU Lesser General Public License
+                                |GNU Lesser General Public Licence
+                                |GNU LESSER GENERAL PUBLIC LICENSE
+                                |GNU Lesser Public License
+                                |Lesser General Public License (LGPL)
                             </licenseMerge>
-                            <licenseMerge>GNU General Lesser Public License (LGPL) version 3.0|GNU LESSER GENERAL PUBLIC
-                                LICENSE, version 3 (LGPL-3.0)
+                            <licenseMerge>GNU General Lesser Public License (LGPL) version 3.0
+                                |GNU LESSER GENERAL PUBLIC LICENSE, version 3 (LGPL-3.0)
+                                |The GNU Lesser General Public License, Version 3.0
+                                |Lesser General Public License (LGPL) v 3.0
                             </licenseMerge>
                             <!-- Problematic: While the maven plugins may have a simple declaration of "BSD" for their license, they may mean "New BSD" license, at least that's what they state on their websites. -->
                             <licenseMerge>The BSD License|BSD License|BSD</licenseMerge>
