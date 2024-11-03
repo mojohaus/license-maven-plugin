@@ -1091,11 +1091,14 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
     }
 
     private static int licenseMatchPriority(ProjectLicense projectLicense, DataFormatting dataFormatting) {
-        if (dataFormatting.forbiddenLicenses.contains(projectLicense.getName())) {
+        if (dataFormatting.forbiddenLicenses != null
+            && dataFormatting.forbiddenLicenses.contains(projectLicense.getName())) {
             return 3;
-        } else if (dataFormatting.problematicLicenses.contains(projectLicense.getName())) {
+        } else if (dataFormatting.problematicLicenses != null
+            && dataFormatting.problematicLicenses.contains(projectLicense.getName())) {
             return 2;
-        } else if (dataFormatting.okLicenses.contains(projectLicense.getName())) {
+        } else if (dataFormatting.okLicenses != null
+            && dataFormatting.okLicenses.contains(projectLicense.getName())) {
             return 1;
         } else {
             return 0;
