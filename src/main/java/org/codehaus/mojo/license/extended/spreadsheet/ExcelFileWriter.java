@@ -393,7 +393,8 @@ public class ExcelFileWriter {
         private final CellStyle okLicenseStyleNormal;
         private final CellStyle okLicenseStyleGray;
 
-        CellStyles(XSSFWorkbook wb, XSSFColor alternatingRowsColor) {
+        CellStyles(XSSFWorkbook wb, XSSFColor alternatingRowsColor,
+                   AbstractDownloadLicensesMojo.DataFormatting dataFormatting) {
             hyperlinkStyleNormal = createHyperlinkStyle(wb, null);
             hyperlinkStyleGray = createHyperlinkStyle(wb, alternatingRowsColor);
 
@@ -401,17 +402,17 @@ public class ExcelFileWriter {
             grayStyle.setFillForegroundColor(alternatingRowsColor);
             grayStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
-            unknownLicenseStyleNormal = createColoredFontStyle(wb, null, IndexedColors.TEAL);
-            unknownLicenseStyleGray = createColoredFontStyle(wb, alternatingRowsColor, IndexedColors.TEAL);
+            unknownLicenseStyleNormal = createColoredFontStyle(wb, null, IndexedColors.TEAL, dataFormatting);
+            unknownLicenseStyleGray = createColoredFontStyle(wb, alternatingRowsColor, IndexedColors.TEAL, dataFormatting);
 
-            forbiddenLicenseStyleNormal = createColoredFontStyle(wb, null, IndexedColors.RED);
-            forbiddenLicenseStyleGray = createColoredFontStyle(wb, alternatingRowsColor, IndexedColors.RED);
+            forbiddenLicenseStyleNormal = createColoredFontStyle(wb, null, IndexedColors.RED, dataFormatting);
+            forbiddenLicenseStyleGray = createColoredFontStyle(wb, alternatingRowsColor, IndexedColors.RED, dataFormatting);
 
-            problematicLicenseStyleNormal = createColoredFontStyle(wb, null, IndexedColors.ORANGE);
-            problematicLicenseStyleGray = createColoredFontStyle(wb, alternatingRowsColor, IndexedColors.ORANGE);
+            problematicLicenseStyleNormal = createColoredFontStyle(wb, null, IndexedColors.ORANGE, dataFormatting);
+            problematicLicenseStyleGray = createColoredFontStyle(wb, alternatingRowsColor, IndexedColors.ORANGE, dataFormatting);
 
-            okLicenseStyleNormal = createColoredFontStyle(wb, null, IndexedColors.GREEN);
-            okLicenseStyleGray = createColoredFontStyle(wb, alternatingRowsColor, IndexedColors.GREEN);
+            okLicenseStyleNormal = createColoredFontStyle(wb, null, IndexedColors.GREEN, dataFormatting);
+            okLicenseStyleGray = createColoredFontStyle(wb, alternatingRowsColor, IndexedColors.GREEN, dataFormatting);
         }
 
         private static CellStyle createHyperlinkStyle(XSSFWorkbook wb, XSSFColor backgroundColor) {
@@ -428,7 +429,7 @@ public class ExcelFileWriter {
         }
 
         private static CellStyle createColoredFontStyle(XSSFWorkbook wb, XSSFColor backgroundColor,
-                                                            IndexedColors indexedColor) {
+                                                        IndexedColors indexedColor, AbstractDownloadLicensesMojo.DataFormatting dataFormatting) {
             Font highlightUnknownFont = wb.createFont();
             highlightUnknownFont.setColor(indexedColor.getIndex());
             XSSFCellStyle colorStyle = wb.createCellStyle();
@@ -437,10 +438,19 @@ public class ExcelFileWriter {
                 colorStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
             }
             colorStyle.setFont(highlightUnknownFont);
-            colorStyle.setLeftBorderColor(indexedColor.getIndex());
-            colorStyle.setTopBorderColor(indexedColor.getIndex());
-            colorStyle.setRightBorderColor(indexedColor.getIndex());
-            colorStyle.setBottomBorderColor(indexedColor.getIndex());
+            if (dataFormatting.matchedLicensesHaveBorder) {
+                colorStyle.setLeftBorderColor(indexedColor.getIndex());
+                colorStyle.setBorderLeft(BorderStyle.MEDIUM);
+
+                colorStyle.setTopBorderColor(indexedColor.getIndex());
+                colorStyle.setBorderTop(BorderStyle.MEDIUM);
+
+                colorStyle.setRightBorderColor(indexedColor.getIndex());
+                colorStyle.setBorderRight(BorderStyle.MEDIUM);
+
+                colorStyle.setBottomBorderColor(indexedColor.getIndex());
+                colorStyle.setBorderBottom(BorderStyle.MEDIUM);
+            }
             return colorStyle;
         }
 
@@ -492,16 +502,14 @@ public class ExcelFileWriter {
 
         boolean grayBackground = false;
 
-        final CellStyles cellStyles = new CellStyles(wb, alternatingRowsColor);
+        final CellStyles cellStyles = new CellStyles(wb, alternatingRowsColor, dataFormatting);
 
         for (ProjectLicenseInfo projectInfo : projectLicenseInfos) {
-            final CellStyle cellStyle, hyperlinkStyle;
+            final CellStyle hyperlinkStyle;
             LOG.debug("Writing {}:{} into Microsoft Excel file", projectInfo.getGroupId(), projectInfo.getArtifactId());
             if (grayBackground) {
-                cellStyle = cellStyles.grayStyle;
                 hyperlinkStyle = cellStyles.hyperlinkStyleGray;
             } else {
-                cellStyle = null;
                 hyperlinkStyle = cellStyles.hyperlinkStyleNormal;
             }
             grayBackground = !grayBackground;

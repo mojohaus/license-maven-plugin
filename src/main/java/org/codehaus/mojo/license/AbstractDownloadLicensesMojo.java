@@ -40,6 +40,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
@@ -1001,17 +1002,9 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
         switch (dataFormatting.orderBy) {
             case none:
                 // This should never have been reached.
-                throw new IllegalArgumentException("Can't sort by \"none\"");
+                throw new IllegalStateException("Can't sort by \"none\"");
             case dependencyName:
-                return IntStream.of(
-                        li1.getId().compareTo(li2.getId()),
-                        li1.getGroupId().compareTo(li2.getGroupId()),
-                        li1.getArtifactId().compareTo(li2.getArtifactId()),
-                        li1.getVersion().compareTo(li2.getVersion())
-                    )
-                    .filter(i -> i != 0)
-                    .findFirst()
-                    .orElse(0);
+                return compareDependenciesByName(li1, li2);
             case dependencyPluginId:
                 return IntStream.of(
                         li1.getGroupId().compareTo(li2.getGroupId()),
@@ -1021,27 +1014,92 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
                     .filter(i -> i != 0)
                     .findFirst()
                     .orElse(0);
-            case license:
-                // Sort the licenses alphabetically.
-                li1.getLicenses().sort(Comparator.comparing(ProjectLicense::getName));
-                li2.getLicenses().sort(Comparator.comparing(ProjectLicense::getName));
-                if (CollectionUtils.isEmpty(li1.getLicenses())) {
-                    if (CollectionUtils.isEmpty(li2.getLicenses())) {
-                        // Both Maven licenses information are empty. Try the extendedInfo.
-                        return compareExtendedInfo(li1.getExtendedInfo(), li2.getExtendedInfo());
-                    } else {
-                        return -1;
-                    }
+            case licenseMatch:
+                final int priority1 = licenseMatchPriority(li1, dataFormatting);
+                final int priority2 = licenseMatchPriority(li2, dataFormatting);
+                final int licensePriority = priority2 - priority1;
+                if (licensePriority == 0) {
+                    return compareLicensesByName(li1, li2);
                 } else {
-                    if (CollectionUtils.isEmpty(li2.getLicenses())) {
-                        return 1;
-                    } else {
-                        return li1.getLicenses().get(0).getName().compareTo(li2.getLicenses().get(0).getName());
-                    }
+                    return licensePriority;
                 }
+            case licenseName:
+                return compareLicensesByName(li1, li2);
         }
         throw new IllegalArgumentException("Implement missing switch case " + dataFormatting.orderBy
             + " for DataFormatting OrderBy");
+    }
+
+    private static int compareDependenciesByName(ProjectLicenseInfo li1, ProjectLicenseInfo li2) {
+        Comparator<ProjectLicenseInfo> projectNameComparison = Comparator.comparing(li ->
+            Optional.ofNullable(li.getExtendedInfo())
+                .map(ExtendedInfo::getName)
+                .orElse(null),
+            Comparator.nullsLast(String::compareToIgnoreCase));
+
+        return IntStream.of(
+                projectNameComparison.compare(li1, li2),
+                li1.getGroupId().compareTo(li2.getGroupId()),
+                li1.getArtifactId().compareTo(li2.getArtifactId()),
+                li1.getVersion().compareTo(li2.getVersion())
+            )
+            .filter(i -> i != 0)
+            .findFirst()
+            .orElse(0);
+    }
+
+    private static int compareLicensesByName(ProjectLicenseInfo li1, ProjectLicenseInfo li2) {
+        // Sort the licenses alphabetically.
+        li1.getLicenses().sort(Comparator.comparing(ProjectLicense::getName));
+        li2.getLicenses().sort(Comparator.comparing(ProjectLicense::getName));
+        if (CollectionUtils.isEmpty(li1.getLicenses())) {
+            if (CollectionUtils.isEmpty(li2.getLicenses())) {
+                // Both Maven licenses information are empty. Try the extendedInfo.
+                return compareExtendedInfo(li1.getExtendedInfo(), li2.getExtendedInfo());
+            } else {
+                return -1;
+            }
+        } else {
+            if (CollectionUtils.isEmpty(li2.getLicenses())) {
+                return 1;
+            } else {
+                final int nameOrder = li1.getLicenses().get(0).getName().compareTo(li2.getLicenses().get(0).getName());
+                if (nameOrder == 0) {
+                    return compareDependenciesByName(li1, li2);
+                } else {
+                    return nameOrder;
+                }
+            }
+        }
+    }
+
+    /**
+     * Looks if license name is contained in any of the lists of
+     * {@link DataFormatting#forbiddenLicenses}, {@link DataFormatting#problematicLicenses}
+     * or {@link DataFormatting#okLicenses}.
+     *
+     * @param projectLicenseInfo Project license info.
+     * @param dataFormatting Data formatting.
+     * @return The highest priority of all licenses.
+     */
+    private static int licenseMatchPriority(ProjectLicenseInfo projectLicenseInfo, DataFormatting dataFormatting) {
+        int maxPriority = 0;
+        for (ProjectLicense license : projectLicenseInfo.getLicenses()) {
+            maxPriority = Math.max(maxPriority, licenseMatchPriority(license, dataFormatting));
+        }
+        return maxPriority;
+    }
+
+    private static int licenseMatchPriority(ProjectLicense projectLicense, DataFormatting dataFormatting) {
+        if (dataFormatting.forbiddenLicenses.contains(projectLicense.getName())) {
+            return 3;
+        } else if (dataFormatting.problematicLicenses.contains(projectLicense.getName())) {
+            return 2;
+        } else if (dataFormatting.okLicenses.contains(projectLicense.getName())) {
+            return 1;
+        } else {
+            return 0;
+        }
     }
 
     private static int compareExtendedInfo(ExtendedInfo extendedInfo1, ExtendedInfo extendedInfo2) {
@@ -1599,16 +1657,26 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
              */
             dependencyPluginId,
             /**
-             * Sort by the dependency's license.
+             * Sort by the dependency's license name.
              * <ul>
              * <li>If there are multiple licenses per project, it takes the first license according to alphabetical
              * order.</li>
              * <li>If there are no licenses in the pom.xml, and there were licenses found via extendedInfo,
              * it will try to sort them by the licenses found there.
-             * But the pom.xml licenses take precedence.</li>
+             * But the pom.xml's licenses take precedence.</li>
              * </ul>
              */
-            license
+            licenseName,
+            /**
+             * Sort by the dependency's license match in the lists in the following order:
+             * <ol>
+             * <li>{@link #forbiddenLicenses}</li>
+             * <li>{@link #problematicLicenses}</li>
+             * <li>{@link #okLicenses}</li>
+             * <li>Licenses without a match in the previous lists.</li>
+             * </ol>
+             */
+            licenseMatch
         }
 
         /**
@@ -1619,29 +1687,40 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
 
         /**
          * If all unknown licenses should be highlighted.
-         * Unknown means: There is no entry for that license in the <code>licenseMerges</code>
-         * list.
+         * Unknown means: There is no entry for a license in {@link #forbiddenLicenses},
+         * {@link #problematicLicenses} or {@link #okLicenses}.
          */
         @Parameter(property = "formatting.unknownLicenses")
         public boolean highlightUnknownLicenses;
 
         /**
-         * '|' seperated list of licenses which should be highlighted as forbidden.
+         * List of licenses which should be highlighted as forbidden.
          */
         @Parameter(property = "formatting.forbiddenLicenses")
         public List<String> forbiddenLicenses;
 
         /**
-         * '|' seperated list of licenses which should be highlighted as problematic.
+         * List of licenses which should be highlighted as problematic.
          */
         @Parameter(property = "formatting.problematicLicenses")
         public List<String> problematicLicenses;
 
         /**
-         * '|' seperated list of licenses which should be highlighted as OK.
+         * List of licenses which should be highlighted as OK.
          */
         @Parameter(property = "formatting.okLicenses")
         public List<String> okLicenses;
+
+        /**
+         * If licenses found in {@link #forbiddenLicenses}, {@link #problematicLicenses}, {@link #okLicenses}
+         * or where {@link #highlightUnknownLicenses} is used,
+         * have a visible border.
+         * <p>
+         * The border makes license types better visible at a glance, but when quickly scrolling through a long list,
+         * it makes licenses look as if they were the only ones belonging to a dependency if it has multiple licenses.
+         */
+        @Parameter(property = "formatting.matchedLicensesHaveBorder")
+        public boolean matchedLicensesHaveBorder;
 
         /**
          * Skip the developer info.
