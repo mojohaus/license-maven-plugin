@@ -710,11 +710,14 @@ public class ExcelFileWriter {
 
     private static LicenseColorStyle getLicenseColorStyle(ProjectLicense license, AbstractDownloadLicensesMojo.DataFormatting dataFormatting) {
         final LicenseColorStyle licenseColorStyle;
-        if (dataFormatting.forbiddenLicenses.contains(license.getName())) {
+        if (dataFormatting.forbiddenLicenses != null
+            && dataFormatting.forbiddenLicenses.contains(license.getName())) {
             licenseColorStyle = LicenseColorStyle.FORBIDDEN;
-        } else if (dataFormatting.problematicLicenses.contains(license.getName())) {
+        } else if (dataFormatting.problematicLicenses != null
+            && dataFormatting.problematicLicenses.contains(license.getName())) {
             licenseColorStyle = LicenseColorStyle.PROBLEMATIC;
-        } else if (dataFormatting.okLicenses.contains(license.getName())) {
+        } else if (dataFormatting.okLicenses != null
+            && dataFormatting.okLicenses.contains(license.getName())) {
             licenseColorStyle = LicenseColorStyle.OK;
         } else if (dataFormatting.highlightUnknownLicenses) {
             licenseColorStyle = LicenseColorStyle.UNKNOWN;
