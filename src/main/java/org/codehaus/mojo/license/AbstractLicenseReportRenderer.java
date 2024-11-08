@@ -61,8 +61,7 @@ public abstract class AbstractLicenseReportRenderer extends AbstractMavenReportR
      */
     protected final String bundleName;
 
-    public AbstractLicenseReportRenderer(
-            org.apache.maven.doxia.sink.Sink sink, String bundleName, I18N i18n, Locale locale) {
+    public AbstractLicenseReportRenderer(Sink sink, String bundleName, I18N i18n, Locale locale) {
         super(sink);
         this.bundleName = bundleName;
         this.i18n = i18n;
@@ -114,44 +113,6 @@ public abstract class AbstractLicenseReportRenderer extends AbstractMavenReportR
         return ArtifactUtils.versionlessKey(details.getGroupId(), details.getArtifactId()) + ":" + details.getVersion();
     }
 
-    protected void renderThirdPartySummaryTableHeader() {
-        renderThirdPartySummaryTableHeader(true, true, true);
-    }
-
-    protected void renderThirdPartySummaryTableHeader(
-            boolean includeScope, boolean includeClassifier, boolean includeType) {
-        sink.tableRow();
-        sinkHeaderCellText(getText("report.status"));
-        sinkHeaderCellText(getText("report.gav"));
-        //        sink.tableHeaderCell();
-        //        sink.text( getText( "report.artifactId" ) );
-        //        sink.tableHeaderCell_();
-        //        sink.tableHeaderCell();
-        //        sink.text( getText( "report.version" ) );
-        //        sink.tableHeaderCell_();
-        if (includeScope) {
-            sinkHeaderCellText(getText("report.scope"));
-        }
-        if (includeClassifier) {
-            sinkHeaderCellText(getText("report.classifier"));
-        }
-        if (includeType) {
-            sinkHeaderCellText(getText("report.type"));
-        }
-        sinkHeaderCellText(getText("report.licenses"));
-        sink.tableRow_();
-    }
-
-    protected void renderThirdPartySummaryTableRow(ThirdPartyDetails details) {
-        renderThirdPartySummaryTableRow(details, true, true, true);
-    }
-
-    protected void sinkHeaderCellText(String text) {
-        sink.tableHeaderCell();
-        sink.text(text);
-        sink.tableHeaderCell_();
-    }
-
     protected void sinkHeaderCellText(String width, String text) {
 
         SinkEventAttributes attrs = new SinkEventAttributeSet();
@@ -170,14 +131,7 @@ public abstract class AbstractLicenseReportRenderer extends AbstractMavenReportR
         sink.tableCell_();
     }
 
-    protected void sinkCellText(String text) {
-        sink.tableCell();
-        sink.text(text);
-        sink.tableCell_();
-    }
-
-    protected void renderThirdPartySummaryTableRow(
-            ThirdPartyDetails details, boolean includeScope, boolean includeClassifier, boolean includeType) {
+    protected void renderThirdPartySummaryTableRow(ThirdPartyDetails details) {
         sink.tableRow();
         sink.tableCell();
         if (details.hasPomLicenses()) {
@@ -187,26 +141,20 @@ public abstract class AbstractLicenseReportRenderer extends AbstractMavenReportR
         } else {
             renderErrorIcon();
         }
+        sink.tableCell_();
 
         sink.tableCell();
         String gav = getGAV(details);
         sink.link("#" + gav);
         sink.text(gav);
         sink.link_();
-
         sink.tableCell_();
-        if (includeScope) {
-            sinkCellText(details.getScope());
-        }
-        if (includeClassifier) {
-            sinkCellText(details.getClassifier());
-        }
-        if (includeType) {
-            sinkCellText(details.getType());
-        }
+
+        tableCell(details.getScope());
+        tableCell(details.getClassifier());
+        tableCell(details.getType());
 
         sink.tableCell();
-
         if (details.hasLicenses()) {
             String[] licenses = details.getLicenses();
             for (int i = 0; i < licenses.length; i++) {
@@ -223,52 +171,11 @@ public abstract class AbstractLicenseReportRenderer extends AbstractMavenReportR
         sink.tableRow_();
     }
 
-    protected void safeBold() {
-        try {
-            sink.bold();
-        } catch (NoSuchMethodError e) {
-            // ignore Maven 2.1.0
-        }
-    }
-
-    // CHECKSTYLE_OFF: MethodName
-    protected void safeBold_() {
-        // CHECKSTYLE_ON: MethodName
-        try {
-            sink.bold_();
-        } catch (NoSuchMethodError e) {
-            // ignore Maven 2.1.0
-        }
-    }
-
-    protected void safeItalic() {
-        try {
-            sink.italic();
-        } catch (NoSuchMethodError e) {
-            // ignore Maven 2.1.0
-        }
-    }
-
-    // CHECKSTYLE_OFF: MethodName
-    protected void safeItalic_() {
-        // CHECKSTYLE_ON: MethodName
-        try {
-            sink.italic_();
-        } catch (NoSuchMethodError e) {
-            // ignore Maven 2.1.0
-        }
-    }
-
     protected void renderThirdPartyDetailTable(ThirdPartyDetails details) {
-        renderThirdPartyDetailTable(details, true, true, true);
-    }
-
-    protected void renderThirdPartyDetailTable(
-            ThirdPartyDetails details, boolean includeScope, boolean includeClassifier, boolean includeType) {
         final String cellWidth = "80%";
         final String headerWidth = "20%";
-        sink.table();
-        sink.tableRows(new int[] {Sink.JUSTIFY_RIGHT, Sink.JUSTIFY_LEFT}, false);
+        startTable(new int[] {Sink.JUSTIFY_RIGHT, Sink.JUSTIFY_LEFT}, false);
+
         sink.tableRow();
         sinkHeaderCellText(headerWidth, getText("report.status"));
         SinkEventAttributes attrs = new SinkEventAttributeSet();
@@ -295,24 +202,21 @@ public abstract class AbstractLicenseReportRenderer extends AbstractMavenReportR
         sinkCellText(cellWidth, getGAV(details));
         sink.tableRow_();
 
-        if (includeScope) {
-            sink.tableRow();
-            sinkHeaderCellText(headerWidth, getText("report.scope"));
-            sinkCellText(cellWidth, details.getScope());
-            sink.tableRow_();
-        }
-        if (includeClassifier) {
-            sink.tableRow();
-            sinkHeaderCellText(headerWidth, getText("report.classifier"));
-            sinkCellText(cellWidth, details.getClassifier());
-            sink.tableRow_();
-        }
-        if (includeType) {
-            sink.tableRow();
-            sinkHeaderCellText(headerWidth, getText("report.type"));
-            sinkCellText(cellWidth, details.getType());
-            sink.tableRow_();
-        }
+        sink.tableRow();
+        sinkHeaderCellText(headerWidth, getText("report.scope"));
+        sinkCellText(cellWidth, details.getScope());
+        sink.tableRow_();
+
+        sink.tableRow();
+        sinkHeaderCellText(headerWidth, getText("report.classifier"));
+        sinkCellText(cellWidth, details.getClassifier());
+        sink.tableRow_();
+
+        sink.tableRow();
+        sinkHeaderCellText(headerWidth, getText("report.type"));
+        sinkCellText(cellWidth, details.getType());
+        sink.tableRow_();
+
         String[] licenses = details.getLicenses();
 
         if (details.hasPomLicenses()) {
@@ -346,39 +250,22 @@ public abstract class AbstractLicenseReportRenderer extends AbstractMavenReportR
             sinkCellText(cellWidth, getText("report.no.license"));
             sink.tableRow_();
         }
-        sink.tableRows_();
-        sink.table_();
+        endTable();
     }
 
     protected void renderThirdPartySummaryTable(Collection<ThirdPartyDetails> collection) {
-        renderThirdPartySummaryTable(collection, true, true, true);
-    }
-
-    protected void renderThirdPartySummaryTable(
-            Collection<ThirdPartyDetails> collection,
-            boolean includeScope,
-            boolean includeClassifier,
-            boolean includeType) {
-        sink.table();
-        sink.tableRows(null, false);
-        renderThirdPartySummaryTableHeader(includeScope, includeClassifier, includeType);
+        startTable();
+        tableHeader(new String[] {
+            getText("report.status"),
+            getText("report.gav"),
+            getText("report.scope"),
+            getText("report.classifier"),
+            getText("report.type"),
+            getText("report.licenses")
+        });
         for (ThirdPartyDetails details : collection) {
-            renderThirdPartySummaryTableRow(details, includeScope, includeClassifier, includeType);
+            renderThirdPartySummaryTableRow(details);
         }
-        renderThirdPartySummaryTableHeader(includeScope, includeClassifier, includeType);
-        sink.tableRows_();
-        sink.table_();
-    }
-
-    protected void renderPropertySummaryTableHeader() {
-        sink.tableRow();
-        sinkHeaderCellText(getText("report.status"));
-        sinkHeaderCellText(getText("report.property"));
-        sinkHeaderCellText(getText("report.currentVersion"));
-        sinkHeaderCellText(getText("report.nextVersion"));
-        sinkHeaderCellText(getText("report.nextIncremental"));
-        sinkHeaderCellText(getText("report.nextMinor"));
-        sinkHeaderCellText(getText("report.nextMajor"));
-        sink.tableRow_();
+        endTable();
     }
 }
