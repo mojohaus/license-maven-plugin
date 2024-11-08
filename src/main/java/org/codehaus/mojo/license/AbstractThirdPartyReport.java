@@ -71,9 +71,9 @@ import org.slf4j.LoggerFactory;
  * @author tchemit dev@tchemit.fr
  * @since 1.1
  */
-public abstract class AbstractThirdPartyReportMojo extends AbstractMavenReport
+public abstract class AbstractThirdPartyReport extends AbstractMavenReport
         implements MavenProjectDependenciesConfigurator {
-    private static final Logger LOG = LoggerFactory.getLogger(AbstractThirdPartyReportMojo.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractThirdPartyReport.class);
 
     // ----------------------------------------------------------------------
     // Mojo Parameters

@@ -42,7 +42,7 @@ import org.codehaus.mojo.license.api.ThirdPartyToolException;
  * @since 1.1
  */
 @Mojo(name = "third-party-report", requiresDependencyResolution = ResolutionScope.TEST)
-public class ThirdPartyReportMojo extends AbstractThirdPartyReportMojo {
+public class ThirdPartyReport extends AbstractThirdPartyReport {
 
     // ----------------------------------------------------------------------
     // Mojo Parameters
@@ -73,7 +73,7 @@ public class ThirdPartyReportMojo extends AbstractThirdPartyReportMojo {
     }
 
     // ----------------------------------------------------------------------
-    // AbstractThirdPartyReportMojo Implementation
+    // AbstractThirdPartyReport Implementation
     // ----------------------------------------------------------------------
 
     /**
