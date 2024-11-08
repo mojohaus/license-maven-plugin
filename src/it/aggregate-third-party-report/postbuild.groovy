@@ -20,7 +20,7 @@
  * #L%
  */
 
-file = new File(basedir, 'target/site/aggregate-third-party-report.html');
+file = new File(basedir, 'target/reports/aggregate-third-party-report.html');
 assert file.exists();
 content = file.text;
 assert !content.contains('the project has no dependencies.');
@@ -29,5 +29,5 @@ assert content.contains('<a href="#commons-logging:commons-logging:1.1.1">common
 assert content.contains('<td>The Apache Software License, Version 2.0</td>'); // TODO Should be a link
 assert content.contains('<a href="#Overview">Back to top</a>');
 
-file = new File(basedir, 'target/site/third-party-report.html');
+file = new File(basedir, 'target/reports/third-party-report.html');
 assert !file.exists();

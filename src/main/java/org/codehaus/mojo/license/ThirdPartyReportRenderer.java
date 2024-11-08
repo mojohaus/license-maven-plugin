@@ -81,29 +81,21 @@ public class ThirdPartyReportRenderer extends AbstractLicenseReportRenderer {
      */
     protected void renderBody() {
 
-        sink.section1();
-        sink.sectionTitle1();
-        sink.text(getText("report.overview.title"));
-        sink.sectionTitle1_();
-        sink.paragraph();
-        sink.text(getText("report.overview.text"));
-        sink.paragraph_();
+        startSection(getText("report.overview.title"));
+        paragraph(getText("report.overview.text"));
 
         renderSummaryTotalsTable(details);
 
-        renderSummaryTable("report.overview.thirdParty", details, "report.overview.nothirdParty");
+        renderSummaryTable(details);
 
-        sink.section1_();
+        endSection();
 
         Collection<ThirdPartyDetails> dependencies;
 
         // With no licenses dependencies
 
         dependencies = getThirdPartiesNoLicense();
-        sink.section1();
-        sink.sectionTitle1();
-        sink.text(getText("report.detail.title.noLicense"));
-        sink.sectionTitle1_();
+        startSection(getText("report.detail.title.noLicense"));
         sink.paragraph();
         sink.text(getText("report.detail.text.noLicense"));
         if (CollectionUtils.isEmpty(dependencies)) {
@@ -115,15 +107,12 @@ public class ThirdPartyReportRenderer extends AbstractLicenseReportRenderer {
         for (final ThirdPartyDetails detail : dependencies) {
             renderThirdPartyDetail(detail);
         }
-        sink.section1_();
+        endSection();
 
         // With third-party licenses dependencies
 
         dependencies = getThirdPartiesThirdPartyLicense();
-        sink.section1();
-        sink.sectionTitle1();
-        sink.text(getText("report.detail.title.thirdPartyLicense"));
-        sink.sectionTitle1_();
+        startSection(getText("report.detail.title.thirdPartyLicense"));
         sink.paragraph();
         sink.text(getText("report.detail.text.thirdPartyLicense"));
         if (CollectionUtils.isEmpty(dependencies)) {
@@ -135,15 +124,12 @@ public class ThirdPartyReportRenderer extends AbstractLicenseReportRenderer {
         for (final ThirdPartyDetails detail : dependencies) {
             renderThirdPartyDetail(detail);
         }
-        sink.section1_();
+        endSection();
 
         // With no pom dependencies
 
         dependencies = getThirdPartiesPomLicense();
-        sink.section1();
-        sink.sectionTitle1();
-        sink.text(getText("report.detail.title.pomLicense"));
-        sink.sectionTitle1_();
+        startSection(getText("report.detail.title.pomLicense"));
         sink.paragraph();
         sink.text(getText("report.detail.text.pomLicense"));
         if (CollectionUtils.isEmpty(dependencies)) {
@@ -155,7 +141,7 @@ public class ThirdPartyReportRenderer extends AbstractLicenseReportRenderer {
         for (final ThirdPartyDetails detail : dependencies) {
             renderThirdPartyDetail(detail);
         }
-        sink.section1_();
+        endSection();
     }
 
     private void renderSummaryTotalsTable(Collection<ThirdPartyDetails> allThirdParties) {
@@ -171,71 +157,61 @@ public class ThirdPartyReportRenderer extends AbstractLicenseReportRenderer {
                 numWithNoLicense++;
             }
         }
-        sink.table();
-        sink.tableRows(null, false);
+        startTable();
 
         sink.tableRow();
         sink.tableCell();
         renderInfoIcon();
         sink.tableCell_();
-        sinkCellText(getText("report.overview.numThirdParties"));
-        sinkCellText(Integer.toString(allThirdParties.size()));
+        tableCell(getText("report.overview.numThirdParties"));
+        tableCell(Integer.toString(allThirdParties.size()));
         sink.tableRow_();
 
         sink.tableRow();
         sink.tableCell();
         renderSuccessIcon();
         sink.tableCell_();
-        sinkCellText(getText("report.overview.numWithPomLicenses"));
-        sinkCellText(Integer.toString(numWithPomLicense));
+        tableCell(getText("report.overview.numWithPomLicenses"));
+        tableCell(Integer.toString(numWithPomLicense));
         sink.tableRow_();
 
         sink.tableRow();
         sink.tableCell();
         renderWarningIcon();
         sink.tableCell_();
-        sinkCellText(getText("report.overview.numWithThirdPartyLicenses"));
-        sinkCellText(Integer.toString(numWithThirdPartyLicense));
+        tableCell(getText("report.overview.numWithThirdPartyLicenses"));
+        tableCell(Integer.toString(numWithThirdPartyLicense));
         sink.tableRow_();
 
         sink.tableRow();
         sink.tableCell();
         renderErrorIcon();
         sink.tableCell_();
-        sinkCellText(getText("report.overview.numWithNoLicense"));
-        sinkCellText(Integer.toString(numWithNoLicense));
+        tableCell(getText("report.overview.numWithNoLicense"));
+        tableCell(Integer.toString(numWithNoLicense));
         sink.tableRow_();
-        sink.tableRows_();
-        sink.table_();
+        endTable();
     }
 
-    private void renderSummaryTable(String titleKey, Collection<ThirdPartyDetails> contents, String emptyKey) {
-        sink.section2();
-        sink.sectionTitle2();
-        sink.text(getText(titleKey));
-        sink.sectionTitle2_();
+    private void renderSummaryTable(Collection<ThirdPartyDetails> contents) {
+        startSection(getText("report.overview.thirdParty"));
 
         if (contents.isEmpty()) {
-            sink.paragraph();
-            sink.text(getText(emptyKey));
-            sink.paragraph_();
+            paragraph(getText("report.overview.nothirdParty"));
         } else {
             renderThirdPartySummaryTable(contents);
         }
-        sink.section2_();
+        endSection();
     }
 
     private void renderThirdPartyDetail(ThirdPartyDetails detail) {
-        sink.section2();
-        sink.sectionTitle2();
-        sink.text(getGAV(detail));
-        sink.sectionTitle2_();
+        startSection(getGAV(detail));
         renderThirdPartyDetailTable(detail);
 
         sink.link("#" + getText("report.overview.title"));
         sink.text(getText("report.back.to.top.page"));
         sink.link_();
         sink.lineBreak();
-        sink.section2_();
+        endSection();
     }
 }
