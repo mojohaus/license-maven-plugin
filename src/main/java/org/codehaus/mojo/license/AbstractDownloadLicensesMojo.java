@@ -32,6 +32,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -40,12 +41,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import com.google.common.base.Strings;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -724,6 +729,47 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
     private DataFormatting dataFormatting;
 
     /**
+     * To specify some licenses to exclude.
+     * <p>
+     * If a such license is found then build will fail when property {@link #failOnBlacklist} is <tt>true</tt>.
+     * <br>Also the list of licenses which should be highlighted as forbidden if written into an Excel or a Calc file.
+     * <p>
+     * Since version {@code 1.4}, there are three ways to fill this parameter :
+     * <ul>
+     * <li>A simple string (separated by {@code |}), the way to use by property configuration:
+     *
+     * <pre>
+     * &lt;excludedLicenses&gt;licenseA|licenseB&lt;/excludedLicenses&gt;
+     * </pre>
+     *
+     * or
+     *
+     * <pre>
+     * -Dlicense.excludedLicenses=licenseA|licenseB
+     * </pre>
+     *
+     * </li>
+     * <li>A list of string (can only be used in plugin configuration, not via property configuration)
+     *
+     * <pre>
+     * &lt;excludedLicenses&gt;
+     *   &lt;excludedLicense&gt;licenseA&lt;/excludedLicense&gt;
+     *   &lt;excludedLicense&gt;licenseB&lt;/excludedLicense&gt;
+     * &lt;/excludedLicenses&gt;
+     * </pre>
+     *
+     * @since 2.5
+     */
+    @Parameter(property = "license.excludedLicenses")
+    protected AbstractAddThirdPartyMojo.ExcludedLicenses excludedLicenses;
+
+    /**
+     * If a blacklisted license is found, the plugin leaves the Maven process with an error-message.
+     */
+    @Parameter(property = "license.failOnBlacklist", defaultValue = "false")
+    public boolean failOnBlacklist;
+
+    /**
      * To merge licenses in the Excel file.
      * <p>
      * Each entry represents a merge (first license is main license to keep), licenses are separated by {@code |}.
@@ -742,11 +788,23 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
      *         |Apache-2.0
      *         |The Apache Software License, Version 2.0
      *     </licenseMerge>
+     *     <licenseMerge>EDL 1.0
+     *         |Eclipse Distribution License - v 1.0
+     *         |Eclipse Distribution License v. 1.0
+     *     </licenseMerge>
+     *     <licenseMerge>EPL 1.0
+     *         |Eclipse Public License - v 1.0
+     *         |Eclipse Public License 1.0
+     *         |Eclipse Public License, Version 1.0
+     *     </licenseMerge>
      *     <licenseMerge>EPL 2.0
+     *         |EPL-2.0
      *         |Eclipse Public License 2.0
      *         |Eclipse Public License v. 2.0
+     *         |Eclipse Public License v2.0
      *     </licenseMerge>
      *     <licenseMerge>GPL2 w/ CPE
+     *         |GNU General Public License, version 2 with the GNU Classpath Exception
      *         |GPL-2.0-with-classpath-exception
      *     </licenseMerge>
      *     <licenseMerge>MIT License
@@ -769,7 +827,11 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
      *          for their license, they may mean "New BSD" license, at least that's what they state
      *          on their websites. -->
      *     <licenseMerge>The BSD License|BSD License|BSD</licenseMerge>
-     *     <licenseMerge>The BSD 3-Clause License|The New BSD License|New BSD License</licenseMerge>
+     *     <licenseMerge>The BSD 3-Clause License
+     *         |BSD-3-Clause
+     *         |New BSD License
+     *         |The New BSD License
+     *     </licenseMerge>
      * </licenseMerges>
      * </code></pre>
      *
@@ -975,6 +1037,8 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
                         "Unexpected value of " + ErrorRemedy.class.getName() + ": " + errorRemedy);
             }
         }
+
+        exitOnForbiddenLicenses(depProjectLicenses);
     }
 
     private void writeLicenseSummaries(
@@ -985,11 +1049,44 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
 
         writeLicenseSummary(depProjectLicenses, outputFile, writeVersions);
         if (writeExcelFile) {
-            ExcelFileWriter.write(depProjectLicenses, excelOutputFile, dataFormatting);
+            ExcelFileWriter.write(depProjectLicenses, excelOutputFile, dataFormatting, excludedLicenses);
         }
         if (writeCalcFile) {
             CalcFileWriter.write(depProjectLicenses, calcOutputFile, dataFormatting);
         }
+    }
+
+    private void exitOnForbiddenLicenses(List<ProjectLicenseInfo> depProjectLicenses) throws MojoFailureException {
+        if (dataFormatting != null && CollectionUtils.isNotEmpty(excludedLicenses.getData())
+            && failOnBlacklist) {
+            List<ForbiddenLicenseInfo> forbiddenLicensesFound = new ArrayList<>();
+            Set<String> uniqueLicenseNames = new HashSet<>();
+            for (ProjectLicenseInfo licenseInfo : depProjectLicenses) {
+                List<ProjectLicense> foundForbiddenLicenses = new ArrayList<>();
+                for (ProjectLicense license : licenseInfo.getLicenses()) {
+                    for (String forbiddenLicense : excludedLicenses.getData()) {
+                        if (Objects.equals(license.getName(), forbiddenLicense)) {
+                            foundForbiddenLicenses.add(license);
+                            uniqueLicenseNames.add(license.getName());
+                        }
+                    }
+                }
+                if (!foundForbiddenLicenses.isEmpty()) {
+                    forbiddenLicensesFound.add(new ForbiddenLicenseInfo(licenseInfo, foundForbiddenLicenses));
+                }
+            }
+            if (!forbiddenLicensesFound.isEmpty()) {
+                throw new MojoFailureException(forbiddenLicensesFound,
+                    MessageFormat.format("{0} unique forbidden licenses found", uniqueLicenseNames.size()),
+                    forbiddenLicensesFound.stream()
+                        .map(ForbiddenLicenseInfo::toString)
+                        .collect(joinWithHorizontalLines()));
+            }
+        }
+    }
+
+    private static Collector<CharSequence, ?, String> joinWithHorizontalLines() {
+        return Collectors.joining(MessageFormat.format("\n{0}\n", Strings.repeat("=", 80)));
     }
 
     private void sortProjectLicenseInfo(List<ProjectLicenseInfo> depProjectLicenses) {
@@ -1015,8 +1112,8 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
                     .findFirst()
                     .orElse(0);
             case licenseMatch:
-                final int priority1 = licenseMatchPriority(li1, dataFormatting);
-                final int priority2 = licenseMatchPriority(li2, dataFormatting);
+                final int priority1 = licenseMatchPriority(li1, dataFormatting, excludedLicenses);
+                final int priority2 = licenseMatchPriority(li2, dataFormatting, excludedLicenses);
                 final int licensePriority = priority2 - priority1;
                 if (licensePriority == 0) {
                     return compareLicensesByName(li1, li2);
@@ -1032,9 +1129,9 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
 
     private static int compareDependenciesByName(ProjectLicenseInfo li1, ProjectLicenseInfo li2) {
         Comparator<ProjectLicenseInfo> projectNameComparison = Comparator.comparing(li ->
-            Optional.ofNullable(li.getExtendedInfo())
-                .map(ExtendedInfo::getName)
-                .orElse(null),
+                Optional.ofNullable(li.getExtendedInfo())
+                    .map(ExtendedInfo::getName)
+                    .orElse(null),
             Comparator.nullsLast(String::compareToIgnoreCase));
 
         return IntStream.of(
@@ -1075,24 +1172,28 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
 
     /**
      * Looks if license name is contained in any of the lists of
-     * {@link DataFormatting#forbiddenLicenses}, {@link DataFormatting#problematicLicenses}
+     * {@link DataFormatting#excludedLicenses}, {@link DataFormatting#problematicLicenses}
      * or {@link DataFormatting#okLicenses}.
      *
      * @param projectLicenseInfo Project license info.
-     * @param dataFormatting Data formatting.
+     * @param dataFormatting     Data formatting.
      * @return The highest priority of all licenses.
      */
-    private static int licenseMatchPriority(ProjectLicenseInfo projectLicenseInfo, DataFormatting dataFormatting) {
+    private static int licenseMatchPriority(ProjectLicenseInfo projectLicenseInfo,
+                                            DataFormatting dataFormatting,
+                                            AbstractAddThirdPartyMojo.ExcludedLicenses excludedLicenses) {
         int maxPriority = 0;
         for (ProjectLicense license : projectLicenseInfo.getLicenses()) {
-            maxPriority = Math.max(maxPriority, licenseMatchPriority(license, dataFormatting));
+            maxPriority = Math.max(maxPriority, licenseMatchPriority(license, dataFormatting, excludedLicenses));
         }
         return maxPriority;
     }
 
-    private static int licenseMatchPriority(ProjectLicense projectLicense, DataFormatting dataFormatting) {
-        if (dataFormatting.forbiddenLicenses != null
-            && dataFormatting.forbiddenLicenses.contains(projectLicense.getName())) {
+    private static int licenseMatchPriority(ProjectLicense projectLicense,
+                                            DataFormatting dataFormatting,
+                                            AbstractAddThirdPartyMojo.ExcludedLicenses excludedLicenses) {
+        if (excludedLicenses != null
+            && excludedLicenses.contains(projectLicense.getName())) {
             return 3;
         } else if (dataFormatting.problematicLicenses != null
             && dataFormatting.problematicLicenses.contains(projectLicense.getName())) {
@@ -1673,7 +1774,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
             /**
              * Sort by the dependency's license match in the lists in the following order:
              * <ol>
-             * <li>{@link #forbiddenLicenses}</li>
+             * <li>{@link #excludedLicenses}</li>
              * <li>{@link #problematicLicenses}</li>
              * <li>{@link #okLicenses}</li>
              * <li>Licenses without a match in the previous lists.</li>
@@ -1690,17 +1791,11 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
 
         /**
          * If all unknown licenses should be highlighted.
-         * Unknown means: There is no entry for a license in {@link #forbiddenLicenses},
+         * Unknown means: There is no entry for a license in {@link #excludedLicenses},
          * {@link #problematicLicenses} or {@link #okLicenses}.
          */
         @Parameter(property = "formatting.unknownLicenses")
         public boolean highlightUnknownLicenses;
-
-        /**
-         * List of licenses which should be highlighted as forbidden.
-         */
-        @Parameter(property = "formatting.forbiddenLicenses")
-        public List<String> forbiddenLicenses;
 
         /**
          * List of licenses which should be highlighted as problematic.
@@ -1715,7 +1810,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
         public List<String> okLicenses;
 
         /**
-         * If licenses found in {@link #forbiddenLicenses}, {@link #problematicLicenses}, {@link #okLicenses}
+         * If licenses found in {@link #excludedLicenses}, {@link #problematicLicenses}, {@link #okLicenses}
          * or where {@link #highlightUnknownLicenses} is used,
          * have a visible border.
          * <p>

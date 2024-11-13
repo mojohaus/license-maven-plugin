@@ -28,6 +28,7 @@ import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.apache.maven.model.Developer;
 import org.apache.maven.model.Organization;
 import org.apache.maven.model.Scm;
+import org.codehaus.mojo.license.AbstractAddThirdPartyMojo;
 import org.codehaus.mojo.license.AbstractDownloadLicensesMojo;
 import org.codehaus.mojo.license.Eol;
 import org.codehaus.mojo.license.extended.ExtendedInfo;
@@ -162,9 +163,10 @@ class LicenseSummaryTest {
         validateXml(licenseSummaryFile);
 
         AbstractDownloadLicensesMojo.DataFormatting dataFormatting = new AbstractDownloadLicensesMojo.DataFormatting();
+        AbstractAddThirdPartyMojo.ExcludedLicenses excludedLicenses = new AbstractAddThirdPartyMojo.ExcludedLicenses();
 
         Path licensesExcelOutputFile = Files.createTempFile("licExcel", ".xlsx");
-        ExcelFileWriter.write(licSummary, licensesExcelOutputFile.toFile(), dataFormatting);
+        ExcelFileWriter.write(licSummary, licensesExcelOutputFile.toFile(), dataFormatting, excludedLicenses);
 
         Path licensesCalcOutputFile = Files.createTempFile("licCalc", ".ods");
         CalcFileWriter.write(licSummary, licensesCalcOutputFile.toFile(), dataFormatting);

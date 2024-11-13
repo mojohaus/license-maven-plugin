@@ -60,6 +60,7 @@ import org.apache.poi.xssf.usermodel.IndexedColorMap;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.codehaus.mojo.license.AbstractAddThirdPartyMojo;
 import org.codehaus.mojo.license.AbstractDownloadLicensesMojo;
 import org.codehaus.mojo.license.download.ProjectLicense;
 import org.codehaus.mojo.license.download.ProjectLicenseInfo;
@@ -114,7 +115,8 @@ public class ExcelFileWriter {
      * @param dataFormatting
      */
     public static void write(List<ProjectLicenseInfo> projectLicenseInfos, final File licensesExcelOutputFile,
-                             AbstractDownloadLicensesMojo.DataFormatting dataFormatting) {
+                             AbstractDownloadLicensesMojo.DataFormatting dataFormatting,
+                             AbstractAddThirdPartyMojo.ExcludedLicenses excludedLicenses) {
         if (CollectionUtils.isEmpty(projectLicenseInfos)) {
             LOG.debug("Nothing to write to excel, no project data.");
             return;
@@ -135,7 +137,7 @@ public class ExcelFileWriter {
 
         createHeader(projectLicenseInfos, wb, sheet);
 
-        writeData(projectLicenseInfos, wb, sheet, alternatingRowsColor, dataFormatting);
+        writeData(projectLicenseInfos, wb, sheet, alternatingRowsColor, dataFormatting, excludedLicenses);
 
         try (OutputStream fileOut = Files.newOutputStream(licensesExcelOutputFile.toPath())) {
             wb.write(fileOut);
@@ -438,7 +440,7 @@ public class ExcelFileWriter {
                 colorStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
             }
             colorStyle.setFont(highlightUnknownFont);
-            if (dataFormatting.matchedLicensesHaveBorder) {
+            if (dataFormatting != null && dataFormatting.matchedLicensesHaveBorder) {
                 colorStyle.setLeftBorderColor(indexedColor.getIndex());
                 colorStyle.setBorderLeft(BorderStyle.MEDIUM);
 
@@ -494,7 +496,8 @@ public class ExcelFileWriter {
         XSSFWorkbook wb,
         Sheet sheet,
         XSSFColor alternatingRowsColor,
-        AbstractDownloadLicensesMojo.DataFormatting dataFormatting) {
+        AbstractDownloadLicensesMojo.DataFormatting dataFormatting,
+        AbstractAddThirdPartyMojo.ExcludedLicenses excludedLicenses) {
         final int firstRowIndex = 3;
         int currentRowIndex = firstRowIndex;
         final Map<Integer, Row> rowMap = new HashMap<>();
@@ -538,7 +541,8 @@ public class ExcelFileWriter {
                 SpreadsheetUtil.LICENSES_COLUMNS,
                 projectInfo.getLicenses(),
                 (Row licenseRow, ProjectLicense license)
-                    -> addLicenses(wb, licenseRow, license, cellStyles, finalGrayBackground, dataFormatting));
+                    -> addLicenses(wb, licenseRow, license, cellStyles, finalGrayBackground, dataFormatting,
+                                    excludedLicenses));
 
             final ExtendedInfo extendedInfo = projectInfo.getExtendedInfo();
             if (extendedInfo != null) {
@@ -547,7 +551,7 @@ public class ExcelFileWriter {
                 createDataCellsInRow(
                         currentRow, SpreadsheetUtil.GENERAL_START_COLUMN, cellStyles, grayBackground, extendedInfo.getName());
                 // Developers
-                if (!dataFormatting.skipDevelopers) {
+                if (dataFormatting == null || !dataFormatting.skipDevelopers) {
                     currentRowData = new SpreadsheetUtil.CurrentRowData(currentRowIndex, extraRows, hasExtendedInfo);
                     extraRows = addList(
                         cellListParameter,
@@ -690,7 +694,8 @@ public class ExcelFileWriter {
     }
 
     private static void addLicenses(XSSFWorkbook wb, Row licenseRow, ProjectLicense license, CellStyles cellStyles,
-                                    boolean grayBackground, AbstractDownloadLicensesMojo.DataFormatting dataFormatting) {
+                                    boolean grayBackground, AbstractDownloadLicensesMojo.DataFormatting dataFormatting,
+                                    AbstractAddThirdPartyMojo.ExcludedLicenses excludedLicenses) {
         Cell[] licenses = createDataCellsInRow(
             licenseRow,
                 SpreadsheetUtil.LICENSES_START_COLUMN,
@@ -701,17 +706,19 @@ public class ExcelFileWriter {
                 license.getDistribution(),
                 license.getComments(),
                 license.getFile());
-        final LicenseColorStyle licenseColorStyle = getLicenseColorStyle(license, dataFormatting);
+        final LicenseColorStyle licenseColorStyle = getLicenseColorStyle(license, dataFormatting, excludedLicenses);
         if (licenseColorStyle != LicenseColorStyle.NONE) {
             licenses[0].setCellStyle(cellStyles.getLicenseStyle(licenseColorStyle, grayBackground));
         }
         addHyperlinkIfExists(wb, licenses[1], cellStyles.getHyperlinkStyle(grayBackground), HyperlinkType.URL);
     }
 
-    private static LicenseColorStyle getLicenseColorStyle(ProjectLicense license, AbstractDownloadLicensesMojo.DataFormatting dataFormatting) {
+    private static LicenseColorStyle getLicenseColorStyle(ProjectLicense license,
+                                                          AbstractDownloadLicensesMojo.DataFormatting dataFormatting,
+                                                          AbstractAddThirdPartyMojo.ExcludedLicenses excludedLicenses) {
         final LicenseColorStyle licenseColorStyle;
-        if (dataFormatting.forbiddenLicenses != null
-            && dataFormatting.forbiddenLicenses.contains(license.getName())) {
+        if (excludedLicenses != null
+            && excludedLicenses.contains(license.getName())) {
             licenseColorStyle = LicenseColorStyle.FORBIDDEN;
         } else if (dataFormatting.problematicLicenses != null
             && dataFormatting.problematicLicenses.contains(license.getName())) {

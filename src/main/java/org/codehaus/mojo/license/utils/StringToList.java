@@ -76,4 +76,8 @@ public class StringToList {
     protected void addEntryToList(String data) {
         this.data.add(data);
     }
+
+    public boolean contains(String name) {
+        return data.contains(name);
+    }
 }
