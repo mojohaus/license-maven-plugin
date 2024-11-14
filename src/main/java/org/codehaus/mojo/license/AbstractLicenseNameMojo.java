@@ -227,9 +227,6 @@ public abstract class AbstractLicenseNameMojo extends AbstractLicenseMojo {
     // ----------------------------------------------------------------------
 
     protected License getLicense(String licenseName, boolean checkIfExists) {
-        if (StringUtils.isEmpty(licenseName)) {
-            throw new IllegalArgumentException("licenseName can not be null, nor empty");
-        }
         if (licenseStore == null) {
             throw new IllegalStateException("No license store initialized!");
         }
