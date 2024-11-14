@@ -114,7 +114,7 @@ public abstract class AbstractLicenseNameMojo extends AbstractLicenseMojo {
      * @parameter property="license.licenseName"
      * @since 1.0
      */
-    @Parameter(property = "license.licenseName")
+    @Parameter(property = "license.licenseName", required = true)
     private String licenseName;
 
     /**
