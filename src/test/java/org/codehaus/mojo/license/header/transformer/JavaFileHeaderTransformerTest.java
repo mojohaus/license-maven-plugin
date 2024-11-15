@@ -22,8 +22,9 @@ package org.codehaus.mojo.license.header.transformer;
  * #L%
  */
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests the {@link JavaFileHeaderTransformer}.
@@ -52,12 +53,12 @@ public class JavaFileHeaderTransformerTest {
         transformer.setAddJavaLicenseAfterPackage(false);
 
         String result = transformer.addHeader(HEADER, content);
-        Assert.assertEquals(HEADER + content, result);
+        assertEquals(HEADER + content, result);
 
         transformer.setAddJavaLicenseAfterPackage(true);
 
         result = transformer.addHeader(HEADER, content);
-        Assert.assertEquals(
+        assertEquals(
                 PACKAGE + FileHeaderTransformer.LINE_SEPARATOR + transformer.getLineSeparator() + HEADER + CONTENT,
                 result);
     }

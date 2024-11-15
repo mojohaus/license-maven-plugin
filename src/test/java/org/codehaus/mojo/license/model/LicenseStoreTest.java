@@ -27,9 +27,12 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests {@link LicenseStore}.
@@ -62,7 +65,7 @@ public class LicenseStoreTest {
 
     protected LicenseStore store;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         store = null;
     }
@@ -74,27 +77,27 @@ public class LicenseStoreTest {
         store.init();
 
         List<LicenseRepository> repositories = store.getRepositories();
-        Assert.assertNotNull(repositories);
-        Assert.assertEquals(1, repositories.size());
+        assertNotNull(repositories);
+        assertEquals(1, repositories.size());
         LicenseRepository repository = repositories.get(0);
 
         License[] licenses1 = repository.getLicenses();
         License[] licenses = store.getLicenses();
-        Assert.assertNotNull(licenses);
-        Assert.assertNotNull(licenses1);
-        Assert.assertEquals(DEFAULT_LICENSES.size(), licenses.length);
-        Assert.assertEquals(DEFAULT_LICENSES.size(), licenses1.length);
+        assertNotNull(licenses);
+        assertNotNull(licenses1);
+        assertEquals(DEFAULT_LICENSES.size(), licenses.length);
+        assertEquals(DEFAULT_LICENSES.size(), licenses1.length);
 
         for (String licenseName : DEFAULT_LICENSES) {
             License license = repository.getLicense(licenseName);
             License license1 = store.getLicense(licenseName);
-            Assert.assertNotNull(license);
-            Assert.assertNotNull(license1);
-            Assert.assertEquals(license, license1);
+            assertNotNull(license);
+            assertNotNull(license1);
+            assertEquals(license, license1);
         }
 
         for (String licenseName : store.getLicenseNames()) {
-            Assert.assertTrue(DEFAULT_LICENSES.contains(licenseName));
+            assertTrue(DEFAULT_LICENSES.contains(licenseName));
         }
     }
 
@@ -109,27 +112,27 @@ public class LicenseStoreTest {
         store.addRepository(jarRepository);
         store.init();
         List<LicenseRepository> repositories = store.getRepositories();
-        Assert.assertNotNull(repositories);
-        Assert.assertEquals(1, repositories.size());
+        assertNotNull(repositories);
+        assertEquals(1, repositories.size());
         LicenseRepository repository = repositories.get(0);
 
         License[] licenses1 = repository.getLicenses();
         License[] licenses = store.getLicenses();
-        Assert.assertNotNull(licenses);
-        Assert.assertNotNull(licenses1);
-        Assert.assertEquals(licenses1.length, 4);
-        Assert.assertEquals(licenses1.length, licenses.length);
+        assertNotNull(licenses);
+        assertNotNull(licenses1);
+        assertEquals(licenses1.length, 4);
+        assertEquals(licenses1.length, licenses.length);
 
         for (String licenseName : NEW_LICENSES) {
             License license = repository.getLicense(licenseName);
             License license1 = store.getLicense(licenseName);
-            Assert.assertNotNull(license);
-            Assert.assertNotNull(license1);
-            Assert.assertEquals(license, license1);
+            assertNotNull(license);
+            assertNotNull(license1);
+            assertEquals(license, license1);
         }
 
         for (String licenseName : store.getLicenseNames()) {
-            Assert.assertTrue(NEW_LICENSES.contains(licenseName));
+            assertTrue(NEW_LICENSES.contains(licenseName));
         }
     }
 }

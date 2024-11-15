@@ -22,10 +22,11 @@ package org.codehaus.mojo.license.header.transformer;
  * #L%
  */
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests the {@link XmlFileHeaderTransformer}.
@@ -41,12 +42,12 @@ public class XmlFileHeaderTransformerTest {
 
     private static final String HEADER = "header";
 
-    @Before
+    @BeforeEach
     public void setUp() {
         transformer = new XmlFileHeaderTransformer();
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         transformer = null;
     }
@@ -56,7 +57,7 @@ public class XmlFileHeaderTransformerTest {
         String header = HEADER;
         String content = CONTENT;
         String result = transformer.addHeader(header, content);
-        Assert.assertEquals(header + content, result);
+        assertEquals(header + content, result);
     }
 
     @Test
@@ -65,11 +66,11 @@ public class XmlFileHeaderTransformerTest {
         String prolog = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
         String content = prolog + CONTENT;
         String result = transformer.addHeader(header, content);
-        Assert.assertEquals(prolog + FileHeaderTransformer.LINE_SEPARATOR + header + CONTENT, result);
+        assertEquals(prolog + FileHeaderTransformer.LINE_SEPARATOR + header + CONTENT, result);
 
         header = HEADER;
         content = "  " + prolog + CONTENT;
         result = transformer.addHeader(header, content);
-        Assert.assertEquals("  " + prolog + FileHeaderTransformer.LINE_SEPARATOR + header + CONTENT, result);
+        assertEquals("  " + prolog + FileHeaderTransformer.LINE_SEPARATOR + header + CONTENT, result);
     }
 }

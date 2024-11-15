@@ -33,14 +33,15 @@ import org.codehaus.mojo.license.extended.ExtendedInfo;
 import org.codehaus.mojo.license.extended.InfoFile;
 import org.codehaus.mojo.license.extended.spreadsheet.CalcFileWriter;
 import org.codehaus.mojo.license.extended.spreadsheet.ExcelFileWriter;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import static org.codehaus.mojo.license.download.LicenseSummaryWriter.LICENSE_PATH;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @since 1.0
@@ -64,17 +65,17 @@ public class LicenseSummaryTest {
             list = LicenseSummaryReader.parseLicenseSummary(fis);
         }
         ProjectLicenseInfo dep = list.get(0);
-        Assert.assertEquals("org.codehaus.mojo", dep.getGroupId());
-        Assert.assertEquals("junk", dep.getArtifactId());
-        Assert.assertEquals("1.1", dep.getVersion());
+        assertEquals("org.codehaus.mojo", dep.getGroupId());
+        assertEquals("junk", dep.getArtifactId());
+        assertEquals("1.1", dep.getVersion());
 
         List<ProjectLicense> licenses = dep.getLicenses();
-        Assert.assertEquals(1, licenses.size());
+        assertEquals(1, licenses.size());
         ProjectLicense lic0 = dep.getLicenses().get(0);
-        Assert.assertEquals("lgpl", lic0.getName());
-        Assert.assertEquals("http://www.gnu.org/licenses/lgpl-3.0.txt", lic0.getUrl());
-        Assert.assertEquals("lgpl-3.0.txt", lic0.getFile());
-        Assert.assertEquals("lgpl version 3.0", lic0.getComments());
+        assertEquals("lgpl", lic0.getName());
+        assertEquals("http://www.gnu.org/licenses/lgpl-3.0.txt", lic0.getUrl());
+        assertEquals("lgpl-3.0.txt", lic0.getFile());
+        assertEquals("lgpl version 3.0", lic0.getComments());
     }
 
     /**
@@ -123,17 +124,17 @@ public class LicenseSummaryTest {
         List<ProjectLicenseInfo> list = LicenseSummaryReader.parseLicenseSummary(fis);
         fis.close();
         ProjectLicenseInfo dep = list.get(0);
-        Assert.assertEquals("org.test", dep.getGroupId());
-        Assert.assertEquals("test1", dep.getArtifactId());
-        Assert.assertEquals("1.0", dep.getVersion());
+        assertEquals("org.test", dep.getGroupId());
+        assertEquals("test1", dep.getArtifactId());
+        assertEquals("1.0", dep.getVersion());
 
         List<ProjectLicense> licenses = dep.getLicenses();
-        Assert.assertEquals(1, licenses.size());
+        assertEquals(1, licenses.size());
         ProjectLicense lic0 = dep.getLicenses().get(0);
-        Assert.assertEquals("lgpl", lic0.getName());
-        Assert.assertEquals("http://www.gnu.org/licenses/lgpl-3.0.txt", lic0.getUrl());
-        Assert.assertEquals("lgpl-3.0.txt", lic0.getFile());
-        Assert.assertEquals("lgpl version 3.0", lic0.getComments());
+        assertEquals("lgpl", lic0.getName());
+        assertEquals("http://www.gnu.org/licenses/lgpl-3.0.txt", lic0.getUrl());
+        assertEquals("lgpl-3.0.txt", lic0.getFile());
+        assertEquals("lgpl version 3.0", lic0.getComments());
 
         validateXml(licenseSummaryFile);
 
@@ -145,17 +146,17 @@ public class LicenseSummaryTest {
         list = LicenseSummaryReader.parseLicenseSummary(fis);
         fis.close();
         dep = list.get(0);
-        Assert.assertEquals("org.test", dep.getGroupId());
-        Assert.assertEquals("test1", dep.getArtifactId());
-        Assert.assertNull(dep.getVersion());
+        assertEquals("org.test", dep.getGroupId());
+        assertEquals("test1", dep.getArtifactId());
+        assertNull(dep.getVersion());
 
         licenses = dep.getLicenses();
-        Assert.assertEquals(1, licenses.size());
+        assertEquals(1, licenses.size());
         lic0 = dep.getLicenses().get(0);
-        Assert.assertEquals("lgpl", lic0.getName());
-        Assert.assertEquals("http://www.gnu.org/licenses/lgpl-3.0.txt", lic0.getUrl());
-        Assert.assertEquals("lgpl-3.0.txt", lic0.getFile());
-        Assert.assertEquals("lgpl version 3.0", lic0.getComments());
+        assertEquals("lgpl", lic0.getName());
+        assertEquals("http://www.gnu.org/licenses/lgpl-3.0.txt", lic0.getUrl());
+        assertEquals("lgpl-3.0.txt", lic0.getFile());
+        assertEquals("lgpl version 3.0", lic0.getComments());
 
         validateXml(licenseSummaryFile);
 
@@ -245,10 +246,10 @@ public class LicenseSummaryTest {
 
     @Test
     public void patternOrText() {
-        Assert.assertEquals("\\Qsimple\\E", LicenseSummaryWriter.patternOrText("simple", true));
-        Assert.assertEquals("\\Qone two\\E", LicenseSummaryWriter.patternOrText("one two", true));
-        Assert.assertEquals("\\Qone\\E\\s+\\Qtwo\\E", LicenseSummaryWriter.patternOrText("one  two", true));
-        Assert.assertEquals("\\Qone\ntwo\\E", LicenseSummaryWriter.patternOrText("one\ntwo", true));
-        Assert.assertEquals("\\Qone\\E\\s+\\Qtwo\\E", LicenseSummaryWriter.patternOrText("one\n\t\ttwo", true));
+        assertEquals("\\Qsimple\\E", LicenseSummaryWriter.patternOrText("simple", true));
+        assertEquals("\\Qone two\\E", LicenseSummaryWriter.patternOrText("one two", true));
+        assertEquals("\\Qone\\E\\s+\\Qtwo\\E", LicenseSummaryWriter.patternOrText("one  two", true));
+        assertEquals("\\Qone\ntwo\\E", LicenseSummaryWriter.patternOrText("one\ntwo", true));
+        assertEquals("\\Qone\\E\\s+\\Qtwo\\E", LicenseSummaryWriter.patternOrText("one\n\t\ttwo", true));
     }
 }

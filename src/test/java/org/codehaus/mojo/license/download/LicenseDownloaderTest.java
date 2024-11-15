@@ -24,8 +24,9 @@ package org.codehaus.mojo.license.download;
 
 import java.io.File;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class LicenseDownloaderTest {
 
@@ -38,6 +39,6 @@ public class LicenseDownloaderTest {
     private static void assertExtension(String expected, String input, String mimeType) {
         final File in = new File(input);
         final File result = LicenseDownloader.updateFileExtension(in, mimeType);
-        Assert.assertEquals(expected, result.getPath().replace('\\', '/'));
+        assertEquals(expected, result.getPath().replace('\\', '/'));
     }
 }
