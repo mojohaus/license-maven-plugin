@@ -19,7 +19,7 @@
           </includes>
           <licenseName>test</licenseName>
           <organizationName>CodeHaus</organizationName>
-          <licenseResolver>file:${basedir}/src/license</licenseResolver>
+          <licenseResolver>${project.baseUri}/src/license</licenseResolver>
           <descriptionTemplate>${basedir}/src/license/test/descriptionTemplate.ftl</descriptionTemplate>
           <inceptionYear>2010</inceptionYear>
         </configuration>

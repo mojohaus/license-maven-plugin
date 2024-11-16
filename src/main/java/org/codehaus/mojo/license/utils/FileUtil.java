@@ -31,7 +31,6 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringReader;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
@@ -44,8 +43,7 @@ import java.util.List;
 import java.util.Locale;
 
 import org.apache.commons.codec.binary.Hex;
-import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.IOUtil;
+import org.apache.commons.io.FileUtils;
 
 /**
  * Some basic file io utilities
@@ -66,12 +64,12 @@ public class FileUtil {
     public static void renameFile(File file, File destination) throws IOException {
         try {
             try {
-                org.apache.commons.io.FileUtils.forceDelete(destination);
+                FileUtils.forceDelete(destination);
             } catch (FileNotFoundException ex) {
                 // Just do nothing
             }
 
-            org.apache.commons.io.FileUtils.moveFile(file, destination);
+            FileUtils.moveFile(file, destination);
         } catch (IOException ex) {
             throw new IOException(String.format("could not rename '%s' to '%s'", file, destination));
         }
@@ -110,22 +108,6 @@ public class FileUtil {
     }
 
     /**
-     * Permet de lire un fichier et de retourner sont contenu sous forme d'une
-     * chaine de carateres.
-     *
-     * @param file     le fichier a lire
-     * @param encoding encoding to read file
-     * @return the content of the file
-     * @throws IOException if IO pb
-     */
-    public static String readAsString(File file, String encoding) throws IOException {
-
-        try (BufferedReader in = Files.newBufferedReader(file.toPath(), Charset.forName(encoding))) {
-            return IOUtil.toString(in);
-        }
-    }
-
-    /**
      * Print content to file. This method ensures that a platform specific line ending is used.
      *
      * @param file     the file to write to
@@ -136,18 +118,13 @@ public class FileUtil {
     public static void printString(File file, String content, String encoding) throws IOException {
         Files.createDirectories(file.getParentFile().toPath());
 
-        BufferedReader in;
-        PrintWriter out;
-        in = new BufferedReader(new StringReader(content));
-        out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), encoding)));
-        try {
+        try (BufferedReader in = new BufferedReader(new StringReader(content));
+                PrintWriter out = new PrintWriter(
+                        new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), encoding)))) {
             String line;
             while ((line = in.readLine()) != null) {
                 out.println(line);
             }
-        } finally {
-            in.close();
-            out.close();
         }
     }
 

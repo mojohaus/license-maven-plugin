@@ -25,7 +25,9 @@ package org.codehaus.mojo.license.utils;
 import java.io.BufferedReader;
 import java.io.CharArrayReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -64,9 +66,9 @@ public class UrlRequester {
             return true;
         }
         try {
-            new URL(data);
+            URI.create(data).toURL();
             return true;
-        } catch (MalformedURLException e) {
+        } catch (IllegalArgumentException | MalformedURLException e) {
             return false;
         }
     }
@@ -153,7 +155,9 @@ public class UrlRequester {
                 }
             }
         } else {
-            result = IOUtils.toString(new URL(url).openStream(), charset);
+            try (InputStream in = URI.create(url).toURL().openStream()) {
+                result = IOUtils.toString(in, charset);
+            }
         }
         return result;
     }
@@ -172,10 +176,8 @@ public class UrlRequester {
      */
     public static List<String> downloadList(String url) throws MojoExecutionException {
         List<String> list = new ArrayList<>();
-        BufferedReader bufferedReader = null;
-        try {
-            bufferedReader =
-                    new BufferedReader(new CharArrayReader(getFromUrl(url).toCharArray()));
+        try (BufferedReader bufferedReader =
+                new BufferedReader(new CharArrayReader(getFromUrl(url).toCharArray()))) {
             String line;
             while ((line = bufferedReader.readLine()) != null) {
                 if (StringUtils.isNotBlank(line) && !StringUtils.startsWith(line, "#") && !list.contains(line)) {
@@ -184,14 +186,6 @@ public class UrlRequester {
             }
         } catch (IOException e) {
             throw new MojoExecutionException("Could not open connection to URL: " + url, e);
-        } finally {
-            if (bufferedReader != null) {
-                try {
-                    bufferedReader.close();
-                } catch (IOException e) {
-                    throw new MojoExecutionException(e.getMessage(), e);
-                }
-            }
         }
         return list;
     }
