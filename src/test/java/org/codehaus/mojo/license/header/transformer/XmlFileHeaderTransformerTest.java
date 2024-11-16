@@ -43,17 +43,17 @@ public class XmlFileHeaderTransformerTest {
     private static final String HEADER = "header";
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         transformer = new XmlFileHeaderTransformer();
     }
 
     @AfterEach
-    public void tearDown() {
+    void tearDown() {
         transformer = null;
     }
 
     @Test
-    public void testAddHeaderWithNoProlog() {
+    void testAddHeaderWithNoProlog() {
         String header = HEADER;
         String content = CONTENT;
         String result = transformer.addHeader(header, content);
@@ -61,7 +61,7 @@ public class XmlFileHeaderTransformerTest {
     }
 
     @Test
-    public void testAddHeaderWithProlog() {
+    void testAddHeaderWithProlog() {
         String header = HEADER;
         String prolog = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
         String content = prolog + CONTENT;

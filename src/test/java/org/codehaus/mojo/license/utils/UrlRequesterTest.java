@@ -12,18 +12,18 @@ import org.junit.jupiter.api.io.TempDir;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class UrlRequesterTest {
+class UrlRequesterTest {
 
     private static final String RESOURCE_NAME = "org/codehaus/mojo/license/utils/licenses.properties";
 
     @Test
-    public void testClasspathRequester() throws Exception {
+    void testClasspathRequester() throws Exception {
         String licenseContent = UrlRequester.getFromUrl("classpath:" + RESOURCE_NAME);
         assertEquals("license1=This is mine!", licenseContent.trim());
     }
 
     @Test
-    public void testGenericRequester(@TempDir Path tempDir) throws Exception {
+    void testGenericRequester(@TempDir Path tempDir) throws Exception {
         URL res = getClass().getClassLoader().getResource(RESOURCE_NAME);
         File testFile = Files.createTempFile(tempDir, "requester", "test").toFile();
         FileUtils.copyURLToFile(res, testFile);
@@ -33,12 +33,12 @@ public class UrlRequesterTest {
     }
 
     @Test
-    public void testClasspathIsAValidUrl() {
+    void testClasspathIsAValidUrl() {
         assertTrue(UrlRequester.isStringUrl("classpath:" + RESOURCE_NAME), "classpath protocol not registered");
     }
 
     @Test
-    public void testClasspathIsAExternalUrl() {
+    void testClasspathIsAExternalUrl() {
         assertTrue(UrlRequester.isExternalUrl("classpath:" + RESOURCE_NAME), "classpath protocol as external");
     }
 }

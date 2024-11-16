@@ -46,7 +46,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * @since 1.0
  */
-public class LicenseSummaryTest {
+class LicenseSummaryTest {
     private static final Logger LOG = LoggerFactory.getLogger(LicenseSummaryTest.class);
 
     /**
@@ -57,7 +57,7 @@ public class LicenseSummaryTest {
      * @throws SAXException                 if any
      */
     @Test
-    public void testReadLicenseSummary() throws IOException, SAXException, ParserConfigurationException {
+    void testReadLicenseSummary() throws IOException, SAXException, ParserConfigurationException {
         File licenseSummaryFile = new File("src/test/resources/license-summary-test.xml");
         assertTrue(licenseSummaryFile.exists());
         List<ProjectLicenseInfo> list;
@@ -89,7 +89,7 @@ public class LicenseSummaryTest {
      * @throws SAXException                         if any
      */
     @Test
-    public void testWriteReadLicenseSummary()
+    void testWriteReadLicenseSummary()
             throws IOException, SAXException, ParserConfigurationException, TransformerFactoryConfigurationError,
                     TransformerException {
         List<ProjectLicenseInfo> licSummary = new ArrayList<>();
@@ -245,7 +245,7 @@ public class LicenseSummaryTest {
     }
 
     @Test
-    public void patternOrText() {
+    void patternOrText() {
         assertEquals("\\Qsimple\\E", LicenseSummaryWriter.patternOrText("simple", true));
         assertEquals("\\Qone two\\E", LicenseSummaryWriter.patternOrText("one two", true));
         assertEquals("\\Qone\\E\\s+\\Qtwo\\E", LicenseSummaryWriter.patternOrText("one  two", true));

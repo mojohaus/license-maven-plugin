@@ -31,9 +31,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * <a href="https://raw.githubusercontent.com/spdx/license-list-data/v3.5/json/licenses.json">
  * https://raw.githubusercontent.com/spdx/license-list-data/v3.5/json/licenses.json</a>
  */
-public class SpdxLicenseListDataTest {
+class SpdxLicenseListDataTest {
     @Test
-    public void getInstance() {
+    void getInstance() {
         SpdxLicenseList list = SpdxLicenseList.getLatest();
         assertEquals(388, list.getLicenses().size());
     }

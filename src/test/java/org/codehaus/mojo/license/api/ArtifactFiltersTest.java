@@ -16,9 +16,9 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class ArtifactFiltersTest {
+class ArtifactFiltersTest {
     @Test
-    public void isIncluded() throws InvalidVersionSpecificationException {
+    void isIncluded() throws InvalidVersionSpecificationException {
         final Artifact jar1Compile = new DefaultArtifact(
                 "org.group1", "artifact1", VersionRange.createFromVersionSpec("1.0"), "compile", "jar", "", null);
         final Artifact jar2Compile = new DefaultArtifact(
@@ -163,7 +163,7 @@ public class ArtifactFiltersTest {
     }
 
     @Test
-    public void urlContent() throws IOException, InvalidVersionSpecificationException {
+    void urlContent() throws IOException, InvalidVersionSpecificationException {
         final Builder builder = ArtifactFilters.buidler();
         final URL url = getClass().getClassLoader().getResource("org/codehaus/mojo/license/api/atifact-filters.txt");
         try (InputStream in = url.openStream()) {

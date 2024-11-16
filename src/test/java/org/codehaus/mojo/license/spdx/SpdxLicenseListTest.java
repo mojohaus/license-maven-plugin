@@ -9,9 +9,9 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class SpdxLicenseListTest {
+class SpdxLicenseListTest {
     @Test
-    public void mimeTypes() {
+    void mimeTypes() {
         for (SpdxLicenseInfo lic : SpdxLicenseList.getLatest().getLicenses().values()) {
             for (UrlInfo urlInfo : lic.getAttachments().getUrlInfos().values()) {
                 if (urlInfo.getMimeType() != null) {
@@ -22,7 +22,7 @@ public class SpdxLicenseListTest {
     }
 
     @Test
-    public void extraAliases() {
+    void extraAliases() {
         Map<String, SpdxLicenseInfo> lics = SpdxLicenseList.getLatest().getLicenses();
         Map<String, UrlInfo> urlInfos = lics.get("Apache-2.0").getAttachments().getUrlInfos();
         assertTrue(urlInfos.containsKey("https://opensource.org/licenses/apache2.0"));

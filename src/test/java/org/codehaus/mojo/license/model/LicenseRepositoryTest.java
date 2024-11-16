@@ -38,17 +38,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
-public class LicenseRepositoryTest {
+class LicenseRepositoryTest {
 
     protected LicenseRepository repository;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         repository = null;
     }
 
     @Test
-    public void testJarRepository() throws IOException {
+    void testJarRepository() throws IOException {
 
         repository = new LicenseRepository();
         URL baseURL = getClass().getResource(LicenseStore.JAR_LICENSE_REPOSITORY);
@@ -72,7 +72,7 @@ public class LicenseRepositoryTest {
     }
 
     @Test
-    public void testUserRepository() throws IOException {
+    void testUserRepository() throws IOException {
 
         repository = new LicenseRepository();
         URL baseURL = getClass().getResource("/newRepository");

@@ -41,11 +41,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author tchemit dev@tchemit.fr
  * @since 1.1
  */
-public class FreeMarkerHelperTest {
+class FreeMarkerHelperTest {
     private static final Logger LOG = LoggerFactory.getLogger(FreeMarkerHelperTest.class);
 
     @Test
-    public void testRenderTemplateForThirdPartyFile() throws Exception {
+    void testRenderTemplateForThirdPartyFile() throws Exception {
 
         FreeMarkerHelper helper = FreeMarkerHelper.newDefaultHelper();
 
@@ -88,7 +88,7 @@ public class FreeMarkerHelperTest {
     }
 
     @Test
-    public void testRenderTemplateForThirdPartyFileGroupByLicense() throws Exception {
+    void testRenderTemplateForThirdPartyFileGroupByLicense() throws Exception {
 
         FreeMarkerHelper helper = FreeMarkerHelper.newDefaultHelper();
 
@@ -131,7 +131,7 @@ public class FreeMarkerHelperTest {
     }
 
     @Test
-    public void testRenderTemplateForUpdateFileHeader() throws Exception {
+    void testRenderTemplateForUpdateFileHeader() throws Exception {
 
         FreeMarkerHelper helper = FreeMarkerHelper.newDefaultHelper();
 

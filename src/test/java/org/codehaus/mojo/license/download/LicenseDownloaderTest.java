@@ -28,10 +28,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class LicenseDownloaderTest {
+class LicenseDownloaderTest {
 
     @Test
-    public void updateFileExtension() {
+    void updateFileExtension() {
         assertExtension("path/to/file.html", "path/to/file.php", "text/html");
         assertExtension("path/to/file.txt", "path/to/file", null);
     }

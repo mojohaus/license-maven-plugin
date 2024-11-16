@@ -34,9 +34,9 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class LicenseMatchersTest {
+class LicenseMatchersTest {
     @Test
-    public void licenseMatches() {
+    void licenseMatches() {
         final LicenseMatcher lm1 = new LicenseMatcher("my license", "http://some.com", null, "important comment");
         final ProjectLicense lic = new ProjectLicense("my license", "http://some.com", null, "important comment", null);
 
@@ -74,7 +74,7 @@ public class LicenseMatchersTest {
     }
 
     @Test
-    public void replaceMatchesLegacy() {
+    void replaceMatchesLegacy() {
         final ProjectLicenseInfo dep = new ProjectLicenseInfo("myGroup", "myArtifact", "1a2.3", null);
         final ProjectLicenseInfo pli1 = new ProjectLicenseInfo("myGroup", "myArtifact", "1.2.3", false);
         final ProjectLicense lic2 = new ProjectLicense("lic2", "http://other.org", null, "other comment", null);
@@ -94,7 +94,7 @@ public class LicenseMatchersTest {
     }
 
     @Test
-    public void replaceMatches() {
+    void replaceMatches() {
 
         final ProjectLicenseInfo dep = new ProjectLicenseInfo("myGroup", "myArtifact", "1.2.3", null);
         final DependencyMatcher m0 = DependencyMatcher.of(new ProjectLicenseInfo("myGroup", "myArtifact", null, true));

@@ -40,9 +40,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
-public class LicenseStoreTest {
+class LicenseStoreTest {
 
-    public static final List<String> DEFAULT_LICENSES = Arrays.asList(
+    static final List<String> DEFAULT_LICENSES = Arrays.asList(
             "agpl_v3",
             "apache_v2",
             "bsd_2",
@@ -61,17 +61,17 @@ public class LicenseStoreTest {
             "lgpl_v3",
             "mit");
 
-    public static final List<String> NEW_LICENSES = Arrays.asList("license1", "license2", "license3", "license4");
+    static final List<String> NEW_LICENSES = Arrays.asList("license1", "license2", "license3", "license4");
 
     protected LicenseStore store;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         store = null;
     }
 
     @Test
-    public void testJarRepository() throws IOException {
+    void testJarRepository() throws IOException {
 
         store = new LicenseStore();
         store.init();
@@ -102,7 +102,7 @@ public class LicenseStoreTest {
     }
 
     @Test
-    public void testUserRepository() throws IOException {
+    void testUserRepository() throws IOException {
 
         URL baseURL = getClass().getResource("/newRepository");
         LicenseRepository jarRepository = new LicenseRepository();

@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author tchemit dev@tchemit.fr
  * @since 1.2
  */
-public class JavaFileHeaderTransformerTest {
+class JavaFileHeaderTransformerTest {
 
     private static final String PACKAGE = "package org.codehaus.mojo.license.header.transformer;";
 
@@ -43,7 +43,7 @@ public class JavaFileHeaderTransformerTest {
     private static final String LINE_SEPARATOR = "<eol>";
 
     @Test
-    public void testAddHeader() {
+    void testAddHeader() {
         JavaFileHeaderTransformer transformer = new JavaFileHeaderTransformer();
         transformer.setLineSeparator(LINE_SEPARATOR);
         transformer.setEmptyLineAfterHeader(false);
