@@ -165,9 +165,6 @@ public class LicenseRepository implements Iterable<License> {
 
     public License getLicense(String licenseName) {
         checkInit("getLicense");
-        if (StringUtils.isBlank(licenseName)) {
-            throw new IllegalArgumentException("licenceName can not be null, nor blank");
-        }
 
         License license = null;
         for (License l : this) {
