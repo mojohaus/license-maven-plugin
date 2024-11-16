@@ -23,6 +23,7 @@ package org.codehaus.mojo.license.model;
  */
 
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -160,7 +161,7 @@ public class LicenseStore implements Iterable<LicenseRepository> {
             URL baseURL = getClass().getClassLoader().getResource(extraResolver);
             addRepository(baseURL);
         } else {
-            URL baseURL = new URL(extraResolver);
+            URL baseURL = URI.create(extraResolver).toURL();
             addRepository(baseURL);
         }
     }

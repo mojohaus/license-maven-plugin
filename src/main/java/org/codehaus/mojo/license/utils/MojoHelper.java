@@ -24,6 +24,7 @@ package org.codehaus.mojo.license.utils;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.Arrays;
@@ -164,7 +165,7 @@ public class MojoHelper {
     public static URL getUrl(URL baseUrl, String suffix) {
         String url = baseUrl.toString() + "/" + suffix;
         try {
-            return new URL(url);
+            return URI.create(url).toURL();
         } catch (MalformedURLException ex) {
             throw new IllegalArgumentException("could not obtain url " + url, ex);
         }

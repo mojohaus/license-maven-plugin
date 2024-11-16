@@ -103,7 +103,7 @@
               <goal>add-third-party</goal>
             </goals>
             <configuration>
-              <missingFileUrl>file:///${basedir}/missing-licenses.properties</missingFileUrl>
+              <missingFileUrl>${project.baseUri}/missing-licenses.properties</missingFileUrl>
               <thirdPartyFilename>THIRD-PARTY-by-file.txt</thirdPartyFilename>
             </configuration>
           </execution>

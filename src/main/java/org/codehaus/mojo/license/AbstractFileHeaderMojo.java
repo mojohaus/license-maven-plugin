@@ -37,6 +37,7 @@ import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import freemarker.template.Template;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Component;
@@ -758,7 +759,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo {
             // this is a costy operation
             // TODO-TC-20100411 We should process always from the read content not reading again from file
 
-            content = FileUtil.readAsString(file, getEncoding());
+            content = IOUtils.toString(file.toURI(), getEncoding());
 
         } catch (IOException e) {
             throw new IOException("Could not obtain content of file " + file);
@@ -859,7 +860,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo {
         } else {
             try {
                 // replace file with the updated one
-                String updatedContent = FileUtil.readAsString(processFile, getEncoding());
+                String updatedContent = IOUtils.toString(processFile.toURI(), getEncoding());
                 FileUtil.printString(file, updatedContent, getEncoding());
                 Files.deleteIfExists(processFile.toPath());
             } catch (IOException e) {

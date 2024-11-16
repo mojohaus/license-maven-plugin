@@ -34,6 +34,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import freemarker.template.Template;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -408,7 +409,7 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo {
         String content;
 
         try {
-            content = FileUtil.readAsString(file, getEncoding());
+            content = IOUtils.toString(file.toURI(), getEncoding());
         } catch (IOException e) {
             throw new IOException("Could not obtain content of file " + file);
         }

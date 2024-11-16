@@ -23,6 +23,7 @@ package org.codehaus.mojo.license.model;
  */
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -106,7 +107,9 @@ public class LicenseRepository implements Iterable<License> {
                         "no licenses.properties found with url [" + definitionURL + "] for resolver " + this);
             }
             Properties p = new Properties();
-            p.load(definitionURL.openStream());
+            try (InputStream in = definitionURL.openStream()) {
+                p.load(in);
+            }
 
             for (Entry<Object, Object> entry : p.entrySet()) {
                 String licenseName = (String) entry.getKey();

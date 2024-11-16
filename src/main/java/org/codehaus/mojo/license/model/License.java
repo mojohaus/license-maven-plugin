@@ -22,16 +22,14 @@ package org.codehaus.mojo.license.model;
  * #L%
  */
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.InputStream;
 import java.net.URL;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.codehaus.mojo.license.utils.MojoHelper;
-import org.codehaus.plexus.util.IOUtil;
 
 /**
  * The model of a license.
@@ -113,11 +111,8 @@ public class License {
             throw new IllegalStateException("no baseURL defined, can not obtain license content in " + this);
         }
 
-        Reader r = new BufferedReader(new InputStreamReader(getLicenseURL().openStream(), encoding));
-        try {
-            return IOUtil.toString(r);
-        } finally {
-            r.close();
+        try (InputStream in = getLicenseURL().openStream()) {
+            return IOUtils.toString(in, encoding);
         }
     }
 
@@ -125,11 +120,9 @@ public class License {
         if (baseURL == null) {
             throw new IllegalStateException("no baseURL defined, can not obtain header content in " + this);
         }
-        Reader r = new BufferedReader(new InputStreamReader(getHeaderURL().openStream(), encoding));
-        try {
-            return IOUtil.toString(r);
-        } finally {
-            r.close();
+
+        try (InputStream in = getHeaderURL().openStream()) {
+            return IOUtils.toString(in, encoding);
         }
     }
 
