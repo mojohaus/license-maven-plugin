@@ -1,12 +1,12 @@
 package org.codehaus.mojo.license;
 
-import org.codehaus.mojo.license.download.ProjectLicense;
-import org.codehaus.mojo.license.download.ProjectLicenseInfo;
-
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+import org.codehaus.mojo.license.download.ProjectLicense;
+import org.codehaus.mojo.license.download.ProjectLicenseInfo;
 
 /**
  * Container of a project, and a list of all license it has, which are listed as forbidden.
@@ -34,11 +34,11 @@ public class ForbiddenLicenseInfo {
 
     @Override
     public String toString() {
-        return MessageFormat.format("Project \"{0}\" has the following forbidden licenses:\n{1}.",
-            projectLicenseInfo,
-            forbiddenLicenses.stream()
-                .map(projectLicense -> MessageFormat.format("\t- {0}", projectLicense.getName()))
-                .collect(Collectors.joining("\n"))
-        );
+        return MessageFormat.format(
+                "Project \"{0}\" has the following forbidden licenses:\n{1}.",
+                projectLicenseInfo,
+                forbiddenLicenses.stream()
+                        .map(projectLicense -> MessageFormat.format("\t- {0}", projectLicense.getName()))
+                        .collect(Collectors.joining("\n")));
     }
 }

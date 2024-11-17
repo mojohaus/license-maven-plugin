@@ -29,7 +29,7 @@ import org.apache.maven.model.Developer;
 import org.apache.maven.model.Organization;
 import org.apache.maven.model.Scm;
 import org.codehaus.mojo.license.AbstractAddThirdPartyMojo;
-import org.codehaus.mojo.license.AbstractDownloadLicensesMojo;
+import org.codehaus.mojo.license.AbstractDownloadLicensesMojo.DataFormatting;
 import org.codehaus.mojo.license.Eol;
 import org.codehaus.mojo.license.extended.ExtendedInfo;
 import org.codehaus.mojo.license.extended.InfoFile;
@@ -105,9 +105,18 @@ class LicenseSummaryTest {
         lic.setUrl("http://www.gnu.org/licenses/lgpl-3.0.txt");
         lic.setFile("lgpl-3.0.txt");
         lic.setComments("lgpl version 3.0");
+
+        ProjectLicense lic2 = new ProjectLicense();
+        lic2.setName("Apache 2.0");
+        lic2.setComments("Apache License 2.0");
+
+        ProjectLicense lic3 = new ProjectLicense();
+        lic3.setName("GPL 2");
+        lic3.setComments("GNU Public License 2");
+
         dep1.addLicense(lic);
-        dep2.addLicense(lic);
-        dep3.addLicense(lic);
+        dep2.addLicense(lic2);
+        dep3.addLicense(lic3);
 
         dep2.addDownloaderMessage("There were server problems");
         // Skip dependency 3, to test correct empty cell filling of ODS export.
@@ -162,14 +171,18 @@ class LicenseSummaryTest {
 
         validateXml(licenseSummaryFile);
 
-        AbstractDownloadLicensesMojo.DataFormatting dataFormatting = new AbstractDownloadLicensesMojo.DataFormatting();
+        DataFormatting dataFormatting = new DataFormatting();
+        dataFormatting.orderBy = DataFormatting.OrderBy.licenseName;
+        dataFormatting.problematicLicenses = Collections.singletonList("lgpl");
+        dataFormatting.okLicenses = Collections.singletonList("Apache 2.0");
         AbstractAddThirdPartyMojo.ExcludedLicenses excludedLicenses = new AbstractAddThirdPartyMojo.ExcludedLicenses();
+        excludedLicenses.getData().add("GPL 2");
 
         Path licensesExcelOutputFile = Files.createTempFile("licExcel", ".xlsx");
         ExcelFileWriter.write(licSummary, licensesExcelOutputFile.toFile(), dataFormatting, excludedLicenses);
 
         Path licensesCalcOutputFile = Files.createTempFile("licCalc", ".ods");
-        CalcFileWriter.write(licSummary, licensesCalcOutputFile.toFile(), dataFormatting);
+        CalcFileWriter.write(licSummary, licensesCalcOutputFile.toFile(), dataFormatting, excludedLicenses);
     }
 
     /**

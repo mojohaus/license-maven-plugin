@@ -82,41 +82,17 @@ public class ExcelFileWriter {
     private ExcelFileWriter() {}
 
     /**
-     * In which color, according to a license, the cell is styled.
-     */
-    private enum LicenseColorStyle {
-        /**
-         * Unknown license highlight.
-         */
-        UNKNOWN,
-        /**
-         * Forbidden license highlight.
-         */
-        FORBIDDEN,
-        /**
-         * Problematic license highlight.
-         */
-        PROBLEMATIC,
-        /**
-         * OK license highlight.
-         */
-        OK,
-        /**
-         * No highlighting at all.
-         */
-        NONE
-    }
-
-    /**
-     * Writes a list of projects into Excel file.
+     * Writes a list of projects into an Excel file.
      *
      * @param projectLicenseInfos     Project license infos to write.
      * @param licensesExcelOutputFile Excel output file in latest format (OOXML).
-     * @param dataFormatting
+     * @param dataFormatting          Data formatting.
      */
-    public static void write(List<ProjectLicenseInfo> projectLicenseInfos, final File licensesExcelOutputFile,
-                             AbstractDownloadLicensesMojo.DataFormatting dataFormatting,
-                             AbstractAddThirdPartyMojo.ExcludedLicenses excludedLicenses) {
+    public static void write(
+            List<ProjectLicenseInfo> projectLicenseInfos,
+            final File licensesExcelOutputFile,
+            AbstractDownloadLicensesMojo.DataFormatting dataFormatting,
+            AbstractAddThirdPartyMojo.ExcludedLicenses excludedLicenses) {
         if (CollectionUtils.isEmpty(projectLicenseInfos)) {
             LOG.debug("Nothing to write to excel, no project data.");
             return;
@@ -395,8 +371,10 @@ public class ExcelFileWriter {
         private final CellStyle okLicenseStyleNormal;
         private final CellStyle okLicenseStyleGray;
 
-        CellStyles(XSSFWorkbook wb, XSSFColor alternatingRowsColor,
-                   AbstractDownloadLicensesMojo.DataFormatting dataFormatting) {
+        CellStyles(
+                XSSFWorkbook wb,
+                XSSFColor alternatingRowsColor,
+                AbstractDownloadLicensesMojo.DataFormatting dataFormatting) {
             hyperlinkStyleNormal = createHyperlinkStyle(wb, null);
             hyperlinkStyleGray = createHyperlinkStyle(wb, alternatingRowsColor);
 
@@ -405,13 +383,16 @@ public class ExcelFileWriter {
             grayStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
             unknownLicenseStyleNormal = createColoredFontStyle(wb, null, IndexedColors.TEAL, dataFormatting);
-            unknownLicenseStyleGray = createColoredFontStyle(wb, alternatingRowsColor, IndexedColors.TEAL, dataFormatting);
+            unknownLicenseStyleGray =
+                    createColoredFontStyle(wb, alternatingRowsColor, IndexedColors.TEAL, dataFormatting);
 
             forbiddenLicenseStyleNormal = createColoredFontStyle(wb, null, IndexedColors.RED, dataFormatting);
-            forbiddenLicenseStyleGray = createColoredFontStyle(wb, alternatingRowsColor, IndexedColors.RED, dataFormatting);
+            forbiddenLicenseStyleGray =
+                    createColoredFontStyle(wb, alternatingRowsColor, IndexedColors.RED, dataFormatting);
 
             problematicLicenseStyleNormal = createColoredFontStyle(wb, null, IndexedColors.ORANGE, dataFormatting);
-            problematicLicenseStyleGray = createColoredFontStyle(wb, alternatingRowsColor, IndexedColors.ORANGE, dataFormatting);
+            problematicLicenseStyleGray =
+                    createColoredFontStyle(wb, alternatingRowsColor, IndexedColors.ORANGE, dataFormatting);
 
             okLicenseStyleNormal = createColoredFontStyle(wb, null, IndexedColors.GREEN, dataFormatting);
             okLicenseStyleGray = createColoredFontStyle(wb, alternatingRowsColor, IndexedColors.GREEN, dataFormatting);
@@ -430,8 +411,11 @@ public class ExcelFileWriter {
             return hyperlinkStyle;
         }
 
-        private static CellStyle createColoredFontStyle(XSSFWorkbook wb, XSSFColor backgroundColor,
-                                                        IndexedColors indexedColor, AbstractDownloadLicensesMojo.DataFormatting dataFormatting) {
+        private static CellStyle createColoredFontStyle(
+                XSSFWorkbook wb,
+                XSSFColor backgroundColor,
+                IndexedColors indexedColor,
+                AbstractDownloadLicensesMojo.DataFormatting dataFormatting) {
             Font highlightUnknownFont = wb.createFont();
             highlightUnknownFont.setColor(indexedColor.getIndex());
             XSSFCellStyle colorStyle = wb.createCellStyle();
@@ -457,15 +441,11 @@ public class ExcelFileWriter {
         }
 
         public CellStyle getGrayStyle(boolean grayBackground) {
-            return grayBackground
-                ? grayStyle
-                : null;
+            return grayBackground ? grayStyle : null;
         }
 
         public CellStyle getHyperlinkStyle(boolean grayBackground) {
-            return grayBackground
-                ? hyperlinkStyleGray
-                : hyperlinkStyleNormal;
+            return grayBackground ? hyperlinkStyleGray : hyperlinkStyleNormal;
         }
 
         public CellStyle getLicenseStyle(LicenseColorStyle licenseColorStyle, boolean grayBackground) {
@@ -492,12 +472,12 @@ public class ExcelFileWriter {
     But keep it still threadsafe. */
     @SuppressWarnings("checkstyle:MethodLength")
     private static void writeData(
-        List<ProjectLicenseInfo> projectLicenseInfos,
-        XSSFWorkbook wb,
-        Sheet sheet,
-        XSSFColor alternatingRowsColor,
-        AbstractDownloadLicensesMojo.DataFormatting dataFormatting,
-        AbstractAddThirdPartyMojo.ExcludedLicenses excludedLicenses) {
+            List<ProjectLicenseInfo> projectLicenseInfos,
+            XSSFWorkbook wb,
+            Sheet sheet,
+            XSSFColor alternatingRowsColor,
+            AbstractDownloadLicensesMojo.DataFormatting dataFormatting,
+            AbstractAddThirdPartyMojo.ExcludedLicenses excludedLicenses) {
         final int firstRowIndex = 3;
         int currentRowIndex = firstRowIndex;
         final Map<Integer, Row> rowMap = new HashMap<>();
@@ -530,52 +510,62 @@ public class ExcelFileWriter {
                     projectInfo.getArtifactId(),
                     projectInfo.getVersion());
             // Licenses
-            final CellListParameter cellListParameter = new CellListParameter(sheet, rowMap, cellStyles, grayBackground);
+            final CellListParameter cellListParameter =
+                    new CellListParameter(sheet, rowMap, cellStyles, grayBackground);
             SpreadsheetUtil.CurrentRowData currentRowData =
                     new SpreadsheetUtil.CurrentRowData(currentRowIndex, extraRows, hasExtendedInfo);
             boolean finalGrayBackground = grayBackground;
             extraRows = addList(
-                cellListParameter,
-                currentRowData,
-                SpreadsheetUtil.LICENSES_START_COLUMN,
-                SpreadsheetUtil.LICENSES_COLUMNS,
-                projectInfo.getLicenses(),
-                (Row licenseRow, ProjectLicense license)
-                    -> addLicenses(wb, licenseRow, license, cellStyles, finalGrayBackground, dataFormatting,
-                                    excludedLicenses));
+                    cellListParameter,
+                    currentRowData,
+                    SpreadsheetUtil.LICENSES_START_COLUMN,
+                    SpreadsheetUtil.LICENSES_COLUMNS,
+                    projectInfo.getLicenses(),
+                    (Row licenseRow, ProjectLicense license) -> addLicenses(
+                            wb,
+                            licenseRow,
+                            license,
+                            cellStyles,
+                            finalGrayBackground,
+                            dataFormatting,
+                            excludedLicenses));
 
             final ExtendedInfo extendedInfo = projectInfo.getExtendedInfo();
             if (extendedInfo != null) {
                 hasExtendedInfo = true;
                 // General
                 createDataCellsInRow(
-                        currentRow, SpreadsheetUtil.GENERAL_START_COLUMN, cellStyles, grayBackground, extendedInfo.getName());
+                        currentRow,
+                        SpreadsheetUtil.GENERAL_START_COLUMN,
+                        cellStyles,
+                        grayBackground,
+                        extendedInfo.getName());
                 // Developers
                 if (dataFormatting == null || !dataFormatting.skipDevelopers) {
                     currentRowData = new SpreadsheetUtil.CurrentRowData(currentRowIndex, extraRows, hasExtendedInfo);
                     extraRows = addList(
-                        cellListParameter,
-                        currentRowData,
-                        SpreadsheetUtil.DEVELOPERS_START_COLUMN,
-                        SpreadsheetUtil.DEVELOPERS_COLUMNS,
-                        extendedInfo.getDevelopers(),
-                        (Row developerRow, Developer developer) -> {
-                            Cell[] licenses = createDataCellsInRow(
-                                developerRow,
-                                SpreadsheetUtil.DEVELOPERS_START_COLUMN,
-                                cellStyles,
-                                finalGrayBackground,
-                                developer.getId(),
-                                developer.getEmail(),
-                                developer.getName(),
-                                developer.getOrganization(),
-                                developer.getOrganizationUrl(),
-                                developer.getUrl(),
-                                developer.getTimezone());
-                            addHyperlinkIfExists(wb, licenses[1], hyperlinkStyle, HyperlinkType.EMAIL);
-                            addHyperlinkIfExists(wb, licenses[4], hyperlinkStyle, HyperlinkType.URL);
-                            addHyperlinkIfExists(wb, licenses[5], hyperlinkStyle, HyperlinkType.URL);
-                        });
+                            cellListParameter,
+                            currentRowData,
+                            SpreadsheetUtil.DEVELOPERS_START_COLUMN,
+                            SpreadsheetUtil.DEVELOPERS_COLUMNS,
+                            extendedInfo.getDevelopers(),
+                            (Row developerRow, Developer developer) -> {
+                                Cell[] licenses = createDataCellsInRow(
+                                        developerRow,
+                                        SpreadsheetUtil.DEVELOPERS_START_COLUMN,
+                                        cellStyles,
+                                        finalGrayBackground,
+                                        developer.getId(),
+                                        developer.getEmail(),
+                                        developer.getName(),
+                                        developer.getOrganization(),
+                                        developer.getOrganizationUrl(),
+                                        developer.getUrl(),
+                                        developer.getTimezone());
+                                addHyperlinkIfExists(wb, licenses[1], hyperlinkStyle, HyperlinkType.EMAIL);
+                                addHyperlinkIfExists(wb, licenses[4], hyperlinkStyle, HyperlinkType.URL);
+                                addHyperlinkIfExists(wb, licenses[5], hyperlinkStyle, HyperlinkType.URL);
+                            });
                 }
                 // Miscellaneous
                 Cell[] miscCells = createDataCellsInRow(
@@ -680,8 +670,8 @@ public class ExcelFileWriter {
                         SpreadsheetUtil.DOWNLOAD_MESSAGE_COLUMNS,
                         projectInfo.getDownloaderMessages(),
                         (Row licenseRow, String message) -> {
-                            Cell[] licenses = createDataCellsInRow(licenseRow, startColumn, cellStyles, finalGrayBackground,
-                                message);
+                            Cell[] licenses = createDataCellsInRow(
+                                    licenseRow, startColumn, cellStyles, finalGrayBackground, message);
                             if (message.matches(SpreadsheetUtil.VALID_LINK)) {
                                 addHyperlinkIfExists(wb, licenses[0], hyperlinkStyle, HyperlinkType.URL);
                             }
@@ -693,45 +683,30 @@ public class ExcelFileWriter {
         autosizeColumns(sheet, hasExtendedInfo);
     }
 
-    private static void addLicenses(XSSFWorkbook wb, Row licenseRow, ProjectLicense license, CellStyles cellStyles,
-                                    boolean grayBackground, AbstractDownloadLicensesMojo.DataFormatting dataFormatting,
-                                    AbstractAddThirdPartyMojo.ExcludedLicenses excludedLicenses) {
+    private static void addLicenses(
+            XSSFWorkbook wb,
+            Row licenseRow,
+            ProjectLicense license,
+            CellStyles cellStyles,
+            boolean grayBackground,
+            AbstractDownloadLicensesMojo.DataFormatting dataFormatting,
+            AbstractAddThirdPartyMojo.ExcludedLicenses excludedLicenses) {
         Cell[] licenses = createDataCellsInRow(
-            licenseRow,
+                licenseRow,
                 SpreadsheetUtil.LICENSES_START_COLUMN,
-            cellStyles,
-            grayBackground,
+                cellStyles,
+                grayBackground,
                 license.getName(),
                 license.getUrl(),
                 license.getDistribution(),
                 license.getComments(),
                 license.getFile());
-        final LicenseColorStyle licenseColorStyle = getLicenseColorStyle(license, dataFormatting, excludedLicenses);
+        final LicenseColorStyle licenseColorStyle =
+                LicenseColorStyle.getLicenseColorStyle(license, dataFormatting, excludedLicenses);
         if (licenseColorStyle != LicenseColorStyle.NONE) {
             licenses[0].setCellStyle(cellStyles.getLicenseStyle(licenseColorStyle, grayBackground));
         }
         addHyperlinkIfExists(wb, licenses[1], cellStyles.getHyperlinkStyle(grayBackground), HyperlinkType.URL);
-    }
-
-    private static LicenseColorStyle getLicenseColorStyle(ProjectLicense license,
-                                                          AbstractDownloadLicensesMojo.DataFormatting dataFormatting,
-                                                          AbstractAddThirdPartyMojo.ExcludedLicenses excludedLicenses) {
-        final LicenseColorStyle licenseColorStyle;
-        if (excludedLicenses != null
-            && excludedLicenses.contains(license.getName())) {
-            licenseColorStyle = LicenseColorStyle.FORBIDDEN;
-        } else if (dataFormatting.problematicLicenses != null
-            && dataFormatting.problematicLicenses.contains(license.getName())) {
-            licenseColorStyle = LicenseColorStyle.PROBLEMATIC;
-        } else if (dataFormatting.okLicenses != null
-            && dataFormatting.okLicenses.contains(license.getName())) {
-            licenseColorStyle = LicenseColorStyle.OK;
-        } else if (dataFormatting.highlightUnknownLicenses) {
-            licenseColorStyle = LicenseColorStyle.UNKNOWN;
-        } else {
-            licenseColorStyle = LicenseColorStyle.NONE;
-        }
-        return licenseColorStyle;
     }
 
     private static void autosizeColumns(Sheet sheet, boolean hasExtendedInfo) {
@@ -882,8 +857,8 @@ public class ExcelFileWriter {
     }
 
     @SafeVarargs
-    private static void createAndStyleCells(Row row, CellStyles cellStyles, boolean grayBackground,
-                                            Pair<Integer, Integer>... ranges) {
+    private static void createAndStyleCells(
+            Row row, CellStyles cellStyles, boolean grayBackground, Pair<Integer, Integer>... ranges) {
         for (Pair<Integer, Integer> range : ranges) {
             for (int i = range.getLeft(); i < range.getRight(); i++) {
                 Cell cell = row.createCell(i, CellType.STRING);
@@ -937,8 +912,8 @@ public class ExcelFileWriter {
         return modifiedLink;
     }
 
-    private static Cell[] createDataCellsInRow(Row row, int startColumn, CellStyles cellStyles, boolean grayBackground,
-                                               String... names) {
+    private static Cell[] createDataCellsInRow(
+            Row row, int startColumn, CellStyles cellStyles, boolean grayBackground, String... names) {
         Cell[] result = new Cell[names.length];
         for (int i = 0; i < names.length; i++) {
             Cell cell = row.createCell(startColumn + i, CellType.STRING);

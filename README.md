@@ -23,6 +23,30 @@ cd target/checkout
 mvn verify site -DperformRelease scm-publish:publish-scm
 ```
 
+## Run integration tests
+
+```bash
+mvn clean verify -Prun-its
+```
+
+## List dependencies
+
+```bash
+mvn dependency:tree -l dependencies.txt
+```
+
+Show with Windows:
+
+```bash
+start dependencies.txt
+```
+
+Show with Linux:
+
+```bash
+gopen dependencies.txt
+```
+
 ## How to configure the extended Excel report
 
 The projects `pom.xml` must have the lines marked with "`<!-- New -->`" to use the new options (`extendedInfo`
@@ -72,11 +96,13 @@ and `writeExcelFile`):
                             <licenseMerge>The BSD 3-Clause License|The New BSD License|New BSD License</licenseMerge>
                         </licenseMerges>
 ```
+
 Since this hasn't been published to the official Maven repository yet, you must compile it yourself and install it to
 your local repository.
 
 If you want to include it in your project and make sure all dependencies are packed together and
 solved, install it by adding:
+
 ```xml
     <properties>
         <third.party.dir>  <Your-Dir-Where-The-JAR-Is-Located>  </third.party.dir>
@@ -118,6 +144,7 @@ solved, install it by adding:
             </plugin>
             ...
 ```
+
 Then, to install the plugin a `mvn validate` is enough.
 
 After that, generate the report with `mvn license:aggregate-download-licenses`.

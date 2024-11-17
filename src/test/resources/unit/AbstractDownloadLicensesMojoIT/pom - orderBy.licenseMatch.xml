@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.codehaus.mojo.license</groupId>
+  <artifactId>AbstractDownloadLicensesMojoIT</artifactId>
+  <version>1.0-SNAPSHOT</version>
+
+  <properties>
+    <maven.compiler.source>8</maven.compiler.source>
+    <maven.compiler.target>8</maven.compiler.target>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>2.15.2</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+      <version>2.15.2</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-annotations</artifactId>
+      <version>2.15.2</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>32.1.2-jre</version>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.platform</groupId>
+      <artifactId>jakarta.jakartaee-api</artifactId>
+      <version>10.0.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>testcontainers</artifactId>
+      <version>1.20.3</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-collections</groupId>
+      <artifactId>commons-collections</artifactId>
+      <version>3.2.2</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <version>3.17.0</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-test -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <version>3.3.5</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+      <version>3.3.5</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/com.github.docker-java/docker-java -->
+    <dependency>
+      <groupId>com.github.docker-java</groupId>
+      <artifactId>docker-java</artifactId>
+      <version>3.4.0</version>
+    </dependency>
+
+    <!-- For Debugging -->
+    <dependency>
+      <groupId>org.codehaus.mojo</groupId>
+      <artifactId>license-maven-plugin</artifactId>
+      <version>2.5.0-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <!-- Update the plugin version -->
+        <version>2.5.0-SNAPSHOT</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>aggregate-download-licenses</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <extendedInfo>true</extendedInfo>
+          <writeCalcFile>true</writeCalcFile>
+          <writeExcelFile>true</writeExcelFile>
+
+          <licensesCalcOutputFile>target/generated-resources/licenses - orderByLicenseMatch.ods</licensesCalcOutputFile>
+          <licensesExcelOutputFile>target/generated-resources/licenses - orderByLicenseMatch.xlsx</licensesExcelOutputFile>
+
+          <excludedLicenses>
+            <excludedLicense>GNU General Lesser Public License (LGPL) version 3.0</excludedLicense>
+          </excludedLicenses>
+
+          <failOnBlacklist>true</failOnBlacklist>
+
+          <dataFormatting>
+            <orderBy>licenseMatch</orderBy>
+            <problematicLicenses>
+              <problematicLicense>EPL 2.0</problematicLicense>
+              <problematicLicense>GPL2 w/ CPE</problematicLicense>
+            </problematicLicenses>
+            <okLicenses>
+              <okLicense>Apache License, Version 2.0</okLicense>
+            </okLicenses>
+            <matchedLicensesHaveBorder>true</matchedLicensesHaveBorder>
+            <skipDevelopers>true</skipDevelopers>
+          </dataFormatting>
+
+          <!-- Not needed, but a suggestion -->
+          <!-- Makes it more readable, licenses are the same with different names -->
+          <licenseMerges>
+            <licenseMerge>Apache License, Version 2.0
+              |AL 2.0
+              |ASF 2.0
+              |Apache 2
+              |Apache 2.0
+              |Apache License 2.0
+              |Apache License, version 2.0
+              |Apache Public License 2.0
+              |Apache-2.0
+              |The Apache License, Version 2.0
+              |The Apache Software License, Version 2.0
+            </licenseMerge>
+            <licenseMerge>EDL 1.0
+              |Eclipse Distribution License - v 1.0
+              |Eclipse Distribution License v. 1.0
+            </licenseMerge>
+            <licenseMerge>EPL 1.0
+              |Eclipse Public License - v 1.0
+              |Eclipse Public License 1.0
+              |Eclipse Public License, Version 1.0
+            </licenseMerge>
+            <licenseMerge>EPL 2.0
+              |EPL-2.0
+              |Eclipse Public License 2.0
+              |Eclipse Public License v. 2.0
+              |Eclipse Public License v2.0
+            </licenseMerge>
+            <licenseMerge>GPL2 w/ CPE
+              |GNU General Public License, version 2 with the GNU Classpath Exception
+              |GPL-2.0-with-classpath-exception
+            </licenseMerge>
+            <licenseMerge>MIT License
+              |MIT
+              |The MIT License
+              |The MIT License (MIT)
+            </licenseMerge>
+            <licenseMerge>GNU Lesser General Public License
+              |GNU LESSER GENERAL PUBLIC LICENSE
+              |GNU Lesser General Public Licence
+              |GNU Lesser Public License
+              |Lesser General Public License (LGPL)
+            </licenseMerge>
+            <licenseMerge>GNU General Lesser Public License (LGPL) version 3.0
+              |GNU LESSER GENERAL PUBLIC LICENSE, version 3 (LGPL-3.0)
+              |Lesser General Public License (LGPL) v 3.0
+              |The GNU Lesser General Public License, Version 3.0
+            </licenseMerge>
+            <!-- Problematic: While the maven plugins may have a simple declaration of "BSD"
+                 for their license, they may mean "New BSD" license, at least that's what they state
+                 on their websites. -->
+            <licenseMerge>The BSD License|BSD License|BSD</licenseMerge>
+            <licenseMerge>The BSD 3-Clause License
+              |BSD-3-Clause
+              |New BSD License
+              |The New BSD License
+            </licenseMerge>
+          </licenseMerges>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

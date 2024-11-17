@@ -22,7 +22,8 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.maven.model.Developer;
 import org.apache.maven.model.Organization;
 import org.apache.maven.model.Scm;
-import org.codehaus.mojo.license.AbstractDownloadLicensesMojo;
+import org.codehaus.mojo.license.AbstractAddThirdPartyMojo;
+import org.codehaus.mojo.license.AbstractDownloadLicensesMojo.DataFormatting;
 import org.codehaus.mojo.license.download.ProjectLicense;
 import org.codehaus.mojo.license.download.ProjectLicenseInfo;
 import org.codehaus.mojo.license.extended.ExtendedInfo;
@@ -39,6 +40,7 @@ import org.odftoolkit.odfdom.dom.element.config.ConfigConfigItemElement;
 import org.odftoolkit.odfdom.dom.element.config.ConfigConfigItemMapEntryElement;
 import org.odftoolkit.odfdom.dom.element.style.StyleParagraphPropertiesElement;
 import org.odftoolkit.odfdom.dom.element.style.StyleTableCellPropertiesElement;
+import org.odftoolkit.odfdom.dom.element.style.StyleTableRowPropertiesElement;
 import org.odftoolkit.odfdom.dom.element.style.StyleTextPropertiesElement;
 import org.odftoolkit.odfdom.dom.element.text.TextAElement;
 import org.odftoolkit.odfdom.dom.style.OdfStyleFamily;
@@ -99,14 +101,30 @@ public class CalcFileWriter {
     private static final String HYPERLINK_GRAY_STYLE = "hyperlinkGrayStyle";
     private static final String GRAY_CELL_STYLE = "grayCellStyle";
     private static final String NORMAL_CELL_STYLE = "normalCellStyle";
+
+    private static final String UNKNOWN_NORMAL_CELL_STYLE = "unknownNormalCellStyle";
+    private static final String UNKNOWN_GRAY_CELL_STYLE = "unknownGrayCellStyle";
+
+    private static final String FORBIDDEN_NORMAL_CELL_STYLE = "forbiddenNormalCellStyle";
+    private static final String FORBIDDEN_GRAY_CELL_STYLE = "forbiddenGrayCellStyle";
+
+    private static final String PROBLEMATIC_NORMAL_CELL_STYLE = "problematicNormalCellStyle";
+    private static final String PROBLEMATIC_GRAY_CELL_STYLE = "problematicGrayCellStyle";
+
+    private static final String OK_NORMAL_CELL_STYLE = "okNormalCellStyle";
+    private static final String OK_GRAY_CELL_STYLE = "okGrayCellStyle";
+
     private static final int DOWNLOAD_COLUMN_WIDTH = 6_000;
     private static final String VALUE_TYPE_STRING = "string";
     private static final String CONFIG_TYPE_SHORT = "short";
 
     private CalcFileWriter() {}
 
-    public static void write(List<ProjectLicenseInfo> projectLicenseInfos, final File licensesCalcOutputFile,
-                             AbstractDownloadLicensesMojo.DataFormatting dataFormatting) {
+    public static void write(
+            List<ProjectLicenseInfo> projectLicenseInfos,
+            final File licensesCalcOutputFile,
+            DataFormatting dataFormatting,
+            AbstractAddThirdPartyMojo.ExcludedLicenses excludedLicenses) {
         if (CollectionUtils.isEmpty(projectLicenseInfos)) {
             LOG.debug("Nothing to write to excel, no project data.");
             return;
@@ -128,8 +146,12 @@ public class CalcFileWriter {
             createHeader(projectLicenseInfos, spreadsheet, table);
 
             writeData(
-                    projectLicenseInfos, spreadsheet, table, convertToOdfColor(SpreadsheetUtil.ALTERNATING_ROWS_COLOR),
-                dataFormatting);
+                    projectLicenseInfos,
+                    spreadsheet,
+                    table,
+                    convertToOdfColor(SpreadsheetUtil.ALTERNATING_ROWS_COLOR),
+                    dataFormatting,
+                    excludedLicenses);
 
             try (OutputStream fileOut = Files.newOutputStream(licensesCalcOutputFile.toPath())) {
                 spreadsheet.save(fileOut);
@@ -484,7 +506,8 @@ public class CalcFileWriter {
             OdfSpreadsheetDocument wb,
             OdfTable table,
             Color alternatingRowsColor,
-            AbstractDownloadLicensesMojo.DataFormatting dataFormatting) {
+            DataFormatting dataFormatting,
+            AbstractAddThirdPartyMojo.ExcludedLicenses excludedLicenses) {
         final int firstRowIndex = 3;
         int currentRowIndex = firstRowIndex;
         final Map<Integer, OdfTableRow> rowMap = new HashMap<>();
@@ -498,6 +521,8 @@ public class CalcFileWriter {
         OdfStyle styleGray = officeStyles.newStyle(GRAY_CELL_STYLE, OdfStyleFamily.TableCell);
         styleGray.setProperty(StyleTableCellPropertiesElement.BackgroundColor, alternatingRowsColor.toString());
         styleGray.setProperty(OdfTableColumnProperties.UseOptimalColumnWidth, String.valueOf(true));
+
+        createDataFormattingStyles(alternatingRowsColor, officeStyles, dataFormatting.matchedLicensesHaveBorder);
 
         /* Set own, empty style, instead of leaving the style out,
         because otherwise it copies the style of the row above. */
@@ -515,10 +540,21 @@ public class CalcFileWriter {
                 cellStyle = styleNormal;
                 hyperlinkStyle = hyperlinkStyleNormal;
             }
+            boolean finalGrayBackground = grayBackground;
             grayBackground = !grayBackground;
 
             int extraRows = 0;
             OdfTableRow currentRow = table.appendRow();
+
+            // --------------------------------------------------------------------------------------
+            currentRow.setUseOptimalHeight(false);
+            currentRow.setHeight(0, true);
+
+            OdfStyle defaultCellStyle = currentRow.getDefaultCellStyle();
+            defaultCellStyle.setProperty(StyleTableRowPropertiesElement.RowHeight, "1");
+            currentRow.setDefaultCellStyle(defaultCellStyle);
+            // --------------------------------------------------------------------------------------
+
             rowMap.put(currentRowIndex, currentRow);
             // Plugin ID
             createDataCellsInRow(
@@ -547,6 +583,8 @@ public class CalcFileWriter {
                                 license.getDistribution(),
                                 license.getComments(),
                                 license.getFile());
+                        applyDataFormattingToLicense(
+                                licenses[0], dataFormatting, excludedLicenses, license, finalGrayBackground);
                         addHyperlinkIfExists(table, licenses[1], hyperlinkStyle);
                     });
 
@@ -556,30 +594,33 @@ public class CalcFileWriter {
                 // General
                 createDataCellsInRow(currentRow, GENERAL_START_COLUMN, cellStyle, extendedInfo.getName());
                 // Developers
-                if (!dataFormatting.skipDevelopers) {
-                    currentRowData = new CurrentRowData(currentRowIndex, extraRows, hasExtendedInfo);
+                currentRowData = new CurrentRowData(currentRowIndex, extraRows, hasExtendedInfo);
+                if (dataFormatting.skipDevelopers) {
+                    setStyleOnEmptyCells(
+                            cellListParameter, currentRowData, DEVELOPERS_START_COLUMN, DEVELOPERS_COLUMNS);
+                } else {
                     extraRows = addList(
-                        cellListParameter,
-                        currentRowData,
-                        DEVELOPERS_START_COLUMN,
-                        DEVELOPERS_COLUMNS,
-                        extendedInfo.getDevelopers(),
-                        (OdfTableRow developerRow, Developer developer) -> {
-                            OdfTableCell[] licenses = createDataCellsInRow(
-                                developerRow,
-                                DEVELOPERS_START_COLUMN,
-                                cellStyle,
-                                developer.getId(),
-                                developer.getEmail(),
-                                developer.getName(),
-                                developer.getOrganization(),
-                                developer.getOrganizationUrl(),
-                                developer.getUrl(),
-                                developer.getTimezone());
-                            addHyperlinkIfExists(table, licenses[1], hyperlinkStyle, true);
-                            addHyperlinkIfExists(table, licenses[4], hyperlinkStyle);
-                            addHyperlinkIfExists(table, licenses[5], hyperlinkStyle);
-                        });
+                            cellListParameter,
+                            currentRowData,
+                            DEVELOPERS_START_COLUMN,
+                            DEVELOPERS_COLUMNS,
+                            extendedInfo.getDevelopers(),
+                            (OdfTableRow developerRow, Developer developer) -> {
+                                OdfTableCell[] licenses = createDataCellsInRow(
+                                        developerRow,
+                                        DEVELOPERS_START_COLUMN,
+                                        cellStyle,
+                                        developer.getId(),
+                                        developer.getEmail(),
+                                        developer.getName(),
+                                        developer.getOrganization(),
+                                        developer.getOrganizationUrl(),
+                                        developer.getUrl(),
+                                        developer.getTimezone());
+                                addHyperlinkIfExists(table, licenses[1], hyperlinkStyle, true);
+                                addHyperlinkIfExists(table, licenses[4], hyperlinkStyle);
+                                addHyperlinkIfExists(table, licenses[5], hyperlinkStyle);
+                            });
                 }
                 // Miscellaneous
                 OdfTableCell[] miscCells = createDataCellsInRow(
@@ -607,7 +648,7 @@ public class CalcFileWriter {
                         extendedInfo.getImplementationVendor());
 
                 // Info files
-                if (!CollectionUtils.isEmpty(extendedInfo.getInfoFiles())) {
+                if (CollectionUtils.isNotEmpty(extendedInfo.getInfoFiles())) {
                     // Sort all info files by type into 3 different lists, each list for each of the 3 types.
                     List<InfoFile> notices = new ArrayList<>();
                     List<InfoFile> licenses = new ArrayList<>();
@@ -686,6 +727,124 @@ public class CalcFileWriter {
         }
 
         autosizeColumns(table, hasExtendedInfo, currentRowIndex);
+    }
+
+    private static void applyDataFormattingToLicense(
+            OdfTableCell tableCell,
+            DataFormatting dataFormatting,
+            AbstractAddThirdPartyMojo.ExcludedLicenses excludedLicenses,
+            ProjectLicense license,
+            boolean grayBackground) {
+        if (dataFormatting != null && dataFormatting.orderBy != DataFormatting.OrderBy.none) {
+            final LicenseColorStyle licenseColorStyle =
+                    LicenseColorStyle.getLicenseColorStyle(license, dataFormatting, excludedLicenses);
+            final String styleName;
+            switch (licenseColorStyle) {
+                case FORBIDDEN:
+                    styleName = grayBackground ? FORBIDDEN_GRAY_CELL_STYLE : FORBIDDEN_NORMAL_CELL_STYLE;
+                    break;
+                case PROBLEMATIC:
+                    styleName = grayBackground ? PROBLEMATIC_GRAY_CELL_STYLE : PROBLEMATIC_NORMAL_CELL_STYLE;
+                    break;
+                case OK:
+                    styleName = grayBackground ? OK_GRAY_CELL_STYLE : OK_NORMAL_CELL_STYLE;
+                    break;
+                case UNKNOWN:
+                    styleName = grayBackground ? UNKNOWN_GRAY_CELL_STYLE : UNKNOWN_NORMAL_CELL_STYLE;
+                    break;
+                case NONE:
+                default:
+                    styleName = null;
+                    break;
+            }
+            if (styleName != null) {
+                tableCell.getOdfElement().setStyleName(styleName);
+            }
+        }
+    }
+
+    private static void createDataFormattingStyles(
+            Color alternatingRowsColor, OdfOfficeStyles officeStyles, boolean hasBorders) {
+        // Unknown
+        OdfStyle unknownNormal = officeStyles.newStyle(UNKNOWN_NORMAL_CELL_STYLE, OdfStyleFamily.TableCell);
+        unknownNormal.setProperty(
+                StyleTextPropertiesElement.Color,
+                convertToOdfColor(SpreadsheetUtil.UNKNOWN_ROWS_COLOR).toString());
+        unknownNormal.setProperty(OdfTableColumnProperties.UseOptimalColumnWidth, String.valueOf(true));
+        if (hasBorders) {
+            unknownNormal.setProperty(StyleTableCellPropertiesElement.Border, "1.5pt solid #008080");
+        }
+
+        OdfStyle unknownGray = officeStyles.newStyle(UNKNOWN_GRAY_CELL_STYLE, OdfStyleFamily.TableCell);
+        unknownGray.setProperty(StyleTableCellPropertiesElement.BackgroundColor, alternatingRowsColor.toString());
+        unknownGray.setProperty(
+                StyleTextPropertiesElement.Color,
+                convertToOdfColor(SpreadsheetUtil.UNKNOWN_ROWS_COLOR).toString());
+        unknownGray.setProperty(OdfTableColumnProperties.UseOptimalColumnWidth, String.valueOf(true));
+        if (hasBorders) {
+            unknownGray.setProperty(StyleTableCellPropertiesElement.Border, "1.5pt solid #008080");
+        }
+
+        // Forbidden
+        OdfStyle forbiddenNormal = officeStyles.newStyle(FORBIDDEN_NORMAL_CELL_STYLE, OdfStyleFamily.TableCell);
+        forbiddenNormal.setProperty(
+                StyleTextPropertiesElement.Color,
+                convertToOdfColor(SpreadsheetUtil.FORBIDDEN_ROWS_COLOR).toString());
+        forbiddenNormal.setProperty(OdfTableColumnProperties.UseOptimalColumnWidth, String.valueOf(true));
+        if (hasBorders) {
+            forbiddenNormal.setProperty(StyleTableCellPropertiesElement.Border, "1.5pt solid #D00000");
+        }
+
+        OdfStyle forbiddenGray = officeStyles.newStyle(FORBIDDEN_GRAY_CELL_STYLE, OdfStyleFamily.TableCell);
+        forbiddenGray.setProperty(StyleTableCellPropertiesElement.BackgroundColor, alternatingRowsColor.toString());
+        forbiddenGray.setProperty(
+                StyleTextPropertiesElement.Color,
+                convertToOdfColor(SpreadsheetUtil.FORBIDDEN_ROWS_COLOR).toString());
+        forbiddenGray.setProperty(OdfTableColumnProperties.UseOptimalColumnWidth, String.valueOf(true));
+        if (hasBorders) {
+            forbiddenGray.setProperty(StyleTableCellPropertiesElement.Border, "1.5pt solid #D00000");
+        }
+
+        // Problematic
+        OdfStyle problematicNormal = officeStyles.newStyle(PROBLEMATIC_NORMAL_CELL_STYLE, OdfStyleFamily.TableCell);
+        problematicNormal.setProperty(
+                StyleTextPropertiesElement.Color,
+                convertToOdfColor(SpreadsheetUtil.PROBLEMATIC_ROWS_COLOR).toString());
+        problematicNormal.setProperty(OdfTableColumnProperties.UseOptimalColumnWidth, String.valueOf(true));
+        if (hasBorders) {
+            problematicNormal.setProperty(StyleTableCellPropertiesElement.Border, "1.5pt solid #FF5000");
+        }
+
+        OdfStyle problematicNormalGray = officeStyles.newStyle(PROBLEMATIC_GRAY_CELL_STYLE, OdfStyleFamily.TableCell);
+        problematicNormalGray.setProperty(
+                StyleTableCellPropertiesElement.BackgroundColor, alternatingRowsColor.toString());
+        problematicNormalGray.setProperty(
+                StyleTextPropertiesElement.Color,
+                convertToOdfColor(SpreadsheetUtil.PROBLEMATIC_ROWS_COLOR).toString());
+        problematicNormalGray.setProperty(OdfTableColumnProperties.UseOptimalColumnWidth, String.valueOf(true));
+        if (hasBorders) {
+            problematicNormalGray.setProperty(StyleTableCellPropertiesElement.Border, "1.5pt solid #FF5000");
+        }
+
+        // OK
+        OdfStyle okNormal = officeStyles.newStyle(OK_NORMAL_CELL_STYLE, OdfStyleFamily.TableCell);
+        okNormal.setProperty(
+                StyleTextPropertiesElement.Color,
+                convertToOdfColor(SpreadsheetUtil.OK_ROWS_COLOR).toString());
+        okNormal.setProperty(OdfTableColumnProperties.UseOptimalColumnWidth, String.valueOf(true));
+        if (hasBorders) {
+            okNormal.setProperty(StyleTableCellPropertiesElement.Border, "1.5pt solid #008000");
+        }
+
+        OdfStyle okGray = officeStyles.newStyle(OK_GRAY_CELL_STYLE, OdfStyleFamily.TableCell);
+        okGray.setProperty(StyleTableCellPropertiesElement.BackgroundColor, alternatingRowsColor.toString());
+        okGray.setProperty(
+                StyleTextPropertiesElement.Color,
+                convertToOdfColor(SpreadsheetUtil.OK_ROWS_COLOR).toString());
+        okGray.setProperty(OdfTableColumnProperties.UseOptimalColumnWidth, String.valueOf(true));
+        if (hasBorders) {
+            okGray.setProperty(StyleTableCellPropertiesElement.Border, "1.5pt solid #008000");
+        }
     }
 
     private static OdfStyle createHyperlinkStyle(OdfSpreadsheetDocument wb, String name, Color backgroundColor) {
@@ -910,7 +1069,7 @@ public class CalcFileWriter {
             if (cellStyle != null) {
                 cell.getOdfElement().setStyleName(getCellStyleName(cellStyle));
             }
-            if (!StringUtils.isEmpty(names[i])) {
+            if (StringUtils.isNotEmpty(names[i])) {
                 final String value;
                 final int maxCellStringLength = Short.MAX_VALUE;
                 if (names[i].length() > maxCellStringLength) {
