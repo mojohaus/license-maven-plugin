@@ -25,9 +25,9 @@ package org.codehaus.mojo.license.model;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.apache.maven.project.MavenProject;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class LicenseMapTest {
     // licenses must be equal
@@ -40,7 +40,7 @@ public class LicenseMapTest {
 
     // unit test for #361
     @Test
-    public void licenseMapOrderByName() {
+    void licenseMapOrderByName() {
         LicenseMap licenseMap = new LicenseMap();
         licenseMap.put(LICENSE_KEY, projectForArtifact(PROJECT_NAME, ARTIFACT_ID_FIRST));
         licenseMap.put(LICENSE_KEY, projectForArtifact(PROJECT_NAME, ARTIFACT_ID_SECOND));
@@ -50,7 +50,7 @@ public class LicenseMapTest {
 
     // it's a re-assurance test for default unsorted behavior
     @Test
-    public void licenseMapDefaultState() {
+    void licenseMapDefaultState() {
         LicenseMap licenseMap = new LicenseMap();
         licenseMap.put(LICENSE_KEY, projectForArtifact(PROJECT_NAME, ARTIFACT_ID_FIRST));
         licenseMap.put(LICENSE_KEY, projectForArtifact(PROJECT_NAME, ARTIFACT_ID_SECOND));

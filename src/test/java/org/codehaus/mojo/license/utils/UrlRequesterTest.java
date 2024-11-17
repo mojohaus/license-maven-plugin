@@ -2,43 +2,43 @@ package org.codehaus.mojo.license.utils;
 
 import java.io.File;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.codehaus.plexus.util.FileUtils;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
-public class UrlRequesterTest {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+class UrlRequesterTest {
 
     private static final String RESOURCE_NAME = "org/codehaus/mojo/license/utils/licenses.properties";
 
-    @Rule
-    public TemporaryFolder fileRule = new TemporaryFolder();
-
     @Test
-    public void testClasspathRequester() throws Exception {
+    void testClasspathRequester() throws Exception {
         String licenseContent = UrlRequester.getFromUrl("classpath:" + RESOURCE_NAME);
-        Assert.assertEquals("license1=This is mine!", licenseContent.trim());
+        assertEquals("license1=This is mine!", licenseContent.trim());
     }
 
     @Test
-    public void testGenericRequester() throws Exception {
+    void testGenericRequester(@TempDir Path tempDir) throws Exception {
         URL res = getClass().getClassLoader().getResource(RESOURCE_NAME);
-        File testFile = fileRule.newFile();
+        File testFile = Files.createTempFile(tempDir, "requester", "test").toFile();
         FileUtils.copyURLToFile(res, testFile);
 
         String licenseContent = UrlRequester.getFromUrl(testFile.toURI().toURL().toString());
-        Assert.assertEquals("license1=This is mine!", licenseContent.trim());
+        assertEquals("license1=This is mine!", licenseContent.trim());
     }
 
     @Test
-    public void testClasspathIsAValidUrl() {
-        Assert.assertTrue("classpath protocol not registered", UrlRequester.isStringUrl("classpath:" + RESOURCE_NAME));
+    void testClasspathIsAValidUrl() {
+        assertTrue(UrlRequester.isStringUrl("classpath:" + RESOURCE_NAME), "classpath protocol not registered");
     }
 
     @Test
-    public void testClasspathIsAExternalUrl() {
-        Assert.assertTrue("classpath protocol as external", UrlRequester.isExternalUrl("classpath:" + RESOURCE_NAME));
+    void testClasspathIsAExternalUrl() {
+        assertTrue(UrlRequester.isExternalUrl("classpath:" + RESOURCE_NAME), "classpath protocol as external");
     }
 }

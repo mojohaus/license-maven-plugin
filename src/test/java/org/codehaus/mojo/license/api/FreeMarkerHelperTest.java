@@ -29,10 +29,11 @@ import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.mojo.license.model.LicenseMap;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests the {@link FreeMarkerHelper} and given templates.
@@ -40,11 +41,11 @@ import org.slf4j.LoggerFactory;
  * @author tchemit dev@tchemit.fr
  * @since 1.1
  */
-public class FreeMarkerHelperTest {
+class FreeMarkerHelperTest {
     private static final Logger LOG = LoggerFactory.getLogger(FreeMarkerHelperTest.class);
 
     @Test
-    public void testRenderTemplateForThirdPartyFile() throws Exception {
+    void testRenderTemplateForThirdPartyFile() throws Exception {
 
         FreeMarkerHelper helper = FreeMarkerHelper.newDefaultHelper();
 
@@ -87,7 +88,7 @@ public class FreeMarkerHelperTest {
     }
 
     @Test
-    public void testRenderTemplateForThirdPartyFileGroupByLicense() throws Exception {
+    void testRenderTemplateForThirdPartyFileGroupByLicense() throws Exception {
 
         FreeMarkerHelper helper = FreeMarkerHelper.newDefaultHelper();
 
@@ -130,7 +131,7 @@ public class FreeMarkerHelperTest {
     }
 
     @Test
-    public void testRenderTemplateForUpdateFileHeader() throws Exception {
+    void testRenderTemplateForUpdateFileHeader() throws Exception {
 
         FreeMarkerHelper helper = FreeMarkerHelper.newDefaultHelper();
 
@@ -155,7 +156,7 @@ public class FreeMarkerHelperTest {
         properties.put("addSvnKeyWords", true);
 
         String s = helper.renderTemplate("/org/codehaus/mojo/license/default-file-header-description.ftl", properties);
-        Assert.assertEquals("projectName\n$Id:$\n$HeadURL:$", s);
+        assertEquals("projectName\n$Id:$\n$HeadURL:$", s);
         LOG.info("{}", s);
     }
 }

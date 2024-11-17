@@ -25,9 +25,12 @@ package org.codehaus.mojo.license.model;
 import java.io.IOException;
 import java.net.URL;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests {@link LicenseRepository}.
@@ -35,17 +38,17 @@ import org.junit.Test;
  * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
-public class LicenseRepositoryTest {
+class LicenseRepositoryTest {
 
     protected LicenseRepository repository;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         repository = null;
     }
 
     @Test
-    public void testJarRepository() throws IOException {
+    void testJarRepository() throws IOException {
 
         repository = new LicenseRepository();
         URL baseURL = getClass().getResource(LicenseStore.JAR_LICENSE_REPOSITORY);
@@ -53,23 +56,23 @@ public class LicenseRepositoryTest {
         repository.load();
 
         License[] licenses = repository.getLicenses();
-        Assert.assertNotNull(licenses);
-        Assert.assertEquals(LicenseStoreTest.DEFAULT_LICENSES.size(), licenses.length);
+        assertNotNull(licenses);
+        assertEquals(LicenseStoreTest.DEFAULT_LICENSES.size(), licenses.length);
 
         for (String licenseName : LicenseStoreTest.DEFAULT_LICENSES) {
             License license = repository.getLicense(licenseName);
-            Assert.assertNotNull(license);
-            Assert.assertNotNull(license.getHeaderURL());
-            Assert.assertNotNull(license.getLicenseURL());
+            assertNotNull(license);
+            assertNotNull(license.getHeaderURL());
+            assertNotNull(license.getLicenseURL());
         }
 
         for (String licenseName : repository.getLicenseNames()) {
-            Assert.assertTrue(LicenseStoreTest.DEFAULT_LICENSES.contains(licenseName));
+            assertTrue(LicenseStoreTest.DEFAULT_LICENSES.contains(licenseName));
         }
     }
 
     @Test
-    public void testUserRepository() throws IOException {
+    void testUserRepository() throws IOException {
 
         repository = new LicenseRepository();
         URL baseURL = getClass().getResource("/newRepository");
@@ -77,18 +80,18 @@ public class LicenseRepositoryTest {
         repository.load();
 
         License[] licenses = repository.getLicenses();
-        Assert.assertNotNull(licenses);
-        Assert.assertEquals(LicenseStoreTest.NEW_LICENSES.size(), licenses.length);
+        assertNotNull(licenses);
+        assertEquals(LicenseStoreTest.NEW_LICENSES.size(), licenses.length);
 
         for (String licenseName : LicenseStoreTest.NEW_LICENSES) {
             License license = repository.getLicense(licenseName);
-            Assert.assertNotNull(license);
-            Assert.assertNotNull(license.getHeaderURL());
-            Assert.assertNotNull(license.getLicenseURL());
+            assertNotNull(license);
+            assertNotNull(license.getHeaderURL());
+            assertNotNull(license.getLicenseURL());
         }
 
         for (String licenseName : repository.getLicenseNames()) {
-            Assert.assertTrue(LicenseStoreTest.NEW_LICENSES.contains(licenseName));
+            assertTrue(LicenseStoreTest.NEW_LICENSES.contains(licenseName));
         }
     }
 }
