@@ -20,15 +20,20 @@
  * #L%
  */
 
-import java.nio.file.Path;
-import java.nio.file.Files;
+import com.github.tomakehurst.wiremock.WireMockServer
+
+import java.nio.file.Files
+import java.nio.file.Path
 
 final Path basePath = basedir.toPath()
 
 final Path asl2 = basePath.resolve('target/generated-resources/licenses/apache license 2.0 - license-2.0.txt')
 assert Files.exists(asl2)
-assert asl2.toFile().text.contains('Proxied via LittleProxy')
+assert asl2.toFile().text.contains('Proxied via WireMock')
 
 final Path expectedLicensesXml = basePath.resolve('licenses.expected.xml')
 final Path licensesXml = basePath.resolve('target/generated-resources/licenses.xml')
 assert expectedLicensesXml.toFile().text.equals(licensesXml.toFile().text)
+
+WireMockServer wireMockServer = context.get("wireMockServer")
+wireMockServer.stop()
