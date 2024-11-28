@@ -39,7 +39,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
@@ -600,8 +599,7 @@ public abstract class AbstractAddThirdPartyMojo extends AbstractLicenseMojo {
      *
      * @since 1.0
      */
-    @Component
-    ThirdPartyTool thirdPartyTool;
+    final ThirdPartyTool thirdPartyTool;
 
     /**
      * Dependencies tool. (pluggable component to find dependencies that match up with
@@ -609,8 +607,7 @@ public abstract class AbstractAddThirdPartyMojo extends AbstractLicenseMojo {
      *
      * @since 1.1
      */
-    @Component
-    DependenciesTool dependenciesTool;
+    final DependenciesTool dependenciesTool;
 
     // ----------------------------------------------------------------------
     // Private fields
@@ -668,6 +665,11 @@ public abstract class AbstractAddThirdPartyMojo extends AbstractLicenseMojo {
      */
     @Parameter(property = "license.artifactFiltersUrl")
     protected String artifactFiltersUrl;
+
+    protected AbstractAddThirdPartyMojo(ThirdPartyTool thirdPartyTool, DependenciesTool dependenciesTool) {
+        this.thirdPartyTool = thirdPartyTool;
+        this.dependenciesTool = dependenciesTool;
+    }
 
     // ----------------------------------------------------------------------
     // Abstract Methods
@@ -860,7 +862,7 @@ public abstract class AbstractAddThirdPartyMojo extends AbstractLicenseMojo {
         resolveUnsafeDependenciesFromFile(missingLicensesFromArtifact);
     }
 
-    void resolveUnsafeDependenciesFromFile(File missingLicenses) throws IOException, MojoExecutionException {
+    void resolveUnsafeDependenciesFromFile(File missingLicenses) throws IOException {
         if (missingLicenses == null) {
             return;
         }
@@ -897,18 +899,16 @@ public abstract class AbstractAddThirdPartyMojo extends AbstractLicenseMojo {
     }
 
     void checkUnsafeDependencies() {
-        if (CollectionUtils.isNotEmpty(unsafeDependencies)) {
-            if (LOG.isWarnEnabled()) {
-                boolean plural = unsafeDependencies.size() > 1;
-                String message = String.format(
-                        "There %s %d %s with no license :",
-                        plural ? "are" : "is", unsafeDependencies.size(), plural ? "dependencies" : "dependency");
-                LOG.warn(message);
-                for (MavenProject dep : unsafeDependencies) {
+        if (CollectionUtils.isNotEmpty(unsafeDependencies) && LOG.isWarnEnabled()) {
+            boolean plural = unsafeDependencies.size() > 1;
+            String message = String.format(
+                    "There %s %d %s with no license :",
+                    plural ? "are" : "is", unsafeDependencies.size(), plural ? "dependencies" : "dependency");
+            LOG.warn(message);
+            for (MavenProject dep : unsafeDependencies) {
 
-                    // no license found for the dependency
-                    LOG.warn(" - {}", MojoHelper.getArtifactId(dep.getArtifact()));
-                }
+                // no license found for the dependency
+                LOG.warn(" - {}", MojoHelper.getArtifactId(dep.getArtifact()));
             }
         }
     }

@@ -114,17 +114,14 @@ public class DefaultThirdPartyTool implements ThirdPartyTool {
     /**
      * Maven Artifact Resolver repoSystem
      */
-    @Inject
-    private RepositorySystem aetherRepoSystem;
+    private final RepositorySystem aetherRepoSystem;
 
-    @Inject
-    private Provider<MavenSession> mavenSessionProvider;
+    private final Provider<MavenSession> mavenSessionProvider;
 
     /**
      * Maven ProjectHelper.
      */
-    @Inject
-    private MavenProjectHelper projectHelper;
+    private final MavenProjectHelper projectHelper;
 
     /**
      * freeMarker helper.
@@ -137,6 +134,16 @@ public class DefaultThirdPartyTool implements ThirdPartyTool {
     private final Comparator<MavenProject> projectComparator = MojoHelper.newMavenProjectComparator();
 
     private boolean verbose;
+
+    @Inject
+    DefaultThirdPartyTool(
+            RepositorySystem aetherRepoSystem,
+            Provider<MavenSession> mavenSessionProvider,
+            MavenProjectHelper projectHelper) {
+        this.aetherRepoSystem = aetherRepoSystem;
+        this.mavenSessionProvider = mavenSessionProvider;
+        this.projectHelper = projectHelper;
+    }
 
     /**
      * {@inheritDoc}
@@ -657,8 +664,8 @@ public class DefaultThirdPartyTool implements ThirdPartyTool {
     // ----------------------------------------------------------------------
 
     /**
-     * @param project         not null
-     * @param remoteRepositories    not null
+     * @param project not null
+     * @param remoteRepositories not null
      * @return the resolved third party descriptor
      * @throws ArtifactResolutionException if any
      */

@@ -22,6 +22,8 @@ package org.codehaus.mojo.license;
  * #L%
  */
 
+import javax.inject.Inject;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -40,6 +42,8 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
+import org.codehaus.mojo.license.api.DependenciesTool;
+import org.codehaus.mojo.license.api.ThirdPartyTool;
 import org.codehaus.mojo.license.model.LicenseMap;
 import org.codehaus.mojo.license.utils.SortedProperties;
 import org.slf4j.Logger;
@@ -107,6 +111,11 @@ public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo {
     @Parameter(property = "license.aggregateMissingLicensesFile")
     private File aggregateMissingLicensesFile;
 
+    @Inject
+    public AggregatorAddThirdPartyMojo(ThirdPartyTool thirdPartyTool, DependenciesTool dependenciesTool) {
+        super(thirdPartyTool, dependenciesTool);
+    }
+
     // ----------------------------------------------------------------------
     // AbstractLicenseMojo Implementaton
     // ----------------------------------------------------------------------
@@ -168,14 +177,13 @@ public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo {
 
         licenseMap = new LicenseMap();
 
-        Artifact pluginArtifact =
-                (Artifact) project.getPluginArtifactMap().get("org.codehaus.mojo:license-maven-plugin");
+        Artifact pluginArtifact = project.getPluginArtifactMap().get("org.codehaus.mojo:license-maven-plugin");
 
         String groupId = null;
         String artifactId = null;
         String version = null;
         if (pluginArtifact == null) {
-            Plugin plugin = (Plugin)
+            Plugin plugin =
                     project.getPluginManagement().getPluginsAsMap().get("org.codehaus.mojo:license-maven-plugin");
             if (plugin != null) {
                 groupId = plugin.getGroupId();
@@ -214,7 +222,7 @@ public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo {
                 continue;
             }
 
-            AddThirdPartyMojo mojo = new AddThirdPartyMojo();
+            AddThirdPartyMojo mojo = new AddThirdPartyMojo(thirdPartyTool, dependenciesTool);
             mojo.initFromMojo(this, reactorProject);
 
             LicenseMap childLicenseMap = mojo.licenseMap;

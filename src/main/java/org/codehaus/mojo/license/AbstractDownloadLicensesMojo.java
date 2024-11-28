@@ -63,6 +63,7 @@ import org.codehaus.mojo.license.download.LicenseDownloader.LicenseDownloadResul
 import org.codehaus.mojo.license.download.LicenseMatchers;
 import org.codehaus.mojo.license.download.LicenseSummaryReader;
 import org.codehaus.mojo.license.download.LicensedArtifact;
+import org.codehaus.mojo.license.download.LicensedArtifactResolver;
 import org.codehaus.mojo.license.download.PreferredFileNames;
 import org.codehaus.mojo.license.download.ProjectLicense;
 import org.codehaus.mojo.license.download.ProjectLicenseInfo;
@@ -777,6 +778,10 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
     private final Set<String> orphanFileNames = new HashSet<>();
 
     private UrlReplacements urlReplacements;
+
+    protected AbstractDownloadLicensesMojo(LicensedArtifactResolver licensedArtifactResolver) {
+        super(licensedArtifactResolver);
+    }
 
     protected abstract boolean isSkip();
 

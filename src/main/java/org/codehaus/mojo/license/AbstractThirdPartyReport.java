@@ -40,7 +40,6 @@ import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
@@ -227,9 +226,9 @@ public abstract class AbstractThirdPartyReport extends AbstractMavenReport
     private String overrideUrl;
 
     /**
-     * A {@link URL} prepared either our of {@link #overrideFile} or {@link #overrideUrl} or the default value.
+     * A URL prepared either our of {@link #overrideFile} or {@link #overrideUrl} or the default value.
      *
-     * @see LicenseMojoUtils#prepareThirdPartyOverrideUrl(URL, File, String, File)
+     * @see LicenseMojoUtils#prepareThirdPartyOverrideUrl(String, File, String, File)
      */
     String resolvedOverrideUrl;
 
@@ -300,24 +299,21 @@ public abstract class AbstractThirdPartyReport extends AbstractMavenReport
      *
      * @since 1.1
      */
-    @Component
-    private I18N i18n;
+    private final I18N i18n;
 
     /**
      * dependencies tool.
      *
      * @since 1.1
      */
-    @Component
-    private DependenciesTool dependenciesTool;
+    private final DependenciesTool dependenciesTool;
 
     /**
      * third party tool.
      *
      * @since 1.1
      */
-    @Component
-    private ThirdPartyTool thirdPartyTool;
+    private final ThirdPartyTool thirdPartyTool;
 
     /**
      * A URL returning a plain text file that contains include/exclude artifact filters in the following format:
@@ -340,6 +336,12 @@ public abstract class AbstractThirdPartyReport extends AbstractMavenReport
     private String artifactFiltersUrl;
 
     private ArtifactFilters artifactFilters;
+
+    protected AbstractThirdPartyReport(I18N i18n, DependenciesTool dependenciesTool, ThirdPartyTool thirdPartyTool) {
+        this.i18n = i18n;
+        this.dependenciesTool = dependenciesTool;
+        this.thirdPartyTool = thirdPartyTool;
+    }
 
     // ----------------------------------------------------------------------
     // Protected Abstract Methods
@@ -396,7 +398,7 @@ public abstract class AbstractThirdPartyReport extends AbstractMavenReport
         }
 
         ThirdPartyReportRenderer renderer =
-                new ThirdPartyReportRenderer(getSink(), i18n, getOutputName(), locale, details);
+                new ThirdPartyReportRenderer(getSink(), i18n, getOutputPath(), locale, details);
         renderer.render();
     }
 
@@ -405,7 +407,7 @@ public abstract class AbstractThirdPartyReport extends AbstractMavenReport
      */
     @Override
     public String getDescription(Locale locale) {
-        return i18n.getString(getOutputName(), locale, "report.description");
+        return i18n.getString(getOutputPath(), locale, "report.description");
     }
 
     /**
@@ -413,7 +415,7 @@ public abstract class AbstractThirdPartyReport extends AbstractMavenReport
      */
     @Override
     public String getName(Locale locale) {
-        return i18n.getString(getOutputName(), locale, "report.title");
+        return i18n.getString(getOutputPath(), locale, "report.title");
     }
 
     // ----------------------------------------------------------------------

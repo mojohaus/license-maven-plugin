@@ -22,6 +22,8 @@ package org.codehaus.mojo.license;
  * #L%
  */
 
+import javax.inject.Inject;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -30,7 +32,6 @@ import java.util.Map;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.codehaus.mojo.license.header.transformer.FileHeaderTransformer;
@@ -68,8 +69,12 @@ public class CommentStyleListMojo extends AbstractLicenseMojo {
      *
      * @since 1.0
      */
-    @Component(role = FileHeaderTransformer.class)
-    private Map<String, FileHeaderTransformer> transformers;
+    private final Map<String, FileHeaderTransformer> transformers;
+
+    @Inject
+    public CommentStyleListMojo(Map<String, FileHeaderTransformer> transformers) {
+        this.transformers = transformers;
+    }
 
     // ----------------------------------------------------------------------
     // AbstractLicenseMojo Implementation
