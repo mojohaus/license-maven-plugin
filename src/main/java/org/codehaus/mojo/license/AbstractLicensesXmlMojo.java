@@ -34,7 +34,6 @@ import java.util.List;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.mojo.license.download.LicenseSummaryWriter;
@@ -106,10 +105,13 @@ public abstract class AbstractLicensesXmlMojo extends AbstractMojo {
      *
      * @since 1.0
      */
-    @Component
-    protected LicensedArtifactResolver licensedArtifactResolver;
+    protected final LicensedArtifactResolver licensedArtifactResolver;
 
     private Charset charset;
+
+    protected AbstractLicensesXmlMojo(LicensedArtifactResolver licensedArtifactResolver) {
+        this.licensedArtifactResolver = licensedArtifactResolver;
+    }
 
     /** {@inheritDoc} */
     public String getEncoding() {

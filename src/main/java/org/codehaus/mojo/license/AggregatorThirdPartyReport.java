@@ -22,6 +22,8 @@ package org.codehaus.mojo.license;
  * #L%
  */
 
+import javax.inject.Inject;
+
 import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -33,9 +35,12 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
+import org.codehaus.mojo.license.api.DependenciesTool;
 import org.codehaus.mojo.license.api.DependenciesToolException;
 import org.codehaus.mojo.license.api.ThirdPartyDetails;
+import org.codehaus.mojo.license.api.ThirdPartyTool;
 import org.codehaus.mojo.license.api.ThirdPartyToolException;
+import org.codehaus.plexus.i18n.I18N;
 
 /**
  * Generates a report of all third-parties detected in the module.
@@ -73,6 +78,11 @@ public class AggregatorThirdPartyReport extends AbstractThirdPartyReport {
             defaultValue = "true")
     private boolean executeOnlyOnRootModule;
 
+    @Inject
+    public AggregatorThirdPartyReport(I18N i18n, DependenciesTool dependenciesTool, ThirdPartyTool thirdPartyTool) {
+        super(i18n, dependenciesTool, thirdPartyTool);
+    }
+
     // ----------------------------------------------------------------------
     // MavenReport Implementaton
     // ----------------------------------------------------------------------
@@ -80,6 +90,8 @@ public class AggregatorThirdPartyReport extends AbstractThirdPartyReport {
     /**
      * {@inheritDoc}
      */
+    @Override
+    @Deprecated
     public String getOutputName() {
         return "aggregate-third-party-report";
     }

@@ -40,7 +40,6 @@ import freemarker.template.Template;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.codehaus.mojo.license.api.FreeMarkerHelper;
 import org.codehaus.mojo.license.header.FileHeader;
@@ -328,8 +327,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo {
      *
      * @since 1.0
      */
-    @Component(role = FileHeaderTransformer.class)
-    private Map<String, FileHeaderTransformer> transformers;
+    private final Map<String, FileHeaderTransformer> transformers;
 
     // ----------------------------------------------------------------------
     // Private fields
@@ -375,6 +373,10 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo {
      * @since 1.0
      */
     private FreeMarkerHelper freeMarkerHelper = FreeMarkerHelper.newDefaultHelper();
+
+    protected AbstractFileHeaderMojo(Map<String, FileHeaderTransformer> transformers) {
+        this.transformers = transformers;
+    }
 
     // ----------------------------------------------------------------------
     // Abstract Methods

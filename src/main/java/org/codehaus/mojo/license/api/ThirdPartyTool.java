@@ -51,11 +51,6 @@ import org.eclipse.aether.transfer.ArtifactNotFoundException;
 public interface ThirdPartyTool {
 
     /**
-     * Plexus Role.
-     */
-    String ROLE = ThirdPartyTool.class.getName();
-
-    /**
      * Is log should be verbose?
      *
      * @return {@code true} if verbose log should be produced, {@code false} otherwise.

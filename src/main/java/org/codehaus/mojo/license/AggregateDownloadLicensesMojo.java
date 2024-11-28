@@ -22,6 +22,8 @@ package org.codehaus.mojo.license;
  * #L%
  */
 
+import javax.inject.Inject;
+
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -33,6 +35,7 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.mojo.license.api.ResolvedProjectDependencies;
 import org.codehaus.mojo.license.download.LicensedArtifact;
+import org.codehaus.mojo.license.download.LicensedArtifactResolver;
 import org.codehaus.mojo.license.utils.MojoHelper;
 
 /**
@@ -107,6 +110,11 @@ public class AggregateDownloadLicensesMojo extends AbstractDownloadLicensesMojo 
      */
     @Parameter(property = "license.extendedInfo", defaultValue = "false")
     private boolean extendedInfo;
+
+    @Inject
+    public AggregateDownloadLicensesMojo(LicensedArtifactResolver licensedArtifactResolver) {
+        super(licensedArtifactResolver);
+    }
 
     // ----------------------------------------------------------------------
     // AbstractDownloadLicensesMojo Implementation

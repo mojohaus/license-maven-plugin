@@ -22,6 +22,8 @@ package org.codehaus.mojo.license;
  * #L%
  */
 
+import javax.inject.Inject;
+
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -41,6 +43,7 @@ import org.codehaus.mojo.license.api.MavenProjectDependenciesConfigurator;
 import org.codehaus.mojo.license.api.ResolvedProjectDependencies;
 import org.codehaus.mojo.license.download.LicenseSummaryReader;
 import org.codehaus.mojo.license.download.LicensedArtifact;
+import org.codehaus.mojo.license.download.LicensedArtifactResolver;
 import org.codehaus.mojo.license.download.ProjectLicenseInfo;
 import org.codehaus.mojo.license.utils.MojoHelper;
 import org.slf4j.Logger;
@@ -75,6 +78,11 @@ public class LicensesXmlInsertVersionsMojo extends AbstractLicensesXmlMojo {
      */
     @Parameter(property = "license.skipDownloadLicenses", defaultValue = "false")
     private boolean skipDownloadLicenses;
+
+    @Inject
+    public LicensesXmlInsertVersionsMojo(LicensedArtifactResolver licensedArtifactResolver) {
+        super(licensedArtifactResolver);
+    }
 
     public void execute() throws MojoExecutionException, MojoFailureException {
 

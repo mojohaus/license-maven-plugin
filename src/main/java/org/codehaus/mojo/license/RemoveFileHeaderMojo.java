@@ -22,6 +22,8 @@ package org.codehaus.mojo.license;
  * #L%
  */
 
+import javax.inject.Inject;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -36,7 +38,6 @@ import java.util.TreeMap;
 import freemarker.template.Template;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.codehaus.mojo.license.header.transformer.FileHeaderTransformer;
@@ -186,8 +187,7 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo {
      *
      * @since 1.0
      */
-    @Component(role = FileHeaderTransformer.class)
-    private Map<String, FileHeaderTransformer> transformers;
+    private final Map<String, FileHeaderTransformer> transformers;
 
     // ----------------------------------------------------------------------
     // Private fields
@@ -219,6 +219,11 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo {
      * Dictionary of files to treat indexed by their CommentStyle.
      */
     private Map<String, List<File>> filesToTreatByCommentStyle;
+
+    @Inject
+    public RemoveFileHeaderMojo(Map<String, FileHeaderTransformer> transformers) {
+        this.transformers = transformers;
+    }
 
     // ----------------------------------------------------------------------
     // AbstractLicenceMojo Implementation

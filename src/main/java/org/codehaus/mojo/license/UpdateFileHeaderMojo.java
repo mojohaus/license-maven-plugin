@@ -22,8 +22,13 @@ package org.codehaus.mojo.license;
  * #L%
  */
 
+import javax.inject.Inject;
+
+import java.util.Map;
+
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.codehaus.mojo.license.header.transformer.FileHeaderTransformer;
 
 /**
  * The goal to update (or add) the header on project source files.
@@ -81,6 +86,11 @@ public class UpdateFileHeaderMojo extends AbstractFileHeaderMojo {
      */
     @Parameter(property = "dryRun", defaultValue = "false")
     private boolean dryRun;
+
+    @Inject
+    public UpdateFileHeaderMojo(Map<String, FileHeaderTransformer> transformers) {
+        super(transformers);
+    }
 
     // ----------------------------------------------------------------------
     // AbstractLicenceMojo Implementation

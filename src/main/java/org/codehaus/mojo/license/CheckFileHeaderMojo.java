@@ -22,8 +22,13 @@ package org.codehaus.mojo.license;
  * #L%
  */
 
+import javax.inject.Inject;
+
+import java.util.Map;
+
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.codehaus.mojo.license.header.transformer.FileHeaderTransformer;
 
 /**
  * The goal to check if the state of header on project source files.
@@ -61,6 +66,11 @@ public class CheckFileHeaderMojo extends AbstractFileHeaderMojo {
      */
     @Parameter(property = "license.skipCheckLicense", defaultValue = "false")
     private boolean skipCheckLicense;
+
+    @Inject
+    public CheckFileHeaderMojo(Map<String, FileHeaderTransformer> transformers) {
+        super(transformers);
+    }
 
     // ----------------------------------------------------------------------
     // AbstractLicenseFileNameMojo Implementation

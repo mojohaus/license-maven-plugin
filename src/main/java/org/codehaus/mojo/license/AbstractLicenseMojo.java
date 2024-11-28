@@ -23,6 +23,7 @@ package org.codehaus.mojo.license;
  */
 
 import java.io.File;
+import java.nio.charset.Charset;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.AbstractMojo;
@@ -31,7 +32,6 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.mojo.license.utils.MojoHelper;
-import org.codehaus.plexus.util.ReaderFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -150,9 +150,7 @@ public abstract class AbstractLicenseMojo extends AbstractMojo {
 
                 init();
 
-            } catch (MojoFailureException e) {
-                throw e;
-            } catch (MojoExecutionException e) {
+            } catch (MojoFailureException | MojoExecutionException e) {
                 throw e;
             } catch (Exception e) {
                 throw new MojoExecutionException(
@@ -169,9 +167,7 @@ public abstract class AbstractLicenseMojo extends AbstractMojo {
 
             try {
                 doAction();
-            } catch (MojoFailureException e) {
-                throw e;
-            } catch (MojoExecutionException e) {
+            } catch (MojoFailureException | MojoExecutionException e) {
                 throw e;
             } catch (Exception e) {
                 throw new MojoExecutionException(
@@ -320,10 +316,11 @@ public abstract class AbstractLicenseMojo extends AbstractMojo {
             LOG.info("Will check encoding: {}", getEncoding());
         }
         if (StringUtils.isEmpty(getEncoding())) {
+            String sysEncoding = Charset.defaultCharset().displayName();
             LOG.warn(
                     "File encoding has not been set, using platform encoding {}, i.e. build is platform dependent!",
-                    ReaderFactory.FILE_ENCODING);
-            setEncoding(ReaderFactory.FILE_ENCODING);
+                    sysEncoding);
+            setEncoding(sysEncoding);
         }
     }
 

@@ -22,6 +22,8 @@ package org.codehaus.mojo.license;
  * #L%
  */
 
+import javax.inject.Inject;
+
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -31,6 +33,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.codehaus.mojo.license.api.ResolvedProjectDependencies;
 import org.codehaus.mojo.license.download.LicensedArtifact;
+import org.codehaus.mojo.license.download.LicensedArtifactResolver;
 import org.codehaus.mojo.license.utils.MojoHelper;
 
 /**
@@ -70,6 +73,11 @@ public class DownloadLicensesMojo extends AbstractDownloadLicensesMojo {
      */
     @Parameter(property = "license.skipDownloadLicenses", defaultValue = "false")
     protected boolean skipDownloadLicenses;
+
+    @Inject
+    public DownloadLicensesMojo(LicensedArtifactResolver licensedArtifactResolver) {
+        super(licensedArtifactResolver);
+    }
 
     // ----------------------------------------------------------------------
     // AbstractDownloadLicensesMojo Implementation
