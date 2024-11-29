@@ -30,7 +30,7 @@
   </parent>
 
   <artifactId>license-maven-plugin</artifactId>
-  <version>2.5.0</version>
+  <version>2.5.1-SNAPSHOT</version>
   <packaging>maven-plugin</packaging>
 
   <name>License Maven Plugin</name>
@@ -103,7 +103,7 @@
   <scm>
     <connection>scm:git:https://github.com/mojohaus/license-maven-plugin.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/mojohaus/license-maven-plugin.git</developerConnection>
-    <tag>2.5.0</tag>
+    <tag>HEAD</tag>
     <url>https://github.com/mojohaus/license-maven-plugin/tree/master</url>
   </scm>
 
@@ -139,7 +139,7 @@
 
     <!-- the same version as in Maven core -->
     <maven-resolver.version>1.4.1</maven-resolver.version>
-    <project.build.outputTimestamp>2024-11-29T07:11:05Z</project.build.outputTimestamp>
+    <project.build.outputTimestamp>2024-11-29T07:11:25Z</project.build.outputTimestamp>
   </properties>
 
   <dependencyManagement>
