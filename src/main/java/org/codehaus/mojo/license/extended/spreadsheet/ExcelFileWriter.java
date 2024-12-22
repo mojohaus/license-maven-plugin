@@ -424,7 +424,7 @@ public class ExcelFileWriter {
                 colorStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
             }
             colorStyle.setFont(highlightUnknownFont);
-            if (dataFormatting != null && dataFormatting.matchedLicensesHaveBorder) {
+            if (dataFormatting != null && dataFormatting.getMatchedLicensesHaveBorder()) {
                 colorStyle.setLeftBorderColor(indexedColor.getIndex());
                 colorStyle.setBorderLeft(BorderStyle.MEDIUM);
 
@@ -541,7 +541,7 @@ public class ExcelFileWriter {
                         grayBackground,
                         extendedInfo.getName());
                 // Developers
-                if (dataFormatting == null || !dataFormatting.skipDevelopers) {
+                if (dataFormatting == null || !dataFormatting.getSkipDevelopers()) {
                     currentRowData = new SpreadsheetUtil.CurrentRowData(currentRowIndex, extraRows, hasExtendedInfo);
                     extraRows = addList(
                             cellListParameter,

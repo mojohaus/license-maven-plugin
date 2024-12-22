@@ -22,6 +22,9 @@ package org.codehaus.mojo.license.download;
  * #L%
  */
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -53,9 +56,6 @@ import org.codehaus.mojo.license.spdx.SpdxLicenseList;
 import org.osgi.framework.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * @author <a href="https://github.com/ppalaga">Peter Palaga</a>, Jan-Hendrik Diederich (for the extended information)
@@ -114,9 +114,9 @@ public class LicensedArtifact {
         if (!(obj instanceof LicensedArtifact)) return false;
         LicensedArtifact other = (LicensedArtifact) obj;
         return Objects.equals(artifactId, other.artifactId)
-            && Objects.equals(groupId, other.groupId)
-            && Objects.equals(licenses, other.licenses)
-            && Objects.equals(version, other.version);
+                && Objects.equals(groupId, other.groupId)
+                && Objects.equals(licenses, other.licenses)
+                && Objects.equals(version, other.version);
         // CHECKSTYLE_ON: NeedBraces
     }
 
@@ -195,7 +195,7 @@ public class LicensedArtifact {
         @Nullable
         private ExtendedInfo extraInfosFromArtifact(@Nonnull Artifact artifact) {
             if (artifact.getFile() == null) {
-                LOG.error("Artifact {} has no valid file set",  artifact);
+                LOG.error("Artifact {} has no valid file set", artifact);
                 return null;
             }
             String extension = FilenameUtils.getExtension(artifact.getFile().toString());
@@ -240,8 +240,7 @@ public class LicensedArtifact {
         private static void copyManifestToExtendedInfo(Manifest manifest, ExtendedInfo extendedInfo) {
             final Attributes mainAttributes = manifest.getMainAttributes();
             // Fetch Java standard JAR manifest attributes.
-            final Object implementationVendor =
-                    mainAttributes.get(Attributes.Name.IMPLEMENTATION_VENDOR);
+            final Object implementationVendor = mainAttributes.get(Attributes.Name.IMPLEMENTATION_VENDOR);
             if (implementationVendor instanceof String) {
                 extendedInfo.setImplementationVendor((String) implementationVendor);
             }

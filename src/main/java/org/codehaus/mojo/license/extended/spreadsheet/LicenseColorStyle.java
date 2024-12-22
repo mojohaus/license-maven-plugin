@@ -36,12 +36,13 @@ enum LicenseColorStyle {
         final LicenseColorStyle licenseColorStyle;
         if (excludedLicenses != null && excludedLicenses.contains(license.getName())) {
             licenseColorStyle = LicenseColorStyle.FORBIDDEN;
-        } else if (dataFormatting.problematicLicenses != null
-                && dataFormatting.problematicLicenses.contains(license.getName())) {
+        } else if (dataFormatting.getProblematicLicenses() != null
+                && dataFormatting.getProblematicLicenses().contains(license.getName())) {
             licenseColorStyle = LicenseColorStyle.PROBLEMATIC;
-        } else if (dataFormatting.okLicenses != null && dataFormatting.okLicenses.contains(license.getName())) {
+        } else if (dataFormatting.getOkLicenses() != null
+                && dataFormatting.getOkLicenses().contains(license.getName())) {
             licenseColorStyle = LicenseColorStyle.OK;
-        } else if (dataFormatting.highlightUnknownLicenses) {
+        } else if (dataFormatting.getHighlightUnknownLicenses()) {
             licenseColorStyle = LicenseColorStyle.UNKNOWN;
         } else {
             licenseColorStyle = LicenseColorStyle.NONE;

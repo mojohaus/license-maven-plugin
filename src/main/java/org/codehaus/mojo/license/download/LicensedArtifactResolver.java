@@ -36,6 +36,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.building.ModelBuildingRequest;
+import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
@@ -59,6 +60,7 @@ import org.slf4j.LoggerFactory;
  */
 @Named
 @Singleton
+@Mojo(name = "LicensedArtifactResolver")
 public class LicensedArtifactResolver {
     private static final Logger LOG = LoggerFactory.getLogger(LicensedArtifactResolver.class);
 
@@ -71,11 +73,23 @@ public class LicensedArtifactResolver {
     /**
      * Project builder.
      */
-    @Inject
     private ProjectBuilder mavenProjectBuilder;
 
-    @Inject
+    public void setMavenProjectBuilder(ProjectBuilder mavenProjectBuilder) {
+        this.mavenProjectBuilder = mavenProjectBuilder;
+    }
+
     private Provider<MavenSession> mavenSessionProvider;
+
+    public void setMavenSessionProvider(Provider<MavenSession> mavenSessionProvider) {
+        this.mavenSessionProvider = mavenSessionProvider;
+    }
+
+    @Inject
+    public LicensedArtifactResolver(ProjectBuilder mavenProjectBuilder, Provider<MavenSession> mavenSessionProvider) {
+        this.mavenProjectBuilder = mavenProjectBuilder;
+        this.mavenSessionProvider = mavenSessionProvider;
+    }
 
     // CHECKSTYLE_OFF: MethodLength
     /**

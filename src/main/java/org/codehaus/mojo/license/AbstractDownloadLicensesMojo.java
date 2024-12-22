@@ -791,7 +791,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
      * If a blacklisted license is found, the plugin leaves the Maven process with an error-message.
      */
     @Parameter(property = "license.failOnBlacklist", defaultValue = "false")
-    public boolean failOnBlacklist;
+    protected boolean failOnBlacklist;
 
     /**
      * To merge licenses in the Excel file.
@@ -1131,9 +1131,6 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
 
     private int compareProjectLicenseInfo(ProjectLicenseInfo li1, ProjectLicenseInfo li2) {
         switch (dataFormatting.orderBy) {
-            case none:
-                // This should never have been reached.
-                throw new IllegalStateException("Can't sort by \"none\"");
             case dependencyName:
                 return compareDependenciesByName(li1, li2);
             case dependencyPluginId:
@@ -1152,9 +1149,11 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
                 }
             case licenseName:
                 return compareLicensesByName(li1, li2);
+            case none:
+            default:
+                // This should never have been reached.
+                throw new IllegalStateException("Can't sort by \"" + dataFormatting.orderBy + "\"");
         }
-        throw new IllegalArgumentException(
-                "Implement missing switch case " + dataFormatting.orderBy + " for DataFormatting OrderBy");
     }
 
     private static IntStream pluginIdCompareStream(ProjectLicenseInfo li1, ProjectLicenseInfo li2) {
@@ -1487,7 +1486,8 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
      */
     protected Path[] getAutodetectEolFiles() {
         return new Path[] {
-            licensesConfigFile.toPath(), project.getBasedir().toPath().resolve("pom.xml")
+            // TODO: Find out why "project.getFile()" wasn't always directly used.
+            project.getFile().toPath()
         };
     }
 
@@ -1827,7 +1827,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
          * By what column / data are the lines ordered?
          */
         @Parameter(property = "formatting.orderBy", defaultValue = "NONE")
-        public OrderBy orderBy;
+        protected OrderBy orderBy;
 
         /**
          * If all unknown licenses should be highlighted.
@@ -1835,19 +1835,19 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
          * {@link #problematicLicenses} or {@link #okLicenses}.
          */
         @Parameter(property = "formatting.unknownLicenses")
-        public boolean highlightUnknownLicenses;
+        protected boolean highlightUnknownLicenses;
 
         /**
          * List of licenses which should be highlighted as problematic.
          */
         @Parameter(property = "formatting.problematicLicenses")
-        public List<String> problematicLicenses;
+        protected List<String> problematicLicenses;
 
         /**
          * List of licenses which should be highlighted as OK.
          */
         @Parameter(property = "formatting.okLicenses")
-        public List<String> okLicenses;
+        protected List<String> okLicenses;
 
         /**
          * If licenses found in {@link #excludedLicenses}, {@link #problematicLicenses}, {@link #okLicenses}
@@ -1858,7 +1858,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
          * it makes licenses look as if they were the only ones belonging to a dependency if it has multiple licenses.
          */
         @Parameter(property = "formatting.matchedLicensesHaveBorder")
-        public boolean matchedLicensesHaveBorder;
+        protected boolean matchedLicensesHaveBorder;
 
         /**
          * Skip the developer info.
@@ -1866,7 +1866,43 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
          * because often then each dependency has only a single line of information.
          */
         @Parameter(property = "formatting.skipDevelopers")
-        public boolean skipDevelopers;
+        protected boolean skipDevelopers;
+
+        public boolean getHighlightUnknownLicenses() {
+            return highlightUnknownLicenses;
+        }
+
+        public boolean getMatchedLicensesHaveBorder() {
+            return matchedLicensesHaveBorder;
+        }
+
+        public List<String> getOkLicenses() {
+            return okLicenses;
+        }
+
+        public void setOkLicenses(List<String> okLicenses) {
+            this.okLicenses = okLicenses;
+        }
+
+        public OrderBy getOrderBy() {
+            return orderBy;
+        }
+
+        public void setOrderBy(OrderBy orderBy) {
+            this.orderBy = orderBy;
+        }
+
+        public void setProblematicLicenses(List<String> problematicLicenses) {
+            this.problematicLicenses = problematicLicenses;
+        }
+
+        public List<String> getProblematicLicenses() {
+            return problematicLicenses;
+        }
+
+        public boolean getSkipDevelopers() {
+            return skipDevelopers;
+        }
 
         @Override
         public String toString() {

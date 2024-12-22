@@ -172,9 +172,9 @@ class LicenseSummaryTest {
         validateXml(licenseSummaryFile);
 
         DataFormatting dataFormatting = new DataFormatting();
-        dataFormatting.orderBy = DataFormatting.OrderBy.licenseName;
-        dataFormatting.problematicLicenses = Collections.singletonList("lgpl");
-        dataFormatting.okLicenses = Collections.singletonList("Apache 2.0");
+        dataFormatting.setOrderBy(DataFormatting.OrderBy.licenseName);
+        dataFormatting.setProblematicLicenses(Collections.singletonList("lgpl"));
+        dataFormatting.setOkLicenses(Collections.singletonList("Apache 2.0"));
         AbstractAddThirdPartyMojo.ExcludedLicenses excludedLicenses = new AbstractAddThirdPartyMojo.ExcludedLicenses();
         excludedLicenses.getData().add("GPL 2");
 

@@ -26,7 +26,13 @@ mvn verify site -DperformRelease scm-publish:publish-scm
 ## Run integration tests
 
 ```bash
-mvn clean verify -Prun-its
+mvn clean integration-test -Prun-its
+```
+
+Run only some tests (separated by comma (",")):
+
+```bash
+mvn integration-test -Prun-its -Dinvoker.test=aggregate-download-licenses-sort-by-*
 ```
 
 ## List dependencies
