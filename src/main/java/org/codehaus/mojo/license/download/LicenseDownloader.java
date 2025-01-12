@@ -37,16 +37,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.time.Instant;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpException;
 import org.apache.http.HttpHost;
@@ -92,13 +89,6 @@ public class LicenseDownloader implements AutoCloseable {
     private static final String PROTOCOL_HTTPS = "https://";
     private static final Pattern PROTOCOL_PATTERN = Pattern.compile(".+://.+");
 
-    /**
-     * Last time the given URL was downloaded.<br>
-     * Used to implement a rate limiter, so the server doesn't start blocking the requests, because it gets spammed.
-     * Example: The gnu.org server. Which is basically the default license server and used very often.
-     */
-    private static final Map<String, Instant> LAST_DOWNLOADED = new HashMap<>();
-
     private final CloseableHttpClient client;
 
     private final Map<String, ContentSanitizer> contentSanitizers;
@@ -123,7 +113,18 @@ public class LicenseDownloader implements AutoCloseable {
             configBuilder.setProxy(new HttpHost(proxy.getHost(), proxy.getPort(), proxy.getProtocol()));
         }
 
-        HttpClientBuilder clientBuilder = HttpClients.custom().setDefaultRequestConfig(configBuilder.build());
+        HttpClientBuilder clientBuilder = HttpClients.custom()
+                .setDefaultRequestConfig(configBuilder.build())
+                /*
+                If you download licenses without a header, for example from "gnu.org",
+                probably the most used, most important license hoster,
+                without a user-agent, it will block all download attempts with
+                a (misleading) error: "429 Too many requests".
+                Even on the first download after a week of not contacting gnu.org!
+
+                Using "wget" here, because that is a well-known client and it does basically what is done here.
+                */
+                .setUserAgent("Wget/1.21.4");
         if (proxy != null) {
             if (proxy.getUsername() != null && proxy.getPassword() != null) {
                 final CredentialsProvider credsProvider = new BasicCredentialsProvider();
@@ -271,7 +272,7 @@ public class LicenseDownloader implements AutoCloseable {
     private CloseableHttpResponse tryDownload(String licenseUrlString) throws IOException {
         // Shortcut if the URL starts already with a protocol.
         if (PROTOCOL_PATTERN.matcher(licenseUrlString).matches()) {
-            return tryDownloadAndRetry(licenseUrlString);
+            return downloadUrl(licenseUrlString);
         }
         // There is no protocol prefix, try the original, then HTTPS and HTTP.
         String[] protocolPrefixes = new String[] {
@@ -285,7 +286,7 @@ public class LicenseDownloader implements AutoCloseable {
             try {
                 String prefixedLicenseUrlString =
                         index >= 0 ? protocolPrefixes[index] + licenseUrlString : licenseUrlString;
-                return tryDownloadAndRetry(prefixedLicenseUrlString);
+                return downloadUrl(prefixedLicenseUrlString);
             } catch (IOException e) {
                 if (LOG.isDebugEnabled()) {
                     if (index < protocolPrefixes.length - 1) {
@@ -307,84 +308,14 @@ public class LicenseDownloader implements AutoCloseable {
     }
 
     /**
-     * Try downloading the given URL and retry if the server wants a retry after a timeout.<br>
-     * An example for this is the gnu.org server, which is extremely often used as a license resource.
+     * Download with a HTTP GET from the given URL <code>url</code>.
      *
      * @param url The URL.
      * @return The CloseableHttpResponse.
      * @throws IOException Thrown when the connection could not be opened.
      */
-    private CloseableHttpResponse tryDownloadAndRetry(String url) throws IOException {
-        try {
-            URI uri = new URI(url);
-            String host = uri.getHost();
-            Instant lastDownload = LAST_DOWNLOADED.get(host);
-            if (lastDownload != null && lastDownload.plusMillis(1_250).isAfter(Instant.now())) {
-                LOG.debug("Rate limiting download of {} to avoid server blocking", host);
-                try {
-                    Thread.sleep(1_250);
-                } catch (InterruptedException e) {
-                    LOG.error("Interrupted while waiting for rate limiting", e);
-                }
-            }
-            LAST_DOWNLOADED.put(host, Instant.now());
-        } catch (URISyntaxException e) {
-            LOG.warn("Invalid URL \"{}\"?", url);
-        }
-
-        CloseableHttpResponse execute = client.execute(new HttpGet(url));
-
-        //        /* This can happen easily with a modern, fast internet connection.
-        //        Especially when connecting to gnu.org, which is extremely often used as a license resource. */
-        //        if (execute.getStatusLine().getStatusCode() == HttpStatus.SC_TOO_MANY_REQUESTS) {
-        //            execute = retryAfterTimeout(execute, url);
-        //        }
-        return execute;
-    }
-
-    /**
-     * If the server wants a retry after a timeout, this method waits for the given time and retries the request.<br>
-     * This happens regularly with the extremely often referenced gnu.org server.
-     *
-     * @param lastResponse Last CloseableHttpResponse.
-     * @param urlString URL string.
-     * @return The CloseableHttpResponse.
-     * @throws IOException An error happened during opening the HTTP connection.
-     */
-    private CloseableHttpResponse retryAfterTimeout(CloseableHttpResponse lastResponse, String urlString)
-            throws IOException {
-        Header[] headers = lastResponse.getHeaders("Retry-After");
-        if (headers.length > 0) {
-            try {
-                long seconds = Long.parseLong(headers[0].getValue());
-                long millis = seconds * 1000L * 10L + 100L;
-                LOG.warn(
-                        "Too many requests to {}. Waiting for {} seconds (message was: \"{}\").",
-                        urlString,
-                        millis / 1000L,
-                        lastResponse.getStatusLine().getReasonPhrase());
-                lastResponse.close();
-                Thread.sleep(millis);
-                lastResponse = client.execute(new HttpGet(urlString));
-                if (LOG.isDebugEnabled()) {
-                    if (lastResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                        LOG.debug("Successfully downloaded {} after waiting for {} seconds", urlString, millis / 1000L);
-                    } else {
-                        LOG.debug(
-                                "Failed to download {} after waiting for {} seconds. Status code: {}. Message: {}.",
-                                urlString,
-                                seconds,
-                                lastResponse.getStatusLine().getStatusCode(),
-                                lastResponse.getStatusLine().getReasonPhrase());
-                    }
-                }
-            } catch (NumberFormatException | InterruptedException e) {
-                LOG.warn("Failed to parse Retry-After header", e);
-            }
-        } else {
-            LOG.warn("No Retry-After header found for {}", urlString);
-        }
-        return lastResponse;
+    private CloseableHttpResponse downloadUrl(String url) throws IOException {
+        return client.execute(new HttpGet(url));
     }
 
     static LicenseDownloadResult sanitize(

@@ -150,6 +150,17 @@ public class LicensedArtifact {
         return extendedInfos;
     }
 
+    @Override
+    public String toString() {
+        return "LicensedArtifact{" + "groupId='"
+                + groupId + '\'' + ", artifactId='"
+                + artifactId + '\'' + ", version='"
+                + version + '\'' + ", licenses="
+                + licenses + ", errorMessages="
+                + errorMessages + ", extendedInfos="
+                + extendedInfos + '}';
+    }
+
     /**
      * A {@link LicensedArtifact} builder.
      */
