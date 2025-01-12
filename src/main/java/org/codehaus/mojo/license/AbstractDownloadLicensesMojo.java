@@ -1793,7 +1793,9 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
              */
             none,
             /**
-             * Sort by the dependency's name 1st, then by plugin group id, artifact id, etc..
+             * Sort by the dependency's name 1st, then by plugin group id, artifact id, etc..<br>
+             * Only working if <code>&lt;extendedInfo&gt;</code> is <code>true</code>, as the dependency's name is part
+             * of the extended info.
              */
             dependencyName,
             /**

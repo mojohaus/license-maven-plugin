@@ -116,8 +116,8 @@ public class LicenseDownloader implements AutoCloseable {
         HttpClientBuilder clientBuilder = HttpClients.custom()
                 .setDefaultRequestConfig(configBuilder.build())
                 /*
-                If you download licenses without a header, for example from "gnu.org",
-                probably the most used, most important license hoster,
+                If you download licenses without a header, for example, from "gnu.org"
+                (one of the most used, important license hosters),
                 without a user-agent, it will block all download attempts with
                 a (misleading) error: "429 Too many requests".
                 Even on the first download after a week of not contacting gnu.org!

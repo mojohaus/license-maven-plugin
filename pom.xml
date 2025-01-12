@@ -341,6 +341,21 @@
             <requiredJavaVersion>8</requiredJavaVersion>
           </configuration>
         </plugin>
+
+        <!--
+        Write later versions of dependencies and plugins to "dependencies.txt" with
+        "mvn versions:display-dependency-updates -l dependencies.txt".
+        -->
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>versions-maven-plugin</artifactId>
+          <version>2.17.1</version>
+          <configuration>
+            <!-- Ignore alphas, betas, milestones, release-candidates, etc. -->
+            <ignoredVersions>(?i).*-(alpha|beta|m|rc)([-.]?\d+)?</ignoredVersions>
+            <processDependencyManagementTransitive>false</processDependencyManagementTransitive>
+          </configuration>
+        </plugin>
       </plugins>
     </pluginManagement>
 
@@ -554,38 +569,6 @@
           </plugin>
         </plugins>
       </reporting>
-    </profile>
-    <profile>
-      <id>java11+</id>
-      <activation>
-        <jdk>[11,)</jdk>
-      </activation>
-
-      <!-- In JDK 9, the JAXB classes have been removed from the default JDK module. -->
-      <dependencies>
-        <!-- API, java.xml.bind module -->
-        <dependency>
-          <groupId>jakarta.xml.bind</groupId>
-          <artifactId>jakarta.xml.bind-api</artifactId>
-          <version>2.3.3</version>
-          <scope>test</scope>
-        </dependency>
-        <!-- Runtime, com.sun.xml.bind module -->
-        <dependency>
-          <groupId>org.glassfish.jaxb</groupId>
-          <artifactId>jaxb-runtime</artifactId>
-          <version>2.3.9</version>
-          <scope>test</scope>
-        </dependency>
-      </dependencies>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>com.diffplug.spotless</groupId>
-            <artifactId>spotless-maven-plugin</artifactId>
-          </plugin>
-        </plugins>
-      </build>
     </profile>
   </profiles>
 </project>

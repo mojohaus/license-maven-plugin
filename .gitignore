@@ -22,4 +22,11 @@ bin/
 # Misc
 /*~
 /*/*~
+# List outdated dependencies with "mvn versions:display-dependency-updates -l dependencies.txt"
 /dependencies.txt
+
+# Ignore test files
+/src/it/aggregate-download-licenses-sort-by-dependencyName/*.html
+/src/it/aggregate-download-licenses-sort-by-licenseMatch/*.html
+/src/it/aggregate-download-licenses-sort-by-licenseName/*.html
+/src/it/aggregate-download-licenses-sort-by-pluginId/*.html

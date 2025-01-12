@@ -40,7 +40,6 @@ import org.odftoolkit.odfdom.dom.element.config.ConfigConfigItemElement;
 import org.odftoolkit.odfdom.dom.element.config.ConfigConfigItemMapEntryElement;
 import org.odftoolkit.odfdom.dom.element.style.StyleParagraphPropertiesElement;
 import org.odftoolkit.odfdom.dom.element.style.StyleTableCellPropertiesElement;
-import org.odftoolkit.odfdom.dom.element.style.StyleTableRowPropertiesElement;
 import org.odftoolkit.odfdom.dom.element.style.StyleTextPropertiesElement;
 import org.odftoolkit.odfdom.dom.element.text.TextAElement;
 import org.odftoolkit.odfdom.dom.style.OdfStyleFamily;
@@ -113,6 +112,10 @@ public class CalcFileWriter {
 
     private static final String OK_NORMAL_CELL_STYLE = "okNormalCellStyle";
     private static final String OK_GRAY_CELL_STYLE = "okGrayCellStyle";
+
+    // Setting the row height is ignored by OpenOffice Calc.
+    // private static final String ROW_STYLE = "defaultRowStyle";
+    // private static final String ROW_HEIGHT = "0.5cm";
 
     private static final int DOWNLOAD_COLUMN_WIDTH = 6_000;
     private static final String VALUE_TYPE_STRING = "string";
@@ -529,6 +532,12 @@ public class CalcFileWriter {
         OdfStyle styleNormal = officeStyles.newStyle(NORMAL_CELL_STYLE, OdfStyleFamily.TableCell);
         styleNormal.setProperty(OdfTableColumnProperties.UseOptimalColumnWidth, String.valueOf(true));
 
+        /*
+        Setting the row-style to limit the height doesn't work with OpenOffice Calc.
+        */
+        // OdfStyle rowStyle = officeStyles.newStyle(ROW_STYLE, OdfStyleFamily.TableRow);
+        // rowStyle.setProperty(StyleTableRowPropertiesElement.RowHeight, ROW_HEIGHT);
+
         for (ProjectLicenseInfo projectInfo : projectLicenseInfos) {
             final OdfStyle cellStyle, hyperlinkStyle;
             LOG.debug(
@@ -546,17 +555,20 @@ public class CalcFileWriter {
             int extraRows = 0;
             OdfTableRow currentRow = table.appendRow();
 
-            // --------------------------------------------------------------------------------------
-            currentRow.setUseOptimalHeight(false);
-            currentRow.setHeight(0, true);
+            // =========================================================================
+            // This ways of setting the row height are all ignored by OpenOffice Calc
+            // =========================================================================
+            // currentRow.setDefaultCellStyle(rowStyle);
 
-            OdfStyle defaultCellStyle = currentRow.getDefaultCellStyle();
-            if (defaultCellStyle == null) {
-                defaultCellStyle = officeStyles.newStyle("defaultCellStyle", OdfStyleFamily.TableCell);
-            }
-            defaultCellStyle.setProperty(StyleTableRowPropertiesElement.RowHeight, "1");
-            currentRow.setDefaultCellStyle(defaultCellStyle);
-            // --------------------------------------------------------------------------------------
+            // currentRow.setHeight(10, false);
+            // currentRow.setUseOptimalHeight(false);
+
+            // currentRow.getOdfElement().setStyleName(ROW_STYLE);
+
+            // StyleStyleElement styleElement = currentRow.getOdfElement().getOrCreateUnqiueAutomaticStyle();
+            // styleElement.setProperty(StyleTableRowPropertiesElement.UseOptimalRowHeight, "false");
+            // styleElement.setProperty(StyleTableRowPropertiesElement.RowHeight, ROW_HEIGHT);
+            // styleElement.setProperty(StyleTableRowPropertiesElement.BreakBefore, "auto");
 
             rowMap.put(currentRowIndex, currentRow);
             // Plugin ID

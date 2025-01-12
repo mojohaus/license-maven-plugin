@@ -1,17 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  #%L
+  License Maven Plugin
+  %%
+  Copyright (C) 2008 - 2011 CodeLutin, Codehaus, Tony Chemit
+  %%
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU Lesser General Public License as
+  published by the Free Software Foundation, either version 3 of the
+  License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Lesser Public License for more details.
+
+  You should have received a copy of the GNU General Lesser Public
+  License along with this program.  If not, see
+  <http://www.gnu.org/licenses/lgpl-3.0.html>.
+  #L%
+  -->
+
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.codehaus.mojo.license</groupId>
-  <artifactId>AbstractDownloadLicensesMojoIT</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <groupId>org.codehaus.mojo.license.test</groupId>
+  <artifactId>test-aggregate-download-licenses-sort-by-name</artifactId>
+  <version>@project.version@</version>
+
+  <name>License Test :: aggregate-download-licenses - Sort By Dependency Names</name>
+
+  <packaging>pom</packaging>
 
   <properties>
-    <maven.compiler.source>8</maven.compiler.source>
-    <maven.compiler.target>8</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <license.verbose>true</license.verbose>
   </properties>
 
   <dependencies>
@@ -82,8 +108,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>license-maven-plugin</artifactId>
-        <!-- Update the plugin version -->
-        <version>2.5.0-SNAPSHOT</version>
+        <version>@project.version@</version>
         <executions>
           <execution>
             <goals>
@@ -115,6 +140,7 @@
               <okLicense>Apache License, Version 2.0</okLicense>
             </okLicenses>
             <matchedLicensesHaveBorder>true</matchedLicensesHaveBorder>
+            <highlightUnknownLicenses>true</highlightUnknownLicenses>
             <skipDevelopers>true</skipDevelopers>
           </dataFormatting>
 

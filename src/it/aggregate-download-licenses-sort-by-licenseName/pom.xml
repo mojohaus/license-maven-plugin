@@ -31,7 +31,7 @@
   <artifactId>test-aggregate-download-licenses-sort-by-name</artifactId>
   <version>@project.version@</version>
 
-  <name>License Test :: aggregate-download-licenses - Sort By Name</name>
+  <name>License Test :: aggregate-download-licenses - Sort By License Names</name>
 
   <packaging>pom</packaging>
 
@@ -41,65 +41,22 @@
   </properties>
 
   <dependencies>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-databind</artifactId>
-      <version>2.15.2</version>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-core</artifactId>
-      <version>2.15.2</version>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-annotations</artifactId>
-      <version>2.15.2</version>
-    </dependency>
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-      <version>32.1.2-jre</version>
-    </dependency>
+    <!-- Speed up testing by downloading just a few dependencies.
+    Download a longer, more complex list only in the "aggregate-download-licenses-sort-by-name" test. -->
     <dependency>
       <groupId>jakarta.platform</groupId>
       <artifactId>jakarta.jakartaee-api</artifactId>
       <version>10.0.0</version>
     </dependency>
     <dependency>
-      <groupId>org.testcontainers</groupId>
-      <artifactId>testcontainers</artifactId>
-      <version>1.20.3</version>
-    </dependency>
-    <dependency>
-      <groupId>commons-collections</groupId>
-      <artifactId>commons-collections</artifactId>
-      <version>3.2.2</version>
-    </dependency>
-    <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
-    <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
       <version>3.17.0</version>
     </dependency>
-    <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-test -->
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-test</artifactId>
-      <version>3.3.5</version>
-      <scope>test</scope>
-    </dependency>
-    <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
       <version>3.3.5</version>
-    </dependency>
-    <!-- https://mvnrepository.com/artifact/com.github.docker-java/docker-java -->
-    <dependency>
-      <groupId>com.github.docker-java</groupId>
-      <artifactId>docker-java</artifactId>
-      <version>3.4.0</version>
     </dependency>
   </dependencies>
 
@@ -121,9 +78,6 @@
           <writeCalcFile>true</writeCalcFile>
           <writeExcelFile>true</writeExcelFile>
 
-          <licensesCalcOutputFile>target/generated-resources/licenses - orderByDependencyName.ods</licensesCalcOutputFile>
-          <licensesExcelOutputFile>target/generated-resources/licenses - orderByDependencyName.xlsx</licensesExcelOutputFile>
-
           <excludedLicenses>
             <excludedLicense>GNU General Lesser Public License (LGPL) version 3.0</excludedLicense>
           </excludedLicenses>
@@ -131,10 +85,10 @@
           <failOnBlacklist>true</failOnBlacklist>
 
           <dataFormatting>
-            <orderBy>dependencyName</orderBy>
+            <orderBy>licenseName</orderBy>
             <problematicLicenses>
               <problematicLicense>EPL 2.0</problematicLicense>
-              <problematicLicense>GPL2 w/ CPE</problematicLicense>
+              <problematicLicense>MIT License</problematicLicense>
             </problematicLicenses>
             <okLicenses>
               <okLicense>Apache License, Version 2.0</okLicense>

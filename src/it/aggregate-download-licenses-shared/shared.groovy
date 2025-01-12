@@ -1,33 +1,3 @@
-/*
- * #%L
- * License Maven Plugin
- * %%
- * Copyright (C) 2008 - 2011 CodeLutin, Codehaus, Tony Chemit
- * %%
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Lesser Public License for more details.
- *
- * You should have received a copy of the GNU General Lesser Public
- * License along with this program.  If not, see
- * <http://www.gnu.org/licenses/lgpl-3.0.html>.
- * #L%
- */
-
-import org.apache.poi.ss.usermodel.Cell
-import org.apache.poi.ss.usermodel.CellType
-import org.apache.poi.ss.usermodel.Row
-import org.apache.poi.ss.usermodel.Sheet
-import org.apache.poi.ss.usermodel.Workbook
-import org.apache.poi.ss.usermodel.WorkbookFactory
-import org.odftoolkit.odfdom.doc.OdfSpreadsheetDocument
-import org.odftoolkit.odfdom.doc.table.OdfTable
 import org.w3c.dom.Document
 import org.w3c.dom.Node
 import org.w3c.dom.NodeList
@@ -35,8 +5,8 @@ import org.xml.sax.SAXException
 
 import javax.xml.bind.JAXBContext
 import javax.xml.bind.JAXBException
-import javax.xml.bind.annotation.XmlAccessorType
 import javax.xml.bind.annotation.XmlAccessType
+import javax.xml.bind.annotation.XmlAccessorType
 import javax.xml.bind.annotation.XmlAttribute
 import javax.xml.bind.annotation.XmlElement
 import javax.xml.bind.annotation.XmlRootElement
@@ -52,8 +22,6 @@ import java.util.stream.Collectors
 
 import static org.junit.jupiter.api.Assertions.assertEquals
 import static org.junit.jupiter.api.Assertions.assertNotNull
-
-log = Logger.getLogger("test-aggregate-download-licenses-extended-spreadsheet")
 
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlRootElement
@@ -71,7 +39,7 @@ class DependencyInfos {
 }
 
 @XmlAccessorType(XmlAccessType.NONE)
-@XmlRootElement
+@XmlRootElement(name = "dependencyInfo")
 class DependencyInfo {
     @XmlAttribute
     String name
@@ -85,17 +53,17 @@ class DependencyInfo {
     @XmlAttribute
     String version
 
-    @XmlAttribute
-    String license
+    @XmlElement
+    List<String> licenses
 
     DependencyInfo() {}
 
-    DependencyInfo(String name, String groupId, String artifactId, String version, String license) {
+    DependencyInfo(String name, String groupId, String artifactId, String version, List<String> licenses) {
         this.name = name
         this.groupId = groupId
         this.artifactId = artifactId
         this.version = version
-        this.license = license
+        this.licenses = licenses
     }
 
     @Override
@@ -108,12 +76,12 @@ class DependencyInfo {
             && Objects.equals(groupId, that.groupId)
             && Objects.equals(artifactId, that.artifactId)
             && Objects.equals(version, that.version)
-            && Objects.equals(license, that.license)
+            && Objects.equals(licenses, that.licenses)
     }
 
     @Override
     int hashCode() {
-        return Objects.hash(name, groupId, artifactId, version, license)
+        return Objects.hash(name, groupId, artifactId, version, licenses)
     }
 
     @Override
@@ -123,65 +91,13 @@ class DependencyInfo {
             ", groupId='" + groupId + '\'' +
             ", artifactId='" + artifactId + '\'' +
             ", version='" + version + '\'' +
-            ", license='" + license + '\'' +
+            ", licenses='" + licenses + '\'' +
             '}'
     }
 }
 
-static boolean searchTextInExcel(Sheet sheet, String searchText) {
-    def log2 = Logger.getLogger("test-aggregate-download-licenses-extended-spreadsheet-search")
-
-    for (Iterator<Row> rowIterator = sheet.rowIterator(); rowIterator.hasNext();) {
-        Row row = rowIterator.next()
-        for (Iterator<Cell> cellIterator = row.cellIterator(); cellIterator.hasNext();) {
-            Cell cell = cellIterator.next()
-            if (cell.cellType == CellType.STRING || cell.cellType == CellType.BLANK) {
-                def cellValue = cell.stringCellValue
-                if (cellValue == searchText) {
-                    return true
-                } else {
-                    log2.log(Level.FINEST, "Cell Value: {0}", cellValue)
-                }
-            }
-        }
-    }
-    return false
-}
-
-// -------------- Excel ----------------------
-excelFile = new File(basedir, 'target/generated-resources/licenses - orderByDependencyName.xlsx')
-assert excelFile.exists()
-assert excelFile.length() > 100
-
-try (InputStream input = new FileInputStream(excelFile)) {
-    // So it can be easily opened and inspected manually. In a modern IDE it's just a (double-)click in the log output.
-    log.log(Level.FINE, "Excel export at: {}", excelFile.absolutePath)
-    Workbook workbook = WorkbookFactory.create(input)
-    Sheet sheet = workbook.getSheetAt(0)
-
-    assert searchTextInExcel(sheet, "Maven information")
-    assert searchTextInExcel(sheet, "Apache License, Version 2.0")
-    assert searchTextInExcel(sheet, "EPL 1.0")
-}
-
-// -------------- Calc -----------------
-
-calcFile = new File(basedir, 'target/generated-resources/licenses - orderByDependencyName.ods')
-assert calcFile.exists()
-assert calcFile.length() > 100
-
-try (OdfSpreadsheetDocument spreadsheet = OdfSpreadsheetDocument.loadDocument(calcFile)) {
-    // So it can be easily opened and inspected manually. In a modern IDE it's just a (double-)click in the log output.
-    log.log(Level.FINE, "Calc export at: {}", calcFile.absolutePath)
-    List<OdfTable> tableList = spreadsheet.getTableList()
-    OdfTable table = tableList.get(0)
-    assert table.getRowCount() >= 3
-}
-
-checkResultingLicensesXml()
-
 // -------------- Sort by name -------------------
-private void checkResultingLicensesXml()
+static void checkResultingLicensesXml(Logger log, File basedir, String expected)
     throws ParserConfigurationException, SAXException, IOException, JAXBException {
     Path testPath = basedir.toPath()
     Path generatedResourcesPath = Paths.get(testPath.toString(), "target/generated-resources")
@@ -210,7 +126,7 @@ private void checkResultingLicensesXml()
             String groupId = null
             String artifactId = null
             String version = null
-            String license = null
+            List<String> licenses = new ArrayList<>()
             for (int j = 0; j < dependency.getLength(); j++) {
                 if (dependency.item(j).getNodeName().equals("name")) {
                     name = dependency.item(j).getTextContent()
@@ -222,7 +138,6 @@ private void checkResultingLicensesXml()
                     version = dependency.item(j).getTextContent()
                 } else if (dependency.item(j).getNodeName().equals("licenses")) {
                     Node licensesNode = dependency.item(j)
-                    List<String> licenses = new ArrayList<>()
                     for (int k = 0; k < licensesNode.getChildNodes().getLength(); k++) {
                         Node licenseNode = licensesNode.getChildNodes().item(k)
                         if (licenseNode.getNodeName().equals("license")) {
@@ -237,19 +152,17 @@ private void checkResultingLicensesXml()
                     }
                     if (!licenses.isEmpty()) {
                         licenses.sort(Comparator.naturalOrder())
-                        license = licenses.get(0)
                     }
                 }
             }
             assertNotNull(groupId)
             assertNotNull(artifactId)
             assertNotNull(version)
-            dependencyInfos.add(new DependencyInfo(name, groupId, artifactId, version, license))
+            dependencyInfos.add(new DependencyInfo(name, groupId, artifactId, version, licenses))
             if (name == null) {
-                System.out.println("Dependency without name: " + groupId + ":" + artifactId + ":" + version)
+                log.log(Level.INFO, "Dependency without name: {0}:{1}:{2}", groupId, artifactId, version)
             } else {
-                System.out.println("Dependency: " + name + " (" + groupId + ":" + artifactId + ":" + version
-                    + ") - " + license)
+                log.log(Level.INFO, "Dependency: {0} ({1}:{2}:{3}) - {4}", name, groupId, artifactId, version, licenses)
             }
         }
     }
@@ -258,9 +171,8 @@ private void checkResultingLicensesXml()
     Comment this line in, if there have been changes in the data sorting and new files to check against, must be
     created.
     */
-    // saveDependencyInfos(dependencyInfos);
+    // saveDependencyInfos(log, dependencyInfos)
 
-    String expected = "sortedByDependencyName.xml"
     Path expectedPath = Paths.get(basedir.toString(), expected)
 
     JAXBContext jaxbSerializer = createJaxbSerializer()
@@ -270,10 +182,10 @@ private void checkResultingLicensesXml()
     assertEquals(
         expectedDependencyInfos.dependencyInfos.size(),
         dependencyInfos.size(),
-        expectedDependencyInfos.dependencyInfos.stream()
+        () -> "Expected:\n" + expectedDependencyInfos.dependencyInfos.stream()
             .map(Object::toString)
             .collect(Collectors.joining("\n"))
-            + "\n != \n"
+            + "\n != Actual:\n"
             + dependencyInfos.stream().map(Object::toString).collect(Collectors.joining("\n")))
 
     for (int i = 0; i < dependencyInfos.size(); i++) {
@@ -283,27 +195,30 @@ private void checkResultingLicensesXml()
         assertEquals(
             expectedDependencyInfo,
             actualDependencyInfo,
-            "Expected: " + expectedDependencyInfo.name + ", Sorted: " + actualDependencyInfo.name)
+            () -> "Expected: " + expectedDependencyInfo.name + ", Sorted: " + actualDependencyInfo.name)
     }
 }
 
 /**
- * Use this method if the sorting has changed or became in other ways incompatible to the standard files.
+ * Use this method if the sorting has changed or became in other ways incompatible to the standard files,
+ * to create a new standard to test against.
  * <p>
  * This method saves the created dependency infos to a file as a test-standard if you have checked manually
- * that this data is correct.
+ * that this data is correct.<br>
+ * Look for the line "Sorted XML: " in the log output, to find the file and then copy its content into
+ * the corresponding test-standard file (sortedBy...xml).
  *
  * @param dependencyInfos Created dependency infos.
- * @throws JAXBException JAXB exception at serializing into a file.
+ * @throws javax.xml.bind.JAXBException JAXB exception at serializing into a file.
  * @throws IOException   File access exception.
  */
 @SuppressWarnings("unused")
-private static void saveDependencyInfos(List<DependencyInfo> dependencyInfos) throws JAXBException, IOException {
+private static void saveDependencyInfos(Logger log, List<DependencyInfo> dependencyInfos) throws JAXBException, IOException {
     DependencyInfos dependencyInfosXml = new DependencyInfos(dependencyInfos)
     JAXBContext jaxbContext = createJaxbSerializer()
     File tempFile = File.createTempFile("licensesSort", ".xml")
     jaxbContext.createMarshaller().marshal(dependencyInfosXml, tempFile)
-    System.out.println("Sorted XML: " + tempFile.getAbsolutePath())
+    log.log(Level.INFO, "Sorted XML: {0}", tempFile.getAbsolutePath())
 }
 
 private static JAXBContext createJaxbSerializer() throws JAXBException {
