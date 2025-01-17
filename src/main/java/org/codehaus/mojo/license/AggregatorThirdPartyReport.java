@@ -27,6 +27,7 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.List;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -40,6 +41,7 @@ import org.codehaus.mojo.license.api.DependenciesToolException;
 import org.codehaus.mojo.license.api.ThirdPartyDetails;
 import org.codehaus.mojo.license.api.ThirdPartyTool;
 import org.codehaus.mojo.license.api.ThirdPartyToolException;
+import org.codehaus.mojo.license.utils.ModuleHelper;
 import org.codehaus.plexus.i18n.I18N;
 
 /**
@@ -77,6 +79,22 @@ public class AggregatorThirdPartyReport extends AbstractThirdPartyReport {
             alias = "aggregateThirdPartyReport.executeOnlyOnRootModule",
             defaultValue = "true")
     private boolean executeOnlyOnRootModule;
+
+    /**
+     * An array of modules to include in analysis.
+     *
+     * @since 2.6.0
+     */
+    @Parameter(property = "license.includedModules")
+    private String[] includedModules;
+
+    /**
+     * An array of modules to exclude in analysis.
+     *
+     * @since 2.6.0
+     */
+    @Parameter(property = "license.excludedModules")
+    private String[] excludedModules;
 
     @Inject
     public AggregatorThirdPartyReport(I18N i18n, DependenciesTool dependenciesTool, ThirdPartyTool thirdPartyTool) {
@@ -118,7 +136,9 @@ public class AggregatorThirdPartyReport extends AbstractThirdPartyReport {
 
         Collection<ThirdPartyDetails> details = new LinkedHashSet<>();
 
-        for (MavenProject reactorProject : reactorProjects) {
+        List<MavenProject> modules = ModuleHelper.getFilteredModules(reactorProjects, includedModules, excludedModules);
+
+        for (MavenProject reactorProject : modules) {
 
             Collection<ThirdPartyDetails> thirdPartyDetails = createThirdPartyDetails(reactorProject, true);
             details.addAll(thirdPartyDetails);
