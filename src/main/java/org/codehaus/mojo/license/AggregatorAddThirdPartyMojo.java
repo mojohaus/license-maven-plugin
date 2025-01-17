@@ -45,6 +45,7 @@ import org.apache.maven.project.ProjectBuildingException;
 import org.codehaus.mojo.license.api.DependenciesTool;
 import org.codehaus.mojo.license.api.ThirdPartyTool;
 import org.codehaus.mojo.license.model.LicenseMap;
+import org.codehaus.mojo.license.utils.ModuleHelper;
 import org.codehaus.mojo.license.utils.SortedProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,6 +83,22 @@ public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo {
      */
     @Parameter(property = "reactorProjects", readonly = true, required = true)
     private List<MavenProject> reactorProjects;
+
+    /**
+     * An array of modules to include in analysis.
+     *
+     * @since 2.6.0
+     */
+    @Parameter(property = "license.includedModules")
+    private String[] includedModules;
+
+    /**
+     * An array of modules to exclude in analysis.
+     *
+     * @since 2.6.0
+     */
+    @Parameter(property = "license.excludedModules")
+    private String[] excludedModules;
 
     /**
      * To skip execution of this mojo.
@@ -171,8 +188,11 @@ public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo {
      */
     @Override
     protected void doAction() throws Exception {
+
+        List<MavenProject> modules = ModuleHelper.getFilteredModules(reactorProjects, includedModules, excludedModules);
+
         if (isVerbose()) {
-            LOG.info("After executing on {} project(s)", reactorProjects.size());
+            LOG.info("After executing on {} project(s)", modules.size());
         }
 
         licenseMap = new LicenseMap();
@@ -216,7 +236,7 @@ public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo {
 
         LOG.info("The default plugin hint is: " + addThirdPartyRoleHint);
 
-        for (MavenProject reactorProject : reactorProjects) {
+        for (MavenProject reactorProject : modules) {
             if (getProject().equals(reactorProject) && !acceptPomPackaging) {
                 // does not process this pom unless specified
                 continue;

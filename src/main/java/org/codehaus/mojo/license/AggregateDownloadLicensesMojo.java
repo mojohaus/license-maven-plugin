@@ -36,6 +36,7 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.mojo.license.api.ResolvedProjectDependencies;
 import org.codehaus.mojo.license.download.LicensedArtifact;
 import org.codehaus.mojo.license.download.LicensedArtifactResolver;
+import org.codehaus.mojo.license.utils.ModuleHelper;
 import org.codehaus.mojo.license.utils.MojoHelper;
 
 /**
@@ -101,6 +102,22 @@ public class AggregateDownloadLicensesMojo extends AbstractDownloadLicensesMojo 
     private List<MavenProject> reactorProjects;
 
     /**
+     * An array of modules to include in analysis.
+     *
+     * @since 2.6.0
+     */
+    @Parameter(property = "license.includedModules")
+    private String[] includedModules;
+
+    /**
+     * An array of modules to exclude in analysis.
+     *
+     * @since 2.6.0
+     */
+    @Parameter(property = "license.excludedModules")
+    private String[] excludedModules;
+
+    /**
      * Extract and use non-maven data for license, copyright and vendor information,
      * including the plugins' archive file content.
      * <p/>
@@ -134,7 +151,9 @@ public class AggregateDownloadLicensesMojo extends AbstractDownloadLicensesMojo 
     protected Map<String, LicensedArtifact> getDependencies() {
         final Map<String, LicensedArtifact> result = new TreeMap<>();
 
-        for (MavenProject p : reactorProjects) {
+        List<MavenProject> modules = ModuleHelper.getFilteredModules(reactorProjects, includedModules, excludedModules);
+
+        for (MavenProject p : modules) {
             licensedArtifactResolver.loadProjectDependencies(
                     new ResolvedProjectDependencies(p.getArtifacts(), MojoHelper.getDependencyArtifacts(p)),
                     this,
