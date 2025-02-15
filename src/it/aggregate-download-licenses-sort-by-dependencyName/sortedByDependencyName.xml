@@ -315,10 +315,6 @@
     <licenses>Apache License, Version 2.0</licenses>
     <licenses>LGPL-2.1-or-later</licenses>
   </dependencyInfos>
-  <dependencyInfos name="JavaBeans Activation Framework" groupId="com.sun.activation" artifactId="jakarta.activation"
-                   version="1.2.1">
-    <licenses>EDL 1.0</licenses>
-  </dependencyInfos>
   <dependencyInfos name="Javassist" groupId="org.javassist" artifactId="javassist" version="3.25.0-GA">
     <licenses>Apache License, Version 2.0</licenses>
     <licenses>LGPL 2.1</licenses>

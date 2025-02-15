@@ -119,6 +119,7 @@ static void checkResultingLicensesXml(Logger log, File basedir, String expected)
         throw new IllegalArgumentException("No dependencies found in: " + licensesFile.getAbsolutePath())
     }
     List<DependencyInfo> dependencyInfos = new ArrayList<>()
+    dependenciesLoop:
     for (int i = 0; i < dependencies.getLength(); i++) {
         if (dependencies.item(i).getNodeName().equals("dependency")) {
             NodeList dependency = dependencies.item(i).getChildNodes()
@@ -130,6 +131,10 @@ static void checkResultingLicensesXml(Logger log, File basedir, String expected)
             for (int j = 0; j < dependency.getLength(); j++) {
                 if (dependency.item(j).getNodeName().equals("name")) {
                     name = dependency.item(j).getTextContent()
+                    // Filter this one out, since this is JDK version dependent.
+                    if ("JavaBeans Activation Framework".equals(name)) {
+                        continue dependenciesLoop
+                    }
                 } else if (dependency.item(j).getNodeName().equals("groupId")) {
                     groupId = dependency.item(j).getTextContent()
                 } else if (dependency.item(j).getNodeName().equals("artifactId")) {
@@ -218,7 +223,11 @@ private static void saveDependencyInfos(Logger log, List<DependencyInfo> depende
     JAXBContext jaxbContext = createJaxbSerializer()
     File tempFile = File.createTempFile("licensesSort", ".xml")
     jaxbContext.createMarshaller().marshal(dependencyInfosXml, tempFile)
-    log.log(Level.INFO, "Sorted XML: {0}", tempFile.getAbsolutePath())
+    /*
+     Make this a warning to make it easy to find.
+     Remember: This is only in the "target/it/[Test]/build.log" file, not in the normal log output.
+     */
+    log.log(Level.WARNING, "Sorted XML: {0}", tempFile.getAbsolutePath())
 }
 
 private static JAXBContext createJaxbSerializer() throws JAXBException {

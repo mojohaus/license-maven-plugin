@@ -20,16 +20,6 @@
  * #L%
  */
 
-import org.apache.poi.ss.usermodel.Cell
-import org.apache.poi.ss.usermodel.CellType
-import org.apache.poi.ss.usermodel.Row
-import org.apache.poi.ss.usermodel.Sheet
-import org.apache.poi.ss.usermodel.Workbook
-import org.apache.poi.ss.usermodel.WorkbookFactory
-import org.odftoolkit.odfdom.doc.OdfSpreadsheetDocument
-import org.odftoolkit.odfdom.doc.table.OdfTable
-
-import java.util.logging.Level
 import java.util.logging.Logger
 
 log = Logger.getLogger("test-aggregate-download-licenses-sort-by-dependencyName")
