@@ -1,6 +1,4 @@
-import org.w3c.dom.Document
-import org.w3c.dom.Node
-import org.w3c.dom.NodeList
+import groovy.xml.XmlParser
 import org.xml.sax.SAXException
 
 import javax.xml.bind.JAXBContext
@@ -10,18 +8,45 @@ import javax.xml.bind.annotation.XmlAccessorType
 import javax.xml.bind.annotation.XmlAttribute
 import javax.xml.bind.annotation.XmlElement
 import javax.xml.bind.annotation.XmlRootElement
-import javax.xml.parsers.DocumentBuilder
-import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.parsers.ParserConfigurationException
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.security.Policy
+import java.util.logging.FileHandler
 import java.util.logging.Level
 import java.util.logging.Logger
+import java.util.logging.SimpleFormatter
 import java.util.stream.Collectors
 
 import static org.junit.jupiter.api.Assertions.assertEquals
 import static org.junit.jupiter.api.Assertions.assertNotNull
+
+/** Utility method to create {@link CustomLogger} from a dynamically parsed file. */
+static CustomLogger newCustomLogger(Path logFile) {
+    new CustomLogger(logFile)
+}
+
+/** For logging into the build.log. */
+class CustomLogger {
+    private final Logger logger = Logger.getLogger(CustomLogger.class
+        .getName())
+    private FileHandler fh = null
+
+    CustomLogger(Path logFile) {
+        try {
+            fh = new FileHandler(logFile.toAbsolutePath().toString(), true)
+        } catch (Exception e) {
+            e.printStackTrace()
+        }
+
+        fh.setFormatter(new SimpleFormatter())
+        logger.addHandler(fh)
+    }
+
+    void log(Level level, String message, Object... params) {
+        logger.log(level, message, params)
+    }
+}
 
 @XmlAccessorType(XmlAccessType.NONE)
 @XmlRootElement
@@ -97,7 +122,7 @@ class DependencyInfo {
 }
 
 // -------------- Sort by name -------------------
-static void checkResultingLicensesXml(Logger log, File basedir, String expected)
+static void checkResultingLicensesXml(CustomLogger log, File basedir, String expected)
     throws ParserConfigurationException, SAXException, IOException, JAXBException {
     Path testPath = basedir.toPath()
     Path generatedResourcesPath = Paths.get(testPath.toString(), "target/generated-resources")
@@ -108,69 +133,7 @@ static void checkResultingLicensesXml(Logger log, File basedir, String expected)
         throw new FileNotFoundException("Licenses file not found: " + licensesFile.getAbsolutePath())
     }
 
-    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance()
-    DocumentBuilder builder = factory.newDocumentBuilder()
-    Document document = builder.parse(licensesFile)
-
-    NodeList dependenciesRoot = document.getElementsByTagName("dependencies")
-    assertEquals(1, dependenciesRoot.getLength())
-    NodeList dependencies = dependenciesRoot.item(0).getChildNodes()
-    if (dependencies.getLength() == 0) {
-        throw new IllegalArgumentException("No dependencies found in: " + licensesFile.getAbsolutePath())
-    }
-    List<DependencyInfo> dependencyInfos = new ArrayList<>()
-    dependenciesLoop:
-    for (int i = 0; i < dependencies.getLength(); i++) {
-        if (dependencies.item(i).getNodeName().equals("dependency")) {
-            NodeList dependency = dependencies.item(i).getChildNodes()
-            String name = null
-            String groupId = null
-            String artifactId = null
-            String version = null
-            List<String> licenses = new ArrayList<>()
-            for (int j = 0; j < dependency.getLength(); j++) {
-                if (dependency.item(j).getNodeName().equals("name")) {
-                    name = dependency.item(j).getTextContent()
-                    // Filter this one out, since this is JDK version dependent.
-                    if ("JavaBeans Activation Framework".equals(name)) {
-                        continue dependenciesLoop
-                    }
-                } else if (dependency.item(j).getNodeName().equals("groupId")) {
-                    groupId = dependency.item(j).getTextContent()
-                } else if (dependency.item(j).getNodeName().equals("artifactId")) {
-                    artifactId = dependency.item(j).getTextContent()
-                } else if (dependency.item(j).getNodeName().equals("version")) {
-                    version = dependency.item(j).getTextContent()
-                } else if (dependency.item(j).getNodeName().equals("licenses")) {
-                    Node licensesNode = dependency.item(j)
-                    for (int k = 0; k < licensesNode.getChildNodes().getLength(); k++) {
-                        Node licenseNode = licensesNode.getChildNodes().item(k)
-                        if (licenseNode.getNodeName().equals("license")) {
-                            for (int l = 0; l < licenseNode.getChildNodes().getLength(); l++) {
-                                Node licenseChild =
-                                    licenseNode.getChildNodes().item(l)
-                                if (licenseChild.getNodeName().equals("name")) {
-                                    licenses.add(licenseChild.getTextContent())
-                                }
-                            }
-                        }
-                    }
-                    if (!licenses.isEmpty()) {
-                        licenses.sort(Comparator.naturalOrder())
-                    }
-                }
-            }
-            assertNotNull(groupId)
-            assertNotNull(artifactId)
-            assertNotNull(version)
-            dependencyInfos.add(new DependencyInfo(name, groupId, artifactId, version, licenses))
-            if (name == null) {
-                log.log(Level.INFO, "Dependency without name: {0}:{1}:{2}", groupId, artifactId, version)
-            } else {
-                log.log(Level.INFO, "Dependency: {0} ({1}:{2}:{3}) - {4}", name, groupId, artifactId, version, licenses)
-            }
-        }
-    }
+    ArrayList<DependencyInfo> dependencyInfos = parseGeneratedLicensesXml(log, licensesFile)
 
     /*
     Comment this line in, if there have been changes in the data sorting and new files to check against, must be
@@ -202,6 +165,46 @@ static void checkResultingLicensesXml(Logger log, File basedir, String expected)
             actualDependencyInfo,
             () -> "Expected: " + expectedDependencyInfo.name + ", Sorted: " + actualDependencyInfo.name)
     }
+    log.log(Level.INFO, "{0} dependencies are sorted as expected.", dependencyInfos.size())
+}
+
+private static ArrayList<DependencyInfo> parseGeneratedLicensesXml(CustomLogger log, File licensesFile) {
+    final def dependencyInfos = new ArrayList<DependencyInfo>()
+    final def xml = new XmlParser().parse(licensesFile)
+
+    def dependencies = xml.dependencies.dependency
+    if (dependencies.isEmpty()) {
+        throw new IllegalArgumentException("No dependencies found in: " + licensesFile.getAbsolutePath())
+    }
+
+    dependencies.each { dependency ->
+        def name = dependency.name.text()
+        def groupId = dependency.groupId.text()
+        def artifactId = dependency.artifactId.text()
+        def version = dependency.version.text()
+        def licenses = dependency.licenses.license.name*.text().sort()
+
+        // Filter this one out, since this is JDK version dependent.
+        if (name == "JavaBeans Activation Framework") {
+            return
+        }
+
+        assertNotNull(groupId)
+        assertNotNull(artifactId)
+        assertNotNull(version)
+        dependencyInfos.add(new DependencyInfo(name, groupId, artifactId, version, licenses))
+
+        if (name == null) {
+            log.log(Level.INFO, "Dependency without name: {0}:{1}:{2}", groupId, artifactId, version)
+        } else {
+            log.log(Level.INFO, "Dependency: {0} ({1}:{2}:{3}) - {4}", name, groupId, artifactId, version, licenses)
+        }
+    }
+
+    if (dependencyInfos.empty) {
+        throw new IllegalArgumentException("No dependencies found in: " + licensesFile.getAbsolutePath())
+    }
+    return dependencyInfos
 }
 
 /**
@@ -218,7 +221,7 @@ static void checkResultingLicensesXml(Logger log, File basedir, String expected)
  * @throws IOException   File access exception.
  */
 @SuppressWarnings("unused")
-private static void saveDependencyInfos(Logger log, List<DependencyInfo> dependencyInfos) throws JAXBException, IOException {
+private static void saveDependencyInfos(CustomLogger log, List<DependencyInfo> dependencyInfos) throws JAXBException, IOException {
     DependencyInfos dependencyInfosXml = new DependencyInfos(dependencyInfos)
     JAXBContext jaxbContext = createJaxbSerializer()
     File tempFile = File.createTempFile("licensesSort", ".xml")

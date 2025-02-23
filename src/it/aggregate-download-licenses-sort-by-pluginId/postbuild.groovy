@@ -1,3 +1,5 @@
+import java.nio.file.Path
+
 /*
  * #%L
  * License Maven Plugin
@@ -20,13 +22,13 @@
  * #L%
  */
 
-import java.util.logging.Logger
-
-log = Logger.getLogger("test-aggregate-download-licenses-sort-by-pluginId")
-
 GroovyShell gs = new GroovyShell();
 // baseDir is ".../license-maven-plugin/target/it/aggregate-download-licenses-sort-by-pluginId"
 def sharedFile = new File(basedir, "../../../src/it/aggregate-download-licenses-shared/shared.groovy")
 def shared = gs.parse(sharedFile)
 
-shared.checkResultingLicensesXml(log, basedir, "sortedByDependencyPluginId.xml")
+final Path basePath = basedir.toPath()
+final Path logPath = basePath.resolve('build.log')
+def logger = shared.newCustomLogger(logPath);
+
+shared.checkResultingLicensesXml(logger, basedir, "sortedByDependencyPluginId.xml")
