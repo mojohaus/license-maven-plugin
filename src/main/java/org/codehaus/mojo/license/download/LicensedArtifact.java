@@ -22,6 +22,9 @@ package org.codehaus.mojo.license.download;
  * #L%
  */
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -30,6 +33,7 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
@@ -37,6 +41,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -106,22 +111,12 @@ public class LicensedArtifact {
     public boolean equals(Object obj) {
         // CHECKSTYLE_OFF: NeedBraces
         if (this == obj) return true;
-        if (obj == null) return false;
-        if (getClass() != obj.getClass()) return false;
+        if (!(obj instanceof LicensedArtifact)) return false;
         LicensedArtifact other = (LicensedArtifact) obj;
-        if (artifactId == null) {
-            if (other.artifactId != null) return false;
-        } else if (!artifactId.equals(other.artifactId)) return false;
-        if (groupId == null) {
-            if (other.groupId != null) return false;
-        } else if (!groupId.equals(other.groupId)) return false;
-        if (licenses == null) {
-            if (other.licenses != null) return false;
-        } else if (!licenses.equals(other.licenses)) return false;
-        if (version == null) {
-            if (other.version != null) return false;
-        } else if (!version.equals(other.version)) return false;
-        return true;
+        return Objects.equals(artifactId, other.artifactId)
+                && Objects.equals(groupId, other.groupId)
+                && Objects.equals(licenses, other.licenses)
+                && Objects.equals(version, other.version);
         // CHECKSTYLE_ON: NeedBraces
     }
 
@@ -153,6 +148,17 @@ public class LicensedArtifact {
      */
     public ExtendedInfo getExtendedInfos() {
         return extendedInfos;
+    }
+
+    @Override
+    public String toString() {
+        return "LicensedArtifact{" + "groupId='"
+                + groupId + '\'' + ", artifactId='"
+                + artifactId + '\'' + ", version='"
+                + version + '\'' + ", licenses="
+                + licenses + ", errorMessages="
+                + errorMessages + ", extendedInfos="
+                + extendedInfos + '}';
     }
 
     /**
@@ -197,9 +203,15 @@ public class LicensedArtifact {
             return new LicensedArtifact(groupId, artifactId, version, lics, msgs, extendedInfos);
         }
 
-        private ExtendedInfo extraInfosFromArtifact(Artifact artifact) {
+        @Nullable
+        private ExtendedInfo extraInfosFromArtifact(@Nonnull Artifact artifact) {
             if (artifact.getFile() == null) {
-                LOG.error("Artifact " + artifact + " has no valid file set");
+                LOG.error("Artifact {} has no valid file set", artifact);
+                return null;
+            }
+            String extension = FilenameUtils.getExtension(artifact.getFile().toString());
+            if (!(extension.equalsIgnoreCase("jar") || extension.equalsIgnoreCase("zip"))) {
+                LOG.warn("Artifact {} is no JAR- / ZIP-file", artifact);
                 return null;
             }
             ExtendedInfo result = new ExtendedInfo();
@@ -224,18 +236,7 @@ public class LicensedArtifact {
                     } else if (fileName.equals("meta-inf/manifest.mf")) {
                         try (InputStream inputStream = zipFile.getInputStream(zipEntry)) {
                             Manifest manifest = new Manifest(inputStream);
-                            final Attributes mainAttributes = manifest.getMainAttributes();
-                            // Fetch Java standard JAR manifest attributes.
-                            final Object implementationVendor =
-                                    mainAttributes.get(Attributes.Name.IMPLEMENTATION_VENDOR);
-                            if (implementationVendor instanceof String) {
-                                result.setImplementationVendor((String) implementationVendor);
-                            }
-                            // Fetch OSGI framework JAR manifest attributes.
-                            final String bundleVendor = mainAttributes.getValue(Constants.BUNDLE_VENDOR);
-                            result.setBundleVendor(bundleVendor);
-                            final String bundleLicense = mainAttributes.getValue(Constants.BUNDLE_LICENSE);
-                            result.setBundleLicense(bundleLicense);
+                            copyManifestToExtendedInfo(manifest, result);
                         } catch (IOException e) {
                             LOG.warn("Error at reading data from jar manifest", e);
                         }
@@ -245,6 +246,20 @@ public class LicensedArtifact {
                 LOG.warn("Can't open zip file \"" + artifact.getFile() + "\"", e);
             }
             return result;
+        }
+
+        private static void copyManifestToExtendedInfo(Manifest manifest, ExtendedInfo extendedInfo) {
+            final Attributes mainAttributes = manifest.getMainAttributes();
+            // Fetch Java standard JAR manifest attributes.
+            final Object implementationVendor = mainAttributes.get(Attributes.Name.IMPLEMENTATION_VENDOR);
+            if (implementationVendor instanceof String) {
+                extendedInfo.setImplementationVendor((String) implementationVendor);
+            }
+            // Fetch OSGI framework JAR manifest attributes.
+            final String bundleVendor = mainAttributes.getValue(Constants.BUNDLE_VENDOR);
+            extendedInfo.setBundleVendor(bundleVendor);
+            final String bundleLicense = mainAttributes.getValue(Constants.BUNDLE_LICENSE);
+            extendedInfo.setBundleLicense(bundleLicense);
         }
 
         private InfoFile buildInfoFile(ZipFile zipFile, ZipEntry zipEntry, InfoFile.Type type) {
@@ -289,6 +304,7 @@ public class LicensedArtifact {
          * @param copyrightMatchers Lines containing one of these strings are returned. Arguments must be all lowercase.
          * @return The found lines containing copyright claims.
          */
+        @Nullable
         private Set<String> scanForCopyrights(String[] lines, String... copyrightMatchers) {
             if (lines == null) {
                 return null;
@@ -305,13 +321,14 @@ public class LicensedArtifact {
             return result;
         }
 
+        @Nullable
         private Pair<String, String[]> readZipEntryTextLines(ZipFile zipFile, ZipEntry zipEntry) {
             try (InputStream inputStream = zipFile.getInputStream(zipEntry)) {
                 byte[] content = IOUtils.readFully(inputStream, (int) zipEntry.getSize());
                 String contentString = new String(content);
                 return new ImmutablePair<>(contentString, contentString.split("\\R+"));
             } catch (IOException e) {
-                LOG.warn("Can't read zip file entry " + zipEntry, e);
+                LOG.warn("Can't read zip file entry {}", zipEntry, e);
                 return null;
             }
         }
