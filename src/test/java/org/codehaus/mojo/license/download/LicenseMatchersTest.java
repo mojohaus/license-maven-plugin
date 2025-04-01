@@ -75,8 +75,8 @@ class LicenseMatchersTest {
 
     @Test
     void replaceMatchesLegacy() {
-        final ProjectLicenseInfo dep = new ProjectLicenseInfo("myGroup", "myArtifact", "1a2.3", null);
-        final ProjectLicenseInfo pli1 = new ProjectLicenseInfo("myGroup", "myArtifact", "1.2.3", false);
+        final ProjectLicenseInfo dep = new ProjectLicenseInfo("myGroup", "myArtifact", "1a2.3", "compile", null);
+        final ProjectLicenseInfo pli1 = new ProjectLicenseInfo("myGroup", "myArtifact", "1.2.3", "compile", false);
         final ProjectLicense lic2 = new ProjectLicense("lic2", "http://other.org", null, "other comment", null);
         pli1.addLicense(lic2);
         final DependencyMatcher m1 = DependencyMatcher.of(pli1);
