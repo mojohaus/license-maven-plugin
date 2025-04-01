@@ -160,7 +160,7 @@ public class LicensesXmlInsertVersionsMojo extends AbstractLicensesXmlMojo {
                 dependencyLicenseInfo.setVersion(dependency.getVersion());
             }
 
-            writeLicenseSummary(projectLicenseInfos, licensesOutputFile, true);
+            writeLicenseSummary(projectLicenseInfos, licensesOutputFile, true, false);
         } catch (MojoFailureException e) {
             throw e;
         } catch (Exception e) {

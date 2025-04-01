@@ -617,6 +617,19 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
     private boolean writeVersions;
 
     /**
+     * If {@code true}, {@link #licensesOutputFile} and {@link #licensesErrorsFile} will contain {@code <scope>}
+     * elements for each {@code <dependency>}; otherwise the {@code <scope>} {@link #licensesOutputFile} and
+     * {@link #licensesErrorsFile} elements will not be appended under {@code <dependency>} elements in
+     * <b>
+     * Might be useful if you want to keep the {@link #licensesOutputFile} under source control and you do not want to
+     * see the changing dependency versions there.
+     *
+     * @since 1.18
+     */
+    @Parameter(property = "license.writeScopes", defaultValue = "false")
+    private boolean writeScopes;
+
+    /**
      * Connect timeout in milliseconds passed to the HTTP client when downloading licenses from remote URLs.
      *
      * @since 1.18
@@ -930,7 +943,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
     private void writeLicenseSummaries(
             List<ProjectLicenseInfo> depProjectLicenses, File outputFile, File excelOutputFile, File calcOutputFile)
             throws ParserConfigurationException, TransformerException, IOException {
-        writeLicenseSummary(depProjectLicenses, outputFile, writeVersions);
+        writeLicenseSummary(depProjectLicenses, outputFile, writeVersions, writeScopes);
         if (writeExcelFile) {
             ExcelFileWriter.write(depProjectLicenses, excelOutputFile);
         }
@@ -1175,6 +1188,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
                 depMavenProject.getGroupId(),
                 depMavenProject.getArtifactId(),
                 depMavenProject.getVersion(),
+                depMavenProject.getScope(),
                 depMavenProject.getExtendedInfos());
         final List<org.codehaus.mojo.license.download.License> licenses = depMavenProject.getLicenses();
         for (org.codehaus.mojo.license.download.License license : licenses) {

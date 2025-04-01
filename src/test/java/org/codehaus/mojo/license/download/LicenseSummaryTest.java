@@ -93,10 +93,10 @@ class LicenseSummaryTest {
             throws IOException, SAXException, ParserConfigurationException, TransformerFactoryConfigurationError,
                     TransformerException {
         List<ProjectLicenseInfo> licSummary = new ArrayList<>();
-        ProjectLicenseInfo dep1 = new ProjectLicenseInfo("org.test", "test1", "1.0", buildExtendedInfo(1));
-        ProjectLicenseInfo dep2 = new ProjectLicenseInfo("org.test", "test2", "2.0", buildExtendedInfo(2));
-        ProjectLicenseInfo dep3 = new ProjectLicenseInfo("com.test", "test3", "3.0", buildExtendedInfo(3));
-        ProjectLicenseInfo dep4 = new ProjectLicenseInfo("dk.test", "test4", "4.0", buildExtendedInfo(4));
+        ProjectLicenseInfo dep1 = new ProjectLicenseInfo("org.test", "test1", "1.0", "compile", buildExtendedInfo(1));
+        ProjectLicenseInfo dep2 = new ProjectLicenseInfo("org.test", "test2", "2.0", "compile", buildExtendedInfo(2));
+        ProjectLicenseInfo dep3 = new ProjectLicenseInfo("com.test", "test3", "3.0", "compile", buildExtendedInfo(3));
+        ProjectLicenseInfo dep4 = new ProjectLicenseInfo("dk.test", "test4", "4.0", "compile", buildExtendedInfo(4));
 
         ProjectLicense lic = new ProjectLicense();
         lic.setName("lgpl");
@@ -117,7 +117,8 @@ class LicenseSummaryTest {
         licSummary.add(dep4);
 
         File licenseSummaryFile = File.createTempFile("licSummary", "tmp");
-        LicenseSummaryWriter.writeLicenseSummary(licSummary, licenseSummaryFile, StandardCharsets.UTF_8, Eol.LF, true);
+        LicenseSummaryWriter.writeLicenseSummary(
+                licSummary, licenseSummaryFile, StandardCharsets.UTF_8, Eol.LF, true, true);
 
         assertTrue(licenseSummaryFile.exists());
         FileInputStream fis = new FileInputStream(licenseSummaryFile);
@@ -127,6 +128,7 @@ class LicenseSummaryTest {
         assertEquals("org.test", dep.getGroupId());
         assertEquals("test1", dep.getArtifactId());
         assertEquals("1.0", dep.getVersion());
+        assertEquals("compile", dep.getScope());
 
         List<ProjectLicense> licenses = dep.getLicenses();
         assertEquals(1, licenses.size());
@@ -139,7 +141,8 @@ class LicenseSummaryTest {
         validateXml(licenseSummaryFile);
 
         licenseSummaryFile = File.createTempFile("licSummaryNoVersionNoXsd", "tmp");
-        LicenseSummaryWriter.writeLicenseSummary(licSummary, licenseSummaryFile, StandardCharsets.UTF_8, Eol.LF, false);
+        LicenseSummaryWriter.writeLicenseSummary(
+                licSummary, licenseSummaryFile, StandardCharsets.UTF_8, Eol.LF, false, false);
 
         assertTrue(licenseSummaryFile.exists());
         fis = new FileInputStream(licenseSummaryFile);
