@@ -20,7 +20,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <!-- Key property for this test -->
     <license.sortArtifactByName>true</license.sortArtifactByName>
-    <smack.version>4.1.6</smack.version>
+    <smack.version>4.1.9</smack.version>
   </properties>
 
   <!-- Any 2 libraries with the same artifact name would allow exposing the issue -->
