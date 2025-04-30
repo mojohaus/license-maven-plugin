@@ -69,6 +69,8 @@ public class LicensedArtifact {
 
     private final String version;
 
+    private final String scope;
+
     private final List<License> licenses;
 
     private final List<String> errorMessages;
@@ -79,6 +81,7 @@ public class LicensedArtifact {
             String groupId,
             String artifactId,
             String version,
+            String scope,
             List<License> licenses,
             List<String> errorMessages,
             ExtendedInfo extendedInfos) {
@@ -86,6 +89,7 @@ public class LicensedArtifact {
         this.groupId = groupId;
         this.artifactId = artifactId;
         this.version = version;
+        this.scope = scope;
         this.licenses = licenses;
         this.errorMessages = errorMessages;
         this.extendedInfos = extendedInfos;
@@ -99,6 +103,7 @@ public class LicensedArtifact {
         result = prime * result + ((groupId == null) ? 0 : groupId.hashCode());
         result = prime * result + ((licenses == null) ? 0 : licenses.hashCode());
         result = prime * result + ((version == null) ? 0 : version.hashCode());
+        result = prime * result + ((scope == null) ? 0 : scope.hashCode());
         return result;
     }
 
@@ -121,6 +126,9 @@ public class LicensedArtifact {
         if (version == null) {
             if (other.version != null) return false;
         } else if (!version.equals(other.version)) return false;
+        if (scope == null) {
+            if (other.scope != null) return false;
+        } else if (!scope.equals(other.scope)) return false;
         return true;
         // CHECKSTYLE_ON: NeedBraces
     }
@@ -135,6 +143,10 @@ public class LicensedArtifact {
 
     public String getVersion() {
         return version;
+    }
+
+    public String getScope() {
+        return scope;
     }
 
     public List<License> getLicenses() {
@@ -164,6 +176,7 @@ public class LicensedArtifact {
             this.groupId = artifact.getGroupId();
             this.artifactId = artifact.getArtifactId();
             this.version = artifact.getVersion();
+            this.scope = artifact.getScope();
             this.extendedInfos = useNonMavenData ? extraInfosFromArtifact(artifact) : null;
         }
 
@@ -172,6 +185,8 @@ public class LicensedArtifact {
         private final String artifactId;
 
         private final String version;
+
+        private final String scope;
 
         private List<License> licenses = new ArrayList<>();
 
@@ -194,7 +209,7 @@ public class LicensedArtifact {
             licenses = null;
             final List<String> msgs = Collections.unmodifiableList(errorMessages);
             errorMessages = null;
-            return new LicensedArtifact(groupId, artifactId, version, lics, msgs, extendedInfos);
+            return new LicensedArtifact(groupId, artifactId, version, scope, lics, msgs, extendedInfos);
         }
 
         private ExtendedInfo extraInfosFromArtifact(Artifact artifact) {

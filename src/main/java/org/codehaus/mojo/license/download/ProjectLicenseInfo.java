@@ -42,6 +42,8 @@ public class ProjectLicenseInfo {
 
     private String version;
 
+    private String scope;
+
     private List<ProjectLicense> licenses = new ArrayList<>();
 
     private List<ProjectLicense> matchLicenses = new ArrayList<>();
@@ -59,16 +61,28 @@ public class ProjectLicenseInfo {
     public ProjectLicenseInfo() {}
 
     public ProjectLicenseInfo(String groupId, String artifactId, String version, ExtendedInfo extendedInfo) {
+        this(groupId, artifactId, version, null, extendedInfo);
+    }
+
+    public ProjectLicenseInfo(
+            String groupId, String artifactId, String version, String scope, ExtendedInfo extendedInfo) {
         this.groupId = groupId;
         this.artifactId = artifactId;
         this.version = version;
+        this.scope = scope;
         this.extendedInfo = extendedInfo;
     }
 
     public ProjectLicenseInfo(String groupId, String artifactId, String version, boolean hasMatchLicenses) {
+        this(groupId, artifactId, version, null, hasMatchLicenses);
+    }
+
+    public ProjectLicenseInfo(
+            String groupId, String artifactId, String version, String scope, boolean hasMatchLicenses) {
         this.groupId = groupId;
         this.artifactId = artifactId;
         this.version = version;
+        this.scope = scope;
         this.hasMatchLicenses = hasMatchLicenses;
     }
 
@@ -94,6 +108,14 @@ public class ProjectLicenseInfo {
 
     public void setVersion(String version) {
         this.version = version;
+    }
+
+    public String getScope() {
+        return scope;
+    }
+
+    public void setScope(String scope) {
+        this.scope = scope;
     }
 
     public List<ProjectLicense> getLicenses() {

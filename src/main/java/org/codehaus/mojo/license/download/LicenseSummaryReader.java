@@ -108,6 +108,8 @@ public class LicenseSummaryReader {
                 dependency.setArtifactId(node.getTextContent());
             } else if (node.getNodeName().equals("version")) {
                 dependency.setVersion(node.getTextContent());
+            } else if (node.getNodeName().equals("scope")) {
+                dependency.setScope(node.getTextContent());
             } else if (node.getNodeName().equals("licenses")) {
                 Map.Entry<Boolean, List<ProjectLicense>> entry = parseLicenses(node);
                 dependency.setLicenses(entry.getValue());

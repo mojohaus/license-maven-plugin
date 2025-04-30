@@ -69,7 +69,12 @@ public class LicenseSummaryWriter {
     static final String LICENSE_PATH = LICENSE_FOLDER + LICENSES_XSD_FILE;
 
     public static void writeLicenseSummary(
-            List<ProjectLicenseInfo> dependencies, File outputFile, Charset charset, Eol eol, boolean writeVersions)
+            List<ProjectLicenseInfo> dependencies,
+            File outputFile,
+            Charset charset,
+            Eol eol,
+            boolean writeVersions,
+            boolean writeScopes)
             throws ParserConfigurationException, TransformerException, IOException {
         DocumentBuilderFactory fact = DocumentBuilderFactory.newInstance();
         DocumentBuilder parser = fact.newDocumentBuilder();
@@ -82,7 +87,7 @@ public class LicenseSummaryWriter {
         root.appendChild(dependenciesNode);
 
         for (ProjectLicenseInfo dep : dependencies) {
-            dependenciesNode.appendChild(createDependencyNode(doc, dep, writeVersions));
+            dependenciesNode.appendChild(createDependencyNode(doc, dep, writeVersions, writeScopes));
         }
 
         // Prepare the output file File
@@ -100,7 +105,8 @@ public class LicenseSummaryWriter {
         }
     }
 
-    public static Node createDependencyNode(Document doc, ProjectLicenseInfo dep, boolean writeVersions) {
+    public static Node createDependencyNode(
+            Document doc, ProjectLicenseInfo dep, boolean writeVersions, boolean writeScopes) {
         final List<String> messages = dep.getDownloaderMessages();
         final boolean hasDownloaderMessages = messages != null && !messages.isEmpty();
 
@@ -120,6 +126,14 @@ public class LicenseSummaryWriter {
             depNode.appendChild(versionNode);
         } else if (hasDownloaderMessages) {
             depNode.appendChild(doc.createComment(" <version>" + dep.getVersion() + "</version> "));
+        }
+
+        if (writeScopes) {
+            final Node scopeNode = doc.createElement("scope");
+            scopeNode.appendChild(doc.createTextNode(patternOrText(dep.getScope(), hasDownloaderMessages)));
+            depNode.appendChild(scopeNode);
+        } else if (hasDownloaderMessages) {
+            depNode.appendChild(doc.createComment(" <scope>" + dep.getScope() + "</scope> "));
         }
 
         if (hasDownloaderMessages) {
