@@ -408,6 +408,14 @@ public abstract class AbstractAddThirdPartyMojo extends AbstractLicenseMojo {
      * &lt;includedLicenses&gt;licenseA|licenseB&lt;/includedLicenses&gt;
      * </pre>
      *
+     * or since 2.5.0, newlines are filtered out and strings trimmed, so it can be structured like this:
+     * <pre>
+     * &lt;includedLicenses&gt;licenseA
+     *   |licenseB
+     *   |licenseC
+     * &lt;/includedLicenses&gt;
+     * </pre>
+     *
      * or
      *
      * <pre>
@@ -459,6 +467,15 @@ public abstract class AbstractAddThirdPartyMojo extends AbstractLicenseMojo {
      *
      * <pre>
      * &lt;excludedLicenses&gt;licenseA|licenseB&lt;/excludedLicenses&gt;
+     * </pre>
+     *
+     * or since 2.5.0, newlines are filtered out and strings trimmed, so it can be structured like this:
+     *
+     * <pre>
+     * &lt;excludedLicenses&gt;licenseA
+     *   |licenseB
+     *   |licenseC
+     * &lt;/excludedLicenses&gt;
      * </pre>
      *
      * or
