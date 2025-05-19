@@ -19,10 +19,10 @@ public class ModuleHelper {
     public static List<MavenProject> getFilteredModules(
             List<MavenProject> reactorProjects, String[] includedModules, String[] excludedModules) {
         return reactorProjects.stream()
-                .filter(element -> (includedModules == null
+                .filter(element -> ((includedModules == null || includedModules.length == 0)
                         || Arrays.stream(includedModules)
                                 .anyMatch(value -> Objects.equals(value, element.getArtifactId()))))
-                .filter(element -> (excludedModules == null
+                .filter(element -> ((excludedModules == null || excludedModules.length == 0)
                         || Arrays.stream(excludedModules)
                                 .noneMatch(value -> Objects.equals(value, element.getArtifactId()))))
                 .collect(Collectors.toList());
