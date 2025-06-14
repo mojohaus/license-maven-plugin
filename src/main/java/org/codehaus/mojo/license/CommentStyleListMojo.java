@@ -34,6 +34,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.MavenProjectHelper;
 import org.codehaus.mojo.license.header.transformer.FileHeaderTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,7 +73,8 @@ public class CommentStyleListMojo extends AbstractLicenseMojo {
     private final Map<String, FileHeaderTransformer> transformers;
 
     @Inject
-    public CommentStyleListMojo(Map<String, FileHeaderTransformer> transformers) {
+    public CommentStyleListMojo(Map<String, FileHeaderTransformer> transformers, MavenProjectHelper projectHelper) {
+        super(projectHelper);
         this.transformers = transformers;
     }
 

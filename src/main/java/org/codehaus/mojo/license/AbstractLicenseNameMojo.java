@@ -35,6 +35,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.MavenProjectHelper;
 import org.codehaus.mojo.license.api.FreeMarkerHelper;
 import org.codehaus.mojo.license.header.transformer.FileHeaderTransformer;
 import org.codehaus.mojo.license.model.Copyright;
@@ -200,6 +201,10 @@ public abstract class AbstractLicenseNameMojo extends AbstractLicenseMojo {
      * Store of available licenses.
      */
     private LicenseStore licenseStore;
+
+    public AbstractLicenseNameMojo(MavenProjectHelper projectHelper) {
+        super(projectHelper);
+    }
 
     // ----------------------------------------------------------------------
     // AbstractLicenseMojo Implementaton
