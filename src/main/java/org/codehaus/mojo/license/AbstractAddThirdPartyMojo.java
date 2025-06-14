@@ -41,6 +41,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.MavenProjectHelper;
 import org.apache.maven.project.ProjectBuildingException;
 import org.codehaus.mojo.license.api.DefaultThirdPartyHelper;
 import org.codehaus.mojo.license.api.DependenciesTool;
@@ -666,7 +667,9 @@ public abstract class AbstractAddThirdPartyMojo extends AbstractLicenseMojo {
     @Parameter(property = "license.artifactFiltersUrl")
     protected String artifactFiltersUrl;
 
-    protected AbstractAddThirdPartyMojo(ThirdPartyTool thirdPartyTool, DependenciesTool dependenciesTool) {
+    protected AbstractAddThirdPartyMojo(
+            ThirdPartyTool thirdPartyTool, DependenciesTool dependenciesTool, MavenProjectHelper projectHelper) {
+        super(projectHelper);
         this.thirdPartyTool = thirdPartyTool;
         this.dependenciesTool = dependenciesTool;
     }

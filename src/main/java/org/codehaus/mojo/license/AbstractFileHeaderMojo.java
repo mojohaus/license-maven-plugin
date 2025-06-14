@@ -41,6 +41,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.MavenProjectHelper;
 import org.codehaus.mojo.license.api.FreeMarkerHelper;
 import org.codehaus.mojo.license.header.FileHeader;
 import org.codehaus.mojo.license.header.FileHeaderProcessor;
@@ -374,7 +375,9 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo {
      */
     private FreeMarkerHelper freeMarkerHelper = FreeMarkerHelper.newDefaultHelper();
 
-    protected AbstractFileHeaderMojo(Map<String, FileHeaderTransformer> transformers) {
+    protected AbstractFileHeaderMojo(
+            Map<String, FileHeaderTransformer> transformers, MavenProjectHelper projectHelper) {
+        super(projectHelper);
         this.transformers = transformers;
     }
 

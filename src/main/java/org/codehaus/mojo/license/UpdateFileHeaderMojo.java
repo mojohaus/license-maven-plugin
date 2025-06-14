@@ -28,6 +28,7 @@ import java.util.Map;
 
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.MavenProjectHelper;
 import org.codehaus.mojo.license.header.transformer.FileHeaderTransformer;
 
 /**
@@ -88,8 +89,8 @@ public class UpdateFileHeaderMojo extends AbstractFileHeaderMojo {
     private boolean dryRun;
 
     @Inject
-    public UpdateFileHeaderMojo(Map<String, FileHeaderTransformer> transformers) {
-        super(transformers);
+    public UpdateFileHeaderMojo(Map<String, FileHeaderTransformer> transformers, MavenProjectHelper projectHelper) {
+        super(transformers, projectHelper);
     }
 
     // ----------------------------------------------------------------------
