@@ -42,6 +42,13 @@
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-core</artifactId>
       <version>6.4.5</version>
+      <exclusions>
+        <!-- for test transitive dependencies are not required -->
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
 </project>
