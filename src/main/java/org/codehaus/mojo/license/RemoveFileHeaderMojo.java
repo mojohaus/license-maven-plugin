@@ -40,6 +40,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.MavenProjectHelper;
 import org.codehaus.mojo.license.header.transformer.FileHeaderTransformer;
 import org.codehaus.mojo.license.model.License;
 import org.codehaus.mojo.license.utils.FileUtil;
@@ -221,7 +222,8 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo {
     private Map<String, List<File>> filesToTreatByCommentStyle;
 
     @Inject
-    public RemoveFileHeaderMojo(Map<String, FileHeaderTransformer> transformers) {
+    public RemoveFileHeaderMojo(Map<String, FileHeaderTransformer> transformers, MavenProjectHelper projectHelper) {
+        super(projectHelper);
         this.transformers = transformers;
     }
 
