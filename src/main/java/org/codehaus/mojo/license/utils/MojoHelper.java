@@ -22,7 +22,6 @@ package org.codehaus.mojo.license.utils;
  * #L%
  */
 
-import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -35,7 +34,6 @@ import java.util.Set;
 
 import org.apache.commons.collections.comparators.ComparatorChain;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.model.Resource;
 import org.apache.maven.project.MavenProject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,58 +46,6 @@ import org.slf4j.LoggerFactory;
  */
 public class MojoHelper {
     private static final Logger LOG = LoggerFactory.getLogger(MojoHelper.class);
-
-    /**
-     * Add the directory as a resource of the given project.
-     *
-     * @param dir      the directory to add
-     * @param project  the project to update
-     * @param includes the includes of the resource
-     * @return {@code true} if the resources was added (not already existing)
-     */
-    public static boolean addResourceDir(File dir, MavenProject project, String... includes) {
-        List<?> resources = project.getResources();
-        return addResourceDir(dir, project, resources, includes);
-    }
-
-    /**
-     * Add the directory as a resource in the given resource list.
-     *
-     * @param dir       the directory to add
-     * @param project   the project involved
-     * @param resources the list of existing resources
-     * @param includes  includes of the new resources
-     * @return {@code true} if the resource was added (not already existing)
-     */
-    public static boolean addResourceDir(File dir, MavenProject project, List<?> resources, String... includes) {
-        String newresourceDir = dir.getAbsolutePath();
-        boolean shouldAdd = true;
-        for (Object o : resources) {
-            Resource r = (Resource) o;
-            if (!r.getDirectory().equals(newresourceDir)) {
-                continue;
-            }
-
-            for (String i : includes) {
-                if (!r.getIncludes().contains(i)) {
-                    r.addInclude(i);
-                }
-            }
-            shouldAdd = false;
-            break;
-        }
-        if (shouldAdd) {
-            Resource r = new Resource();
-            r.setDirectory(newresourceDir);
-            for (String i : includes) {
-                if (!r.getIncludes().contains(i)) {
-                    r.addInclude(i);
-                }
-            }
-            project.addResource(r);
-        }
-        return shouldAdd;
-    }
 
     public static Comparator<MavenProject> newMavenProjectComparator() {
         return new Comparator<MavenProject>() {

@@ -22,11 +22,14 @@ package org.codehaus.mojo.license;
  * #L%
  */
 
+import javax.inject.Inject;
+
 import java.io.File;
 
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.MavenProjectHelper;
 import org.codehaus.mojo.license.model.License;
 import org.codehaus.mojo.license.utils.FileUtil;
 import org.slf4j.Logger;
@@ -122,6 +125,11 @@ public class UpdateProjectLicenseMojo extends AbstractLicenseNameMojo {
      * Flag to known if generate is needed.
      */
     private boolean doGenerate;
+
+    @Inject
+    public UpdateProjectLicenseMojo(MavenProjectHelper projectHelper) {
+        super(projectHelper);
+    }
 
     // ----------------------------------------------------------------------
     // AbstractLicenceMojo Implementation

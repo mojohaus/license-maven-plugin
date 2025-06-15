@@ -41,6 +41,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.MavenProjectHelper;
 import org.apache.maven.project.ProjectBuildingException;
 import org.codehaus.mojo.license.api.DependenciesTool;
 import org.codehaus.mojo.license.api.ThirdPartyTool;
@@ -129,8 +130,9 @@ public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo {
     private File aggregateMissingLicensesFile;
 
     @Inject
-    public AggregatorAddThirdPartyMojo(ThirdPartyTool thirdPartyTool, DependenciesTool dependenciesTool) {
-        super(thirdPartyTool, dependenciesTool);
+    public AggregatorAddThirdPartyMojo(
+            ThirdPartyTool thirdPartyTool, DependenciesTool dependenciesTool, MavenProjectHelper projectHelper) {
+        super(thirdPartyTool, dependenciesTool, projectHelper);
     }
 
     // ----------------------------------------------------------------------
@@ -242,7 +244,7 @@ public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo {
                 continue;
             }
 
-            AddThirdPartyMojo mojo = new AddThirdPartyMojo(thirdPartyTool, dependenciesTool);
+            AddThirdPartyMojo mojo = new AddThirdPartyMojo(thirdPartyTool, dependenciesTool, projectHelper);
             mojo.initFromMojo(this, reactorProject);
 
             LicenseMap childLicenseMap = mojo.licenseMap;

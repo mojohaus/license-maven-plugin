@@ -28,6 +28,7 @@ import java.util.Map;
 
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.MavenProjectHelper;
 import org.codehaus.mojo.license.header.transformer.FileHeaderTransformer;
 
 /**
@@ -68,8 +69,8 @@ public class CheckFileHeaderMojo extends AbstractFileHeaderMojo {
     private boolean skipCheckLicense;
 
     @Inject
-    public CheckFileHeaderMojo(Map<String, FileHeaderTransformer> transformers) {
-        super(transformers);
+    public CheckFileHeaderMojo(Map<String, FileHeaderTransformer> transformers, MavenProjectHelper projectHelper) {
+        super(transformers, projectHelper);
     }
 
     // ----------------------------------------------------------------------

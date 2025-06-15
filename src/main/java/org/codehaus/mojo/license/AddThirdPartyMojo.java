@@ -43,6 +43,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.MavenProjectHelper;
 import org.apache.maven.project.ProjectBuildingException;
 import org.codehaus.mojo.license.api.ArtifactFilters;
 import org.codehaus.mojo.license.api.DependenciesTool;
@@ -126,8 +127,9 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
     private ArtifactFilters artifactFilters;
 
     @Inject
-    public AddThirdPartyMojo(ThirdPartyTool thirdPartyTool, DependenciesTool dependenciesTool) {
-        super(thirdPartyTool, dependenciesTool);
+    public AddThirdPartyMojo(
+            ThirdPartyTool thirdPartyTool, DependenciesTool dependenciesTool, MavenProjectHelper projectHelper) {
+        super(thirdPartyTool, dependenciesTool, projectHelper);
     }
 
     // ----------------------------------------------------------------------

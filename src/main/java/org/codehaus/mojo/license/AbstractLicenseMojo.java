@@ -24,6 +24,8 @@ package org.codehaus.mojo.license;
 
 import java.io.File;
 import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.AbstractMojo;
@@ -31,7 +33,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.mojo.license.utils.MojoHelper;
+import org.apache.maven.project.MavenProjectHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,6 +79,12 @@ public abstract class AbstractLicenseMojo extends AbstractMojo {
      */
     @Parameter(defaultValue = "${project}", readonly = true)
     MavenProject project;
+
+    protected final MavenProjectHelper projectHelper;
+
+    protected AbstractLicenseMojo(MavenProjectHelper projectHelper) {
+        this.projectHelper = Objects.requireNonNull(projectHelper, "projectHelper cannot be null");
+    }
 
     // ----------------------------------------------------------------------
     // Abstract methods
@@ -332,9 +340,9 @@ public abstract class AbstractLicenseMojo extends AbstractMojo {
      * @param includes files to include
      */
     protected void addResourceDir(File dir, String... includes) {
-        boolean added = MojoHelper.addResourceDir(dir, getProject(), includes);
-        if (added && isVerbose()) {
-            LOG.info("add resource {} with includes {}", dir, (Object) includes);
+        projectHelper.addResource(getProject(), dir.getAbsolutePath(), Arrays.asList(includes), null);
+        if (isVerbose()) {
+            LOG.info("add resource {} with includes {}", dir, includes);
         }
     }
 
