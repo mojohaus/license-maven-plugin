@@ -624,7 +624,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
      * Might be useful if you want to keep the {@link #licensesOutputFile} under source control and you do not want to
      * see the changing dependency versions there.
      *
-     * @since 1.18
+     * @since 2.6.0
      */
     @Parameter(property = "license.writeScopes", defaultValue = "false")
     private boolean writeScopes;
