@@ -278,7 +278,7 @@
       <!-- avoid errors as Log4j2 could not find a logging implementation -->
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-to-slf4j</artifactId>
-      <version>2.24.3</version>
+      <version>2.25.0</version>
       <scope>runtime</scope>
     </dependency>
 
