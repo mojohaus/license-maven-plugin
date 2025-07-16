@@ -107,6 +107,12 @@ Usage
 
   For full detail see {{{./update-project-license-mojo.html}detail page}}.
 
+** check-project-license goal
+
+  This checks existing of the LICENSE.txt.
+
+  For full detail see {{{./check-project-license-mojo.html}detail page}}.
+
 ** update-file-header goal
 
   This goal adds or updates the license header based on the configuration.

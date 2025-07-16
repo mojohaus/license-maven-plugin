@@ -67,6 +67,9 @@ ${project.name}
   * <<<{{{./update-project-license-mojo.html}license:update-project-license}}>>>\
     Updates (or creates) the main project license file according to the license defined in the licenseName parameter.
 
+  * <<<{{{./check-project-license-mojo.html}license:check-project-license}}>>>\
+    Checks the license file of current project.
+
 * {Reports} Overview
 
   The following goals are meant to participate in the site build lifecycle as reports:
