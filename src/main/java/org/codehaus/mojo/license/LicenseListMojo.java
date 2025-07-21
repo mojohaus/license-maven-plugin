@@ -22,6 +22,8 @@ package org.codehaus.mojo.license;
  * #L%
  */
 
+import javax.inject.Inject;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -79,6 +81,7 @@ public class LicenseListMojo extends AbstractLicenseMojo {
      */
     private LicenseStore licenseStore;
 
+    @Inject
     public LicenseListMojo(MavenProjectHelper projectHelper) {
         super(projectHelper);
     }
