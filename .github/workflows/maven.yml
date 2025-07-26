@@ -26,6 +26,7 @@ jobs:
     with:
       ff-goal: 'verify'                # no ITs on fast fail build
       verify-goal: '-P run-its verify'
+      verify-fail-fast: false         # do not fail fast in matrix
       maven4-enabled: true
 
 
