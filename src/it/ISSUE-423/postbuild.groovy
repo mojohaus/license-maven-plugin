@@ -24,7 +24,7 @@ file = new File(basedir, 'target/generated-sources/license/THIRD-PARTY.txt')
 assert file.exists()
 content = file.text
 // Check that the non-overridden dependency is present.
-assert content.contains('(Apache License, Version 2.0) Apache Commons Lang (org.apache.commons:commons-lang3:3.8.1 - http://commons.apache.org/proper/commons-lang/)')
+assert content.contains('(Apache-2.0) Apache Commons Lang (org.apache.commons:commons-lang3:3.18.0 - https://commons.apache.org/proper/commons-lang/)')
 // Check that the license name for a dependency can be overridden.
 assert content.contains('(Apache-2.0) Commons Logging (commons-logging:commons-logging:1.1.1 - http://commons.apache.org/logging)')
 // Check that the unused override does not end up in the report.
