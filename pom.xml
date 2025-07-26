@@ -492,6 +492,7 @@
                   <pomExcludes>
                     <!-- failed test on GH use remote resources -->
                     <pomExclude>download-licenses-basic/pom.xml</pomExclude>
+                    <pomExclude>download-licenses-configured/pom.xml</pomExclude>
                     <pomExclude>download-licenses-force/pom.xml</pomExclude>
                   </pomExcludes>
                 </configuration>
