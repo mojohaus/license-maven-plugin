@@ -32,6 +32,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -40,10 +41,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
+import com.google.common.base.Strings;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -68,6 +75,7 @@ import org.codehaus.mojo.license.download.PreferredFileNames;
 import org.codehaus.mojo.license.download.ProjectLicense;
 import org.codehaus.mojo.license.download.ProjectLicenseInfo;
 import org.codehaus.mojo.license.download.UrlReplacements;
+import org.codehaus.mojo.license.extended.ExtendedInfo;
 import org.codehaus.mojo.license.extended.InfoFile;
 import org.codehaus.mojo.license.extended.spreadsheet.CalcFileWriter;
 import org.codehaus.mojo.license.extended.spreadsheet.ExcelFileWriter;
@@ -358,6 +366,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
      *   {@link AbstractDownloadLicensesMojo#licensesErrorsFile}; in case there are error messages, the build will
      * fail after processing all dependencies</ul>
      * </li>
+     *
      * @since 1.18
      */
     @Parameter(property = "license.errorRemedy", defaultValue = "warn")
@@ -420,7 +429,13 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
     @Parameter(property = "license.organizeLicensesByDependencies", defaultValue = "false")
     protected boolean organizeLicensesByDependencies;
 
+    /**
+     * If true, the licenses will be sorted by groupId and artifactId.
+     * <p>
+     * Deprecated since 2.5.0, use {@link #dataFormatting}<code>.orderBy</code> instead.
+     */
     @Parameter(property = "license.sortByGroupIdAndArtifactId", defaultValue = "false")
+    @Deprecated
     private boolean sortByGroupIdAndArtifactId;
 
     /**
@@ -533,8 +548,8 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
      * mojo with debug log level, e.g. using {@code -X} or
      * {-Dorg.slf4j.simpleLogger.log.org.codehaus.mojo.license=debug} on the command line.
      *
-     * @since 1.20
      * @see #licenseUrlReplacements
+     * @since 1.20
      */
     @Parameter(property = "license.useDefaultUrlReplacements", defaultValue = "false")
     protected boolean useDefaultUrlReplacements;
@@ -671,8 +686,8 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
      * }
      * </pre>
      *
-     * @since 1.20
      * @see #useDefaultContentSanitizers
+     * @since 1.20
      */
     @Parameter(property = "license.licenseContentSanitizers")
     private List<LicenseContentSanitizer> licenseContentSanitizers;
@@ -689,8 +704,8 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
      * the mojo with debug log level, e.g. using {@code -X} or
      * {-Dorg.slf4j.simpleLogger.log.org.codehaus.mojo.license=debug} on the command line.
      *
-     * @since 1.20
      * @see #licenseContentSanitizers
+     * @since 1.20
      */
     @Parameter(property = "license.useDefaultContentSanitizers", defaultValue = "false")
     private boolean useDefaultContentSanitizers;
@@ -712,17 +727,138 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
     private boolean writeCalcFile;
 
     /**
+     * How the data written to the <i>MS Office Excel</i> or <i>LibreOffice Calc</i> file is formatted.
+     *
+     * @since 2.5.0
+     */
+    @Parameter(property = "license.dataFormatting")
+    private DataFormatting dataFormatting;
+
+    /**
+     * To specify some licenses to exclude.
+     * <p>
+     * If a such license is found then build will fail when property {@link #failOnBlacklist} is <tt>true</tt>.
+     * <br>Also, the list of licenses which should be highlighted as forbidden if written into an Excel or a Calc file.
+     * <p>
+     * There are three ways to fill this parameter :
+     * <ul>
+     * <li>A simple string (separated by {@code |}), the way to use by property configuration:
+     *
+     * <pre>
+     * &lt;excludedLicenses&gt;licenseA|licenseB&lt;/excludedLicenses&gt;
+     * </pre>
+     *
+     * or
+     *
+     * <pre>
+     * -Dlicense.excludedLicenses=licenseA|licenseB
+     * </pre>
+     *
+     * </li>
+     * <li>A list of string (can only be used in plugin configuration, not via property configuration)
+     *
+     * <pre>
+     * &lt;excludedLicenses&gt;
+     *   &lt;excludedLicense&gt;licenseA&lt;/excludedLicense&gt;
+     *   &lt;excludedLicense&gt;licenseB&lt;/excludedLicense&gt;
+     * &lt;/excludedLicenses&gt;
+     * </pre>
+     *
+     * </li>
+     * <li>A URL that contains a set of license names at the target source (only a single URL is accepted as
+     * parameter)
+     *
+     * <pre>
+     *  &lt;excludedLicenses&gt;http://my.license.host.com/my-blacklist&lt;/excludedLicenses&gt;
+     * </pre>
+     *
+     * the license-list on the given URL is expected to be list with a line-break after every entry e.g.:
+     * <ul style="list-style-type:none;">
+     * <li>The Apache Software License, Version 2.0</li>
+     * <li>Apache License, Version 2.0</li>
+     * <li>Bouncy Castle Licence</li>
+     * <li>MIT License</li>
+     * </ul>
+     * empty lines will be ignored.</li>
+     * </ul>
+     *
+     * @since 2.5.0
+     */
+    @Parameter(property = "license.excludedLicenses")
+    protected AbstractAddThirdPartyMojo.ExcludedLicenses excludedLicenses;
+
+    /**
+     * If a blacklisted license is found, the plugin leaves the Maven process with an error-message.
+     */
+    @Parameter(property = "license.failOnBlacklist", defaultValue = "false")
+    protected boolean failOnBlacklist;
+
+    /**
      * To merge licenses in the Excel file.
      * <p>
      * Each entry represents a merge (first license is main license to keep), licenses are separated by {@code |}.
      * <p>
-     * Example:
-     * <p>
-     * <pre>
-     * &lt;licenseMerges&gt;
-     * &lt;licenseMerge&gt;The Apache Software License|Version 2.0,Apache License, Version 2.0&lt;/licenseMerge&gt;
-     * &lt;/licenseMerges&gt;
-     * &lt;/pre&gt;
+     * Suggested starting point:
+     * <pre><code>
+     * <licenseMerges>
+     *   <licenseMerge>Apache License, Version 2.0
+     *         |AL 2.0
+     *         |ASF 2.0
+     *         |Apache 2
+     *         |Apache 2.0
+     *         |Apache License 2.0
+     *         |Apache License, version 2.0
+     *         |Apache Public License 2.0
+     *         |Apache-2.0
+     *         |The Apache License, Version 2.0
+     *         |The Apache Software License, Version 2.0
+     *     </licenseMerge>
+     *     <licenseMerge>EDL 1.0
+     *         |Eclipse Distribution License - v 1.0
+     *         |Eclipse Distribution License v. 1.0
+     *     </licenseMerge>
+     *     <licenseMerge>EPL 1.0
+     *         |Eclipse Public License - v 1.0
+     *         |Eclipse Public License 1.0
+     *         |Eclipse Public License, Version 1.0
+     *     </licenseMerge>
+     *     <licenseMerge>EPL 2.0
+     *         |EPL-2.0
+     *         |Eclipse Public License 2.0
+     *         |Eclipse Public License v. 2.0
+     *         |Eclipse Public License v2.0
+     *     </licenseMerge>
+     *     <licenseMerge>GPL2 w/ CPE
+     *         |GNU General Public License, version 2 with the GNU Classpath Exception
+     *         |GPL-2.0-with-classpath-exception
+     *     </licenseMerge>
+     *     <licenseMerge>MIT License
+     *         |MIT
+     *         |The MIT License
+     *         |The MIT License (MIT)
+     *     </licenseMerge>
+     *     <licenseMerge>GNU Lesser General Public License
+     *         |GNU LESSER GENERAL PUBLIC LICENSE
+     *         |GNU Lesser General Public Licence
+     *         |GNU Lesser Public License
+     *         |Lesser General Public License (LGPL)
+     *     </licenseMerge>
+     *     <licenseMerge>GNU General Lesser Public License (LGPL) version 3.0
+     *         |GNU LESSER GENERAL PUBLIC LICENSE, version 3 (LGPL-3.0)
+     *         |Lesser General Public License (LGPL) v 3.0
+     *         |The GNU Lesser General Public License, Version 3.0
+     *     </licenseMerge>
+     *     <!-- Problematic: While the maven plugins may have a simple declaration of "BSD"
+     *          for their license, they may mean "New BSD" license, at least that's what they state
+     *          on their websites. -->
+     *     <licenseMerge>The BSD License|BSD License|BSD</licenseMerge>
+     *     <licenseMerge>The BSD 3-Clause License
+     *         |BSD-3-Clause
+     *         |New BSD License
+     *         |The New BSD License
+     *     </licenseMerge>
+     * </licenseMerges>
+     * </code></pre>
      *
      * @since 2.2.1
      */
@@ -797,6 +933,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
 
     /**
      * {@inheritDoc}
+     *
      * @throws MojoFailureException
      */
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -888,7 +1025,9 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
         }
 
         try {
-            if (sortByGroupIdAndArtifactId) {
+            // The new "dataFormatting" option takes precedence over the old "sortByGroupIdAndArtifactId".
+            final boolean sorted = sortProjectLicenseInfo(depProjectLicenses);
+            if (!sorted && sortByGroupIdAndArtifactId) {
                 sortByGroupIdAndArtifactId(depProjectLicenses);
             }
 
@@ -925,17 +1064,207 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
                             "Unexpected value of " + ErrorRemedy.class.getName() + ": " + errorRemedy);
             }
         }
+
+        exitOnForbiddenLicenses(depProjectLicenses);
     }
 
     private void writeLicenseSummaries(
             List<ProjectLicenseInfo> depProjectLicenses, File outputFile, File excelOutputFile, File calcOutputFile)
             throws ParserConfigurationException, TransformerException, IOException {
+
         writeLicenseSummary(depProjectLicenses, outputFile, writeVersions);
         if (writeExcelFile) {
-            ExcelFileWriter.write(depProjectLicenses, excelOutputFile);
+            ExcelFileWriter.write(depProjectLicenses, excelOutputFile, dataFormatting, excludedLicenses);
         }
         if (writeCalcFile) {
-            CalcFileWriter.write(depProjectLicenses, calcOutputFile);
+            CalcFileWriter.write(depProjectLicenses, calcOutputFile, dataFormatting, excludedLicenses);
+        }
+    }
+
+    private void exitOnForbiddenLicenses(List<ProjectLicenseInfo> depProjectLicenses) throws MojoFailureException {
+        if (dataFormatting != null && CollectionUtils.isNotEmpty(excludedLicenses.getData()) && failOnBlacklist) {
+            List<ForbiddenLicenseInfo> forbiddenLicensesFound = new ArrayList<>();
+            Set<String> uniqueLicenseNames = new HashSet<>();
+            for (ProjectLicenseInfo licenseInfo : depProjectLicenses) {
+                List<ProjectLicense> foundForbiddenLicenses = new ArrayList<>();
+                for (ProjectLicense license : licenseInfo.getLicenses()) {
+                    for (String forbiddenLicense : excludedLicenses.getData()) {
+                        if (Objects.equals(license.getName(), forbiddenLicense)) {
+                            foundForbiddenLicenses.add(license);
+                            uniqueLicenseNames.add(license.getName());
+                        }
+                    }
+                }
+                if (!foundForbiddenLicenses.isEmpty()) {
+                    forbiddenLicensesFound.add(new ForbiddenLicenseInfo(licenseInfo, foundForbiddenLicenses));
+                }
+            }
+            if (!forbiddenLicensesFound.isEmpty()) {
+                throw new MojoFailureException(
+                        forbiddenLicensesFound,
+                        MessageFormat.format("{0} unique forbidden licenses found", uniqueLicenseNames.size()),
+                        forbiddenLicensesFound.stream()
+                                .map(ForbiddenLicenseInfo::toString)
+                                .collect(joinWithHorizontalLines()));
+            }
+        }
+    }
+
+    private static Collector<CharSequence, ?, String> joinWithHorizontalLines() {
+        return Collectors.joining(MessageFormat.format("\n{0}\n", Strings.repeat("=", 80)));
+    }
+
+    /**
+     * Sort project license information by {@link #dataFormatting}<code>.orderBy</code>, if set.
+     *
+     * @param depProjectLicenses Dependency project licenses.
+     * @return If {@link #dataFormatting}<code>.orderBy</code> was set and ordering happened.
+     */
+    private boolean sortProjectLicenseInfo(List<ProjectLicenseInfo> depProjectLicenses) {
+        if (dataFormatting.orderBy != null && dataFormatting.orderBy != DataFormatting.OrderBy.none) {
+            depProjectLicenses.sort(this::compareProjectLicenseInfo);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private int compareProjectLicenseInfo(ProjectLicenseInfo li1, ProjectLicenseInfo li2) {
+        switch (dataFormatting.orderBy) {
+            case dependencyName:
+                return compareDependenciesByName(li1, li2);
+            case dependencyPluginId:
+                return pluginIdCompareStream(li1, li2)
+                        .filter(i -> i != 0)
+                        .findFirst()
+                        .orElse(0);
+            case licenseMatch:
+                final int priority1 = licenseMatchPriority(li1, dataFormatting, excludedLicenses);
+                final int priority2 = licenseMatchPriority(li2, dataFormatting, excludedLicenses);
+                final int licensePriority = priority2 - priority1;
+                if (licensePriority == 0) {
+                    return compareLicensesByName(li1, li2);
+                } else {
+                    return licensePriority;
+                }
+            case licenseName:
+                return compareLicensesByName(li1, li2);
+            case none:
+            default:
+                // This should never have been reached.
+                throw new IllegalStateException("Can't sort by \"" + dataFormatting.orderBy + "\"");
+        }
+    }
+
+    private static IntStream pluginIdCompareStream(ProjectLicenseInfo li1, ProjectLicenseInfo li2) {
+        return IntStream.of(
+                li1.getGroupId().compareTo(li2.getGroupId()),
+                li1.getArtifactId().compareTo(li2.getArtifactId()),
+                li1.getVersion().compareTo(li2.getVersion()));
+    }
+
+    private static int compareDependenciesByName(ProjectLicenseInfo li1, ProjectLicenseInfo li2) {
+        Comparator<ProjectLicenseInfo> projectNameComparison = Comparator.comparing(
+                li -> Optional.ofNullable(li.getExtendedInfo())
+                        .map(ExtendedInfo::getName)
+                        .orElse(null),
+                Comparator.nullsLast(String::compareToIgnoreCase));
+
+        return IntStream.concat(IntStream.of(projectNameComparison.compare(li1, li2)), pluginIdCompareStream(li1, li2))
+                .filter(i -> i != 0)
+                .findFirst()
+                .orElse(0);
+    }
+
+    private static int compareLicensesByName(ProjectLicenseInfo li1, ProjectLicenseInfo li2) {
+        // Sort the licenses alphabetically.
+        li1.getLicenses().sort(Comparator.comparing(ProjectLicense::getName));
+        li2.getLicenses().sort(Comparator.comparing(ProjectLicense::getName));
+        if (CollectionUtils.isEmpty(li1.getLicenses())) {
+            if (CollectionUtils.isEmpty(li2.getLicenses())) {
+                // Both Maven licenses information are empty. Try the extendedInfo.
+                return compareExtendedInfo(li1.getExtendedInfo(), li2.getExtendedInfo());
+            } else {
+                return -1;
+            }
+        } else {
+            if (CollectionUtils.isEmpty(li2.getLicenses())) {
+                return 1;
+            } else {
+                final int nameOrder = li1.getLicenses()
+                        .get(0)
+                        .getName()
+                        .compareTo(li2.getLicenses().get(0).getName());
+                if (nameOrder == 0) {
+                    return compareDependenciesByName(li1, li2);
+                } else {
+                    return nameOrder;
+                }
+            }
+        }
+    }
+
+    /**
+     * Looks if license name is contained in any of the lists of
+     * {@link DataFormatting#excludedLicenses}, {@link DataFormatting#problematicLicenses}
+     * or {@link DataFormatting#okLicenses}.
+     *
+     * @param projectLicenseInfo Project license info.
+     * @param dataFormatting     Data formatting.
+     * @return The highest priority of all licenses.
+     */
+    private static int licenseMatchPriority(
+            ProjectLicenseInfo projectLicenseInfo,
+            DataFormatting dataFormatting,
+            AbstractAddThirdPartyMojo.ExcludedLicenses excludedLicenses) {
+        int maxPriority = 0;
+        for (ProjectLicense license : projectLicenseInfo.getLicenses()) {
+            maxPriority = Math.max(maxPriority, licenseMatchPriority(license, dataFormatting, excludedLicenses));
+        }
+        return maxPriority;
+    }
+
+    private static int licenseMatchPriority(
+            ProjectLicense projectLicense,
+            DataFormatting dataFormatting,
+            AbstractAddThirdPartyMojo.ExcludedLicenses excludedLicenses) {
+        if (excludedLicenses != null && excludedLicenses.contains(projectLicense.getName())) {
+            return 3;
+        } else if (dataFormatting.problematicLicenses != null
+                && dataFormatting.problematicLicenses.contains(projectLicense.getName())) {
+            return 2;
+        } else if (dataFormatting.okLicenses != null && dataFormatting.okLicenses.contains(projectLicense.getName())) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
+    private static int compareExtendedInfo(ExtendedInfo extendedInfo1, ExtendedInfo extendedInfo2) {
+        if (extendedInfo1 == null) {
+            if (extendedInfo2 == null) {
+                return 0;
+            } else {
+                return -1;
+            }
+        } else {
+            if (extendedInfo2 == null) {
+                return 1;
+            } else {
+                if (StringUtils.isBlank(extendedInfo1.getBundleLicense())) {
+                    if (StringUtils.isBlank(extendedInfo2.getBundleLicense())) {
+                        return 0;
+                    } else {
+                        return -1;
+                    }
+                } else {
+                    if (StringUtils.isBlank(extendedInfo2.getBundleLicense())) {
+                        return 1;
+                    } else {
+                        return extendedInfo1.getBundleLicense().compareTo(extendedInfo2.getBundleLicense());
+                    }
+                }
+            }
         }
     }
 
@@ -1045,7 +1374,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
      *
      * @param depProjectLicenses the list of {@link ProjectLicenseInfo}s to filter
      * @return a new {@link List} of {@link ProjectLicenseInfo}s containing only elements with non-empty
-     *         {@link ProjectLicenseInfo#getDownloaderMessages()}
+     * {@link ProjectLicenseInfo#getDownloaderMessages()}
      */
     private List<ProjectLicenseInfo> filterErrors(List<ProjectLicenseInfo> depProjectLicenses) {
         final List<ProjectLicenseInfo> result = new ArrayList<>();
@@ -1070,15 +1399,18 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
         }
     }
 
+    /**
+     * Sort by Group and Artifact ID.<br>
+     * Deprecated since 2.5.0: Use {@link #sortProjectLicenseInfo(List)} instead.
+     *
+     * @param depProjectLicenses Dpendency project licenses.
+     */
+    @Deprecated
     private void sortByGroupIdAndArtifactId(List<ProjectLicenseInfo> depProjectLicenses) {
-        Comparator<ProjectLicenseInfo> comparator = new Comparator<ProjectLicenseInfo>() {
-            public int compare(ProjectLicenseInfo info1, ProjectLicenseInfo info2) {
-                // ProjectLicenseInfo::getId() can not be used because . is before : thus a:b.c would be after a.b:c
-                return (info1.getGroupId() + "+" + info1.getArtifactId())
-                        .compareTo(info2.getGroupId() + "+" + info2.getArtifactId());
-            }
-        };
-        Collections.sort(depProjectLicenses, comparator);
+        // ProjectLicenseInfo::getId() can not be used because . is before : thus a:b.c would be after a.b:c
+        Comparator<ProjectLicenseInfo> comparator =
+                Comparator.comparing(info -> (info.getGroupId() + "+" + info.getArtifactId()));
+        depProjectLicenses.sort(comparator);
     }
 
     // ----------------------------------------------------------------------
@@ -1099,7 +1431,9 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
         return excludeTransitiveDependencies;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public ArtifactFilters getArtifactFilters() {
         if (artifactFilters == null) {
             artifactFilters = ArtifactFilters.of(
@@ -1147,10 +1481,13 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
         }
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     protected Path[] getAutodetectEolFiles() {
         return new Path[] {
-            licensesConfigFile.toPath(), project.getBasedir().toPath().resolve("pom.xml")
+            // TODO: Find out why "project.getFile()" wasn't always directly used.
+            project.getFile().toPath()
         };
     }
 
@@ -1193,9 +1530,9 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
      * Determine filename to use for downloaded license file. The file name is based on the configured name of the
      * license (if available) and the remote filename of the license.
      *
-     * @param depProject the project containing the license
-     * @param url the license url
-     * @param licenseName the license name
+     * @param depProject      the project containing the license
+     * @param url             the license url
+     * @param licenseName     the license name
      * @param licenseFileName the file name where to save the license
      * @return A filename to be used for the downloaded license file
      * @throws URISyntaxException
@@ -1263,7 +1600,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
     /**
      * Download the licenses associated with this project
      *
-     * @param depProject The project which generated the dependency
+     * @param depProject       The project which generated the dependency
      * @param matchingUrlsOnly
      * @throws MojoFailureException
      */
@@ -1419,9 +1756,13 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
      * @since 1.18
      */
     public enum ErrorRemedy {
-        /** All errors are ignored */
+        /**
+         * All errors are ignored
+         */
         ignore,
-        /** All errors are output to the log as warnings */
+        /**
+         * All errors are output to the log as warnings
+         */
         warn,
         /**
          * The first encountered error is logged and a {@link MojoFailureException} is thrown
@@ -1433,5 +1774,147 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
          * fail after processing all dependencies.
          */
         xmlOutput
+    }
+
+    /**
+     * Information about how to format the data written into the <i>MS Office Excel</i> or <i>LibreOffice Calc</i>
+     * file.<br>
+     * Except for <code>orderBy</code>: That affects also the order of the data written into the summary XML.
+     *
+     * @since 2.5.0
+     */
+    public static class DataFormatting {
+        /**
+         * By what column / data are the lines ordered?
+         */
+        public enum OrderBy {
+            /**
+             * No sorting, list it in the order it appears in memory.
+             */
+            none,
+            /**
+             * Sort by the dependency's name 1st, then by plugin group id, artifact id, etc..<br>
+             * Only working if <code>&lt;extendedInfo&gt;</code> is <code>true</code>, as the dependency's name is part
+             * of the extended info.
+             */
+            dependencyName,
+            /**
+             * Sort only by the dependency's plugin id with the group id, artifact id, etc., ignoring the name.
+             */
+            dependencyPluginId,
+            /**
+             * Sort by the dependency's license name.
+             * <ul>
+             * <li>If there are multiple licenses per project, it takes the first license according to alphabetical
+             * order.</li>
+             * <li>If there are no licenses in the pom.xml, and there were licenses found via extendedInfo,
+             * it will try to sort them by the licenses found there.
+             * But the pom.xml's licenses take precedence.</li>
+             * </ul>
+             */
+            licenseName,
+            /**
+             * Sort by the dependency's license match in the lists in the following order:
+             * <ol>
+             * <li>{@link #excludedLicenses}</li>
+             * <li>{@link #problematicLicenses}</li>
+             * <li>{@link #okLicenses}</li>
+             * <li>Licenses without a match in the previous lists.</li>
+             * </ol>
+             */
+            licenseMatch
+        }
+
+        /**
+         * By what column / data are the lines ordered?
+         */
+        @Parameter(property = "formatting.orderBy", defaultValue = "NONE")
+        protected OrderBy orderBy;
+
+        /**
+         * If all unknown licenses should be highlighted.
+         * Unknown means: There is no entry for a license in {@link #excludedLicenses},
+         * {@link #problematicLicenses} or {@link #okLicenses}.
+         */
+        @Parameter(property = "formatting.unknownLicenses")
+        protected boolean highlightUnknownLicenses;
+
+        /**
+         * List of licenses which should be highlighted as problematic.
+         */
+        @Parameter(property = "formatting.problematicLicenses")
+        protected List<String> problematicLicenses;
+
+        /**
+         * List of licenses which should be highlighted as OK.
+         */
+        @Parameter(property = "formatting.okLicenses")
+        protected List<String> okLicenses;
+
+        /**
+         * If licenses found in {@link #excludedLicenses}, {@link #problematicLicenses}, {@link #okLicenses}
+         * or where {@link #highlightUnknownLicenses} is used,
+         * have a visible border.
+         * <p>
+         * The border makes license types better visible at a glance, but when quickly scrolling through a long list,
+         * it makes licenses look as if they were the only ones belonging to a dependency if it has multiple licenses.
+         */
+        @Parameter(property = "formatting.matchedLicensesHaveBorder")
+        protected boolean matchedLicensesHaveBorder;
+
+        /**
+         * Skip the developer info.
+         * The report may become much clearer,
+         * because often then each dependency has only a single line of information.
+         */
+        @Parameter(property = "formatting.skipDevelopers")
+        protected boolean skipDevelopers;
+
+        public boolean getHighlightUnknownLicenses() {
+            return highlightUnknownLicenses;
+        }
+
+        public boolean getMatchedLicensesHaveBorder() {
+            return matchedLicensesHaveBorder;
+        }
+
+        public List<String> getOkLicenses() {
+            return okLicenses;
+        }
+
+        public void setOkLicenses(List<String> okLicenses) {
+            this.okLicenses = okLicenses;
+        }
+
+        public OrderBy getOrderBy() {
+            return orderBy;
+        }
+
+        public void setOrderBy(OrderBy orderBy) {
+            this.orderBy = orderBy;
+        }
+
+        public void setProblematicLicenses(List<String> problematicLicenses) {
+            this.problematicLicenses = problematicLicenses;
+        }
+
+        public List<String> getProblematicLicenses() {
+            return problematicLicenses;
+        }
+
+        public boolean getSkipDevelopers() {
+            return skipDevelopers;
+        }
+
+        @Override
+        public String toString() {
+            return "DataFormatting{" + "orderBy="
+                    + orderBy + ", highlightUnknownLicenses="
+                    + highlightUnknownLicenses + ", problematicLicenses="
+                    + problematicLicenses + ", okLicenses="
+                    + okLicenses + ", matchedLicensesHaveBorder="
+                    + matchedLicensesHaveBorder + ", skipDevelopers="
+                    + skipDevelopers + '}';
+        }
     }
 }
