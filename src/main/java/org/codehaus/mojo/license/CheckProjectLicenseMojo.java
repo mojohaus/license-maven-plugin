@@ -35,7 +35,7 @@ import org.apache.maven.project.MavenProjectHelper;
  * The goal to check if there are license files in project.
  *
  * @author swalendzik
- * @since 2.7
+ * @since 2.7.0
  */
 @Mojo(name = "check-project-license", threadSafe = true)
 public class CheckProjectLicenseMojo extends AbstractLicenseMojo {
@@ -47,14 +47,14 @@ public class CheckProjectLicenseMojo extends AbstractLicenseMojo {
     /**
      * Project license file to check.
      *
-     * @since 2.7
+     * @since 2.7.0
      */
     @Parameter(property = "license.licenceFile", defaultValue = "LICENSE.txt")
     private File licenseFile;
     /**
      * A flag to fail the build if there is missing any license file.
      *
-     * @since 2.7
+     * @since 2.7.0
      */
     @Parameter(property = "license.failOnMissingLicense", defaultValue = "false")
     private boolean failOnMissingLicense;
@@ -62,7 +62,7 @@ public class CheckProjectLicenseMojo extends AbstractLicenseMojo {
     /**
      * A flag to skip the goal.
      *
-     * @since 2.7
+     * @since 2.7.0
      */
     @Parameter(property = "license.skipCheckLicense", defaultValue = "false")
     private boolean skipCheckLicense;
