@@ -10,7 +10,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generator" content="Apache Maven Doxia Site Renderer 2.0.0" />
-    <title>license:license-list – License Maven Plugin</title>
+    <title>license:check-project-license – License Maven Plugin</title>
     <link rel="stylesheet" href="./css/apache-maven-fluido-2.1.0.min.css" />
     <link rel="stylesheet" href="./css/site.css" />
     <link rel="stylesheet" href="./css/print.css" media="print" />
@@ -47,7 +47,7 @@
           <ul class="breadcrumb">
       <li><a href="../">MojoHaus</a><span class="divider">/</span></li>
       <li><a href="./">License Maven Plugin</a><span class="divider">/</span></li>
-    <li class="active">license:license-list</li>
+    <li class="active">license:check-project-license</li>
         <li id="publishDate" class="pull-right"><span class="divider">|</span> Last Published: 2025-09-22</li>
           <li id="projectVersion" class="pull-right"><span class="divider">|</span>Version: 2.7.0</li>
         <li class="pull-right"><a href="https://maven.apache.org/">Maven</a></li>
@@ -85,17 +85,17 @@
           </div>
         </header>
         <main id="bodyColumn" class="span10">
-<section><a id="license.3Alicense-list"></a>
-<h1>license:license-list</h1>
+<section><a id="license.3Acheck-project-license"></a>
+<h1>license:check-project-license</h1>
 <p><strong>Full name</strong>:</p>
-<p>org.codehaus.mojo:license-maven-plugin:2.7.0:license-list</p>
+<p>org.codehaus.mojo:license-maven-plugin:2.7.0:check-project-license</p>
 <p><strong>Description</strong>:</p>
-<p>Display all available licenses.</p>
+<p>The goal to check if there are license files in project.</p>
 <p><strong>Attributes</strong>:</p>
 <ul>
-<li>Executes by direct invocation only.</li>
-<li>The goal is not marked as thread-safe and thus does not support parallel builds.</li>
-<li>Since version: <code>1.0</code>.</li></ul><section><a id="Optional_Parameters"></a>
+<li>Requires a Maven project to be executed.</li>
+<li>The goal is thread-safe and supports parallel builds.</li>
+<li>Since version: <code>2.7.0</code>.</li></ul><section><a id="Optional_Parameters"></a>
 <h2>Optional Parameters</h2>
 <table class="table table-striped">
 <tr class="a">
@@ -104,34 +104,31 @@
 <th>Since</th>
 <th>Description</th></tr>
 <tr class="b">
-<td><a href="#detail"><code>&lt;detail&gt;</code></a></td>
-<td><code>boolean</code></td>
-<td><code>1.0</code></td>
-<td>A flag to display also the content of each license.<br /><strong>User Property</strong>: <code>detail</code></td></tr>
-<tr class="a">
 <td><a href="#encoding"><code>&lt;encoding&gt;</code></a></td>
 <td><code>String</code></td>
 <td><code>1.0</code></td>
 <td>Encoding used to read and writes files. <b>Note:</b> If nothing is filled here, we will use the system property <code>file.encoding</code>.<br /><strong>Default</strong>: <code>${project.build.sourceEncoding}</code><br /><strong>User Property</strong>: <code>license.encoding</code></td></tr>
-<tr class="b">
-<td><a href="#extraResolver"><code>&lt;extraResolver&gt;</code></a></td>
-<td><code>String</code></td>
-<td><code>1.0</code></td>
-<td>The url of an extra license repository. 
-<p><strong>Note: </strong>If you want to refer to a file within this project, start the expression with <code>${project.baseUri}</code></p><br /><strong>User Property</strong>: <code>extraResolver</code></td></tr>
 <tr class="a">
+<td><a href="#failOnMissingLicense"><code>&lt;failOnMissingLicense&gt;</code></a></td>
+<td><code>boolean</code></td>
+<td><code>2.7.0</code></td>
+<td>A flag to fail the build if there is missing any license file.<br /><strong>Default</strong>: <code>false</code><br /><strong>User Property</strong>: <code>license.failOnMissingLicense</code></td></tr>
+<tr class="b">
+<td><a href="#licenseFile"><code>&lt;licenseFile&gt;</code></a></td>
+<td><code>File</code></td>
+<td><code>2.7.0</code></td>
+<td>Project license file to check.<br /><strong>Default</strong>: <code>LICENSE.txt</code><br /><strong>User Property</strong>: <code>license.licenceFile</code></td></tr>
+<tr class="a">
+<td><a href="#skipCheckLicense"><code>&lt;skipCheckLicense&gt;</code></a></td>
+<td><code>boolean</code></td>
+<td><code>2.7.0</code></td>
+<td>A flag to skip the goal.<br /><strong>Default</strong>: <code>false</code><br /><strong>User Property</strong>: <code>license.skipCheckLicense</code></td></tr>
+<tr class="b">
 <td><a href="#verbose"><code>&lt;verbose&gt;</code></a></td>
 <td><code>boolean</code></td>
 <td><code>1.0</code></td>
 <td>Flag to activate verbose mode. <b>Note:</b> Verbose mode is always on if you starts a debug maven instance (says via <code>-X</code>).<br /><strong>Default</strong>: <code>${maven.verbose}</code><br /><strong>User Property</strong>: <code>license.verbose</code></td></tr></table></section><section><a id="Parameter_Details"></a>
-<h2>Parameter Details</h2><a id="detail"></a><section><a id="a.3Cdetail.3E"></a>
-<h3>&lt;detail&gt;</h3>
-<div>A flag to display also the content of each license.</div>
-<ul>
-<li><strong>Type</strong>: <code>boolean</code></li>
-<li><strong>Since</strong>: <code>1.0</code></li>
-<li><strong>Required</strong>: <code>No</code></li>
-<li><strong>User Property</strong>: <code>detail</code></li></ul><hr /></section><a id="encoding"></a><section><a id="a.3Cencoding.3E"></a>
+<h2>Parameter Details</h2><a id="encoding"></a><section><a id="a.3Cencoding.3E"></a>
 <h3>&lt;encoding&gt;</h3>
 <div>Encoding used to read and writes files. <b>Note:</b> If nothing is filled here, we will use the system property <code>file.encoding</code>.</div>
 <ul>
@@ -139,15 +136,31 @@
 <li><strong>Since</strong>: <code>1.0</code></li>
 <li><strong>Required</strong>: <code>No</code></li>
 <li><strong>User Property</strong>: <code>license.encoding</code></li>
-<li><strong>Default</strong>: <code>${project.build.sourceEncoding}</code></li></ul><hr /></section><a id="extraResolver"></a><section><a id="a.3CextraResolver.3E"></a>
-<h3>&lt;extraResolver&gt;</h3>
-<div>The url of an extra license repository. 
-<p><strong>Note: </strong>If you want to refer to a file within this project, start the expression with <code>${project.baseUri}</code></p></div>
+<li><strong>Default</strong>: <code>${project.build.sourceEncoding}</code></li></ul><hr /></section><a id="failOnMissingLicense"></a><section><a id="a.3CfailOnMissingLicense.3E"></a>
+<h3>&lt;failOnMissingLicense&gt;</h3>
+<div>A flag to fail the build if there is missing any license file.</div>
 <ul>
-<li><strong>Type</strong>: <code>java.lang.String</code></li>
-<li><strong>Since</strong>: <code>1.0</code></li>
+<li><strong>Type</strong>: <code>boolean</code></li>
+<li><strong>Since</strong>: <code>2.7.0</code></li>
 <li><strong>Required</strong>: <code>No</code></li>
-<li><strong>User Property</strong>: <code>extraResolver</code></li></ul><hr /></section><a id="verbose"></a><section><a id="a.3Cverbose.3E"></a>
+<li><strong>User Property</strong>: <code>license.failOnMissingLicense</code></li>
+<li><strong>Default</strong>: <code>false</code></li></ul><hr /></section><a id="licenseFile"></a><section><a id="a.3ClicenseFile.3E"></a>
+<h3>&lt;licenseFile&gt;</h3>
+<div>Project license file to check.</div>
+<ul>
+<li><strong>Type</strong>: <code>java.io.File</code></li>
+<li><strong>Since</strong>: <code>2.7.0</code></li>
+<li><strong>Required</strong>: <code>No</code></li>
+<li><strong>User Property</strong>: <code>license.licenceFile</code></li>
+<li><strong>Default</strong>: <code>LICENSE.txt</code></li></ul><hr /></section><a id="skipCheckLicense"></a><section><a id="a.3CskipCheckLicense.3E"></a>
+<h3>&lt;skipCheckLicense&gt;</h3>
+<div>A flag to skip the goal.</div>
+<ul>
+<li><strong>Type</strong>: <code>boolean</code></li>
+<li><strong>Since</strong>: <code>2.7.0</code></li>
+<li><strong>Required</strong>: <code>No</code></li>
+<li><strong>User Property</strong>: <code>license.skipCheckLicense</code></li>
+<li><strong>Default</strong>: <code>false</code></li></ul><hr /></section><a id="verbose"></a><section><a id="a.3Cverbose.3E"></a>
 <h3>&lt;verbose&gt;</h3>
 <div>Flag to activate verbose mode. <b>Note:</b> Verbose mode is always on if you starts a debug maven instance (says via <code>-X</code>).</div>
 <ul>
