@@ -936,8 +936,26 @@ public abstract class AbstractAddThirdPartyMojo extends AbstractLicenseMojo {
             Set<String> dependencyLicenses = licenseMap.keySet();
             LOG.info("Included licenses (whitelist): {}", whiteLicenses);
 
+
+            for (final String unsafeLicence : unsafeLicenses.keySet()) {
+                for (MavenProject potentiallyUnsafeProject : unsafeLicenses.get(unsafeLicence)) {
+
+                    final boolean whiteListed = isDependencyWhitelisted(potentiallyUnsafeProject, unsafeLicence, whiteLicenses);
+
+                    if (whiteListed) {
+                        LOG.debug("Project {} has black listed licence {} but also white listed dependency",
+                                potentiallyUnsafeProject, unsafeLicence);
+
+                        unsafeLicenses.get(unsafeLicence).remove(potentiallyUnsafeProject);
+                    }
+                }
+            }
+
+
+
             for (String dependencyLicense : dependencyLicenses) {
                 LOG.debug("Testing license '{}'", dependencyLicense);
+
                 if (!whiteLicenses.contains(dependencyLicense)
                         && CollectionUtils.isNotEmpty(licenseMap.get(dependencyLicense))) {
                     LOG.debug("Testing dependency license '{}' against all other licenses", dependencyLicense);
@@ -946,7 +964,7 @@ public abstract class AbstractAddThirdPartyMojo extends AbstractLicenseMojo {
                         LOG.debug("testing dependency {}", dependency);
 
                         boolean isLicenceWhitelistedAndUsed = isDependencyWhitelisted(dependency, dependencyLicense,
-                                dependencyLicenses, whiteLicenses);
+                                whiteLicenses);
 
                         // bad license found
                         if (!isLicenceWhitelistedAndUsed) {
@@ -991,9 +1009,9 @@ public abstract class AbstractAddThirdPartyMojo extends AbstractLicenseMojo {
     private boolean isDependencyWhitelisted(
             final MavenProject dependency,
             final String dependencyLicense,
-            final Set<String> dependencyLicenses,
             final List<String> whiteLicenses) {
 
+        final Set<String> dependencyLicenses = licenseMap.keySet();
         for (String otherLicense : dependencyLicenses) {
             // skip this license if it is the same as the dependency license
             // skip this license if it has no projects assigned
