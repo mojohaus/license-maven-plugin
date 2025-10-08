@@ -171,6 +171,31 @@ class AbstractAddThirdPartyMojoTest {
             assertFalse(mojo.checkForbiddenLicenses());
         }
 
+        @Test
+        void dualLicencedProjectisBothWhitelistedAndUnlisted() throws MojoExecutionException {
+            mojo.setIncludedLicenses("Good");
+            mojo.setExcludedLicenses("UNSAFE");
+
+            final MavenProject dualLicencedProject = createProject("artifact");
+            mojo.licenseMap.put("Good", dualLicencedProject);
+            mojo.licenseMap.put("Unlisted", dualLicencedProject);
+
+            assertTrue(mojo.checkForbiddenLicenses());
+        }
+
+        @Test
+        void dualLicencedProjectisBothBlacklistedAndUnlisted() throws MojoExecutionException {
+            mojo.setIncludedLicenses("Good");
+            mojo.setExcludedLicenses("UNSAFE");
+
+            final MavenProject dualLicencedProject = createProject("artifact");
+            mojo.licenseMap.put("UNSAFE", dualLicencedProject);
+            mojo.licenseMap.put("Unlisted", dualLicencedProject);
+
+            assertFalse(mojo.checkForbiddenLicenses());
+        }
+
+
     }
 
 
