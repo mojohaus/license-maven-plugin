@@ -70,6 +70,11 @@ class SpreadsheetUtil {
      */
     static final int[] ALTERNATING_ROWS_COLOR = new int[] {220, 220, 220};
 
+    static final int[] UNKNOWN_ROWS_COLOR = new int[] {0, 128, 128};
+    static final int[] FORBIDDEN_ROWS_COLOR = new int[] {200, 0, 0};
+    static final int[] PROBLEMATIC_ROWS_COLOR = new int[] {255, 90, 0};
+    static final int[] OK_ROWS_COLOR = new int[] {0, 128, 0};
+
     static final String COPYRIGHT_JOIN_SEPARATOR = "§";
 
     static int getDownloadColumn(boolean hasExtendedInfo) {

@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  #%L
+  License Maven Plugin
+  %%
+  Copyright (C) 2008 - 2011 CodeLutin, Codehaus, Tony Chemit
+  %%
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU Lesser General Public License as
+  published by the Free Software Foundation, either version 3 of the
+  License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Lesser Public License for more details.
+
+  You should have received a copy of the GNU General Lesser Public
+  License along with this program.  If not, see
+  <http://www.gnu.org/licenses/lgpl-3.0.html>.
+  #L%
+  -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.codehaus.mojo.license.test</groupId>
+  <artifactId>test-aggregate-download-licenses-sort-by-name</artifactId>
+  <version>@project.version@</version>
+
+  <name>License Test :: aggregate-download-licenses - Sort By Plugin Ids</name>
+
+  <packaging>pom</packaging>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <license.verbose>true</license.verbose>
+  </properties>
+
+  <dependencies>
+    <!-- Speed up testing by downloading just a few dependencies.
+    Download a longer, more complex list only in the "aggregate-download-licenses-sort-by-name" test. -->
+    <dependency>
+      <groupId>jakarta.platform</groupId>
+      <artifactId>jakarta.jakartaee-api</artifactId>
+      <version>10.0.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <version>3.17.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+      <version>3.3.5</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>@project.version@</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>aggregate-download-licenses</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <extendedInfo>true</extendedInfo>
+          <writeCalcFile>true</writeCalcFile>
+          <writeExcelFile>true</writeExcelFile>
+
+          <excludedLicenses>
+            <excludedLicense>GNU General Lesser Public License (LGPL) version 3.0</excludedLicense>
+          </excludedLicenses>
+
+          <failOnBlacklist>true</failOnBlacklist>
+
+          <dataFormatting>
+            <orderBy>dependencyPluginId</orderBy>
+            <problematicLicenses>
+              <problematicLicense>EPL 2.0</problematicLicense>
+              <problematicLicense>GPL2 w/ CPE</problematicLicense>
+            </problematicLicenses>
+            <okLicenses>
+              <okLicense>Apache License, Version 2.0</okLicense>
+            </okLicenses>
+            <matchedLicensesHaveBorder>true</matchedLicensesHaveBorder>
+            <skipDevelopers>false</skipDevelopers>
+          </dataFormatting>
+
+          <!-- Not needed, but a suggestion -->
+          <!-- Makes it more readable, licenses are the same with different names -->
+          <licenseMerges>
+            <licenseMerge>Apache License, Version 2.0
+              |AL 2.0
+              |ASF 2.0
+              |Apache 2
+              |Apache 2.0
+              |Apache License 2.0
+              |Apache License, version 2.0
+              |Apache Public License 2.0
+              |Apache-2.0
+              |The Apache License, Version 2.0
+              |The Apache Software License, Version 2.0
+            </licenseMerge>
+            <licenseMerge>EDL 1.0
+              |Eclipse Distribution License - v 1.0
+              |Eclipse Distribution License v. 1.0
+            </licenseMerge>
+            <licenseMerge>EPL 1.0
+              |Eclipse Public License - v 1.0
+              |Eclipse Public License 1.0
+              |Eclipse Public License, Version 1.0
+            </licenseMerge>
+            <licenseMerge>EPL 2.0
+              |EPL-2.0
+              |Eclipse Public License 2.0
+              |Eclipse Public License v. 2.0
+              |Eclipse Public License v2.0
+            </licenseMerge>
+            <licenseMerge>GPL2 w/ CPE
+              |GNU General Public License, version 2 with the GNU Classpath Exception
+              |GPL-2.0-with-classpath-exception
+            </licenseMerge>
+            <licenseMerge>MIT License
+              |MIT
+              |The MIT License
+              |The MIT License (MIT)
+            </licenseMerge>
+            <licenseMerge>GNU Lesser General Public License
+              |GNU LESSER GENERAL PUBLIC LICENSE
+              |GNU Lesser General Public Licence
+              |GNU Lesser Public License
+              |Lesser General Public License (LGPL)
+            </licenseMerge>
+            <licenseMerge>GNU General Lesser Public License (LGPL) version 3.0
+              |GNU LESSER GENERAL PUBLIC LICENSE, version 3 (LGPL-3.0)
+              |Lesser General Public License (LGPL) v 3.0
+              |The GNU Lesser General Public License, Version 3.0
+            </licenseMerge>
+            <!-- Problematic: While the maven plugins may have a simple declaration of "BSD"
+                 for their license, they may mean "New BSD" license, at least that's what they state
+                 on their websites. -->
+            <licenseMerge>The BSD License|BSD License|BSD</licenseMerge>
+            <licenseMerge>The BSD 3-Clause License
+              |BSD-3-Clause
+              |New BSD License
+              |The New BSD License
+            </licenseMerge>
+          </licenseMerges>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
