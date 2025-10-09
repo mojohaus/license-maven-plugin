@@ -208,7 +208,6 @@ class AbstractAddThirdPartyMojoTest {
         }
     }
 
-
     @Test
     void defaultStateIsTrue() {
         // Given: no dependencies

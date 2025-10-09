@@ -936,22 +936,22 @@ public abstract class AbstractAddThirdPartyMojo extends AbstractLicenseMojo {
             Set<String> dependencyLicenses = licenseMap.keySet();
             LOG.info("Included licenses (whitelist): {}", whiteLicenses);
 
-
             for (final String unsafeLicence : unsafeLicenses.keySet()) {
                 for (MavenProject potentiallyUnsafeProject : unsafeLicenses.get(unsafeLicence)) {
 
-                    final boolean whiteListed = isDependencyWhitelisted(potentiallyUnsafeProject, unsafeLicence, whiteLicenses);
+                    final boolean whiteListed =
+                            isDependencyWhitelisted(potentiallyUnsafeProject, unsafeLicence, whiteLicenses);
 
                     if (whiteListed) {
-                        LOG.debug("Project {} has black listed licence {} but also white listed dependency",
-                                potentiallyUnsafeProject, unsafeLicence);
+                        LOG.debug(
+                                "Project {} has black listed licence {} but also white listed dependency",
+                                potentiallyUnsafeProject,
+                                unsafeLicence);
 
                         unsafeLicenses.get(unsafeLicence).remove(potentiallyUnsafeProject);
                     }
                 }
             }
-
-
 
             for (String dependencyLicense : dependencyLicenses) {
                 LOG.debug("Testing license '{}'", dependencyLicense);
@@ -963,8 +963,8 @@ public abstract class AbstractAddThirdPartyMojo extends AbstractLicenseMojo {
                     for (MavenProject dependency : licenseMap.get(dependencyLicense)) {
                         LOG.debug("testing dependency {}", dependency);
 
-                        boolean isLicenceWhitelistedAndUsed = isDependencyWhitelisted(dependency, dependencyLicense,
-                                whiteLicenses);
+                        boolean isLicenceWhitelistedAndUsed =
+                                isDependencyWhitelisted(dependency, dependencyLicense, whiteLicenses);
 
                         // bad license found
                         if (!isLicenceWhitelistedAndUsed) {
@@ -1007,9 +1007,7 @@ public abstract class AbstractAddThirdPartyMojo extends AbstractLicenseMojo {
     }
 
     private boolean isDependencyWhitelisted(
-            final MavenProject dependency,
-            final String dependencyLicense,
-            final List<String> whiteLicenses) {
+            final MavenProject dependency, final String dependencyLicense, final List<String> whiteLicenses) {
 
         final Set<String> dependencyLicenses = licenseMap.keySet();
         for (String otherLicense : dependencyLicenses) {
@@ -1036,7 +1034,6 @@ public abstract class AbstractAddThirdPartyMojo extends AbstractLicenseMojo {
             }
         }
         return false;
-
     }
 
     void writeThirdPartyFile() throws IOException {
