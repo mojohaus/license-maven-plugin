@@ -42,6 +42,7 @@
     <menu name="Examples">
       <item name="Add License" href="examples/example-add-license.html" />
       <item name="Download Licenses" href="examples/example-download-licenses.html" />
+      <item name="Check Licenses XML" href="examples/example-check-licenses-xml.html" />
       <item name="List Licenses" href="examples/example-license-list.html" />
       <item name="Thirdparty Licenses" href="examples/example-thirdparty.html" />
       <item name="List Comment style" href="examples/example-comment-style-list.html" />
