@@ -1,0 +1,196 @@
+~~~
+~~ #%L
+~~ License Maven Plugin
+~~ %%
+~~ Copyright (C) 2025 MojoHaus
+~~ %%
+~~ This program is free software: you can redistribute it and/or modify
+~~ it under the terms of the GNU Lesser General Public License as
+~~ published by the Free Software Foundation, either version 3 of the
+~~ License, or (at your option) any later version.
+~~
+~~ This program is distributed in the hope that it will be useful,
+~~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+~~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+~~ GNU General Lesser Public License for more details.
+~~
+~~ You should have received a copy of the GNU General Lesser Public
+~~ License along with this program.  If not, see
+~~ <http://www.gnu.org/licenses/lgpl-3.0.html>.
+~~ #L%
+~~~
+
+ ------
+ Check Licenses XML Examples
+ ------
+ ------
+ 2025-10-19
+ ------
+
+Check Licenses XML Examples
+
+  This page provides examples of how to use the <<<check-licenses-xml>>> goal.
+  The <<<{{{../check-licenses-xml-mojo.html}check-licenses-xml}}>>> goal verifies that the 
+  <<<licenses.xml>>> file is complete and minimal with respect to JAR files in specified directories.
+  
+  This is particularly useful when creating fat JARs or binary distributions where various JARs 
+  from dependencies are packaged together. The goal ensures that:
+  
+  * All JAR files have corresponding license entries (completeness)
+  
+  * All license entries correspond to actual JAR files (minimality)
+
+* Basic Example
+
+  This example shows how to configure the <<<check-licenses-xml>>> goal for basic usage.
+  It works in conjunction with the <<<download-licenses>>> goal and the 
+  <<<maven-dependency-plugin>>> to verify license documentation completeness.
+
+-------------------
+<project>
+  ...
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>${project.version}</version>
+        <executions>
+          <execution>
+            <id>download-licenses</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>download-licenses</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>check-licenses-xml</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>check-licenses-xml</goal>
+            </goals>
+            <configuration>
+              <jarDirectories>
+                <jarDirectory>\${project.build.directory}/lib</jarDirectory>
+              </jarDirectories>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>3.8.1</version>
+        <executions>
+          <execution>
+            <id>copy-dependencies</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>\${project.build.directory}/lib</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+    ...
+  </build>
+  ...
+</project>
+-------------------
+
+  Next run your build:
+
++-----+
+mvn verify
++-----+
+
+  The goal will check if all JAR files in <<<target/lib>>> have corresponding entries in 
+  <<<target/generated-resources/licenses.xml>>> and will fail the build if any are missing.
+
+* Checking Multiple Directories
+
+  You can specify multiple directories to check:
+
+-------------------
+<configuration>
+  <jarDirectories>
+    <jarDirectory>\${project.build.directory}/lib</jarDirectory>
+    <jarDirectory>\${project.build.directory}/endorsed</jarDirectory>
+  </jarDirectories>
+</configuration>
+-------------------
+
+* Configuration Options
+
+  The goal supports several configuration options:
+
+  * <<<licensesXmlFile>>>: Path to the licenses.xml file to check (default: <<<target/generated-resources/licenses.xml>>>)
+  
+  * <<<jarDirectories>>>: List of directories containing JAR files to check (required)
+  
+  * <<<failOnError>>>: Whether to fail the build if completeness check fails (default: <<<true>>>)
+  
+  * <<<checkCompleteness>>>: Enable completeness checking (default: <<<true>>>)
+  
+  * <<<checkMinimality>>>: Enable minimality checking (default: <<<true>>>)
+  
+  * <<<skipCheckLicensesXml>>>: Skip this goal (default: <<<false>>>)
+
+-------------------
+<configuration>
+  <licensesXmlFile>\${project.build.directory}/generated-resources/licenses.xml</licensesXmlFile>
+  <jarDirectories>
+    <jarDirectory>\${project.build.directory}/lib</jarDirectory>
+  </jarDirectories>
+  <failOnError>true</failOnError>
+  <checkCompleteness>true</checkCompleteness>
+  <checkMinimality>true</checkMinimality>
+</configuration>
+-------------------
+
+* Custom JAR Name Pattern
+
+  By default, the goal uses a standard Maven JAR naming pattern (<<<artifactId-version.jar>>>).
+  For non-standard JAR naming patterns, you can specify a custom regex pattern:
+
+-------------------
+<configuration>
+  <jarDirectories>
+    <jarDirectory>\${project.build.directory}/lib</jarDirectory>
+  </jarDirectories>
+  <jarNamePattern>(?&lt;groupId&gt;[^-]+)-(?&lt;artifactId&gt;[^-]+)-(?&lt;version&gt;[^-]+)\\.jar</jarNamePattern>
+</configuration>
+-------------------
+
+  The pattern should contain named groups: <<<artifactId>>> and <<<version>>> are required,
+  <<<groupId>>> is optional. If <<<groupId>>> is not present, matching will be done based on
+  <<<artifactId>>> and <<<version>>> only.
+
+* Warning-Only Mode
+
+  If you want to only warn about issues without failing the build:
+
+-------------------
+<configuration>
+  <jarDirectories>
+    <jarDirectory>\${project.build.directory}/lib</jarDirectory>
+  </jarDirectories>
+  <failOnError>false</failOnError>
+</configuration>
+-------------------
+
+* Disable Minimality Check
+
+  If you only want to check completeness and don't care about extra entries:
+
+-------------------
+<configuration>
+  <jarDirectories>
+    <jarDirectory>\${project.build.directory}/lib</jarDirectory>
+  </jarDirectories>
+  <checkMinimality>false</checkMinimality>
+</configuration>
+-------------------
