@@ -438,7 +438,7 @@ public abstract class AbstractAddThirdPartyMojo extends AbstractLicenseMojo {
      * <ul style="list-style-type:none;">
      * <li>The Apache Software License, Version 2.0</li>
      * <li>Apache License, Version 2.0</li>
-     * <li>Bouncy Castle Licence</li>
+     * <li>Bouncy Castle License</li>
      * <li>MIT License</li>
      * </ul>
      * empty lines will be ignored.</li>
@@ -491,7 +491,7 @@ public abstract class AbstractAddThirdPartyMojo extends AbstractLicenseMojo {
      * <ul style="list-style-type:none;">
      * <li>The Apache Software License, Version 2.0</li>
      * <li>Apache License, Version 2.0</li>
-     * <li>Bouncy Castle Licence</li>
+     * <li>Bouncy Castle license</li>
      * <li>MIT License</li>
      * </ul>
      * empty lines will be ignored.</li>
@@ -919,7 +919,7 @@ public abstract class AbstractAddThirdPartyMojo extends AbstractLicenseMojo {
     boolean checkForbiddenLicenses() {
         List<String> whiteLicenses = getIncludedLicenses();
         List<String> blackLicenses = getExcludedLicenses();
-        Set<String> unsafeLicenses = new HashSet<>();
+        LicenseMap unsafeLicenses = new LicenseMap();
         if (CollectionUtils.isNotEmpty(blackLicenses)) {
             Set<String> licenses = licenseMap.keySet();
             LOG.info("Excluded licenses (blacklist): {}", blackLicenses);
@@ -927,7 +927,7 @@ public abstract class AbstractAddThirdPartyMojo extends AbstractLicenseMojo {
             for (String excludeLicense : blackLicenses) {
                 if (licenses.contains(excludeLicense) && CollectionUtils.isNotEmpty(licenseMap.get(excludeLicense))) {
                     // bad license found
-                    unsafeLicenses.add(excludeLicense);
+                    unsafeLicenses.put(excludeLicense, licenseMap.get(excludeLicense));
                 }
             }
         }
@@ -936,45 +936,39 @@ public abstract class AbstractAddThirdPartyMojo extends AbstractLicenseMojo {
             Set<String> dependencyLicenses = licenseMap.keySet();
             LOG.info("Included licenses (whitelist): {}", whiteLicenses);
 
+            for (final String unsafelicense : unsafeLicenses.keySet()) {
+                for (MavenProject potentiallyUnsafeProject : unsafeLicenses.get(unsafelicense)) {
+
+                    final boolean whiteListed =
+                            isDependencyWhitelisted(potentiallyUnsafeProject, unsafelicense, whiteLicenses);
+
+                    if (whiteListed) {
+                        LOG.debug(
+                                "Project {} has black listed license {} but also white listed dependency",
+                                potentiallyUnsafeProject,
+                                unsafelicense);
+
+                        unsafeLicenses.get(unsafelicense).remove(potentiallyUnsafeProject);
+                    }
+                }
+            }
+
             for (String dependencyLicense : dependencyLicenses) {
                 LOG.debug("Testing license '{}'", dependencyLicense);
+
                 if (!whiteLicenses.contains(dependencyLicense)
                         && CollectionUtils.isNotEmpty(licenseMap.get(dependencyLicense))) {
                     LOG.debug("Testing dependency license '{}' against all other licenses", dependencyLicense);
 
                     for (MavenProject dependency : licenseMap.get(dependencyLicense)) {
-                        LOG.debug("- testing dependency {}" + dependency);
+                        LOG.debug("testing dependency {}", dependency);
 
-                        boolean forbiddenLicenseUsed = true;
-
-                        for (String otherLicense : dependencyLicenses) {
-                            // skip this license if it is the same as the dependency license
-                            // skip this license if it has no projects assigned
-                            if (otherLicense.equals(dependencyLicense)
-                                    || licenseMap.get(dependencyLicense).isEmpty()) {
-                                continue;
-                            }
-
-                            // skip this license if it isn't one of the whitelisted
-                            if (!whiteLicenses.contains(otherLicense)) {
-                                continue;
-                            }
-
-                            if (licenseMap.get(otherLicense).contains(dependency)) {
-                                LOG.info(
-                                        "License: '{}' for '{}' is OK since it is also licensed under '{}'",
-                                        dependencyLicense,
-                                        dependency,
-                                        otherLicense);
-                                // this dependency is licensed under another license from white list
-                                forbiddenLicenseUsed = false;
-                                break;
-                            }
-                        }
+                        boolean islicenseWhitelistedAndUsed =
+                                isDependencyWhitelisted(dependency, dependencyLicense, whiteLicenses);
 
                         // bad license found
-                        if (forbiddenLicenseUsed) {
-                            unsafeLicenses.add(dependencyLicense);
+                        if (!islicenseWhitelistedAndUsed) {
+                            unsafeLicenses.put(dependencyLicense, dependency);
                             break;
                         }
                     }
@@ -982,13 +976,19 @@ public abstract class AbstractAddThirdPartyMojo extends AbstractLicenseMojo {
             }
         }
 
-        boolean safe = CollectionUtils.isEmpty(unsafeLicenses);
+        for (final String s : unsafeLicenses.keySet()) {
+            if (CollectionUtils.isEmpty(unsafeLicenses.get(s))) {
+                unsafeLicenses.remove(s);
+            }
+        }
+
+        boolean safe = CollectionUtils.isEmpty(unsafeLicenses.keySet());
 
         if (!safe) {
             LOG.warn("There are {} forbidden licenses used:", unsafeLicenses.size());
-            for (String unsafeLicense : unsafeLicenses) {
+            for (String unsafeLicense : unsafeLicenses.keySet()) {
 
-                SortedSet<MavenProject> deps = licenseMap.get(unsafeLicense);
+                SortedSet<MavenProject> deps = unsafeLicenses.get(unsafeLicense);
                 if (!deps.isEmpty()) {
                     StringBuilder sb = new StringBuilder();
                     sb.append("License: '")
@@ -1004,6 +1004,36 @@ public abstract class AbstractAddThirdPartyMojo extends AbstractLicenseMojo {
             }
         }
         return safe;
+    }
+
+    private boolean isDependencyWhitelisted(
+            final MavenProject dependency, final String dependencyLicense, final List<String> whiteLicenses) {
+
+        final Set<String> dependencyLicenses = licenseMap.keySet();
+        for (String otherLicense : dependencyLicenses) {
+            // skip this license if it is the same as the dependency license
+            // skip this license if it has no projects assigned
+            if (otherLicense.equals(dependencyLicense)
+                    || licenseMap.get(dependencyLicense).isEmpty()) {
+                continue;
+            }
+
+            // skip this license if it isn't one of the whitelisted
+            if (!whiteLicenses.contains(otherLicense)) {
+                continue;
+            }
+
+            if (licenseMap.get(otherLicense).contains(dependency)) {
+                LOG.info(
+                        "License: '{}' for '{}' is OK since it is also licensed under '{}'",
+                        dependencyLicense,
+                        dependency,
+                        otherLicense);
+                // this dependency is licensed under another license from white list
+                return true;
+            }
+        }
+        return false;
     }
 
     void writeThirdPartyFile() throws IOException {
