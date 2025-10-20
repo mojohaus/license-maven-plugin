@@ -65,7 +65,7 @@ class AbstractAddThirdPartyMojoTest {
     class EmptyBlacklist {
 
         @Test
-        void findWhitelistedLicence() throws MojoExecutionException {
+        void findWhitelistedLicense() throws MojoExecutionException {
             // Given: all dependencies use whitelisted licenses
             mojo.setIncludedLicenses("Good|Safe");
             mojo.licenseMap.put("Good", createProject("artifact1"));
@@ -75,7 +75,7 @@ class AbstractAddThirdPartyMojoTest {
         }
 
         @Test
-        void doNotFindWhitelistedLicence() throws MojoExecutionException {
+        void doNotFindWhitelistedLicense() throws MojoExecutionException {
             // Given: dependency uses non-whitelisted license
             mojo.setIncludedLicenses("Good|Safe");
             mojo.licenseMap.put("Good", createProject("artifact1"));
@@ -85,7 +85,7 @@ class AbstractAddThirdPartyMojoTest {
         }
 
         @Test
-        void findWhitelistedDualLicenced() throws MojoExecutionException {
+        void findWhitelistedDualLicensed() throws MojoExecutionException {
             // Given: dependency has multiple licenses, one of which is whitelisted
             mojo.setIncludedLicenses("Good");
             MavenProject dualLicensedProject = createProject("artifact1");
@@ -101,7 +101,7 @@ class AbstractAddThirdPartyMojoTest {
     class EmptyWhitelist {
 
         @Test
-        void findBlacklistedLicence() throws MojoExecutionException {
+        void findBlacklistedLicense() throws MojoExecutionException {
             // Given: blacklisted license is present
             mojo.setExcludedLicenses("UNSAFE|FORBIDDEN");
             mojo.licenseMap.put("UNSAFE", createProject("artifact1"));
@@ -111,7 +111,7 @@ class AbstractAddThirdPartyMojoTest {
         }
 
         @Test
-        void doNotFindForbiddenLicence() throws MojoExecutionException {
+        void doNotFindForbiddenLicense() throws MojoExecutionException {
             // Given: blacklisted license is not present
             mojo.setExcludedLicenses("UNSAFE|FORBIDDEN");
             mojo.licenseMap.put("Unlisted", createProject("artifact1"));
@@ -136,7 +136,7 @@ class AbstractAddThirdPartyMojoTest {
         }
 
         @Test
-        void findWhitelistedDoNotFindBlacklistedLicence() throws MojoExecutionException {
+        void findWhitelistedDoNotFindBlacklistedLicense() throws MojoExecutionException {
             // Given: both blacklist and whitelist configured, all licenses comply
             mojo.setIncludedLicenses("Good|Safe");
             mojo.setExcludedLicenses("UNSAFE");
@@ -196,13 +196,13 @@ class AbstractAddThirdPartyMojoTest {
         }
 
         @Test
-        void dualLicencedProjectisBothWhitelistedAndBlacklisted() throws MojoExecutionException {
+        void dualLicensedProjectisBothWhitelistedAndBlacklisted() throws MojoExecutionException {
             mojo.setIncludedLicenses("Good");
             mojo.setExcludedLicenses("UNSAFE");
 
-            final MavenProject dualLicencedProject = createProject("artifact");
-            mojo.licenseMap.put("Good", dualLicencedProject);
-            mojo.licenseMap.put("UNSAFE", dualLicencedProject);
+            final MavenProject dualLicensedProject = createProject("artifact");
+            mojo.licenseMap.put("Good", dualLicensedProject);
+            mojo.licenseMap.put("UNSAFE", dualLicensedProject);
 
             assertTrue(mojo.checkForbiddenLicenses());
         }
