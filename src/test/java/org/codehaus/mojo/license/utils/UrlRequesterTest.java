@@ -17,13 +17,13 @@ class UrlRequesterTest {
     private static final String RESOURCE_NAME = "org/codehaus/mojo/license/utils/licenses.properties";
 
     @Test
-    void testClasspathRequester() throws Exception {
+    void classpathRequester() throws Exception {
         String licenseContent = UrlRequester.getFromUrl("classpath:" + RESOURCE_NAME);
         assertEquals("license1=This is mine!", licenseContent.trim());
     }
 
     @Test
-    void testGenericRequester(@TempDir Path tempDir) throws Exception {
+    void genericRequester(@TempDir Path tempDir) throws Exception {
         URL res = getClass().getClassLoader().getResource(RESOURCE_NAME);
         File testFile = Files.createTempFile(tempDir, "requester", "test").toFile();
         FileUtils.copyURLToFile(res, testFile);
@@ -33,12 +33,12 @@ class UrlRequesterTest {
     }
 
     @Test
-    void testClasspathIsAValidUrl() {
+    void classpathIsAValidUrl() {
         assertTrue(UrlRequester.isStringUrl("classpath:" + RESOURCE_NAME), "classpath protocol not registered");
     }
 
     @Test
-    void testClasspathIsAExternalUrl() {
+    void classpathIsAExternalUrl() {
         assertTrue(UrlRequester.isExternalUrl("classpath:" + RESOURCE_NAME), "classpath protocol as external");
     }
 }

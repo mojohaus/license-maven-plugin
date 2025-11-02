@@ -1,28 +1,5 @@
 package org.codehaus.mojo.license.model;
 
-/*
- * #%L
- * License Maven Plugin
- * %%
- * Copyright (C) 2008 - 2011 CodeLutin, Codehaus, Tony Chemit
- * %%
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Lesser Public License for more details.
- *
- * You should have received a copy of the GNU General Lesser Public
- * License along with this program.  If not, see
- * <http://www.gnu.org/licenses/lgpl-3.0.html>.
- * #L%
- */
-
-import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
@@ -71,7 +48,7 @@ class LicenseStoreTest {
     }
 
     @Test
-    void testJarRepository() throws IOException {
+    void jarRepository() throws Exception {
 
         store = new LicenseStore();
         store.init();
@@ -102,7 +79,7 @@ class LicenseStoreTest {
     }
 
     @Test
-    void testUserRepository() throws IOException {
+    void userRepository() throws Exception {
 
         URL baseURL = getClass().getResource("/newRepository");
         LicenseRepository jarRepository = new LicenseRepository();
@@ -120,7 +97,7 @@ class LicenseStoreTest {
         License[] licenses = store.getLicenses();
         assertNotNull(licenses);
         assertNotNull(licenses1);
-        assertEquals(licenses1.length, 4);
+        assertEquals(4, licenses1.length);
         assertEquals(licenses1.length, licenses.length);
 
         for (String licenseName : NEW_LICENSES) {

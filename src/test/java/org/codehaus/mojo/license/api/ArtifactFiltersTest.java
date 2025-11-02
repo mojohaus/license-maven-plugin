@@ -1,6 +1,5 @@
 package org.codehaus.mojo.license.api;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -8,7 +7,6 @@ import java.nio.charset.StandardCharsets;
 import org.apache.commons.io.IOUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.codehaus.mojo.license.api.ArtifactFilters.Builder;
 import org.junit.jupiter.api.Test;
@@ -18,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ArtifactFiltersTest {
     @Test
-    void isIncluded() throws InvalidVersionSpecificationException {
+    void isIncluded() throws Exception {
         final Artifact jar1Compile = new DefaultArtifact(
                 "org.group1", "artifact1", VersionRange.createFromVersionSpec("1.0"), "compile", "jar", "", null);
         final Artifact jar2Compile = new DefaultArtifact(
@@ -163,7 +161,7 @@ class ArtifactFiltersTest {
     }
 
     @Test
-    void urlContent() throws IOException, InvalidVersionSpecificationException {
+    void urlContent() throws Exception {
         final Builder builder = ArtifactFilters.buidler();
         final URL url = getClass().getClassLoader().getResource("org/codehaus/mojo/license/api/atifact-filters.txt");
         try (InputStream in = url.openStream()) {

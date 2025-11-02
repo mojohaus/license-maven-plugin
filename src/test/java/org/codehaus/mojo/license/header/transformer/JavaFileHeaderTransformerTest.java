@@ -43,7 +43,7 @@ class JavaFileHeaderTransformerTest {
     private static final String LINE_SEPARATOR = "<eol>";
 
     @Test
-    void testAddHeader() {
+    void addHeader() {
         JavaFileHeaderTransformer transformer = new JavaFileHeaderTransformer();
         transformer.setLineSeparator(LINE_SEPARATOR);
         transformer.setEmptyLineAfterHeader(false);

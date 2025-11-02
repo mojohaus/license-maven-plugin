@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class LicenseMapTest {
+class LicenseMapTest {
     // licenses must be equal
     private static final String LICENSE_KEY = LicenseMap.UNKNOWN_LICENSE_MESSAGE;
     // project names must be equal
