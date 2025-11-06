@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
  * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
-@Mojo(name = "comment-style-list", requiresProject = false, requiresDirectInvocation = true)
+@Mojo(name = "comment-style-list", requiresProject = false, requiresDirectInvocation = true, threadSafe = true)
 public class CommentStyleListMojo extends AbstractLicenseMojo {
     private static final Logger LOG = LoggerFactory.getLogger(CommentStyleListMojo.class);
 

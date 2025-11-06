@@ -26,7 +26,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -34,7 +33,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
-import java.util.TreeMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.maven.artifact.Artifact;
@@ -101,10 +100,9 @@ public class DefaultThirdPartyHelper implements ThirdPartyHelper {
     /**
      * Cache of dependencies (as maven project) loaded.
      */
-    private static volatile SortedMap<String, MavenProject> artifactCache;
-
-    // Mutex to guard lazy initialization of artifactCache
-    private static final Object ARTIFACT_CACHE_MUTEX = new Object();
+    private static final class ArtifactCacheHolder {
+        static final SortedMap<String, MavenProject> INSTANCE = new ConcurrentSkipListMap<>();
+    }
 
     /**
      * Constructor of the helper.
@@ -141,14 +139,7 @@ public class DefaultThirdPartyHelper implements ThirdPartyHelper {
      * {@inheritDoc}
      */
     public SortedMap<String, MavenProject> getArtifactCache() {
-        if (artifactCache == null) {
-            synchronized (ARTIFACT_CACHE_MUTEX) {
-                if (artifactCache == null) {
-                    artifactCache = Collections.synchronizedSortedMap(new TreeMap<String, MavenProject>());
-                }
-            }
-        }
-        return artifactCache;
+        return ArtifactCacheHolder.INSTANCE;
     }
 
     /**
