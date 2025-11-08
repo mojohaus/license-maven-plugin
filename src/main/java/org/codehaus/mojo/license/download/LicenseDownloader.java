@@ -40,33 +40,34 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpException;
-import org.apache.http.HttpHost;
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpStatus;
-import org.apache.http.StatusLine;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.Credentials;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.config.CookieSpecs;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.config.RequestConfig.Builder;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.conn.routing.HttpRoutePlanner;
-import org.apache.http.entity.ContentType;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.DefaultProxyRoutePlanner;
-import org.apache.http.protocol.HttpContext;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.impl.routing.DefaultProxyRoutePlanner;
+import org.apache.hc.client5.http.routing.HttpRoutePlanner;
+import org.apache.hc.core5.http.ClassicHttpRequest;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpException;
+import org.apache.hc.core5.http.HttpHost;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.message.StatusLine;
+import org.apache.hc.client5.http.auth.AuthScope;
+import org.apache.hc.client5.http.auth.Credentials;
+import org.apache.hc.client5.http.auth.CredentialsStore;
+import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.config.RequestConfig.Builder;
+import org.apache.hc.client5.http.cookie.StandardCookieSpec;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.http.protocol.HttpContext;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.settings.Proxy;
 import org.codehaus.mojo.license.spdx.SpdxLicenseList.Attachments.ContentSanitizer;
@@ -100,20 +101,20 @@ public class LicenseDownloader implements AutoCloseable {
         this.contentSanitizers = contentSanitizers;
         this.charset = charset;
         final Builder configBuilder = RequestConfig.copy(RequestConfig.DEFAULT) //
-                .setConnectTimeout(connectTimeout) //
-                .setSocketTimeout(socketTimeout) //
-                .setCookieSpec(CookieSpecs.STANDARD)
-                .setConnectionRequestTimeout(connectionRequestTimeout);
+                .setConnectTimeout(connectTimeout, TimeUnit.MILLISECONDS) //
+                .setResponseTimeout(socketTimeout, TimeUnit.MILLISECONDS) //
+                .setCookieSpec(StandardCookieSpec.RELAXED)
+                .setConnectionRequestTimeout(connectionRequestTimeout, TimeUnit.MILLISECONDS);
 
         if (proxy != null) {
-            configBuilder.setProxy(new HttpHost(proxy.getHost(), proxy.getPort(), proxy.getProtocol()));
+            configBuilder.setProxy(new HttpHost(proxy.getProtocol(), proxy.getHost(), proxy.getPort()));
         }
 
         HttpClientBuilder clientBuilder = HttpClients.custom().setDefaultRequestConfig(configBuilder.build());
         if (proxy != null) {
             if (proxy.getUsername() != null && proxy.getPassword() != null) {
-                final CredentialsProvider credsProvider = new BasicCredentialsProvider();
-                final Credentials creds = new UsernamePasswordCredentials(proxy.getUsername(), proxy.getPassword());
+                final CredentialsStore credsProvider = new BasicCredentialsProvider();
+                final Credentials creds = new UsernamePasswordCredentials(proxy.getUsername(), proxy.getPassword().toCharArray());
                 credsProvider.setCredentials(new AuthScope(proxy.getHost(), proxy.getPort()), creds);
                 clientBuilder.setDefaultCredentialsProvider(credsProvider);
             }
@@ -132,7 +133,7 @@ public class LicenseDownloader implements AutoCloseable {
                     final HttpRoutePlanner routePlanner = new DefaultProxyRoutePlanner(proxyHost) {
 
                         @Override
-                        protected HttpHost determineProxy(HttpHost target, HttpRequest request, HttpContext context)
+                        protected HttpHost determineProxy(HttpHost target, ClassicHttpRequest request, HttpContext context)
                                 throws HttpException {
                             for (Pattern pattern : nonProxyPatterns) {
                                 if (pattern.matcher(target.getHostName()).matches()) {
@@ -185,7 +186,7 @@ public class LicenseDownloader implements AutoCloseable {
         } else {
             LOG.debug("About to download '{}'", licenseUrlString);
             try (CloseableHttpResponse response = client.execute(new HttpGet(licenseUrlString))) {
-                final StatusLine statusLine = response.getStatusLine();
+                final StatusLine statusLine = new StatusLine(response);
                 if (statusLine.getStatusCode() != HttpStatus.SC_OK) {
                     return LicenseDownloadResult.failure("'" + licenseUrlString + "' returned "
                             + statusLine.getStatusCode()

@@ -35,12 +35,13 @@ import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.entity.ContentType;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.message.StatusLine;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.apache.maven.plugin.MojoExecutionException;
 
 /**
@@ -135,7 +136,7 @@ public class UrlRequester {
             try (CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
                 HttpGet get = new HttpGet(url);
                 try (CloseableHttpResponse response = httpClient.execute(get)) {
-                    int responseCode = response.getStatusLine().getStatusCode();
+                    int responseCode = response.getCode();
                     // CHECKSTYLE_OFF: MagicNumber
                     if (responseCode >= 200 && responseCode < 300)
                     // CHECKSTYLE_ON: MagicNumber
@@ -150,7 +151,7 @@ public class UrlRequester {
                         result = IOUtils.toString(entity.getContent(), charset);
                     } else {
                         throw new IOException(
-                                "For the URL (" + url + ") the server responded with " + response.getStatusLine());
+                                "For the URL (" + url + ") the server responded with " + new StatusLine(response));
                     }
                 }
             }
