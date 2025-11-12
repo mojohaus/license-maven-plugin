@@ -183,10 +183,8 @@ public class DefaultThirdPartyHelper implements ThirdPartyHelper {
 
         LicenseMap licenseMap = new LicenseMap();
 
-        synchronized (dependencies) {
-            for (MavenProject project : dependencies.values()) {
-                thirdPartyTool.addLicense(licenseMap, project, project.getLicenses());
-            }
+        for (MavenProject project : dependencies.values()) {
+            thirdPartyTool.addLicense(licenseMap, project, project.getLicenses());
         }
         return licenseMap;
     }
@@ -230,10 +228,7 @@ public class DefaultThirdPartyHelper implements ThirdPartyHelper {
 
                 // try to load missing third party files from dependencies
 
-                Collection<MavenProject> projects;
-                synchronized (projectDependencies) {
-                    projects = new ArrayList<>(projectDependencies.values());
-                }
+                Collection<MavenProject> projects = new ArrayList<>(projectDependencies.values());
                 projects.remove(project);
                 projects.removeAll(unsafeDependencies);
 
