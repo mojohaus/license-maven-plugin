@@ -58,7 +58,8 @@ import org.slf4j.LoggerFactory;
 @Mojo(
         name = "licenses-xml-insert-versions",
         requiresDependencyResolution = ResolutionScope.TEST,
-        defaultPhase = LifecyclePhase.PACKAGE)
+        defaultPhase = LifecyclePhase.PACKAGE,
+        threadSafe = true)
 public class LicensesXmlInsertVersionsMojo extends AbstractLicensesXmlMojo {
     private static final Logger LOG = LoggerFactory.getLogger(LicensesXmlInsertVersionsMojo.class);
 

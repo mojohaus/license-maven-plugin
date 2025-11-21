@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
  * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
-@Mojo(name = "license-list", requiresProject = false, requiresDirectInvocation = true)
+@Mojo(name = "license-list", requiresProject = false, requiresDirectInvocation = true, threadSafe = true)
 public class LicenseListMojo extends AbstractLicenseMojo {
     private static final Logger LOG = LoggerFactory.getLogger(LicenseListMojo.class);
 
