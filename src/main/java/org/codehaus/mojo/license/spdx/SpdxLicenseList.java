@@ -41,12 +41,10 @@ import org.codehaus.mojo.license.spdx.SpdxLicenseList.Attachments.UrlReplacement
  * @since 1.18
  */
 public class SpdxLicenseList {
-    private static final class Holder {
-        static final SpdxLicenseList LATEST = SpdxLicenseListData.createList();
-    }
+    private static final SpdxLicenseList LATEST = SpdxLicenseListData.createList();
 
     public static SpdxLicenseList getLatest() {
-        return Holder.LATEST;
+        return LATEST;
     }
 
     private final String licenseListVersion;
