@@ -100,9 +100,7 @@ public class DefaultThirdPartyHelper implements ThirdPartyHelper {
     /**
      * Cache of dependencies (as maven project) loaded.
      */
-    private static final class ArtifactCacheHolder {
-        static final SortedMap<String, MavenProject> INSTANCE = new ConcurrentSkipListMap<>();
-    }
+    private static final SortedMap<String, MavenProject> ARTIFACT_CACHE = new ConcurrentSkipListMap<>();
 
     /**
      * Constructor of the helper.
@@ -139,7 +137,7 @@ public class DefaultThirdPartyHelper implements ThirdPartyHelper {
      * {@inheritDoc}
      */
     public SortedMap<String, MavenProject> getArtifactCache() {
-        return ArtifactCacheHolder.INSTANCE;
+        return ARTIFACT_CACHE;
     }
 
     /**
