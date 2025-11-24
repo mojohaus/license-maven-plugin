@@ -59,7 +59,8 @@ import org.codehaus.mojo.license.utils.MojoHelper;
 @Mojo(
         name = "download-licenses",
         requiresDependencyResolution = ResolutionScope.TEST,
-        defaultPhase = LifecyclePhase.PACKAGE)
+        defaultPhase = LifecyclePhase.PACKAGE,
+        threadSafe = true)
 public class DownloadLicensesMojo extends AbstractDownloadLicensesMojo {
 
     // ----------------------------------------------------------------------

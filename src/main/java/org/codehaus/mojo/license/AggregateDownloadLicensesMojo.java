@@ -65,7 +65,8 @@ import org.codehaus.mojo.license.utils.MojoHelper;
         name = "aggregate-download-licenses",
         requiresDependencyResolution = ResolutionScope.TEST,
         defaultPhase = LifecyclePhase.PACKAGE,
-        aggregator = true)
+        aggregator = true,
+        threadSafe = true)
 public class AggregateDownloadLicensesMojo extends AbstractDownloadLicensesMojo {
 
     // ----------------------------------------------------------------------

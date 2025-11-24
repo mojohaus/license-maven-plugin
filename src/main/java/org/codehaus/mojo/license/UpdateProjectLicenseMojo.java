@@ -46,7 +46,7 @@ import org.slf4j.LoggerFactory;
  * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
-@Mojo(name = "update-project-license", defaultPhase = LifecyclePhase.GENERATE_RESOURCES)
+@Mojo(name = "update-project-license", defaultPhase = LifecyclePhase.GENERATE_RESOURCES, threadSafe = true)
 public class UpdateProjectLicenseMojo extends AbstractLicenseNameMojo {
     private static final Logger LOG = LoggerFactory.getLogger(UpdateProjectLicenseMojo.class);
 
