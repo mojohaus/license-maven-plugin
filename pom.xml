@@ -132,6 +132,7 @@
 
     <version.httpcomponents.httpclient>4.5.14</version.httpcomponents.httpclient>
     <version.httpcomponents.httpcore>4.4.16</version.httpcomponents.httpcore>
+    <version.odfdom-java>0.12.0</version.odfdom-java>
 
     <!-- license configuration -->
     <license.useMissingFile>true</license.useMissingFile>
@@ -314,8 +315,13 @@
     <dependency>
       <groupId>org.odftoolkit</groupId>
       <artifactId>odfdom-java</artifactId>
-      <!-- There are later versions, but that versions need JDKs after version 8 -->
-      <version>0.9.0</version>
+      <version>${version.odfdom-java}</version>
+    </dependency>
+    <!-- XML APIs is needed for JDK 8, was a transitive dependency from old version of odfdom-java -->
+    <dependency>
+      <groupId>xml-apis</groupId>
+      <artifactId>xml-apis</artifactId>
+      <version>1.4.01</version>
     </dependency>
   </dependencies>
 
@@ -338,7 +344,7 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-plugin-plugin</artifactId>
           <configuration>
-            <!-- due to freemarker mixed jar FREEMARKER-228 -->
+            <!-- due to usage of JDK 11 dependencies with multi-release jar support -->
             <requiredJavaVersion>8</requiredJavaVersion>
           </configuration>
         </plugin>
@@ -468,7 +474,7 @@
               <dependency>
                 <groupId>org.odftoolkit</groupId>
                 <artifactId>odfdom-java</artifactId>
-                <version>0.9.0</version>
+                <version>${version.odfdom-java}</version>
               </dependency>
               <dependency>
                 <groupId>commons-io</groupId>
@@ -512,6 +518,9 @@
 
     <profile>
       <id>mojo-release</id>
+      <properties>
+        <minimalJavaBuildVersion>11</minimalJavaBuildVersion>
+      </properties>
       <build>
         <plugins>
           <plugin>
@@ -552,6 +561,49 @@
           </plugin>
         </plugins>
       </reporting>
+    </profile>
+
+    <profile>
+      <id>java11-mrjar</id>
+      <activation>
+        <jdk>[11,)</jdk>
+      </activation>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <executions>
+              <!-- Compile Java 11+ specific code -->
+              <execution>
+                <id>java11-compile</id>
+                <goals>
+                  <goal>compile</goal>
+                </goals>
+                <phase>compile</phase>
+                <configuration>
+                  <release>11</release>
+                  <compileSourceRoots>
+                    <compileSourceRoot>${project.basedir}/src/main/java11</compileSourceRoot>
+                  </compileSourceRoots>
+                  <outputDirectory>${project.build.outputDirectory}/META-INF/versions/11</outputDirectory>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <classesDirectory>${project.build.outputDirectory}/META-INF/versions/11</classesDirectory>
+              <additionalClasspathElements>
+                <additionalClasspathElement>${project.build.outputDirectory}</additionalClasspathElement>
+              </additionalClasspathElements>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
   </profiles>
 </project>
