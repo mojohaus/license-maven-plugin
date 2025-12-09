@@ -34,6 +34,7 @@ import org.codehaus.mojo.license.extended.InfoFile;
 import org.codehaus.mojo.license.extended.spreadsheet.CalcFileWriter;
 import org.codehaus.mojo.license.extended.spreadsheet.ExcelFileWriter;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.JRE;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -41,6 +42,7 @@ import org.xml.sax.SAXException;
 import static org.codehaus.mojo.license.download.LicenseSummaryWriter.LICENSE_PATH;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -164,7 +166,15 @@ class LicenseSummaryTest {
         ExcelFileWriter.write(licSummary, licensesExcelOutputFile.toFile());
 
         Path licensesCalcOutputFile = Files.createTempFile("licCalc", ".ods");
-        CalcFileWriter.write(licSummary, licensesCalcOutputFile.toFile());
+        if (JRE.currentJre().version() >= 11) {
+            CalcFileWriter.write(licSummary, licensesCalcOutputFile.toFile());
+        } else {
+            // on JDK 8 this should throw an UnsupportedOperationException
+            UnsupportedOperationException exception = assertThrows(
+                    UnsupportedOperationException.class,
+                    () -> CalcFileWriter.write(licSummary, licensesCalcOutputFile.toFile()));
+            assertEquals("Write LibreOffice Calc file (ODS) requires JDK 11+", exception.getMessage());
+        }
     }
 
     /**
