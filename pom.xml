@@ -118,7 +118,7 @@
   </ciManagement>
 
   <properties>
-    <mavenVersion>3.9.11</mavenVersion>
+    <mavenVersion>3.9.12</mavenVersion>
     <minimalMavenBuildVersion>3.6.3</minimalMavenBuildVersion>
     <mojo.java.target>8</mojo.java.target>
 
