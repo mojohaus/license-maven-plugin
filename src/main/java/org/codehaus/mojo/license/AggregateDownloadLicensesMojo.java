@@ -62,12 +62,13 @@ import org.codehaus.mojo.license.utils.MojoHelper;
  * @since 1.10
  */
 @Mojo(
-        name = "aggregate-download-licenses",
+        name = AggregateDownloadLicensesMojo.GOAL,
         requiresDependencyResolution = ResolutionScope.TEST,
         defaultPhase = LifecyclePhase.PACKAGE,
         aggregator = true,
         threadSafe = true)
 public class AggregateDownloadLicensesMojo extends AbstractDownloadLicensesMojo {
+    public static final String GOAL = "aggregate-download-licenses";
 
     // ----------------------------------------------------------------------
     // Mojo Parameters

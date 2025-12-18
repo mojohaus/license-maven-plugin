@@ -1,0 +1,9 @@
+table tr th {
+    background: #f0f0f0;
+}
+
+th {
+    position: sticky;
+    z-index: 100;
+    top: 0;
+}

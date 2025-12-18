@@ -38,7 +38,7 @@ import org.apache.maven.plugin.MojoExecutionException;
  */
 public class StringToList {
     /**
-     * Regular expression to split license list.
+     * Regular expression to split license list with a pipe character: "|".
      */
     public static final String LIST_OF_LICENSES_REG_EX = "\\s*\\|\\s*";
 
@@ -57,7 +57,8 @@ public class StringToList {
     public StringToList(String data) throws MojoExecutionException {
         this();
         if (!UrlRequester.isStringUrl(data)) {
-            for (String s : data.split(LIST_OF_LICENSES_REG_EX)) {
+            String[] splited = trimmedStringSplit(data);
+            for (String s : splited) {
                 addEntryToList(s);
             }
         } else {
@@ -69,11 +70,44 @@ public class StringToList {
         }
     }
 
+    /**
+     * Splits a String by the pipe character and trims it.<br>
+     * It allows, for example, to write lengthy license merge lists not written as a 400 characters long, hard to read
+     * line, but as a list of lines separated by a pipe character.<br>
+     * Example, instead of writing the following XML:
+     * <pre><code>
+     * <tag>Righteous license 2.1|The righteous extra long named super rights granting license version 2.1|Hidden right license 2.1|The completely unfair "all your rights belong to us" license version 2.1</tag>
+     * </code></pre>
+     * write:
+     * <pre><code>
+     * <tag>Righteous license 2.1
+     *     |The righteous extra long named super rights granting license version 2.1
+     *     |Hidden right license 2.1
+     *     |The completely unfair "all your rights belong to us" license version 2.1
+     * </tag>
+     * </code></pre>
+     * @param stringToSplit String to split.
+     * @return Split and trimmed string.
+     */
+    public static String[] trimmedStringSplit(String stringToSplit) {
+        return stringToSplit
+                .trim()
+                // Replace newlines
+                .replace('\n', ' ')
+                // Replace multiple spaces with one.
+                .replaceAll(" +", " ")
+                .split(LIST_OF_LICENSES_REG_EX);
+    }
+
     public List<String> getData() {
         return data;
     }
 
     protected void addEntryToList(String data) {
         this.data.add(data);
+    }
+
+    public boolean contains(String name) {
+        return data.contains(name);
     }
 }
