@@ -85,6 +85,10 @@ public class LicenseDownloader implements AutoCloseable {
 
     private static final Pattern EXTENSION_PATTERN = Pattern.compile("\\.[a-z]{1,4}$", Pattern.CASE_INSENSITIVE);
 
+    private static final String PROTOCOL_HTTP = "http://";
+    private static final String PROTOCOL_HTTPS = "https://";
+    private static final Pattern PROTOCOL_PATTERN = Pattern.compile(".+://.+");
+
     private final CloseableHttpClient client;
 
     private final Map<String, ContentSanitizer> contentSanitizers;
@@ -109,7 +113,18 @@ public class LicenseDownloader implements AutoCloseable {
             configBuilder.setProxy(new HttpHost(proxy.getHost(), proxy.getPort(), proxy.getProtocol()));
         }
 
-        HttpClientBuilder clientBuilder = HttpClients.custom().setDefaultRequestConfig(configBuilder.build());
+        HttpClientBuilder clientBuilder = HttpClients.custom()
+                .setDefaultRequestConfig(configBuilder.build())
+                /*
+                If you download licenses without a header, for example, from "gnu.org"
+                (one of the most used, important license hosters),
+                without a user-agent, it will block all download attempts with
+                a (misleading) error: "429 Too many requests".
+                Even on the first download after a week of not contacting gnu.org!
+
+                Using "wget" here, because that is a well-known client and it does basically what is done here.
+                */
+                .setUserAgent("Wget/1.21.4");
         if (proxy != null) {
             if (proxy.getUsername() != null && proxy.getPassword() != null) {
                 final CredentialsProvider credsProvider = new BasicCredentialsProvider();
@@ -184,7 +199,7 @@ public class LicenseDownloader implements AutoCloseable {
             }
         } else {
             LOG.debug("About to download '{}'", licenseUrlString);
-            try (CloseableHttpResponse response = client.execute(new HttpGet(licenseUrlString))) {
+            try (CloseableHttpResponse response = tryDownload(licenseUrlString)) {
                 final StatusLine statusLine = response.getStatusLine();
                 if (statusLine.getStatusCode() != HttpStatus.SC_OK) {
                     return LicenseDownloadResult.failure("'" + licenseUrlString + "' returned "
@@ -244,6 +259,63 @@ public class LicenseDownloader implements AutoCloseable {
                 }
             }
         }
+    }
+
+    /**
+     * Try downloading from given URL, and if it fails, it tries prefixing the URL with 1st https:// and then http://.
+     * This happens, for example, with the "jquery.org/license" URL.
+     *
+     * @param licenseUrlString License URL string.
+     * @return CloseableHttpResponse
+     * @throws IOException Raised when all attempts tried to open a connection.
+     */
+    private CloseableHttpResponse tryDownload(String licenseUrlString) throws IOException {
+        // Shortcut if the URL starts already with a protocol.
+        if (PROTOCOL_PATTERN.matcher(licenseUrlString).matches()) {
+            return downloadUrl(licenseUrlString);
+        }
+        // There is no protocol prefix, try the original, then HTTPS and HTTP.
+        String[] protocolPrefixes = new String[] {
+            // Prefer HTTPS, since it's secure.
+            PROTOCOL_HTTPS,
+            /* HTTPS may not always be available, especially in complex proxy environments.
+            And the information is publicly available anyway. */
+            PROTOCOL_HTTP
+        };
+        for (int index = -1; index < protocolPrefixes.length; index++) {
+            try {
+                String prefixedLicenseUrlString =
+                        index >= 0 ? protocolPrefixes[index] + licenseUrlString : licenseUrlString;
+                return downloadUrl(prefixedLicenseUrlString);
+            } catch (IOException e) {
+                if (LOG.isDebugEnabled()) {
+                    if (index < protocolPrefixes.length - 1) {
+                        LOG.debug(
+                                "Failed to download from \"{}\". Trying \"{}\" next.",
+                                licenseUrlString,
+                                protocolPrefixes[index + 1] + licenseUrlString);
+                    } else {
+                        LOG.debug("Failed to download from \"{}\". This was the last attempt", licenseUrlString);
+                    }
+                }
+                if (index >= protocolPrefixes.length - 1) {
+                    throw e;
+                }
+            }
+        }
+        throw new IllegalStateException(
+                "This code should never be reached," + " either returning a connection or throwing an exception.");
+    }
+
+    /**
+     * Download with a HTTP GET from the given URL <code>url</code>.
+     *
+     * @param url The URL.
+     * @return The CloseableHttpResponse.
+     * @throws IOException Thrown when the connection could not be opened.
+     */
+    private CloseableHttpResponse downloadUrl(String url) throws IOException {
+        return client.execute(new HttpGet(url));
     }
 
     static LicenseDownloadResult sanitize(
@@ -421,7 +493,7 @@ public class LicenseDownloader implements AutoCloseable {
                 /* License files exist which are completely identical, except that someone changed
                 <http://fsf.org/> to <https://fsf.org/>.
                  */
-                .replace("http://", "https://")
+                .replace(PROTOCOL_HTTP, PROTOCOL_HTTPS)
                 // All to lowercase
                 .toLowerCase();
     }

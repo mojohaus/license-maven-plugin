@@ -220,14 +220,9 @@ public class LicensedArtifactResolver {
         final Map<String, String> mergedLicenses = new HashMap<>();
         if (licenseMerges != null) {
             for (String licenseMerge : licenseMerges) {
-                String[] splited = licenseMerge
-                        .trim()
-                        // Replace newlines
-                        .replace('\n', ' ')
-                        // Replace multiple spaces with one.
-                        .replaceAll(" +", " ")
-                        .split(StringToList.LIST_OF_LICENSES_REG_EX);
+                String[] splited = StringToList.trimmedStringSplit(licenseMerge);
                 for (String split : splited) {
+                    // Map other occurrences to first occurrence.
                     mergedLicenses.put(split, splited[0]);
                 }
             }

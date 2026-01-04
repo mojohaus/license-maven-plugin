@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<?xml-stylesheet type="text/xsl" href="../aggregate-download-licenses-shared/sortedByHtml.xslt"?>
+<dependencyInfos>
+  <dependencyInfos name="Apache Commons Lang" groupId="org.apache.commons" artifactId="commons-lang3"
+                   version="3.17.0">
+    <licenses>Apache License, Version 2.0</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="Apache Log4j API" groupId="org.apache.logging.log4j" artifactId="log4j-api" version="2.23.1">
+    <licenses>Apache License, Version 2.0</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="Apache Log4j to SLF4J Adapter" groupId="org.apache.logging.log4j" artifactId="log4j-to-slf4j"
+                   version="2.23.1">
+    <licenses>Apache License, Version 2.0</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="CDI APIs" groupId="jakarta.enterprise" artifactId="jakarta.enterprise.cdi-api"
+                   version="4.0.1">
+    <licenses>Apache License, Version 2.0</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="CDI Language Model" groupId="jakarta.enterprise" artifactId="jakarta.enterprise.lang-model"
+                   version="4.0.1">
+    <licenses>Apache License, Version 2.0</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="Jackson datatype: jdk8" groupId="com.fasterxml.jackson.datatype"
+                   artifactId="jackson-datatype-jdk8" version="2.17.2">
+    <licenses>Apache License, Version 2.0</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="Jackson datatype: JSR310" groupId="com.fasterxml.jackson.datatype"
+                   artifactId="jackson-datatype-jsr310" version="2.17.2">
+    <licenses>Apache License, Version 2.0</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="Jackson-annotations" groupId="com.fasterxml.jackson.core" artifactId="jackson-annotations"
+                   version="2.17.2">
+    <licenses>Apache License, Version 2.0</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="Jackson-core" groupId="com.fasterxml.jackson.core" artifactId="jackson-core"
+                   version="2.17.2">
+    <licenses>Apache License, Version 2.0</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="jackson-databind" groupId="com.fasterxml.jackson.core" artifactId="jackson-databind"
+                   version="2.17.2">
+    <licenses>Apache License, Version 2.0</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="Jackson-module-parameter-names" groupId="com.fasterxml.jackson.module"
+                   artifactId="jackson-module-parameter-names" version="2.17.2">
+    <licenses>Apache License, Version 2.0</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="Jakarta Batch API" groupId="jakarta.batch" artifactId="jakarta.batch-api" version="2.1.1">
+    <licenses>Apache License, Version 2.0</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="Jakarta Bean Validation API" groupId="jakarta.validation" artifactId="jakarta.validation-api"
+                   version="3.0.2">
+    <licenses>Apache License, Version 2.0</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="Jakarta Dependency Injection" groupId="jakarta.inject" artifactId="jakarta.inject-api"
+                   version="2.0.1">
+    <licenses>Apache License, Version 2.0</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="micrometer-commons" groupId="io.micrometer" artifactId="micrometer-commons"
+                   version="1.12.11">
+    <licenses>Apache License, Version 2.0</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="micrometer-observation" groupId="io.micrometer" artifactId="micrometer-observation"
+                   version="1.12.11">
+    <licenses>Apache License, Version 2.0</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="SnakeYAML" groupId="org.yaml" artifactId="snakeyaml" version="2.2">
+    <licenses>Apache License, Version 2.0</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="Spring AOP" groupId="org.springframework" artifactId="spring-aop" version="6.1.14">
+    <licenses>Apache License, Version 2.0</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="Spring Beans" groupId="org.springframework" artifactId="spring-beans" version="6.1.14">
+    <licenses>Apache License, Version 2.0</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="Spring Commons Logging Bridge" groupId="org.springframework" artifactId="spring-jcl"
+                   version="6.1.14">
+    <licenses>Apache License, Version 2.0</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="Spring Context" groupId="org.springframework" artifactId="spring-context" version="6.1.14">
+    <licenses>Apache License, Version 2.0</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="Spring Core" groupId="org.springframework" artifactId="spring-core" version="6.1.14">
+    <licenses>Apache License, Version 2.0</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="Spring Expression Language (SpEL)" groupId="org.springframework"
+                   artifactId="spring-expression" version="6.1.14">
+    <licenses>Apache License, Version 2.0</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="Spring Web" groupId="org.springframework" artifactId="spring-web" version="6.1.14">
+    <licenses>Apache License, Version 2.0</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="Spring Web MVC" groupId="org.springframework" artifactId="spring-webmvc" version="6.1.14">
+    <licenses>Apache License, Version 2.0</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="spring-boot" groupId="org.springframework.boot" artifactId="spring-boot" version="3.3.5">
+    <licenses>Apache License, Version 2.0</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="spring-boot-autoconfigure" groupId="org.springframework.boot"
+                   artifactId="spring-boot-autoconfigure" version="3.3.5">
+    <licenses>Apache License, Version 2.0</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="spring-boot-starter" groupId="org.springframework.boot" artifactId="spring-boot-starter"
+                   version="3.3.5">
+    <licenses>Apache License, Version 2.0</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="spring-boot-starter-json" groupId="org.springframework.boot"
+                   artifactId="spring-boot-starter-json" version="3.3.5">
+    <licenses>Apache License, Version 2.0</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="spring-boot-starter-logging" groupId="org.springframework.boot"
+                   artifactId="spring-boot-starter-logging" version="3.3.5">
+    <licenses>Apache License, Version 2.0</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="spring-boot-starter-tomcat" groupId="org.springframework.boot"
+                   artifactId="spring-boot-starter-tomcat" version="3.3.5">
+    <licenses>Apache License, Version 2.0</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="spring-boot-starter-web" groupId="org.springframework.boot"
+                   artifactId="spring-boot-starter-web" version="3.3.5">
+    <licenses>Apache License, Version 2.0</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="tomcat-embed-core" groupId="org.apache.tomcat.embed" artifactId="tomcat-embed-core"
+                   version="10.1.31">
+    <licenses>Apache License, Version 2.0</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="tomcat-embed-el" groupId="org.apache.tomcat.embed" artifactId="tomcat-embed-el"
+                   version="10.1.31">
+    <licenses>Apache License, Version 2.0</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="tomcat-embed-websocket" groupId="org.apache.tomcat.embed" artifactId="tomcat-embed-websocket"
+                   version="10.1.31">
+    <licenses>Apache License, Version 2.0</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="Jakarta Activation API" groupId="jakarta.activation" artifactId="jakarta.activation-api"
+                   version="2.1.0">
+    <licenses>EDL 1.0</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="Jakarta Mail API" groupId="jakarta.mail" artifactId="jakarta.mail-api" version="2.1.0">
+    <licenses>EDL 1.0</licenses>
+    <licenses>EPL 2.0</licenses>
+    <licenses>GPL2 w/ CPE</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="Jakarta Persistence API" groupId="jakarta.persistence" artifactId="jakarta.persistence-api"
+                   version="3.1.0">
+    <licenses>EDL 1.0</licenses>
+    <licenses>EPL 2.0</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="Logback Classic Module" groupId="ch.qos.logback" artifactId="logback-classic"
+                   version="1.5.11">
+    <licenses>EPL 1.0</licenses>
+    <licenses>GNU Lesser General Public License</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="Logback Core Module" groupId="ch.qos.logback" artifactId="logback-core" version="1.5.11">
+    <licenses>EPL 1.0</licenses>
+    <licenses>GNU Lesser General Public License</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="Jakarta Annotations API" groupId="jakarta.annotation" artifactId="jakarta.annotation-api"
+                   version="2.1.1">
+    <licenses>EPL 2.0</licenses>
+    <licenses>GPL2 w/ CPE</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="Jakarta Authentication" groupId="jakarta.authentication"
+                   artifactId="jakarta.authentication-api" version="3.0.0">
+    <licenses>EPL 2.0</licenses>
+    <licenses>GPL2 w/ CPE</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="Jakarta Authorization" groupId="jakarta.authorization" artifactId="jakarta.authorization-api"
+                   version="2.1.0">
+    <licenses>EPL 2.0</licenses>
+    <licenses>GPL2 w/ CPE</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="Jakarta Enterprise Beans API" groupId="jakarta.ejb" artifactId="jakarta.ejb-api"
+                   version="4.0.1">
+    <licenses>EPL 2.0</licenses>
+    <licenses>GPL2 w/ CPE</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="Jakarta Expression Language API" groupId="jakarta.el" artifactId="jakarta.el-api"
+                   version="5.0.1">
+    <licenses>EPL 2.0</licenses>
+    <licenses>GPL2 w/ CPE</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="Jakarta Faces" groupId="jakarta.faces" artifactId="jakarta.faces-api" version="4.0.1">
+    <licenses>EPL 2.0</licenses>
+    <licenses>GPL2 w/ CPE</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="Jakarta Interceptors" groupId="jakarta.interceptor" artifactId="jakarta.interceptor-api"
+                   version="2.1.0">
+    <licenses>EPL 2.0</licenses>
+    <licenses>GPL2 w/ CPE</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="Jakarta JSON Processing API" groupId="jakarta.json" artifactId="jakarta.json-api"
+                   version="2.1.0">
+    <licenses>EPL 2.0</licenses>
+    <licenses>GPL2 w/ CPE</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="Jakarta Messaging API" groupId="jakarta.jms" artifactId="jakarta.jms-api" version="3.1.0">
+    <licenses>EPL 2.0</licenses>
+    <licenses>GPL2 w/ CPE</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="Jakarta RESTful WS API" groupId="jakarta.ws.rs" artifactId="jakarta.ws.rs-api"
+                   version="3.1.0">
+    <licenses>EPL 2.0</licenses>
+    <licenses>GPL2 w/ CPE</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="Jakarta Security" groupId="jakarta.security.enterprise"
+                   artifactId="jakarta.security.enterprise-api" version="3.0.0">
+    <licenses>EPL 2.0</licenses>
+    <licenses>GPL2 w/ CPE</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="Jakarta Server Pages API" groupId="jakarta.servlet.jsp" artifactId="jakarta.servlet.jsp-api"
+                   version="3.1.0">
+    <licenses>EPL 2.0</licenses>
+    <licenses>GPL2 w/ CPE</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="Jakarta Servlet" groupId="jakarta.servlet" artifactId="jakarta.servlet-api" version="6.0.0">
+    <licenses>EPL 2.0</licenses>
+    <licenses>GPL2 w/ CPE</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="Jakarta Standard Tag Library API" groupId="jakarta.servlet.jsp.jstl"
+                   artifactId="jakarta.servlet.jsp.jstl-api" version="3.0.0">
+    <licenses>EPL 2.0</licenses>
+    <licenses>GPL2 w/ CPE</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="Jakarta WebSocket - Client API" groupId="jakarta.websocket"
+                   artifactId="jakarta.websocket-client-api" version="2.1.0">
+    <licenses>EPL 2.0</licenses>
+    <licenses>GPL2 w/ CPE</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="Jakarta WebSocket - Server API" groupId="jakarta.websocket"
+                   artifactId="jakarta.websocket-api" version="2.1.0">
+    <licenses>EPL 2.0</licenses>
+    <licenses>GPL2 w/ CPE</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="jakarta.jakartaee-api" groupId="jakarta.platform" artifactId="jakarta.jakartaee-api"
+                   version="10.0.0">
+    <licenses>EPL 2.0</licenses>
+    <licenses>GPL2 w/ CPE</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="jakarta.jakartaee-web-api" groupId="jakarta.platform" artifactId="jakarta.jakartaee-web-api"
+                   version="10.0.0">
+    <licenses>EPL 2.0</licenses>
+    <licenses>GPL2 w/ CPE</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="jakarta.resource API" groupId="jakarta.resource" artifactId="jakarta.resource-api"
+                   version="2.1.0">
+    <licenses>EPL 2.0</licenses>
+    <licenses>GPL2 w/ CPE</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="jakarta.transaction API" groupId="jakarta.transaction" artifactId="jakarta.transaction-api"
+                   version="2.0.1">
+    <licenses>EPL 2.0</licenses>
+    <licenses>GPL2 w/ CPE</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="JSON-B API" groupId="jakarta.json.bind" artifactId="jakarta.json.bind-api" version="3.0.0">
+    <licenses>EPL 2.0</licenses>
+    <licenses>GPL2 w/ CPE</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="JUL to SLF4J bridge" groupId="org.slf4j" artifactId="jul-to-slf4j" version="2.0.16">
+    <licenses>MIT License</licenses>
+  </dependencyInfos>
+  <dependencyInfos name="SLF4J API Module" groupId="org.slf4j" artifactId="slf4j-api" version="2.0.15">
+    <licenses>MIT License</licenses>
+  </dependencyInfos>
+</dependencyInfos>
