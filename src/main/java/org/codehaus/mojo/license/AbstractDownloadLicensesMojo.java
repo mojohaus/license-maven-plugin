@@ -705,6 +705,8 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
 
     /**
      * Write LibreOffice Calc file (ODS) for goal license:aggregate-download-licenses.
+     * <p>
+     * <b>NOTICE</b> Requires JDK 11 or higher.
      *
      * @since 2.4.0
      */

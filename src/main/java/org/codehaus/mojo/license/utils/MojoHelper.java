@@ -109,7 +109,11 @@ public class MojoHelper {
      * @return the new url
      */
     public static URL getUrl(URL baseUrl, String suffix) {
-        String url = baseUrl.toString() + "/" + suffix;
+        String url = baseUrl.toString();
+        if (!url.endsWith("/")) {
+            url += "/";
+        }
+        url += suffix;
         try {
             return URI.create(url).toURL();
         } catch (MalformedURLException ex) {

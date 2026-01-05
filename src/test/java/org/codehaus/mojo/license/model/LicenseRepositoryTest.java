@@ -27,6 +27,8 @@ import java.net.URL;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledOnJre;
+import org.junit.jupiter.api.condition.JRE;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -48,8 +50,10 @@ class LicenseRepositoryTest {
     }
 
     @Test
+    @EnabledOnJre(
+            value = JRE.JAVA_8,
+            disabledReason = "changed class order for Java 9+, dut to add varsion/11 for surefire")
     void testJarRepository() throws IOException {
-
         repository = new LicenseRepository();
         URL baseURL = getClass().getResource(LicenseStore.JAR_LICENSE_REPOSITORY);
         repository.setBaseURL(baseURL);
