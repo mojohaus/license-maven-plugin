@@ -74,4 +74,18 @@ public enum Eol {
     public String getEolString() {
         return eolString;
     }
+
+    public static Eol from(String eol) throws IllegalArgumentException {
+        switch (eol) {
+            case "\r\n":
+                return CRLF;
+            case "\n":
+                return LF;
+            default:
+                throw new IllegalArgumentException(String.format(
+                    "Unable to convert Eol from %s",
+                    eol
+                ));
+        }
+    }
 }
