@@ -28,10 +28,12 @@ import javax.xml.transform.TransformerException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -58,6 +60,7 @@ import org.codehaus.mojo.license.api.ArtifactFilters;
 import org.codehaus.mojo.license.api.MavenProjectDependenciesConfigurator;
 import org.codehaus.mojo.license.download.Cache;
 import org.codehaus.mojo.license.download.FileNameEntry;
+import org.codehaus.mojo.license.download.KnownLicenseLocalResolver;
 import org.codehaus.mojo.license.download.LicenseDownloader;
 import org.codehaus.mojo.license.download.LicenseDownloader.LicenseDownloadResult;
 import org.codehaus.mojo.license.download.LicenseMatchers;
@@ -1323,8 +1326,10 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
                         final File licenseOutputFile = fileNameEntry.getFile();
                         if (matchingUrlsOnly == fileNameEntry.isPreferred()) {
                             if (!licenseOutputFile.exists() || forceDownload) {
-                                LicenseDownloadResult result =
-                                        licenseDownloader.downloadLicense(licenseUrl, fileNameEntry);
+                                LicenseDownloadResult result = resolveKnownLicenseLocally(licenseUrl, fileNameEntry);
+                                if (result == null) {
+                                    result = licenseDownloader.downloadLicense(licenseUrl, fileNameEntry);
+                                }
                                 if (!organizeLicensesByDependencies && result.isSuccess()) {
                                     /* check if we can re-use an existing file that has the same content */
                                     final String name = preferredFileNames.getFileNameBySha1(result.getSha1());
@@ -1377,6 +1382,29 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
                 }
             }
             licenseIndex++;
+        }
+    }
+
+    private LicenseDownloadResult resolveKnownLicenseLocally(String licenseUrl, FileNameEntry fileNameEntry)
+            throws IOException {
+        final String resourcePath = KnownLicenseLocalResolver.resolveResourcePath(licenseUrl);
+        if (resourcePath == null) {
+            return null;
+        }
+        final File outputFile = fileNameEntry.getFile();
+        final Path outputPath = outputFile.toPath();
+        if (outputPath.getParent() != null) {
+            Files.createDirectories(outputPath.getParent());
+        }
+        final String resourceLocation = "/" + resourcePath;
+        try (InputStream in = AbstractDownloadLicensesMojo.class.getResourceAsStream(resourceLocation)) {
+            if (in == null) {
+                LOG.debug("Could not resolve local resource {} for URL {}", resourcePath, licenseUrl);
+                return null;
+            }
+            Files.copy(in, outputPath, StandardCopyOption.REPLACE_EXISTING);
+            LOG.debug("Resolved URL '{}' from local known-license resource '{}'", licenseUrl, resourcePath);
+            return LicenseDownloadResult.success(outputFile, FileUtil.sha1(outputPath), fileNameEntry.isPreferred());
         }
     }
 
