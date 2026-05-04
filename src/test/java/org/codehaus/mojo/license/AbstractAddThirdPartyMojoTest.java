@@ -37,6 +37,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -205,6 +206,42 @@ class AbstractAddThirdPartyMojoTest {
             mojo.licenseMap.put("UNSAFE", dualLicensedProject);
 
             assertTrue(mojo.checkForbiddenLicenses());
+        }
+
+        /**
+         * Reproduces a {@link java.util.ConcurrentModificationException} thrown from
+         * {@link AbstractAddThirdPartyMojo#checkForbiddenLicenses()} when two or more
+         * dependencies are mapped to the same blacklisted license <em>and</em> are
+         * simultaneously whitelisted via another license.
+         *
+         * <p>The inner loop iterates the {@code SortedSet} of unsafe projects and
+         * calls {@code set.remove(...)} on the very same set, which mutates the
+         * underlying {@code TreeMap}'s {@code modCount}. The next call to
+         * {@code Iterator.next()} then fails fast with a CME originating from
+         * {@code TreeMap$KeyIterator.next} (TreeSet is backed by a TreeMap).
+         *
+         * <p>Trigger conditions: at least two dependencies on the same blacklisted
+         * license, with the first iterated one being whitelisted (so the remove
+         * fires) and at least one further iteration step required afterwards.
+         */
+        @Test
+        void multipleDualLicensedProjectsDoNotThrowConcurrentModification() throws MojoExecutionException {
+            mojo.setIncludedLicenses("Good");
+            mojo.setExcludedLicenses("UNSAFE");
+
+            final MavenProject project1 = createProject("artifact1");
+            final MavenProject project2 = createProject("artifact2");
+
+            // Both projects are licensed under both UNSAFE (blacklisted)
+            // and Good (whitelisted) — i.e. dual-licensed.
+            mojo.licenseMap.put("UNSAFE", project1);
+            mojo.licenseMap.put("UNSAFE", project2);
+            mojo.licenseMap.put("Good", project1);
+            mojo.licenseMap.put("Good", project2);
+
+            // Pre-fix: throws ConcurrentModificationException (TreeMap$KeyIterator.next).
+            // Post-fix: returns true because every blacklisted project is also whitelisted.
+            assertTrue(assertDoesNotThrow(() -> mojo.checkForbiddenLicenses()));
         }
     }
 

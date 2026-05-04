@@ -27,11 +27,13 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
@@ -926,8 +928,9 @@ public abstract class AbstractAddThirdPartyMojo extends AbstractLicenseMojo {
 
             for (String excludeLicense : blackLicenses) {
                 if (licenses.contains(excludeLicense) && CollectionUtils.isNotEmpty(licenseMap.get(excludeLicense))) {
-                    // bad license found
-                    unsafeLicenses.put(excludeLicense, licenseMap.get(excludeLicense));
+                    // bad license found — store a defensive copy so subsequent mutations
+                    // on the unsafeLicenses set do not leak back into licenseMap.
+                    unsafeLicenses.put(excludeLicense, new TreeSet<>(licenseMap.get(excludeLicense)));
                 }
             }
         }
@@ -937,7 +940,9 @@ public abstract class AbstractAddThirdPartyMojo extends AbstractLicenseMojo {
             LOG.info("Included licenses (whitelist): {}", whiteLicenses);
 
             for (final String unsafelicense : unsafeLicenses.keySet()) {
-                for (MavenProject potentiallyUnsafeProject : unsafeLicenses.get(unsafelicense)) {
+                Iterator<MavenProject> it = unsafeLicenses.get(unsafelicense).iterator();
+                while (it.hasNext()) {
+                    MavenProject potentiallyUnsafeProject = it.next();
 
                     final boolean whiteListed =
                             isDependencyWhitelisted(potentiallyUnsafeProject, unsafelicense, whiteLicenses);
@@ -948,7 +953,7 @@ public abstract class AbstractAddThirdPartyMojo extends AbstractLicenseMojo {
                                 potentiallyUnsafeProject,
                                 unsafelicense);
 
-                        unsafeLicenses.get(unsafelicense).remove(potentiallyUnsafeProject);
+                        it.remove();
                     }
                 }
             }
@@ -976,11 +981,7 @@ public abstract class AbstractAddThirdPartyMojo extends AbstractLicenseMojo {
             }
         }
 
-        for (final String s : unsafeLicenses.keySet()) {
-            if (CollectionUtils.isEmpty(unsafeLicenses.get(s))) {
-                unsafeLicenses.remove(s);
-            }
-        }
+        unsafeLicenses.entrySet().removeIf(e -> CollectionUtils.isEmpty(e.getValue()));
 
         boolean safe = CollectionUtils.isEmpty(unsafeLicenses.keySet());
 
@@ -1025,7 +1026,7 @@ public abstract class AbstractAddThirdPartyMojo extends AbstractLicenseMojo {
 
             if (licenseMap.get(otherLicense).contains(dependency)) {
                 LOG.info(
-                        "License: '{}' for '{}' is OK since it is also licensed under '{}'",
+                        "'{}' is OK. It is licenced under forbidden licence '{}' but also it is licensed under '{}'",
                         dependencyLicense,
                         dependency,
                         otherLicense);
