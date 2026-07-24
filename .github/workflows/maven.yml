@@ -22,7 +22,7 @@ on: [push, pull_request]
 jobs:
   build:
     name: Verify
-    uses: apache/maven-gh-actions-shared/.github/workflows/maven-verify.yml@v4
+    uses: apache/maven-gh-actions-shared/.github/workflows/maven-verify.yml@v5
     with:
       ff-goal: 'verify'                # no ITs on fast fail build
       verify-goal: '-P run-its verify'
