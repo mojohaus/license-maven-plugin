@@ -38,6 +38,10 @@
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>license-maven-plugin</artifactId>
         <version>@project.version@</version>
+        <configuration>
+          <serverId>my-artifactory</serverId>
+          <serverUrl>http://localhost:18081/auth-licenses</serverUrl>
+        </configuration>
         <executions>
           <execution>
             <goals>
