@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.codehaus.mojo.license</groupId>
+  <artifactId>download-licenses-auth</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <name>Integration Test</name>
+  <url>http://maven.apache.org</url>
+  <description>
+    Check download-licenses with Basic Authentication. Verifies that credentials are sent only to
+    URLs matching the configured serverUrl prefix, and not to other (public/third-party) URLs.
+  </description>
+
+  <!--
+    Two dependencies whose license URLs are overridden via src/license/licenses.xml:
+      - commons-logging -> http://localhost:18081/auth-licenses/apache-2.0.txt  (should receive auth)
+      - commons-codec   -> http://localhost:18081/public-licenses/mit.txt        (must NOT receive auth)
+  -->
+  <dependencies>
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <version>1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-codec</groupId>
+      <artifactId>commons-codec</artifactId>
+      <version>1.6</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>@project.version@</version>
+        <configuration>
+          <serverId>my-artifactory</serverId>
+          <serverUrl>http://localhost:18081/auth-licenses</serverUrl>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>download-licenses</goal>
+            </goals>
+            <configuration>
+              <!--
+                The Maven settings server ID whose credentials to use for authenticated downloads.
+                Defined in src/it/settings-auth.xml as username=testuser / password=testpass.
+              -->
+              <serverId>my-artifactory</serverId>
+              <!--
+                Only URLs starting with this prefix will receive the credentials.
+                Requests to http://localhost:18081/public-licenses/... will not include auth.
+              -->
+              <serverUrl>http://localhost:18081/auth-licenses</serverUrl>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

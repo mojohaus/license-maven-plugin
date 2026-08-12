@@ -33,6 +33,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.settings.crypto.SettingsDecrypter;
 import org.codehaus.mojo.license.api.ResolvedProjectDependencies;
 import org.codehaus.mojo.license.download.LicensedArtifact;
 import org.codehaus.mojo.license.download.LicensedArtifactResolver;
@@ -130,8 +131,9 @@ public class AggregateDownloadLicensesMojo extends AbstractDownloadLicensesMojo 
     private boolean extendedInfo;
 
     @Inject
-    public AggregateDownloadLicensesMojo(LicensedArtifactResolver licensedArtifactResolver) {
-        super(licensedArtifactResolver);
+    public AggregateDownloadLicensesMojo(
+            LicensedArtifactResolver licensedArtifactResolver, SettingsDecrypter settingsDecrypter) {
+        super(licensedArtifactResolver, settingsDecrypter);
     }
 
     // ----------------------------------------------------------------------
