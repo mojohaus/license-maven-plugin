@@ -2,6 +2,11 @@ version: 2
 updates:
   - package-ecosystem: "maven"
     directory: "/"
+    # Integration test fixtures pin their dependency versions on purpose:
+    # the postbuild assertions and expected XML files contain those versions
+    # verbatim, so a bump there is always red until the assertions are updated.
+    exclude-paths:
+      - "src/it/**"
     schedule:
       interval: "daily"
   - package-ecosystem: "github-actions"
