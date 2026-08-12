@@ -31,6 +31,7 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.apache.maven.settings.crypto.SettingsDecrypter;
 import org.codehaus.mojo.license.api.ResolvedProjectDependencies;
 import org.codehaus.mojo.license.download.LicensedArtifact;
 import org.codehaus.mojo.license.download.LicensedArtifactResolver;
@@ -76,8 +77,9 @@ public class DownloadLicensesMojo extends AbstractDownloadLicensesMojo {
     protected boolean skipDownloadLicenses;
 
     @Inject
-    public DownloadLicensesMojo(LicensedArtifactResolver licensedArtifactResolver) {
-        super(licensedArtifactResolver);
+    public DownloadLicensesMojo(
+            LicensedArtifactResolver licensedArtifactResolver, SettingsDecrypter settingsDecrypter) {
+        super(licensedArtifactResolver, settingsDecrypter);
     }
 
     // ----------------------------------------------------------------------

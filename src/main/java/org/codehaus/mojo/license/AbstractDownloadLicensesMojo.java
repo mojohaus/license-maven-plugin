@@ -49,11 +49,16 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Proxy;
+import org.apache.maven.settings.Server;
+import org.apache.maven.settings.crypto.DefaultSettingsDecryptionRequest;
+import org.apache.maven.settings.crypto.SettingsDecrypter;
+import org.apache.maven.settings.crypto.SettingsDecryptionResult;
 import org.codehaus.mojo.license.api.ArtifactFilters;
 import org.codehaus.mojo.license.api.MavenProjectDependenciesConfigurator;
 import org.codehaus.mojo.license.download.Cache;
@@ -74,6 +79,7 @@ import org.codehaus.mojo.license.extended.spreadsheet.ExcelFileWriter;
 import org.codehaus.mojo.license.spdx.SpdxLicenseList;
 import org.codehaus.mojo.license.spdx.SpdxLicenseList.Attachments.ContentSanitizer;
 import org.codehaus.mojo.license.utils.FileUtil;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -410,6 +416,42 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
      */
     @Parameter(defaultValue = "${settings.proxies}", readonly = true)
     private List<Proxy> proxies;
+
+    /**
+     * The Maven session, used to resolve {@link #serverId} credentials from {@code settings.xml}.
+     *
+     * @since 2.8.0
+     */
+    @Parameter(defaultValue = "${session}", readonly = true)
+    private MavenSession session;
+
+    /**
+     * A server ID from {@code settings.xml} that provides authentication credentials (username,
+     * password, and optional custom HTTP headers) for downloading license files from a protected
+     * repository such as Artifactory.
+     *
+     * <p>Credentials are only sent to URLs that start with {@link #serverUrl}, preventing
+     * accidental credential leakage to third-party license servers.
+     *
+     * @since 2.8.0
+     */
+    @Parameter(property = "license.serverId", defaultValue = "")
+    private String serverId;
+
+    /**
+     * Base URL prefix that a license download URL must start with in order to receive the
+     * credentials configured by {@link #serverId}.
+     *
+     * <p>This prevents credentials from being sent to any third-party server that happens to
+     * host a license file. Only URLs starting with this value will carry the {@code Authorization}
+     * header or custom HTTP headers from the server configuration.
+     *
+     * <p>Example: {@code https://artifactory.example.com/artifactory}
+     *
+     * @since 2.8.0
+     */
+    @Parameter(property = "license.serverUrl", defaultValue = "")
+    private String serverUrl;
 
     /**
      * A flag to organize the licenses by dependencies. When this is done, each dependency will
@@ -762,6 +804,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
     // ----------------------------------------------------------------------
     // Plexus Components
     // ----------------------------------------------------------------------
+    private final SettingsDecrypter settingsDecrypter;
 
     // ----------------------------------------------------------------------
     // Private Fields
@@ -781,8 +824,10 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
 
     private UrlReplacements urlReplacements;
 
-    protected AbstractDownloadLicensesMojo(LicensedArtifactResolver licensedArtifactResolver) {
+    protected AbstractDownloadLicensesMojo(
+            LicensedArtifactResolver licensedArtifactResolver, SettingsDecrypter settingsDecrypter) {
         super(licensedArtifactResolver);
+        this.settingsDecrypter = settingsDecrypter;
     }
 
     protected abstract boolean isSkip();
@@ -848,13 +893,21 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
         // The resulting list of licenses after dependency resolution
         final List<ProjectLicenseInfo> depProjectLicenses = new ArrayList<>();
 
+        final Server server = decryptServer(serverId);
+        final String downloadUserName = server != null ? server.getUsername() : null;
+        final String downloadPassword = server != null ? server.getPassword() : null;
+        final Map<String, String> serverHttpHeaders = server != null ? getHttpHeaders(server) : Collections.emptyMap();
         try (LicenseDownloader licenseDownloader = new LicenseDownloader(
                 findActiveProxy(),
                 connectTimeout,
                 socketTimeout,
                 connectionRequestTimeout,
                 contentSanitizers(),
-                getCharset())) {
+                getCharset(),
+                downloadUserName,
+                downloadPassword,
+                serverUrl,
+                serverHttpHeaders)) {
             for (LicensedArtifact artifact : dependencies.values()) {
                 LOG.debug("Checking licenses for project {}", artifact);
                 final ProjectLicenseInfo depProject = createDependencyProject(artifact);
@@ -1163,6 +1216,72 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
             }
         }
         return null;
+    }
+
+    /**
+     * Looks up the server with the given {@code id} from the current Maven session's settings and
+     * decrypts any encrypted credentials.
+     *
+     * @param id the server ID from {@code settings.xml}; ignored when {@code null} or empty
+     * @return the decrypted {@link Server}, or {@code null} when not found or {@code id} is empty
+     */
+    private Server decryptServer(String id) {
+        if (StringUtils.isEmpty(id)) {
+            return null;
+        }
+        if (session == null || session.getSettings() == null) {
+            return null;
+        }
+        final Server server = session.getSettings().getServer(id);
+        if (server == null) {
+            LOG.warn("Could not find server '{}' in settings.xml - no credentials will be applied", id);
+            return null;
+        }
+        synchronized (server) {
+            final DefaultSettingsDecryptionRequest request = new DefaultSettingsDecryptionRequest(server);
+            final SettingsDecryptionResult result = settingsDecrypter.decrypt(request);
+            return result.getServer();
+        }
+    }
+
+    /**
+     * Extracts custom HTTP headers declared inside a server's {@code <configuration>} element:
+     *
+     * <pre>{@code
+     * <server>
+     *   <id>my-server</id>
+     *   <configuration>
+     *     <httpHeaders>
+     *       <property>
+     *         <name>Authorization</name>
+     *         <value>Bearer my-token</value>
+     *       </property>
+     *     </httpHeaders>
+     *   </configuration>
+     * </server>
+     * }</pre>
+     *
+     * @param server the server entry from {@code settings.xml}
+     * @return a map of header name → header value; never {@code null}
+     */
+    private Map<String, String> getHttpHeaders(Server server) {
+        if (!(server.getConfiguration() instanceof Xpp3Dom)) {
+            return Collections.emptyMap();
+        }
+        final Xpp3Dom configuration = (Xpp3Dom) server.getConfiguration();
+        final Xpp3Dom httpHeaders = configuration.getChild("httpHeaders");
+        if (httpHeaders == null) {
+            return Collections.emptyMap();
+        }
+        final Map<String, String> result = new TreeMap<>();
+        for (Xpp3Dom property : httpHeaders.getChildren("property")) {
+            final Xpp3Dom name = property.getChild("name");
+            final Xpp3Dom value = property.getChild("value");
+            if (name != null && value != null) {
+                result.put(name.getValue(), value.getValue());
+            }
+        }
+        return result;
     }
 
     /**

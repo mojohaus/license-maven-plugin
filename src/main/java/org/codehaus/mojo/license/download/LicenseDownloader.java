@@ -30,6 +30,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -38,12 +39,14 @@ import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpException;
 import org.apache.http.HttpHost;
@@ -53,14 +56,18 @@ import org.apache.http.StatusLine;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.AuthCache;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.config.RequestConfig.Builder;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.conn.routing.HttpRoutePlanner;
 import org.apache.http.entity.ContentType;
+import org.apache.http.impl.auth.BasicScheme;
+import org.apache.http.impl.client.BasicAuthCache;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -90,6 +97,24 @@ public class LicenseDownloader implements AutoCloseable {
     private final Map<String, ContentSanitizer> contentSanitizers;
     private final Charset charset;
 
+    /** Credentials for authenticated downloads. May be {@code null} if no authentication is configured. */
+    private final String userName;
+
+    private final String password;
+
+    /**
+     * Base URL prefix used to determine which download URLs should receive authentication credentials.
+     * Credentials are sent only when a license URL starts with this prefix.
+     * May be {@code null} if no authentication is configured.
+     */
+    private final String serverUrl;
+
+    /** Additional HTTP headers to include in authenticated requests (e.g. custom tokens). May be empty. */
+    private final Map<String, String> httpHeaders;
+
+    /**
+     * Creates a new {@code LicenseDownloader} without authentication. Proxy settings and timeouts are still applied.
+     */
     public LicenseDownloader(
             Proxy proxy,
             int connectTimeout,
@@ -97,8 +122,55 @@ public class LicenseDownloader implements AutoCloseable {
             int connectionRequestTimeout,
             Map<String, ContentSanitizer> contentSanitizers,
             Charset charset) {
+        this(
+                proxy,
+                connectTimeout,
+                socketTimeout,
+                connectionRequestTimeout,
+                contentSanitizers,
+                charset,
+                null,
+                null,
+                null,
+                Collections.emptyMap());
+    }
+
+    /**
+     * Creates a new {@code LicenseDownloader} with optional authentication.
+     *
+     * <p>Credentials ({@code userName}/{@code password}) and {@code httpHeaders} are sent only to URLs that start
+     * with {@code serverUrl}, preventing credential leakage to third-party license servers.
+     *
+     * @param proxy               optional proxy configuration from {@code settings.xml}
+     * @param connectTimeout      HTTP connection timeout in milliseconds
+     * @param socketTimeout       HTTP socket (read) timeout in milliseconds
+     * @param connectionRequestTimeout HTTP connection-pool request timeout in milliseconds
+     * @param contentSanitizers   optional content sanitizers keyed by an id string
+     * @param charset             charset used when reading text license content
+     * @param userName            username for preemptive Basic Authentication, or {@code null}/empty to disable
+     * @param password            password for preemptive Basic Authentication, or {@code null}/empty to disable
+     * @param serverUrl           URL prefix that a license URL must start with in order to receive credentials;
+     *                            {@code null} disables authentication for all URLs
+     * @param httpHeaders         additional HTTP headers sent only to matching URLs (e.g. {@code Authorization: Bearer})
+     */
+    @SuppressWarnings("checkstyle:ParameterNumber")
+    public LicenseDownloader(
+            Proxy proxy,
+            int connectTimeout,
+            int socketTimeout,
+            int connectionRequestTimeout,
+            Map<String, ContentSanitizer> contentSanitizers,
+            Charset charset,
+            String userName,
+            String password,
+            String serverUrl,
+            Map<String, String> httpHeaders) {
         this.contentSanitizers = contentSanitizers;
         this.charset = charset;
+        this.userName = userName;
+        this.password = password;
+        this.serverUrl = serverUrl;
+        this.httpHeaders = httpHeaders != null ? httpHeaders : Collections.emptyMap();
         final Builder configBuilder = RequestConfig.copy(RequestConfig.DEFAULT) //
                 .setConnectTimeout(connectTimeout) //
                 .setSocketTimeout(socketTimeout) //
@@ -184,7 +256,23 @@ public class LicenseDownloader implements AutoCloseable {
             }
         } else {
             LOG.debug("About to download '{}'", licenseUrlString);
-            try (CloseableHttpResponse response = client.execute(new HttpGet(licenseUrlString))) {
+            final HttpGet request = new HttpGet(licenseUrlString);
+            final HttpClientContext context;
+            if (shouldAuthenticate(licenseUrlString)) {
+                LOG.debug("Applying authentication for URL '{}' (matches serverUrl '{}')", licenseUrlString, serverUrl);
+                context = makeLocalContext(new URL(licenseUrlString));
+                for (Map.Entry<String, String> header : httpHeaders.entrySet()) {
+                    LOG.debug(
+                            "Adding HTTP header '{}' to authenticated request for '{}'",
+                            header.getKey(),
+                            licenseUrlString);
+                    request.addHeader(header.getKey(), header.getValue());
+                }
+            } else {
+                context = null;
+            }
+            try (CloseableHttpResponse response =
+                    context != null ? client.execute(request, context) : client.execute(request)) {
                 final StatusLine statusLine = response.getStatusLine();
                 if (statusLine.getStatusCode() != HttpStatus.SC_OK) {
                     return LicenseDownloadResult.failure("'" + licenseUrlString + "' returned "
@@ -291,6 +379,52 @@ public class LicenseDownloader implements AutoCloseable {
             return new File(outputFile.getParentFile(), newFileName);
         }
         return outputFile;
+    }
+
+    /**
+     * Returns {@code true} when credentials should be applied to the given download URL.
+     *
+     * <p>Credentials are only applied when <em>all</em> of the following conditions hold:
+     * <ul>
+     *   <li>{@link #serverUrl} is configured and non-empty</li>
+     *   <li>{@link #userName} is configured and non-empty</li>
+     *   <li>the download {@code url} starts with {@link #serverUrl}</li>
+     * </ul>
+     *
+     * <p>This prevents credential leakage to third-party license servers that are not the
+     * configured authenticated server.
+     *
+     * @param url the license download URL to check
+     * @return {@code true} if the URL matches the configured server and credentials should be sent
+     */
+    boolean shouldAuthenticate(String url) {
+        return StringUtils.isNotEmpty(serverUrl) && StringUtils.isNotEmpty(userName) && url.startsWith(serverUrl);
+    }
+
+    /**
+     * Creates an {@link HttpClientContext} with preemptive Basic Authentication for the given URL.
+     *
+     * <p>The context contains both a {@link BasicAuthCache} (for preemptive auth) and a
+     * {@link BasicCredentialsProvider} scoped to the target host, so credentials are sent on
+     * the first request without waiting for a server challenge.
+     *
+     * @param requestUrl the URL to authenticate against
+     * @return a configured {@link HttpClientContext} for an authenticated request
+     */
+    private HttpClientContext makeLocalContext(URL requestUrl) {
+        final HttpHost target = new HttpHost(requestUrl.getHost(), requestUrl.getPort(), requestUrl.getProtocol());
+        // Preemptive Basic Auth: register the target host in the auth cache
+        final AuthCache authCache = new BasicAuthCache();
+        authCache.put(target, new BasicScheme());
+        // Provide credentials scoped to the target host
+        final CredentialsProvider credsProvider = new BasicCredentialsProvider();
+        credsProvider.setCredentials(
+                new AuthScope(requestUrl.getHost(), requestUrl.getPort()),
+                new UsernamePasswordCredentials(userName, password));
+        final HttpClientContext localContext = HttpClientContext.create();
+        localContext.setAuthCache(authCache);
+        localContext.setCredentialsProvider(credsProvider);
+        return localContext;
     }
 
     @Override
