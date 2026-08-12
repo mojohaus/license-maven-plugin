@@ -66,6 +66,8 @@ import org.codehaus.mojo.license.download.FileNameEntry;
 import org.codehaus.mojo.license.download.LicenseDownloader;
 import org.codehaus.mojo.license.download.LicenseDownloader.LicenseDownloadResult;
 import org.codehaus.mojo.license.download.LicenseMatchers;
+import org.codehaus.mojo.license.download.LicenseNameUrlOverrides;
+import org.codehaus.mojo.license.download.LicenseNameUrlOverridesReader;
 import org.codehaus.mojo.license.download.LicenseSummaryReader;
 import org.codehaus.mojo.license.download.LicensedArtifact;
 import org.codehaus.mojo.license.download.LicensedArtifactResolver;
@@ -564,6 +566,49 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
     protected List<LicenseUrlReplacement> licenseUrlReplacements;
 
     /**
+     * Path to an XML file that maps license name patterns to download URLs. When a dependency's license name
+     * (the {@code <name>} element inside {@code <licenses><license>} in the dependency's POM) matches one of the
+     * configured {@code <licenseNamePattern>} values, the plugin uses the associated {@code <url>} to download the
+     * license text instead of any URL declared in the dependency's POM. This is particularly useful for:
+     * <ul>
+     *   <li>Redirecting downloads to an internal mirror so that the build does not depend on external services.</li>
+     *   <li>Replacing broken HTML pages with clean plain-text versions of well-known licenses.</li>
+     *   <li>Providing a download URL for dependencies that declare a license name but no URL in their POM.</li>
+     * </ul>
+     *
+     * <p>The {@code <licenseNamePattern>} values are Java regular expressions matched against the full license name
+     * string (e.g. {@code "Apache License, Version 2.0"}, {@code "MIT License"}).
+     * The patterns are evaluated in the order they appear in the file; the first match wins.</p>
+     *
+     * <p>Example file content:</p>
+     * <pre>
+     * {@code
+     * <licenseNameUrlOverrides>
+     *   <licenseNameUrlOverride>
+     *     <licenseNamePattern>(?i)apache.*2\.0</licenseNamePattern>
+     *     <url>https://nexus.internal/licenses/apache-2.0.txt</url>
+     *   </licenseNameUrlOverride>
+     *   <licenseNameUrlOverride>
+     *     <licenseNamePattern>\QMIT License\E</licenseNamePattern>
+     *     <url>https://nexus.internal/licenses/mit.txt</url>
+     *   </licenseNameUrlOverride>
+     * </licenseNameUrlOverrides>
+     * }
+     * </pre>
+     *
+     * <p>Relationship to other parameters:</p>
+     * <ul>
+     *   <li>{@link #licensesConfigFile} is applied before {@link #licenseNameUrlOverridesFile}</li>
+     *   <li>{@link #licenseNameUrlOverridesFile} is applied before {@link #licenseUrlReplacements}</li>
+     *   <li>{@link #licenseUrlReplacements} are applied before {@link #licenseUrlFileNames}</li>
+     * </ul>
+     *
+     * @since 2.8.0
+     */
+    @Parameter(property = "license.licenseNameUrlOverridesFile")
+    protected File licenseNameUrlOverridesFile;
+
+    /**
      * If {@code true} the default license URL replacements be added to the internal {@link Map} of URL replacements
      * before adding {@link #licenseUrlReplacements} by their {@code id}; otherwise the default license URL replacements
      * will not be added to the internal {@link Map} of URL replacements.
@@ -823,6 +868,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
     private final Set<String> orphanFileNames = new HashSet<>();
 
     private UrlReplacements urlReplacements;
+    private LicenseNameUrlOverrides nameUrlOverrides;
 
     protected AbstractDownloadLicensesMojo(
             LicensedArtifactResolver licensedArtifactResolver, SettingsDecrypter settingsDecrypter) {
@@ -857,6 +903,8 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
         this.preferredFileNames = PreferredFileNames.build(licensesOutputDirectory, licenseUrlFileNames);
         this.cache = new Cache(licenseUrlFileNames != null && !licenseUrlFileNames.isEmpty());
         this.urlReplacements = urlReplacements();
+        this.nameUrlOverrides =
+                new LicenseNameUrlOverrides(LicenseNameUrlOverridesReader.read(licenseNameUrlOverridesFile));
 
         initDirectories();
 
@@ -1403,12 +1451,13 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
 
         int licenseIndex = 0;
         for (ProjectLicense license : licenses) {
-            if (matchingUrlsOnly && StringUtils.isBlank(license.getUrl())) {
+            final String nameOverriddenUrl = nameUrlOverrides.overrideIfNecessary(license.getName(), license.getUrl());
+            if (matchingUrlsOnly && StringUtils.isBlank(nameOverriddenUrl)) {
                 handleError(
                         depProject,
                         "No URL for license at index " + licenseIndex + " in dependency " + depProject.toGavString());
-            } else if (StringUtils.isNotBlank(license.getUrl())) {
-                final String licenseUrl = urlReplacements.rewriteIfNecessary(license.getUrl());
+            } else if (StringUtils.isNotBlank(nameOverriddenUrl)) {
+                final String licenseUrl = urlReplacements.rewriteIfNecessary(nameOverriddenUrl);
 
                 final LicenseDownloadResult cachedResult = cache.get(licenseUrl);
                 try {
