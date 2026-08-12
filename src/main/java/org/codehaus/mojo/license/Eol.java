@@ -82,10 +82,7 @@ public enum Eol {
             case "\n":
                 return LF;
             default:
-                throw new IllegalArgumentException(String.format(
-                    "Unable to convert Eol from %s",
-                    eol
-                ));
+                throw new IllegalArgumentException(String.format("Unable to convert Eol from %s", eol));
         }
     }
 }
