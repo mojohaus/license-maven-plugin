@@ -103,12 +103,45 @@ mvn package
 | <<<licenseName>>>    | The license. Dependencies with more than one license are ordered by the   |
 |                      | alphabetically first of them, dependencies without a license come last.   |
 *----------------------+--------------------------------------------------------------------------+
+| <<<licenseMatch>>>   | How the license compares against the lists described in                   |
+|                      | {{{Classifying_the_Licenses}Classifying the Licenses}}, worst first.      |
+*----------------------+--------------------------------------------------------------------------+
 
   Dependencies that compare equal are ordered by group id, artifact id and version, so the report is
   the same on every run.
 
   <<<orderBy>>> replaces <<<sortByGroupIdAndArtifactId>>>, which is deprecated. The old parameter
   still works, and still applies when <<<orderBy>>> is left at <<<none>>>.
+
+* Classifying the Licenses
+
+  Three lists say which licenses have been signed off, which need a second look, and which must not
+  appear at all:
+
+-------------------
+<configuration>
+  <forbiddenLicenses>
+    <forbiddenLicense>GNU General Public License v3.0</forbiddenLicense>
+  </forbiddenLicenses>
+  <problematicLicenses>
+    <problematicLicense>Eclipse Public License 2.0</problematicLicense>
+  </problematicLicenses>
+  <okLicenses>
+    <okLicense>Apache License 2.0</okLicense>
+    <okLicense>MIT License</okLicense>
+  </okLicenses>
+  <orderBy>licenseMatch</orderBy>
+</configuration>
+-------------------
+
+  With <<<orderBy>>> set to <<<licenseMatch>>>, the dependencies come out worst first: the forbidden
+  licenses, then the problematic ones, then the approved ones, and last the ones in none of the
+  lists. A dependency offering several licenses is classified by the most worrying of them, so a
+  dependency under either Apache or GPL is not filed away as approved.
+
+  Names are matched ignoring case and surrounding whitespace. POMs spell the same license in many
+  ways, so use <<<licenseMerges>>> to bring the spellings of one license together; a name that no
+  list matches is not reported, it simply counts as unclassified.
 
 * Manual License Configuration
 
