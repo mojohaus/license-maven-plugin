@@ -15,4 +15,11 @@ public class CalcFileWriter {
     public static void write(List<ProjectLicenseInfo> projectLicenseInfos, final File licensesCalcOutputFile) {
         throw new UnsupportedOperationException("Write LibreOffice Calc file (ODS) requires JDK 11+");
     }
+
+    public static void write(
+            List<ProjectLicenseInfo> projectLicenseInfos,
+            final File licensesCalcOutputFile,
+            SpreadsheetFormatting formatting) {
+        throw new UnsupportedOperationException("Write LibreOffice Calc file (ODS) requires JDK 11+");
+    }
 }

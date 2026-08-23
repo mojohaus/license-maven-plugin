@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.maven.model.Developer;
 import org.apache.maven.model.Organization;
 import org.apache.maven.model.Scm;
+import org.codehaus.mojo.license.download.LicenseClassifier.LicenseMatch;
 import org.codehaus.mojo.license.download.ProjectLicense;
 import org.codehaus.mojo.license.download.ProjectLicenseInfo;
 import org.codehaus.mojo.license.extended.ExtendedInfo;
@@ -98,6 +100,9 @@ public class CalcFileWriter {
     private static final String HYPERLINK_GRAY_STYLE = "hyperlinkGrayStyle";
     private static final String GRAY_CELL_STYLE = "grayCellStyle";
     private static final String NORMAL_CELL_STYLE = "normalCellStyle";
+    private static final String LICENSE_CELL_STYLE_PREFIX = "licenseCellStyle-";
+    private static final String GRAY_CELL_STYLE_SUFFIX = "-gray";
+    private static final String MATCHED_LICENSE_BORDER_WIDTH = "1.5pt";
     private static final int DOWNLOAD_COLUMN_WIDTH = 6_000;
     private static final String VALUE_TYPE_STRING = "string";
     private static final String CONFIG_TYPE_SHORT = "short";
@@ -105,6 +110,21 @@ public class CalcFileWriter {
     private CalcFileWriter() {}
 
     public static void write(List<ProjectLicenseInfo> projectLicenseInfos, final File licensesCalcOutputFile) {
+        write(projectLicenseInfos, licensesCalcOutputFile, SpreadsheetFormatting.NONE);
+    }
+
+    /**
+     * Writes a list of projects into a LibreOffice Calc file.
+     *
+     * @param projectLicenseInfos    Project license infos to write.
+     * @param licensesCalcOutputFile LibreOffice Calc output file.
+     * @param formatting             How to mark up the licenses.
+     * @since 2.8.0
+     */
+    public static void write(
+            List<ProjectLicenseInfo> projectLicenseInfos,
+            final File licensesCalcOutputFile,
+            SpreadsheetFormatting formatting) {
         if (CollectionUtils.isEmpty(projectLicenseInfos)) {
             LOG.debug("Nothing to write to excel, no project data.");
             return;
@@ -126,7 +146,11 @@ public class CalcFileWriter {
             createHeader(projectLicenseInfos, spreadsheet, table);
 
             writeData(
-                    projectLicenseInfos, spreadsheet, table, convertToOdfColor(SpreadsheetUtil.ALTERNATING_ROWS_COLOR));
+                    projectLicenseInfos,
+                    spreadsheet,
+                    table,
+                    convertToOdfColor(SpreadsheetUtil.ALTERNATING_ROWS_COLOR),
+                    formatting);
 
             try (OutputStream fileOut = Files.newOutputStream(licensesCalcOutputFile.toPath())) {
                 spreadsheet.save(fileOut);
@@ -480,7 +504,8 @@ public class CalcFileWriter {
             List<ProjectLicenseInfo> projectLicenseInfos,
             OdfSpreadsheetDocument wb,
             OdfTable table,
-            Color alternatingRowsColor) {
+            Color alternatingRowsColor,
+            SpreadsheetFormatting formatting) {
         final int firstRowIndex = 3;
         int currentRowIndex = firstRowIndex;
         final Map<Integer, OdfTableRow> rowMap = new HashMap<>();
@@ -500,6 +525,9 @@ public class CalcFileWriter {
         OdfStyle styleNormal = officeStyles.newStyle(NORMAL_CELL_STYLE, OdfStyleFamily.TableCell);
         styleNormal.setProperty(OdfTableColumnProperties.UseOptimalColumnWidth, String.valueOf(true));
 
+        final Map<LicenseMatch, String> licenseStyles =
+                createLicenseStyles(officeStyles, alternatingRowsColor, formatting);
+
         for (ProjectLicenseInfo projectInfo : projectLicenseInfos) {
             final OdfStyle cellStyle, hyperlinkStyle;
             LOG.debug(
@@ -511,6 +539,7 @@ public class CalcFileWriter {
                 cellStyle = styleNormal;
                 hyperlinkStyle = hyperlinkStyleNormal;
             }
+            final boolean grayRow = grayBackground;
             grayBackground = !grayBackground;
 
             int extraRows = 0;
@@ -543,6 +572,7 @@ public class CalcFileWriter {
                                 license.getDistribution(),
                                 license.getComments(),
                                 license.getFile());
+                        applyLicenseStyle(licenses[0], licenseStyles, formatting.highlight(license), grayRow);
                         addHyperlinkIfExists(table, licenses[1], hyperlinkStyle);
                     });
 
@@ -680,6 +710,60 @@ public class CalcFileWriter {
         }
 
         autosizeColumns(table, hasExtendedInfo, currentRowIndex);
+    }
+
+    /**
+     * Creates one cell style per license category and row background, and returns the style names keyed by category.
+     * The key of a style on a row with the alternating background is suffixed with {@code -gray}.
+     */
+    private static Map<LicenseMatch, String> createLicenseStyles(
+            OdfOfficeStyles officeStyles, Color alternatingRowsColor, SpreadsheetFormatting formatting) {
+        final Map<LicenseMatch, String> styleNames = new EnumMap<>(LicenseMatch.class);
+        if (!formatting.highlights()) {
+            return styleNames;
+        }
+        for (LicenseMatch licenseMatch : LicenseMatch.values()) {
+            final Color color = convertToOdfColor(SpreadsheetUtil.licenseColor(licenseMatch));
+            final String name = LICENSE_CELL_STYLE_PREFIX + licenseMatch;
+            createLicenseStyle(officeStyles, name, color, null, formatting.hasBorder());
+            createLicenseStyle(
+                    officeStyles, name + GRAY_CELL_STYLE_SUFFIX, color, alternatingRowsColor, formatting.hasBorder());
+            styleNames.put(licenseMatch, name);
+        }
+        return styleNames;
+    }
+
+    private static void createLicenseStyle(
+            OdfOfficeStyles officeStyles, String name, Color color, Color backgroundColor, boolean border) {
+        final OdfStyle style = officeStyles.newStyle(name, OdfStyleFamily.TableCell);
+        style.setProperty(StyleTextPropertiesElement.Color, color.toString());
+        style.setProperty(OdfTableColumnProperties.UseOptimalColumnWidth, String.valueOf(true));
+        if (backgroundColor != null) {
+            style.setProperty(StyleTableCellPropertiesElement.BackgroundColor, backgroundColor.toString());
+        }
+        if (border) {
+            style.setProperty(
+                    StyleTableCellPropertiesElement.Border, MATCHED_LICENSE_BORDER_WIDTH + " solid " + color);
+        }
+    }
+
+    /**
+     * Writes a cell in the colour of its license category.
+     *
+     * @param cell         the cell holding the license name
+     * @param styleNames   the styles created for this document
+     * @param licenseMatch the category, or {@code null} to leave the cell as it is
+     * @param gray         whether the cell is on a row with the alternating background
+     */
+    private static void applyLicenseStyle(
+            OdfTableCell cell, Map<LicenseMatch, String> styleNames, LicenseMatch licenseMatch, boolean gray) {
+        if (licenseMatch == null) {
+            return;
+        }
+        final String name = styleNames.get(licenseMatch);
+        if (name != null) {
+            cell.getOdfElement().setStyleName(gray ? name + GRAY_CELL_STYLE_SUFFIX : name);
+        }
     }
 
     private static OdfStyle createHyperlinkStyle(OdfSpreadsheetDocument wb, String name, Color backgroundColor) {

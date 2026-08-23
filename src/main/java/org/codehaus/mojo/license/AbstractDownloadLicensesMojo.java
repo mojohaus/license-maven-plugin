@@ -77,6 +77,7 @@ import org.codehaus.mojo.license.download.UrlReplacements;
 import org.codehaus.mojo.license.extended.InfoFile;
 import org.codehaus.mojo.license.extended.spreadsheet.CalcFileWriter;
 import org.codehaus.mojo.license.extended.spreadsheet.ExcelFileWriter;
+import org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetFormatting;
 import org.codehaus.mojo.license.spdx.SpdxLicenseList;
 import org.codehaus.mojo.license.spdx.SpdxLicenseList.Attachments.ContentSanitizer;
 import org.codehaus.mojo.license.utils.FileUtil;
@@ -512,6 +513,27 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
      */
     @Parameter(property = "license.okLicenses")
     private List<String> okLicenses;
+
+    /**
+     * Whether the licenses in none of {@link #forbiddenLicenses}, {@link #problematicLicenses} and
+     * {@link #okLicenses} are highlighted in the Excel and Calc files as well. Turn this on once the three lists
+     * are complete, to see what has slipped through them.
+     *
+     * @since 2.8.0
+     */
+    @Parameter(property = "license.highlightUnknownLicenses", defaultValue = "false")
+    private boolean highlightUnknownLicenses;
+
+    /**
+     * Whether a highlighted license in the Excel and Calc files is also boxed in.
+     *
+     * <p>A border tells the categories apart at a glance. The cost is that when scrolling through a long report, the
+     * boxed license of a dependency with several licenses looks like the only one it has.
+     *
+     * @since 2.8.0
+     */
+    @Parameter(property = "license.matchedLicensesHaveBorder", defaultValue = "false")
+    private boolean matchedLicensesHaveBorder;
 
     /**
      * A filter to exclude some GroupIds
@@ -1034,11 +1056,15 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
             List<ProjectLicenseInfo> depProjectLicenses, File outputFile, File excelOutputFile, File calcOutputFile)
             throws ParserConfigurationException, TransformerException, IOException {
         writeLicenseSummary(depProjectLicenses, outputFile, writeVersions);
-        if (writeExcelFile) {
-            ExcelFileWriter.write(depProjectLicenses, excelOutputFile);
-        }
-        if (writeCalcFile) {
-            CalcFileWriter.write(depProjectLicenses, calcOutputFile);
+        if (writeExcelFile || writeCalcFile) {
+            final SpreadsheetFormatting formatting =
+                    new SpreadsheetFormatting(licenseClassifier(), highlightUnknownLicenses, matchedLicensesHaveBorder);
+            if (writeExcelFile) {
+                ExcelFileWriter.write(depProjectLicenses, excelOutputFile, formatting);
+            }
+            if (writeCalcFile) {
+                CalcFileWriter.write(depProjectLicenses, calcOutputFile, formatting);
+            }
         }
     }
 
