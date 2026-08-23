@@ -44,10 +44,10 @@ assertExistsFile(file);
 
 def licenseFile = new File(basedir, 'target/generated-resources/licenses.xml');
 assertExistsFile(licenseFile);
-// the dependencies in the licenses.xml file may come in any order
-String expectedContentOrdering1 = new File(basedir, 'expected_licenses_ordering_1.xml').getText('UTF-8');
-String expectedContentOrdering2 = new File(basedir, 'expected_licenses_ordering_2.xml').getText('UTF-8');
+// -Dlicense.orderBy=dependencyName puts hamcrest-core before junit, the reverse of the order the two are
+// resolved in, so this also fails if the property is not picked up at all.
+String expectedContent = new File(basedir, 'expected_licenses.xml').getText('UTF-8');
 String actualContent = licenseFile.getText('UTF-8');
-assert (expectedContentOrdering1 == actualContent || expectedContentOrdering2 == actualContent) : "${licenseFile} has unexpected content"
+assert expectedContent == actualContent : "${licenseFile} has unexpected content"
 
 return true;

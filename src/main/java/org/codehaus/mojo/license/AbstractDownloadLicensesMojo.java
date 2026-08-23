@@ -462,8 +462,25 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
     @Parameter(property = "license.organizeLicensesByDependencies", defaultValue = "false")
     protected boolean organizeLicensesByDependencies;
 
+    /**
+     * A flag to order the dependencies by group id and artifact id.
+     *
+     * @deprecated Use {@link #orderBy} with {@link OrderBy#dependencyGav} instead, which also orders by version.
+     */
+    @Deprecated
     @Parameter(property = "license.sortByGroupIdAndArtifactId", defaultValue = "false")
     private boolean sortByGroupIdAndArtifactId;
+
+    /**
+     * The order of the dependencies in the license summary file and in the Excel and Calc files.
+     *
+     * <p>Supersedes {@link #sortByGroupIdAndArtifactId}, which orders by group id and artifact id only, and which
+     * is ignored when this parameter is set to anything but {@link OrderBy#none}.
+     *
+     * @since 2.8.0
+     */
+    @Parameter(property = "license.orderBy", defaultValue = "none")
+    private OrderBy orderBy;
 
     /**
      * A filter to exclude some GroupIds
@@ -943,7 +960,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
         }
 
         try {
-            if (sortByGroupIdAndArtifactId) {
+            if (!sortDependencies(depProjectLicenses) && sortByGroupIdAndArtifactId) {
                 sortByGroupIdAndArtifactId(depProjectLicenses);
             }
 
@@ -1123,6 +1140,24 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
             default:
                 return errorRemedy;
         }
+    }
+
+    /**
+     * Orders the dependencies as requested by {@link #orderBy}.
+     *
+     * @param depProjectLicenses the dependencies, ordered in place
+     * @return whether the dependencies were ordered
+     */
+    private boolean sortDependencies(List<ProjectLicenseInfo> depProjectLicenses) {
+        final Comparator<ProjectLicenseInfo> comparator = ProjectLicenseInfoComparators.of(orderBy);
+        if (comparator == null) {
+            return false;
+        }
+        if (sortByGroupIdAndArtifactId) {
+            LOG.info("Ordering by \"{}\", sortByGroupIdAndArtifactId is ignored", orderBy);
+        }
+        depProjectLicenses.sort(comparator);
+        return true;
     }
 
     private void sortByGroupIdAndArtifactId(List<ProjectLicenseInfo> depProjectLicenses) {
@@ -1539,6 +1574,28 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
      *
      * @since 1.18
      */
+    /**
+     * The order of the dependencies in the generated files.
+     *
+     * @since 2.8.0
+     */
+    public enum OrderBy {
+        /** The order in which the dependencies were resolved. */
+        none,
+        /**
+         * The name the dependency gives itself in its POM, falling back to the artifact id for dependencies which
+         * have no name, and for every dependency when {@code extendedInfo} is disabled.
+         */
+        dependencyName,
+        /** The group id, artifact id and version of the dependency. */
+        dependencyGav,
+        /**
+         * The license of the dependency. Dependencies with more than one license are ordered by the alphabetically
+         * first of them, dependencies without a license come last.
+         */
+        licenseName
+    }
+
     public enum ErrorRemedy {
         /** All errors are ignored */
         ignore,
