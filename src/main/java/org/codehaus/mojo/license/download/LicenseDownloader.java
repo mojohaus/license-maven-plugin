@@ -92,6 +92,12 @@ public class LicenseDownloader implements AutoCloseable {
 
     private static final Pattern EXTENSION_PATTERN = Pattern.compile("\\.[a-z]{1,4}$", Pattern.CASE_INSENSITIVE);
 
+    /**
+     * Sent with every license download. Some license hosts, gnu.org among them, answer the Apache HttpClient default
+     * user agent with {@code 429 Too Many Requests} on the very first request.
+     */
+    private static final String USER_AGENT = userAgent();
+
     private final CloseableHttpClient client;
 
     private final Map<String, ContentSanitizer> contentSanitizers;
@@ -181,7 +187,9 @@ public class LicenseDownloader implements AutoCloseable {
             configBuilder.setProxy(new HttpHost(proxy.getHost(), proxy.getPort(), proxy.getProtocol()));
         }
 
-        HttpClientBuilder clientBuilder = HttpClients.custom().setDefaultRequestConfig(configBuilder.build());
+        HttpClientBuilder clientBuilder = HttpClients.custom()
+                .setDefaultRequestConfig(configBuilder.build())
+                .setUserAgent(USER_AGENT);
         if (proxy != null) {
             if (proxy.getUsername() != null && proxy.getPassword() != null) {
                 final CredentialsProvider credsProvider = new BasicCredentialsProvider();
@@ -332,6 +340,11 @@ public class LicenseDownloader implements AutoCloseable {
                 }
             }
         }
+    }
+
+    private static String userAgent() {
+        final String version = LicenseDownloader.class.getPackage().getImplementationVersion();
+        return "license-maven-plugin/" + (version != null ? version : "unknown");
     }
 
     static LicenseDownloadResult sanitize(
