@@ -86,6 +86,21 @@ public final class ExcelFileWriter {
      * @param licensesExcelOutputFile Excel output file in latest format (OOXML).
      */
     public static void write(List<ProjectLicenseInfo> projectLicenseInfos, final File licensesExcelOutputFile) {
+        write(projectLicenseInfos, licensesExcelOutputFile, SpreadsheetFormatting.NONE);
+    }
+
+    /**
+     * Writes a list of projects into Excel file.
+     *
+     * @param projectLicenseInfos     Project license infos to write.
+     * @param licensesExcelOutputFile Excel output file in latest format (OOXML).
+     * @param formatting              How to mark up the licenses.
+     * @since 2.8.0
+     */
+    public static void write(
+            List<ProjectLicenseInfo> projectLicenseInfos,
+            final File licensesExcelOutputFile,
+            SpreadsheetFormatting formatting) {
         if (CollectionUtils.isEmpty(projectLicenseInfos)) {
             LOG.debug("Nothing to write to excel, no project data.");
             return;
@@ -106,7 +121,7 @@ public final class ExcelFileWriter {
 
         createHeader(projectLicenseInfos, wb, sheet);
 
-        writeData(projectLicenseInfos, wb, sheet, alternatingRowsColor);
+        writeData(projectLicenseInfos, wb, sheet, alternatingRowsColor, formatting);
 
         try (OutputStream fileOut = Files.newOutputStream(licensesExcelOutputFile.toPath())) {
             wb.write(fileOut);
@@ -360,7 +375,8 @@ public final class ExcelFileWriter {
             List<ProjectLicenseInfo> projectLicenseInfos,
             XSSFWorkbook wb,
             Sheet sheet,
-            XSSFColor alternatingRowsColor) {
+            XSSFColor alternatingRowsColor,
+            SpreadsheetFormatting formatting) {
         final int firstRowIndex = 3;
         int currentRowIndex = firstRowIndex;
         final Map<Integer, Row> rowMap = new HashMap<>();
@@ -368,6 +384,7 @@ public final class ExcelFileWriter {
 
         final CellStyle hyperlinkStyleNormal = createHyperlinkStyle(wb, null);
         final CellStyle hyperlinkStyleGray = createHyperlinkStyle(wb, alternatingRowsColor);
+        final LicenseStyles licenseStyles = LicenseStyles.of(wb, alternatingRowsColor, formatting);
 
         boolean grayBackground = false;
         XSSFCellStyle styleGray = wb.createCellStyle();
@@ -385,6 +402,7 @@ public final class ExcelFileWriter {
                 cellStyle = null;
                 hyperlinkStyle = hyperlinkStyleNormal;
             }
+            final boolean grayRow = grayBackground;
             grayBackground = !grayBackground;
 
             int extraRows = 0;
@@ -418,6 +436,7 @@ public final class ExcelFileWriter {
                                 license.getDistribution(),
                                 license.getComments(),
                                 license.getFile());
+                        licenseStyles.apply(licenses[0], formatting.highlight(license), grayRow);
                         addHyperlinkIfExists(wb, licenses[1], hyperlinkStyle, HyperlinkType.URL);
                     });
 
