@@ -167,6 +167,10 @@ mvn package
 
   The Calc file requires Java 11 or later.
 
+  Developers are rarely what a license report is read for, and they are the main reason one
+  dependency takes a dozen rows instead of one. Leave them out with <<<skipDevelopers>>>; the
+  developer columns stay in place and are simply empty.
+
 * Manual License Configuration
 
   By default the plugin will look at the POM of each dependency for license information.  However,
