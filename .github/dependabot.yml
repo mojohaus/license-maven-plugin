@@ -9,6 +9,10 @@ updates:
       - "src/it/**"
     schedule:
       interval: "daily"
+    ignore:
+      # wiremock 3 requires Java 11; the integration tests still run on Java 8.
+      - dependency-name: "com.github.tomakehurst:wiremock-jre8-standalone"
+        versions: ["[3.0.0,)"]
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
