@@ -52,7 +52,9 @@
               <licensesConfigFile>${basedir}/src/license/licenses-config-pre-1.18.xml</licensesConfigFile>
               <licensesOutputDirectory>${project.build.directory}/pre-1.18/licenses</licensesOutputDirectory>
               <licensesOutputFile>${project.build.directory}/pre-1.18/licenses.xml</licensesOutputFile>
-              <sortByGroupIdAndArtifactId>true</sortByGroupIdAndArtifactId>
+              <!-- The other executions keep sortByGroupIdAndArtifactId, so both paths stay covered
+                   and are held against the same expected files. -->
+              <orderBy>dependencyGav</orderBy>
             </configuration>
           </execution>
           <execution>
