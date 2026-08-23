@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.codehaus.mojo.license.AbstractDownloadLicensesMojo.OrderBy;
+import org.codehaus.mojo.license.download.LicenseClassifier;
 import org.codehaus.mojo.license.download.ProjectLicense;
 import org.codehaus.mojo.license.download.ProjectLicenseInfo;
 import org.codehaus.mojo.license.extended.ExtendedInfo;
@@ -39,10 +40,38 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 class ProjectLicenseInfoComparatorsTest {
 
+    private static final LicenseClassifier NO_LICENSES_CLASSIFIED = new LicenseClassifier(null, null, null);
+
     @Test
     void noneLeavesTheOrderAlone() {
-        assertNull(ProjectLicenseInfoComparators.of(OrderBy.none));
-        assertNull(ProjectLicenseInfoComparators.of(null));
+        assertNull(ProjectLicenseInfoComparators.of(OrderBy.none, NO_LICENSES_CLASSIFIED));
+        assertNull(ProjectLicenseInfoComparators.of(null, NO_LICENSES_CLASSIFIED));
+    }
+
+    @Test
+    void byLicenseMatch() {
+        final LicenseClassifier classifier = new LicenseClassifier(
+                Arrays.asList("GPL 3.0"), Arrays.asList("EPL 2.0"), Arrays.asList("Apache License, Version 2.0"));
+        final List<ProjectLicenseInfo> input = Arrays.asList(
+                dependency("org.test", "unknown", "1.0", "Some House License"),
+                dependency("org.test", "ok", "1.0", "Apache License, Version 2.0"),
+                dependency("org.test", "unlicensed", "1.0"),
+                dependency("org.test", "problematic", "1.0", "EPL 2.0"),
+                dependency("org.test", "forbidden", "1.0", "GPL 3.0"),
+                dependency("org.test", "both", "1.0", "Apache License, Version 2.0", "GPL 3.0"));
+
+        final List<ProjectLicenseInfo> actual = new ArrayList<>(input);
+        actual.sort(ProjectLicenseInfoComparators.of(OrderBy.licenseMatch, classifier));
+
+        assertEquals(
+                Arrays.asList(
+                        "org.test:both:1.0",
+                        "org.test:forbidden:1.0",
+                        "org.test:problematic:1.0",
+                        "org.test:ok:1.0",
+                        "org.test:unknown:1.0",
+                        "org.test:unlicensed:1.0"),
+                actual.stream().map(ProjectLicenseInfo::toGavString).collect(Collectors.toList()));
     }
 
     @Test
@@ -114,7 +143,8 @@ class ProjectLicenseInfoComparatorsTest {
     }
 
     private static void assertOrder(OrderBy orderBy, List<ProjectLicenseInfo> input, String... expected) {
-        final Comparator<ProjectLicenseInfo> comparator = ProjectLicenseInfoComparators.of(orderBy);
+        final Comparator<ProjectLicenseInfo> comparator =
+                ProjectLicenseInfoComparators.of(orderBy, NO_LICENSES_CLASSIFIED);
         final List<ProjectLicenseInfo> actual = new ArrayList<>(input);
         actual.sort(comparator);
         assertEquals(

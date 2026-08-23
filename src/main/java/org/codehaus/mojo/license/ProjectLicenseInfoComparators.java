@@ -25,6 +25,7 @@ package org.codehaus.mojo.license;
 import java.util.Comparator;
 
 import org.codehaus.mojo.license.AbstractDownloadLicensesMojo.OrderBy;
+import org.codehaus.mojo.license.download.LicenseClassifier;
 import org.codehaus.mojo.license.download.ProjectLicense;
 import org.codehaus.mojo.license.download.ProjectLicenseInfo;
 import org.codehaus.mojo.license.extended.ExtendedInfo;
@@ -51,9 +52,10 @@ final class ProjectLicenseInfoComparators {
      * Returns the comparator for the given order.
      *
      * @param orderBy the requested order, may be {@code null}
+     * @param classifier the license classification behind {@link OrderBy#licenseMatch}
      * @return the comparator, or {@code null} if the dependencies should be left in the order they were resolved in
      */
-    static Comparator<ProjectLicenseInfo> of(OrderBy orderBy) {
+    static Comparator<ProjectLicenseInfo> of(OrderBy orderBy, LicenseClassifier classifier) {
         if (orderBy == null) {
             return null;
         }
@@ -67,6 +69,10 @@ final class ProjectLicenseInfoComparators {
                 return GAV;
             case licenseName:
                 return Comparator.comparing(ProjectLicenseInfoComparators::firstLicenseName, TEXT)
+                        .thenComparing(GAV);
+            case licenseMatch:
+                return Comparator.comparing((ProjectLicenseInfo info) -> classifier.classify(info))
+                        .thenComparing(ProjectLicenseInfoComparators::firstLicenseName, TEXT)
                         .thenComparing(GAV);
             default:
                 throw new IllegalArgumentException("Unexpected " + OrderBy.class.getName() + ": " + orderBy);

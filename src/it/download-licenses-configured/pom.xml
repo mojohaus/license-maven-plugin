@@ -111,6 +111,36 @@
             </configuration>
           </execution>
           <execution>
+            <id>license-match</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>download-licenses</goal>
+            </goals>
+            <configuration>
+              <licensesConfigFile>${basedir}/src/license/licenses-config-no-download.xml</licensesConfigFile>
+              <licensesOutputDirectory>${project.build.directory}/license-match/licenses</licensesOutputDirectory>
+              <licensesOutputFile>${project.build.directory}/license-match/licenses.xml</licensesOutputFile>
+              <!-- The lists are deliberately upside down: this order is the reverse of the order the
+                   dependencies resolve in, so the expected file also fails if orderBy is ignored. -->
+              <orderBy>licenseMatch</orderBy>
+              <forbiddenLicenses>
+                <forbiddenLicense>apache license 2.0</forbiddenLicense>
+              </forbiddenLicenses>
+              <problematicLicenses>
+                <problematicLicense>BSD 3-Clause ASM</problematicLicense>
+              </problematicLicenses>
+              <okLicenses>
+                <okLicense>Public Domain</okLicense>
+              </okLicenses>
+              <licenseUrlFileNameSanitizers>
+                <licenseUrlFileNameSanitizer>
+                  <regexp>[\s-_]+</regexp>
+                  <replacement>-</replacement>
+                </licenseUrlFileNameSanitizer>
+              </licenseUrlFileNameSanitizers>
+            </configuration>
+          </execution>
+          <execution>
             <id>delete-orphans</id>
             <phase>validate</phase>
             <goals>
