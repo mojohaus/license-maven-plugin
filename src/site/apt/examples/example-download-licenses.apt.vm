@@ -77,6 +77,39 @@ mvn package
   For the <<<download-licenses>>> goal, licenses will by default be downloaded into the directory
   <<<target/generated-resources/licenses>>>.  This can be configured using the <<<licensesOutputDirectory>>> parameter.
 
+* Sorting the Report
+
+  The dependencies appear in the order they were resolved in, which changes as the dependency tree
+  changes. The <<<orderBy>>> parameter puts them in a fixed order instead:
+
+-------------------
+<configuration>
+  <orderBy>dependencyName</orderBy>
+</configuration>
+-------------------
+
+  The parameter takes one of the following values, and can also be set on the command line as
+  <<<-Dlicense.orderBy=dependencyName>>>:
+
+*----------------------+--------------------------------------------------------------------------+
+| <<<none>>>           | The order the dependencies were resolved in. The default.                 |
+*----------------------+--------------------------------------------------------------------------+
+| <<<dependencyName>>> | The name the dependency gives itself in its POM. Falls back to the        |
+|                      | artifact id for dependencies without a name, and for every dependency     |
+|                      | when <<<extendedInfo>>> is off.                                           |
+*----------------------+--------------------------------------------------------------------------+
+| <<<dependencyGav>>>  | The group id, artifact id and version.                                    |
+*----------------------+--------------------------------------------------------------------------+
+| <<<licenseName>>>    | The license. Dependencies with more than one license are ordered by the   |
+|                      | alphabetically first of them, dependencies without a license come last.   |
+*----------------------+--------------------------------------------------------------------------+
+
+  Dependencies that compare equal are ordered by group id, artifact id and version, so the report is
+  the same on every run.
+
+  <<<orderBy>>> replaces <<<sortByGroupIdAndArtifactId>>>, which is deprecated. The old parameter
+  still works, and still applies when <<<orderBy>>> is left at <<<none>>>.
+
 * Manual License Configuration
 
   By default the plugin will look at the POM of each dependency for license information.  However,
