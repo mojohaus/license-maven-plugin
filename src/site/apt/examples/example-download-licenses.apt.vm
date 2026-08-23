@@ -143,6 +143,30 @@ mvn package
   ways, so use <<<licenseMerges>>> to bring the spellings of one license together; a name that no
   list matches is not reported, it simply counts as unclassified.
 
+* Highlighting the Licenses
+
+  When <<<writeExcelFile>>> or <<<writeCalcFile>>> is on, every license in the spreadsheet is written
+  in the colour of its category: red for forbidden, orange for problematic and green for approved.
+  Turn <<<highlightUnknownLicenses>>> on to see in teal what the three lists have not covered yet,
+  and <<<matchedLicensesHaveBorder>>> to box the highlighted licenses in as well:
+
+-------------------
+<configuration>
+  <writeExcelFile>true</writeExcelFile>
+  <writeCalcFile>true</writeCalcFile>
+  <highlightUnknownLicenses>true</highlightUnknownLicenses>
+  <matchedLicensesHaveBorder>true</matchedLicensesHaveBorder>
+</configuration>
+-------------------
+
+  A border tells the categories apart at a glance. The cost is that when scrolling through a long
+  report, the boxed license of a dependency with several licenses looks like the only one it has.
+
+  The colour is on the license text rather than the cell background, which stays free for the shading
+  that tells one dependency from the next.
+
+  The Calc file requires Java 11 or later.
+
 * Manual License Configuration
 
   By default the plugin will look at the POM of each dependency for license information.  However,
