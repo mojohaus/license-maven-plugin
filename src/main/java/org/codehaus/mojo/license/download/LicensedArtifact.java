@@ -34,6 +34,7 @@ import java.util.Set;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -241,6 +242,12 @@ public class LicensedArtifact {
                         }
                     }
                 }
+            } catch (ZipException e) {
+                // Dependencies are not always archives: .pom, .exe, .so and .dylib artifacts all end up here.
+                LOG.debug(
+                        "Artifact file \"{}\" is not a ZIP archive, no extended information read from it",
+                        artifact.getFile(),
+                        e);
             } catch (IOException e) {
                 LOG.warn("Can't open zip file \"" + artifact.getFile() + "\"", e);
             }
