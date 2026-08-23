@@ -79,6 +79,7 @@ class CalcFileWriterTest {
         return new SpreadsheetFormatting(
                 new LicenseClassifier(Collections.singletonList(FORBIDDEN), null, Collections.singletonList(OK)),
                 highlightUnknownLicenses,
+                false,
                 false);
     }
 

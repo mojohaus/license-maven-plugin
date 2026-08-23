@@ -536,6 +536,17 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
     private boolean matchedLicensesHaveBorder;
 
     /**
+     * Whether the developers of a dependency are left out of the Excel and Calc files.
+     *
+     * <p>They are rarely what a license report is read for, and they are the main reason one dependency takes a
+     * dozen rows instead of one. The developer columns stay in place, they are simply empty.
+     *
+     * @since 2.8.0
+     */
+    @Parameter(property = "license.skipDevelopers", defaultValue = "false")
+    private boolean skipDevelopers;
+
+    /**
      * A filter to exclude some GroupIds
      * This is a regular expression that is applied to groupIds (not an ant pattern).
      *
@@ -1057,8 +1068,8 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
             throws ParserConfigurationException, TransformerException, IOException {
         writeLicenseSummary(depProjectLicenses, outputFile, writeVersions);
         if (writeExcelFile || writeCalcFile) {
-            final SpreadsheetFormatting formatting =
-                    new SpreadsheetFormatting(licenseClassifier(), highlightUnknownLicenses, matchedLicensesHaveBorder);
+            final SpreadsheetFormatting formatting = new SpreadsheetFormatting(
+                    licenseClassifier(), highlightUnknownLicenses, matchedLicensesHaveBorder, skipDevelopers);
             if (writeExcelFile) {
                 ExcelFileWriter.write(depProjectLicenses, excelOutputFile, formatting);
             }

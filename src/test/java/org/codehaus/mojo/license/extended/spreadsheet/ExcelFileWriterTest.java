@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.maven.model.Developer;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
@@ -45,6 +46,7 @@ import org.junit.jupiter.api.io.TempDir;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ExcelFileWriterTest {
 
@@ -52,6 +54,7 @@ class ExcelFileWriterTest {
     private static final String PROBLEMATIC = "EPL 2.0";
     private static final String OK = "Apache License, Version 2.0";
     private static final String UNCLASSIFIED = "Some House License";
+    private static final String DEVELOPER = "A Developer";
 
     @TempDir
     File tempDir;
@@ -75,6 +78,20 @@ class ExcelFileWriterTest {
     }
 
     @Test
+    void skipsTheDevelopersWhenAsked() throws IOException {
+        final List<ProjectLicenseInfo> dependencies = Collections.singletonList(withDeveloper());
+
+        ExcelFileWriter.write(dependencies, new File(tempDir, "with.xlsx"), SpreadsheetFormatting.NONE);
+        ExcelFileWriter.write(
+                dependencies,
+                new File(tempDir, "without.xlsx"),
+                new SpreadsheetFormatting(new LicenseClassifier(null, null, null), false, false, true));
+
+        assertTrue(holdsCell(new File(tempDir, "with.xlsx"), DEVELOPER), "The developer was left out");
+        assertFalse(holdsCell(new File(tempDir, "without.xlsx"), DEVELOPER), "The developer was written anyway");
+    }
+
+    @Test
     void writesNoColourAtAllWithoutAnyConfiguredLicense() throws IOException {
         final File file = write("none", SpreadsheetFormatting.NONE);
 
@@ -89,6 +106,7 @@ class ExcelFileWriterTest {
                         Collections.singletonList(PROBLEMATIC),
                         Collections.singletonList(OK)),
                 highlightUnknownLicenses,
+                false,
                 false);
     }
 
@@ -101,6 +119,30 @@ class ExcelFileWriterTest {
         final File file = new File(tempDir, "licenses-" + name + ".xlsx");
         ExcelFileWriter.write(dependencies, file, formatting);
         return file;
+    }
+
+    private static ProjectLicenseInfo withDeveloper() {
+        final Developer developer = new Developer();
+        developer.setName(DEVELOPER);
+        final ExtendedInfo extendedInfo = new ExtendedInfo();
+        extendedInfo.setName("A dependency with a developer");
+        extendedInfo.setDevelopers(Collections.singletonList(developer));
+        final ProjectLicenseInfo info = new ProjectLicenseInfo("org.test", "developers", "1.0", extendedInfo);
+        info.addLicense(new ProjectLicense(OK, null, null, null, null));
+        return info;
+    }
+
+    private static boolean holdsCell(File file, String value) throws IOException {
+        try (XSSFWorkbook wb = new XSSFWorkbook(file.getAbsolutePath())) {
+            for (Row row : wb.getSheetAt(0)) {
+                for (Cell cell : row) {
+                    if (cell.getCellType() == CellType.STRING && value.equals(cell.getStringCellValue())) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     private static ProjectLicenseInfo dependency(String artifactId, String licenseName) {
