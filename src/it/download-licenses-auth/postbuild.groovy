@@ -38,6 +38,10 @@ try {
     // 4. Verify that the Authorization header was NOT sent to the public URL (no credential leakage)
     wireMockServer.verify(exactly(0), getRequestedFor(urlEqualTo('/public-licenses/mit.txt'))
             .withHeader('Authorization', matching('.*')))
+
+    // 5. Verify the plugin identifies itself instead of using the Apache HttpClient default user agent
+    wireMockServer.verify(getRequestedFor(urlEqualTo('/public-licenses/mit.txt'))
+            .withHeader('User-Agent', matching('license-maven-plugin/\\d.+')))
 } finally {
     wireMockServer.stop()
 }
