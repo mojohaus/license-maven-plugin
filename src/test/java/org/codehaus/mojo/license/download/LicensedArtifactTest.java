@@ -23,7 +23,6 @@ package org.codehaus.mojo.license.download;
  */
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
@@ -38,6 +37,7 @@ import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.codehaus.mojo.license.extended.ExtendedInfo;
 import org.codehaus.mojo.license.extended.InfoFile;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -69,7 +69,7 @@ class LicensedArtifactTest {
         final Manifest manifest = new Manifest();
         manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION, "1.0");
         manifest.getMainAttributes().put(Attributes.Name.IMPLEMENTATION_VENDOR, "The Test Project");
-        try (OutputStream out = new FileOutputStream(file);
+        try (OutputStream out = Files.newOutputStream(file.toPath());
                 JarOutputStream jar = new JarOutputStream(out, manifest)) {
             jar.putNextEntry(new JarEntry("META-INF/LICENSE.txt"));
             jar.write("Apache License, Version 2.0".getBytes(StandardCharsets.UTF_8));
@@ -86,12 +86,14 @@ class LicensedArtifactTest {
         assertEquals(InfoFile.Type.LICENSE, infoFile.getType());
     }
 
+    @NonNull
     private static ExtendedInfo extendedInfoOf(File file, String type) {
         final Artifact artifact =
                 new DefaultArtifact("org.test", "test", "1.0", "compile", type, null, new DefaultArtifactHandler(type));
         artifact.setFile(file);
         final ExtendedInfo extendedInfo =
                 new LicensedArtifact.Builder(artifact, true).build().getExtendedInfos();
+        assertNotNull(extendedInfo);
         assertSame(artifact, extendedInfo.getArtifact());
         return extendedInfo;
     }

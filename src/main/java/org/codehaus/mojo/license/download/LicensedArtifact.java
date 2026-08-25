@@ -22,19 +22,21 @@ package org.codehaus.mojo.license.download;
  * #L%
  */
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -49,6 +51,8 @@ import org.codehaus.mojo.license.extended.ExtendedInfo;
 import org.codehaus.mojo.license.extended.InfoFile;
 import org.codehaus.mojo.license.spdx.SpdxLicenseInfo;
 import org.codehaus.mojo.license.spdx.SpdxLicenseList;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.osgi.framework.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,6 +78,7 @@ public class LicensedArtifact {
 
     private final List<String> errorMessages;
 
+    @Nullable
     private final ExtendedInfo extendedInfos;
 
     LicensedArtifact(
@@ -82,7 +87,7 @@ public class LicensedArtifact {
             String version,
             List<License> licenses,
             List<String> errorMessages,
-            ExtendedInfo extendedInfos) {
+            @Nullable ExtendedInfo extendedInfos) {
         super();
         this.groupId = groupId;
         this.artifactId = artifactId;
@@ -107,22 +112,12 @@ public class LicensedArtifact {
     public boolean equals(Object obj) {
         // CHECKSTYLE_OFF: NeedBraces
         if (this == obj) return true;
-        if (obj == null) return false;
-        if (getClass() != obj.getClass()) return false;
+        if (!(obj instanceof LicensedArtifact)) return false;
         LicensedArtifact other = (LicensedArtifact) obj;
-        if (artifactId == null) {
-            if (other.artifactId != null) return false;
-        } else if (!artifactId.equals(other.artifactId)) return false;
-        if (groupId == null) {
-            if (other.groupId != null) return false;
-        } else if (!groupId.equals(other.groupId)) return false;
-        if (licenses == null) {
-            if (other.licenses != null) return false;
-        } else if (!licenses.equals(other.licenses)) return false;
-        if (version == null) {
-            if (other.version != null) return false;
-        } else if (!version.equals(other.version)) return false;
-        return true;
+        return Objects.equals(artifactId, other.artifactId)
+                && Objects.equals(groupId, other.groupId)
+                && Objects.equals(licenses, other.licenses)
+                && Objects.equals(version, other.version);
         // CHECKSTYLE_ON: NeedBraces
     }
 
@@ -152,14 +147,33 @@ public class LicensedArtifact {
      * @return Extended information.
      * @since 2.1.0
      */
+    @Nullable
     public ExtendedInfo getExtendedInfos() {
         return extendedInfos;
+    }
+
+    @Override
+    public String toString() {
+        return "LicensedArtifact{" + "groupId='"
+                + groupId + '\'' + ", artifactId='"
+                + artifactId + '\'' + ", version='"
+                + version + '\'' + ", licenses="
+                + licenses + ", errorMessages="
+                + errorMessages + ", extendedInfos="
+                + extendedInfos + '}';
     }
 
     /**
      * A {@link LicensedArtifact} builder.
      */
     public static class Builder {
+        /**
+         * The magic string to identify normal Java compatible ZIP files.
+         *
+         * @see <a href="https://en.wikipedia.org/wiki/ZIP_(file_format)#File_headers">ZIP header</a>
+         */
+        private static final int ZIP_FILE_HEADER = 0x504b0304;
+
         public Builder(Artifact artifact, boolean useNonMavenData) {
             super();
             this.groupId = artifact.getGroupId();
@@ -198,14 +212,54 @@ public class LicensedArtifact {
             return new LicensedArtifact(groupId, artifactId, version, lics, msgs, extendedInfos);
         }
 
-        private ExtendedInfo extraInfosFromArtifact(Artifact artifact) {
-            if (artifact.getFile() == null) {
-                LOG.error("Artifact " + artifact + " has no valid file set");
+        @Nullable
+        private ExtendedInfo extraInfosFromArtifact(@NonNull Artifact artifact) {
+            File artifactFile = artifact.getFile();
+            if (artifactFile == null) {
+                LOG.error("Artifact {} has no valid file set", artifact);
                 return null;
             }
             ExtendedInfo result = new ExtendedInfo();
             result.setArtifact(artifact);
-            try (ZipFile zipFile = new ZipFile(artifact.getFile())) {
+
+            if (isValidZipFile(artifactFile)) {
+                readValidatedZipFile(artifactFile, result);
+            } else {
+                LOG.debug("Artifact file {} is not a ZIP archive", artifactFile);
+            }
+            return result;
+        }
+
+        /**
+         * Checks if the given file is a valid Java readable ZIP file with content.
+         *
+         * <p>Meaning: Even valid ZIP files don't count, when they're either empty or Multi-Volume ZIP-Archives.
+         *
+         * @param file The file to check.
+         * @return If the given file is a valid Java readable ZIP file with content.
+         */
+        private static boolean isValidZipFile(File file) {
+            if (!file.isFile() || !file.canRead() || file.length() <= Integer.BYTES) {
+                return false;
+            }
+
+            try (InputStream inputStream = Files.newInputStream(file.toPath())) {
+                byte[] signatureBytes = new byte[Integer.BYTES];
+                IOUtils.readFully(inputStream, signatureBytes);
+
+                int signature = ((signatureBytes[0] & 0xff) << 24)
+                        | ((signatureBytes[1] & 0xff) << 16)
+                        | ((signatureBytes[2] & 0xff) << 8)
+                        | (signatureBytes[3] & 0xff);
+                return signature == ZIP_FILE_HEADER;
+            } catch (IOException e) {
+                LOG.warn("Can't inspect ZIP (?) file \"{}\"", file, e);
+                return false;
+            }
+        }
+
+        private void readValidatedZipFile(File artifactFile, ExtendedInfo result) {
+            try (ZipFile zipFile = new ZipFile(artifactFile)) {
                 Enumeration<? extends ZipEntry> entries = zipFile.entries();
                 while (entries.hasMoreElements()) {
                     ZipEntry zipEntry = entries.nextElement();
@@ -225,33 +279,29 @@ public class LicensedArtifact {
                     } else if (fileName.equals("meta-inf/manifest.mf")) {
                         try (InputStream inputStream = zipFile.getInputStream(zipEntry)) {
                             Manifest manifest = new Manifest(inputStream);
-                            final Attributes mainAttributes = manifest.getMainAttributes();
-                            // Fetch Java standard JAR manifest attributes.
-                            final Object implementationVendor =
-                                    mainAttributes.get(Attributes.Name.IMPLEMENTATION_VENDOR);
-                            if (implementationVendor instanceof String) {
-                                result.setImplementationVendor((String) implementationVendor);
-                            }
-                            // Fetch OSGI framework JAR manifest attributes.
-                            final String bundleVendor = mainAttributes.getValue(Constants.BUNDLE_VENDOR);
-                            result.setBundleVendor(bundleVendor);
-                            final String bundleLicense = mainAttributes.getValue(Constants.BUNDLE_LICENSE);
-                            result.setBundleLicense(bundleLicense);
+                            copyManifestToExtendedInfo(manifest, result);
                         } catch (IOException e) {
                             LOG.warn("Error at reading data from jar manifest", e);
                         }
                     }
                 }
-            } catch (ZipException e) {
-                // Dependencies are not always archives: .pom, .exe, .so and .dylib artifacts all end up here.
-                LOG.debug(
-                        "Artifact file \"{}\" is not a ZIP archive, no extended information read from it",
-                        artifact.getFile(),
-                        e);
             } catch (IOException e) {
-                LOG.warn("Can't open zip file \"" + artifact.getFile() + "\"", e);
+                LOG.warn("Can't process ZIP file \"{}\"", artifactFile, e);
             }
-            return result;
+        }
+
+        private static void copyManifestToExtendedInfo(Manifest manifest, ExtendedInfo extendedInfo) {
+            final Attributes mainAttributes = manifest.getMainAttributes();
+            // Fetch Java standard JAR manifest attributes.
+            final Object implementationVendor = mainAttributes.get(Attributes.Name.IMPLEMENTATION_VENDOR);
+            if (implementationVendor instanceof String) {
+                extendedInfo.setImplementationVendor((String) implementationVendor);
+            }
+            // Fetch OSGI framework JAR manifest attributes.
+            final String bundleVendor = mainAttributes.getValue(Constants.BUNDLE_VENDOR);
+            extendedInfo.setBundleVendor(bundleVendor);
+            final String bundleLicense = mainAttributes.getValue(Constants.BUNDLE_LICENSE);
+            extendedInfo.setBundleLicense(bundleLicense);
         }
 
         private InfoFile buildInfoFile(ZipFile zipFile, ZipEntry zipEntry, InfoFile.Type type) {
@@ -296,6 +346,7 @@ public class LicensedArtifact {
          * @param copyrightMatchers Lines containing one of these strings are returned. Arguments must be all lowercase.
          * @return The found lines containing copyright claims.
          */
+        @Nullable
         private Set<String> scanForCopyrights(String[] lines, String... copyrightMatchers) {
             if (lines == null) {
                 return null;
@@ -312,13 +363,14 @@ public class LicensedArtifact {
             return result;
         }
 
+        @Nullable
         private Pair<String, String[]> readZipEntryTextLines(ZipFile zipFile, ZipEntry zipEntry) {
             try (InputStream inputStream = zipFile.getInputStream(zipEntry)) {
-                byte[] content = IOUtils.readFully(inputStream, (int) zipEntry.getSize());
+                byte[] content = IOUtils.toByteArray(inputStream, (int) zipEntry.getSize());
                 String contentString = new String(content);
                 return new ImmutablePair<>(contentString, contentString.split("\\R+"));
             } catch (IOException e) {
-                LOG.warn("Can't read zip file entry " + zipEntry, e);
+                LOG.warn("Can't read zip file entry {}", zipEntry, e);
                 return null;
             }
         }
