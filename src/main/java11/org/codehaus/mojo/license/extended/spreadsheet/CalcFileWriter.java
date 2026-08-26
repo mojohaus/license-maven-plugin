@@ -582,29 +582,31 @@ public class CalcFileWriter {
                 // General
                 createDataCellsInRow(currentRow, GENERAL_START_COLUMN, cellStyle, extendedInfo.getName());
                 // Developers
-                currentRowData = new CurrentRowData(currentRowIndex, extraRows, hasExtendedInfo);
-                extraRows = addList(
-                        cellListParameter,
-                        currentRowData,
-                        DEVELOPERS_START_COLUMN,
-                        DEVELOPERS_COLUMNS,
-                        extendedInfo.getDevelopers(),
-                        (OdfTableRow developerRow, Developer developer) -> {
-                            OdfTableCell[] licenses = createDataCellsInRow(
-                                    developerRow,
-                                    DEVELOPERS_START_COLUMN,
-                                    cellStyle,
-                                    developer.getId(),
-                                    developer.getEmail(),
-                                    developer.getName(),
-                                    developer.getOrganization(),
-                                    developer.getOrganizationUrl(),
-                                    developer.getUrl(),
-                                    developer.getTimezone());
-                            addHyperlinkIfExists(table, licenses[1], hyperlinkStyle, true);
-                            addHyperlinkIfExists(table, licenses[4], hyperlinkStyle);
-                            addHyperlinkIfExists(table, licenses[5], hyperlinkStyle);
-                        });
+                if (!formatting.skipsDevelopers()) {
+                    currentRowData = new CurrentRowData(currentRowIndex, extraRows, hasExtendedInfo);
+                    extraRows = addList(
+                            cellListParameter,
+                            currentRowData,
+                            DEVELOPERS_START_COLUMN,
+                            DEVELOPERS_COLUMNS,
+                            extendedInfo.getDevelopers(),
+                            (OdfTableRow developerRow, Developer developer) -> {
+                                OdfTableCell[] licenses = createDataCellsInRow(
+                                        developerRow,
+                                        DEVELOPERS_START_COLUMN,
+                                        cellStyle,
+                                        developer.getId(),
+                                        developer.getEmail(),
+                                        developer.getName(),
+                                        developer.getOrganization(),
+                                        developer.getOrganizationUrl(),
+                                        developer.getUrl(),
+                                        developer.getTimezone());
+                                addHyperlinkIfExists(table, licenses[1], hyperlinkStyle, true);
+                                addHyperlinkIfExists(table, licenses[4], hyperlinkStyle);
+                                addHyperlinkIfExists(table, licenses[5], hyperlinkStyle);
+                            });
+                }
                 // Miscellaneous
                 OdfTableCell[] miscCells = createDataCellsInRow(
                         currentRow,
