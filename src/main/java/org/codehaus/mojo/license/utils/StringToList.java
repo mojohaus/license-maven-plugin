@@ -73,7 +73,24 @@ public class StringToList {
         return data;
     }
 
+    /**
+     * Adds one license name, dropping the whitespace around it and ignoring it when there is nothing else left.
+     *
+     * <p>The names arrive straight out of the POM, so they carry whatever the XML formatter left behind. A list
+     * whose entries are long enough gets broken over several lines, either by hand or by a formatter:
+     *
+     * <pre>
+     * &lt;includedLicenses&gt;
+     *   Apache License 2.0
+     *   |MIT License
+     * &lt;/includedLicenses&gt;
+     * </pre>
+     *
+     * @param data the license name
+     */
     protected void addEntryToList(String data) {
-        this.data.add(data);
+        if (StringUtils.isNotBlank(data)) {
+            this.data.add(data.trim());
+        }
     }
 }
