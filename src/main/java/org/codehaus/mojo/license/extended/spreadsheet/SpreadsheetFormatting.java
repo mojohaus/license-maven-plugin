@@ -38,17 +38,22 @@ public class SpreadsheetFormatting {
 
     /** Marks up nothing, the behaviour before the license lists existed. */
     public static final SpreadsheetFormatting NONE =
-            new SpreadsheetFormatting(new LicenseClassifier(null, null, null), false, false);
+            new SpreadsheetFormatting(new LicenseClassifier(null, null, null), false, false, false);
 
     private final LicenseClassifier classifier;
     private final boolean highlightUnknownLicenses;
     private final boolean matchedLicensesHaveBorder;
+    private final boolean skipDevelopers;
 
     public SpreadsheetFormatting(
-            LicenseClassifier classifier, boolean highlightUnknownLicenses, boolean matchedLicensesHaveBorder) {
+            LicenseClassifier classifier,
+            boolean highlightUnknownLicenses,
+            boolean matchedLicensesHaveBorder,
+            boolean skipDevelopers) {
         this.classifier = classifier;
         this.highlightUnknownLicenses = highlightUnknownLicenses;
         this.matchedLicensesHaveBorder = matchedLicensesHaveBorder;
+        this.skipDevelopers = skipDevelopers;
     }
 
     /**
@@ -79,5 +84,15 @@ public class SpreadsheetFormatting {
      */
     public boolean hasBorder() {
         return matchedLicensesHaveBorder;
+    }
+
+    /**
+     * Whether the developers of a dependency are left out. They are rarely what a license report is read for, and
+     * they are the main reason one dependency takes a dozen rows. The columns stay, they are simply empty.
+     *
+     * @return whether to leave the developers out
+     */
+    public boolean skipsDevelopers() {
+        return skipDevelopers;
     }
 }

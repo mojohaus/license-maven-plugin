@@ -446,29 +446,31 @@ public class ExcelFileWriter {
                 createDataCellsInRow(
                         currentRow, SpreadsheetUtil.GENERAL_START_COLUMN, cellStyle, extendedInfo.getName());
                 // Developers
-                currentRowData = new SpreadsheetUtil.CurrentRowData(currentRowIndex, extraRows, hasExtendedInfo);
-                extraRows = addList(
-                        cellListParameter,
-                        currentRowData,
-                        SpreadsheetUtil.DEVELOPERS_START_COLUMN,
-                        SpreadsheetUtil.DEVELOPERS_COLUMNS,
-                        extendedInfo.getDevelopers(),
-                        (Row developerRow, Developer developer) -> {
-                            Cell[] licenses = createDataCellsInRow(
-                                    developerRow,
-                                    SpreadsheetUtil.DEVELOPERS_START_COLUMN,
-                                    cellStyle,
-                                    developer.getId(),
-                                    developer.getEmail(),
-                                    developer.getName(),
-                                    developer.getOrganization(),
-                                    developer.getOrganizationUrl(),
-                                    developer.getUrl(),
-                                    developer.getTimezone());
-                            addHyperlinkIfExists(wb, licenses[1], hyperlinkStyle, HyperlinkType.EMAIL);
-                            addHyperlinkIfExists(wb, licenses[4], hyperlinkStyle, HyperlinkType.URL);
-                            addHyperlinkIfExists(wb, licenses[5], hyperlinkStyle, HyperlinkType.URL);
-                        });
+                if (!formatting.skipsDevelopers()) {
+                    currentRowData = new SpreadsheetUtil.CurrentRowData(currentRowIndex, extraRows, hasExtendedInfo);
+                    extraRows = addList(
+                            cellListParameter,
+                            currentRowData,
+                            SpreadsheetUtil.DEVELOPERS_START_COLUMN,
+                            SpreadsheetUtil.DEVELOPERS_COLUMNS,
+                            extendedInfo.getDevelopers(),
+                            (Row developerRow, Developer developer) -> {
+                                Cell[] licenses = createDataCellsInRow(
+                                        developerRow,
+                                        SpreadsheetUtil.DEVELOPERS_START_COLUMN,
+                                        cellStyle,
+                                        developer.getId(),
+                                        developer.getEmail(),
+                                        developer.getName(),
+                                        developer.getOrganization(),
+                                        developer.getOrganizationUrl(),
+                                        developer.getUrl(),
+                                        developer.getTimezone());
+                                addHyperlinkIfExists(wb, licenses[1], hyperlinkStyle, HyperlinkType.EMAIL);
+                                addHyperlinkIfExists(wb, licenses[4], hyperlinkStyle, HyperlinkType.URL);
+                                addHyperlinkIfExists(wb, licenses[5], hyperlinkStyle, HyperlinkType.URL);
+                            });
+                }
                 // Miscellaneous
                 Cell[] miscCells = createDataCellsInRow(
                         currentRow,
