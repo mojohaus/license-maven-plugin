@@ -43,7 +43,7 @@ class StringToListTest {
     void dropsTheWhitespaceAnXmlFormatterLeavesBehind() throws MojoExecutionException {
         assertEquals(
                 Arrays.asList("Apache License 2.0", "MIT License", "EPL 2.0"),
-                new StringToList("\n    Apache License 2.0\n    |MIT License\n    | EPL 2.0\n  ").getData());
+                new StringToList("\n    Apache License\n    2.0\n    |MIT License\n    | EPL 2.0\n  ").getData());
     }
 
     @Test
