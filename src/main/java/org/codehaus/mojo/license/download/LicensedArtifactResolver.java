@@ -198,6 +198,9 @@ public class LicensedArtifactResolver {
         if (excludeTransitiveDependencies) {
             for (Map.Entry<String, Artifact> entry : includeArtifacts.entrySet()) {
                 List<String> dependencyTrail = entry.getValue().getDependencyTrail();
+                if (dependencyTrail == null) {
+                    continue;
+                }
 
                 boolean remove = false;
 
