@@ -132,7 +132,7 @@
 
     <version.httpcomponents.httpclient>4.5.14</version.httpcomponents.httpclient>
     <version.httpcomponents.httpcore>4.4.16</version.httpcomponents.httpcore>
-    <version.odfdom-java>0.12.0</version.odfdom-java>
+    <version.odfdom-java>0.13.0</version.odfdom-java>
 
     <!-- license configuration -->
     <license.useMissingFile>true</license.useMissingFile>
