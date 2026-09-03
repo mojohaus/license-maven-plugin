@@ -33,7 +33,10 @@ import org.codehaus.mojo.license.extended.ExtendedInfo;
 import org.codehaus.mojo.license.extended.InfoFile;
 import org.codehaus.mojo.license.extended.spreadsheet.CalcFileWriter;
 import org.codehaus.mojo.license.extended.spreadsheet.ExcelFileWriter;
+import org.jspecify.annotations.NonNull;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledForJreRange;
 import org.junit.jupiter.api.condition.JRE;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,29 +97,7 @@ class LicenseSummaryTest {
     void testWriteReadLicenseSummary()
             throws IOException, SAXException, ParserConfigurationException, TransformerFactoryConfigurationError,
                     TransformerException {
-        List<ProjectLicenseInfo> licSummary = new ArrayList<>();
-        ProjectLicenseInfo dep1 = new ProjectLicenseInfo("org.test", "test1", "1.0", buildExtendedInfo(1));
-        ProjectLicenseInfo dep2 = new ProjectLicenseInfo("org.test", "test2", "2.0", buildExtendedInfo(2));
-        ProjectLicenseInfo dep3 = new ProjectLicenseInfo("com.test", "test3", "3.0", buildExtendedInfo(3));
-        ProjectLicenseInfo dep4 = new ProjectLicenseInfo("dk.test", "test4", "4.0", buildExtendedInfo(4));
-
-        ProjectLicense lic = new ProjectLicense();
-        lic.setName("lgpl");
-        lic.setUrl("http://www.gnu.org/licenses/lgpl-3.0.txt");
-        lic.setFile("lgpl-3.0.txt");
-        lic.setComments("lgpl version 3.0");
-        dep1.addLicense(lic);
-        dep2.addLicense(lic);
-        dep3.addLicense(lic);
-
-        dep2.addDownloaderMessage("There were server problems");
-        // Skip dependency 3, to test correct empty cell filling of ODS export.
-        dep4.addDownloaderMessage("http://google.de");
-
-        licSummary.add(dep1);
-        licSummary.add(dep2);
-        licSummary.add(dep3);
-        licSummary.add(dep4);
+        List<ProjectLicenseInfo> licSummary = createLicenseSummary();
 
         File licenseSummaryFile = File.createTempFile("licSummary", "tmp");
         LicenseSummaryWriter.writeLicenseSummary(licSummary, licenseSummaryFile, StandardCharsets.UTF_8, Eol.LF, true);
@@ -164,17 +145,66 @@ class LicenseSummaryTest {
 
         Path licensesExcelOutputFile = Files.createTempFile("licExcel", ".xlsx");
         ExcelFileWriter.write(licSummary, licensesExcelOutputFile.toFile());
+    }
 
+    private static @NonNull List<ProjectLicenseInfo> createLicenseSummary() {
+        List<ProjectLicenseInfo> licSummary = new ArrayList<>();
+        ProjectLicenseInfo dep1 = new ProjectLicenseInfo("org.test", "test1", "1.0", buildExtendedInfo(1));
+        ProjectLicenseInfo dep2 = new ProjectLicenseInfo("org.test", "test2", "2.0", buildExtendedInfo(2));
+        ProjectLicenseInfo dep3 = new ProjectLicenseInfo("com.test", "test3", "3.0", buildExtendedInfo(3));
+        ProjectLicenseInfo dep4 = new ProjectLicenseInfo("dk.test", "test4", "4.0", buildExtendedInfo(4));
+
+        ProjectLicense lic = new ProjectLicense();
+        lic.setName("lgpl");
+        lic.setUrl("http://www.gnu.org/licenses/lgpl-3.0.txt");
+        lic.setFile("lgpl-3.0.txt");
+        lic.setComments("lgpl version 3.0");
+        dep1.addLicense(lic);
+        dep2.addLicense(lic);
+        dep3.addLicense(lic);
+
+        dep2.addDownloaderMessage("There were server problems");
+        // Skip dependency 3, to test correct empty cell filling of ODS export.
+        dep4.addDownloaderMessage("http://google.de");
+
+        licSummary.add(dep1);
+        licSummary.add(dep2);
+        licSummary.add(dep3);
+        licSummary.add(dep4);
+        return licSummary;
+    }
+
+    /**
+     * Expected failure of writing a LibreOffice Calc file (ODS) on JDK < 11.
+     *
+     * @throws IOException Unexpected Calc file writing problem.
+     */
+    @Test
+    @EnabledForJreRange(max = JRE.JAVA_10)
+    void testWriteCalcFail() throws IOException {
+        List<ProjectLicenseInfo> licSummary = createLicenseSummary();
         Path licensesCalcOutputFile = Files.createTempFile("licCalc", ".ods");
-        if (JRE.currentJre().version() >= 11) {
-            CalcFileWriter.write(licSummary, licensesCalcOutputFile.toFile());
-        } else {
-            // on JDK 8 this should throw an UnsupportedOperationException
-            UnsupportedOperationException exception = assertThrows(
-                    UnsupportedOperationException.class,
-                    () -> CalcFileWriter.write(licSummary, licensesCalcOutputFile.toFile()));
-            assertEquals("Write LibreOffice Calc file (ODS) requires JDK 11+", exception.getMessage());
-        }
+
+        // on JDK < 11 this should throw an UnsupportedOperationException
+        UnsupportedOperationException exception = assertThrows(
+                UnsupportedOperationException.class,
+                () -> CalcFileWriter.write(licSummary, licensesCalcOutputFile.toFile()));
+        assertEquals("Write LibreOffice Calc file (ODS) requires JDK 11+", exception.getMessage());
+    }
+
+    /**
+     * Expected success of writing a LibreOffice Calc file (ODS) on JDK >= 11.
+     *
+     * @throws IOException Unexpected Calc file writing problem.
+     */
+    @Test
+    @EnabledForJreRange(min = JRE.JAVA_11)
+    void testWriteCalcSuccess() throws IOException {
+        List<ProjectLicenseInfo> licSummary = createLicenseSummary();
+        Path licensesCalcOutputFile = Files.createTempFile("licCalc", ".ods");
+        Assertions.assertDoesNotThrow(
+                () -> CalcFileWriter.write(licSummary, licensesCalcOutputFile.toFile()),
+                String.format("JRE version %d.", JRE.currentJre().version()));
     }
 
     /**

@@ -311,12 +311,6 @@
       <version>5.5.1</version>
     </dependency>
 
-    <!-- LibreOffice Calc ODT export -->
-    <dependency>
-      <groupId>org.odftoolkit</groupId>
-      <artifactId>odfdom-java</artifactId>
-      <version>${version.odfdom-java}</version>
-    </dependency>
     <!-- XML APIs is needed for JDK 8, was a transitive dependency from old version of odfdom-java -->
     <dependency>
       <groupId>xml-apis</groupId>
@@ -569,6 +563,15 @@
         <jdk>[11,)</jdk>
       </activation>
 
+      <dependencies>
+        <!-- LibreOffice Calc ODS export — requires Java 11+; excluded from Java 8 compilation -->
+        <dependency>
+          <groupId>org.odftoolkit</groupId>
+          <artifactId>odfdom-java</artifactId>
+          <version>${version.odfdom-java}</version>
+        </dependency>
+      </dependencies>
+
       <build>
         <plugins>
           <plugin>
@@ -588,6 +591,21 @@
                     <compileSourceRoot>${project.basedir}/src/main/java11</compileSourceRoot>
                   </compileSourceRoots>
                   <outputDirectory>${project.build.outputDirectory}/META-INF/versions/11</outputDirectory>
+                </configuration>
+              </execution>
+              <!-- Compile Java 11+ specific test code -->
+              <execution>
+                <id>java11-test-compile</id>
+                <goals>
+                  <goal>testCompile</goal>
+                </goals>
+                <phase>test-compile</phase>
+                <configuration>
+                  <release>11</release>
+                  <compileSourceRoots>
+                    <compileSourceRoot>${project.basedir}/src/test/java11</compileSourceRoot>
+                  </compileSourceRoots>
+                  <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
                 </configuration>
               </execution>
             </executions>

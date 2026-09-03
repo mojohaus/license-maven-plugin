@@ -43,6 +43,7 @@ import org.odftoolkit.odfdom.dom.style.OdfStyleFamily;
 import org.odftoolkit.odfdom.incubator.doc.style.OdfStyle;
 import org.odftoolkit.odfdom.type.Color;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -87,7 +88,9 @@ class CalcFileWriterTest {
         final List<ProjectLicenseInfo> dependencies = Arrays.asList(
                 dependency("forbidden", FORBIDDEN), dependency("ok", OK), dependency("unclassified", UNCLASSIFIED));
         final File file = new File(tempDir, "licenses-" + name + ".ods");
-        CalcFileWriter.write(dependencies, file, formatting);
+        assertDoesNotThrow(
+                () -> CalcFileWriter.write(dependencies, file, formatting),
+                String.format("JRE version %d.", JRE.currentJre().version()));
         return file;
     }
 
