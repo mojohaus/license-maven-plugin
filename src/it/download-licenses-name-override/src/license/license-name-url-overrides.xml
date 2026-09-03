@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<licenseNameUrlOverrides>
+  <!--
+    Maps license names to preferred download URLs.
+    licenseNamePattern is a Java regular expression matched against the license name
+    declared in the dependency's POM (the <name> inside <licenses><license>).
+    The first matching entry wins.
+    The %project.baseUri% placeholder is replaced by prebuild.groovy at IT run time.
+  -->
+  <licenseNameUrlOverride>
+    <!-- junit 4.13.1 declares "Eclipse Public License 1.0" with URL http://www.eclipse.org/legal/epl-v10.html;
+         the override replaces it with a local file. -->
+    <licenseNamePattern>(?i)eclipse public license.*</licenseNamePattern>
+    <url>%project.baseUri%src/license/epl-1.0.txt</url>
+  </licenseNameUrlOverride>
+  <licenseNameUrlOverride>
+    <!-- commons-logging 1.0 declares "The Apache Software License, Version 2.0" with URL
+         http://www.apache.org/licenses/LICENSE-2.0.txt; the override replaces it with a local file. -->
+    <licenseNamePattern>(?i).*apache.*</licenseNamePattern>
+    <url>%project.baseUri%src/license/apache-2.0.txt</url>
+  </licenseNameUrlOverride>
+</licenseNameUrlOverrides>
