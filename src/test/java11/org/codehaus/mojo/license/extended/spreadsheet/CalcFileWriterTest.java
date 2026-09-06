@@ -115,7 +115,7 @@ class CalcFileWriterTest {
      */
     private static String colorOf(File file, String licenseName) throws Exception {
         try (OdfSpreadsheetDocument document = OdfSpreadsheetDocument.loadDocument(file)) {
-            final OdfTable table = document.getTableList().get(0);
+            final OdfTable table = document.getTableList(false).get(0);
             for (int row = 0; row < table.getRowCount(); row++) {
                 for (int column = 0; column < table.getColumnCount(); column++) {
                     final OdfTableCell cell = table.getCellByPosition(column, row);
