@@ -38,7 +38,7 @@ class SpreadsheetUtil {
     // Columns values for JAR data, including separator gaps for data grouping.
     private static final int INFO_FILES_GAPS = 2;
     private static final int MANIFEST_GAPS = 1;
-    private static final int MANIFEST_COLUMNS = 3;
+    public static final int MANIFEST_COLUMNS = 3;
     static final int MANIFEST_END_COLUMN = MANIFEST_START_COLUMN + MANIFEST_COLUMNS;
     static final int INFO_NOTICES_START_COLUMN = MANIFEST_END_COLUMN + 1;
     static final int INFO_NOTICES_COLUMNS = 3;

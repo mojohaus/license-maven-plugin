@@ -76,6 +76,7 @@ import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.INF
 import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.LICENSES_COLUMNS;
 import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.LICENSES_END_COLUMN;
 import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.LICENSES_START_COLUMN;
+import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.MANIFEST_COLUMNS;
 import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.MANIFEST_END_COLUMN;
 import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.MANIFEST_START_COLUMN;
 import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.MAVEN_END_COLUMN;
@@ -106,6 +107,8 @@ public class CalcFileWriter {
     private static final int DOWNLOAD_COLUMN_WIDTH = 6_000;
     private static final String VALUE_TYPE_STRING = "string";
     private static final String CONFIG_TYPE_SHORT = "short";
+
+    private static final String ATTRIBUTE_CONFIG_NAME = "config:name";
 
     private CalcFileWriter() {
     }
@@ -373,8 +376,7 @@ public class CalcFileWriter {
 
     private static void createFreezePane(
         OdfSpreadsheetDocument spreadsheet, OdfTable table, int column, int lineCount) {
-        // TODO: Find out why this perfect XML is ignored. Use FreezePane function from ODFToolkit after they add it.
-
+        // Note: Use FreezePane function from ODFToolkit once they add it.
         final OdfSettingsDom settingsDom;
         try {
             settingsDom = spreadsheet.getSettingsDom();
@@ -386,14 +388,13 @@ public class CalcFileWriter {
         for (int i = 0; i < childNodes.getLength(); i++) {
             Node child = childNodes.item(i);
             if ("config:config-item-set".equals(child.getNodeName())
-                && "ooo:view-settings".equals(((Element) child).getAttribute("config:name"))) {
+                && "ooo:view-settings".equals(((Element) child).getAttribute(ATTRIBUTE_CONFIG_NAME))) {
 
                 NodeList subChilds = child.getChildNodes();
                 for (int j = 0; j < subChilds.getLength(); j++) {
                     Node subChild = subChilds.item(j);
                     if ("config:config-item-map-indexed".equals(subChild.getNodeName())
-                        && "Views".equals(((Element) subChild).getAttribute("config:name"))) {
-
+                        && "Views".equals(((Element) subChild).getAttribute(ATTRIBUTE_CONFIG_NAME))) {
                         break;
                     }
                 }
@@ -402,50 +403,66 @@ public class CalcFileWriter {
         }
 
         XPath xpath = settingsDom.getXPath();
-        NodeList list;
         try {
-            list = (NodeList) xpath.evaluate(
-                "/office:document-settings/" + "office:settings/"
-                    + "config:config-item-set/"
-                    + "config:config-item-map-indexed/"
-                    + "config:config-item-map-entry/"
-                    + "config:config-item-map-named/"
-                    + "config:config-item-map-entry",
-                //                    "/config:config-item-set[@config:name=\"ooo:view-settings\"]" +
+            String tableName = table.getTableName();
+            // Find the config:config-item-map-named[@config:name="Tables"] for the active view
+            Node tablesNode = (Node) xpath.evaluate(
+                "/office:document-settings/office:settings"
+                    + "/config:config-item-set[@config:name='ooo:view-settings']"
+                    + "/config:config-item-map-indexed[@config:name='Views']"
+                    + "/config:config-item-map-entry"
+                    + "/config:config-item-map-named[@config:name='Tables']",
                 settingsDom,
                 XPathConstants.NODE);
 
-            /*
-            <config:config-item config:name="HorizontalSplitMode" config:type="short">2</config:config-item>
-            <config:config-item config:name="VerticalSplitMode" config:type="short">2</config:config-item>
-            <config:config-item config:name="HorizontalSplitPosition" config:type="int">1</config:config-item>
-            <config:config-item config:name="VerticalSplitPosition" config:type="int">4</config:config-item>
-            <config:config-item config:name="ActiveSplitRange" config:type="short">3</config:config-item>
-
-            <config:config-item config:name="PositionLeft" config:type="int">0</config:config-item>
-            <config:config-item config:name="PositionRight" config:type="int">1</config:config-item>
-            <config:config-item config:name="PositionTop" config:type="int">0</config:config-item>
-            <config:config-item config:name="PositionBottom" config:type="int">3</config:config-item>
-             */
-            if (list instanceof ConfigConfigItemMapEntryElement) {
-                ConfigConfigItemMapEntryElement entryElement = (ConfigConfigItemMapEntryElement) list;
-
-                appendConfigItemElement(entryElement, "HorizontalSplitMode", CONFIG_TYPE_SHORT, "2");
-                appendConfigItemElement(entryElement, "VerticalSplitMode", CONFIG_TYPE_SHORT, "2");
-
-                appendConfigItemElement(entryElement, "HorizontalSplitPosition", "int", "1");
-                appendConfigItemElement(entryElement, "VerticalSplitPosition", "int", "3");
-
-                appendConfigItemElement(entryElement, "ActiveSplitRange", CONFIG_TYPE_SHORT, "3");
-
-                appendConfigItemElement(entryElement, "PositionLeft", "int", "0");
-                appendConfigItemElement(entryElement, "PositionRight", "int", "1");
-                appendConfigItemElement(entryElement, "PositionTop", "int", "0");
-                appendConfigItemElement(entryElement, "PositionBottom", "int", "3");
-
-                appendConfigItemElement(entryElement, "ShowGrid", "boolean", "true");
-                appendConfigItemElement(entryElement, "AnchoredTextOverflowLegacy", "boolean", "false");
+            if (tablesNode == null) {
+                return;
             }
+
+            // Find the sheet's config entry — rename it to the actual table name if the
+            // template still carries the default "Sheet1" placeholder.
+            ConfigConfigItemMapEntryElement entryElement = null;
+            NodeList tableEntries = tablesNode.getChildNodes();
+            for (int i = 0; i < tableEntries.getLength(); i++) {
+                Node n = tableEntries.item(i);
+                if (n instanceof ConfigConfigItemMapEntryElement) {
+                    entryElement = (ConfigConfigItemMapEntryElement) n;
+                    if (!tableName.equals(((Element) n).getAttribute(ATTRIBUTE_CONFIG_NAME))) {
+                        entryElement.setAttribute(ATTRIBUTE_CONFIG_NAME, tableName);
+                    }
+                    break;
+                }
+            }
+            if (entryElement == null) {
+                return;
+            }
+
+            // Fix the ActiveTable item in the parent view entry so the correct sheet is shown
+            Node viewEntry = tablesNode.getParentNode();
+            NodeList viewChildren = viewEntry.getChildNodes();
+            for (int i = 0; i < viewChildren.getLength(); i++) {
+                Node n = viewChildren.item(i);
+                if (n instanceof ConfigConfigItemElement
+                    && "ActiveTable".equals(((ConfigConfigItemElement) n).getConfigNameAttribute())) {
+                    n.setTextContent(tableName);
+                    break;
+                }
+            }
+            appendConfigItemElement(entryElement, "HorizontalSplitMode", CONFIG_TYPE_SHORT, "2");
+            appendConfigItemElement(entryElement, "VerticalSplitMode", CONFIG_TYPE_SHORT, "2");
+
+            appendConfigItemElement(entryElement, "HorizontalSplitPosition", "int", String.valueOf(column));
+            appendConfigItemElement(entryElement, "VerticalSplitPosition", "int", String.valueOf(lineCount));
+
+            appendConfigItemElement(entryElement, "ActiveSplitRange", CONFIG_TYPE_SHORT, "3");
+
+            appendConfigItemElement(entryElement, "PositionLeft", "int", "0");
+            appendConfigItemElement(entryElement, "PositionRight", "int", String.valueOf(column));
+            appendConfigItemElement(entryElement, "PositionTop", "int", "0");
+            appendConfigItemElement(entryElement, "PositionBottom", "int", String.valueOf(lineCount));
+
+            appendConfigItemElement(entryElement, "ShowGrid", "boolean", "true");
+            appendConfigItemElement(entryElement, "AnchoredTextOverflowLegacy", "boolean", "false");
         } catch (XPathExpressionException e) {
             throw new RuntimeException(e);
         }
@@ -545,6 +562,7 @@ public class CalcFileWriter {
 
             int extraRows = 0;
             OdfTableRow currentRow = table.appendRow();
+            fixRowHeight(currentRow);
             rowMap.put(currentRowIndex, currentRow);
             // Plugin ID
             createDataCellsInRow(
@@ -577,18 +595,25 @@ public class CalcFileWriter {
                     addHyperlinkIfExists(table, licenses[1], hyperlinkStyle);
                 });
 
+            // Add empty cells, so it doesn't copy the previous row cell, even if it doesn't have any data.
+            setStyleOnEmptyCells(
+                cellListParameter, currentRowData, GENERAL_START_COLUMN, 1);
+            setStyleOnEmptyCells(
+                cellListParameter, currentRowData, DEVELOPERS_START_COLUMN, DEVELOPERS_COLUMNS);
+            setStyleOnEmptyCells(
+                cellListParameter, currentRowData, MISC_START_COLUMN, MISC_COLUMNS);
+
             final ExtendedInfo extendedInfo = projectInfo.getExtendedInfo();
             if (extendedInfo != null) {
+                setStyleOnEmptyCells(
+                    cellListParameter, currentRowData, MANIFEST_START_COLUMN, MANIFEST_COLUMNS);
+
                 hasExtendedInfo = true;
                 // General
                 createDataCellsInRow(currentRow, GENERAL_START_COLUMN, cellStyle, extendedInfo.getName());
                 // Developers
                 currentRowData = new CurrentRowData(currentRowIndex, extraRows, hasExtendedInfo);
-                if (formatting.skipsDevelopers()) {
-                    // Add empty cells, so it doesn't copy the previous row cell.
-                    setStyleOnEmptyCells(
-                        cellListParameter, currentRowData, DEVELOPERS_START_COLUMN, DEVELOPERS_COLUMNS);
-                } else {
+                if (!formatting.skipsDevelopers()) {
                     extraRows = addList(
                         cellListParameter,
                         currentRowData,
@@ -685,10 +710,6 @@ public class CalcFileWriter {
                         cellListParameter, currentRowData, INFO_LICENSES_START_COLUMN, INFO_LICENSES_COLUMNS);
                     setStyleOnEmptyCells(cellListParameter, currentRowData, INFO_SPDX_START_COLUMN, INFO_SPDX_COLUMNS);
                 }
-            } else {
-                createDataCellsInRow(currentRow, GENERAL_START_COLUMN, cellStyle, 1);
-                createDataCellsInRow(currentRow, DEVELOPERS_START_COLUMN, cellStyle, DEVELOPERS_COLUMNS);
-                createDataCellsInRow(currentRow, MISC_START_COLUMN, cellStyle, MISC_COLUMNS);
             }
 
             final int downloadColumn = getDownloadColumn(hasExtendedInfo);
@@ -717,6 +738,16 @@ public class CalcFileWriter {
         }
 
         autosizeColumns(table, hasExtendedInfo, currentRowIndex);
+    }
+
+    /**
+     * Lock row height, so extra large content doesn't inflate it.
+     *
+     * @param row Row to fix height for.
+     */
+    private static void fixRowHeight(OdfTableRow row) {
+        row.setUseOptimalHeight(false);
+        row.setHeight(6, true);
     }
 
     /**
@@ -811,6 +842,16 @@ public class CalcFileWriter {
         }
     }
 
+    /**
+     * Autosizes the columns in the given ranges, based on the maximum string length of the cells in each column.
+     *
+     * <p>The width is calculated by the cell content because <code>OdfTableColumn.setUseOptimalWidth(true)</code>
+     * is ignored by LibreOffice Calc.
+     *
+     * @param sheet Sheet.
+     * @param rows Rows to autosize.
+     * @param ranges Ranges of columns to autosize.
+     */
     @SafeVarargs
     private static void autosizeColumns(OdfTable sheet, int rows, Pair<Integer, Integer>... ranges) {
         for (Pair<Integer, Integer> range : ranges) {
@@ -875,6 +916,7 @@ public class CalcFileWriter {
                 OdfTableRow row = cellListParameter.getRows().get(index);
                 if (row == null) {
                     row = cellListParameter.getSheet().appendRow();
+                    fixRowHeight(row);
                     cellListParameter.getRows().put(index, row);
                     if (cellListParameter.getCellStyle() != null) {
                         // Style all empty left cells, in the columns left from this
@@ -909,7 +951,9 @@ public class CalcFileWriter {
 
     /**
      * If no cells are set, color at least the background,
-     * to color concatenated blocks with the same background color.
+     * to color concatenated blocks with the same background color.<br>
+     * Also, it stops the exporter from copying the style of the previous row,
+     * if the current row has no cells set.
      *
      * @param cellListParameter Passes data about sheet, row, cell style.
      * @param currentRowData    Passes data about the current indices for rows and columns.
@@ -930,6 +974,7 @@ public class CalcFileWriter {
             if (row == null) {
                 LOG.warn("Create row {} for empty cells, because it doesn't exist yet.", rowIndex);
                 row = cellListParameter.getSheet().appendRow();
+                fixRowHeight(row);
                 cellListParameter.getRows().put(rowIndex, row);
             }
             for (int i = 0; i < columnsToFill; i++) {
@@ -1022,26 +1067,6 @@ public class CalcFileWriter {
             result[i] = cell;
         }
         return result;
-    }
-
-    /**
-     * Fills cells with empty strings, so they get created and don't copy the previous rows content and <b>style</b>,
-     * like the header's background color and bold border.
-     *
-     * @param row         Row.
-     * @param startColumn Starting column (inclusive).
-     * @param cellStyle   Cell style.
-     * @param count       Number of columns to set.
-     */
-    private static void createDataCellsInRow(OdfTableRow row, int startColumn, OdfStyle cellStyle, int count) {
-        for (int i = 0; i < count; i++) {
-            OdfTableCell cell = row.getCellByIndex(startColumn + i);
-            cell.setValueType(VALUE_TYPE_STRING);
-            if (cellStyle != null) {
-                cell.getOdfElement().setStyleName(getCellStyleName(cellStyle));
-            }
-            cell.setStringValue("");
-        }
     }
 
     private static String getCellStyleName(OdfStyle cellStyle) {
