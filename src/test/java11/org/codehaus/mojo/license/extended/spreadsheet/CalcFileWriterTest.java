@@ -39,9 +39,13 @@ import org.odftoolkit.odfdom.doc.OdfSpreadsheetDocument;
 import org.odftoolkit.odfdom.doc.table.OdfTable;
 import org.odftoolkit.odfdom.doc.table.OdfTableCell;
 import org.odftoolkit.odfdom.dom.element.style.StyleTextPropertiesElement;
+import org.odftoolkit.odfdom.dom.element.table.TableTableColumnGroupElement;
+import org.odftoolkit.odfdom.dom.element.table.TableTableElement;
 import org.odftoolkit.odfdom.dom.style.OdfStyleFamily;
 import org.odftoolkit.odfdom.incubator.doc.style.OdfStyle;
+import org.odftoolkit.odfdom.pkg.OdfElement;
 import org.odftoolkit.odfdom.type.Color;
+import org.w3c.dom.Node;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -76,6 +80,22 @@ class CalcFileWriterTest {
         assertNull(colorOf(file, UNCLASSIFIED), UNCLASSIFIED + " is highlighted although it should not be");
     }
 
+    @Test
+    void writesNestedColumnGroupsForMergedHeaders() throws Exception {
+        final File file = write(
+                "grouped-headers", formatting(false), Collections.singletonList(dependencyWithExtendedInfo("grouped")));
+
+        try (OdfSpreadsheetDocument document = OdfSpreadsheetDocument.loadDocument(file)) {
+            final TableTableElement tableElement =
+                    document.getTableList(false).get(0).getOdfElement();
+            final List<TableTableColumnGroupElement> topLevelGroups = directColumnGroups(tableElement);
+
+            assertEquals(2, topLevelGroups.size());
+            assertEquals(4, directColumnGroups(topLevelGroups.get(0)).size());
+            assertEquals(4, directColumnGroups(topLevelGroups.get(1)).size());
+        }
+    }
+
     private static SpreadsheetFormatting formatting(boolean highlightUnknownLicenses) {
         return new SpreadsheetFormatting(
                 new LicenseClassifier(Collections.singletonList(FORBIDDEN), null, Collections.singletonList(OK)),
@@ -87,7 +107,12 @@ class CalcFileWriterTest {
     private File write(String name, SpreadsheetFormatting formatting) {
         final List<ProjectLicenseInfo> dependencies = Arrays.asList(
                 dependency("forbidden", FORBIDDEN), dependency("ok", OK), dependency("unclassified", UNCLASSIFIED));
+        return write(name, formatting, dependencies);
+    }
+
+    private File write(String name, SpreadsheetFormatting formatting, List<ProjectLicenseInfo> dependencies) {
         final File file = new File(tempDir, "licenses-" + name + ".ods");
+        System.out.println("Writing licenses to " + file.getAbsolutePath());
         assertDoesNotThrow(
                 () -> CalcFileWriter.write(dependencies, file, formatting),
                 String.format("JRE version %d.", JRE.currentJre().version()));
@@ -97,6 +122,15 @@ class CalcFileWriterTest {
     private static ProjectLicenseInfo dependency(String artifactId, String licenseName) {
         final ProjectLicenseInfo info = new ProjectLicenseInfo("org.test", artifactId, "1.0", (ExtendedInfo) null);
         info.addLicense(new ProjectLicense(licenseName, null, null, null, null));
+        return info;
+    }
+
+    private static ProjectLicenseInfo dependencyWithExtendedInfo(String artifactId) {
+        final ExtendedInfo extendedInfo = new ExtendedInfo();
+        extendedInfo.setName("Dependency with extended info");
+        extendedInfo.setDevelopers(Collections.emptyList());
+        final ProjectLicenseInfo info = new ProjectLicenseInfo("org.test", artifactId, "1.0", extendedInfo);
+        info.addLicense(new ProjectLicense(OK, null, null, null, null));
         return info;
     }
 
@@ -136,5 +170,15 @@ class CalcFileWriterTest {
 
     private static String hex(int[] color) {
         return new Color(color[0], color[1], color[2]).toString();
+    }
+
+    private static List<TableTableColumnGroupElement> directColumnGroups(OdfElement parent) {
+        final List<TableTableColumnGroupElement> groups = new java.util.ArrayList<>();
+        for (Node child = parent.getFirstChild(); child != null; child = child.getNextSibling()) {
+            if (child instanceof TableTableColumnGroupElement) {
+                groups.add((TableTableColumnGroupElement) child);
+            }
+        }
+        return groups;
     }
 }

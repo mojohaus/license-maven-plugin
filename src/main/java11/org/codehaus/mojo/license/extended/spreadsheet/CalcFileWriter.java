@@ -8,7 +8,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Deque;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
@@ -28,6 +31,7 @@ import org.codehaus.mojo.license.download.ProjectLicense;
 import org.codehaus.mojo.license.download.ProjectLicenseInfo;
 import org.codehaus.mojo.license.extended.ExtendedInfo;
 import org.codehaus.mojo.license.extended.InfoFile;
+import org.jspecify.annotations.NonNull;
 import org.odftoolkit.odfdom.doc.OdfSpreadsheetDocument;
 import org.odftoolkit.odfdom.doc.table.OdfTable;
 import org.odftoolkit.odfdom.doc.table.OdfTableCell;
@@ -41,6 +45,9 @@ import org.odftoolkit.odfdom.dom.element.config.ConfigConfigItemMapEntryElement;
 import org.odftoolkit.odfdom.dom.element.style.StyleParagraphPropertiesElement;
 import org.odftoolkit.odfdom.dom.element.style.StyleTableCellPropertiesElement;
 import org.odftoolkit.odfdom.dom.element.style.StyleTextPropertiesElement;
+import org.odftoolkit.odfdom.dom.element.table.TableTableColumnElement;
+import org.odftoolkit.odfdom.dom.element.table.TableTableColumnGroupElement;
+import org.odftoolkit.odfdom.dom.element.table.TableTableElement;
 import org.odftoolkit.odfdom.dom.element.text.TextAElement;
 import org.odftoolkit.odfdom.dom.style.OdfStyleFamily;
 import org.odftoolkit.odfdom.dom.style.props.OdfTableColumnProperties;
@@ -95,6 +102,8 @@ import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.get
  */
 public class CalcFileWriter {
     private static final Logger LOG = LoggerFactory.getLogger(CalcFileWriter.class);
+    /** Custom attribute name to store pending column groups, before they are added to the table. */
+    private static final String PENDING_COLUMN_GROUPS_KEY = CalcFileWriter.class.getName() + ".pendingColumnGroups";
 
     private static final String HEADER_CELL_STYLE = "headerCellStyle";
     private static final String HYPERLINK_NORMAL_STYLE = "hyperlinkNormalStyle";
@@ -156,11 +165,12 @@ public class CalcFileWriter {
             createHeader(projectLicenseInfos, spreadsheet, table);
 
             writeData(
-                projectLicenseInfos,
-                spreadsheet,
-                table,
-                convertToOdfColor(SpreadsheetUtil.ALTERNATING_ROWS_COLOR),
-                formatting);
+                    projectLicenseInfos,
+                    spreadsheet,
+                    table,
+                    convertToOdfColor(SpreadsheetUtil.ALTERNATING_ROWS_COLOR),
+                    formatting);
+            applyPendingColumnGroups(table);
 
             try (OutputStream fileOut = Files.newOutputStream(licensesCalcOutputFile.toPath())) {
                 spreadsheet.save(fileOut);
@@ -1111,13 +1121,123 @@ public class CalcFileWriter {
         if (merge) {
             OdfTableCellRange cellRange = table.getCellRangeByPosition(startColumn, rowIndex, endColumn - 1, rowIndex);
             cellRange.merge();
+            addColumnGroup(table, startColumn, endColumn);
         }
 
         // Set value and style only after merge
         cell.setStringValue(cellValue);
         cell.getOdfElement().setStyleName(styleName);
+    }
 
-        // TODO: Add grouping, with a hierarchy, after ODFToolkit offers it.
+    private static void addColumnGroup(OdfTable table, int startColumn, int endColumn) {
+        if (endColumn - startColumn < 2) {
+            return;
+        }
+        getPendingColumnGroups(table).add(new ColumnGroup(startColumn, endColumn));
+    }
+
+    @SuppressWarnings("unchecked")
+    private static List<ColumnGroup> getPendingColumnGroups(OdfTable table) {
+        TableTableElement tableElement = table.getOdfElement();
+        List<ColumnGroup> groups = (List<ColumnGroup>) tableElement.getUserData(PENDING_COLUMN_GROUPS_KEY);
+        if (groups == null) {
+            groups = new ArrayList<>();
+            tableElement.setUserData(PENDING_COLUMN_GROUPS_KEY, groups, null);
+        }
+        return groups;
+    }
+
+    private static void applyPendingColumnGroups(OdfTable table) {
+        TableTableElement tableElement = table.getOdfElement();
+        List<ColumnGroup> groups = getPendingColumnGroups(table);
+        if (groups.isEmpty()) {
+            return;
+        }
+
+        int columnCount = table.getColumnCount();
+        for (int i = 0; i < columnCount; i++) {
+            // Auto-Extend the number of columns, so no columns are missing.
+            table.getColumnByIndex(i);
+        }
+
+        List<TableTableColumnElement> columnElements = getDirectColumnElements(tableElement);
+        if (columnElements.isEmpty()) {
+            tableElement.setUserData(PENDING_COLUMN_GROUPS_KEY, null, null);
+            return;
+        }
+
+        ColumnGroup rootGroup = buildColumnGroupTree(columnElements.size(), groups);
+        Node firstNonColumnNode = tableElement.getFirstChild();
+        while (firstNonColumnNode instanceof TableTableColumnElement) {
+            firstNonColumnNode = firstNonColumnNode.getNextSibling();
+        }
+
+        for (TableTableColumnElement columnElement : columnElements) {
+            tableElement.removeChild(columnElement);
+        }
+
+        Node rootFragment = tableElement.getOwnerDocument().createDocumentFragment();
+        appendColumns(rootFragment, tableElement, columnElements, rootGroup);
+        if (firstNonColumnNode == null) {
+            tableElement.appendChild(rootFragment);
+        } else {
+            tableElement.insertBefore(rootFragment, firstNonColumnNode);
+        }
+        tableElement.setUserData(PENDING_COLUMN_GROUPS_KEY, null, null);
+    }
+
+    private static List<TableTableColumnElement> getDirectColumnElements(TableTableElement tableElement) {
+        List<TableTableColumnElement> columnElements = new ArrayList<>();
+        for (Node child = tableElement.getFirstChild(); child != null; child = child.getNextSibling()) {
+            if (child instanceof TableTableColumnElement) {
+                columnElements.add((TableTableColumnElement) child);
+            }
+        }
+        return columnElements;
+    }
+
+    private static ColumnGroup buildColumnGroupTree(int columnCount, List<ColumnGroup> groups) {
+        List<ColumnGroup> sortedGroups = new ArrayList<>(groups);
+        sortedGroups.sort(Comparator.comparingInt((ColumnGroup columnGroup) -> columnGroup.startColumn));
+
+        ColumnGroup rootGroup = new ColumnGroup(0, columnCount);
+        Deque<ColumnGroup> stack = new ArrayDeque<>();
+        stack.push(rootGroup);
+        for (ColumnGroup group : sortedGroups) {
+            ColumnGroup parentGroup = stack.peek();
+            while (parentGroup != null && group.startColumn >= parentGroup.endColumn) {
+                stack.pop();
+                parentGroup = stack.peek();
+            }
+            if (parentGroup == null
+                    || group.startColumn < parentGroup.startColumn
+                    || group.endColumn > parentGroup.endColumn) {
+                throw new IllegalArgumentException("Column groups must be properly nested without crossings.");
+            }
+            parentGroup.nestedGroups.add(group);
+            stack.push(group);
+        }
+        return rootGroup;
+    }
+
+    private static void appendColumns(
+            Node parentNode,
+            TableTableElement tableElement,
+            List<TableTableColumnElement> columnElements,
+            @NonNull ColumnGroup group) {
+        int columnIndex = group.startColumn;
+        for (ColumnGroup nestedGroup : group.nestedGroups) {
+            while (columnIndex < nestedGroup.startColumn) {
+                parentNode.appendChild(columnElements.get(columnIndex++));
+            }
+            TableTableColumnGroupElement groupElement = tableElement.newTableTableColumnGroupElement();
+            appendColumns(groupElement, tableElement, columnElements, nestedGroup);
+            parentNode.appendChild(groupElement);
+            columnIndex = nestedGroup.endColumn;
+        }
+        while (columnIndex < group.endColumn) {
+            parentNode.appendChild(columnElements.get(columnIndex++));
+        }
     }
 
     private static OdfTableCell createCellsInRow(int startColumn, int exclusiveEndColumn, OdfTableRow inRow) {
@@ -1129,6 +1249,20 @@ public class CalcFileWriter {
             }
         }
         return firstCell;
+    }
+
+    private static final class ColumnGroup {
+        /** Inclusive start column index. */
+        private final int startColumn;
+        /** Exclusive end column index, i.e. the first column index that is not part of this group. */
+        private final int endColumn;
+
+        private final List<ColumnGroup> nestedGroups = new ArrayList<>();
+
+        private ColumnGroup(int startColumn, int endColumn) {
+            this.startColumn = startColumn;
+            this.endColumn = endColumn;
+        }
     }
 
     /**
