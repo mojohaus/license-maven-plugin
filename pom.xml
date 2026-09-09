@@ -139,8 +139,6 @@
     <license.failOnMissing>true</license.failOnMissing>
     <license.licenseName>lgpl_v3</license.licenseName>
 
-    <!-- the same version as in Maven core -->
-    <maven-resolver.version>1.4.1</maven-resolver.version>
     <project.build.outputTimestamp>2026-01-05T00:10:21Z</project.build.outputTimestamp>
   </properties>
 
@@ -181,12 +179,6 @@
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-artifact</artifactId>
       <version>${mavenVersion}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.resolver</groupId>
-      <artifactId>maven-resolver-api</artifactId>
-      <version>${maven-resolver.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
