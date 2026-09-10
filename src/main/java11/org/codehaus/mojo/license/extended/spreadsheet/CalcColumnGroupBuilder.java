@@ -22,7 +22,7 @@ class CalcColumnGroupBuilder {
     private CalcColumnGroupBuilder() {}
 
     /**
-     * Custom attribute name to store pending column groups, before they are added to the table.
+     * Custom attribute name to store pending column groups, before they are applied to the table.
      */
     private static final String PENDING_COLUMN_GROUPS_KEY = CalcFileWriter.class.getName() + ".pendingColumnGroups";
 
@@ -41,6 +41,12 @@ class CalcColumnGroupBuilder {
         getPendingColumnGroups(table).add(new ColumnGroup(startColumn, endColumn));
     }
 
+    /**
+     * Returns the list of pending column groups for the given table, creating it if absent.
+     *
+     * @param table the table whose pending column groups should be retrieved.
+     * @return the mutable list of pending {@link ColumnGroup}s attached to the table.
+     */
     @SuppressWarnings("unchecked")
     private static List<ColumnGroup> getPendingColumnGroups(OdfTable table) {
         TableTableElement tableElement = table.getOdfElement();
@@ -52,6 +58,16 @@ class CalcColumnGroupBuilder {
         return groups;
     }
 
+    /**
+     * Applies all pending column groups to the table, restructuring the flat column sequence into a nested
+     * {@code table:table-column-group} hierarchy.
+     * <p>
+     * Column groups previously registered via {@link #addColumnGroup(OdfTable, int, int)} are collected, sorted, and
+     * inserted into the table's XML structure. This method must be called after all rows and {@link ColumnGroup}s have
+     * been added to the table.
+     *
+     * @param table the table to apply the pending column groups to.
+     */
     static void applyPendingColumnGroups(OdfTable table) {
         TableTableElement tableElement = table.getOdfElement();
         List<ColumnGroup> groups = getPendingColumnGroups(table);
@@ -85,17 +101,36 @@ class CalcColumnGroupBuilder {
             tableElement.removeChild(columnElement);
         }
 
+        /* Build a document fragment that contains the regrouped column structure.
+        This lets us replace the flat sequence of <table:table-column> nodes
+        with the nested <table:table-column-group> hierarchy in one atomic insert. */
         Node rootFragment = tableElement.getOwnerDocument().createDocumentFragment();
         appendColumns(rootFragment, tableElement, columnElements, rootGroup);
+
         if (firstNonColumnNode == null) {
+            /* No non-column nodes were found, so this is the end of the table definition.
+            Append the rebuilt column structure at the end of the table element. */
             tableElement.appendChild(rootFragment);
         } else {
+            /* Insert the regrouped columns before the first non-column node, preserving
+            the ordering of any following table content/metadata. */
             tableElement.insertBefore(rootFragment, firstNonColumnNode);
         }
         // There is no explicit "remove" method for the userData, just setting it to null does that.
         tableElement.setUserData(PENDING_COLUMN_GROUPS_KEY, null, null);
     }
 
+    /**
+     * Returns the direct table-column elements in document order.
+     * <p>
+     * This inspects only the immediate children of the table definition and ignores
+     * any nested column-group nodes or other table content so the flat column list
+     * can be regrouped consistently.
+     *
+     * @param tableElement the table definition whose direct column elements should be read.
+     * @return the direct {@code table:table-column} elements in the order they appear
+     * in the document.
+     */
     private static @NonNull List<TableTableColumnElement> getDirectColumnElements(
             @NonNull TableTableElement tableElement) {
         List<TableTableColumnElement> columnElements = new ArrayList<>();
@@ -107,6 +142,18 @@ class CalcColumnGroupBuilder {
         return columnElements;
     }
 
+    /**
+     * Builds a nested tree of {@link ColumnGroup}s from a flat list of groups.
+     * <p>
+     * The groups are sorted by start column and then by end (outermost first),
+     * and are attached to their enclosing parent via a virtual root group that
+     * spans all columns.
+     *
+     * @param columnCount total number of columns in the table.
+     * @param groups      flat list of column groups to nest; must be properly nested without crossings.
+     * @return the virtual root {@link ColumnGroup} whose {@code nestedGroups} contain the full tree.
+     * @throws IllegalArgumentException if two groups cross without one fully containing the other.
+     */
     private static @NonNull ColumnGroup buildColumnGroupTree(int columnCount, @NonNull List<ColumnGroup> groups) {
         List<ColumnGroup> sortedGroups = new ArrayList<>(groups);
         // Sort by start column, and for equal starts put outer groups before inner groups.
@@ -146,6 +193,17 @@ class CalcColumnGroupBuilder {
         return rootGroup;
     }
 
+    /**
+     * Appends the column structure for the given group to the target node.
+     * <p>
+     * Plain columns are emitted in document order, and nested groups are wrapped
+     * in {@code table:table-column-group} elements recursively.
+     *
+     * @param parentNode the node that will receive the appended column structure.
+     * @param tableElement the table used to create new column-group elements.
+     * @param columnElements the flat list of column elements in document order.
+     * @param group the column group to append.
+     */
     private static void appendColumns(
             Node parentNode,
             TableTableElement tableElement,
@@ -169,6 +227,22 @@ class CalcColumnGroupBuilder {
         }
     }
 
+    /**
+     * Creates the cells for the given column range in the target row and merges them when the range spans
+     * more than one column.
+     * <p>
+     * When a merge happens, the corresponding pending column group is also registered so Calc can expose
+     * that range as a hideable column group once
+     * {@link #applyPendingColumnGroups(OdfTable)} runs.
+     *
+     * @param table the table containing the row and merged cell range.
+     * @param startColumn inclusive start column index.
+     * @param endColumn exclusive end column index.
+     * @param row the row in which the cells should be merged.
+     * @param cellValue the string value to assign to the leading cell.
+     * @param rowIndex the row index used to address the merge range in the table.
+     * @param styleName the style name to apply to the leading cell after merging.
+     */
     static void createMergedCellsInRow(
             OdfTable table,
             int startColumn,
@@ -208,6 +282,9 @@ class CalcColumnGroupBuilder {
         return firstCell;
     }
 
+    /**
+     * Stores nested column group ranges, to be later applied to the table.
+     */
     private static final class ColumnGroup {
         /**
          * Inclusive start column index.

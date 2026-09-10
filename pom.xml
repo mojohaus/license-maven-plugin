@@ -577,6 +577,12 @@
           <artifactId>odfdom-java</artifactId>
           <version>${version.odfdom-java}</version>
         </dependency>
+        <!-- For parameterized tests -->
+        <dependency>
+          <groupId>org.junit.jupiter</groupId>
+          <artifactId>junit-jupiter-params</artifactId>
+          <scope>test</scope>
+        </dependency>
       </dependencies>
 
       <build>
