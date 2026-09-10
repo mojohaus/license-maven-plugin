@@ -23,9 +23,11 @@ package org.codehaus.mojo.license.extended.spreadsheet;
  */
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.codehaus.mojo.license.download.LicenseClassifier;
 import org.codehaus.mojo.license.download.ProjectLicense;
@@ -35,6 +37,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledForJreRange;
 import org.junit.jupiter.api.condition.JRE;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.odftoolkit.odfdom.doc.OdfSpreadsheetDocument;
 import org.odftoolkit.odfdom.doc.table.OdfTable;
 import org.odftoolkit.odfdom.doc.table.OdfTableCell;
@@ -52,7 +56,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-/** The Calc writer only exists on Java 11 and later; on Java 8 the class on the classpath is a stub. */
+/**
+ * The Calc writer only exists on Java 11 and later; on Java 8 the class on the classpath is a stub.
+ */
 @EnabledForJreRange(min = JRE.JAVA_11)
 class CalcFileWriterTest {
 
@@ -80,19 +86,31 @@ class CalcFileWriterTest {
         assertNull(colorOf(file, UNCLASSIFIED), UNCLASSIFIED + " is highlighted although it should not be");
     }
 
-    @Test
-    void writesNestedColumnGroupsForMergedHeaders() throws Exception {
+    static Stream<GroupingParameters> licenseInfoProvider() {
+        return java.util.stream.Stream.of(
+                // Without extended info there should be 1 main group with 4 subgroups.
+                new GroupingParameters(dependency("forbidden", FORBIDDEN), 1, 4),
+                // With extended info there should be 2 main groups, both with 4 subgroups.
+                new GroupingParameters(dependencyWithExtendedInfo("grouped"), 2, 4, 4));
+    }
+
+    @ParameterizedTest
+    @MethodSource("licenseInfoProvider")
+    void writesNestedColumnGroupsForMergedHeaders(GroupingParameters groupingParameters) throws Exception {
         final File file = write(
-                "grouped-headers", formatting(false), Collections.singletonList(dependencyWithExtendedInfo("grouped")));
+                "grouped-headers", formatting(false), Collections.singletonList(groupingParameters.projectLicenseInfo));
 
         try (OdfSpreadsheetDocument document = OdfSpreadsheetDocument.loadDocument(file)) {
             final TableTableElement tableElement =
                     document.getTableList(false).get(0).getOdfElement();
             final List<TableTableColumnGroupElement> topLevelGroups = directColumnGroups(tableElement);
 
-            assertEquals(2, topLevelGroups.size());
-            assertEquals(4, directColumnGroups(topLevelGroups.get(0)).size());
-            assertEquals(4, directColumnGroups(topLevelGroups.get(1)).size());
+            assertEquals(groupingParameters.topSize, topLevelGroups.size());
+            for (int i = 0; i < groupingParameters.topSize; i++) {
+                assertEquals(
+                        (int) groupingParameters.subSizes.get(i),
+                        directColumnGroups(topLevelGroups.get(i)).size());
+            }
         }
     }
 
@@ -173,12 +191,25 @@ class CalcFileWriterTest {
     }
 
     private static List<TableTableColumnGroupElement> directColumnGroups(OdfElement parent) {
-        final List<TableTableColumnGroupElement> groups = new java.util.ArrayList<>();
+        final List<TableTableColumnGroupElement> groups = new ArrayList<>();
         for (Node child = parent.getFirstChild(); child != null; child = child.getNextSibling()) {
             if (child instanceof TableTableColumnGroupElement) {
                 groups.add((TableTableColumnGroupElement) child);
             }
         }
         return groups;
+    }
+
+    /** Parameters for a test of the nested column group writer. */
+    private static class GroupingParameters {
+        final ProjectLicenseInfo projectLicenseInfo;
+        final int topSize;
+        final List<Integer> subSizes;
+
+        public GroupingParameters(ProjectLicenseInfo forbidden, int topSize, Integer... subSizes) {
+            this.projectLicenseInfo = forbidden;
+            this.topSize = topSize;
+            this.subSizes = List.of(subSizes);
+        }
     }
 }
