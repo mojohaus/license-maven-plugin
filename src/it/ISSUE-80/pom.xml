@@ -76,6 +76,16 @@
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>license-maven-plugin</artifactId>
           <version>@project.version@</version>
+          <configuration>
+            <!-- repository.jboss.org is a flaky, unmaintained HTTP-only host; stub it via WireMock
+                 (started in prebuild.groovy) instead of depending on it being reachable in CI -->
+            <licenseUrlReplacements>
+              <licenseUrlReplacement>
+                <regexp>^http://repository\.jboss\.org/(.*)$</regexp>
+                <replacement>http://localhost:18081/$1</replacement>
+              </licenseUrlReplacement>
+            </licenseUrlReplacements>
+          </configuration>
         </plugin>
       </plugins>
     </pluginManagement>
