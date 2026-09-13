@@ -569,10 +569,18 @@
           <artifactId>odfdom-java</artifactId>
           <version>${version.odfdom-java}</version>
         </dependency>
+        <!-- ========== Begin of test dependencies ========== -->
         <!-- For parameterized tests -->
         <dependency>
           <groupId>org.junit.jupiter</groupId>
           <artifactId>junit-jupiter-params</artifactId>
+          <scope>test</scope>
+        </dependency>
+        <!-- Log during tests for test-driven-development. -->
+        <dependency>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-simple</artifactId>
+          <version>1.7.36</version>
           <scope>test</scope>
         </dependency>
       </dependencies>
