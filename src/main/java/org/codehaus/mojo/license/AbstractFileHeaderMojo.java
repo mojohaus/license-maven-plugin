@@ -100,7 +100,8 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo {
     private String sectionDelimiter;
 
     /**
-     * To specify a line separator to use.
+     * To specify a line separator to use. Providing "LF" and "CRLF" will instead use the characters "\n" and "\r\n",
+     * respectively.
      *
      * If not set, will use system property {@code line.separator}.
      */
@@ -403,6 +404,20 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo {
      */
     protected abstract boolean isFailOnNotUptodateHeader();
 
+    /**
+     * Converts line ending string, like LF or CRLF, to proper line separator character.
+     *
+     * @param lineSeparator Line separator that may be converted.
+     */
+    public void setLineSeparator(String lineSeparator) {
+        try {
+            this.lineSeparator = Eol.valueOf(lineSeparator).getEolString();
+        } catch (IllegalArgumentException e) {
+            LOG.warn("Unable to parse lineSeparator '{}', using it as-is.", lineSeparator);
+            this.lineSeparator = lineSeparator;
+        }
+    }
+
     // ----------------------------------------------------------------------
     // AbstractLicenseMojo Implementaton
     // ----------------------------------------------------------------------
@@ -472,6 +487,15 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo {
         sectionDelimiter = cleanHeaderConfiguration(sectionDelimiter, FileHeaderTransformer.DEFAULT_SECTION_DELIMITER);
         if (isVerbose()) {
             LOG.info("Will use sectionDelimiter: {}", sectionDelimiter);
+        }
+        if (isVerbose()) {
+            String verboseLineSeparator;
+            try {
+                verboseLineSeparator = Eol.from(lineSeparator).name();
+            } catch (IllegalArgumentException e) {
+                verboseLineSeparator = lineSeparator;
+            }
+            LOG.info("Will use lineSeparator: {}", verboseLineSeparator);
         }
 
         // add default extensions from header transformers
