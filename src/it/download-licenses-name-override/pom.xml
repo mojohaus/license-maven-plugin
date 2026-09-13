@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.codehaus.mojo.license</groupId>
+  <artifactId>it-download-licenses-name-override</artifactId>
+  <version>1.0</version>
+  <name>Integration Test - download-licenses with licenseNameUrlOverrides</name>
+
+  <properties>
+    <project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
+  </properties>
+
+  <dependencies>
+    <!-- Declares "Eclipse Public License 1.0" with URL http://www.eclipse.org/legal/epl-v10.html -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.13.2</version>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <!-- Declares "The Apache Software License, Version 2.0" with URL http://www.apache.org/licenses/LICENSE-2.0.txt -->
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <version>1.3.6</version>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>@project.version@</version>
+        <executions>
+
+          <!-- Both dependencies have license URLs in their POMs; the overrides replace them with local files -->
+          <execution>
+            <id>override-urls</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>download-licenses</goal>
+            </goals>
+            <configuration>
+              <licensesOutputDirectory>${project.build.directory}/licenses</licensesOutputDirectory>
+              <licensesOutputFile>${project.build.directory}/licenses.xml</licensesOutputFile>
+              <sortByGroupIdAndArtifactId>true</sortByGroupIdAndArtifactId>
+              <excludeTransitiveDependencies>true</excludeTransitiveDependencies>
+              <licenseNameUrlOverridesFile>${project.basedir}/src/license/license-name-url-overrides.xml</licenseNameUrlOverridesFile>
+            </configuration>
+          </execution>
+
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>
