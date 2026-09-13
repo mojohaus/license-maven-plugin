@@ -49,18 +49,27 @@ import org.odftoolkit.odfdom.dom.style.OdfStyleFamily;
 import org.odftoolkit.odfdom.incubator.doc.style.OdfStyle;
 import org.odftoolkit.odfdom.pkg.OdfElement;
 import org.odftoolkit.odfdom.type.Color;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 
+import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.GENERAL_START_COLUMN;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * The Calc writer only exists on Java 11 and later; on Java 8 the class on the classpath is a stub.
  */
 @EnabledForJreRange(min = JRE.JAVA_11)
 class CalcFileWriterTest {
+    /**
+     * Run the following to see the debug output of the CalcFileWriter:<pre>
+     * mvn test -Dtest=CalcFileWriterTest -Dorg.slf4j.simpleLogger.log.org.codehaus.mojo.license.extended.spreadsheet=DEBUG</pre>
+     */
+    private static final Logger LOG = LoggerFactory.getLogger(CalcFileWriterTest.class);
 
     private static final String FORBIDDEN = "GPL 3.0";
     private static final String OK = "Apache License, Version 2.0";
@@ -86,32 +95,141 @@ class CalcFileWriterTest {
         assertNull(colorOf(file, UNCLASSIFIED), UNCLASSIFIED + " is highlighted although it should not be");
     }
 
-    static Stream<GroupingParameters> licenseInfoProvider() {
+    static Stream<GroupingExpectation> groupingExpectations() {
         return java.util.stream.Stream.of(
                 // Without extended info there should be 1 main group with 4 subgroups.
-                new GroupingParameters(dependency("forbidden", FORBIDDEN), 1, 4),
+                new GroupingExpectation(
+                        dependency("forbidden", FORBIDDEN),
+                        List.of(
+                                List.of(new RowEntry(
+                                        GENERAL_START_COLUMN, SpreadsheetUtil.MAVEN_END_COLUMN, "Maven information")),
+                                List.of(
+                                        new RowEntry(
+                                                GENERAL_START_COLUMN, SpreadsheetUtil.GENERAL_END_COLUMN, "General"),
+                                        new RowEntry(
+                                                SpreadsheetUtil.PLUGIN_ID_START_COLUMN,
+                                                SpreadsheetUtil.PLUGIN_ID_END_COLUMN,
+                                                "Plugin ID"),
+                                        new RowEntry(
+                                                SpreadsheetUtil.LICENSES_START_COLUMN,
+                                                SpreadsheetUtil.LICENSES_END_COLUMN,
+                                                "Licenses"),
+                                        new RowEntry(
+                                                SpreadsheetUtil.DEVELOPERS_START_COLUMN,
+                                                SpreadsheetUtil.DEVELOPERS_END_COLUMN,
+                                                "Developers"),
+                                        new RowEntry(
+                                                SpreadsheetUtil.MISC_START_COLUMN,
+                                                SpreadsheetUtil.MISC_END_COLUMN,
+                                                "Miscellaneous"))),
+                        1,
+                        4),
                 // With extended info there should be 2 main groups, both with 4 subgroups.
-                new GroupingParameters(dependencyWithExtendedInfo("grouped"), 2, 4, 4));
+                new GroupingExpectation(
+                        dependencyWithExtendedInfo("grouped"),
+                        List.of(
+                                List.of(
+                                        new RowEntry(0, SpreadsheetUtil.MAVEN_END_COLUMN, "Maven information"),
+                                        new RowEntry(
+                                                SpreadsheetUtil.EXTENDED_INFO_START_COLUMN,
+                                                SpreadsheetUtil.EXTENDED_INFO_END_COLUMN,
+                                                "JAR Content")),
+                                List.of(
+                                        new RowEntry(
+                                                GENERAL_START_COLUMN, SpreadsheetUtil.GENERAL_END_COLUMN, "General"),
+                                        new RowEntry(
+                                                SpreadsheetUtil.PLUGIN_ID_START_COLUMN,
+                                                SpreadsheetUtil.PLUGIN_ID_END_COLUMN,
+                                                "Plugin ID"),
+                                        new RowEntry(
+                                                SpreadsheetUtil.LICENSES_START_COLUMN,
+                                                SpreadsheetUtil.LICENSES_END_COLUMN,
+                                                "Licenses"),
+                                        new RowEntry(
+                                                SpreadsheetUtil.DEVELOPERS_START_COLUMN,
+                                                SpreadsheetUtil.DEVELOPERS_END_COLUMN,
+                                                "Developers"),
+                                        new RowEntry(
+                                                SpreadsheetUtil.MISC_START_COLUMN,
+                                                SpreadsheetUtil.MISC_END_COLUMN,
+                                                "Miscellaneous"),
+                                        new RowEntry(
+                                                SpreadsheetUtil.MANIFEST_START_COLUMN,
+                                                SpreadsheetUtil.MANIFEST_END_COLUMN,
+                                                "MANIFEST.MF"),
+                                        new RowEntry(
+                                                SpreadsheetUtil.INFO_NOTICES_START_COLUMN,
+                                                SpreadsheetUtil.INFO_NOTICES_END_COLUMN,
+                                                "Notices text files"),
+                                        new RowEntry(
+                                                SpreadsheetUtil.INFO_LICENSES_START_COLUMN,
+                                                SpreadsheetUtil.INFO_LICENSES_END_COLUMN,
+                                                "License text files"),
+                                        new RowEntry(
+                                                SpreadsheetUtil.INFO_SPDX_START_COLUMN,
+                                                SpreadsheetUtil.INFO_SPDX_END_COLUMN,
+                                                "SPDX license id matched"))),
+                        2,
+                        4,
+                        4));
     }
 
     @ParameterizedTest
-    @MethodSource("licenseInfoProvider")
-    void writesNestedColumnGroupsForMergedHeaders(GroupingParameters groupingParameters) throws Exception {
+    @MethodSource("groupingExpectations")
+    void writesNestedColumnGroupsForMergedHeaders(GroupingExpectation groupingExpectation) throws Exception {
         final File file = write(
-                "grouped-headers", formatting(false), Collections.singletonList(groupingParameters.projectLicenseInfo));
+                "grouped-headers",
+                formatting(false),
+                Collections.singletonList(groupingExpectation.projectLicenseInfo));
 
         try (OdfSpreadsheetDocument document = OdfSpreadsheetDocument.loadDocument(file)) {
-            final TableTableElement tableElement =
-                    document.getTableList(false).get(0).getOdfElement();
+            OdfTable table = document.getTableList(false).get(0);
+            final TableTableElement tableElement = table.getOdfElement();
             final List<TableTableColumnGroupElement> topLevelGroups = directColumnGroups(tableElement);
 
-            assertEquals(groupingParameters.topSize, topLevelGroups.size());
-            for (int i = 0; i < groupingParameters.topSize; i++) {
+            assertEquals(groupingExpectation.topSize, topLevelGroups.size());
+            for (int i = 0; i < groupingExpectation.topSize; i++) {
                 assertEquals(
-                        (int) groupingParameters.subSizes.get(i),
+                        (int) groupingExpectation.subSizes.get(i),
                         directColumnGroups(topLevelGroups.get(i)).size());
             }
+
+            // Check that the merged headers are written in the right cells.
+            for (int row = 0; row < groupingExpectation.rowEntries.size(); row++) {
+                final List<RowEntry> rowEntries = groupingExpectation.rowEntries.get(row);
+                for (RowEntry rowEntry : rowEntries) {
+                    // Assert beginning of merged cell.
+                    assertTrue(
+                            rowEntry.columnStart < table.getColumnCount(),
+                            String.format(
+                                    "Row entry at row %d has start column %d >= column count %d",
+                                    row, rowEntry.columnStart, table.getColumnCount()));
+                    // Assert content of merged cell.
+                    final OdfTableCell cell = table.getCellByPosition(rowEntry.columnStart, row);
+                    assertEquals(
+                            rowEntry.cellContent,
+                            cell.getStringValue(),
+                            String.format("Wrong content in cell at row %d, column %d.", row, rowEntry.columnStart));
+                    // Assert the cell is merged across the expected number of columns.
+                    assertEquals(
+                            rowEntry.columnEnd - rowEntry.columnStart,
+                            columnSpanOf(cell),
+                            String.format(
+                                    "Cell at row %d, column %d is not merged across the expected number of columns.",
+                                    row, rowEntry.columnStart));
+                }
+            }
         }
+    }
+
+    /**
+     * The number of columns a cell is merged across, or <code>1</code> if it is not merged.
+     */
+    private static int columnSpanOf(OdfTableCell cell) {
+        final String value = cell.getOdfElement()
+                .getAttributeNS("urn:oasis:names:tc:opendocument:xmlns:table:1.0", "number-columns-spanned");
+        LOG.debug("Column span attribute: '{}'", value);
+        return (value == null || value.isEmpty()) ? 1 : Integer.parseInt(value);
     }
 
     private static SpreadsheetFormatting formatting(boolean highlightUnknownLicenses) {
@@ -130,7 +248,8 @@ class CalcFileWriterTest {
 
     private File write(String name, SpreadsheetFormatting formatting, List<ProjectLicenseInfo> dependencies) {
         final File file = new File(tempDir, "licenses-" + name + ".ods");
-        System.out.println("Writing licenses to " + file.getAbsolutePath());
+        // Set breakpoint after log-output and open Calc for manual debugging.
+        LOG.debug("Writing licenses to {}", file.getAbsolutePath());
         assertDoesNotThrow(
                 () -> CalcFileWriter.write(dependencies, file, formatting),
                 String.format("JRE version %d.", JRE.currentJre().version()));
@@ -200,14 +319,32 @@ class CalcFileWriterTest {
         return groups;
     }
 
-    /** Parameters for a test of the nested column group writer. */
-    private static class GroupingParameters {
+    /**
+     * Merged cell entry in a row.
+     */
+    private static class RowEntry {
+        final int columnStart;
+        final int columnEnd;
+        final String cellContent;
+
+        RowEntry(int columnStart, int columnEnd, String cellContent) {
+            this.columnStart = columnStart;
+            this.columnEnd = columnEnd;
+            this.cellContent = cellContent;
+        }
+    }
+
+    /** Expected parameters for a test of the nested column group writer. */
+    private static class GroupingExpectation {
         final ProjectLicenseInfo projectLicenseInfo;
+        final List<List<RowEntry>> rowEntries;
         final int topSize;
         final List<Integer> subSizes;
 
-        public GroupingParameters(ProjectLicenseInfo forbidden, int topSize, Integer... subSizes) {
+        GroupingExpectation(
+                ProjectLicenseInfo forbidden, List<List<RowEntry>> rowEntries, int topSize, Integer... subSizes) {
             this.projectLicenseInfo = forbidden;
+            this.rowEntries = rowEntries;
             this.topSize = topSize;
             this.subSizes = List.of(subSizes);
         }
