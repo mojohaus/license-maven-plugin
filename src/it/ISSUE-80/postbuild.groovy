@@ -20,7 +20,17 @@
  * #L%
  */
 
-file = new File(basedir, 'target/licenses.xml');
-expectedFile = new File(basedir, 'expected_licenses.xml');
-assert expectedFile.text.equals(file.text);
+import com.github.tomakehurst.wiremock.WireMockServer
+
+WireMockServer wireMockServer = context.get("wireMockServer")
+try {
+    file = new File(basedir, 'target/licenses.xml');
+    expectedFile = new File(basedir, 'expected_licenses.xml');
+    assert expectedFile.text.equals(file.text);
+
+    licenseFile = new File(basedir, 'target/generated-resources/licenses/public domain - cc0-1.0.txt');
+    assert licenseFile.text.equals('stub license text for ITs: cc0-1.0.txt');
+} finally {
+    wireMockServer.stop()
+}
 return true;
