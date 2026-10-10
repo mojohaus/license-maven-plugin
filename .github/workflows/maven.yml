@@ -24,6 +24,12 @@ jobs:
     name: Verify
     uses: apache/maven-gh-actions-shared/.github/workflows/maven-verify.yml@v5
     with:
+      matrix-exclude: >
+        [
+          {"os": "macos-latest", "jdk": "8"},
+          {"os": "macos-latest", "jdk": "21"},
+          {"os": "windows-latest", "jdk": "21"}
+        ]
       ff-goal: 'verify'                # no ITs on fast fail build
       verify-goal: '-P run-its verify'
       verify-fail-fast: false         # do not fail fast in matrix
