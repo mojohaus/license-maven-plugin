@@ -11,6 +11,7 @@ updates:
       interval: "monthly"
     groups:
       maven:
+        patterns: ["*"]
         update-types: ["minor", "patch"]
     ignore:
       # wiremock 3 requires Java 11; the integration tests still run on Java 8.
