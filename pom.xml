@@ -124,7 +124,7 @@
 
     <processorVersion>1.4</processorVersion>
     <!-- run the ITs in parallel -->
-    <invoker.parallelThreads>0.75C</invoker.parallelThreads>
+    <invoker.parallelThreads>1C</invoker.parallelThreads>
 
     <doxiaVersion>2.1.0</doxiaVersion>
     <!-- ASF project maven-doxia-sitetools:1.8.1 has different release cycle and it is dependent on maven-doxia:1.8 -->
