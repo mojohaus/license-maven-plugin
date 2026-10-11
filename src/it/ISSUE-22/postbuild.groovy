@@ -19,54 +19,33 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
-def assertExistsFile(file)
-{
-    if ( !file.exists() || file.isDirectory() )
-    {
-        println(file.getAbsolutePath() + " file is missing or a directory.")
-        assert false
-    }
-    assert true
-}
-
-def assertContains(file, content, expected)
-{
-    if ( !content.contains(expected) )
-    {
-        println(expected + " was not found in file [" + file + "]\n :" + content)
-        return false
-    }
-    return true
-}
 
 def newLine = System.getProperty("line.separator")
 
 file = new File(basedir, 'src/main/resources/HelloWorld.html');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, '<!DOCTYPE html>' + newLine +
+assert content.contains('<!DOCTYPE html>' + newLine +
         '<!--');
 
 file = new File(basedir, 'src/main/resources/HelloWorld2.html');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">' + newLine +
+assert content.contains('<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">' + newLine +
         '<!--');
 
 file = new File(basedir, 'src/main/resources/HelloWorld3.html');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">' + newLine +
+assert content.contains('<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">' + newLine +
         '<!--');
 
 file = new File(basedir, 'src/main/resources/HelloWorld4.xhtml');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">' + newLine +
+assert content.contains('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">' + newLine +
         '<!--');
-
-return true;

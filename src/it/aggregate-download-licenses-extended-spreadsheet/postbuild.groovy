@@ -35,24 +35,16 @@ import org.apache.poi.ss.usermodel.WorkbookFactory
 
 log = Logger.getLogger("test-aggregate-download-licenses-extended-spreadsheet")
 
-static boolean searchTextInExcel(Sheet sheet, String searchText) {
-    def log2 = Logger.getLogger("test-aggregate-download-licenses-extended-spreadsheet-search")
-
-    for (Iterator<Row> rowIterator = sheet.rowIterator(); rowIterator.hasNext();) {
-        Row row = rowIterator.next()
-        for (Iterator<Cell> cellIterator = row.cellIterator(); cellIterator.hasNext();) {
-            Cell cell = cellIterator.next()
+static Set<String> stringCells(Sheet sheet) {
+    Set<String> values = new HashSet<>()
+    for (Row row : sheet) {
+        for (Cell cell : row) {
             if (cell.cellType == CellType.STRING || cell.cellType == CellType.BLANK) {
-                def cellValue = cell.stringCellValue
-                if (cellValue == searchText) {
-                    return true
-                } else {
-                    log2.log(Level.FINEST, "Cell Value: {0}", cellValue)
-                }
+                values.add(cell.stringCellValue)
             }
         }
     }
-    return false
+    return values
 }
 
 // -------------- Excel ----------------------
@@ -66,9 +58,10 @@ try (InputStream input = new FileInputStream(excelFile)) {
     Workbook workbook = WorkbookFactory.create(input)
     Sheet sheet = workbook.getSheetAt(0)
 
-    assert searchTextInExcel(sheet, "Maven information")
-    assert searchTextInExcel(sheet, "The Apache Software License, Version 2.0")
-    assert searchTextInExcel(sheet, "The Apache Software Foundation")
+    Set<String> cells = stringCells(sheet)
+    assert cells.contains("Maven information")
+    assert cells.contains("The Apache Software License, Version 2.0")
+    assert cells.contains("The Apache Software Foundation")
 }
 
 // -------------- Calc -----------------

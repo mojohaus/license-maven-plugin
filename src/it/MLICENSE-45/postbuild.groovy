@@ -19,36 +19,15 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
-def assertExistsFile(file)
-{
-  if ( !file.exists() || file.isDirectory() )
-  {
-    println(file.getAbsolutePath() + " file is missing or a directory.")
-    assert false
-  }
-  assert true
-}
-
-def assertContains(file, content, expected)
-{
-  if ( !content.contains(expected) )
-  {
-    println(expected + " was not found in file [" + file + "]\n :" + content)
-    return false
-  }
-  return true
-}
 
 file = new File(basedir, 'child2/src/main/java/org/codehaus/mojo/license/test/File1.java');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, 'License from classpath header.');
+assert content.contains('License from classpath header.');
 
 file = new File(basedir, 'child2/LICENSE.txt');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, 'Full License from classpath.');
-
-return true;
+assert content.contains('Full License from classpath.');

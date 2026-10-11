@@ -20,38 +20,8 @@
  * #L%
  */
 
-def assertExistsFile( file )
-{
-  if ( !file.exists() || file.isDirectory() )
-  {
-    println( file.getAbsolutePath() + " file is missing or a directory." )
-    return false
-  }
-  return true
-}
-
-def assertNotContains( content, expected )
-{
-  if ( content.contains( expected ) )
-  {
-    println( expected + " was found in \n :" + content )
-    return false
-  }
-  return true
-}
-
-def assertContains( content, expected )
-{
-  if ( !content.contains( expected ) )
-  {
-    println( expected + " was not found in \n :" + content )
-    return false
-  }
-  return true
-}
-
 file = new File( basedir, 'LICENSE.txt' );
-assertExistsFile( file )
+assert file.isFile()
 
 String[] notExpectedContents = ["MYLicense!",
         ";; This line will be removed!1"];
@@ -67,12 +37,10 @@ String[] expectedContents = ["The License!",
 
 content = file.text;
 
-notExpectedContents.each {
-  assert assertNotContains( content, it )
+for (expected in notExpectedContents) {
+  assert !content.contains(expected)
 }
 
-expectedContents.each {
-  assert assertContains( content, it )
+for (expected in expectedContents) {
+  assert content.contains(expected)
 }
-
-return true;

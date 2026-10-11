@@ -20,26 +20,8 @@
  * #L%
  */
 
-def assertExistsFile(file) {
-    if (!file.exists() || file.isDirectory()) {
-        println(file.getAbsolutePath() + " file is missing or a directory.")
-        assert false
-    }
-    assert true
-}
-
-def assertContains(file, content, expected) {
-    if (!content.contains(expected)) {
-        println(expected + " was not found in file [" + file + "]\n :" + content)
-        return false
-    }
-    return true
-}
-
 file = new File(basedir, 'target/generated-sources/license/THIRD-PARTY.txt');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, '(Custom defined license in PR-64) Jettison (org.codehaus.jettison:jettison:1.1 - no url defined)');
-
-return true;
+assert content.contains('(Custom defined license in PR-64) Jettison (org.codehaus.jettison:jettison:1.1 - no url defined)');
