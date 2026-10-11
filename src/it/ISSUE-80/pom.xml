@@ -51,7 +51,7 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.jboss.xnio</groupId>
+      <groupId>localhost</groupId>
       <artifactId>xnio-nio</artifactId>
       <version>3.3.6.Final</version>
     </dependency>
@@ -61,7 +61,7 @@
       <version>1.0</version>
     </dependency>
     <dependency>
-      <groupId>org.jboss.xnio</groupId>
+      <groupId>localhost</groupId>
       <artifactId>xnio-api</artifactId>
       <version>3.3.6.Final</version>
     </dependency>

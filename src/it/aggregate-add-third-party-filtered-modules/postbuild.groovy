@@ -26,6 +26,6 @@ content = file.text;
 assert !content.contains('The project has no dependencies.');
 assert !content.contains('commons-logging:commons-logging:1.1.1');
 assert !content.contains('junit:junit');
-assert content.contains('org.springframework.security:spring-security-core:6.4.5');
+assert content.contains('localhost:spring-security-core:6.4.5');
 
 return true
