@@ -20,26 +20,11 @@
  * #L%
  */
 
-def assertExistsFile(file) {
-    if (!file.exists() || file.isDirectory()) {
-        println(file.getAbsolutePath() + " file is missing or a directory.")
-        assert false
-    }
-    assert true
-}
-
-def assertContains(file, content, expected) {
-    if (!content.contains(expected)) {
-        println(expected + " was not found in file [" + file + "]\n :" + content)
-        return false
-    }
-    return true
-}
-
 file = new File(basedir, 'src/main/docker/DockerFile');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, 'License');
-
-return true;
+assert content.contains('# #%L');
+assert content.contains('# Test ISSUE-38');
+assert content.contains('License');
+assert content.contains('# RUN TODO');

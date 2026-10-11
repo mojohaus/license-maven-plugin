@@ -20,46 +20,6 @@
  * #L%
  */
 
-def assertExistsDirectory(file)
-{
-  if ( !file.exists() || !file.isDirectory() )
-  {
-    println(file.getAbsolutePath() + " file is missing or is not a directory.")
-    assert false
-  }
-  assert true
-}
-
-def assertExistsFile(file)
-{
-  if ( !file.exists() || file.isDirectory() )
-  {
-    println(file.getAbsolutePath() + " file is missing or a directory.")
-    assert false
-  }
-  assert true
-}
-
-def assertContains(file, content, expected)
-{
-  if ( !content.contains(expected) )
-  {
-    println(expected + " was not found in file [" + file + "]\n :" + content)
-    return false
-  }
-  return true
-}
-
-def assertNotContains(file, content, expected)
-{
-  if ( content.contains(expected) )
-  {
-    println(expected + " should not be found in file [" + file + "]\n :" + content)
-    return false
-  }
-  return true
-}
-
 def newLine = System.getProperty("line.separator")
 
 Calendar cal = Calendar.getInstance();
@@ -78,709 +38,704 @@ println("Date range to use: " + dateRange)
 //
 
 file = new File(basedir, 'src/main/java/org/codehaus/mojo/license/java-info.java');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains( file, content, 'Copyright (C) ' + dateRange + ' License Test' );
-
+assert content.contains('Copyright (C) ' + dateRange + ' License Test');
 
 file = new File(basedir, 'src/main/java/org/codehaus/mojo/license/MyBean.java');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, 'Copyright (C) ' + dateRange + ' License Test');
+assert content.contains('Copyright (C) ' + dateRange + ' License Test');
 
 file = new File(basedir, 'src/main/java/org/codehaus/mojo/license/MyBean2.java');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, 'Copyright (C) 2010 Tony');
-assert assertContains(file, content, 'do NOT update!');
-assert assertNotContains(file, content, 'Fake to be removed!');
+assert content.contains('Copyright (C) 2010 Tony');
+assert content.contains('do NOT update!');
+assert !content.contains('Fake to be removed!');
 
 file = new File(basedir, 'src/main/java/org/codehaus/mojo/license/MyBean3.java');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, ' * %%Ignore-License');
-assert assertContains(file, content, ' * yet another license');
-assert assertContains(file, content, ' * Copyright (C) 2000 Codelutin Do not update!');
+assert content.contains(' * %%Ignore-License');
+assert content.contains(' * yet another license');
+assert content.contains(' * Copyright (C) 2000 Codelutin Do not update!');
 
 file = new File(basedir, 'src/main/java/org/codehaus/mojo/license/MyBean.java2');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, 'Copyright (C) ' + dateRange + ' License Test');
+assert content.contains('Copyright (C) ' + dateRange + ' License Test');
 
 file = new File(basedir, 'src/main/java/org/codehaus/mojo/license/MyBean2.java2');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, 'Copyright (C) 2010 Tony');
-assert assertContains(file, content, 'do NOT update!');
-assert assertNotContains(file, content, 'Fake to be removed!');
+assert content.contains('Copyright (C) 2010 Tony');
+assert content.contains('do NOT update!');
+assert !content.contains('Fake to be removed!');
 
 file = new File(basedir, 'src/main/java/org/codehaus/mojo/license/MyBean3.java2');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, ' * %%Ignore-License');
-assert assertContains(file, content, ' * yet another license');
-assert assertContains(file, content, ' * Copyright (C) 2000 Codelutin Do not update!');
+assert content.contains(' * %%Ignore-License');
+assert content.contains(' * yet another license');
+assert content.contains(' * Copyright (C) 2000 Codelutin Do not update!');
 
 //
 // Test apt files
 //
 
 file = new File(basedir, 'src/files/apt/test.apt');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, 'Copyright (C)');
-assert assertContains(file, content, '~~ #%L');
-assert assertContains(file, content, '~~ #L%');
-assert assertContains(file, content, '$Id');
-assert assertNotContains(file, content, '~~ ~~');
+assert content.contains('Copyright (C)');
+assert content.contains('~~ #%L');
+assert content.contains('~~ #L%');
+assert content.contains('$Id');
+assert !content.contains('~~ ~~');
 
 file = new File(basedir, 'src/files/apt/test2.apt');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, 'Copyright (C)');
-assert assertContains(file, content, '~~ #%L');
-assert assertContains(file, content, '~~ #L%');
-assert assertContains(file, content, '$Id');
-assert assertNotContains(file, content, '~~ ~~');
+assert content.contains('Copyright (C)');
+assert content.contains('~~ #%L');
+assert content.contains('~~ #L%');
+assert content.contains('$Id');
+assert !content.contains('~~ ~~');
 
 file = new File(basedir, 'src/files/apt/test.apt2');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, 'Copyright (C)');
-assert assertContains(file, content, '~~ #%L');
-assert assertContains(file, content, '~~ #L%');
-assert assertContains(file, content, '$Id');
-assert assertNotContains(file, content, '~~ ~~');
+assert content.contains('Copyright (C)');
+assert content.contains('~~ #%L');
+assert content.contains('~~ #L%');
+assert content.contains('$Id');
+assert !content.contains('~~ ~~');
 
 file = new File(basedir, 'src/files/apt/test2.apt2');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, 'Copyright (C)');
-assert assertContains(file, content, '~~ #%L');
-assert assertContains(file, content, '~~ #L%');
-assert assertContains(file, content, '$Id');
-assert assertNotContains(file, content, '~~ ~~');
+assert content.contains('Copyright (C)');
+assert content.contains('~~ #%L');
+assert content.contains('~~ #L%');
+assert content.contains('$Id');
+assert !content.contains('~~ ~~');
 
 //
 // Test rst files
 //
 
 file = new File(basedir, 'src/files/rst/test.rst');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, 'Copyright (C)');
-assert assertContains(file, content, '.. * #%L');
-assert assertContains(file, content, '.. * #L%');
-assert assertContains(file, content, '$Id');
-assert assertNotContains(file, content, '.. * .. *');
+assert content.contains('Copyright (C)');
+assert content.contains('.. * #%L');
+assert content.contains('.. * #L%');
+assert content.contains('$Id');
+assert !content.contains('.. * .. *');
 
 file = new File(basedir, 'src/files/rst/rst2/test.rst');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertNotContains(file, content, 'Copyright (C)');
+assert !content.contains('Copyright (C)');
 
 file = new File(basedir, 'src/files/rst/test2.rst');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, 'Copyright (C)');
-assert assertContains(file, content, '.. * #%L');
-assert assertContains(file, content, '.. * #L%');
-assert assertContains(file, content, '$Id');
-assert assertNotContains(file, content, '.. * .. *');
+assert content.contains('Copyright (C)');
+assert content.contains('.. * #%L');
+assert content.contains('.. * #L%');
+assert content.contains('$Id');
+assert !content.contains('.. * .. *');
 
 file = new File(basedir, 'src/files/rst/test.rst2');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, 'Copyright (C)');
-assert assertContains(file, content, '.. * #%L');
-assert assertContains(file, content, '.. * #L%');
-assert assertContains(file, content, '$Id');
-assert assertNotContains(file, content, '.. * .. *');
+assert content.contains('Copyright (C)');
+assert content.contains('.. * #%L');
+assert content.contains('.. * #L%');
+assert content.contains('$Id');
+assert !content.contains('.. * .. *');
 
 file = new File(basedir, 'src/files/rst/test2.rst2');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, 'Copyright (C)');
-assert assertContains(file, content, '.. * #%L');
-assert assertContains(file, content, '.. * #L%');
-assert assertContains(file, content, '$Id');
-assert assertNotContains(file, content, '.. * .. *');
+assert content.contains('Copyright (C)');
+assert content.contains('.. * #%L');
+assert content.contains('.. * #L%');
+assert content.contains('$Id');
+assert !content.contains('.. * .. *');
 
 //
 // Test xml files
 //
 
 file = new File(basedir, 'src/files/xml/test.xml');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
 assert content.startsWith("<?xml version='1.0' encoding='UTF-8'?>");
-assert assertContains(file, content, 'Copyright (C)');
-assert assertContains(file, content, '#%L');
-assert assertContains(file, content, '#L%');
-assert assertContains(file, content, '$Id');
+assert content.contains('Copyright (C)');
+assert content.contains('#%L');
+assert content.contains('#L%');
+assert content.contains('$Id');
 
 file = new File(basedir, 'src/files/xml/test2.xml');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
 assert content.startsWith("<?xml version='1.0' encoding='UTF-8'?>");
-assert assertContains(file, content, 'Copyright (C)');
-assert assertContains(file, content, '#%L');
-assert assertContains(file, content, '#L%');
-assert assertContains(file, content, '$Id');
+assert content.contains('Copyright (C)');
+assert content.contains('#%L');
+assert content.contains('#L%');
+assert content.contains('$Id');
 
 file = new File(basedir, 'src/files/xml/test.xml2');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
 assert content.startsWith("<?xml version='1.0' encoding='UTF-8'?>");
-assert assertContains(file, content, 'Copyright (C)');
-assert assertContains(file, content, '#%L');
-assert assertContains(file, content, '#L%');
-assert assertContains(file, content, '$Id');
+assert content.contains('Copyright (C)');
+assert content.contains('#%L');
+assert content.contains('#L%');
+assert content.contains('$Id');
 
 file = new File(basedir, 'src/files/xml/test2.xml2');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
 assert content.startsWith("<?xml version='1.0' encoding='UTF-8'?>");
-assert assertContains(file, content, 'Copyright (C)');
-assert assertContains(file, content, '#%L');
-assert assertContains(file, content, '#L%');
-assert assertContains(file, content, '$Id');
+assert content.contains('Copyright (C)');
+assert content.contains('#%L');
+assert content.contains('#L%');
+assert content.contains('$Id');
 
 //
 // Test jsp files
 //
 
 file = new File(basedir, 'src/files/jsp/test.jsp');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
 assert content.startsWith("<%--");
-assert assertContains(file, content, 'Copyright (C)');
-assert assertContains(file, content, '#%L');
-assert assertContains(file, content, '#L%');
-assert assertContains(file, content, '$Id');
+assert content.contains('Copyright (C)');
+assert content.contains('#%L');
+assert content.contains('#L%');
+assert content.contains('$Id');
 
 file = new File(basedir, 'src/files/jsp/test2.jsp');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
 assert content.startsWith("<%--");
-assert assertContains(file, content, 'Copyright (C)');
-assert assertContains(file, content, '#%L');
-assert assertContains(file, content, '#L%');
-assert assertContains(file, content, '$Id');
+assert content.contains('Copyright (C)');
+assert content.contains('#%L');
+assert content.contains('#L%');
+assert content.contains('$Id');
 
 file = new File(basedir, 'src/files/jsp/test.jsp2');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
 assert content.startsWith("<%--");
-assert assertContains(file, content, 'Copyright (C)');
-assert assertContains(file, content, '#%L');
-assert assertContains(file, content, '#L%');
-assert assertContains(file, content, '$Id');
+assert content.contains('Copyright (C)');
+assert content.contains('#%L');
+assert content.contains('#L%');
+assert content.contains('$Id');
 
 file = new File(basedir, 'src/files/jsp/test2.jsp2');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
 assert content.startsWith("<%--");
-assert assertContains(file, content, 'Copyright (C)');
-assert assertContains(file, content, '#%L');
-assert assertContains(file, content, '#L%');
-assert assertContains(file, content, '$Id');
+assert content.contains('Copyright (C)');
+assert content.contains('#%L');
+assert content.contains('#L%');
+assert content.contains('$Id');
 
 //
 // Test properties files
 //
 
 file = new File(basedir, 'src/files/properties/test.properties');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, 'Copyright (C)');
-assert assertContains(file, content, '# #%L');
-assert assertContains(file, content, '# #L%');
-assert assertNotContains(file, content, '# # ' + newLine);
-assert assertContains(file, content, '$Id');
+assert content.contains('Copyright (C)');
+assert content.contains('# #%L');
+assert content.contains('# #L%');
+assert !content.contains('# # ' + newLine);
+assert content.contains('$Id');
 
 file = new File(basedir, 'src/files/properties/test2.properties');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, 'Copyright (C)');
-assert assertContains(file, content, '# #%L');
-assert assertContains(file, content, '# #L%');
-assert assertContains(file, content, '# #%L');
-assert assertNotContains(file, content, '# # ' + newLine);
-assert assertContains(file, content, '$Id');
-
+assert content.contains('Copyright (C)');
+assert content.contains('# #%L');
+assert content.contains('# #L%');
+assert content.contains('# #%L');
+assert !content.contains('# # ' + newLine);
+assert content.contains('$Id');
 
 file = new File(basedir, 'src/files/properties/test.properties2');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, 'Copyright (C)');
-assert assertContains(file, content, '# #%L');
-assert assertContains(file, content, '# #L%');
-assert assertNotContains(file, content, '# # ' + newLine);
-assert assertContains(file, content, '$Id');
-
+assert content.contains('Copyright (C)');
+assert content.contains('# #%L');
+assert content.contains('# #L%');
+assert !content.contains('# # ' + newLine);
+assert content.contains('$Id');
 
 file = new File(basedir, 'src/files/properties/test2.properties2');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, 'Copyright (C)');
-assert assertContains(file, content, '# #%L');
-assert assertContains(file, content, '# #L%');
-assert assertContains(file, content, '# #%L');
-assert assertNotContains(file, content, '# # ' + newLine);
-assert assertContains(file, content, '$Id');
+assert content.contains('Copyright (C)');
+assert content.contains('# #%L');
+assert content.contains('# #L%');
+assert content.contains('# #%L');
+assert !content.contains('# # ' + newLine);
+assert content.contains('$Id');
 
 //
 // Test sh files
 //
 
 file = new File(basedir, 'src/files/properties/test.sh');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
 assert content.startsWith('#!/bin/sh');
-assert assertContains(file, content, 'Copyright (C)');
-assert assertContains(file, content, '# #%L');
-assert assertContains(file, content, '# #L%');
-assert assertNotContains(file, content, '# # ' + newLine);
-assert assertContains(file, content, '$Id');
+assert content.contains('Copyright (C)');
+assert content.contains('# #%L');
+assert content.contains('# #L%');
+assert !content.contains('# # ' + newLine);
+assert content.contains('$Id');
 
 file = new File(basedir, 'src/files/properties/test2.sh');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
 assert content.startsWith('#!/bin/sh');
-assert assertContains(file, content, 'Copyright (C)');
-assert assertContains(file, content, '# #%L');
-assert assertContains(file, content, '# #L%');
-assert assertNotContains(file, content, '# # ' + newLine);
-assert assertContains(file, content, '$Id');
+assert content.contains('Copyright (C)');
+assert content.contains('# #%L');
+assert content.contains('# #L%');
+assert !content.contains('# # ' + newLine);
+assert content.contains('$Id');
 
 file = new File(basedir, 'src/files/properties/test.sh2');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
 assert content.startsWith('#!/bin/sh');
-assert assertContains(file, content, 'Copyright (C)');
-assert assertContains(file, content, '# #%L');
-assert assertContains(file, content, '# #L%');
-assert assertNotContains(file, content, '# # ' + newLine);
-assert assertContains(file, content, '$Id');
+assert content.contains('Copyright (C)');
+assert content.contains('# #%L');
+assert content.contains('# #L%');
+assert !content.contains('# # ' + newLine);
+assert content.contains('$Id');
 
 file = new File(basedir, 'src/files/properties/test2.sh2');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
 assert content.startsWith('#!/bin/sh');
-assert assertContains(file, content, 'Copyright (C)');
-assert assertContains(file, content, '# #%L');
-assert assertContains(file, content, '# #L%');
-assert assertNotContains(file, content, '# # ' + newLine);
-assert assertContains(file, content, '$Id');
+assert content.contains('Copyright (C)');
+assert content.contains('# #%L');
+assert content.contains('# #L%');
+assert !content.contains('# # ' + newLine);
+assert content.contains('$Id');
 
 //
 // Test ftl files
 //
 
 file = new File(basedir, 'src/files/ftl/test.ftl');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, 'Copyright (C)');
-assert assertContains(file, content, '<#--');
-assert assertContains(file, content, ' #%L');
-assert assertContains(file, content, ' #L%');
-assert assertContains(file, content, '$Id');
-assert assertContains(file, content, '-->');
+assert content.contains('Copyright (C)');
+assert content.contains('<#--');
+assert content.contains(' #%L');
+assert content.contains(' #L%');
+assert content.contains('$Id');
+assert content.contains('-->');
 
 file = new File(basedir, 'src/files/ftl/test2.ftl');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, 'Copyright (C)');
-assert assertContains(file, content, '<#--');
-assert assertContains(file, content, ' #%L');
-assert assertContains(file, content, ' #L%');
-assert assertContains(file, content, '$Id');
-assert assertContains(file, content, '-->');
+assert content.contains('Copyright (C)');
+assert content.contains('<#--');
+assert content.contains(' #%L');
+assert content.contains(' #L%');
+assert content.contains('$Id');
+assert content.contains('-->');
 
 file = new File(basedir, 'src/files/ftl/test.ftl2');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, 'Copyright (C)');
-assert assertContains(file, content, '<#--');
-assert assertContains(file, content, ' #%L');
-assert assertContains(file, content, ' #L%');
-assert assertContains(file, content, '$Id');
-assert assertContains(file, content, '-->');
+assert content.contains('Copyright (C)');
+assert content.contains('<#--');
+assert content.contains(' #%L');
+assert content.contains(' #L%');
+assert content.contains('$Id');
+assert content.contains('-->');
 
 file = new File(basedir, 'src/files/ftl/test2.ftl2');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, 'Copyright (C)');
-assert assertContains(file, content, '<#--');
-assert assertContains(file, content, ' #%L');
-assert assertContains(file, content, ' #L%');
-assert assertContains(file, content, '$Id');
-assert assertContains(file, content, '-->');
+assert content.contains('Copyright (C)');
+assert content.contains('<#--');
+assert content.contains(' #%L');
+assert content.contains(' #L%');
+assert content.contains('$Id');
+assert content.contains('-->');
 
 //
 // Test sql files
 //
 file = new File(basedir, 'src/files/sql/test.sql');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, 'Copyright (C)');
-assert assertContains(file, content, '-- #%L');
-assert assertContains(file, content, '-- #L%');
-assert assertContains(file, content, '$Id');
-assert assertContains(file, content, '---');
+assert content.contains('Copyright (C)');
+assert content.contains('-- #%L');
+assert content.contains('-- #L%');
+assert content.contains('$Id');
+assert content.contains('---');
 
 file = new File(basedir, 'src/files/sql/test2.sql');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, 'Copyright (C)');
-assert assertContains(file, content, '-- #%L');
-assert assertContains(file, content, '-- #L%');
-assert assertContains(file, content, '$Id');
-assert assertContains(file, content, '---');
+assert content.contains('Copyright (C)');
+assert content.contains('-- #%L');
+assert content.contains('-- #L%');
+assert content.contains('$Id');
+assert content.contains('---');
 
 file = new File(basedir, 'src/files/sql/test.sql2');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, 'Copyright (C)');
-assert assertContains(file, content, '-- #%L');
-assert assertContains(file, content, '-- #L%');
-assert assertContains(file, content, '$Id');
-assert assertContains(file, content, '---');
+assert content.contains('Copyright (C)');
+assert content.contains('-- #%L');
+assert content.contains('-- #L%');
+assert content.contains('$Id');
+assert content.contains('---');
 
 file = new File(basedir, 'src/files/sql/test2.sql2');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, 'Copyright (C)');
-assert assertContains(file, content, '-- #%L');
-assert assertContains(file, content, '-- #L%');
-assert assertContains(file, content, '$Id');
-assert assertContains(file, content, '---');
+assert content.contains('Copyright (C)');
+assert content.contains('-- #%L');
+assert content.contains('-- #L%');
+assert content.contains('$Id');
+assert content.contains('---');
 
 //
 // Test mysql files
 //
 file = new File(basedir, 'src/files/mysql/test.mysql');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, 'Copyright (C)');
-assert assertContains(file, content, '-- #%L');
-assert assertContains(file, content, '-- #L%');
-assert assertContains(file, content, '$Id');
-assert assertContains(file, content, '-- -');
+assert content.contains('Copyright (C)');
+assert content.contains('-- #%L');
+assert content.contains('-- #L%');
+assert content.contains('$Id');
+assert content.contains('-- -');
 
 file = new File(basedir, 'src/files/mysql/test2.mysql');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, 'Copyright (C)');
-assert assertContains(file, content, '-- #%L');
-assert assertContains(file, content, '-- #L%');
-assert assertContains(file, content, '$Id');
-assert assertContains(file, content, '-- -');
+assert content.contains('Copyright (C)');
+assert content.contains('-- #%L');
+assert content.contains('-- #L%');
+assert content.contains('$Id');
+assert content.contains('-- -');
 
 file = new File(basedir, 'src/files/mysql/test.mysql2');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, 'Copyright (C)');
-assert assertContains(file, content, '-- #%L');
-assert assertContains(file, content, '-- #L%');
-assert assertContains(file, content, '$Id');
-assert assertContains(file, content, '-- -');
+assert content.contains('Copyright (C)');
+assert content.contains('-- #%L');
+assert content.contains('-- #L%');
+assert content.contains('$Id');
+assert content.contains('-- -');
 
 file = new File(basedir, 'src/files/mysql/test2.mysql2');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, 'Copyright (C)');
-assert assertContains(file, content, '-- #%L');
-assert assertContains(file, content, '-- #L%');
-assert assertContains(file, content, '$Id');
-assert assertContains(file, content, '-- -');
+assert content.contains('Copyright (C)');
+assert content.contains('-- #%L');
+assert content.contains('-- #L%');
+assert content.contains('$Id');
+assert content.contains('-- -');
 
 // Test on the child1 module
 
 file = new File(basedir, 'child1/src/main/java/org/codehaus/mojo2/license/MyBean.java');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, 'Copyright (C) ' + dateRange + ' License Test');
+assert content.contains('Copyright (C) ' + dateRange + ' License Test');
 
 file = new File(basedir, 'child1/src/main/java/org/codehaus/mojo2/license/MyBean2.java');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, 'Copyright (C) 2010 Tony');
-assert assertContains(file, content, 'do NOT update!');
-assert assertNotContains(file, content, 'Fake to be removed!');
+assert content.contains('Copyright (C) 2010 Tony');
+assert content.contains('do NOT update!');
+assert !content.contains('Fake to be removed!');
 
 file = new File(basedir, 'child1/src/main/java/org/codehaus/mojo2/license/MyBean3.java');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, ' * %%Ignore-License');
-assert assertContains(file, content, ' * yet another license');
-assert assertContains(file, content, ' * Copyright (C) 2000 Codelutin Do not update!');
+assert content.contains(' * %%Ignore-License');
+assert content.contains(' * yet another license');
+assert content.contains(' * Copyright (C) 2000 Codelutin Do not update!');
 
 //
 // Test apt files
 //
 
 file = new File(basedir, 'child1/src/files/apt/test.apt');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, 'Copyright (C)');
-assert assertContains(file, content, '~~ #%L');
-assert assertContains(file, content, '~~ #L%');
-assert assertContains(file, content, '$Id');
-assert assertNotContains(file, content, '~~ ~~');
+assert content.contains('Copyright (C)');
+assert content.contains('~~ #%L');
+assert content.contains('~~ #L%');
+assert content.contains('$Id');
+assert !content.contains('~~ ~~');
 
 file = new File(basedir, 'child1/src/files/apt/test2.apt');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, 'Copyright (C)');
-assert assertContains(file, content, '~~ #%L');
-assert assertContains(file, content, '~~ #L%');
-assert assertContains(file, content, '$Id');
-assert assertNotContains(file, content, '~~ ~~');
+assert content.contains('Copyright (C)');
+assert content.contains('~~ #%L');
+assert content.contains('~~ #L%');
+assert content.contains('$Id');
+assert !content.contains('~~ ~~');
 
 //
 // Test rst files
 //
 
 file = new File(basedir, 'child1/src/files/rst/test.rst');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, 'Copyright (C)');
-assert assertContains(file, content, '.. * #%L');
-assert assertContains(file, content, '.. * #L%');
-assert assertContains(file, content, '$Id');
-assert assertNotContains(file, content, '.. * .. *');
+assert content.contains('Copyright (C)');
+assert content.contains('.. * #%L');
+assert content.contains('.. * #L%');
+assert content.contains('$Id');
+assert !content.contains('.. * .. *');
 
 file = new File(basedir, 'child1/src/files/rst/test2.rst');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, 'Copyright (C)');
-assert assertContains(file, content, '.. * #%L');
-assert assertContains(file, content, '.. * #L%');
-assert assertContains(file, content, '$Id');
-assert assertNotContains(file, content, '.. * .. *');
+assert content.contains('Copyright (C)');
+assert content.contains('.. * #%L');
+assert content.contains('.. * #L%');
+assert content.contains('$Id');
+assert !content.contains('.. * .. *');
 
 //
 // Test xml files
 //
 
 file = new File(basedir, 'child1/src/files/xml/test.xml');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
 assert content.startsWith("<?xml version='1.0' encoding='UTF-8'?>");
-assert assertContains(file, content, 'Copyright (C)');
-assert assertContains(file, content, '#%L');
-assert assertContains(file, content, '#L%');
-assert assertContains(file, content, '$Id');
+assert content.contains('Copyright (C)');
+assert content.contains('#%L');
+assert content.contains('#L%');
+assert content.contains('$Id');
 
 file = new File(basedir, 'child1/src/files/xml/test2.xml');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
 assert content.startsWith("<?xml version='1.0' encoding='UTF-8'?>");
-assert assertContains(file, content, 'Copyright (C)');
-assert assertContains(file, content, '#%L');
-assert assertContains(file, content, '#L%');
-assert assertContains(file, content, '$Id');
+assert content.contains('Copyright (C)');
+assert content.contains('#%L');
+assert content.contains('#L%');
+assert content.contains('$Id');
 
 //
 // Test jsp files
 //
 
 file = new File(basedir, 'child1/src/files/jsp/test.jsp');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
 assert content.startsWith("<%--");
-assert assertContains(file, content, 'Copyright (C)');
-assert assertContains(file, content, '#%L');
-assert assertContains(file, content, '#L%');
-assert assertContains(file, content, '$Id');
+assert content.contains('Copyright (C)');
+assert content.contains('#%L');
+assert content.contains('#L%');
+assert content.contains('$Id');
 
 file = new File(basedir, 'child1/src/files/jsp/test2.jsp');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
 assert content.startsWith("<%--");
-assert assertContains(file, content, 'Copyright (C)');
-assert assertContains(file, content, '#%L');
-assert assertContains(file, content, '#L%');
-assert assertContains(file, content, '$Id');
+assert content.contains('Copyright (C)');
+assert content.contains('#%L');
+assert content.contains('#L%');
+assert content.contains('$Id');
 
 //
 // Test properties files
 //
 
 file = new File(basedir, 'child1/src/files/properties/test.properties');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, 'Copyright (C)');
-assert assertContains(file, content, '# #%L');
-assert assertContains(file, content, '# #L%');
-assert assertNotContains(file, content, '# # ' + newLine);
-assert assertContains(file, content, '$Id');
+assert content.contains('Copyright (C)');
+assert content.contains('# #%L');
+assert content.contains('# #L%');
+assert !content.contains('# # ' + newLine);
+assert content.contains('$Id');
 
 file = new File(basedir, 'child1/src/files/properties/test2.properties');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, 'Copyright (C)');
-assert assertContains(file, content, '# #%L');
-assert assertContains(file, content, '# #L%');
-assert assertContains(file, content, '# #%L');
-assert assertNotContains(file, content, '# # ' + newLine);
-assert assertContains(file, content, '$Id');
+assert content.contains('Copyright (C)');
+assert content.contains('# #%L');
+assert content.contains('# #L%');
+assert content.contains('# #%L');
+assert !content.contains('# # ' + newLine);
+assert content.contains('$Id');
 
 //
 // Test sh files
 //
 
 file = new File(basedir, 'child1/src/files/properties/test.sh');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
 assert content.startsWith('#!/bin/sh');
-assert assertContains(file, content, 'Copyright (C)');
-assert assertContains(file, content, '# #%L');
-assert assertContains(file, content, '# #L%');
-assert assertNotContains(file, content, '# # ' + newLine);
-assert assertContains(file, content, '$Id');
+assert content.contains('Copyright (C)');
+assert content.contains('# #%L');
+assert content.contains('# #L%');
+assert !content.contains('# # ' + newLine);
+assert content.contains('$Id');
 
 file = new File(basedir, 'child1/src/files/properties/test2.sh');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
 assert content.startsWith('#!/bin/sh');
-assert assertContains(file, content, 'Copyright (C)');
-assert assertContains(file, content, '# #%L');
-assert assertContains(file, content, '# #L%');
-assert assertNotContains(file, content, '# # ' + newLine);
-assert assertContains(file, content, '$Id');
+assert content.contains('Copyright (C)');
+assert content.contains('# #%L');
+assert content.contains('# #L%');
+assert !content.contains('# # ' + newLine);
+assert content.contains('$Id');
 
 //
 // Test ftl files
 //
 
 file = new File(basedir, 'child1/src/files/ftl/test.ftl');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, 'Copyright (C)');
-assert assertContains(file, content, '<#--');
-assert assertContains(file, content, ' #%L');
-assert assertContains(file, content, ' #L%');
-assert assertContains(file, content, '$Id');
-assert assertContains(file, content, '-->');
+assert content.contains('Copyright (C)');
+assert content.contains('<#--');
+assert content.contains(' #%L');
+assert content.contains(' #L%');
+assert content.contains('$Id');
+assert content.contains('-->');
 
 file = new File(basedir, 'child1/src/files/ftl/test2.ftl');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, 'Copyright (C)');
-assert assertContains(file, content, '<#--');
-assert assertContains(file, content, ' #%L');
-assert assertContains(file, content, ' #L%');
-assert assertContains(file, content, '$Id');
-assert assertContains(file, content, '-->');
+assert content.contains('Copyright (C)');
+assert content.contains('<#--');
+assert content.contains(' #%L');
+assert content.contains(' #L%');
+assert content.contains('$Id');
+assert content.contains('-->');
 
 //
 // Test sql files
 //
 file = new File(basedir, 'child1/src/files/sql/test.sql');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, 'Copyright (C)');
-assert assertContains(file, content, '-- #%L');
-assert assertContains(file, content, '-- #L%');
-assert assertContains(file, content, '$Id');
-assert assertContains(file, content, '---');
+assert content.contains('Copyright (C)');
+assert content.contains('-- #%L');
+assert content.contains('-- #L%');
+assert content.contains('$Id');
+assert content.contains('---');
 
 file = new File(basedir, 'child1/src/files/sql/test2.sql');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, 'Copyright (C)');
-assert assertContains(file, content, '-- #%L');
-assert assertContains(file, content, '-- #L%');
-assert assertContains(file, content, '$Id');
-assert assertContains(file, content, '---');
+assert content.contains('Copyright (C)');
+assert content.contains('-- #%L');
+assert content.contains('-- #L%');
+assert content.contains('$Id');
+assert content.contains('---');
 
 //
 // Test sql files
 //
 file = new File(basedir, 'child1/src/files/mysql/test.mysql');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, 'Copyright (C)');
-assert assertContains(file, content, '-- #%L');
-assert assertContains(file, content, '-- #L%');
-assert assertContains(file, content, '$Id');
-assert assertContains(file, content, '-- -');
+assert content.contains('Copyright (C)');
+assert content.contains('-- #%L');
+assert content.contains('-- #L%');
+assert content.contains('$Id');
+assert content.contains('-- -');
 
 file = new File(basedir, 'child1/src/files/mysql/test2.mysql');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, 'Copyright (C)');
-assert assertContains(file, content, '-- #%L');
-assert assertContains(file, content, '-- #L%');
-assert assertContains(file, content, '$Id');
-assert assertContains(file, content, '-- -');
-
-return true;
+assert content.contains('Copyright (C)');
+assert content.contains('-- #%L');
+assert content.contains('-- #L%');
+assert content.contains('$Id');
+assert content.contains('-- -');
