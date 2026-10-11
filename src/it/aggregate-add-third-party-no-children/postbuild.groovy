@@ -25,7 +25,7 @@ assert file.exists();
 content = file.text;
 assert !content.toLowerCase().contains('the project has no dependencies');
 assert content.contains('(The Apache Software License, Version 2.0) Commons Logging (commons-logging:commons-logging:1.1.1 - http://commons.apache.org/logging)');
-assert content.contains('(Apache License, Version 2.0) Apache Commons Lang (org.apache.commons:commons-lang3:3.8.1 - http://commons.apache.org/proper/commons-lang/)');
+assert content.contains('(Apache License, Version 2.0) Apache Commons Lang (localhost:commons-lang3:3.8.1 - http://commons.apache.org/proper/commons-lang/)');
 
 file = new File(basedir, 'target/generated-sources/license/THIRD-PARTY-not-accept-pom.txt');
 assert file.exists();

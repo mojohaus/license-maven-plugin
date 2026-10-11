@@ -21,11 +21,11 @@
  */
 
 
-def asl2 = new File(basedir, 'child3/target/generated-resources/licenses/org.apache.commons.commons-lang3_apache_license,_version_2.0.txt')
+def asl2 = new File(basedir, 'child3/target/generated-resources/licenses/localhost.commons-lang3_apache_license,_version_2.0.txt')
 assert asl2.exists()
 assert asl2.text.contains('Version 2.0, January 2004');
 
 def licensesXml = new File(basedir, 'child3/target/generated-resources/licenses.xml');
 assert licensesXml.exists()
-assert licensesXml.text.contains('<file>org.apache.commons.commons-lang3_apache_license,_version_2.0.txt</file>')
+assert licensesXml.text.contains('<file>localhost.commons-lang3_apache_license,_version_2.0.txt</file>')
 assert licensesXml.text.contains('<url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>')

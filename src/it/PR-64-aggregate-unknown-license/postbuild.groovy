@@ -24,4 +24,4 @@ file = new File(basedir, 'target/generated-sources/license/THIRD-PARTY.txt');
 assert file.isFile();
 
 content = file.text;
-assert content.contains('(Custom defined license in PR-64) Jettison (org.codehaus.jettison:jettison:1.1 - no url defined)');
+assert content.contains('(Custom defined license in PR-64) Jettison (localhost:jettison:1.1 - no url defined)');
