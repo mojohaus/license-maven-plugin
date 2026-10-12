@@ -25,7 +25,6 @@ package org.codehaus.mojo.license.utils;
 import java.util.Arrays;
 import java.util.Collections;
 
-import org.apache.maven.plugin.MojoExecutionException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -33,21 +32,21 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class StringToListTest {
 
     @Test
-    void splitsOnThePipe() throws MojoExecutionException {
+    void splitsOnThePipe() throws Exception {
         assertEquals(
                 Arrays.asList("Apache License 2.0", "MIT License"),
                 new StringToList("Apache License 2.0|MIT License").getData());
     }
 
     @Test
-    void dropsTheWhitespaceAnXmlFormatterLeavesBehind() throws MojoExecutionException {
+    void dropsTheWhitespaceAnXmlFormatterLeavesBehind() throws Exception {
         assertEquals(
                 Arrays.asList("Apache License 2.0", "MIT License", "EPL 2.0"),
                 new StringToList("\n    Apache License\n    2.0\n    |MIT License\n    | EPL 2.0\n  ").getData());
     }
 
     @Test
-    void ignoresEmptyEntries() throws MojoExecutionException {
+    void ignoresEmptyEntries() throws Exception {
         // An empty list used to hold one entry, the empty string, which matches no license.
         assertEquals(0, new StringToList("").getData().size());
         assertEquals(0, new StringToList("   ").getData().size());

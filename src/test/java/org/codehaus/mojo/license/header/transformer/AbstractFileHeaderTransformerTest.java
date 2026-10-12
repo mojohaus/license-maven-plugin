@@ -38,6 +38,7 @@ import static org.codehaus.mojo.license.header.transformer.FileHeaderTransformer
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -76,7 +77,7 @@ class AbstractFileHeaderTransformerTest {
     }
 
     @Test
-    void testIllegalTransformer() throws Exception {
+    void illegalTransformer() throws Exception {
         assertThrows(
                 IllegalStateException.class,
                 () ->
@@ -90,7 +91,7 @@ class AbstractFileHeaderTransformerTest {
     }
 
     @Test
-    void testIllegalTransformer2() throws Exception {
+    void illegalTransformer2() throws Exception {
         assertThrows(
                 IllegalStateException.class,
                 () ->
@@ -104,7 +105,7 @@ class AbstractFileHeaderTransformerTest {
     }
 
     @Test
-    void testCopyrightPattern() throws Exception {
+    void copyrightPattern() throws Exception {
         String actual;
         Matcher matcher;
         String prefix;
@@ -121,7 +122,7 @@ class AbstractFileHeaderTransformerTest {
         firstYear = matcher.group(2);
         assertEquals("2010", firstYear);
         lastYear = matcher.group(4);
-        assertEquals(null, lastYear);
+        assertNull(lastYear);
         holder = matcher.group(5);
         assertEquals("Tony", holder);
 
@@ -154,7 +155,7 @@ class AbstractFileHeaderTransformerTest {
     }
 
     @Test
-    void testToFileHeader() throws Exception {
+    void toFileHeader() throws Exception {
         String header;
         FileHeader model;
 
@@ -192,7 +193,7 @@ class AbstractFileHeaderTransformerTest {
     }
 
     @Test
-    void testBoxProcessTag() throws Exception {
+    void boxProcessTag() throws Exception {
         String header;
         String boxedHeader;
 
@@ -217,7 +218,7 @@ class AbstractFileHeaderTransformerTest {
     }
 
     @Test
-    void testUnboxProcessTag() throws Exception {
+    void unboxProcessTag() throws Exception {
         String header;
         String boxedHeader;
         String unboxedHeader;
@@ -236,7 +237,7 @@ class AbstractFileHeaderTransformerTest {
     }
 
     @Test
-    void testBoxComment() throws Exception {
+    void boxComment() throws Exception {
         String header;
         String boxedHeader;
 
@@ -287,7 +288,7 @@ class AbstractFileHeaderTransformerTest {
     }
 
     @Test
-    void testUnboxComment() throws Exception {
+    void unboxComment() throws Exception {
         String header;
         String boxedHeader;
         String unboxedHeader;
@@ -306,7 +307,7 @@ class AbstractFileHeaderTransformerTest {
     }
 
     @Test
-    void testSetTrimHeaderLine() {
+    void setTrimHeaderLine() {
         assertFalse(transformer.isTrimHeaderLine());
 
         transformer.setTrimHeaderLine(true);
