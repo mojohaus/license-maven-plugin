@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author tchemit dev@tchemit.fr
  * @since 1.0
  */
-public class XmlFileHeaderTransformerTest {
+class XmlFileHeaderTransformerTest {
 
     protected XmlFileHeaderTransformer transformer;
 
@@ -53,7 +53,7 @@ public class XmlFileHeaderTransformerTest {
     }
 
     @Test
-    void testAddHeaderWithNoProlog() {
+    void addHeaderWithNoProlog() {
         String header = HEADER;
         String content = CONTENT;
         String result = transformer.addHeader(header, content);
@@ -61,7 +61,7 @@ public class XmlFileHeaderTransformerTest {
     }
 
     @Test
-    void testAddHeaderWithProlog() {
+    void addHeaderWithProlog() {
         String header = HEADER;
         String prolog = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
         String content = prolog + CONTENT;

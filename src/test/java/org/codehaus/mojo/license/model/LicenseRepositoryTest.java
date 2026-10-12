@@ -22,7 +22,6 @@ package org.codehaus.mojo.license.model;
  * #L%
  */
 
-import java.io.IOException;
 import java.net.URL;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -53,7 +52,7 @@ class LicenseRepositoryTest {
     @EnabledOnJre(
             value = JRE.JAVA_8,
             disabledReason = "changed class order for Java 9+, dut to add varsion/11 for surefire")
-    void testJarRepository() throws IOException {
+    void jarRepository() throws Exception {
         repository = new LicenseRepository();
         URL baseURL = getClass().getResource(LicenseStore.JAR_LICENSE_REPOSITORY);
         repository.setBaseURL(baseURL);
@@ -76,7 +75,7 @@ class LicenseRepositoryTest {
     }
 
     @Test
-    void testUserRepository() throws IOException {
+    void userRepository() throws Exception {
 
         repository = new LicenseRepository();
         URL baseURL = getClass().getResource("/newRepository");

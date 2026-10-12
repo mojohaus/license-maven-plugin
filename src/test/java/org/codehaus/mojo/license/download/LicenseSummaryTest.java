@@ -59,7 +59,7 @@ class LicenseSummaryTest {
      * @throws SAXException                 if any
      */
     @Test
-    void testReadLicenseSummary() throws IOException, SAXException, ParserConfigurationException {
+    void readLicenseSummary() throws Exception {
         File licenseSummaryFile = new File("src/test/resources/license-summary-test.xml");
         assertTrue(licenseSummaryFile.exists());
         List<ProjectLicenseInfo> list;
@@ -91,9 +91,7 @@ class LicenseSummaryTest {
      * @throws SAXException                         if any
      */
     @Test
-    void testWriteReadLicenseSummary()
-            throws IOException, SAXException, ParserConfigurationException, TransformerFactoryConfigurationError,
-                    TransformerException {
+    void writeReadLicenseSummary() throws Exception {
         List<ProjectLicenseInfo> licSummary = new ArrayList<>();
         ProjectLicenseInfo dep1 = new ProjectLicenseInfo("org.test", "test1", "1.0", buildExtendedInfo(1));
         ProjectLicenseInfo dep2 = new ProjectLicenseInfo("org.test", "test2", "2.0", buildExtendedInfo(2));
