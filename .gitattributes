@@ -1,2 +1,4 @@
-*        text eol=lf
-*.cmd    text eol=crlf
+*         text eol=lf
+*.cmd     text eol=crlf
+CrLf.java text eol=crlf
+Lf.java   text eol=lf
