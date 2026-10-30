@@ -120,7 +120,6 @@
   <properties>
     <mavenVersion>3.9.16</mavenVersion>
     <minimalMavenBuildVersion>3.9.0</minimalMavenBuildVersion>
-    <mojo.java.target>8</mojo.java.target>
 
     <processorVersion>1.4</processorVersion>
     <!-- run the ITs in parallel -->
