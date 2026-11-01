@@ -40,13 +40,17 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpException;
 import org.apache.http.HttpHost;
@@ -64,6 +68,7 @@ import org.apache.http.client.config.RequestConfig.Builder;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.client.utils.DateUtils;
 import org.apache.http.conn.routing.HttpRoutePlanner;
 import org.apache.http.entity.ContentType;
 import org.apache.http.impl.auth.BasicScheme;
@@ -99,6 +104,13 @@ public class LicenseDownloader implements AutoCloseable {
     private static final String USER_AGENT = userAgent();
 
     private final CloseableHttpClient client;
+
+    /**
+     * Hosts that answered {@code 429} or {@code 503}, with the reason to report for every later download from the
+     * same host. A host stays in the map for the lifetime of this downloader, which the download mojos create once
+     * per execution.
+     */
+    private final Map<String, String> stoppedHosts = new ConcurrentHashMap<>();
 
     private final Map<String, ContentSanitizer> contentSanitizers;
     private final Charset charset;
@@ -229,6 +241,44 @@ public class LicenseDownloader implements AutoCloseable {
         this.client = clientBuilder.build();
     }
 
+    private static boolean isHostStopStatus(int statusCode) {
+        return statusCode == 429 || statusCode == HttpStatus.SC_SERVICE_UNAVAILABLE;
+    }
+
+    private static String hostOf(String url) {
+        try {
+            final String host = new URI(url).getHost();
+            return host != null ? host.toLowerCase(Locale.ROOT) : null;
+        } catch (URISyntaxException e) {
+            return null;
+        }
+    }
+
+    /**
+     * Remembers that {@code host} refused a request, so that later downloads from it fail without a request. Warns
+     * once per host. Never waits or retries: the {@code Retry-After} value is only reported.
+     */
+    private void stopHost(String host, int statusCode, Header retryAfter) {
+        final String detail = describeRetryAfter(retryAfter);
+        final String reason = "host '" + host + "' answered " + statusCode + " earlier in this build" + detail;
+        if (stoppedHosts.putIfAbsent(host, reason) == null) {
+            LOG.warn("Host '{}' answered {}{}; its remaining license downloads are skipped", host, statusCode, detail);
+        }
+    }
+
+    private static String describeRetryAfter(Header retryAfter) {
+        if (retryAfter == null || retryAfter.getValue() == null) {
+            return "";
+        }
+        final String value = retryAfter.getValue().trim();
+        try {
+            return " (Retry-After: " + Long.parseLong(value) + " seconds)";
+        } catch (NumberFormatException e) {
+            final Date date = DateUtils.parseDate(value);
+            return date != null ? " (Retry-After: " + DateUtils.formatDate(date) + ")" : "";
+        }
+    }
+
     /**
      * Downloads a license file from the given {@code licenseUrlString} stores it locally and
      * returns the local path where the license file was stored. Note that the
@@ -263,6 +313,11 @@ public class LicenseDownloader implements AutoCloseable {
                 }
             }
         } else {
+            final String host = hostOf(licenseUrlString);
+            final String stopped = host != null ? stoppedHosts.get(host) : null;
+            if (stopped != null) {
+                return LicenseDownloadResult.failure("'" + licenseUrlString + "' not requested: " + stopped);
+            }
             LOG.debug("About to download '{}'", licenseUrlString);
             final HttpGet request = new HttpGet(licenseUrlString);
             final HttpClientContext context;
@@ -282,6 +337,9 @@ public class LicenseDownloader implements AutoCloseable {
             try (CloseableHttpResponse response =
                     context != null ? client.execute(request, context) : client.execute(request)) {
                 final StatusLine statusLine = response.getStatusLine();
+                if (host != null && isHostStopStatus(statusLine.getStatusCode())) {
+                    stopHost(host, statusLine.getStatusCode(), response.getFirstHeader("Retry-After"));
+                }
                 if (statusLine.getStatusCode() != HttpStatus.SC_OK) {
                     return LicenseDownloadResult.failure("'" + licenseUrlString + "' returned "
                             + statusLine.getStatusCode()

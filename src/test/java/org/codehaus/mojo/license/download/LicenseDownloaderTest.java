@@ -23,10 +23,14 @@ package org.codehaus.mojo.license.download;
  */
 
 import java.io.File;
+import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import com.sun.net.httpserver.HttpServer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -105,6 +109,128 @@ class LicenseDownloaderTest {
         // Different path that merely contains the serverUrl as a substring but doesn't start with it
         assertFalse(downloader.shouldAuthenticate(
                 "https://other.example.com/?ref=https://artifactory.example.com/artifactory"));
+    }
+
+    // -----------------------------------------------------------------------
+    // per-host stop on 429 and 503
+    // -----------------------------------------------------------------------
+
+    @Test
+    void hostThatAnswered429IsNotRequestedAgain(@TempDir File dir) throws Exception {
+        runWithServer(429, null, (server, hits) -> {
+            try (LicenseDownloader downloader = downloader()) {
+                LicenseDownloader.LicenseDownloadResult first = download(downloader, server, "a", dir);
+                LicenseDownloader.LicenseDownloadResult second = download(downloader, server, "b", dir);
+
+                assertFalse(first.isSuccess());
+                assertTrue(first.getErrorMessage().contains("returned 429"), first.getErrorMessage());
+                assertFalse(second.isSuccess());
+                assertTrue(second.getErrorMessage().contains("not requested"), second.getErrorMessage());
+                assertTrue(second.getErrorMessage().contains("host 'localhost' answered 429"));
+                assertEquals(1, hits.get());
+            }
+        });
+    }
+
+    @Test
+    void otherHostIsStillRequested(@TempDir File dir) throws Exception {
+        runWithServer(429, null, (server, hits) -> {
+            try (LicenseDownloader downloader = downloader()) {
+                download(downloader, server, "a", dir);
+                String otherHost = "http://127.0.0.1:" + server.getAddress().getPort() + "/b";
+                LicenseDownloader.LicenseDownloadResult other =
+                        downloader.downloadLicense(otherHost, new FileNameEntry(new File(dir, "b.txt"), false, null));
+
+                assertTrue(other.getErrorMessage().contains("returned 429"), other.getErrorMessage());
+                assertEquals(2, hits.get());
+            }
+        });
+    }
+
+    @Test
+    void hostThatAnswered503IsNotRequestedAgain(@TempDir File dir) throws Exception {
+        runWithServer(503, null, (server, hits) -> {
+            try (LicenseDownloader downloader = downloader()) {
+                download(downloader, server, "a", dir);
+                LicenseDownloader.LicenseDownloadResult second = download(downloader, server, "b", dir);
+
+                assertTrue(second.getErrorMessage().contains("host 'localhost' answered 503"));
+                assertEquals(1, hits.get());
+            }
+        });
+    }
+
+    @Test
+    void otherStatusDoesNotStopTheHost(@TempDir File dir) throws Exception {
+        runWithServer(404, null, (server, hits) -> {
+            try (LicenseDownloader downloader = downloader()) {
+                download(downloader, server, "a", dir);
+                LicenseDownloader.LicenseDownloadResult second = download(downloader, server, "b", dir);
+
+                assertTrue(second.getErrorMessage().contains("returned 404"), second.getErrorMessage());
+                assertEquals(2, hits.get());
+            }
+        });
+    }
+
+    @Test
+    void retryAfterSecondsIsReported(@TempDir File dir) throws Exception {
+        runWithServer(429, "120", (server, hits) -> {
+            try (LicenseDownloader downloader = downloader()) {
+                download(downloader, server, "a", dir);
+                LicenseDownloader.LicenseDownloadResult second = download(downloader, server, "b", dir);
+
+                assertTrue(second.getErrorMessage().contains("(Retry-After: 120 seconds)"), second.getErrorMessage());
+            }
+        });
+    }
+
+    @Test
+    void retryAfterHttpDateIsReported(@TempDir File dir) throws Exception {
+        runWithServer(503, "Wed, 21 Oct 2026 07:28:00 GMT", (server, hits) -> {
+            try (LicenseDownloader downloader = downloader()) {
+                download(downloader, server, "a", dir);
+                LicenseDownloader.LicenseDownloadResult second = download(downloader, server, "b", dir);
+
+                assertTrue(
+                        second.getErrorMessage().contains("(Retry-After: Wed, 21 Oct 2026 07:28:00 GMT)"),
+                        second.getErrorMessage());
+            }
+        });
+    }
+
+    private interface ServerTest {
+        void run(HttpServer server, AtomicInteger hits) throws Exception;
+    }
+
+    private static void runWithServer(int status, String retryAfter, ServerTest test) throws Exception {
+        final AtomicInteger hits = new AtomicInteger();
+        final HttpServer server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
+        server.createContext("/", exchange -> {
+            hits.incrementAndGet();
+            if (retryAfter != null) {
+                exchange.getResponseHeaders().add("Retry-After", retryAfter);
+            }
+            exchange.sendResponseHeaders(status, -1);
+            exchange.close();
+        });
+        server.start();
+        try {
+            test.run(server, hits);
+        } finally {
+            server.stop(0);
+        }
+    }
+
+    private static LicenseDownloader.LicenseDownloadResult download(
+            LicenseDownloader downloader, HttpServer server, String name, File dir) throws Exception {
+        return downloader.downloadLicense(
+                "http://localhost:" + server.getAddress().getPort() + "/" + name,
+                new FileNameEntry(new File(dir, name + ".txt"), false, null));
+    }
+
+    private static LicenseDownloader downloader() {
+        return downloaderWithAuth(null, null, null);
     }
 
     private static LicenseDownloader downloaderWithAuth(String userName, String password, String serverUrl) {
