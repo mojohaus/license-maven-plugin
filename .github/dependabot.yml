@@ -30,6 +30,9 @@ updates:
         versions: [">= 3.10.0"]
       - dependency-name: "org.apache.maven:maven-model-builder"
         versions: [">= 3.10.0"]
+      # maven-archiver 4.x is built on the Maven 4 API
+      - dependency-name: "org.apache.maven:maven-archiver"
+        versions: [">= 4.0.0-alpha-1"]
       # wiremock 3 requires Java 11; the integration tests still run on Java 8.
       - dependency-name: "com.github.tomakehurst:wiremock-jre8-standalone"
         versions: ["[3.0.0,)"]
