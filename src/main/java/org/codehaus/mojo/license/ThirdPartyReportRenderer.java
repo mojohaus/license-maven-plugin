@@ -161,7 +161,7 @@ public class ThirdPartyReportRenderer extends AbstractLicenseReportRenderer {
 
         sink.tableRow();
         sink.tableCell();
-        renderInfoIcon();
+        renderInfoStatus();
         sink.tableCell_();
         tableCell(getText("report.overview.numThirdParties"));
         tableCell(Integer.toString(allThirdParties.size()));
@@ -169,7 +169,7 @@ public class ThirdPartyReportRenderer extends AbstractLicenseReportRenderer {
 
         sink.tableRow();
         sink.tableCell();
-        renderSuccessIcon();
+        renderSuccessStatus();
         sink.tableCell_();
         tableCell(getText("report.overview.numWithPomLicenses"));
         tableCell(Integer.toString(numWithPomLicense));
@@ -177,7 +177,7 @@ public class ThirdPartyReportRenderer extends AbstractLicenseReportRenderer {
 
         sink.tableRow();
         sink.tableCell();
-        renderWarningIcon();
+        renderWarningStatus();
         sink.tableCell_();
         tableCell(getText("report.overview.numWithThirdPartyLicenses"));
         tableCell(Integer.toString(numWithThirdPartyLicense));
@@ -185,7 +185,7 @@ public class ThirdPartyReportRenderer extends AbstractLicenseReportRenderer {
 
         sink.tableRow();
         sink.tableCell();
-        renderErrorIcon();
+        renderErrorStatus();
         sink.tableCell_();
         tableCell(getText("report.overview.numWithNoLicense"));
         tableCell(Integer.toString(numWithNoLicense));
