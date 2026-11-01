@@ -85,28 +85,20 @@ public abstract class AbstractLicenseReportRenderer extends AbstractMavenReportR
         return i18n.getString(bundleName, locale, key);
     }
 
-    protected void renderWarningIcon() {
-        sink.figure();
-        sink.figureGraphics("images/icon_warning_sml.gif");
-        sink.figure_();
+    protected void renderWarningStatus() {
+        sink.text(getText("report.status.warning"));
     }
 
-    protected void renderErrorIcon() {
-        sink.figure();
-        sink.figureGraphics("images/icon_error_sml.gif");
-        sink.figure_();
+    protected void renderErrorStatus() {
+        sink.text(getText("report.status.error"));
     }
 
-    protected void renderSuccessIcon() {
-        sink.figure();
-        sink.figureGraphics("images/icon_success_sml.gif");
-        sink.figure_();
+    protected void renderSuccessStatus() {
+        sink.text(getText("report.status.success"));
     }
 
-    protected void renderInfoIcon() {
-        sink.figure();
-        sink.figureGraphics("images/icon_info_sml.gif");
-        sink.figure_();
+    protected void renderInfoStatus() {
+        sink.text(getText("report.status.info"));
     }
 
     protected String getGAV(ThirdPartyDetails details) {
@@ -135,11 +127,11 @@ public abstract class AbstractLicenseReportRenderer extends AbstractMavenReportR
         sink.tableRow();
         sink.tableCell();
         if (details.hasPomLicenses()) {
-            renderSuccessIcon();
+            renderSuccessStatus();
         } else if (details.hasThirdPartyLicenses()) {
-            renderWarningIcon();
+            renderWarningStatus();
         } else {
-            renderErrorIcon();
+            renderErrorStatus();
         }
         sink.tableCell_();
 
@@ -182,15 +174,15 @@ public abstract class AbstractLicenseReportRenderer extends AbstractMavenReportR
         attrs.addAttribute(SinkEventAttributes.WIDTH, cellWidth);
         sink.tableCell(attrs);
         if (details.hasPomLicenses()) {
-            renderSuccessIcon();
+            renderSuccessStatus();
             sink.nonBreakingSpace();
             sink.text(getText("report.status.licenseFromPom"));
         } else if (details.hasThirdPartyLicenses()) {
-            renderWarningIcon();
+            renderWarningStatus();
             sink.nonBreakingSpace();
             sink.text(getText("report.status.licenseFromThirdParty"));
         } else {
-            renderErrorIcon();
+            renderErrorStatus();
             sink.nonBreakingSpace();
             sink.text(getText("report.status.noLicense"));
         }

@@ -22,3 +22,8 @@ for (expected in notExpectedContents) {
 for (expected in expectedContents) {
   assert content.contains(expected)
 }
+
+// status is text, not the site skin's images
+assert content.contains('✔ Success') || content.contains('&#x2714; Success')
+assert !content.contains('icon_success_sml')
+assert !content.contains('icon_error_sml')
