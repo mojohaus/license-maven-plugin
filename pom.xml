@@ -118,6 +118,7 @@
   </ciManagement>
 
   <properties>
+    <sisuVersion>1.0.0</sisuVersion>
     <mavenVersion>3.9.16</mavenVersion>
     <resolverVersion>1.9.27</resolverVersion>
     <minimalMavenBuildVersion>3.9.0</minimalMavenBuildVersion>
@@ -251,7 +252,14 @@
     <dependency>
       <groupId>org.eclipse.sisu</groupId>
       <artifactId>org.eclipse.sisu.plexus</artifactId>
-      <version>1.0.0</version>
+      <version>${sisuVersion}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <!-- keep in step with org.eclipse.sisu.plexus, which calls into it -->
+      <groupId>org.eclipse.sisu</groupId>
+      <artifactId>org.eclipse.sisu.inject</artifactId>
+      <version>${sisuVersion}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
