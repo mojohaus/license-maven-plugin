@@ -118,7 +118,7 @@
   </ciManagement>
 
   <properties>
-    <mavenVersion>3.9.16</mavenVersion>
+    <mavenVersion>3.10.0</mavenVersion>
     <resolverVersion>1.9.27</resolverVersion>
     <minimalMavenBuildVersion>3.9.0</minimalMavenBuildVersion>
 
@@ -126,10 +126,10 @@
     <!-- run the ITs in parallel -->
     <invoker.parallelThreads>1C</invoker.parallelThreads>
 
-    <doxiaVersion>2.1.0</doxiaVersion>
+    <doxiaVersion>2.2.0</doxiaVersion>
     <!-- ASF project maven-doxia-sitetools:1.8.1 has different release cycle and it is dependent on maven-doxia:1.8 -->
     <doxiaRendererVersion>2.0.0</doxiaRendererVersion>
-    <mavenReportingApiVersion>4.0.0</mavenReportingApiVersion>
+    <mavenReportingApiVersion>4.1.0</mavenReportingApiVersion>
     <mavenReportingImplVersion>4.0.0</mavenReportingImplVersion>
 
     <version.httpcomponents.httpclient>4.5.14</version.httpcomponents.httpclient>
@@ -251,7 +251,7 @@
     <dependency>
       <groupId>org.eclipse.sisu</groupId>
       <artifactId>org.eclipse.sisu.plexus</artifactId>
-      <version>1.0.0</version>
+      <version>1.1.1</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
