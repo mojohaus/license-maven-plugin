@@ -67,7 +67,6 @@ import org.codehaus.mojo.license.download.LicenseDownloader;
 import org.codehaus.mojo.license.download.LicenseDownloader.LicenseDownloadResult;
 import org.codehaus.mojo.license.download.LicenseMatchers;
 import org.codehaus.mojo.license.download.LicenseNameUrlOverrides;
-import org.codehaus.mojo.license.download.LicenseNameUrlOverridesReader;
 import org.codehaus.mojo.license.download.LicenseSummaryReader;
 import org.codehaus.mojo.license.download.LicensedArtifact;
 import org.codehaus.mojo.license.download.LicensedArtifactResolver;
@@ -566,26 +565,27 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
     protected List<LicenseUrlReplacement> licenseUrlReplacements;
 
     /**
-     * Path to an XML file that maps license name patterns to download URLs. When a dependency's license name
-     * (the {@code <name>} element inside {@code <licenses><license>} in the dependency's POM) matches one of the
-     * configured {@code <licenseNamePattern>} values, the plugin uses the associated {@code <url>} to download the
-     * license text instead of any URL declared in the dependency's POM. This is particularly useful for:
+     * A list of {@link LicenseNameUrlOverride} entries that map license name patterns to download URLs.
+     * When a dependency's license name (the {@code <name>} element inside {@code <licenses><license>}
+     * in the dependency's POM) matches one of the configured {@code <licenseNamePattern>} values,
+     * the plugin uses the associated {@code <url>} to download the license text instead of any URL
+     * declared in the dependency's POM. This is particularly useful for:
      * <ul>
      *   <li>Redirecting downloads to an internal mirror so that the build does not depend on external services.</li>
      *   <li>Replacing broken HTML pages with clean plain-text versions of well-known licenses.</li>
      *   <li>Providing a download URL for dependencies that declare a license name but no URL in their POM.</li>
      * </ul>
      *
-     * <p>The {@code <licenseNamePattern>} values are Java regular expressions matched against the full license name
-     * string (e.g. {@code "Apache License, Version 2.0"}, {@code "MIT License"}).
-     * The patterns are evaluated in the order they appear in the file; the first match wins.</p>
+     * <p>The {@code <licenseNamePattern>} values are Java regular expressions matched case-insensitively
+     * against the full license name string (e.g. {@code "Apache License, Version 2.0"}, {@code "MIT License"}).
+     * The patterns are evaluated in the order they appear in the configuration; the first match wins.</p>
      *
-     * <p>Example file content:</p>
+     * <p>Example configuration:</p>
      * <pre>
      * {@code
      * <licenseNameUrlOverrides>
      *   <licenseNameUrlOverride>
-     *     <licenseNamePattern>(?i)apache.*2\.0</licenseNamePattern>
+     *     <licenseNamePattern>.*Apache.*2\.0.*</licenseNamePattern>
      *     <url>https://nexus.internal/licenses/apache-2.0.txt</url>
      *   </licenseNameUrlOverride>
      *   <licenseNameUrlOverride>
@@ -598,15 +598,15 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
      *
      * <p>Relationship to other parameters:</p>
      * <ul>
-     *   <li>{@link #licensesConfigFile} is applied before {@link #licenseNameUrlOverridesFile}</li>
-     *   <li>{@link #licenseNameUrlOverridesFile} is applied before {@link #licenseUrlReplacements}</li>
+     *   <li>{@link #licensesConfigFile} is applied before {@link #licenseNameUrlOverrides}</li>
+     *   <li>{@link #licenseNameUrlOverrides} is applied before {@link #licenseUrlReplacements}</li>
      *   <li>{@link #licenseUrlReplacements} are applied before {@link #licenseUrlFileNames}</li>
      * </ul>
      *
-     * @since 2.8.0
+     * @since 2.7.2
      */
-    @Parameter(property = "license.licenseNameUrlOverridesFile")
-    protected File licenseNameUrlOverridesFile;
+    @Parameter
+    protected List<LicenseNameUrlOverride> licenseNameUrlOverrides;
 
     /**
      * If {@code true} the default license URL replacements be added to the internal {@link Map} of URL replacements
@@ -899,12 +899,17 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
             return;
         }
 
+        if (licenseNameUrlOverrides != null) {
+            for (LicenseNameUrlOverride override : licenseNameUrlOverrides) {
+                override.validate();
+            }
+        }
+
         this.errorRemedy = getEffectiveErrorRemedy(this.quiet, this.errorRemedy);
         this.preferredFileNames = PreferredFileNames.build(licensesOutputDirectory, licenseUrlFileNames);
         this.cache = new Cache(licenseUrlFileNames != null && !licenseUrlFileNames.isEmpty());
         this.urlReplacements = urlReplacements();
-        this.nameUrlOverrides =
-                new LicenseNameUrlOverrides(LicenseNameUrlOverridesReader.read(licenseNameUrlOverridesFile));
+        this.nameUrlOverrides = new LicenseNameUrlOverrides(licenseNameUrlOverrides);
 
         initDirectories();
 
@@ -919,7 +924,10 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
                         final String fileName = lic.getFile();
                         if (fileName != null) {
                             orphanFileNames.add(fileName);
-                            final String url = lic.getUrl();
+                            final String overriddenUrl =
+                                    nameUrlOverrides.overrideIfNecessary(lic.getName(), lic.getUrl(), false);
+                            final String url =
+                                    overriddenUrl != null ? urlReplacements.rewriteIfNecessary(overriddenUrl) : null;
                             if (url != null) {
                                 final File file = new File(licensesOutputDirectory, fileName);
                                 if (file.exists()) {
@@ -1451,6 +1459,8 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
 
         int licenseIndex = 0;
         for (ProjectLicense license : licenses) {
+            final LicenseNameUrlOverride matchedOverride = nameUrlOverrides.findMatch(license.getName());
+            final boolean urlFromOverride = matchedOverride != null && StringUtils.isNotBlank(matchedOverride.getUrl());
             final String nameOverriddenUrl = nameUrlOverrides.overrideIfNecessary(license.getName(), license.getUrl());
             if (matchingUrlsOnly && StringUtils.isBlank(nameOverriddenUrl)) {
                 handleError(
@@ -1528,13 +1538,21 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
                         }
                     }
                 } catch (URISyntaxException e) {
-                    String msg = "POM for dependency " + depProject.toGavString() + " has an invalid license URL: "
-                            + licenseUrl;
+                    String msg = urlFromOverride
+                            ? "License name URL override (pattern: '" + matchedOverride.getLicenseNamePattern()
+                                    + "') for dependency " + depProject.toGavString() + " has an invalid license URL: "
+                                    + licenseUrl
+                            : "POM for dependency " + depProject.toGavString() + " has an invalid license URL: "
+                                    + licenseUrl;
                     handleError(depProject, msg);
                     LOG.debug(msg, e);
                 } catch (FileNotFoundException e) {
-                    String msg = "POM for dependency " + depProject.toGavString()
-                            + " has a license URL that returns file not found: " + licenseUrl;
+                    String msg = urlFromOverride
+                            ? "License name URL override (pattern: '" + matchedOverride.getLicenseNamePattern()
+                                    + "') for dependency " + depProject.toGavString()
+                                    + " has a license URL that returns file not found: " + licenseUrl
+                            : "POM for dependency " + depProject.toGavString()
+                                    + " has a license URL that returns file not found: " + licenseUrl;
                     handleError(depProject, msg);
                     LOG.debug(msg, e);
                 } catch (IOException e) {

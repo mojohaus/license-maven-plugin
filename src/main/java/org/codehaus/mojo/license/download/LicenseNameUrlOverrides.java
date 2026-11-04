@@ -1,8 +1,10 @@
 package org.codehaus.mojo.license.download;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.codehaus.mojo.license.LicenseNameUrlOverride;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +28,40 @@ public class LicenseNameUrlOverrides {
     private final List<LicenseNameUrlOverride> overrides;
 
     public LicenseNameUrlOverrides(List<LicenseNameUrlOverride> overrides) {
-        this.overrides = overrides == null ? Collections.emptyList() : Collections.unmodifiableList(overrides);
+        this.overrides =
+                overrides == null ? Collections.emptyList() : Collections.unmodifiableList(new ArrayList<>(overrides));
+    }
+
+    /**
+     * Finds the first {@link LicenseNameUrlOverride} matching the given {@code licenseName}.
+     *
+     * @param licenseName the license name as declared in the dependency's POM; may be {@code null} or blank
+     * @return the matching override, or {@code null} if no match or if {@code licenseName} is null or blank
+     */
+    public LicenseNameUrlOverride findMatch(final String licenseName) {
+        if (StringUtils.isBlank(licenseName)) {
+            return null;
+        }
+        for (LicenseNameUrlOverride override : overrides) {
+            if (override.getPattern() != null
+                    && override.getPattern().matcher(licenseName).matches()) {
+                return override;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * If {@code licenseName} matches one of the configured name patterns, returns the URL configured for that
+     * override; otherwise returns {@code currentUrl} unchanged (which may be {@code null} or blank).
+     * Applied overrides are logged at INFO level.
+     *
+     * @param licenseName the license name as declared in the dependency's POM; may be {@code null} or blank
+     * @param currentUrl  the URL currently associated with the license; may be {@code null} or blank
+     * @return the override URL when the name matches, or {@code currentUrl} when there is no match
+     */
+    public String overrideIfNecessary(final String licenseName, final String currentUrl) {
+        return overrideIfNecessary(licenseName, currentUrl, true);
     }
 
     /**
@@ -35,20 +70,21 @@ public class LicenseNameUrlOverrides {
      *
      * @param licenseName the license name as declared in the dependency's POM; may be {@code null} or blank
      * @param currentUrl  the URL currently associated with the license; may be {@code null} or blank
+     * @param logOverride whether to log the applied override at INFO level
      * @return the override URL when the name matches, or {@code currentUrl} when there is no match
      */
-    public String overrideIfNecessary(final String licenseName, final String currentUrl) {
-        if (licenseName == null || licenseName.isEmpty()) {
-            return currentUrl;
-        }
-        for (LicenseNameUrlOverride override : overrides) {
-            if (override.getPattern() != null
-                    && override.getPattern().matcher(licenseName).matches()) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Overriding URL for license '{}': {} => {}", licenseName, currentUrl, override.getUrl());
-                }
-                return override.getUrl();
+    public String overrideIfNecessary(final String licenseName, final String currentUrl, final boolean logOverride) {
+        final LicenseNameUrlOverride match = findMatch(licenseName);
+        if (match != null && StringUtils.isNotBlank(match.getUrl())) {
+            final String newUrl = match.getUrl().trim();
+            if (logOverride && !newUrl.equals(currentUrl)) {
+                LOG.info(
+                        "Overriding URL for license '{}': {} => {}",
+                        licenseName,
+                        currentUrl == null ? "none" : currentUrl,
+                        newUrl);
             }
+            return newUrl;
         }
         return currentUrl;
     }
