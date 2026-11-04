@@ -1,14 +1,19 @@
 package org.codehaus.mojo.license.download;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.regex.PatternSyntaxException;
 
+import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.mojo.license.LicenseNameUrlOverride;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class LicenseNameUrlOverridesTest {
@@ -27,7 +32,7 @@ class LicenseNameUrlOverridesTest {
     @Test
     void matchingNamePatternReturnsOverrideUrl() {
         LicenseNameUrlOverrides subject = getLicenseNameUrlOverrides(
-                getSingleLicenseOverride("Apache License, Version 2\\.0", "https://internal/apache-2.0.txt"));
+                getSingleLicenseOverride(".*Apache License, Version 2\\.0.*", "https://internal/apache-2.0.txt"));
         assertEquals(
                 "https://internal/apache-2.0.txt",
                 subject.overrideIfNecessary(
@@ -55,12 +60,21 @@ class LicenseNameUrlOverridesTest {
     }
 
     @Test
-    void caseInsensitivePatternMatchWorks() {
+    void caseInsensitivePatternMatchWorksByDefault() {
         LicenseNameUrlOverrides subject = getLicenseNameUrlOverrides(
-                getSingleLicenseOverride("(?i)apache.*2\\.0", "https://internal/apache-2.0.txt"));
+                getSingleLicenseOverride("apache.*2\\.0", "https://internal/apache-2.0.txt"));
         assertEquals(
                 "https://internal/apache-2.0.txt",
                 subject.overrideIfNecessary("APACHE LICENSE, VERSION 2.0", "https://old.url/"));
+    }
+
+    @Test
+    void wholeStringMatchWithWildcardsMatchesDeclaredAsfName() {
+        LicenseNameUrlOverrides subject = getLicenseNameUrlOverrides(
+                getSingleLicenseOverride(".*Apache.*2\\.0.*", "https://internal/apache-2.0.txt"));
+        assertEquals(
+                "https://internal/apache-2.0.txt",
+                subject.overrideIfNecessary("The Apache Software License, Version 2.0", "https://old.url/"));
     }
 
     @Test
@@ -75,6 +89,7 @@ class LicenseNameUrlOverridesTest {
         LicenseNameUrlOverrides subject =
                 getLicenseNameUrlOverrides(getSingleLicenseOverride("Apache.*", "https://internal/apache-2.0.txt"));
         assertEquals("https://old.url/", subject.overrideIfNecessary("", "https://old.url/"));
+        assertEquals("https://old.url/", subject.overrideIfNecessary("   ", "https://old.url/"));
     }
 
     @Test
@@ -113,8 +128,70 @@ class LicenseNameUrlOverridesTest {
     }
 
     @Test
+    void findMatchReturnsMatchingOverride() {
+        LicenseNameUrlOverride override = getSingleLicenseOverride("MIT License", "https://internal/mit.txt");
+        LicenseNameUrlOverrides subject = getLicenseNameUrlOverrides(override);
+
+        assertSame(override, subject.findMatch("MIT License"));
+        assertNull(subject.findMatch("Apache License"));
+        assertNull(subject.findMatch(null));
+        assertNull(subject.findMatch("   "));
+    }
+
+    @Test
+    void constructorDefensivelyCopiesList() {
+        List<LicenseNameUrlOverride> mutableList = new ArrayList<>();
+        mutableList.add(getSingleLicenseOverride("MIT License", "https://internal/mit.txt"));
+
+        LicenseNameUrlOverrides subject = new LicenseNameUrlOverrides(mutableList);
+        mutableList.clear();
+
+        assertNotNull(subject.findMatch("MIT License"));
+    }
+
+    @Test
+    void overrideWithBlankUrlFallsBackToCurrentUrl() {
+        LicenseNameUrlOverride blankUrlOverride = getSingleLicenseOverride("MIT License", "   ");
+        LicenseNameUrlOverrides subject = getLicenseNameUrlOverrides(blankUrlOverride);
+
+        assertEquals("https://old.url/", subject.overrideIfNecessary("MIT License", "https://old.url/"));
+    }
+
+    @Test
     void malformedRegexFailsEagerlyAtConstruction() {
         LicenseNameUrlOverride o = new LicenseNameUrlOverride();
         assertThrows(PatternSyntaxException.class, () -> o.setLicenseNamePattern("[invalid"));
+    }
+
+    @Test
+    void validationFailsOnBlankPattern() {
+        LicenseNameUrlOverride o = new LicenseNameUrlOverride();
+        o.setUrl("https://example.com");
+
+        assertThrows(MojoExecutionException.class, o::validate);
+
+        o.setLicenseNamePattern("   ");
+        assertThrows(MojoExecutionException.class, o::validate);
+    }
+
+    @Test
+    void validationFailsOnBlankUrl() {
+        LicenseNameUrlOverride o = new LicenseNameUrlOverride();
+        o.setLicenseNamePattern(".*MIT.*");
+
+        assertThrows(MojoExecutionException.class, o::validate);
+
+        o.setUrl("   ");
+        assertThrows(MojoExecutionException.class, o::validate);
+    }
+
+    @Test
+    void validationPassesOnValidOverride() throws MojoExecutionException {
+        LicenseNameUrlOverride o = new LicenseNameUrlOverride();
+        o.setLicenseNamePattern(".*MIT.*");
+        o.setUrl("https://example.com/mit.txt");
+
+        o.validate();
+        assertNotNull(o.getPattern());
     }
 }

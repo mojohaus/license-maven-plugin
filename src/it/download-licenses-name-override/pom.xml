@@ -60,7 +60,16 @@
               <licensesOutputFile>${project.build.directory}/licenses.xml</licensesOutputFile>
               <sortByGroupIdAndArtifactId>true</sortByGroupIdAndArtifactId>
               <excludeTransitiveDependencies>true</excludeTransitiveDependencies>
-              <licenseNameUrlOverridesFile>${project.basedir}/src/license/license-name-url-overrides.xml</licenseNameUrlOverridesFile>
+              <licenseNameUrlOverrides>
+                <licenseNameUrlOverride>
+                  <licenseNamePattern>.*Eclipse Public License.*</licenseNamePattern>
+                  <url>${project.baseUri}src/license/epl-1.0.txt</url>
+                </licenseNameUrlOverride>
+                <licenseNameUrlOverride>
+                  <licenseNamePattern>.*Apache.*2\.0.*</licenseNamePattern>
+                  <url>${project.baseUri}src/license/apache-2.0.txt</url>
+                </licenseNameUrlOverride>
+              </licenseNameUrlOverrides>
             </configuration>
           </execution>
 
