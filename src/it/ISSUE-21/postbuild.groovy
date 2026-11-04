@@ -19,30 +19,9 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
-def assertExistsFile(file)
-{
-    if ( !file.exists() || file.isDirectory() )
-    {
-        println(file.getAbsolutePath() + " file is missing or a directory.")
-        assert false
-    }
-    assert true
-}
-
-def assertNotContains(file, content, expected)
-{
-    if ( content.contains(expected) )
-    {
-        println(expected + " was found in file [" + file + "]\n :" + content)
-        return false
-    }
-    return true
-}
 
 file = new File(basedir, 'src/main/java/org/codehaus/mojo/HelloWorld.java');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertNotContains(file, content, '#%L');
-
-return true;
+assert !content.contains('#%L');

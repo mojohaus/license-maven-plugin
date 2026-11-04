@@ -17,45 +17,45 @@ class LicenseMojoUtilsTest {
     private MockLogger log = new MockLogger();
 
     @Test
-    void testIsValidNull() {
+    void isValidNull() {
         assertFalse(LicenseMojoUtils.isValid(null));
     }
 
     @Test
-    void testIsValidEmpty() {
+    void isValidEmpty() {
         // This might be wrong; feel free to change the test when it starts to fail
         assertTrue(LicenseMojoUtils.isValid(""));
     }
 
     @Test
-    void testIsValidBlank() {
+    void isValidBlank() {
         // This might be wrong; feel free to change the test when it starts to fail
         assertTrue(LicenseMojoUtils.isValid("   "));
     }
 
     @Test
-    void testIsValidNonexistingClasspathResource() {
+    void isValidNonexistingClasspathResource() {
         assertTrue(LicenseMojoUtils.isValid("classpath:noSuchResource"));
     }
 
     @Test
-    void testIsValidClasspathResource() {
+    void isValidClasspathResource() {
         assertTrue(LicenseMojoUtils.isValid("classpath:log4j.properties"));
     }
 
     @Test
-    void testIsValidHttpResource() {
+    void isValidHttpResource() {
         assertTrue(LicenseMojoUtils.isValid("http://foo/bar/baz"));
     }
 
     @Test
-    void testPrepareThirdPartyOverrideUrlNull() {
+    void prepareThirdPartyOverrideUrlNull() {
         String actual = LicenseMojoUtils.prepareThirdPartyOverrideUrl(resolvedUrl, deprecatedFile, url, basedir, log);
         assertEquals(LicenseMojoUtils.NO_URL, actual);
     }
 
     @Test
-    void testPrepareThirdPartyOverrideUrlBothOverrides() {
+    void prepareThirdPartyOverrideUrlBothOverrides() {
         deprecatedFile = new File("src/test/resources/overrides.properties");
         url = "classpath:overrides.properties";
         try {
@@ -68,7 +68,7 @@ class LicenseMojoUtilsTest {
     }
 
     @Test
-    void testPrepareThirdPartyOverrideUrlNonExistingDeprecatedFile() {
+    void prepareThirdPartyOverrideUrlNonExistingDeprecatedFile() {
         deprecatedFile = new File("foo");
         String actual = runTestAndJoinResults();
         assertEquals(
@@ -81,7 +81,7 @@ class LicenseMojoUtilsTest {
     }
 
     @Test
-    void testPrepareThirdPartyOverrideUrlDeprecatedFile() {
+    void prepareThirdPartyOverrideUrlDeprecatedFile() {
         deprecatedFile = new File("src/test/resources/overrides.properties");
         String actual = runTestAndJoinResults();
         assertEquals(
@@ -93,7 +93,7 @@ class LicenseMojoUtilsTest {
     }
 
     @Test
-    void testPrepareThirdPartyOverrideClasspathResource() {
+    void prepareThirdPartyOverrideClasspathResource() {
         url = "classpath:overrides.properties";
         String actual = LicenseMojoUtils.prepareThirdPartyOverrideUrl(resolvedUrl, deprecatedFile, url, basedir, log);
         assertEquals(url, actual);
@@ -102,7 +102,7 @@ class LicenseMojoUtilsTest {
     }
 
     @Test
-    void testPrepareThirdPartyOverrideInvalidUrl() {
+    void prepareThirdPartyOverrideInvalidUrl() {
         url = "foo://localhost/bar";
         String actual = runTestAndJoinResults();
         assertEquals(
@@ -114,7 +114,7 @@ class LicenseMojoUtilsTest {
     }
 
     @Test
-    void testPrepareThirdPartyOverridePreventReinit() {
+    void prepareThirdPartyOverridePreventReinit() {
         resolvedUrl = "classpath:overrides.properties";
         deprecatedFile = new File("foo");
         url = "classpath:bar";

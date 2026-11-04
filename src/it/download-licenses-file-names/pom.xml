@@ -48,7 +48,7 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>commons-beanutils</groupId>
+      <groupId>localhost</groupId>
       <artifactId>commons-beanutils</artifactId>
       <version>1.9.4</version>
       <exclusions>

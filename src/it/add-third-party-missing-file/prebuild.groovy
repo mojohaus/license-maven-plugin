@@ -23,7 +23,7 @@
 import java.util.jar.JarOutputStream
 import java.util.zip.ZipEntry
 
-String missingLicences = "org.json--json--20230227=The JSON License by classpath url\n" +
+String missingLicences = "localhost--json--20230227=The JSON License by classpath url\n" +
                          "javax.resource--connector-api--1.5=CDDL + GPLv2 with classpath exception by classpath url";
 
 JarOutputStream licenseRepo = new JarOutputStream(new FileOutputStream(new File(basedir, "license-repo.jar")));

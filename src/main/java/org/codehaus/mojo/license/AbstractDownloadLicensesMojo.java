@@ -63,6 +63,7 @@ import org.codehaus.mojo.license.api.ArtifactFilters;
 import org.codehaus.mojo.license.api.MavenProjectDependenciesConfigurator;
 import org.codehaus.mojo.license.download.Cache;
 import org.codehaus.mojo.license.download.FileNameEntry;
+import org.codehaus.mojo.license.download.LicenseClassifier;
 import org.codehaus.mojo.license.download.LicenseDownloader;
 import org.codehaus.mojo.license.download.LicenseDownloader.LicenseDownloadResult;
 import org.codehaus.mojo.license.download.LicenseMatchers;
@@ -463,8 +464,55 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
     @Parameter(property = "license.organizeLicensesByDependencies", defaultValue = "false")
     protected boolean organizeLicensesByDependencies;
 
+    /**
+     * A flag to order the dependencies by group id and artifact id.
+     *
+     * @deprecated Use {@link #orderBy} with {@link OrderBy#dependencyGav} instead, which also orders by version.
+     */
+    @Deprecated
     @Parameter(property = "license.sortByGroupIdAndArtifactId", defaultValue = "false")
     private boolean sortByGroupIdAndArtifactId;
+
+    /**
+     * The order of the dependencies in the license summary file and in the Excel and Calc files.
+     *
+     * <p>Supersedes {@link #sortByGroupIdAndArtifactId}, which orders by group id and artifact id only, and which
+     * is ignored when this parameter is set to anything but {@link OrderBy#none}.
+     *
+     * @since 2.8.0
+     */
+    @Parameter(property = "license.orderBy", defaultValue = "none")
+    private OrderBy orderBy;
+
+    /**
+     * The names of the licenses that must not appear in the report at all.
+     *
+     * <p>Names are matched ignoring case and surrounding whitespace. Use {@link #licenseMerges} to bring the
+     * spelling variants of one license together first.
+     *
+     * @see OrderBy#licenseMatch
+     * @since 2.8.0
+     */
+    @Parameter(property = "license.forbiddenLicenses")
+    private List<String> forbiddenLicenses;
+
+    /**
+     * The names of the licenses that need a second look.
+     *
+     * @see #forbiddenLicenses
+     * @since 2.8.0
+     */
+    @Parameter(property = "license.problematicLicenses")
+    private List<String> problematicLicenses;
+
+    /**
+     * The names of the licenses that have been signed off.
+     *
+     * @see #forbiddenLicenses
+     * @since 2.8.0
+     */
+    @Parameter(property = "license.okLicenses")
+    private List<String> okLicenses;
 
     /**
      * A filter to exclude some GroupIds
@@ -999,7 +1047,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
         }
 
         try {
-            if (sortByGroupIdAndArtifactId) {
+            if (!sortDependencies(depProjectLicenses) && sortByGroupIdAndArtifactId) {
                 sortByGroupIdAndArtifactId(depProjectLicenses);
             }
 
@@ -1179,6 +1227,34 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
             default:
                 return errorRemedy;
         }
+    }
+
+    /**
+     * The classification of the license names configured on this mojo.
+     *
+     * @return the classifier, never {@code null}
+     */
+    protected LicenseClassifier licenseClassifier() {
+        return new LicenseClassifier(forbiddenLicenses, problematicLicenses, okLicenses);
+    }
+
+    /**
+     * Orders the dependencies as requested by {@link #orderBy}.
+     *
+     * @param depProjectLicenses the dependencies, ordered in place
+     * @return whether the dependencies were ordered
+     */
+    private boolean sortDependencies(List<ProjectLicenseInfo> depProjectLicenses) {
+        final Comparator<ProjectLicenseInfo> comparator =
+                ProjectLicenseInfoComparators.of(orderBy, licenseClassifier());
+        if (comparator == null) {
+            return false;
+        }
+        if (sortByGroupIdAndArtifactId) {
+            LOG.info("Ordering by \"{}\", sortByGroupIdAndArtifactId is ignored", orderBy);
+        }
+        depProjectLicenses.sort(comparator);
+        return true;
     }
 
     private void sortByGroupIdAndArtifactId(List<ProjectLicenseInfo> depProjectLicenses) {
@@ -1606,6 +1682,35 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
      *
      * @since 1.18
      */
+    /**
+     * The order of the dependencies in the generated files.
+     *
+     * @since 2.8.0
+     */
+    public enum OrderBy {
+        /** The order in which the dependencies were resolved. */
+        none,
+        /**
+         * The name the dependency gives itself in its POM, falling back to the artifact id for dependencies which
+         * have no name, and for every dependency when {@code extendedInfo} is disabled.
+         */
+        dependencyName,
+        /** The group id, artifact id and version of the dependency. */
+        dependencyGav,
+        /**
+         * The license of the dependency. Dependencies with more than one license are ordered by the alphabetically
+         * first of them, dependencies without a license come last.
+         */
+        licenseName,
+        /**
+         * How the license of the dependency compares against {@link #forbiddenLicenses},
+         * {@link #problematicLicenses} and {@link #okLicenses}, in that order, with the dependencies whose licenses
+         * are in none of the lists last. Dependencies with more than one license are ordered by the most worrying
+         * of them.
+         */
+        licenseMatch
+    }
+
     public enum ErrorRemedy {
         /** All errors are ignored */
         ignore,

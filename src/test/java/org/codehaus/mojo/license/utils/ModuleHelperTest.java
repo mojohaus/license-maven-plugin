@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ModuleHelperTest {
+class ModuleHelperTest {
     List<MavenProject> projects = new ArrayList<>();
     MavenProject project0 = new MavenProject();
     MavenProject project1 = new MavenProject();
@@ -63,7 +63,7 @@ public class ModuleHelperTest {
     }
 
     @Test
-    void testNoFilters() {
+    void noFilters() {
         String[] includedModules = null;
         String[] excludedModules = null;
 
@@ -74,7 +74,7 @@ public class ModuleHelperTest {
     }
 
     @Test
-    void testIncludeFilterOnly() {
+    void includeFilterOnly() {
         String[] includedModules = {artifactId2, artifactId4};
         String[] excludedModules = null;
 
@@ -86,7 +86,7 @@ public class ModuleHelperTest {
     }
 
     @Test
-    void testExcludeFilterOnly() {
+    void excludeFilterOnly() {
         String[] includedModules = null;
         String[] excludedModules = {artifactId2, artifactId4};
 
@@ -99,7 +99,7 @@ public class ModuleHelperTest {
     }
 
     @Test
-    void testIncludeAndExcludeFilter() {
+    void includeAndExcludeFilter() {
         String[] includedModules = {artifactId0, artifactId2, artifactId3};
         String[] excludedModules = {artifactId2, artifactId4};
 

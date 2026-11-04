@@ -22,7 +22,6 @@ package org.codehaus.mojo.license.model;
  * #L%
  */
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
@@ -76,7 +75,7 @@ class LicenseStoreTest {
     @EnabledOnJre(
             value = JRE.JAVA_8,
             disabledReason = "changed class order for Java 9+, dut to add varsion/11 for surefire")
-    void testJarRepository() throws IOException {
+    void jarRepository() throws Exception {
 
         store = new LicenseStore();
         store.init();
@@ -107,7 +106,7 @@ class LicenseStoreTest {
     }
 
     @Test
-    void testUserRepository() throws IOException {
+    void userRepository() throws Exception {
 
         URL baseURL = getClass().getResource("/newRepository");
         LicenseRepository jarRepository = new LicenseRepository();
@@ -125,7 +124,7 @@ class LicenseStoreTest {
         License[] licenses = store.getLicenses();
         assertNotNull(licenses);
         assertNotNull(licenses1);
-        assertEquals(licenses1.length, 4);
+        assertEquals(4, licenses1.length);
         assertEquals(licenses1.length, licenses.length);
 
         for (String licenseName : NEW_LICENSES) {

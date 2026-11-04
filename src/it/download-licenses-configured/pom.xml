@@ -52,7 +52,9 @@
               <licensesConfigFile>${basedir}/src/license/licenses-config-pre-1.18.xml</licensesConfigFile>
               <licensesOutputDirectory>${project.build.directory}/pre-1.18/licenses</licensesOutputDirectory>
               <licensesOutputFile>${project.build.directory}/pre-1.18/licenses.xml</licensesOutputFile>
-              <sortByGroupIdAndArtifactId>true</sortByGroupIdAndArtifactId>
+              <!-- The other executions keep sortByGroupIdAndArtifactId, so both paths stay covered
+                   and are held against the same expected files. -->
+              <orderBy>dependencyGav</orderBy>
             </configuration>
           </execution>
           <execution>
@@ -100,6 +102,36 @@
               <licensesOutputDirectory>${project.build.directory}/no-download/licenses</licensesOutputDirectory>
               <licensesOutputFile>${project.build.directory}/no-download/licenses.xml</licensesOutputFile>
               <sortByGroupIdAndArtifactId>true</sortByGroupIdAndArtifactId>
+              <licenseUrlFileNameSanitizers>
+                <licenseUrlFileNameSanitizer>
+                  <regexp>[\s-_]+</regexp>
+                  <replacement>-</replacement>
+                </licenseUrlFileNameSanitizer>
+              </licenseUrlFileNameSanitizers>
+            </configuration>
+          </execution>
+          <execution>
+            <id>license-match</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>download-licenses</goal>
+            </goals>
+            <configuration>
+              <licensesConfigFile>${basedir}/src/license/licenses-config-no-download.xml</licensesConfigFile>
+              <licensesOutputDirectory>${project.build.directory}/license-match/licenses</licensesOutputDirectory>
+              <licensesOutputFile>${project.build.directory}/license-match/licenses.xml</licensesOutputFile>
+              <!-- The lists are deliberately upside down: this order is the reverse of the order the
+                   dependencies resolve in, so the expected file also fails if orderBy is ignored. -->
+              <orderBy>licenseMatch</orderBy>
+              <forbiddenLicenses>
+                <forbiddenLicense>apache license 2.0</forbiddenLicense>
+              </forbiddenLicenses>
+              <problematicLicenses>
+                <problematicLicense>BSD 3-Clause ASM</problematicLicense>
+              </problematicLicenses>
+              <okLicenses>
+                <okLicense>Public Domain</okLicense>
+              </okLicenses>
               <licenseUrlFileNameSanitizers>
                 <licenseUrlFileNameSanitizer>
                   <regexp>[\s-_]+</regexp>

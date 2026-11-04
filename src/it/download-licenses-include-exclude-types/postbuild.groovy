@@ -19,6 +19,8 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
+import com.github.tomakehurst.wiremock.WireMockServer
+
 def assertExistsFile(file)
 {
     if ( !file.exists() || file.isDirectory() )
@@ -39,20 +41,26 @@ def assertNotExistsFile(file)
   assert true
 }
 
-file = new File(basedir, 'target/generated-resources/licenses1/eclipse public license 1.0 - epl-v10.html');
-assertExistsFile(file);
+WireMockServer wireMockServer = context.get("wireMockServer")
+try {
+    file = new File(basedir, 'target/generated-resources/licenses1/eclipse public license 1.0 - epl-v10.html');
+    assertExistsFile(file);
 
-file = new File(basedir, 'target/generated-resources/licenses2/eclipse public license 1.0 - epl-v10.html');
-assertNotExistsFile(file);
+    file = new File(basedir, 'target/generated-resources/licenses2/eclipse public license 1.0 - epl-v10.html');
+    assertNotExistsFile(file);
 
-file = new File(basedir, 'target/generated-resources/licenses1/lgpl - lgpl-2.1.txt');
-assertNotExistsFile(file);
-file = new File(basedir, 'target/generated-resources/licenses2/lgpl - lgpl-2.1.txt');
-assertExistsFile(file);
+    file = new File(basedir, 'target/generated-resources/licenses1/lgpl - lgpl-2.1.txt');
+    assertNotExistsFile(file);
+    file = new File(basedir, 'target/generated-resources/licenses2/lgpl - lgpl-2.1.txt');
+    assertExistsFile(file);
+    assert file.text.equals('stub license text for ITs');
 
-file = new File(basedir, 'target/generated-resources/licenses1.xml');
-assertExistsFile(file);
-file = new File(basedir, 'target/generated-resources/licenses2.xml');
-assertExistsFile(file);
+    file = new File(basedir, 'target/generated-resources/licenses1.xml');
+    assertExistsFile(file);
+    file = new File(basedir, 'target/generated-resources/licenses2.xml');
+    assertExistsFile(file);
+} finally {
+    wireMockServer.stop()
+}
 
 return true;

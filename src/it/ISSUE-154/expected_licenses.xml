@@ -2,7 +2,7 @@
 <licenseSummary>
   <dependencies>
     <dependency>
-      <groupId>org.jboss.xnio</groupId>
+      <groupId>localhost</groupId>
       <artifactId>xnio-api</artifactId>
       <version>3.3.6.Final</version>
       <licenses>

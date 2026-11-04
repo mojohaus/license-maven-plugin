@@ -112,6 +112,14 @@ return {
     assert expectedLicensesXml.toFile().text.equals(licensesXml.toFile().text)
     return true
 }() && {
+    final String id = 'license-match'
+    final Path outputBase = basePath.resolve('target/' + id)
+
+    final Path expectedLicensesXml = basePath.resolve('licenses-'+ id +'.expected.xml')
+    final Path licensesXml = outputBase.resolve('licenses.xml')
+    assert expectedLicensesXml.toFile().text.equals(licensesXml.toFile().text)
+    return true
+}() && {
     final String id = 'content-sanitizers'
     final Path outputBase = basePath.resolve('target/' + id)
 

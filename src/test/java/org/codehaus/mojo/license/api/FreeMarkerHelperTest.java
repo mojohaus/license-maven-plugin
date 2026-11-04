@@ -45,7 +45,7 @@ class FreeMarkerHelperTest {
     private static final Logger LOG = LoggerFactory.getLogger(FreeMarkerHelperTest.class);
 
     @Test
-    void testRenderTemplateForThirdPartyFile() throws Exception {
+    void renderTemplateForThirdPartyFile() throws Exception {
 
         FreeMarkerHelper helper = FreeMarkerHelper.newDefaultHelper();
 
@@ -88,7 +88,7 @@ class FreeMarkerHelperTest {
     }
 
     @Test
-    void testRenderTemplateForThirdPartyFileGroupByLicense() throws Exception {
+    void renderTemplateForThirdPartyFileGroupByLicense() throws Exception {
 
         FreeMarkerHelper helper = FreeMarkerHelper.newDefaultHelper();
 
@@ -131,7 +131,7 @@ class FreeMarkerHelperTest {
     }
 
     @Test
-    void testRenderTemplateForUpdateFileHeader() throws Exception {
+    void renderTemplateForUpdateFileHeader() throws Exception {
 
         FreeMarkerHelper helper = FreeMarkerHelper.newDefaultHelper();
 

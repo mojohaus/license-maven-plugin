@@ -20,50 +20,16 @@
  * #L%
  */
 
-def assertExistsFile(file) {
-    if (!file.exists() || file.isDirectory()) {
-        println(file.getAbsolutePath() + " file is missing or a directory.")
-        assert false
-    }
-    assert true
-}
-
-def assertNotExistsFile(file) {
-    if (file.exists()) {
-        println(file.getAbsolutePath() + " file should not exist.")
-        assert false
-    }
-    assert true
-}
-
-def assertNotContains(file, content, expected) {
-    if (content.contains(expected)) {
-        println(expected + " was found in file [" + file + "]\n :" + content)
-        return false
-    }
-    return true
-}
-
-def assertContains(file, content, expected) {
-    if (!content.contains(expected)) {
-        println(expected + " was not found in file [" + file + "]\n :" + content)
-        return false
-    }
-    return true
-}
-
 file = new File(basedir, 'child1/target/generated-sources/license/THIRD-PARTY.txt');
-assertNotExistsFile(file);
+assert !file.exists();
 
 file = new File(basedir, 'child2/target/generated-sources/license/THIRD-PARTY.txt');
-assertNotExistsFile(file);
+assert !file.exists();
 
 file = new File(basedir, 'target/generated-sources/license/THIRD-PARTY.txt');
-assertExistsFile(file);
+assert file.isFile();
 content = file.text;
 
-assert assertNotContains(file, content, 'the project has no dependencies.');
-assert assertContains(file, content, '(The Apache Software License, Version 2.0) Commons Logging (commons-logging:commons-logging:1.1.1 - http://commons.apache.org/logging)');
-assert assertContains(file, content, '(The Apache Software License, Version 2.0) commons-primitives (commons-primitives:commons-primitives:1.0 - no url defined)');
-
-return true;
+assert !content.contains('the project has no dependencies.');
+assert content.contains('(The Apache Software License, Version 2.0) Commons Logging (commons-logging:commons-logging:1.1.1 - http://commons.apache.org/logging)');
+assert content.contains('(The Apache Software License, Version 2.0) commons-primitives (commons-primitives:commons-primitives:1.0 - no url defined)');

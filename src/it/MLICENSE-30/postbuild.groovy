@@ -19,69 +19,38 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
-def assertExistsFile(file)
-{
-  if ( !file.exists() || file.isDirectory() )
-  {
-    println(file.getAbsolutePath() + " file is missing or a directory.")
-    assert false
-  }
-  assert true
-}
-
-def assertContains(file, content, expected)
-{
-  if ( !content.contains(expected) )
-  {
-    println(expected + " was not found in file [" + file + "]\n :" + content)
-    return false
-  }
-  return true
-}
-
-def assertNotContains(file, content, expected)
-{
-  if ( content.contains(expected) )
-  {
-    println(expected + " should not be found in file [" + file + "]\n :" + content)
-    return false
-  }
-  return true
-}
 
 file = new File(basedir, 'src/main/java/org/codehaus/mojo/license/test/MyBean.java');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, 'Copyright (C) 2112 License Test');
-assert assertContains(file, content, 'MyBean.java - License Test :: MLICENSE-30 - License Test - 2112');
-assert assertContains(file, content, 'org.codehaus.mojo.license.test-MLICENSE-30-1.1');
-assert assertContains(file, content, '#%L');
-assert assertContains(file, content, '%%');
-assert assertContains(file, content, '#L%');
+assert content.contains('Copyright (C) 2112 License Test');
+assert content.contains('MyBean.java - License Test :: MLICENSE-30 - License Test - 2112');
+assert content.contains('org.codehaus.mojo.license.test-MLICENSE-30-1.1');
+assert content.contains('#%L');
+assert content.contains('%%');
+assert content.contains('#L%');
 
 file = new File(basedir, 'src/main/java/org/codehaus/mojo/license/test/MyBean2.java');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, 'Copyright (C) 2010 Tony Do not update!');
-assert assertNotContains(file, content, 'License Test :: Will be updated!');
-assert assertNotContains(file, content, 'Copyright (C) 2112 License Test');
-assert assertContains(file, content, 'MyBean2.java - License Test :: MLICENSE-30 - License Test - 2112');
-assert assertContains(file, content, 'org.codehaus.mojo.license.test-MLICENSE-30-1.1');
-assert assertContains(file, content, 'Copyright (C) 2010 Tony Do not update!');
-assert assertNotContains(file, content, 'Fake to be removed!');
-assert assertContains(file, content, '#%L');
-assert assertContains(file, content, '%%');
-assert assertContains(file, content, '#L%');
+assert content.contains('Copyright (C) 2010 Tony Do not update!');
+assert !content.contains('License Test :: Will be updated!');
+assert !content.contains('Copyright (C) 2112 License Test');
+assert content.contains('MyBean2.java - License Test :: MLICENSE-30 - License Test - 2112');
+assert content.contains('org.codehaus.mojo.license.test-MLICENSE-30-1.1');
+assert content.contains('Copyright (C) 2010 Tony Do not update!');
+assert !content.contains('Fake to be removed!');
+assert content.contains('#%L');
+assert content.contains('%%');
+assert content.contains('#L%');
 
 file = new File(basedir, 'src/main/java/org/codehaus/mojo/license/test/MyBean3.java');
-assertExistsFile(file);
+assert file.isFile();
 
 content = file.text;
-assert assertContains(file, content, '%%Ignore-License');
-assert assertContains(file, content, 'Copyright (C) 2000 Codelutin Do not update!');
-assert assertNotContains(file, content, '#%L');
-assert assertNotContains(file, content, '#L%');
-
-return true;
+assert content.contains('%%Ignore-License');
+assert content.contains('Copyright (C) 2000 Codelutin Do not update!');
+assert !content.contains('#%L');
+assert !content.contains('#L%');

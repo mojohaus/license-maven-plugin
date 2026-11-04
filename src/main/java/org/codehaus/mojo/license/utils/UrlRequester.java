@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -66,10 +67,40 @@ public class UrlRequester {
             return true;
         }
         try {
-            URI.create(data).toURL();
+            toUrl(data);
             return true;
         } catch (IllegalArgumentException | MalformedURLException e) {
             return false;
+        }
+    }
+
+    /**
+     * Converts the given string to a URL.
+     * <p>
+     * A {@code file:} URL that is not a valid URI, such as {@code file:///${project.build.directory}/file.txt}
+     * with a Windows path, is built from its path instead: backslashes become slashes and characters such as
+     * spaces are quoted. {@code java.net.URL} accepted these strings before 2.5.0.
+     *
+     * @param url the URL as a string
+     * @return the URL
+     * @throws MalformedURLException if the string is not a URL
+     * @throws IllegalArgumentException if the string is not a URI and not a {@code file:} URL
+     */
+    public static URL toUrl(String url) throws MalformedURLException {
+        try {
+            return URI.create(url).toURL();
+        } catch (IllegalArgumentException e) {
+            if (!"file".equals(findProtocol(url))) {
+                throw e;
+            }
+            String path = StringUtils.stripStart(url.substring("file:".length()).replace('\\', '/'), "/");
+            try {
+                return new URI("file", null, "/" + path, null).toURL();
+            } catch (URISyntaxException ex) {
+                MalformedURLException mue = new MalformedURLException(ex.getMessage());
+                mue.initCause(ex);
+                throw mue;
+            }
         }
     }
 
@@ -155,7 +186,7 @@ public class UrlRequester {
                 }
             }
         } else {
-            try (InputStream in = URI.create(url).toURL().openStream()) {
+            try (InputStream in = toUrl(url).openStream()) {
                 result = IOUtils.toString(in, charset);
             }
         }
