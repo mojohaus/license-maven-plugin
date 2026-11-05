@@ -81,6 +81,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.DefaultProxyRoutePlanner;
 import org.apache.http.protocol.HttpContext;
+import org.apache.http.util.EntityUtils;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.settings.Proxy;
 import org.codehaus.mojo.license.spdx.SpdxLicenseList.Attachments.ContentSanitizer;
@@ -136,6 +137,9 @@ public class LicenseDownloader implements AutoCloseable {
     /** Additional HTTP headers to include in authenticated requests (e.g. custom tokens). May be empty. */
     private final Map<String, String> httpHeaders;
 
+    /** Keeps downloaded license texts between builds. May be {@code null} if there is no persistent cache. */
+    private final PersistentLicenseCache licenseCache;
+
     /**
      * Creates a new {@code LicenseDownloader} without authentication. Proxy settings and timeouts are still applied.
      */
@@ -189,6 +193,43 @@ public class LicenseDownloader implements AutoCloseable {
             String password,
             String serverUrl,
             Map<String, String> httpHeaders) {
+        this(
+                proxy,
+                connectTimeout,
+                socketTimeout,
+                connectionRequestTimeout,
+                contentSanitizers,
+                charset,
+                userName,
+                password,
+                serverUrl,
+                httpHeaders,
+                null);
+    }
+
+    /**
+     * Creates a new {@code LicenseDownloader} with optional authentication and a persistent cache.
+     *
+     * <p>Only {@code http} and {@code https} downloads that carry no credentials go through {@code licenseCache}.
+     *
+     * @param licenseCache the cache of downloaded license texts, or {@code null} for none
+     * @see #LicenseDownloader(Proxy, int, int, int, Map, Charset, String, String, String, Map)
+     * @since 2.8.0
+     */
+    @SuppressWarnings("checkstyle:ParameterNumber")
+    public LicenseDownloader(
+            Proxy proxy,
+            int connectTimeout,
+            int socketTimeout,
+            int connectionRequestTimeout,
+            Map<String, ContentSanitizer> contentSanitizers,
+            Charset charset,
+            String userName,
+            String password,
+            String serverUrl,
+            Map<String, String> httpHeaders,
+            PersistentLicenseCache licenseCache) {
+        this.licenseCache = licenseCache;
         this.contentSanitizers = contentSanitizers;
         this.charset = charset;
         this.userName = userName;
@@ -344,8 +385,19 @@ public class LicenseDownloader implements AutoCloseable {
             }
         } else {
             final String host = hostOf(licenseUrlString);
+            final boolean cacheable =
+                    licenseCache != null && isHttp(licenseUrlString) && !shouldAuthenticate(licenseUrlString);
+            final PersistentLicenseCache.Entry cached = cacheable ? licenseCache.find(licenseUrlString) : null;
+            if (cached != null && licenseCache.isFresh(cached)) {
+                LOG.debug("Using '{}' from the license cache", licenseUrlString);
+                licenseCache.record(PersistentLicenseCache.Source.CACHE);
+                return process(cached.toEntity(), licenseUrlString, fileNameEntry, sanitizers);
+            }
             final String stopped = host != null ? stoppedHosts.get(host) : null;
             if (stopped != null) {
+                if (cached != null) {
+                    return processStale(cached, stopped, fileNameEntry, sanitizers);
+                }
                 return LicenseDownloadResult.failure("'" + licenseUrlString + "' not requested: " + stopped);
             }
             LOG.debug("About to download '{}'", licenseUrlString);
@@ -364,69 +416,136 @@ public class LicenseDownloader implements AutoCloseable {
             } else {
                 context = null;
             }
+            if (cached != null) {
+                if (cached.getEtag() != null) {
+                    request.addHeader("If-None-Match", cached.getEtag());
+                }
+                if (cached.getLastModified() != null) {
+                    request.addHeader("If-Modified-Since", cached.getLastModified());
+                }
+            }
+            final HttpEntity buffered;
             try (CloseableHttpResponse response =
                     context != null ? client.execute(request, context) : client.execute(request)) {
                 final StatusLine statusLine = response.getStatusLine();
-                if (host != null && isHostStopStatus(statusLine.getStatusCode())) {
-                    stopHost(host, statusLine.getStatusCode(), response.getFirstHeader("Retry-After"));
+                final int status = statusLine.getStatusCode();
+                if (host != null && isHostStopStatus(status)) {
+                    stopHost(host, status, response.getFirstHeader("Retry-After"));
                 }
-                if (statusLine.getStatusCode() != HttpStatus.SC_OK) {
-                    return LicenseDownloadResult.failure("'" + licenseUrlString + "' returned "
-                            + statusLine.getStatusCode()
+                if (cached != null && status == HttpStatus.SC_NOT_MODIFIED) {
+                    LOG.debug("'{}' is unchanged, the cached copy is valid again", licenseUrlString);
+                    licenseCache.refresh(cached);
+                    licenseCache.record(PersistentLicenseCache.Source.REVALIDATED);
+                    return process(cached.toEntity(), licenseUrlString, fileNameEntry, sanitizers);
+                }
+                if (status != HttpStatus.SC_OK) {
+                    if (cached != null && (isHostStopStatus(status) || status >= HttpStatus.SC_INTERNAL_SERVER_ERROR)) {
+                        return processStale(cached, "answered " + status, fileNameEntry, sanitizers);
+                    }
+                    return LicenseDownloadResult.failure("'" + licenseUrlString + "' returned " + status
                             + (statusLine.getReasonPhrase() != null ? " " + statusLine.getReasonPhrase() : ""));
                 }
 
                 final HttpEntity entity = response.getEntity();
-                if (entity != null) {
-                    final ContentType contentType = ContentType.get(entity);
+                if (!cacheable || entity == null) {
+                    return process(entity, licenseUrlString, fileNameEntry, sanitizers);
+                }
+                final byte[] body = EntityUtils.toByteArray(entity);
+                final Header type = entity.getContentType();
+                final Header etag = response.getFirstHeader("ETag");
+                final Header lastModified = response.getFirstHeader("Last-Modified");
+                final String typeValue = type != null ? type.getValue() : null;
+                licenseCache.store(
+                        licenseUrlString,
+                        body,
+                        typeValue,
+                        etag != null ? etag.getValue() : null,
+                        lastModified != null ? lastModified.getValue() : null);
+                licenseCache.record(PersistentLicenseCache.Source.NETWORK);
+                buffered = PersistentLicenseCache.entityOf(body, typeValue);
+            } catch (IOException e) {
+                if (cached == null) {
+                    throw e;
+                }
+                return processStale(cached, e.toString(), fileNameEntry, sanitizers);
+            }
+            return process(buffered, licenseUrlString, fileNameEntry, sanitizers);
+        }
+    }
 
-                    File updatedFile = fileNameEntry.isPreferred()
-                            ? outputFile
-                            : updateFileExtension(outputFile, contentType != null ? contentType.getMimeType() : null);
-                    LOG.debug(
-                            "Downloading '{}' -> '{}'{}",
-                            licenseUrlString,
-                            updatedFile,
-                            fileNameEntry.isPreferred() ? " (preferred file name)" : "");
+    private static boolean isHttp(String url) {
+        final String lower = url.toLowerCase(Locale.ROOT);
+        return lower.startsWith("http://") || lower.startsWith("https://");
+    }
 
-                    if (sanitizers.isEmpty()) {
-                        try (InputStream in = entity.getContent();
-                                FileOutputStream fos = new FileOutputStream(updatedFile)) {
-                            final MessageDigest md = MessageDigest.getInstance("SHA-1");
-                            final byte[] buf = new byte[1024];
-                            int len;
-                            while ((len = in.read(buf)) >= 0) {
-                                md.update(buf, 0, len);
-                                fos.write(buf, 0, len);
-                            }
-                            final String actualSha1 = Hex.encodeHexString(md.digest());
-                            final String expectedSha1 = fileNameEntry.getSha1();
-                            if (expectedSha1 != null && !expectedSha1.equals(actualSha1)) {
-                                throw new MojoFailureException("URL '" + licenseUrlString
-                                        + "' returned content with unexpected sha1 '" + actualSha1 + "'; expected '"
-                                        + expectedSha1 + "'. You may want to (a) re-run the current mojo"
-                                        + " with -Dlicense.forceDownload=true or (b) change the expected sha1 in"
-                                        + " the licenseUrlFileNames entry '"
-                                        + fileNameEntry.getFile().getName()
-                                        + "' or (c) split the entry so that"
-                                        + " its URLs return content with different sha1 sums.");
-                            }
-                            return LicenseDownloadResult.success(updatedFile, actualSha1, fileNameEntry.isPreferred());
-                        } catch (NoSuchAlgorithmException e) {
-                            throw new RuntimeException(e);
-                        }
-                    } else {
-                        final Charset cs = contentType != null
-                                ? (contentType.getCharset() == null ? this.charset : contentType.getCharset())
-                                : this.charset;
-                        try (BufferedReader r = new BufferedReader(new InputStreamReader(entity.getContent(), cs))) {
-                            return sanitize(r, updatedFile, cs, sanitizers, fileNameEntry.isPreferred());
-                        }
+    private LicenseDownloadResult processStale(
+            PersistentLicenseCache.Entry cached,
+            String reason,
+            FileNameEntry fileNameEntry,
+            List<ContentSanitizer> sanitizers)
+            throws IOException, MojoFailureException {
+        LOG.warn(
+                "Using the license text of '{}' cached on {} because the server could not be asked afresh: {}",
+                cached.getUrl(),
+                cached.getDownloaded(),
+                reason);
+        licenseCache.record(PersistentLicenseCache.Source.STALE);
+        return process(cached.toEntity(), cached.getUrl(), fileNameEntry, sanitizers);
+    }
+
+    /** Writes the body of a response, or of a cache entry, to the license file. */
+    private LicenseDownloadResult process(
+            HttpEntity entity, String licenseUrlString, FileNameEntry fileNameEntry, List<ContentSanitizer> sanitizers)
+            throws IOException, MojoFailureException {
+        final File outputFile = fileNameEntry.getFile();
+        if (entity != null) {
+            final ContentType contentType = ContentType.get(entity);
+
+            File updatedFile = fileNameEntry.isPreferred()
+                    ? outputFile
+                    : updateFileExtension(outputFile, contentType != null ? contentType.getMimeType() : null);
+            LOG.debug(
+                    "Downloading '{}' -> '{}'{}",
+                    licenseUrlString,
+                    updatedFile,
+                    fileNameEntry.isPreferred() ? " (preferred file name)" : "");
+
+            if (sanitizers.isEmpty()) {
+                try (InputStream in = entity.getContent();
+                        FileOutputStream fos = new FileOutputStream(updatedFile)) {
+                    final MessageDigest md = MessageDigest.getInstance("SHA-1");
+                    final byte[] buf = new byte[1024];
+                    int len;
+                    while ((len = in.read(buf)) >= 0) {
+                        md.update(buf, 0, len);
+                        fos.write(buf, 0, len);
                     }
-                } else {
-                    return LicenseDownloadResult.failure("'" + licenseUrlString + "' returned no body.");
+                    final String actualSha1 = Hex.encodeHexString(md.digest());
+                    final String expectedSha1 = fileNameEntry.getSha1();
+                    if (expectedSha1 != null && !expectedSha1.equals(actualSha1)) {
+                        throw new MojoFailureException("URL '" + licenseUrlString
+                                + "' returned content with unexpected sha1 '" + actualSha1 + "'; expected '"
+                                + expectedSha1 + "'. You may want to (a) re-run the current mojo"
+                                + " with -Dlicense.forceDownload=true or (b) change the expected sha1 in"
+                                + " the licenseUrlFileNames entry '"
+                                + fileNameEntry.getFile().getName()
+                                + "' or (c) split the entry so that"
+                                + " its URLs return content with different sha1 sums.");
+                    }
+                    return LicenseDownloadResult.success(updatedFile, actualSha1, fileNameEntry.isPreferred());
+                } catch (NoSuchAlgorithmException e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                final Charset cs = contentType != null
+                        ? (contentType.getCharset() == null ? this.charset : contentType.getCharset())
+                        : this.charset;
+                try (BufferedReader r = new BufferedReader(new InputStreamReader(entity.getContent(), cs))) {
+                    return sanitize(r, updatedFile, cs, sanitizers, fileNameEntry.isPreferred());
                 }
             }
+        } else {
+            return LicenseDownloadResult.failure("'" + licenseUrlString + "' returned no body.");
         }
     }
 
