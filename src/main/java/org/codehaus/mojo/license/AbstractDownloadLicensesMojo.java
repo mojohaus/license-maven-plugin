@@ -61,6 +61,7 @@ import org.apache.maven.settings.crypto.SettingsDecrypter;
 import org.apache.maven.settings.crypto.SettingsDecryptionResult;
 import org.codehaus.mojo.license.api.ArtifactFilters;
 import org.codehaus.mojo.license.api.MavenProjectDependenciesConfigurator;
+import org.codehaus.mojo.license.download.BundledLicenseTexts;
 import org.codehaus.mojo.license.download.Cache;
 import org.codehaus.mojo.license.download.FileNameEntry;
 import org.codehaus.mojo.license.download.LicenseClassifier;
@@ -384,6 +385,32 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
      */
     @Parameter(property = "license.forceDownload", defaultValue = "false")
     private boolean forceDownload;
+
+    /**
+     * Whether well-known licenses are written from texts bundled with the plugin instead of being downloaded. Bundled
+     * texts are not a cache: they are used also when {@link #forceDownload} is {@code true}, and they are not used
+     * when {@link #offline} is {@code true}, as no license is downloaded or written then. The URLs in question are
+     * listed in the resource {@code META-INF/licenses/bundled-license-urls.properties} of the plugin and on the
+     * <a href="examples/example-download-licenses.html">download licenses example</a> page. The URL is matched after
+     * {@link #licenseUrlReplacements} have been applied, and never when it is covered by {@link #serverUrl}.
+     * <p>Possible values:
+     * <ul>
+     *   <li>{@code text} (default): URLs that return plain text, for example
+     *     {@code https://www.gnu.org/licenses/gpl-3.0.txt} or {@code https://www.apache.org/licenses/LICENSE-2.0.txt}.
+     *     The file is the license text and nothing else, named as for a {@code text/plain} download.</li>
+     *   <li>{@code all}: in addition the URLs of the HTML pages of the same licenses, for example
+     *     {@code https://www.gnu.org/licenses/gpl-3.0.html}. The file is a {@code .txt} file of the bundled text
+     *     instead of the page, so its name, content and sha1 differ from those of earlier runs. It is off by default
+     *     for that reason.</li>
+     *   <li>{@code none}: every license is downloaded.</li>
+     * </ul>
+     * A {@code licenseUrlFileNames} entry with a {@code sha1} is honored: when the bundled text does not have that
+     * sha1, the URL is downloaded.
+     *
+     * @since 2.8.0
+     */
+    @Parameter(property = "license.useBundledLicenseTexts", defaultValue = "text")
+    private BundledLicenseTexts.Mode useBundledLicenseTexts;
 
     /**
      * Include transitive dependencies when downloading license files.
@@ -956,6 +983,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
                 downloadPassword,
                 serverUrl,
                 serverHttpHeaders)) {
+            licenseDownloader.setBundledTextsMode(useBundledLicenseTexts);
             for (LicensedArtifact artifact : dependencies.values()) {
                 LOG.debug("Checking licenses for project {}", artifact);
                 final ProjectLicenseInfo depProject = createDependencyProject(artifact);
@@ -983,6 +1011,12 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
                 for (ProjectLicenseInfo depProject : depProjectLicenses) {
                     downloadLicenses(licenseDownloader, depProject, false);
                 }
+            }
+
+            if (licenseDownloader.getBundledTextsServed() > 0) {
+                LOG.info(
+                        "Wrote {} license(s) from texts bundled with the plugin instead of downloading them",
+                        licenseDownloader.getBundledTextsServed());
             }
 
             filterCopyrightLines(depProjectLicenses);
