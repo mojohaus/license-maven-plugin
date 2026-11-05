@@ -32,6 +32,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -71,6 +72,7 @@ import org.codehaus.mojo.license.download.LicenseMatchers;
 import org.codehaus.mojo.license.download.LicenseSummaryReader;
 import org.codehaus.mojo.license.download.LicensedArtifact;
 import org.codehaus.mojo.license.download.LicensedArtifactResolver;
+import org.codehaus.mojo.license.download.PersistentLicenseCache;
 import org.codehaus.mojo.license.download.PreferredFileNames;
 import org.codehaus.mojo.license.download.ProjectLicense;
 import org.codehaus.mojo.license.download.ProjectLicenseInfo;
@@ -734,6 +736,41 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
     private boolean writeVersions;
 
     /**
+     * If {@code true}, the texts downloaded from {@code http} and {@code https} URLs are kept in
+     * {@link #licenseCacheDirectory} and reused by later builds, so that builds that start from a clean checkout do not
+     * ask the license hosts for the same pages again. A cached text younger than {@link #licenseCacheTtlDays} is used
+     * without any request. An older one is checked with a conditional request, and used as it is if the server cannot
+     * be reached or answers {@code 429} or a {@code 5xx} status.
+     * <p>
+     * Texts downloaded with the credentials of {@link #serverId} are never cached. {@code file:} URLs are not cached.
+     * {@link #forceDownload} ignores the cached texts but refreshes them.
+     *
+     * @since 2.8.0
+     */
+    @Parameter(property = "license.useLicenseCache", defaultValue = "true")
+    private boolean useLicenseCache;
+
+    /**
+     * The directory of the cache described at {@link #useLicenseCache}. The default is inside the local repository,
+     * so that a CI job that saves and restores the local repository carries the cache along.
+     *
+     * @since 2.8.0
+     */
+    @Parameter(
+            property = "license.licenseCacheDirectory",
+            defaultValue = "${settings.localRepository}/.cache/mojohaus-license-maven-plugin")
+    private File licenseCacheDirectory;
+
+    /**
+     * The number of days a cached license text is used without asking the server. {@code 0} checks the server on
+     * every build.
+     *
+     * @since 2.8.0
+     */
+    @Parameter(property = "license.licenseCacheTtlDays", defaultValue = "30")
+    private int licenseCacheTtlDays;
+
+    /**
      * Connect timeout in milliseconds passed to the HTTP client when downloading licenses from remote URLs.
      *
      * @since 1.18
@@ -968,6 +1005,8 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
         // The resulting list of licenses after dependency resolution
         final List<ProjectLicenseInfo> depProjectLicenses = new ArrayList<>();
 
+        final PersistentLicenseCache licenseCache = createLicenseCache();
+
         final Server server = decryptServer(serverId);
         final String downloadUserName = server != null ? server.getUsername() : null;
         final String downloadPassword = server != null ? server.getPassword() : null;
@@ -982,7 +1021,8 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
                 downloadUserName,
                 downloadPassword,
                 serverUrl,
-                serverHttpHeaders)) {
+                serverHttpHeaders,
+                licenseCache)) {
             licenseDownloader.setBundledTextsMode(useBundledLicenseTexts);
             for (LicensedArtifact artifact : dependencies.values()) {
                 LOG.debug("Checking licenses for project {}", artifact);
@@ -1018,6 +1058,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
                         "Wrote {} license(s) from texts bundled with the plugin instead of downloading them",
                         licenseDownloader.getBundledTextsServed());
             }
+            logLicenseCacheUse(licenseCache);
 
             filterCopyrightLines(depProjectLicenses);
         } catch (IOException e) {
@@ -1606,6 +1647,34 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
                 }
             }
             licenseIndex++;
+        }
+    }
+
+    private PersistentLicenseCache createLicenseCache() {
+        return useLicenseCache && !offline
+                ? new PersistentLicenseCache(
+                        licenseCacheDirectory.toPath(),
+                        Duration.ofDays(Math.max(0, licenseCacheTtlDays)),
+                        !forceDownload)
+                : null;
+    }
+
+    private static void logLicenseCacheUse(PersistentLicenseCache licenseCache) {
+        if (licenseCache == null) {
+            return;
+        }
+        final int fromCache = licenseCache.count(PersistentLicenseCache.Source.CACHE)
+                + licenseCache.count(PersistentLicenseCache.Source.REVALIDATED)
+                + licenseCache.count(PersistentLicenseCache.Source.STALE);
+        final int downloaded = licenseCache.count(PersistentLicenseCache.Source.NETWORK);
+        if (fromCache + downloaded > 0) {
+            LOG.info(
+                    "License cache {}: {} license text(s) from the cache ({} revalidated, {} stale), {} downloaded",
+                    licenseCache.getDirectory(),
+                    fromCache,
+                    licenseCache.count(PersistentLicenseCache.Source.REVALIDATED),
+                    licenseCache.count(PersistentLicenseCache.Source.STALE),
+                    downloaded);
         }
     }
 
