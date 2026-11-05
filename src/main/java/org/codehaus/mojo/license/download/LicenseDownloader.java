@@ -23,6 +23,7 @@ package org.codehaus.mojo.license.download;
  */
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -45,6 +46,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
 import org.apache.commons.codec.binary.Hex;
@@ -114,6 +116,10 @@ public class LicenseDownloader implements AutoCloseable {
 
     private final Map<String, ContentSanitizer> contentSanitizers;
     private final Charset charset;
+
+    private BundledLicenseTexts.Mode bundledTextsMode = BundledLicenseTexts.Mode.none;
+
+    private final AtomicInteger bundledTextsServed = new AtomicInteger();
 
     /** Credentials for authenticated downloads. May be {@code null} if no authentication is configured. */
     private final String userName;
@@ -241,6 +247,25 @@ public class LicenseDownloader implements AutoCloseable {
         this.client = clientBuilder.build();
     }
 
+    /**
+     * Sets which well-known license URLs are answered from a text bundled with the plugin instead of a request. The
+     * default is {@link BundledLicenseTexts.Mode#none}, which keeps the behavior of this class unchanged.
+     *
+     * @param mode the mode
+     * @since 2.8.0
+     */
+    public void setBundledTextsMode(BundledLicenseTexts.Mode mode) {
+        this.bundledTextsMode = mode != null ? mode : BundledLicenseTexts.Mode.none;
+    }
+
+    /**
+     * @return the number of downloads that were answered from a bundled text
+     * @since 2.8.0
+     */
+    public int getBundledTextsServed() {
+        return bundledTextsServed.get();
+    }
+
     private static boolean isHostStopStatus(int statusCode) {
         return statusCode == 429 || statusCode == HttpStatus.SC_SERVICE_UNAVAILABLE;
     }
@@ -300,6 +325,11 @@ public class LicenseDownloader implements AutoCloseable {
         }
 
         List<ContentSanitizer> sanitizers = filterSanitizers(licenseUrlString);
+
+        final LicenseDownloadResult bundled = bundledText(licenseUrlString, fileNameEntry, sanitizers);
+        if (bundled != null) {
+            return bundled;
+        }
 
         if (licenseUrlString.startsWith("file://")) {
             LOG.debug("Downloading '{}' -> '{}'", licenseUrlString, outputFile);
@@ -397,6 +427,46 @@ public class LicenseDownloader implements AutoCloseable {
                     return LicenseDownloadResult.failure("'" + licenseUrlString + "' returned no body.");
                 }
             }
+        }
+    }
+
+    /**
+     * Writes the bundled text for {@code licenseUrlString} if the table has one and the settings admit it.
+     * Returns {@code null} to continue with a download: when there is no entry, when the URL receives credentials, or
+     * when an expected sha1 of {@code fileNameEntry} does not match the bundled text, because the user pinned the
+     * content of the host and not the one of the plugin.
+     */
+    private LicenseDownloadResult bundledText(
+            String licenseUrlString, FileNameEntry fileNameEntry, List<ContentSanitizer> sanitizers)
+            throws IOException {
+        final BundledLicenseTexts.Entry entry =
+                BundledLicenseTexts.getDefault().find(licenseUrlString, bundledTextsMode);
+        if (entry == null || shouldAuthenticate(licenseUrlString)) {
+            return null;
+        }
+        final byte[] text = entry.readText();
+        final String expectedSha1 = fileNameEntry.getSha1();
+        if (sanitizers.isEmpty() && expectedSha1 != null && !expectedSha1.equals(DigestUtils.sha1Hex(text))) {
+            LOG.debug(
+                    "Not using the bundled text '{}' for '{}': it does not have the expected sha1 '{}'",
+                    entry.getLicenseId(),
+                    licenseUrlString,
+                    expectedSha1);
+            return null;
+        }
+        final File outputFile = fileNameEntry.getFile();
+        final File updatedFile =
+                fileNameEntry.isPreferred() ? outputFile : updateFileExtension(outputFile, "text/plain");
+        LOG.debug(
+                "Writing the bundled text '{}' for '{}' -> '{}'", entry.getLicenseId(), licenseUrlString, updatedFile);
+        bundledTextsServed.incrementAndGet();
+        if (sanitizers.isEmpty()) {
+            Files.write(updatedFile.toPath(), text);
+            return LicenseDownloadResult.success(updatedFile, DigestUtils.sha1Hex(text), fileNameEntry.isPreferred());
+        }
+        try (BufferedReader r =
+                new BufferedReader(new InputStreamReader(new ByteArrayInputStream(text), StandardCharsets.UTF_8))) {
+            return sanitize(r, updatedFile, charset, sanitizers, fileNameEntry.isPreferred());
         }
     }
 

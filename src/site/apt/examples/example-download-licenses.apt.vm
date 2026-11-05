@@ -77,6 +77,71 @@ mvn package
   For the <<<download-licenses>>> goal, licenses will by default be downloaded into the directory
   <<<target/generated-resources/licenses>>>.  This can be configured using the <<<licensesOutputDirectory>>> parameter.
 
+* Bundled License Texts
+
+  License hosts such as www.gnu.org are asked for the same few documents by many builds. The plugin
+  therefore ships the texts of the common licenses and writes them from there when a dependency
+  points at a URL that serves exactly such a text. No request is sent for these URLs, no matter
+  whether <<<forceDownload>>> is set. The build log says how many licenses were written this way.
+
+  The URLs are listed in the table <<<META-INF/licenses/bundled-license-urls.properties>>> inside the
+  plugin. The scheme (http or https), a leading <<<www.>>> and a fragment are ignored; a URL with a query
+  or a port is never matched. A URL is matched after <<<licenseUrlReplacements>>> have been applied,
+  so a replacement that points to your own mirror also keeps the plugin from using a bundled text. A
+  URL that lies below <<<serverUrl>>>, where credentials are sent, is always downloaded.
+
+  The <<<useBundledLicenseTexts>>> parameter (<<<-Dlicense.useBundledLicenseTexts>>>) selects which
+  URLs are answered from the plugin:
+
+  * <<<text>>>: the default. URLs that return plain text. The file has the same name as a downloaded
+  <<<text/plain>>> file and holds the document with the URL, apart from the differences listed below.
+
+  * <<<all>>>: also the URLs of HTML pages. The file is a <<<.txt>>> file that contains the license text
+  instead of the page, so its name, content and checksum differ from those of earlier runs. That is
+  why it is off by default.
+
+  * <<<none>>>: every license is downloaded, as in earlier versions of the plugin.
+
+  A <<<licenseUrlFileNames>>> entry with a <<<sha1>>> still means what it says: when the bundled
+  text has another checksum than the one expected, the URL is downloaded.
+
+  These URLs return plain text and are answered with the default setting:
+
+  * <<<https://www.gnu.org/licenses/gpl-3.0.txt>>>: GNU GPL 3.0
+
+  * <<<https://www.gnu.org/licenses/lgpl-3.0.txt>>>: GNU LGPL 3.0
+
+  * <<<https://www.gnu.org/licenses/agpl-3.0.txt>>>: GNU AGPL 3.0
+
+  * <<<https://www.gnu.org/licenses/fdl-1.3.txt>>>: GNU FDL 1.3
+
+  * <<<https://www.gnu.org/licenses/gpl-2.0.txt>>> and <<<https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>>>:
+  GNU GPL 2.0
+
+  * <<<https://www.gnu.org/licenses/lgpl-2.1.txt>>> and <<<https://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt>>>:
+  GNU LGPL 2.1
+
+  * <<<https://www.gnu.org/licenses/old-licenses/gpl-1.0.txt>>>: GNU GPL 1.0
+
+  * <<<https://www.apache.org/licenses/LICENSE-2.0.txt>>> and <<<https://www.apache.org/licenses/LICENSE-2.0>>>:
+  Apache License 2.0
+
+  * <<<https://www.eclipse.org/org/documents/epl-2.0/EPL-2.0.txt>>>: Eclipse Public License 2.0
+
+  These URLs return HTML pages and are answered only with <<<all>>>: the pages
+  <<<gpl-3.0.html>>>, <<<lgpl-3.0.html>>> and <<<agpl-3.0.html>>> below
+  <<<https://www.gnu.org/licenses/>>>, <<<gpl-2.0.html>>> and <<<lgpl-2.1.html>>> below
+  <<<https://www.gnu.org/licenses/old-licenses/>>>, <<<https://www.apache.org/licenses/LICENSE-2.0.html>>>,
+  and <<<https://www.eclipse.org/legal/epl-v10.html>>>, <<<epl-v20.html>>> and their
+  <<<https://www.eclipse.org/legal/epl/>>> counterparts.
+
+  The bundled GPL 1.0 and 2.0, LGPL 2.1 and FDL 1.3 differ from the files on www.gnu.org only in the
+  lines where the FSF has since replaced its postal address or an old web address with
+  <<<https://www.gnu.org/licenses/>>>. The bundled Apache License 2.0 differs from the file on
+  www.apache.org only in white space. Other URLs, for example the ones that always point to the
+  latest version of a license, such as <<<https://www.gnu.org/licenses/gpl.txt>>>, and the pages of
+  opensource.org, are not mapped and are downloaded.
+
 * Sorting the Report
 
   The dependencies appear in the order they were resolved in, which changes as the dependency tree
