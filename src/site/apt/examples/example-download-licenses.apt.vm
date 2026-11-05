@@ -37,7 +37,8 @@ Download Licenses Examples
 
   After downloading the license files, the plugin will create a summary file in XML format which describes
   the license(s) associated with each dependency.  Note that subsequent runs of the plugin will avoid downloading
-  the licenses unless the local file exists or forceDownload is set to true.
+  the licenses unless the local file exists or forceDownload is set to true.  Licenses downloaded by earlier
+  builds are also reused from a cache, see {{{Caching_the_Downloaded_Licenses_Between_Builds}Caching the Downloaded Licenses Between Builds}}.
 
 * Basic Example
 
@@ -141,6 +142,55 @@ mvn package
   www.apache.org only in white space. Other URLs, for example the ones that always point to the
   latest version of a license, such as <<<https://www.gnu.org/licenses/gpl.txt>>>, and the pages of
   opensource.org, are not mapped and are downloaded.
+
+* Caching the Downloaded Licenses Between Builds
+
+  The licenses of a build that starts from a clean checkout, as most CI builds do, would be downloaded
+  again from the license hosts on every run.  To spare those hosts, the plugin keeps every text it downloads
+  from an <<<http>>> or <<<https>>> URL in a cache directory that outlives the build.  By default the directory is
+  <<<${settings.localRepository}/.cache/mojohaus-license-maven-plugin>>>, so a CI job that already saves and restores the
+  local Maven repository carries the cache along, and no other configuration is needed.
+
+  The cache works as follows:
+
+  * The key is the final URL, after the <<<licenseUrlReplacements>>> were applied.  An entry holds the
+    bytes the server sent, so <<<licenseContentSanitizers>>> and the other processing run on a cached text exactly
+    as they do on a downloaded one, and the files in <<<licensesOutputDirectory>>> are the same either way.
+
+  * A text younger than <<<licenseCacheTtlDays>>> (30 by default) is used without a request to the server.
+
+  * An older text is checked with a conditional request (<<<If-None-Match>>> and <<<If-Modified-Since>>>)
+    and replaced only if the server has a newer one.  If the server cannot be reached, or answers with <<<429>>>
+    or a <<<5xx>>> status, the older text is used and the plugin logs a warning.
+
+  * Failed downloads are never cached, and neither are <<<file:>>> URLs.  Downloads that send the credentials of
+    <<<serverId>>> are not cached either, so that a text behind authentication does not end up in a directory
+    that a CI job may publish.
+
+  * <<<forceDownload>>> ignores the cached texts but stores the new ones.  In offline mode the plugin
+    downloads nothing, so it does not read the cache either.
+
+  * Builds may share a cache directory: an entry is written to a temporary file and moved into place in one step.
+
+  The plugin logs at <<<info>>> level once per build how many license texts came from the cache and how many
+  were downloaded.
+
+  To keep the cache in a different place, for example a directory that a CI system caches on its own, set
+  <<<licenseCacheDirectory>>>.  Set <<<useLicenseCache>>> to <<<false>>> to turn the cache off:
+
+-------------------
+<configuration>
+  <licenseCacheDirectory>${user.home}/.cache/mojohaus-license-maven-plugin</licenseCacheDirectory>
+  <licenseCacheTtlDays>90</licenseCacheTtlDays>
+</configuration>
+-------------------
+
+  The parameters can also be set on the command line, as <<<-Dlicense.licenseCacheDirectory=...>>>,
+  <<<-Dlicense.licenseCacheTtlDays=...>>> and <<<-Dlicense.useLicenseCache=false>>>.
+
+  To share the cache in CI, restore and save <<<~/.m2/repository/.cache/mojohaus-license-maven-plugin>>> together with the
+  local repository, or point <<<licenseCacheDirectory>>> at a directory your CI caches.  The cache may also be
+  filled once and shipped as part of a build image.
 
 * Sorting the Report
 
