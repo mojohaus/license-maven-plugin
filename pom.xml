@@ -527,6 +527,10 @@
               <scriptVariables>
                 <projectVersion>${project.version}</projectVersion>
               </scriptVariables>
+              <properties>
+                <!-- the ITs serve different content from the same localhost URLs; one IT turns the cache on -->
+                <license.useLicenseCache>false</license.useLicenseCache>
+              </properties>
             </configuration>
             <dependencies>
               <!-- Microsoft Excel XLSX export -->
