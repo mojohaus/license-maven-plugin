@@ -1,49 +1,43 @@
-~~~
-~~ #%L
-~~ License Maven Plugin
-~~ %%
-~~ Copyright (C) 2008 - 2011 CodeLutin, Codehaus, Tony Chemit
-~~ %%
-~~ This program is free software: you can redistribute it and/or modify
-~~ it under the terms of the GNU Lesser General Public License as
-~~ published by the Free Software Foundation, either version 3 of the
-~~ License, or (at your option) any later version.
-~~
-~~ This program is distributed in the hope that it will be useful,
-~~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-~~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-~~ GNU General Lesser Public License for more details.
-~~
-~~ You should have received a copy of the GNU General Lesser Public
-~~ License along with this program.  If not, see
-~~ <http://www.gnu.org/licenses/lgpl-3.0.html>.
-~~ #L%
-~~~
+---
+title: Download Licenses Examples
+date: 2010-10-16
+---
 
- ------
- Download Licenses Examples
- ------
- ------
- 2010-10-16
- ------
+<!--
+  #%L
+  License Maven Plugin
+  %%
+  Copyright (C) 2008 - 2011 CodeLutin, Codehaus, Tony Chemit
+  %%
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU Lesser General Public License as
+  published by the Free Software Foundation, either version 3 of the
+  License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Lesser Public License for more details.
+
+  You should have received a copy of the GNU General Lesser Public
+  License along with this program.  If not, see
+  <http://www.gnu.org/licenses/lgpl-3.0.html>.
+  #L%
+-->
 
 Download Licenses Examples
+==========================
 
-  This page provides examples of how to use the <<<download-licenses>>> goal.
-  By default, the <<<{{{../download-licenses-mojo.html}download-licenses}}>>> goal will attempt to
-  resolve the license of each project dependency.  These files will be downloaded to a local directory
-  to be included in the final packaging of the project if desired.  The licenses are downloaded
-  based on the url field of the dependency POM.
+This page provides examples of how to use the `download-licenses` goal. By default, the [`download-licenses`](../download-licenses-mojo.html) goal will attempt to resolve the license of each project dependency. These files will be downloaded to a local directory to be included in the final packaging of the project if desired. The licenses are downloaded based on the url field of the dependency POM.
 
-  After downloading the license files, the plugin will create a summary file in XML format which describes
-  the license(s) associated with each dependency.  Note that subsequent runs of the plugin will avoid downloading
-  the licenses unless the local file exists or forceDownload is set to true.
+After downloading the license files, the plugin will create a summary file in XML format which describes the license(s) associated with each dependency. Note that subsequent runs of the plugin will avoid downloading the licenses unless the local file exists or forceDownload is set to true.
 
-* Basic Example
+Basic Example
+-------------
 
-  This example shows how to configure the <<<download-licenses>>> goal for basic usage.
+This example shows how to configure the `download-licenses` goal for basic usage.
 
--------------------
+```xml
 <project>
   ...
   <build>
@@ -66,124 +60,78 @@ Download Licenses Examples
   </build>
   ...
 </project>
--------------------
+```
 
-  Next run your build:
+Next run your build:
 
-+-----+
+```sh
 mvn package
-+-----+
+```
 
-  For the <<<download-licenses>>> goal, licenses will by default be downloaded into the directory
-  <<<target/generated-resources/licenses>>>.  This can be configured using the <<<licensesOutputDirectory>>> parameter.
+For the `download-licenses` goal, licenses will by default be downloaded into the directory `target/generated-resources/licenses`. This can be configured using the `licensesOutputDirectory` parameter.
 
-* Bundled License Texts
+Bundled License Texts
+---------------------
 
-  License hosts such as www.gnu.org are asked for the same few documents by many builds. The plugin
-  therefore ships the texts of the common licenses and writes them from there when a dependency
-  points at a URL that serves exactly such a text. No request is sent for these URLs, no matter
-  whether <<<forceDownload>>> is set. The build log says how many licenses were written this way.
+License hosts such as www.gnu.org are asked for the same few documents by many builds. The plugin therefore ships the texts of the common licenses and writes them from there when a dependency points at a URL that serves exactly such a text. No request is sent for these URLs, no matter whether `forceDownload` is set. The build log says how many licenses were written this way.
 
-  The URLs are listed in the table <<<META-INF/licenses/bundled-license-urls.properties>>> inside the
-  plugin. The scheme (http or https), a leading <<<www.>>> and a fragment are ignored; a URL with a query
-  or a port is never matched. A URL is matched after <<<licenseUrlReplacements>>> have been applied,
-  so a replacement that points to your own mirror also keeps the plugin from using a bundled text. A
-  URL that lies below <<<serverUrl>>>, where credentials are sent, is always downloaded.
+The URLs are listed in the table `META-INF/licenses/bundled-license-urls.properties` inside the plugin. The scheme (http or https), a leading `www.` and a fragment are ignored; a URL with a query or a port is never matched. A URL is matched after `licenseUrlReplacements` have been applied, so a replacement that points to your own mirror also keeps the plugin from using a bundled text. A URL that lies below `serverUrl`, where credentials are sent, is always downloaded.
 
-  The <<<useBundledLicenseTexts>>> parameter (<<<-Dlicense.useBundledLicenseTexts>>>) selects which
-  URLs are answered from the plugin:
+The `useBundledLicenseTexts` parameter (`-Dlicense.useBundledLicenseTexts`) selects which URLs are answered from the plugin:
 
-  * <<<text>>>: the default. URLs that return plain text. The file has the same name as a downloaded
-  <<<text/plain>>> file and holds the document with the URL, apart from the differences listed below.
+- `text`: the default. URLs that return plain text. The file has the same name as a downloaded `text/plain` file and holds the document with the URL, apart from the differences listed below.
+- `all`: also the URLs of HTML pages. The file is a `.txt` file that contains the license text instead of the page, so its name, content and checksum differ from those of earlier runs. That is why it is off by default.
+- `none`: every license is downloaded, as in earlier versions of the plugin.
 
-  * <<<all>>>: also the URLs of HTML pages. The file is a <<<.txt>>> file that contains the license text
-  instead of the page, so its name, content and checksum differ from those of earlier runs. That is
-  why it is off by default.
+A `licenseUrlFileNames` entry with a `sha1` still means what it says: when the bundled text has another checksum than the one expected, the URL is downloaded.
 
-  * <<<none>>>: every license is downloaded, as in earlier versions of the plugin.
+These URLs return plain text and are answered with the default setting:
 
-  A <<<licenseUrlFileNames>>> entry with a <<<sha1>>> still means what it says: when the bundled
-  text has another checksum than the one expected, the URL is downloaded.
+- `https://www.gnu.org/licenses/gpl-3.0.txt`: GNU GPL 3.0
+- `https://www.gnu.org/licenses/lgpl-3.0.txt`: GNU LGPL 3.0
+- `https://www.gnu.org/licenses/agpl-3.0.txt`: GNU AGPL 3.0
+- `https://www.gnu.org/licenses/fdl-1.3.txt`: GNU FDL 1.3
+- `https://www.gnu.org/licenses/gpl-2.0.txt` and `https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt`: GNU GPL 2.0
+- `https://www.gnu.org/licenses/lgpl-2.1.txt` and `https://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt`: GNU LGPL 2.1
+- `https://www.gnu.org/licenses/old-licenses/gpl-1.0.txt`: GNU GPL 1.0
+- `https://www.apache.org/licenses/LICENSE-2.0.txt` and `https://www.apache.org/licenses/LICENSE-2.0`: Apache License 2.0
+- `https://www.eclipse.org/org/documents/epl-2.0/EPL-2.0.txt`: Eclipse Public License 2.0
 
-  These URLs return plain text and are answered with the default setting:
+These URLs return HTML pages and are answered only with `all`: the pages `gpl-3.0.html`, `lgpl-3.0.html` and `agpl-3.0.html` below `https://www.gnu.org/licenses/`, `gpl-2.0.html` and `lgpl-2.1.html` below `https://www.gnu.org/licenses/old-licenses/`, `https://www.apache.org/licenses/LICENSE-2.0.html`, and `https://www.eclipse.org/legal/epl-v10.html`, `epl-v20.html` and their `https://www.eclipse.org/legal/epl/` counterparts.
 
-  * <<<https://www.gnu.org/licenses/gpl-3.0.txt>>>: GNU GPL 3.0
+The bundled GPL 1.0 and 2.0, LGPL 2.1 and FDL 1.3 differ from the files on www.gnu.org only in the lines where the FSF has since replaced its postal address or an old web address with `https://www.gnu.org/licenses/`. The bundled Apache License 2.0 differs from the file on www.apache.org only in white space. Other URLs, for example the ones that always point to the latest version of a license, such as `https://www.gnu.org/licenses/gpl.txt`, and the pages of opensource.org, are not mapped and are downloaded.
 
-  * <<<https://www.gnu.org/licenses/lgpl-3.0.txt>>>: GNU LGPL 3.0
+Sorting the Report
+------------------
 
-  * <<<https://www.gnu.org/licenses/agpl-3.0.txt>>>: GNU AGPL 3.0
+The dependencies appear in the order they were resolved in, which changes as the dependency tree changes. The `orderBy` parameter puts them in a fixed order instead:
 
-  * <<<https://www.gnu.org/licenses/fdl-1.3.txt>>>: GNU FDL 1.3
-
-  * <<<https://www.gnu.org/licenses/gpl-2.0.txt>>> and <<<https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt>>>:
-  GNU GPL 2.0
-
-  * <<<https://www.gnu.org/licenses/lgpl-2.1.txt>>> and <<<https://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt>>>:
-  GNU LGPL 2.1
-
-  * <<<https://www.gnu.org/licenses/old-licenses/gpl-1.0.txt>>>: GNU GPL 1.0
-
-  * <<<https://www.apache.org/licenses/LICENSE-2.0.txt>>> and <<<https://www.apache.org/licenses/LICENSE-2.0>>>:
-  Apache License 2.0
-
-  * <<<https://www.eclipse.org/org/documents/epl-2.0/EPL-2.0.txt>>>: Eclipse Public License 2.0
-
-  These URLs return HTML pages and are answered only with <<<all>>>: the pages
-  <<<gpl-3.0.html>>>, <<<lgpl-3.0.html>>> and <<<agpl-3.0.html>>> below
-  <<<https://www.gnu.org/licenses/>>>, <<<gpl-2.0.html>>> and <<<lgpl-2.1.html>>> below
-  <<<https://www.gnu.org/licenses/old-licenses/>>>, <<<https://www.apache.org/licenses/LICENSE-2.0.html>>>,
-  and <<<https://www.eclipse.org/legal/epl-v10.html>>>, <<<epl-v20.html>>> and their
-  <<<https://www.eclipse.org/legal/epl/>>> counterparts.
-
-  The bundled GPL 1.0 and 2.0, LGPL 2.1 and FDL 1.3 differ from the files on www.gnu.org only in the
-  lines where the FSF has since replaced its postal address or an old web address with
-  <<<https://www.gnu.org/licenses/>>>. The bundled Apache License 2.0 differs from the file on
-  www.apache.org only in white space. Other URLs, for example the ones that always point to the
-  latest version of a license, such as <<<https://www.gnu.org/licenses/gpl.txt>>>, and the pages of
-  opensource.org, are not mapped and are downloaded.
-
-* Sorting the Report
-
-  The dependencies appear in the order they were resolved in, which changes as the dependency tree
-  changes. The <<<orderBy>>> parameter puts them in a fixed order instead:
-
--------------------
+```xml
 <configuration>
   <orderBy>dependencyName</orderBy>
 </configuration>
--------------------
+```
 
-  The parameter takes one of the following values, and can also be set on the command line as
-  <<<-Dlicense.orderBy=dependencyName>>>:
+The parameter takes one of the following values, and can also be set on the command line as `-Dlicense.orderBy=dependencyName`:
 
-*----------------------+--------------------------------------------------------------------------+
-| <<<none>>>           | The order the dependencies were resolved in. The default.                 |
-*----------------------+--------------------------------------------------------------------------+
-| <<<dependencyName>>> | The name the dependency gives itself in its POM. Falls back to the        |
-|                      | artifact id for dependencies without a name, and for every dependency     |
-|                      | when <<<extendedInfo>>> is off.                                           |
-*----------------------+--------------------------------------------------------------------------+
-| <<<dependencyGav>>>  | The group id, artifact id and version.                                    |
-*----------------------+--------------------------------------------------------------------------+
-| <<<licenseName>>>    | The license. Dependencies with more than one license are ordered by the   |
-|                      | alphabetically first of them, dependencies without a license come last.   |
-*----------------------+--------------------------------------------------------------------------+
-| <<<licenseMatch>>>   | How the license compares against the lists described in                   |
-|                      | {{{Classifying_the_Licenses}Classifying the Licenses}}, worst first.      |
-*----------------------+--------------------------------------------------------------------------+
+| Value | Description |
+| --- | --- |
+| `none` | The order the dependencies were resolved in. The default. |
+| `dependencyName` | The name the dependency gives itself in its POM. Falls back to the artifact id for dependencies without a name, and for every dependency when `extendedInfo` is off. |
+| `dependencyGav` | The group id, artifact id and version. |
+| `licenseName` | The license. Dependencies with more than one license are ordered by the alphabetically first of them, dependencies without a license come last. |
+| `licenseMatch` | How the license compares against the lists described in [Classifying the Licenses](#Classifying_the_Licenses), worst first. |
 
-  Dependencies that compare equal are ordered by group id, artifact id and version, so the report is
-  the same on every run.
+Dependencies that compare equal are ordered by group id, artifact id and version, so the report is the same on every run.
 
-  <<<orderBy>>> replaces <<<sortByGroupIdAndArtifactId>>>, which is deprecated. The old parameter
-  still works, and still applies when <<<orderBy>>> is left at <<<none>>>.
+`orderBy` replaces `sortByGroupIdAndArtifactId`, which is deprecated. The old parameter still works, and still applies when `orderBy` is left at `none`.
 
-* Classifying the Licenses
+Classifying the Licenses
+------------------------
 
-  Three lists say which licenses have been signed off, which need a second look, and which must not
-  appear at all:
+Three lists say which licenses have been signed off, which need a second look, and which must not appear at all:
 
--------------------
+```xml
 <configuration>
   <forbiddenLicenses>
     <forbiddenLicense>GNU General Public License v3.0</forbiddenLicense>
@@ -197,28 +145,18 @@ mvn package
   </okLicenses>
   <orderBy>licenseMatch</orderBy>
 </configuration>
--------------------
+```
 
-  With <<<orderBy>>> set to <<<licenseMatch>>>, the dependencies come out worst first: the forbidden
-  licenses, then the problematic ones, then the approved ones, and last the ones in none of the
-  lists. A dependency offering several licenses is classified by the most worrying of them, so a
-  dependency under either Apache or GPL is not filed away as approved.
+With `orderBy` set to `licenseMatch`, the dependencies come out worst first: the forbidden licenses, then the problematic ones, then the approved ones, and last the ones in none of the lists. A dependency offering several licenses is classified by the most worrying of them, so a dependency under either Apache or GPL is not filed away as approved.
 
-  Names are matched ignoring case and surrounding whitespace. POMs spell the same license in many
-  ways, so use <<<licenseMerges>>> to bring the spellings of one license together; a name that no
-  list matches is not reported, it simply counts as unclassified.
+Names are matched ignoring case and surrounding whitespace. POMs spell the same license in many ways, so use `licenseMerges` to bring the spellings of one license together; a name that no list matches is not reported, it simply counts as unclassified.
 
-* Manual License Configuration
+Manual License Configuration
+----------------------------
 
-  By default the plugin will look at the POM of each dependency for license information.  However,
-  not all POMs have been configured with the correct license information.  In these cases,
-  the required license information can be configured manually.  By default, the plugin will look
-  for a file called <<src/license/licenses.xml>>.  This file contains manually configured license information
-  which will be merged with information from the dependency POMs to create the final license report.
-  The location of this file can be configured using the <<licensesConfigFile>> parameter
-  The following is an example license config file.
+By default the plugin will look at the POM of each dependency for license information. However, not all POMs have been configured with the correct license information. In these cases, the required license information can be configured manually. By default, the plugin will look for a file called **src/license/licenses.xml**. This file contains manually configured license information which will be merged with information from the dependency POMs to create the final license report. The location of this file can be configured using the **licensesConfigFile** parameter. The following is an example license config file.
 
--------------------
+```xml
 <?xml version="1.0"?>
 
 <licenseSummary xmlns="http://mojo.codehaus.org/"
@@ -248,6 +186,6 @@ mvn package
     </dependency>
   </dependencies>
 </licenseSummary>
--------------------
+```
 
-  The generated license report follows the same XML format as the manual license config file.
+The generated license report follows the same XML format as the manual license config file.

@@ -1,70 +1,70 @@
-~~~
-~~ #%L
-~~ License Maven Plugin
-~~ %%
-~~ Copyright (C) 2008 - 2011 CodeLutin, Codehaus, Tony Chemit
-~~ %%
-~~ This program is free software: you can redistribute it and/or modify
-~~ it under the terms of the GNU Lesser General Public License as
-~~ published by the Free Software Foundation, either version 3 of the
-~~ License, or (at your option) any later version.
-~~
-~~ This program is distributed in the hope that it will be useful,
-~~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-~~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-~~ GNU General Lesser Public License for more details.
-~~
-~~ You should have received a copy of the GNU General Lesser Public
-~~ License along with this program.  If not, see
-~~ <http://www.gnu.org/licenses/lgpl-3.0.html>.
-~~ #L%
-~~~
+---
 
- ------
- License List Examples
- ------
- ------
- 2011-02-04
- ------
+title: License List Examples
+date: 2011-02-04
+----------------
 
-License List Examples
+<!--
+#%L
+License Maven Plugin
+%%
+Copyright (C) 2008 - 2011 CodeLutin, Codehaus, Tony Chemit
+%%
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
 
-* license-list goal
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Lesser Public License for more details.
 
-  This goal displays a list of available licenses.
+You should have received a copy of the GNU General Lesser Public
+License along with this program.  If not, see
+<http://www.gnu.org/licenses/lgpl-3.0.html>.
+#L%
+-->
 
-  Use it directly (and only) from commandline :
+# License List Examples
 
--------------------------------------------------------------------------------
-  mvn license:license-list
--------------------------------------------------------------------------------
+## license-list goal
 
-  To display the license header, use the <<detail>> parameter :
+This goal displays a list of available licenses.
 
--------------------------------------------------------------------------------
-  mvn license:license-list -Ddetail
--------------------------------------------------------------------------------
+Use it directly (and only) from commandline :
 
-  for full detail see {{{../license-list-mojo.html}detail page}}.
+```sh
+mvn license:license-list
+```
 
-** Example output
+To display the license header, use the **detail** parameter :
 
--------------------------------------------------------------------------------
-  [INFO] [license:license-list {execution: default-cli}]
-  [INFO] Available licenses :
+```sh
+mvn license:license-list -Ddetail
+```
 
-   * agpl_v3   : GNU Affero General Public License (AGPL) version 3.0
-   * apache_v2 : Apache License version 2.0
-   * bsd_2     : BSD 2-Clause License
-   * bsd_3     : BSD 3-Clause License
-   * cddl_v1   : COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0
-   * epl_v1    : Eclipse Public License - v 1.0
-   * eupl_v1_1 : European Union Public License v1.1
-   * fdl_v1_3  : GNU Free Documentation License (FDL) version 1.3
-   * gpl_v1    : GNU General Public License (GPL) version 1.0
-   * gpl_v2    : GNU General Public License (GPL) version 2.0
-   * gpl_v3    : GNU General Public License (GPL) version 3.0
-   * lgpl_v2_1 : GNU General Lesser Public License (LGPL) version 2.1
-   * lgpl_v3   : GNU General Lesser Public License (LGPL) version 3.0
-   * mit       : MIT-License
--------------------------------------------------------------------------------
+for full detail see [detail page](../license-list-mojo.html).
+
+### Example output
+
+```text
+[INFO] [license:license-list {execution: default-cli}]
+[INFO] Available licenses :
+
+ * agpl_v3   : GNU Affero General Public License (AGPL) version 3.0
+ * apache_v2 : Apache License version 2.0
+ * bsd_2     : BSD 2-Clause License
+ * bsd_3     : BSD 3-Clause License
+ * cddl_v1   : COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0
+ * epl_v1    : Eclipse Public License - v 1.0
+ * eupl_v1_1 : European Union Public License v1.1
+ * fdl_v1_3  : GNU Free Documentation License (FDL) version 1.3
+ * gpl_v1    : GNU General Public License (GPL) version 1.0
+ * gpl_v2    : GNU General Public License (GPL) version 2.0
+ * gpl_v3    : GNU General Public License (GPL) version 3.0
+ * lgpl_v2_1 : GNU General Lesser Public License (LGPL) version 2.1
+ * lgpl_v3   : GNU General Lesser Public License (LGPL) version 3.0
+ * mit       : MIT-License
+```
+
