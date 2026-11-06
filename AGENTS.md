@@ -73,9 +73,10 @@ The repository is a single Maven module, the plugin itself.
   vulnerabilities: the postbuild assertions and expected XML files contain those versions
   verbatim. Do not update them. Dependabot excludes `src/it` from version updates, but security
   updates can still propose them; close those pull requests.
-- Deliberate pins in `.github/dependabot.yml`: WireMock stays on 2.x and Mockito below 5 because
-  the build and the integration tests run on JDK 8, Maven Resolver below 2 because 2.x targets
-  Maven 4, and SLF4J below 2 because the Maven 3 runtime does not support SLF4J 2 providers.
+- Deliberate pins in `.github/dependabot.yml`: WireMock stays on 2.x, Apache POI on 5.x and
+  Mockito below 5 because the build and the integration tests run on JDK 8, Maven Resolver below 2
+  because 2.x targets Maven 4, and SLF4J below 2 because the Maven 3 runtime does not support SLF4J
+  2 providers.
 
 ## Pull requests
 
