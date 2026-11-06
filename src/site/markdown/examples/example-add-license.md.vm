@@ -1,45 +1,43 @@
-~~~
-~~ #%L
-~~ License Maven Plugin
-~~ %%
-~~ Copyright (C) 2008 - 2011 CodeLutin, Jean Couteau
-~~ %%
-~~ This program is free software: you can redistribute it and/or modify
-~~ it under the terms of the GNU Lesser General Public License as
-~~ published by the Free Software Foundation, either version 3 of the
-~~ License, or (at your option) any later version.
-~~
-~~ This program is distributed in the hope that it will be useful,
-~~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-~~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-~~ GNU General Lesser Public License for more details.
-~~
-~~ You should have received a copy of the GNU General Lesser Public
-~~ License along with this program.  If not, see
-~~ <http://www.gnu.org/licenses/lgpl-3.0.html>.
-~~ #L%
-~~~
+<!--
+  #%L
+  License Maven Plugin
+  %%
+  Copyright (C) 2008 - 2011 CodeLutin, Jean Couteau
+  %%
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU Lesser General Public License as
+  published by the Free Software Foundation, either version 3 of the
+  License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Lesser Public License for more details.
+
+  You should have received a copy of the GNU General Lesser Public
+  License along with this program.  If not, see
+  <http://www.gnu.org/licenses/lgpl-3.0.html>.
+  #L%
+-->
 
 Add a license not present in license-maven-plugin
+=================================================
 
-  You might want to add a new license that is not already managed by the plugin
-  (common free software licenses are managed, but in case of proprietary
-  software (open or closed source, other license might be used).
+You might want to add a new license that is not already managed by the plugin (common free software licenses are managed, but in case of proprietary software (open or closed source, other license might be used).
 
-* Create the license files
+Create the license files
+------------------------
 
-  To use a new license, you need to define two content files :
+To use a new license, you need to define two content files :
 
-  - the header file (this content will be added in header of all source files)
-  - the license file (this file is the real license file placed at the root of the maven project in
-    (by convention) LICENSE.txt file.
+- the header file (this content will be added in header of all source files)
+- the license file (this file is the real license file placed at the root of the maven project in (by convention) LICENSE.txt file.
 
-  * src/license/my_license/header.txt
+- `src/license/my_license/header.txt`
 
-    Example for GPLv3 :
+  Example for GPLv3 :
 
--------------------------------------------------------------------------------
-
+```text
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as
 published by the Free Software Foundation, either version 3 of the
@@ -53,15 +51,13 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public
 License along with this program.  If not, see
 <http://www.gnu.org/licenses/gpl-3.0.html>.
+```
 
--------------------------------------------------------------------------------
-
-  * src/license/my_license/license.txt
+- `src/license/my_license/license.txt`
 
   Example for GPLv3 :
 
--------------------------------------------------------------------------------
-
+```text
                     GNU GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007
 
@@ -82,36 +78,33 @@ may consider it more useful to permit linking proprietary applications with
 the library.  If this is what you want to do, use the GNU Lesser General
 Public License instead of this License.  But first, please read
 <http://www.gnu.org/philosophy/why-not-lgpl.html>.
+```
 
+Declare the new license
+-----------------------
 
--------------------------------------------------------------------------------
+The new license(s) must be declared in the file : `src/license/licenses.properties`. One license per line like :
 
-* Declare the new license
+```properties
+my_license=My license
+```
 
-  The new license(s) must be declared in the file :
-  src/license/licenses.properties. One license per line like :
+The default (convention) configuration use **header.txt** and **license.txt** as file names for the header and license file.
 
--------------------------------------------------------------------------------
-    my_license=My license
--------------------------------------------------------------------------------
+This can be changed using this syntax in the license repository definition file like this
 
-  The default (convention) configuration use <<header.txt>> and <<license.txt>> as file names for the header and license file.
+```properties
+my_license=My license~~license:licenseFileName.html~~header:headerFileName.html
+```
 
-  This can be changed using this syntax in the license repository definition file like this
+In this example, you have then to define a **licenseFileName.html** and **headerFileName.html** file in the **my_license** directory.
 
---------------------------------------------------------------------------------
-    my_license=My license~~license:licenseFileName.html~~header:headerFileName.html
---------------------------------------------------------------------------------
+Configure the plugin
+--------------------
 
-  In this example, you have then to define a <<licenseFileName.html>> and <<headerFileName.html>> file in the
-  <<my_license>> directory.
+You need to specify the name of your license and where to find it.
 
-
-* Configure the plugin
-
-  You need to specify the name of your license and where to find it.
-
-+-------------------------------------------------------------------------------
+```xml
 <plugin>
     <groupId>org.codehaus.mojo</groupId>
     <artifactId>license-maven-plugin</artifactId>
@@ -130,11 +123,11 @@ Public License instead of this License.  But first, please read
         </execution>
     </executions>
 </plugin>
-+-------------------------------------------------------------------------------
+```
 
-  or
+or
 
-+-------------------------------------------------------------------------------
+```xml
 <properties>
     <license.licenseName>my_license</license.licenseName>
     <license.licenseResolver>${project.baseUri}/src/license</license.licenseResolver>
@@ -154,20 +147,20 @@ Public License instead of this License.  But first, please read
         </execution>
     </executions>
 </plugin>
-+-------------------------------------------------------------------------------
+```
 
-* Using a license resolver from classpath
+Using a license resolver from classpath
+---------------------------------------
 
-  Since version 1.3, it is possible to use a license resolver from classpath (means included into a jar or any
-  dependency of the plugin dependencies).
+Since version 1.3, it is possible to use a license resolver from classpath (means included into a jar or any dependency of the plugin dependencies).
 
-  Just use the <<classpath://>> protocol in the plugin configuration.
+Just use the **classpath://** protocol in the plugin configuration.
 
-  Imagine you have a license resolver in an artifact <com.my:extraLicenseResolvers:1.0> in package <foo.bar>
+Imagine you have a license resolver in an artifact *com.my:extraLicenseResolvers:1.0* in package *foo.bar*
 
-  Next example show how to use this license resolver from classpath:
+Next example show how to use this license resolver from classpath:
 
-+-------------------------------------------------------------------------------
+```xml
 <plugin>
   <groupId>org.codehaus.mojo</groupId>
   <artifactId>license-maven-plugin</artifactId>
@@ -192,30 +185,28 @@ Public License instead of this License.  But first, please read
       </dependency>
   </dependencies>
 </plugin>
-+-------------------------------------------------------------------------------
+```
 
-* Using templates in license files
+Using templates in license files
+--------------------------------
 
-  <<Since version 1.6>>, license and header content files can be parametrized
-  using FreeMarker template engine.
+**Since version 1.6**, license and header content files can be parametrized using FreeMarker template engine.
 
-  To do so, just add <<.ftl>> extension to license or header file, you don't need to
-  change the licenseRepository definition, the plugin will always try (if not found
-  with default file name to search with an extra <<.ftl>> extension).
+To do so, just add **.ftl** extension to license or header file, you don't need to change the licenseRepository definition, the plugin will always try (if not found with default file name to search with an extra **.ftl** extension).
 
-  Here is the list of all available properties in such templates:
+Here is the list of all available properties in such templates:
 
-+----------
-  all system properties with prefix env_
-  all project properties with prefix project_
-  project (maven project)
-  projectName (plugin projectName parameter)
-  organizationName (plugin organizationName parameter)
-  copyright.firstYear (plugin inceptionYear parameter) (*)
-  copyright.lastYear (computed currentYear (or null if equals to firstYear)) (*)
-  copyright.years (computed years range (if lastYear different from firstYear))
-  copyright.holder (plugin copyrightOwners or organizationName parameter)
-  extraTemplateParameters (plugin extraTemplateParameters parameter with prefix extra_)
-+----------
+```text
+all system properties with prefix env_
+all project properties with prefix project_
+project (maven project)
+projectName (plugin projectName parameter)
+organizationName (plugin organizationName parameter)
+copyright.firstYear (plugin inceptionYear parameter) (*)
+copyright.lastYear (computed currentYear (or null if equals to firstYear)) (*)
+copyright.years (computed years range (if lastYear different from firstYear))
+copyright.holder (plugin copyrightOwners or organizationName parameter)
+extraTemplateParameters (plugin extraTemplateParameters parameter with prefix extra_)
+```
 
- (*) This are numbers, so use the <?c> to not have a localized representation of the number.
+(\*) This are numbers, so use the *?c* to not have a localized representation of the number.

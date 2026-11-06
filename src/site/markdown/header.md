@@ -1,218 +1,190 @@
-~~~
-~~ #%L
-~~ License Maven Plugin
-~~ %%
-~~ Copyright (C) 2008 - 2011 CodeLutin, Codehaus, Tony Chemit
-~~ %%
-~~ This program is free software: you can redistribute it and/or modify
-~~ it under the terms of the GNU Lesser General Public License as
-~~ published by the Free Software Foundation, either version 3 of the
-~~ License, or (at your option) any later version.
-~~
-~~ This program is distributed in the hope that it will be useful,
-~~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-~~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-~~ GNU General Lesser Public License for more details.
-~~
-~~ You should have received a copy of the GNU General Lesser Public
-~~ License along with this program.  If not, see
-~~ <http://www.gnu.org/licenses/lgpl-3.0.html>.
-~~ #L%
-~~~
+<!--
+#%L
+License Maven Plugin
+%%
+Copyright (C) 2008 - 2011 CodeLutin, Codehaus, Tony Chemit
+%%
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
 
-Overview
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Lesser Public License for more details.
 
-  This page describes the file header model.  You will learn how to
-  customize it and use it with the goal
-  {{{./update-file-header-mojo.html}update-file-header}}.
+You should have received a copy of the GNU General Lesser Public
+License along with this program.  If not, see
+<http://www.gnu.org/licenses/lgpl-3.0.html>.
+#L%
+-->
 
-Header model
+# Overview
 
-  The header model defines how to display the header on each file.
+This page describes the file header model. You will learn how to customize it and use it with the goal [update-file-header](./update-file-header-mojo.html).
 
-  This header is boxed in a comment proper to each type of file (we call it <comment box>).
+# Header model
 
-* Example
+The header model defines how to display the header on each file.
 
-  Here is an example of a file header (with <NO> comment box) :
+This header is boxed in a comment proper to each type of file (we call it *comment box*).
 
---------------------------------------------------------------------------------
+## Example
 
-  (1) # % L
-  (2) Project description
-  (3) %%
-  (4) Copyright (C) 2010 your organization
-  (5) %%
-  (6) License content
-  (7) # L %
---------------------------------------------------------------------------------
+Here is an example of a file header (with *NO* comment box) :
 
-  * (1) the start process tag used to detect begin of header (NEVER suppress it).
+```text
+(1) # % L
+(2) Project description
+(3) %%
+(4) Copyright (C) 2010 your organization
+(5) %%
+(6) License content
+(7) # L %
+```
 
-  * (2) Project description section
+- (1) the start process tag used to detect begin of header (NEVER suppress it).
+- (2) Project description section
+- (3) Header section delimiter
+- (4) Copyright section of the file (see next section for detail)
+- (5) Header section delimiter
+- (6) License section
+- (7) the end process tag used to detect end of header (NEVER suppress it).
 
-  * (3) Header section delimiter
+## Configuration
 
-  * (4) Copyright section of the file (see next section for detail)
+You can configure these things:
 
-  * (5) Header section delimiter
+- start process tag (using the [processStartTag](./update-file-header-mojo.html#processStartTag) parameter)
+- header section delimiter (using the [sectionDelimiter](./update-file-header-mojo.html#sectionDelimiter) parameter)
+- end process tag (using the [processEndTag](./update-file-header-mojo.html#processEndTag) parameter)
 
-  * (6) License section
+**Note:**
 
-  * (7) the end process tag used to detect end of header (NEVER suppress it).
+- The plugin won't be able to migrate from a header configuration to another one, so prepare this configuration before the first execution of the goal (and never change it :().
+- As the configuration has a special meaning for the goal to treat a file and should not be able to be found more than once in a file, we can use special space separator, the goal will remove then. In that way the exact configuration won't be found twice in your pom.xml.
 
-* Configuration
+## Description section template
 
-  You can configure these things:
+Since version 1.1, it is possible to customize the description section using a freemarker template.
 
-  * start process tag (using the {{{./update-file-header-mojo.html#processStartTag}processStartTag}} parameter)
+Default template is given to reproduce exactly the previous hardcoded description.
 
-  * header section delimiter (using the {{{./update-file-header-mojo.html#sectionDelimiter}sectionDelimiter}} parameter)
+See [example](./examples/update-file-header-config.html#Customize_the_description_section) for more details.
 
-  * end process tag (using the {{{./update-file-header-mojo.html#processEndTag}processEndTag}} parameter)
+## Copyright model
 
-  []
+Copyright section must exactly be of this form :
 
-  <<Note:>>
+```text
+Copyright (C) firstYear[ - lastYear] holder
+```
 
-  * The plugin won't be able to migrate from a header configuration to another one, so prepare this
-    configuration before the first execution of the goal (and never change it :().
+If *firstYear* and *lastYear* are the same then *lastYear* is omitted.
 
-  * As the configuration has a special meaning for the goal to treat a file and should not be able to be found more
-    than once in a file, we can use special space separator, the goal will remove then. In that way the exact
-    configuration won't be found twice in your pom.xml.
+## Comment box
 
-* Description section template
+In a file, we must box the file header in a comment. In the descriptor file you can customize it by choosing a headerType.
 
-  Since version 1.1, it is possible to customize the description section using a freemarker template.
+# Available comment styles
 
-  Default template is given to reproduce exactly the previous hardcoded description.
+Here are the available comment styles.
 
-  See {{{./examples/update-file-header-config.html#Customize_the_description_section}example}} for more details.
+Using the goal [comment-style-list](./comment-style-list-mojo.html) you can find all of them.
 
-* Copyright model
+## java style
 
-  Copyright section must exactly be of this form :
+```java
+/*
+ * HEADER
+ */
+```
 
---------------------------------------------------------------------------------
+## xml style
 
-  Copyright (C) firstYear[ - lastYear] holder
---------------------------------------------------------------------------------
+```xml
+<!--
+ HEADER
+-->
+```
 
-  If <firstYear> and <lastYear> are the same then <lastYear> is omitted.
+## properties style
 
-* Comment box
+```properties
+######
+# HEADER
+######
+```
 
-  In a file, we must box the file header in a comment. In the descriptor file
-  you can customize it by choosing a headerType.
+## apt style
 
-Available comment styles
+```text
+```
 
-  Here are the available comment styles.
+~~ HEADER
 
-  Using the goal {{{./comment-style-list-mojo.html}comment-style-list}}
-  you can find all of them.
+~~~~~~
+```
 
-* java style
+## rst style
 
---------------------------------------------------------------------------------
+```rst
+.. -
+.. * HEADER
+.. -
+```
 
-  /*
-   * HEADER
-   */
---------------------------------------------------------------------------------
+## jsp style
 
-* xml style
+```jsp
+<%--
+ HEADER
+--%>
+```
 
---------------------------------------------------------------------------------
+## sql style
 
-  <!--
-   HEADER
-  -->
---------------------------------------------------------------------------------
+```sql
+---
+-- HEADER
+---
+```
 
-* properties style
+## mysql style
 
---------------------------------------------------------------------------------
+```sql
+-- -
+-- HEADER
+-- -
+```
 
-  ######
-  # HEADER
-  ######
---------------------------------------------------------------------------------
+Note that for mysql, you can not use the simplesql file header (see `http://jira.codehaus.org/browse/MLICENSE-56`)
 
-* apt style
+## freemarker style
 
---------------------------------------------------------------------------------
+```ftl
+<#--
+-- HEADER
+-->
+```
 
-  ~~~~~~
-  ~~ HEADER
-  ~~~~~~
---------------------------------------------------------------------------------
+## php style
 
-* rst style
+```php
+<?php /*
+* HEADER
+*/ ?>
+```
 
---------------------------------------------------------------------------------
-  .. -
-  .. * HEADER
-  .. -
---------------------------------------------------------------------------------
+# Ignore a header
 
-* jsp style
+If you don't want [update-file-header](./update-file-header-mojo.html) goal to treat a specific file, you can use a specific tag in your file:
 
---------------------------------------------------------------------------------
+```text
+%%Ignore-License
+```
 
-  <%--
-   HEADER
-  --%>
---------------------------------------------------------------------------------
+Note : Don't use start (1) and end (7 in example) balise. You can change it with **ignoreTag** property.
+~~~~~~
 
-* sql style
-
---------------------------------------------------------------------------------
-
-  ---
-  -- HEADER
-  ---
---------------------------------------------------------------------------------
-
-* mysql style
-
---------------------------------------------------------------------------------
-
-  -- -
-  -- HEADER
-  -- -
---------------------------------------------------------------------------------
-
-  Note that for mysql, you can not use the simplesql file header (see http://jira.codehaus.org/browse/MLICENSE-56)
-
-* freemarker style
-
---------------------------------------------------------------------------------
-
-  <#--
-  -- HEADER
-  -->
---------------------------------------------------------------------------------
-
-* php style
-
---------------------------------------------------------------------------------
-
-  <?php /*
-  * HEADER
-  */ ?>
---------------------------------------------------------------------------------
-
-Ignore a header
-
-  If you don't want {{{./update-file-header-mojo.html}update-file-header}}
-  goal to treat a specific file, you can use a specific tag in your file:
-
---------------------------------------------------------------------------------
-
-  %%Ignore-License
---------------------------------------------------------------------------------
-
-  Note : Don't use start (1) and end (7 in example) balise
-  You can change it with <<ignoreTag>> property.

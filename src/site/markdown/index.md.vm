@@ -1,117 +1,94 @@
-~~~
-~~ #%L
-~~ License Maven Plugin
-~~ %%
-~~ Copyright (C) 2008 - 2011 CodeLutin, Codehaus, Tony Chemit
-~~ %%
-~~ This program is free software: you can redistribute it and/or modify
-~~ it under the terms of the GNU Lesser General Public License as
-~~ published by the Free Software Foundation, either version 3 of the
-~~ License, or (at your option) any later version.
-~~
-~~ This program is distributed in the hope that it will be useful,
-~~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-~~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-~~ GNU General Lesser Public License for more details.
-~~
-~~ You should have received a copy of the GNU General Lesser Public
-~~ License along with this program.  If not, see
-~~ <http://www.gnu.org/licenses/lgpl-3.0.html>.
-~~ #L%
-~~~
+---
+title: Introduction
+date: 2010-10-16
+---
 
- ------
- Introduction
- ------
- ------
- 2010-10-16
- ------
+<!--
+  #%L
+  License Maven Plugin
+  %%
+  Copyright (C) 2008 - 2011 CodeLutin, Codehaus, Tony Chemit
+  %%
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU Lesser General Public License as
+  published by the Free Software Foundation, either version 3 of the
+  License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Lesser Public License for more details.
+
+  You should have received a copy of the GNU General Lesser Public
+  License along with this program.  If not, see
+  <http://www.gnu.org/licenses/lgpl-3.0.html>.
+  #L%
+-->
 
 ${project.name}
+===============
 
-  This plugin manages the license of a maven project and its dependencies
-  (update file headers, download dependencies licenses, check thirdparty
-  licenses, ...)
+This plugin manages the license of a maven project and its dependencies (update file headers, download dependencies licenses, check thirdparty licenses, ...)
 
-* {Goals} Overview
+<a id="Goals"></a>
 
-  The following goals are meant to participate in the default build lifecycle:
+Goals Overview
+--------------
 
-  * <<<{{{./add-third-party-mojo.html}license:add-third-party}}>>>\
-    Generates a file containing a list of all dependencies and their licenses for a single project build.
+The following goals are meant to participate in the default build lifecycle:
 
-  * <<<{{{./aggregate-add-third-party-mojo.html}license:aggregate-add-third-party}}>>>\
-    Generates a file containing a list of all dependencies and their licenses for a multi-module build.
+- [`license:add-third-party`](./add-third-party-mojo.html)  
+  Generates a file containing a list of all dependencies and their licenses for a single project build.
+- [`license:aggregate-add-third-party`](./aggregate-add-third-party-mojo.html)  
+  Generates a file containing a list of all dependencies and their licenses for a multi-module build.
+- [`license:comment-style-list`](./comment-style-list-mojo.html)  
+  Displays all the available comment styles to box file headers.
+- [`license:download-licenses`](./download-licenses-mojo.html)  
+  Downloads the license files associated with each dependency.
+- [`license:aggregate-download-licenses`](./aggregate-download-licenses-mojo.html)  
+  Downloads the license files associated with each dependency for a multi-modules build.
+- [`license:license-list`](./license-list-mojo.html)  
+  Display all available licenses.
+- [`license:update-file-header`](./update-file-header-mojo.html)  
+  Updates the license header of the current project source files.
+- [`license:check-file-header`](./check-file-header-mojo.html)  
+  Checks the license header of the current project source files.
+- [`license:remove-file-header`](./remove-file-header-mojo.html)  
+  Remove any license header of the current project source files.
+- [`license:update-project-license`](./update-project-license-mojo.html)  
+  Updates (or creates) the main project license file according to the license defined in the licenseName parameter.
+- [`license:check-project-license`](./check-project-license-mojo.html)  
+  Checks the license file of current project.
 
-  * <<<{{{./comment-style-list-mojo.html}license:comment-style-list}}>>>\
-    Displays all the available comment styles to box file headers.
+<a id="Reports"></a>
 
-  * <<<{{{./download-licenses-mojo.html}license:download-licenses}}>>>\
-    Downloads the license files associated with each dependency.
+Reports Overview
+----------------
 
-  * <<<{{{./aggregate-download-licenses-mojo.html}license:aggregate-download-licenses}}>>>\
-    Downloads the license files associated with each dependency for a multi-modules build.
+The following goals are meant to participate in the site build lifecycle as reports:
 
-  * <<<{{{./license-list-mojo.html}license:license-list}}>>>\
-    Display all available licenses.
+- [`license:third-party-report`](./third-party-report-mojo.html)  
+  Generates the third-party report of the given maven project.
+- [`license:aggregate-third-party-report`](./aggregate-third-party-report-mojo.html)  
+  Generates the aggregate third-party report of the given maven project (collect dependencies of all his childs).
 
-  * <<<{{{./update-file-header-mojo.html}license:update-file-header}}>>>\
-    Updates the license header of the current project source files.
+Usage
+-----
 
-  * <<<{{{./check-file-header-mojo.html}license:check-file-header}}>>>\
-    Checks the license header of the current project source files.
+General instructions on how to use the License Plugin can be found on the [usage page](./usage.html). Some more specific use cases are described in the examples given below.
 
-  * <<<{{{./remove-file-header-mojo.html}license:remove-file-header}}>>>\
-    Remove any license header of the current project source files.
+In case you still have questions regarding the plugin's usage, please have a look at the [FAQ](./faq.html) and feel free to contact the [user mailing list](./mailing-lists.html). The posts to the mailing list are archived and could already contain the answer to your question as part of an older thread. Hence, it is also worth browsing/searching the [mail archive](./mailing-lists.html).
 
-  * <<<{{{./update-project-license-mojo.html}license:update-project-license}}>>>\
-    Updates (or creates) the main project license file according to the license defined in the licenseName parameter.
+If you feel like the plugin is missing a feature or has a defect, you can fill a feature request or bug report in our [issue tracker](./issue-management.html). When creating a new issue, please provide a comprehensive description of your concern. Especially for fixing bugs it is crucial that the developers can reproduce your problem. For this reason, entire debug logs, POMs or most preferably little demo projects attached to the issue are very much appreciated. Of course, patches are welcome, too. Contributors can check out the project from our [source repository](./scm.html) and will find supplementary information in the [development guidelines](https://www.mojohaus.org/development/guidelines.html).
 
-  * <<<{{{./check-project-license-mojo.html}license:check-project-license}}>>>\
-    Checks the license file of current project.
+Examples
+--------
 
-* {Reports} Overview
+To provide you with better understanding of some usages of the License Plugin, you can take a look at the following examples:
 
-  The following goals are meant to participate in the site build lifecycle as reports:
-
-  * <<<{{{./third-party-report-mojo.html}license:third-party-report}}>>>\
-    Generates the third-party report of the given maven project.
-
-  * <<<{{{./aggregate-third-party-report-mojo.html}license:aggregate-third-party-report}}>>>\
-    Generates the aggregate third-party report of the given maven project (collect dependencies of all his childs).
-
-* {Usage}
-
-  General instructions on how to use the License Plugin can be found on the {{{./usage.html}usage page}}. Some more
-  specific use cases are described in the examples given below.
-
-  In case you still have questions regarding the plugin's usage, please have a look at the {{{./faq.html}FAQ}} and feel
-  free to contact the {{{./mailing-lists.html}user mailing list}}. The posts to the mailing list are archived and could
-  already contain the answer to your question as part of an older thread. Hence, it is also worth browsing/searching
-  the {{{./mailing-lists.html}mail archive}}.
-
-  If you feel like the plugin is missing a feature or has a defect, you can fill a feature request or bug report in our
-  {{{./issue-management.html}issue tracker}}. When creating a new issue, please provide a comprehensive description of your
-  concern. Especially for fixing bugs it is crucial that the developers can reproduce your problem. For this reason,
-  entire debug logs, POMs or most preferably little demo projects attached to the issue are very much appreciated.
-  Of course, patches are welcome, too. Contributors can check out the project from our
-  {{{./scm.html}source repository}} and will find supplementary information in the
-  {{{https://www.mojohaus.org/development/guidelines.html}development guidelines}}.
-
-* {Examples}
-
-  To provide you with better understanding of some usages of the License Plugin, you can take a look at the following
-  examples:
-
-  * {{{./examples/example-add-license.html}Add License to the plugin}}
-
-  * {{{./examples/example-download-licenses.html}Download dependency licenses}}
-
-  * {{{./examples/example-license-list.html}List available licenses}}
-
-  * {{{./examples/example-comment-style-list.html}List available Comment styles}}
-
-  * {{{./examples/example-thirdparty.html}Check thirdparty licenses}}
-
-  * {{{./examples/update-file-header-config.html}Update file header of source files}}
-
+- [Add License to the plugin](./examples/example-add-license.html)
+- [Download dependency licenses](./examples/example-download-licenses.html)
+- [List available licenses](./examples/example-license-list.html)
+- [List available Comment styles](./examples/example-comment-style-list.html)
+- [Check thirdparty licenses](./examples/example-thirdparty.html)
+- [Update file header of source files](./examples/update-file-header-config.html)
