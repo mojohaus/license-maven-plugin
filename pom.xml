@@ -566,6 +566,9 @@
                     <extraArtifact>${project.groupId}:${project.artifactId}:${project.version}:license.properties:test-third-party</extraArtifact>
                     <!-- needed by download-licenses-proxy test -->
                     <extraArtifact>commons-logging:commons-logging:1.0</extraArtifact>
+                    <!-- the site plugins of the ISSUE-358 site fixture: resolved by the main build, so CI caches them -->
+                    <extraArtifact>org.apache.maven.plugins:maven-site-plugin:${maven-site-plugin.version}:maven-plugin</extraArtifact>
+                    <extraArtifact>org.apache.maven.plugins:maven-project-info-reports-plugin:${maven-project-info-reports-plugin.version}:maven-plugin</extraArtifact>
                   </extraArtifacts>
                   <pomExcludes>
                     <!-- failed test on GH use remote resources -->
