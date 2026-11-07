@@ -1101,6 +1101,15 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
             throw new MojoExecutionException("Unable to write license summary file: " + licensesOutputFile, e);
         }
 
+        reportDownloadErrors();
+    }
+
+    /**
+     * Reports the download errors counted during {@link #execute()} as {@link #errorRemedy} requires.
+     *
+     * @throws MojoFailureException if {@link #errorRemedy} is {@code xmlOutput} and there were errors
+     */
+    private void reportDownloadErrors() throws MojoFailureException {
         if (downloadErrorCount > 0) {
             switch (errorRemedy) {
                 case ignore:
