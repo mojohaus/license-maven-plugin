@@ -394,7 +394,7 @@ public abstract class AbstractLicenseNameMojo extends AbstractLicenseMojo {
 
         Set<File> set = getFiles(result, state);
         if (set == null || set.isEmpty()) {
-            if (isVerbose()) {
+            if (LOG.isDebugEnabled()) {
                 buffer.append("\n * no header to ");
                 buffer.append(operation);
                 buffer.append(".");
@@ -408,7 +408,7 @@ public abstract class AbstractLicenseNameMojo extends AbstractLicenseMojo {
         } else {
             buffer.append(" files.");
         }
-        if (isVerbose()) {
+        if (LOG.isDebugEnabled()) {
             for (File file : set) {
                 buffer.append("\n   - ").append(file);
             }
@@ -455,9 +455,7 @@ public abstract class AbstractLicenseNameMojo extends AbstractLicenseMojo {
                 LOG.info("Will search files to update from root {}", f);
                 rootsList.add(f.getAbsolutePath());
             } else {
-                if (isVerbose()) {
-                    LOG.info("Skip not found root {}", f);
-                }
+                LOG.debug("Skip not found root {}", f);
             }
         }
 

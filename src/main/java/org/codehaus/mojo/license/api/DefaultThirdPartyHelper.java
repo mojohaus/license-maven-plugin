@@ -93,11 +93,6 @@ public class DefaultThirdPartyHelper implements ThirdPartyHelper {
     private final String encoding;
 
     /**
-     * Verbose flag.
-     */
-    private final boolean verbose;
-
-    /**
      * Cache of dependencies (as maven project) loaded. It belongs to this helper, which a mojo creates for each of its
      * executions, so the loaded projects are released with it instead of being kept for the life of the JVM.
      */
@@ -126,7 +121,6 @@ public class DefaultThirdPartyHelper implements ThirdPartyHelper {
         // CHECKSTYLE_ON: ParameterNumber
         this.project = project;
         this.encoding = encoding;
-        this.verbose = verbose;
         this.dependenciesTool = dependenciesTool;
         this.thirdPartyTool = thirdPartyTool;
         this.remoteRepositoriesCoreApi = remoteRepositoriesCoreApi;
@@ -308,9 +302,7 @@ public class DefaultThirdPartyHelper implements ThirdPartyHelper {
             for (Map.Entry<String, Set<String>> entry : mergedLicenses.entrySet()) {
                 String mainLicense = entry.getKey();
                 Set<String> mergedLicense = entry.getValue();
-                if (verbose) {
-                    LOG.info("Will merge to '{}', licenses: {}", mainLicense, mergedLicense);
-                }
+                LOG.debug("Will merge to '{}', licenses: {}", mainLicense, mergedLicense);
 
                 thirdPartyTool.mergeLicenses(licenseMap, mainLicense, mergedLicense);
             }

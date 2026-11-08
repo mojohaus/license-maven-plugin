@@ -718,11 +718,6 @@ public abstract class AbstractAddThirdPartyMojo extends AbstractLicenseMojo {
     @Override
     protected void init() throws Exception {
 
-        if (getLog().isDebugEnabled()) {
-            // always be verbose in debug mode
-            setVerbose(true);
-        }
-
         thirdPartyFile = new File(outputDirectory, thirdPartyFilename);
 
         File projectFile = project.getFile() != null ? project.getFile() : new File("");
@@ -856,7 +851,7 @@ public abstract class AbstractAddThirdPartyMojo extends AbstractLicenseMojo {
             helper = new DefaultThirdPartyHelper(
                     getProject(),
                     getEncoding(),
-                    isVerbose(),
+                    LOG.isDebugEnabled(),
                     dependenciesTool,
                     thirdPartyTool,
                     getProject().getRemoteArtifactRepositories(),
@@ -1052,7 +1047,7 @@ public abstract class AbstractAddThirdPartyMojo extends AbstractLicenseMojo {
                 licenseMap1 = licenseMap.toLicenseMapOrderByName();
             }
             thirdPartyTool.writeThirdPartyFile(
-                    licenseMap1, thirdPartyFile, isVerbose(), getEncoding(), fileTemplate, getProject());
+                    licenseMap1, thirdPartyFile, LOG.isDebugEnabled(), getEncoding(), fileTemplate, getProject());
         }
 
         if (doGenerateBundle) {

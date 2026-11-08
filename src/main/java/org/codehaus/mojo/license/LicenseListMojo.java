@@ -116,7 +116,7 @@ public class LicenseListMojo extends AbstractLicenseMojo {
     public void doAction() throws MojoExecutionException, MojoFailureException {
         StringBuilder buffer = new StringBuilder();
 
-        if (isVerbose()) {
+        if (LOG.isDebugEnabled()) {
             buffer.append("\n\n-------------------------------------------------------------------------------\n");
             buffer.append("                           maven-license-plugin\n");
             buffer.append("-------------------------------------------------------------------------------\n\n");

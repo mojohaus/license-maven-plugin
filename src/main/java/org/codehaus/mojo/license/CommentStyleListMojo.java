@@ -106,7 +106,7 @@ public class CommentStyleListMojo extends AbstractLicenseMojo {
     public void doAction() throws MojoExecutionException, MojoFailureException {
 
         StringBuilder buffer = new StringBuilder();
-        if (isVerbose()) {
+        if (LOG.isDebugEnabled()) {
             buffer.append("\n\n-------------------------------------------------------------------------------\n");
             buffer.append("                           license-maven-plugin\n");
             buffer.append("-------------------------------------------------------------------------------\n\n");

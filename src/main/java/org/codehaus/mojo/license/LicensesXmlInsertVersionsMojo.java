@@ -122,6 +122,7 @@ public class LicensesXmlInsertVersionsMojo extends AbstractLicensesXmlMojo {
             final MavenProjectDependenciesConfigurator config = new MavenProjectDependenciesConfigurator() {
 
                 @Override
+                @Deprecated
                 public boolean isVerbose() {
                     return getLog().isDebugEnabled();
                 }

@@ -283,13 +283,15 @@ public abstract class AbstractThirdPartyReport extends AbstractMavenReport
     /**
      * Flag to activate verbose mode.
      * <p>
-     * <b>Note:</b> Verbose mode is always on if you starts a debug maven instance
-     * (says via {@code -X}).
+     * <b>Note:</b> The messages that this flag enabled are now logged at debug level, so start Maven with
+     * {@code -X} to see them. The flag has no effect any more.
      *
      * @since 1.0
+     * @deprecated the messages are logged at debug level; the flag has no effect and will be removed
      */
-    @Parameter(property = "license.verbose", defaultValue = "${maven.verbose}")
-    private boolean verbose;
+    @Deprecated
+    @Parameter(property = "license.verbose")
+    private Boolean verbose;
 
     /**
      * Encoding used to read and writes files.
@@ -392,6 +394,9 @@ public abstract class AbstractThirdPartyReport extends AbstractMavenReport
     protected void executeReport(Locale locale) throws MavenReportException {
         UrlRequester.setProxy(HttpClientProxy.findActiveProxy(proxies));
 
+        if (verbose != null) {
+            getLog().warn(AbstractLicenseMojo.VERBOSE_DEPRECATION_MESSAGE);
+        }
         resolvedOverrideUrl = LicenseMojoUtils.prepareThirdPartyOverrideUrl(
                 resolvedOverrideUrl, overrideFile, overrideUrl, project.getBasedir());
 
@@ -476,8 +481,9 @@ public abstract class AbstractThirdPartyReport extends AbstractMavenReport
      * {@inheritDoc}
      */
     @Override
+    @Deprecated
     public boolean isVerbose() {
-        return verbose;
+        return Boolean.TRUE.equals(verbose);
     }
 
     // ----------------------------------------------------------------------
@@ -500,7 +506,7 @@ public abstract class AbstractThirdPartyReport extends AbstractMavenReport
         ThirdPartyHelper thirdPartyHelper = new DefaultThirdPartyHelper(
                 project,
                 encoding,
-                verbose,
+                LOG.isDebugEnabled(),
                 dependenciesTool,
                 thirdPartyTool,
                 project.getRemoteArtifactRepositories(),

@@ -193,9 +193,7 @@ public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo {
 
         List<MavenProject> modules = ModuleHelper.getFilteredModules(reactorProjects, includedModules, excludedModules);
 
-        if (isVerbose()) {
-            LOG.info("After executing on {} project(s)", modules.size());
-        }
+        LOG.debug("After executing on {} project(s)", modules.size());
 
         licenseMap = new LicenseMap();
 
@@ -248,20 +246,18 @@ public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo {
             mojo.initFromMojo(this, reactorProject);
 
             LicenseMap childLicenseMap = mojo.licenseMap;
-            if (isVerbose()) {
-                LOG.info(
-                        "Found {} license(s) in module {}:{}",
-                        childLicenseMap.size(),
-                        mojo.project.getGroupId(),
-                        mojo.project.getArtifactId());
-            }
+            LOG.debug(
+                    "Found {} license(s) in module {}:{}",
+                    childLicenseMap.size(),
+                    mojo.project.getGroupId(),
+                    mojo.project.getArtifactId());
             licenseMap.putAll(childLicenseMap);
         }
 
         LOG.info("Detected {} license(s).", licenseMap.size());
-        if (isVerbose()) {
+        if (LOG.isDebugEnabled()) {
             for (Map.Entry<String, SortedSet<MavenProject>> entry : licenseMap.entrySet()) {
-                LOG.info(
+                LOG.debug(
                         " - {} for {} artifact(s).",
                         entry.getKey(),
                         entry.getValue().size());
@@ -305,9 +301,7 @@ public class AggregatorAddThirdPartyMojo extends AbstractAddThirdPartyMojo {
                 .getAbsolutePath()
                 .substring(getProject().getBasedir().getAbsolutePath().length() + 1);
 
-        if (isVerbose()) {
-            LOG.info("Use missing file path: {}", path);
-        }
+        LOG.debug("Use missing file path: {}", path);
 
         SortedProperties unsafeMappings = new SortedProperties(getEncoding());
 

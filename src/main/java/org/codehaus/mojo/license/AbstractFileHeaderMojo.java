@@ -434,7 +434,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo {
             }
         }
 
-        if (isVerbose()) {
+        if (LOG.isDebugEnabled()) {
             // print available comment styles (transformers)
             StringBuilder buffer = new StringBuilder();
             buffer.append("config - available comment styles :");
@@ -444,46 +444,34 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo {
                 String str = String.format(commentFormat, aTransformer.getName(), aTransformer.getDescription());
                 buffer.append(str);
             }
-            LOG.info("{}", buffer);
+            LOG.debug("{}", buffer);
         }
         // set timestamp used for temporary files
         this.timestamp = System.nanoTime();
         super.init();
         if (roots == null || roots.length == 0) {
             roots = DEFAULT_ROOTS;
-            if (isVerbose()) {
-                LOG.info("Will use default roots {}", (Object) roots);
-            }
+            LOG.debug("Will use default roots {}", (Object) roots);
         }
 
         if (includes == null || includes.length == 0) {
             includes = DEFAULT_INCLUDES;
-            if (isVerbose()) {
-                LOG.info("Will use default includes {}", (Object) includes);
-            }
+            LOG.debug("Will use default includes {}", (Object) includes);
         }
 
         if (excludes == null || excludes.length == 0) {
             excludes = DEFAULT_EXCLUDES;
-            if (isVerbose()) {
-                LOG.info("Will use default excludes {}", (Object) excludes);
-            }
+            LOG.debug("Will use default excludes {}", (Object) excludes);
         }
 
         extensionToCommentStyle = new TreeMap<>();
 
         processStartTag = cleanHeaderConfiguration(processStartTag, FileHeaderTransformer.DEFAULT_PROCESS_START_TAG);
-        if (isVerbose()) {
-            LOG.info("Will use processStartTag: {}", processStartTag);
-        }
+        LOG.debug("Will use processStartTag: {}", processStartTag);
         processEndTag = cleanHeaderConfiguration(processEndTag, FileHeaderTransformer.DEFAULT_PROCESS_END_TAG);
-        if (isVerbose()) {
-            LOG.info("Will use processEndTag: {}", processEndTag);
-        }
+        LOG.debug("Will use processEndTag: {}", processEndTag);
         sectionDelimiter = cleanHeaderConfiguration(sectionDelimiter, FileHeaderTransformer.DEFAULT_SECTION_DELIMITER);
-        if (isVerbose()) {
-            LOG.info("Will use sectionDelimiter: {}", sectionDelimiter);
-        }
+        LOG.debug("Will use sectionDelimiter: {}", sectionDelimiter);
 
         // add default extensions from header transformers
         for (Map.Entry<String, FileHeaderTransformer> entry : transformers.entrySet()) {
@@ -506,9 +494,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo {
 
             String[] extensions = aTransformer.getDefaultAcceptedExtensions();
             for (String extension : extensions) {
-                if (isVerbose()) {
-                    LOG.info("Associate extension '{}' to comment style '{}'", extension, commentStyle);
-                }
+                LOG.debug("Associate extension '{}' to comment style '{}'", extension, commentStyle);
                 extensionToCommentStyle.put(extension, commentStyle);
             }
         }
@@ -527,9 +513,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo {
                 String commentStyle = entry.getValue();
                 // check transformer exists
                 getTransformer(transformers, commentStyle);
-                if (isVerbose()) {
-                    LOG.info("Associate extension '{}' to comment style '{}'", extension, commentStyle);
-                }
+                LOG.debug("Associate extension '{}' to comment style '{}'", extension, commentStyle);
                 extensionToCommentStyle.put(extension, commentStyle);
             }
         }
@@ -540,9 +524,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo {
         filesToTreatByCommentStyle = obtainFilesToProcessByCommentStyle(
                 extraFiles, roots, includes, excludes, extensionToCommentStyle, transformers);
         // build the description template
-        if (isVerbose()) {
-            LOG.info("Use description template: {}", descriptionTemplate);
-        }
+        LOG.debug("Use description template: {}", descriptionTemplate);
         descriptionTemplate0 = freeMarkerHelper.getTemplate(descriptionTemplate);
     }
 
@@ -644,9 +626,9 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo {
         // obtain license from definition
         License license = getLicense(getLicenseName(), true);
 
-        if (isVerbose()) {
-            LOG.info("Process header '{}'", commentStyle);
-            LOG.info(" - using {}", license.getDescription());
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Process header '{}'", commentStyle);
+            LOG.debug(" - using {}", license.getDescription());
         }
 
         // use header transformer according to comment style given in header
@@ -807,9 +789,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo {
 
         if (processor.isTouched()) {
 
-            if (isVerbose()) {
-                LOG.info(" - header was updated for {}", file);
-            }
+            LOG.debug(" - header was updated for {}", file);
             if (processor.isModified()) {
 
                 // header content has changed
@@ -833,9 +813,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo {
         }
 
         // no header at all, add a new header
-        if (isVerbose()) {
-            LOG.info(" - adding license header on file {}", file);
-        }
+        LOG.debug(" - adding license header on file {}", file);
 
         // FIXME tchemit 20100409 xml files must add header after a xml prolog line
         content = processor.addHeader(content);

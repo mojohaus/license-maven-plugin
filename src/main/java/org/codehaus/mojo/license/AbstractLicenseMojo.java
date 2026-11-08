@@ -58,13 +58,15 @@ public abstract class AbstractLicenseMojo extends AbstractMojo {
     /**
      * Flag to activate verbose mode.
      *
-     * <b>Note:</b> Verbose mode is always on if you starts a debug maven instance
-     * (says via {@code -X}).
+     * <b>Note:</b> The messages that this flag enabled are now logged at debug level, so start Maven with
+     * {@code -X} to see them. The flag has no effect any more.
      *
      * @since 1.0
+     * @deprecated the messages are logged at debug level; the flag has no effect and will be removed
      */
-    @Parameter(property = "license.verbose", defaultValue = "${maven.verbose}")
-    boolean verbose;
+    @Deprecated
+    @Parameter(property = "license.verbose")
+    Boolean verbose;
 
     /**
      * Encoding used to read and writes files.
@@ -109,6 +111,13 @@ public abstract class AbstractLicenseMojo extends AbstractMojo {
     protected AbstractLicenseMojo(MavenProjectHelper projectHelper) {
         this.projectHelper = Objects.requireNonNull(projectHelper, "projectHelper cannot be null");
     }
+
+    /**
+     * Logged when the deprecated {@code verbose} parameter is set.
+     */
+    static final String VERBOSE_DEPRECATION_MESSAGE =
+            "The parameter 'verbose' (license.verbose) is deprecated and has no effect: "
+                    + "the messages it enabled are logged at debug level, use -X to see them.";
 
     /**
      * Honours the deprecated {@code license.licenceFile} user property for a {@code licenseFile} parameter that now
@@ -184,9 +193,8 @@ public abstract class AbstractLicenseMojo extends AbstractMojo {
     public final void execute() throws MojoExecutionException, MojoFailureException {
         UrlRequester.setProxy(HttpClientProxy.findActiveProxy(proxies));
         try {
-            if (getLog().isDebugEnabled()) {
-                // always be verbose in debug mode
-                setVerbose(true);
+            if (verbose != null) {
+                getLog().warn(VERBOSE_DEPRECATION_MESSAGE);
             }
 
             boolean mustSkip = isSkip();
@@ -268,16 +276,20 @@ public abstract class AbstractLicenseMojo extends AbstractMojo {
 
     /**
      * @return {@code true} if verbose flag is on, {@code false} otherwise
+     * @deprecated the verbose messages are logged at debug level
      */
+    @Deprecated
     public final boolean isVerbose() {
-        return verbose;
+        return Boolean.TRUE.equals(verbose);
     }
 
     /**
      * Sets new value to {@link #verbose} flag.
      *
      * @param verbose new value to set
+     * @deprecated the verbose messages are logged at debug level
      */
+    @Deprecated
     public final void setVerbose(boolean verbose) {
         this.verbose = verbose;
     }
@@ -373,9 +385,7 @@ public abstract class AbstractLicenseMojo extends AbstractMojo {
      */
     protected void checkEncoding() {
 
-        if (isVerbose()) {
-            LOG.info("Will check encoding: {}", getEncoding());
-        }
+        LOG.debug("Will check encoding: {}", getEncoding());
         if (StringUtils.isEmpty(getEncoding())) {
             String sysEncoding = Charset.defaultCharset().displayName();
             LOG.warn(
@@ -394,9 +404,7 @@ public abstract class AbstractLicenseMojo extends AbstractMojo {
      */
     protected void addResourceDir(File dir, String... includes) {
         projectHelper.addResource(getProject(), dir.getAbsolutePath(), Arrays.asList(includes), null);
-        if (isVerbose()) {
-            LOG.info("add resource {} with includes {}", dir, includes);
-        }
+        LOG.debug("add resource {} with includes {}", dir, includes);
     }
 
     /**

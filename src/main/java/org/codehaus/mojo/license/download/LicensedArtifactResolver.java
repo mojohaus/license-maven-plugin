@@ -110,8 +110,6 @@ public class LicensedArtifactResolver {
             depArtifacts = artifacts.getDirectDependencies();
         }
 
-        boolean verbose = configuration.isVerbose();
-
         final Map<String, Artifact> excludeArtifacts = new HashMap<>();
         final Map<String, Artifact> includeArtifacts = new HashMap<>();
 
@@ -142,9 +140,7 @@ public class LicensedArtifactResolver {
 
             final String id = MojoHelper.getArtifactId(artifact);
 
-            if (verbose) {
-                LOG.info("detected artifact {}", id);
-            }
+            LOG.debug("detected artifact {}", id);
 
             LicensedArtifact depMavenProject;
 
@@ -183,9 +179,7 @@ public class LicensedArtifactResolver {
 
                 depMavenProject = laBuilder.build();
 
-                if (verbose) {
-                    LOG.info("add dependency [{}]", id);
-                }
+                LOG.debug("add dependency [{}]", id);
 
                 result.put(id, depMavenProject);
             }
