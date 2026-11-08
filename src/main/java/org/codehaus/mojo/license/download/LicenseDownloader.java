@@ -58,13 +58,10 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpException;
 import org.apache.http.HttpHost;
-import org.apache.http.HttpRequest;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
 import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.AuthCache;
 import org.apache.http.client.CredentialsProvider;
@@ -75,7 +72,6 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.client.utils.DateUtils;
-import org.apache.http.conn.routing.HttpRoutePlanner;
 import org.apache.http.entity.ContentType;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.BasicAuthCache;
@@ -83,13 +79,12 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.DefaultProxyRoutePlanner;
-import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.settings.Proxy;
 import org.codehaus.mojo.license.spdx.SpdxLicenseList.Attachments.ContentSanitizer;
 import org.codehaus.mojo.license.utils.FileUtil;
+import org.codehaus.mojo.license.utils.HttpClientProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -219,49 +214,9 @@ public class LicenseDownloader implements AutoCloseable {
                 .setCookieSpec(CookieSpecs.STANDARD)
                 .setConnectionRequestTimeout(connectionRequestTimeout);
 
-        if (proxy != null) {
-            configBuilder.setProxy(new HttpHost(proxy.getHost(), proxy.getPort(), proxy.getProtocol()));
-        }
-
-        HttpClientBuilder clientBuilder = HttpClients.custom()
-                .setDefaultRequestConfig(configBuilder.build())
-                .setUserAgent(USER_AGENT);
-        if (proxy != null) {
-            if (proxy.getUsername() != null && proxy.getPassword() != null) {
-                final CredentialsProvider credsProvider = new BasicCredentialsProvider();
-                final Credentials creds = new UsernamePasswordCredentials(proxy.getUsername(), proxy.getPassword());
-                credsProvider.setCredentials(new AuthScope(proxy.getHost(), proxy.getPort()), creds);
-                clientBuilder.setDefaultCredentialsProvider(credsProvider);
-            }
-            final String rawNonProxyHosts = proxy.getNonProxyHosts();
-            if (rawNonProxyHosts != null) {
-                final String[] nonProxyHosts = rawNonProxyHosts.split("|");
-                if (nonProxyHosts.length > 0) {
-                    final List<Pattern> nonProxyPatterns = new ArrayList<>();
-                    for (String nonProxyHost : nonProxyHosts) {
-                        final Pattern pat = Pattern.compile(
-                                nonProxyHost.replaceAll("\\.", "\\\\.").replaceAll("\\*", ".*"),
-                                Pattern.CASE_INSENSITIVE);
-                        nonProxyPatterns.add(pat);
-                    }
-                    final HttpHost proxyHost = new HttpHost(proxy.getHost(), proxy.getPort());
-                    final HttpRoutePlanner routePlanner = new DefaultProxyRoutePlanner(proxyHost) {
-
-                        @Override
-                        protected HttpHost determineProxy(HttpHost target, HttpRequest request, HttpContext context)
-                                throws HttpException {
-                            for (Pattern pattern : nonProxyPatterns) {
-                                if (pattern.matcher(target.getHostName()).matches()) {
-                                    return null;
-                                }
-                            }
-                            return super.determineProxy(target, request, context);
-                        }
-                    };
-                    clientBuilder.setRoutePlanner(routePlanner);
-                }
-            }
-        }
+        HttpClientBuilder clientBuilder = HttpClients.custom().setUserAgent(USER_AGENT);
+        HttpClientProxy.configure(proxy, configBuilder, clientBuilder);
+        clientBuilder.setDefaultRequestConfig(configBuilder.build());
         this.client = clientBuilder.build();
     }
 

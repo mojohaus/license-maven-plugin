@@ -25,6 +25,7 @@ package org.codehaus.mojo.license;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
@@ -35,6 +36,9 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
+import org.apache.maven.settings.Proxy;
+import org.codehaus.mojo.license.utils.HttpClientProxy;
+import org.codehaus.mojo.license.utils.UrlRequester;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,6 +90,14 @@ public abstract class AbstractLicenseMojo extends AbstractMojo {
      */
     @Parameter(defaultValue = "${session}", readonly = true)
     MavenSession session;
+
+    /**
+     * Get declared proxies from the {@code settings.xml} file.
+     *
+     * @since 2.8.1
+     */
+    @Parameter(defaultValue = "${settings.proxies}", readonly = true)
+    List<Proxy> proxies;
 
     protected final MavenProjectHelper projectHelper;
 
@@ -170,6 +182,7 @@ public abstract class AbstractLicenseMojo extends AbstractMojo {
      * {@inheritDoc}
      */
     public final void execute() throws MojoExecutionException, MojoFailureException {
+        UrlRequester.setProxy(HttpClientProxy.findActiveProxy(proxies));
         try {
             if (getLog().isDebugEnabled()) {
                 // always be verbose in debug mode

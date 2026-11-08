@@ -46,6 +46,7 @@ import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.reporting.AbstractMavenReport;
 import org.apache.maven.reporting.MavenReportException;
+import org.apache.maven.settings.Proxy;
 import org.codehaus.mojo.license.api.ArtifactFilters;
 import org.codehaus.mojo.license.api.DefaultThirdPartyDetails;
 import org.codehaus.mojo.license.api.DefaultThirdPartyHelper;
@@ -58,6 +59,7 @@ import org.codehaus.mojo.license.api.ThirdPartyHelper;
 import org.codehaus.mojo.license.api.ThirdPartyTool;
 import org.codehaus.mojo.license.api.ThirdPartyToolException;
 import org.codehaus.mojo.license.model.LicenseMap;
+import org.codehaus.mojo.license.utils.HttpClientProxy;
 import org.codehaus.mojo.license.utils.MojoHelper;
 import org.codehaus.mojo.license.utils.UrlRequester;
 import org.codehaus.plexus.i18n.I18N;
@@ -77,6 +79,14 @@ public abstract class AbstractThirdPartyReport extends AbstractMavenReport
     // ----------------------------------------------------------------------
     // Mojo Parameters
     // ----------------------------------------------------------------------
+
+    /**
+     * Get declared proxies from the {@code settings.xml} file.
+     *
+     * @since 2.8.1
+     */
+    @Parameter(defaultValue = "${settings.proxies}", readonly = true)
+    private List<Proxy> proxies;
 
     /**
      * A filter to exclude some scopes.
@@ -380,6 +390,8 @@ public abstract class AbstractThirdPartyReport extends AbstractMavenReport
      * {@inheritDoc}
      */
     protected void executeReport(Locale locale) throws MavenReportException {
+        UrlRequester.setProxy(HttpClientProxy.findActiveProxy(proxies));
+
         resolvedOverrideUrl = LicenseMojoUtils.prepareThirdPartyOverrideUrl(
                 resolvedOverrideUrl, overrideFile, overrideUrl, project.getBasedir());
 
