@@ -39,6 +39,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -399,6 +400,18 @@ public class DefaultThirdPartyTool implements ThirdPartyTool {
     }
 
     /**
+     * Logs a missing file entry that matches no dependency of the project: at DEBUG when the entry comes from a
+     * remote missing file shared between projects, at WARN otherwise.
+     */
+    static void logUnknownDependency(Logger log, boolean fromRemoteMissingFile, String message, String id) {
+        if (fromRemoteMissingFile) {
+            log.debug(message, id);
+        } else {
+            log.warn(message, id);
+        }
+    }
+
+    /**
      * {@inheritDoc}
      */
     public SortedProperties loadUnsafeMapping(
@@ -441,6 +454,10 @@ public class DefaultThirdPartyTool implements ThirdPartyTool {
             // load the missing file
             unsafeMappings.load(missingFile);
         }
+        // entries of a shared, remote missing file are expected to cover more than this project
+        final Set<Object> localIds = new HashSet<>(unsafeMappings.keySet());
+        final boolean remoteMissingFile =
+                UrlRequester.isStringUrl(missingFileUrl) && UrlRequester.isExternalUrl(missingFileUrl);
         if (UrlRequester.isStringUrl(missingFileUrl)) {
             String httpRequestResult = UrlRequester.getFromUrl(missingFileUrl);
             unsafeMappings.load(new ByteArrayInputStream(httpRequestResult.getBytes()));
@@ -477,7 +494,11 @@ public class DefaultThirdPartyTool implements ThirdPartyTool {
 
             // there is some unknown dependencies in the missing file, remove them
             for (String id : unknownDependenciesId) {
-                LOG.warn("dependency [{}] does not exist in project, remove it from the missing file.", id);
+                logUnknownDependency(
+                        LOG,
+                        remoteMissingFile && !localIds.contains(id),
+                        "dependency [{}] does not exist in project, remove it from the missing file.",
+                        id);
                 unsafeMappings.remove(id);
             }
 
@@ -490,7 +511,11 @@ public class DefaultThirdPartyTool implements ThirdPartyTool {
 
             MavenProject project = artifactCache.get(id);
             if (project == null) {
-                LOG.warn("dependency [{}] does not exist in project.", id);
+                logUnknownDependency(
+                        LOG,
+                        remoteMissingFile && !localIds.contains(id),
+                        "dependency [{}] does not exist in project.",
+                        id);
                 continue;
             }
 
