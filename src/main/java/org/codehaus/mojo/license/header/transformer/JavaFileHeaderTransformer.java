@@ -105,7 +105,7 @@ public class JavaFileHeaderTransformer extends AbstractFileHeaderTransformer {
         String result;
 
         String prolog = null;
-        int startProlog = content.indexOf("package");
+        int startProlog = findPackageStatement(content);
         if (startProlog > -1) {
 
             // package was detected
@@ -144,5 +144,63 @@ public class JavaFileHeaderTransformer extends AbstractFileHeaderTransformer {
             result = super.addHeader(prolog + getLineSeparator() + header, content);
         }
         return result;
+    }
+
+    /**
+     * Finds the {@code package} keyword that starts the package declaration, skipping comments, string and character
+     * literals and identifiers that merely contain the word, such as {@code packages} in a Javadoc comment.
+     *
+     * @param content the Java source
+     * @return the index of the keyword, or {@code -1} if the source has no package declaration
+     */
+    static int findPackageStatement(String content) {
+        int length = content.length();
+        int i = 0;
+        while (i < length) {
+            char c = content.charAt(i);
+            if (c == '/' && i + 1 < length && content.charAt(i + 1) == '*') {
+                int end = content.indexOf("*/", i + 2);
+                if (end < 0) {
+                    return -1;
+                }
+                i = end + 2;
+            } else if (c == '/' && i + 1 < length && content.charAt(i + 1) == '/') {
+                int end = content.indexOf('\n', i + 2);
+                if (end < 0) {
+                    return -1;
+                }
+                i = end + 1;
+            } else if (c == '"' || c == '\'') {
+                i = skipLiteral(content, i);
+            } else if (Character.isJavaIdentifierStart(c)) {
+                int end = i + 1;
+                while (end < length && Character.isJavaIdentifierPart(content.charAt(end))) {
+                    end++;
+                }
+                if (content.substring(i, end).equals("package")) {
+                    return i;
+                }
+                i = end;
+            } else {
+                i++;
+            }
+        }
+        return -1;
+    }
+
+    private static int skipLiteral(String content, int start) {
+        char quote = content.charAt(start);
+        int i = start + 1;
+        while (i < content.length()) {
+            char c = content.charAt(i);
+            if (c == '\\') {
+                i += 2;
+            } else if (c == quote) {
+                return i + 1;
+            } else {
+                i++;
+            }
+        }
+        return content.length();
     }
 }

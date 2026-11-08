@@ -62,4 +62,42 @@ class JavaFileHeaderTransformerTest {
                 PACKAGE + FileHeaderTransformer.LINE_SEPARATOR + transformer.getLineSeparator() + HEADER + CONTENT,
                 result);
     }
+
+    @Test
+    void addHeaderIgnoresPackageInsideWordsOfAComment() {
+        JavaFileHeaderTransformer transformer = new JavaFileHeaderTransformer();
+        transformer.setLineSeparator(LINE_SEPARATOR);
+        transformer.setEmptyLineAfterHeader(false);
+        transformer.setAddJavaLicenseAfterPackage(true);
+
+        String module =
+                "/**\n * Defines packages for <a href=\"x\">y</a> &lt;a@b&gt;\n */\nmodule m {\n    exports p;\n}\n";
+
+        // no package statement: the header goes in front, the Javadoc is left alone
+        assertEquals(HEADER + module, transformer.addHeader(HEADER, module));
+    }
+
+    @Test
+    void addHeaderAnchorsOnTheRealPackageStatement() {
+        JavaFileHeaderTransformer transformer = new JavaFileHeaderTransformer();
+        transformer.setLineSeparator(LINE_SEPARATOR);
+        transformer.setEmptyLineAfterHeader(false);
+        transformer.setAddJavaLicenseAfterPackage(true);
+
+        String comment = "// the package is below; see also packages.\n/* package x; */\n";
+        String declaration = "package a.b;\n";
+        String body = "class C { String s = \"package y;\"; }\n";
+
+        assertEquals(
+                comment + declaration + LINE_SEPARATOR + HEADER + body,
+                transformer.addHeader(HEADER, comment + declaration + body));
+    }
+
+    @Test
+    void findPackageStatement() {
+        assertEquals(-1, JavaFileHeaderTransformer.findPackageStatement("/* package a; */ class C {}"));
+        assertEquals(-1, JavaFileHeaderTransformer.findPackageStatement("class C { String packages; }"));
+        assertEquals(9, JavaFileHeaderTransformer.findPackageStatement("/* c */\n\npackage a;"));
+        assertEquals(12, JavaFileHeaderTransformer.findPackageStatement("@Deprecated package a;"));
+    }
 }
