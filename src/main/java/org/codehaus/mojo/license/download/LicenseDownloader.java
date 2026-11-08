@@ -33,11 +33,13 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -48,6 +50,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.codec.binary.Hex;
@@ -120,6 +123,9 @@ public class LicenseDownloader implements AutoCloseable {
     private final Charset charset;
 
     private BundledLicenseTexts.Mode bundledTextsMode = BundledLicenseTexts.Mode.none;
+
+    /** The directory that relative {@code file:} URLs are resolved against; may be {@code null}. */
+    private Path basedir;
 
     private static final String HTML_MIME_TYPE = "text/html";
 
@@ -260,6 +266,17 @@ public class LicenseDownloader implements AutoCloseable {
     }
 
     /**
+     * Sets the directory against which a relative {@code file:} license URL is resolved. Without it, such a URL is
+     * resolved against the working directory.
+     *
+     * @param basedir the directory, usually the basedir of the project
+     * @since 2.8.1
+     */
+    public void setBasedir(Path basedir) {
+        this.basedir = basedir;
+    }
+
+    /**
      * Sets which well-known license URLs are answered from a text bundled with the plugin instead of a request. The
      * default is {@link BundledLicenseTexts.Mode#none}, which keeps the behavior of this class unchanged.
      *
@@ -365,15 +382,18 @@ public class LicenseDownloader implements AutoCloseable {
             return bundled;
         }
 
-        if (licenseUrlString.startsWith("file://")) {
-            LOG.debug("Downloading '{}' -> '{}'", licenseUrlString, outputFile);
-            Path in = Paths.get(new URI(licenseUrlString));
+        if (isFileUrl(licenseUrlString)) {
+            final Path in = resolveFileUrl(licenseUrlString);
+            final File target = fileNameEntry.isPreferred()
+                    ? outputFile
+                    : replaceExtension(outputFile, extensionOf(in.getFileName().toString()));
+            LOG.debug("Downloading '{}' -> '{}'", licenseUrlString, target);
             if (sanitizers.isEmpty()) {
-                Files.copy(in, outputFile.toPath());
-                return LicenseDownloadResult.success(outputFile, FileUtil.sha1(in), fileNameEntry.isPreferred());
+                Files.copy(in, target.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                return LicenseDownloadResult.success(target, FileUtil.sha1(in), fileNameEntry.isPreferred());
             } else {
                 try (BufferedReader r = Files.newBufferedReader(in, charset)) {
-                    return sanitize(r, outputFile, charset, sanitizers, fileNameEntry.isPreferred());
+                    return sanitize(r, target, charset, sanitizers, fileNameEntry.isPreferred());
                 }
             }
         } else {
@@ -464,6 +484,32 @@ public class LicenseDownloader implements AutoCloseable {
             }
             return process(buffered, licenseUrlString, fileNameEntry, sanitizers);
         }
+    }
+
+    private static boolean isFileUrl(String url) {
+        return url.regionMatches(true, 0, "file:", 0, "file:".length());
+    }
+
+    /**
+     * Resolves a {@code file:} URL to a path. An absolute URL such as {@code file:///opt/licenses/a.txt} is used as it
+     * is. Anything else, such as {@code file://./licenses/a.txt}, {@code file://licenses/a.txt} or
+     * {@code file:licenses/a.txt}, is a path relative to the {@linkplain #setBasedir(Path) base directory}.
+     */
+    private Path resolveFileUrl(String url) throws URISyntaxException, IOException {
+        String path = url.substring("file:".length());
+        if (path.startsWith("//")) {
+            path = path.substring(2);
+        }
+        if (path.startsWith("/")) {
+            return Paths.get(new URI(url));
+        }
+        if (path.indexOf('%') >= 0) {
+            path = URLDecoder.decode(path.replace("+", "%2B"), "UTF-8");
+        }
+        final Path relative = Paths.get(path);
+        return relative.isAbsolute() || basedir == null
+                ? relative.toAbsolutePath()
+                : basedir.resolve(relative).normalize();
     }
 
     private static boolean isHttp(String url) {
@@ -627,7 +673,16 @@ public class LicenseDownloader implements AutoCloseable {
     }
 
     static File updateFileExtension(File outputFile, String mimeType) {
-        String realExtension = FileUtil.toExtension(mimeType, false);
+        return replaceExtension(outputFile, FileUtil.toExtension(mimeType, false));
+    }
+
+    /** Returns the extension of a file name, such as {@code .html}, or {@code null} if it has none. */
+    private static String extensionOf(String fileName) {
+        final Matcher matcher = EXTENSION_PATTERN.matcher(fileName);
+        return matcher.find() ? matcher.group().toLowerCase(Locale.ROOT) : null;
+    }
+
+    private static File replaceExtension(File outputFile, String realExtension) {
         if (realExtension == null) {
             /* default extension is .txt */
             realExtension = ".txt";

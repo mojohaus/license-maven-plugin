@@ -1115,6 +1115,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
                 downloadPassword,
                 serverUrl,
                 serverHttpHeaders)) {
+            licenseDownloader.setBasedir(project.getBasedir().toPath());
             licenseDownloader.setBundledTextsMode(useBundledLicenseTexts);
             licenseDownloader.setRejectHtml(rejectHtmlLicenseTexts);
             licenseDownloader.setLicenseCache(licenseCache);
@@ -1644,7 +1645,8 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
             throws URISyntaxException {
 
         final URI licenseUrl = new URI(url);
-        File licenseUrlFile = new File(licenseUrl.getPath());
+        File licenseUrlFile =
+                new File(licenseUrl.getPath() != null ? licenseUrl.getPath() : licenseUrl.getSchemeSpecificPart());
 
         if (organizeLicensesByDependencies) {
             if (licenseFileName != null && !licenseFileName.isEmpty()) {

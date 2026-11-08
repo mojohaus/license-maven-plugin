@@ -218,3 +218,19 @@ By default the plugin will look at the POM of each dependency for license inform
 ```
 
 The generated license report follows the same XML format as the manual license config file.
+
+Using License Texts From Files
+------------------------------
+
+A `url` element of the manual license config file can also point to a file, so that a license text that is not published anywhere is read from the project instead. A relative path is resolved against the base directory of the project, which keeps absolute paths out of the version-controlled configuration:
+
+```xml
+<license>
+  <name>Company internal license</name>
+  <url>file:licenses/company-license.html</url>
+</license>
+```
+
+`file:licenses/company-license.html`, `file://licenses/company-license.html` and `file://./licenses/company-license.html` are equivalent. An absolute path needs three slashes, as in `file:///opt/licenses/company-license.html`.
+
+The copy in `licensesOutputDirectory` takes its extension from the name of the source file, `.html` in this example, in the same way as a download takes it from the content type; a source file without an extension is saved as `.txt`.

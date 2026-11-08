@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.codehaus.mojo.license</groupId>
+  <artifactId>it-download-licenses-file-url</artifactId>
+  <version>1.0</version>
+  <name>Integration Test - download-licenses with a relative file: license URL</name>
+
+  <properties>
+    <project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
+  </properties>
+
+  <dependencies>
+    <!-- Declares no license -->
+    <dependency>
+      <groupId>localhost</groupId>
+      <artifactId>jettison</artifactId>
+      <version>1.1</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>@project.version@</version>
+        <executions>
+          <execution>
+            <id>file-url</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>download-licenses</goal>
+            </goals>
+            <configuration>
+              <licensesConfigFile>${basedir}/licenses-config.xml</licensesConfigFile>
+              <licensesOutputDirectory>${project.build.directory}/licenses</licensesOutputDirectory>
+              <licensesOutputFile>${project.build.directory}/licenses.xml</licensesOutputFile>
+              <excludeTransitiveDependencies>true</excludeTransitiveDependencies>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>
