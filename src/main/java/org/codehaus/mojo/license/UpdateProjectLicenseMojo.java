@@ -61,7 +61,7 @@ public class UpdateProjectLicenseMojo extends AbstractLicenseNameMojo {
      * @required
      * @since 1.0
      */
-    @Parameter(property = "license.licenceFile", defaultValue = "${basedir}/LICENSE.txt")
+    @Parameter(property = "license.licenseFile", defaultValue = "${basedir}/LICENSE.txt")
     protected File licenseFile;
 
     /**
@@ -149,6 +149,8 @@ public class UpdateProjectLicenseMojo extends AbstractLicenseNameMojo {
     @Override
     protected void init() throws Exception {
         super.init();
+
+        licenseFile = resolveLicenseFile(licenseFile);
 
         // must generate if file does not exist or pom never thant license file
         if (licenseFile != null) {

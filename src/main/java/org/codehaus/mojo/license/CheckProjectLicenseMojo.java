@@ -49,7 +49,7 @@ public class CheckProjectLicenseMojo extends AbstractLicenseMojo {
      *
      * @since 2.7.0
      */
-    @Parameter(property = "license.licenceFile", defaultValue = "LICENSE.txt")
+    @Parameter(property = "license.licenseFile", defaultValue = "LICENSE.txt")
     private File licenseFile;
     /**
      * A flag to fail the build if there is missing any license file.
@@ -83,7 +83,7 @@ public class CheckProjectLicenseMojo extends AbstractLicenseMojo {
 
     @Override
     protected void init() throws Exception {
-        // nothing to do
+        licenseFile = resolveLicenseFile(licenseFile);
     }
 
     @Override
