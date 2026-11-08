@@ -103,4 +103,15 @@ public interface ThirdPartyDetails {
      * @return {@code true} if the project has his licenses defined in the third-party file.
      */
     boolean hasThirdPartyLicenses();
+
+    /**
+     * Gets the URL the dependency declares for a license, matched by license name.
+     *
+     * @param licenseName the name of one of the {@link #getLicenses() licenses}
+     * @return the URL, or {@code null} if none is known
+     * @since 2.8.1
+     */
+    default String getLicenseUrl(String licenseName) {
+        return null;
+    }
 }

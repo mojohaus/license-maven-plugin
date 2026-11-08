@@ -24,6 +24,7 @@ package org.codehaus.mojo.license.api;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.maven.model.License;
 import org.apache.maven.project.MavenProject;
 
 /**
@@ -146,6 +147,23 @@ public class DefaultThirdPartyDetails implements ThirdPartyDetails {
      */
     public void setThirdPartyLicenses(String[] thirdPartyLicenses) {
         this.thirdPartyLicenses = thirdPartyLicenses;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getLicenseUrl(String licenseName) {
+        if (licenseName == null || project.getLicenses() == null) {
+            return null;
+        }
+        for (License license : project.getLicenses()) {
+            final String url = license.getUrl();
+            if (url != null && !url.trim().isEmpty() && licenseName.equals(license.getName())) {
+                return url.trim();
+            }
+        }
+        return null;
     }
 
     /**

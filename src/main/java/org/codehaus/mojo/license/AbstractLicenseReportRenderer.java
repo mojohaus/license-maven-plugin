@@ -123,6 +123,20 @@ public abstract class AbstractLicenseReportRenderer extends AbstractMavenReportR
         sink.tableCell_();
     }
 
+    /**
+     * Renders a license name, as a link when the dependency declares a URL for it.
+     */
+    protected void renderLicense(ThirdPartyDetails details, String licenseName) {
+        final String url = details.getLicenseUrl(licenseName);
+        if (url != null) {
+            sink.link(url);
+            sink.text(licenseName);
+            sink.link_();
+        } else {
+            sink.text(licenseName);
+        }
+    }
+
     protected void renderThirdPartySummaryTableRow(ThirdPartyDetails details) {
         sink.tableRow();
         sink.tableCell();
@@ -153,7 +167,7 @@ public abstract class AbstractLicenseReportRenderer extends AbstractMavenReportR
                 if (i > 0) {
                     sink.lineBreak();
                 }
-                sink.text(licenses[i]);
+                renderLicense(details, licenses[i]);
             }
         } else {
             sink.text("-");
@@ -220,7 +234,7 @@ public abstract class AbstractLicenseReportRenderer extends AbstractMavenReportR
                 if (i > 0) {
                     sink.lineBreak();
                 }
-                sink.text(licenses[i]);
+                renderLicense(details, licenses[i]);
             }
             sink.tableCell_();
             sink.tableRow_();
@@ -232,7 +246,7 @@ public abstract class AbstractLicenseReportRenderer extends AbstractMavenReportR
                 if (i > 0) {
                     sink.lineBreak();
                 }
-                sink.text(licenses[i]);
+                renderLicense(details, licenses[i]);
             }
             sink.tableCell_();
             sink.tableRow_();
