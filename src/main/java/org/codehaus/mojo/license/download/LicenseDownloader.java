@@ -138,7 +138,7 @@ public class LicenseDownloader implements AutoCloseable {
     private final Map<String, String> httpHeaders;
 
     /** Keeps downloaded license texts between builds. May be {@code null} if there is no persistent cache. */
-    private final PersistentLicenseCache licenseCache;
+    private PersistentLicenseCache licenseCache;
 
     /**
      * Creates a new {@code LicenseDownloader} without authentication. Proxy settings and timeouts are still applied.
@@ -193,43 +193,6 @@ public class LicenseDownloader implements AutoCloseable {
             String password,
             String serverUrl,
             Map<String, String> httpHeaders) {
-        this(
-                proxy,
-                connectTimeout,
-                socketTimeout,
-                connectionRequestTimeout,
-                contentSanitizers,
-                charset,
-                userName,
-                password,
-                serverUrl,
-                httpHeaders,
-                null);
-    }
-
-    /**
-     * Creates a new {@code LicenseDownloader} with optional authentication and a persistent cache.
-     *
-     * <p>Only {@code http} and {@code https} downloads that carry no credentials go through {@code licenseCache}.
-     *
-     * @param licenseCache the cache of downloaded license texts, or {@code null} for none
-     * @see #LicenseDownloader(Proxy, int, int, int, Map, Charset, String, String, String, Map)
-     * @since 2.8.0
-     */
-    @SuppressWarnings("checkstyle:ParameterNumber")
-    public LicenseDownloader(
-            Proxy proxy,
-            int connectTimeout,
-            int socketTimeout,
-            int connectionRequestTimeout,
-            Map<String, ContentSanitizer> contentSanitizers,
-            Charset charset,
-            String userName,
-            String password,
-            String serverUrl,
-            Map<String, String> httpHeaders,
-            PersistentLicenseCache licenseCache) {
-        this.licenseCache = licenseCache;
         this.contentSanitizers = contentSanitizers;
         this.charset = charset;
         this.userName = userName;
@@ -297,6 +260,17 @@ public class LicenseDownloader implements AutoCloseable {
      */
     public void setBundledTextsMode(BundledLicenseTexts.Mode mode) {
         this.bundledTextsMode = mode != null ? mode : BundledLicenseTexts.Mode.none;
+    }
+
+    /**
+     * Sets the persistent cache of downloaded license texts; none by default. Only {@code http} and {@code https}
+     * downloads that carry no credentials go through it.
+     *
+     * @param licenseCache the cache, or {@code null} for none
+     * @since 2.8.0
+     */
+    public void setLicenseCache(PersistentLicenseCache licenseCache) {
+        this.licenseCache = licenseCache;
     }
 
     /**

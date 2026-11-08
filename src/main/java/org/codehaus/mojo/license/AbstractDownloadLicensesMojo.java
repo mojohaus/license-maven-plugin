@@ -1077,9 +1077,9 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
                 downloadUserName,
                 downloadPassword,
                 serverUrl,
-                serverHttpHeaders,
-                licenseCache)) {
+                serverHttpHeaders)) {
             licenseDownloader.setBundledTextsMode(useBundledLicenseTexts);
+            licenseDownloader.setLicenseCache(licenseCache);
             for (LicensedArtifact artifact : dependencies.values()) {
                 LOG.debug("Checking licenses for project {}", artifact);
                 final ProjectLicenseInfo depProject = createDependencyProject(artifact);
@@ -1739,17 +1739,17 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
         if (licenseCache == null) {
             return;
         }
-        final int fromCache = licenseCache.count(PersistentLicenseCache.Source.CACHE)
-                + licenseCache.count(PersistentLicenseCache.Source.REVALIDATED)
-                + licenseCache.count(PersistentLicenseCache.Source.STALE);
+        final int revalidated = licenseCache.count(PersistentLicenseCache.Source.REVALIDATED);
+        final int stale = licenseCache.count(PersistentLicenseCache.Source.STALE);
+        final int fromCache = licenseCache.count(PersistentLicenseCache.Source.CACHE) + revalidated + stale;
         final int downloaded = licenseCache.count(PersistentLicenseCache.Source.NETWORK);
         if (fromCache + downloaded > 0) {
             LOG.info(
                     "License cache {}: {} license text(s) from the cache ({} revalidated, {} stale), {} downloaded",
                     licenseCache.getDirectory(),
                     fromCache,
-                    licenseCache.count(PersistentLicenseCache.Source.REVALIDATED),
-                    licenseCache.count(PersistentLicenseCache.Source.STALE),
+                    revalidated,
+                    stale,
                     downloaded);
         }
     }

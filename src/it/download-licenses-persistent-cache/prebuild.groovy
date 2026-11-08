@@ -10,7 +10,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.stubFor
 /*
  * Serve two license texts on port 18083. The postbuild script counts the requests.
  */
-new File(basedir, 'license-cache').deleteDir()
 
 WireMockServer wireMockServer = new WireMockServer(WireMockConfiguration.options()
         .port(18083)

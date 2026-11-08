@@ -28,12 +28,11 @@ import java.net.ServerSocket;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.Clock;
 import java.time.Duration;
-import java.time.Instant;
-import java.time.ZoneOffset;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -116,12 +115,14 @@ class LicenseDownloaderCacheTest {
     }
 
     private static LicenseDownloader downloader(PersistentLicenseCache cache, ContentSanitizer... sanitizers) {
-        final java.util.Map<String, ContentSanitizer> map = new java.util.LinkedHashMap<>();
+        final Map<String, ContentSanitizer> map = new LinkedHashMap<>();
         for (ContentSanitizer s : sanitizers) {
             map.put(s.toString() + map.size(), s);
         }
-        return new LicenseDownloader(
-                null, 5000, 5000, 5000, map, StandardCharsets.UTF_8, null, null, null, Collections.emptyMap(), cache);
+        final LicenseDownloader d = new LicenseDownloader(
+                null, 5000, 5000, 5000, map, StandardCharsets.UTF_8, null, null, null, Collections.emptyMap());
+        d.setLicenseCache(cache);
+        return d;
     }
 
     private LicenseDownloadResult download(LicenseDownloader d, String u, String name) throws Exception {
@@ -326,8 +327,8 @@ class LicenseDownloaderCacheTest {
                 "user",
                 "secret",
                 serverUrl,
-                Collections.emptyMap(),
-                cache)) {
+                Collections.emptyMap())) {
+            d.setLicenseCache(cache);
             assertTrue(download(d, url, "a.txt").isSuccess());
             assertTrue(download(d, url, "b.txt").isSuccess());
         }
@@ -346,28 +347,5 @@ class LicenseDownloaderCacheTest {
         }
         assertFalse(Files.exists(cache.getDirectory()), "nothing was written");
         assertNotNull(url);
-    }
-
-    private static final class MutableClock extends Clock {
-        private Instant now = Instant.parse("2026-01-01T00:00:00Z");
-
-        void advance(Duration d) {
-            now = now.plus(d);
-        }
-
-        @Override
-        public java.time.ZoneId getZone() {
-            return ZoneOffset.UTC;
-        }
-
-        @Override
-        public Clock withZone(java.time.ZoneId zone) {
-            return this;
-        }
-
-        @Override
-        public Instant instant() {
-            return now;
-        }
     }
 }
