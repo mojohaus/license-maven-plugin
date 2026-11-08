@@ -159,6 +159,10 @@ public class LicenseStore implements Iterable<LicenseRepository> {
             extraResolver = extraResolver.substring(CLASSPATH_PROTOCOL.length());
             LOG.debug("Using classpath extraresolver: {}", extraResolver);
             URL baseURL = getClass().getClassLoader().getResource(extraResolver);
+            if (baseURL == null) {
+                throw new IOException("The license repository " + CLASSPATH_PROTOCOL + extraResolver
+                        + " was not found in the plugin classpath, add the jar containing it as a plugin dependency");
+            }
             addRepository(baseURL);
         } else {
             URL baseURL = URI.create(extraResolver).toURL();

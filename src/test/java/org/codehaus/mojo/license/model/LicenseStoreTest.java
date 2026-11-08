@@ -22,6 +22,7 @@ package org.codehaus.mojo.license.model;
  * #L%
  */
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
@@ -33,6 +34,7 @@ import org.junit.jupiter.api.condition.JRE;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -138,5 +140,15 @@ class LicenseStoreTest {
         for (String licenseName : store.getLicenseNames()) {
             assertTrue(NEW_LICENSES.contains(licenseName));
         }
+    }
+
+    @Test
+    void missingClasspathResourceIsReportedWhenAdded() {
+        store = new LicenseStore();
+
+        IOException e = assertThrows(IOException.class, () -> store.addRepository("classpath://no/such/licenses"));
+
+        assertTrue(e.getMessage().contains("classpath://no/such/licenses"), e.getMessage());
+        assertTrue(e.getMessage().contains("plugin dependency"), e.getMessage());
     }
 }
