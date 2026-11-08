@@ -98,9 +98,10 @@ public class DefaultThirdPartyHelper implements ThirdPartyHelper {
     private final boolean verbose;
 
     /**
-     * Cache of dependencies (as maven project) loaded.
+     * Cache of dependencies (as maven project) loaded. It belongs to this helper, which a mojo creates for each of its
+     * executions, so the loaded projects are released with it instead of being kept for the life of the JVM.
      */
-    private static final SortedMap<String, MavenProject> ARTIFACT_CACHE = new ConcurrentSkipListMap<>();
+    private final SortedMap<String, MavenProject> artifactCache = new ConcurrentSkipListMap<>();
 
     /**
      * Constructor of the helper.
@@ -137,7 +138,7 @@ public class DefaultThirdPartyHelper implements ThirdPartyHelper {
      * {@inheritDoc}
      */
     public SortedMap<String, MavenProject> getArtifactCache() {
-        return ARTIFACT_CACHE;
+        return artifactCache;
     }
 
     /**
