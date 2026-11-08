@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -66,7 +67,8 @@ public abstract class AbstractLicensesXmlMojo extends AbstractMojo {
      * values are {@code LF}, {@code CRLF}, {@code AUTODETECT} and {@code PLATFORM}.
      * <p>
      * When the value {@code AUTODETECT} is used, the mojo will use whatever EOL value is used in the first existing of
-     * the following files: {@link #licensesConfigFile}, <code>${basedir}/pom.xml</code>.
+     * the following files: {@link #licensesConfigFile}, <code>${basedir}/pom.xml</code>. If none of them exists,
+     * {@code LF} is used.
      * <p>
      * The value {@code PLATFORM} is deprecated but still kept for backwards compatibility reasons.
      *
@@ -150,6 +152,9 @@ public abstract class AbstractLicensesXmlMojo extends AbstractMojo {
                         throw new RuntimeException(
                                 "Cannot autodetect end of line from file \"" + autodetectFromFile + "\"", e);
                     }
+                } else {
+                    LOG.debug("None of the files {} exists, using the end of line {}", Arrays.asList(paths), Eol.LF);
+                    licensesOutputFileEol = Eol.LF;
                 }
             }
         }
