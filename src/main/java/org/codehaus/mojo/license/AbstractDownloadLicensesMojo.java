@@ -524,6 +524,19 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
     private List<String> forbiddenLicenses;
 
     /**
+     * If {@code true}, the build fails after all dependencies have been processed when a dependency declares a license
+     * named in {@link #forbiddenLicenses}; the summary files are written first, and the failure names every such
+     * dependency and its license. A dependency counts when any of its licenses is forbidden, including one that also
+     * offers an approved license. The match is by name only, as for {@link OrderBy#licenseMatch}; no SPDX identifier
+     * and no license text are consulted. The default {@code false} keeps the build going, as before.
+     *
+     * @see #forbiddenLicenses
+     * @since 2.8.0
+     */
+    @Parameter(property = "license.failOnForbidden", defaultValue = "false")
+    private boolean failOnForbidden;
+
+    /**
      * The names of the licenses that need a second look.
      *
      * @see #forbiddenLicenses
@@ -1080,11 +1093,13 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
             throw new RuntimeException(e);
         }
 
+        List<String> forbiddenDependencies;
         try {
             if (!sortDependencies(depProjectLicenses) && sortByGroupIdAndArtifactId) {
                 sortByGroupIdAndArtifactId(depProjectLicenses);
             }
 
+            forbiddenDependencies = failOnForbidden ? findForbidden(depProjectLicenses, licenseClassifier()) : null;
             List<ProjectLicenseInfo> depProjectLicensesWithErrors = filterErrors(depProjectLicenses);
             writeLicenseSummaries(
                     depProjectLicenses, licensesOutputFile, licensesExcelOutputFile, licensesCalcOutputFile);
@@ -1102,6 +1117,35 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
         }
 
         reportDownloadErrors();
+        failOnForbidden(forbiddenDependencies);
+    }
+
+    /**
+     * @return one line per dependency that has a license of {@link LicenseClassifier.LicenseMatch#forbidden}, naming
+     * the dependency and the forbidden licenses
+     */
+    static List<String> findForbidden(List<ProjectLicenseInfo> dependencies, LicenseClassifier classifier) {
+        final List<String> result = new ArrayList<>();
+        for (ProjectLicenseInfo dependency : dependencies) {
+            final List<String> names = new ArrayList<>();
+            for (ProjectLicense license : dependency.getLicenses()) {
+                if (classifier.classify(license) == LicenseClassifier.LicenseMatch.forbidden) {
+                    names.add(license.getName().trim());
+                }
+            }
+            if (!names.isEmpty()) {
+                result.add(dependency.toGavString() + " (" + String.join(", ", names) + ")");
+            }
+        }
+        return result;
+    }
+
+    static void failOnForbidden(List<String> forbiddenDependencies) throws MojoFailureException {
+        if (forbiddenDependencies != null && !forbiddenDependencies.isEmpty()) {
+            throw new MojoFailureException(forbiddenDependencies.size()
+                    + " dependencies have a forbidden license (failOnForbidden is true): "
+                    + String.join("; ", forbiddenDependencies));
+        }
     }
 
     /**
