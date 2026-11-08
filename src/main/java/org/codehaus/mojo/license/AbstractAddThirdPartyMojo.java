@@ -323,21 +323,23 @@ public abstract class AbstractAddThirdPartyMojo extends AbstractLicenseMojo {
     protected String missingLicensesFileArtifact;
 
     /**
-     * A file containing the override license information for dependencies.
-     * <b>Note:</b> Specify either {@link #overrideUrl} (preferred) or {@link #overrideFile}.
+     * A file containing the override license information for dependencies. Use this parameter for a file that lives in
+     * the project, for example {@code src/license/override.properties}: a relative path is resolved against
+     * <code>${basedir}</code>, so the build does not depend on a machine-specific location. Use {@link #overrideUrl}
+     * for a remote or {@code classpath:} location.
+     * <b>Note:</b> Specify either {@link #overrideFile} or {@link #overrideUrl}, not both.
      * If none of these is specified, then {@value LicenseMojoUtils#DEFAULT_OVERRIDE_THIRD_PARTY} resolved against
      * <code>${basedir}</code> will be used if it exists.
      *
      * @since 1.12
-     * @deprecated Use {@link #overrideUrl} instead
      */
-    @Deprecated
     @Parameter(property = "license.overrideFile")
     private File overrideFile;
 
     /**
-     * A URL pointing at a property file with the override license information for dependencies.
-     * <b>Note:</b> Specify either {@link #overrideUrl} (preferred) or {@link #overrideFile}.
+     * A URL pointing at a property file with the override license information for dependencies. For a file that lives
+     * in the project, {@link #overrideFile} is the simpler choice.
+     * <b>Note:</b> Specify either {@link #overrideUrl} or {@link #overrideFile}, not both.
      * If none of these is specified, then {@value LicenseMojoUtils#DEFAULT_OVERRIDE_THIRD_PARTY} resolved against
      * <code>${basedir}</code> will be used if it exists.
      * <p>

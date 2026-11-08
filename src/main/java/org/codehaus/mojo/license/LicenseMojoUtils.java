@@ -57,41 +57,38 @@ public final class LicenseMojoUtils {
     }
 
     /**
-     * Chooses the override {@link URL} to use out of {@code resolvedUrl}, {@code deprecatedFile}, {@code url}, or the
+     * Chooses the override {@link URL} to use out of {@code resolvedUrl}, {@code overrideFile}, {@code url}, or the
      * default given by {@link #DEFAULT_OVERRIDE_THIRD_PARTY}.
      *
      * @param resolvedUrl returns this one if it is not {@code null} and not equal to {@link #NO_URL}
-     * @param deprecatedFile the deprecated mojo parameter
+     * @param overrideFile the {@code overrideFile} mojo parameter, a file in the project
      * @param url the newer variant of the mojo parameter
      * @param basedir {@code basedir} to resolve {@value #DEFAULT_OVERRIDE_THIRD_PARTY} against
      * @return a valid URL or {@link #NO_URL}, never {@code null}
      */
     public static String prepareThirdPartyOverrideUrl(
-            final String resolvedUrl, final File deprecatedFile, final String url, File basedir) {
-        return prepareThirdPartyOverrideUrl(resolvedUrl, deprecatedFile, url, basedir, LOG);
+            final String resolvedUrl, final File overrideFile, final String url, File basedir) {
+        return prepareThirdPartyOverrideUrl(resolvedUrl, overrideFile, url, basedir, LOG);
     }
 
     /**
      * An overload with explicit {@code log} param for testing purposes.
      *
      * @param resolvedUrl returns this one if it is not {@code null} and not equal to {@link #NO_URL}
-     * @param deprecatedFile the deprecated mojo parameter
+     * @param overrideFile the {@code overrideFile} mojo parameter, a file in the project
      * @param url the newer variant of the mojo parameter
      * @param basedir {@code basedir} to resolve {@value #DEFAULT_OVERRIDE_THIRD_PARTY} against
      * @param log the log to write to
      * @return a valid URL or {@link #NO_URL}, never {@code null}
      */
     static String prepareThirdPartyOverrideUrl(
-            final String resolvedUrl, final File deprecatedFile, final String url, File basedir, LoggerFacade log) {
-        if (deprecatedFile != null) {
-            log.warn("'overrideFile' mojo parameter is deprecated. Use 'overrideUrl' instead.");
-        }
-        return prepareUrl(resolvedUrl, deprecatedFile, url, basedir, DEFAULT_OVERRIDE_THIRD_PARTY, log);
+            final String resolvedUrl, final File overrideFile, final String url, File basedir, LoggerFacade log) {
+        return prepareUrl(resolvedUrl, overrideFile, url, basedir, DEFAULT_OVERRIDE_THIRD_PARTY, log);
     }
 
     private static String prepareUrl(
             final String resolvedUrl,
-            final File deprecatedFile,
+            final File overrideFile,
             final String url,
             File basedir,
             String defaultFilePath,
@@ -100,17 +97,17 @@ public final class LicenseMojoUtils {
             return resolvedUrl;
         }
 
-        if (deprecatedFile != null && url != null && !url.isEmpty()) {
+        if (overrideFile != null && url != null && !url.isEmpty()) {
             throw new IllegalArgumentException("You can't use both overrideFile and overrideUrl");
         }
 
-        if (deprecatedFile != null) {
-            if (deprecatedFile.exists()) {
-                String result = deprecatedFile.toURI().toString();
+        if (overrideFile != null) {
+            if (overrideFile.exists()) {
+                String result = overrideFile.toURI().toString();
                 log.debug("Loading overrides from file {}", result);
                 return result;
             } else {
-                log.warn("overrideFile [{}] was configured but doesn't exist", deprecatedFile.getAbsolutePath());
+                log.warn("overrideFile [{}] was configured but doesn't exist", overrideFile.getAbsolutePath());
             }
         }
 
