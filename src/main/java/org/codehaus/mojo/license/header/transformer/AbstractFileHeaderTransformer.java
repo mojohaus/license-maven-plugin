@@ -420,7 +420,7 @@ public abstract class AbstractFileHeaderTransformer implements FileHeaderTransfo
         StringBuilder buffer = new StringBuilder();
         int prefixLength = getCommentLinePrefix().length();
         for (String line : header.split(getLineSeparator() + "")) {
-            if (StringUtils.isEmpty(line) || line.contains(getCommentStartTag()) || line.contains(getCommentEndTag())) {
+            if (line.contains(getCommentStartTag()) || line.contains(getCommentEndTag())) {
 
                 // not be unboxed, but just skipped
                 continue;
