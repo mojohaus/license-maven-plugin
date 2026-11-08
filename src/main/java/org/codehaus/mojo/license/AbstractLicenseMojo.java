@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -80,10 +81,49 @@ public abstract class AbstractLicenseMojo extends AbstractMojo {
     @Parameter(defaultValue = "${project}", readonly = true)
     MavenProject project;
 
+    /**
+     * The current Maven session, used to read the deprecated {@value #LEGACY_LICENSE_FILE_PROPERTY} user property.
+     */
+    @Parameter(defaultValue = "${session}", readonly = true)
+    MavenSession session;
+
     protected final MavenProjectHelper projectHelper;
+
+    /**
+     * The misspelled name under which {@code licenseFile} was bound before it became {@code license.licenseFile}.
+     */
+    static final String LEGACY_LICENSE_FILE_PROPERTY = "license.licenceFile";
 
     protected AbstractLicenseMojo(MavenProjectHelper projectHelper) {
         this.projectHelper = Objects.requireNonNull(projectHelper, "projectHelper cannot be null");
+    }
+
+    /**
+     * Honours the deprecated {@code license.licenceFile} user property for a {@code licenseFile} parameter that now
+     * binds {@code license.licenseFile}. The old property applies only while {@code licenseFile} still has its default
+     * value, so the new property and an explicit POM configuration win.
+     *
+     * @param licenseFile the value of the {@code licenseFile} parameter
+     * @return the license file to use
+     */
+    File resolveLicenseFile(File licenseFile) {
+        String legacyValue =
+                session == null ? null : session.getUserProperties().getProperty(LEGACY_LICENSE_FILE_PROPERTY);
+        return resolveLicenseFile(licenseFile, project.getBasedir(), legacyValue);
+    }
+
+    static File resolveLicenseFile(File licenseFile, File basedir, String legacyValue) {
+        if (StringUtils.isBlank(legacyValue)) {
+            return licenseFile;
+        }
+        LOG.warn(
+                "The property {} is deprecated and will be removed, use license.licenseFile instead.",
+                LEGACY_LICENSE_FILE_PROPERTY);
+        if (!new File(basedir, "LICENSE.txt").equals(licenseFile)) {
+            return licenseFile;
+        }
+        File legacyFile = new File(legacyValue);
+        return legacyFile.isAbsolute() ? legacyFile : new File(basedir, legacyValue);
     }
 
     // ----------------------------------------------------------------------
