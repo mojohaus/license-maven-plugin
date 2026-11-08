@@ -22,6 +22,7 @@ package org.codehaus.mojo.license.download;
  * #L%
  */
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -119,6 +120,13 @@ public class LicenseDownloader implements AutoCloseable {
     private final Charset charset;
 
     private BundledLicenseTexts.Mode bundledTextsMode = BundledLicenseTexts.Mode.none;
+
+    private static final String HTML_MIME_TYPE = "text/html";
+
+    /** Number of leading bytes inspected to recognize an HTML page; enough for a BOM, white space and a doctype. */
+    private static final int HTML_SNIFF_LENGTH = 512;
+
+    private boolean rejectHtml;
 
     private final AtomicInteger bundledTextsServed = new AtomicInteger();
 
@@ -260,6 +268,17 @@ public class LicenseDownloader implements AutoCloseable {
      */
     public void setBundledTextsMode(BundledLicenseTexts.Mode mode) {
         this.bundledTextsMode = mode != null ? mode : BundledLicenseTexts.Mode.none;
+    }
+
+    /**
+     * Sets whether a response that is an HTML page, by Content-Type or by its first bytes, is rejected instead of
+     * being saved as a license text; off by default, because many licenses are published only as HTML pages.
+     *
+     * @param rejectHtml whether HTML responses are rejected
+     * @since 2.8.1
+     */
+    public void setRejectHtml(boolean rejectHtml) {
+        this.rejectHtml = rejectHtml;
     }
 
     /**
@@ -474,6 +493,13 @@ public class LicenseDownloader implements AutoCloseable {
         final File outputFile = fileNameEntry.getFile();
         if (entity != null) {
             final ContentType contentType = ContentType.get(entity);
+            if (rejectHtml && contentType != null && HTML_MIME_TYPE.equalsIgnoreCase(contentType.getMimeType())) {
+                return notALicenseText(licenseUrlString, "Content-Type " + contentType.getMimeType());
+            }
+            final BufferedInputStream body = new BufferedInputStream(entity.getContent());
+            if (rejectHtml && startsWithHtml(body)) {
+                return notALicenseText(licenseUrlString, "a body that starts with an HTML document");
+            }
 
             File updatedFile = fileNameEntry.isPreferred()
                     ? outputFile
@@ -485,7 +511,7 @@ public class LicenseDownloader implements AutoCloseable {
                     fileNameEntry.isPreferred() ? " (preferred file name)" : "");
 
             if (sanitizers.isEmpty()) {
-                try (InputStream in = entity.getContent();
+                try (InputStream in = body;
                         FileOutputStream fos = new FileOutputStream(updatedFile)) {
                     final MessageDigest md = MessageDigest.getInstance("SHA-1");
                     final byte[] buf = new byte[1024];
@@ -514,7 +540,7 @@ public class LicenseDownloader implements AutoCloseable {
                 final Charset cs = contentType != null
                         ? (contentType.getCharset() == null ? this.charset : contentType.getCharset())
                         : this.charset;
-                try (BufferedReader r = new BufferedReader(new InputStreamReader(entity.getContent(), cs))) {
+                try (BufferedReader r = new BufferedReader(new InputStreamReader(body, cs))) {
                     return sanitize(r, updatedFile, cs, sanitizers, fileNameEntry.isPreferred());
                 }
             }
@@ -792,5 +818,37 @@ public class LicenseDownloader implements AutoCloseable {
                 .replace("http://", "https://")
                 // All to lowercase
                 .toLowerCase();
+    }
+
+    private static LicenseDownloadResult notALicenseText(String licenseUrlString, String evidence) {
+        return LicenseDownloadResult.failure("'" + licenseUrlString + "' did not return a license text: " + evidence);
+    }
+
+    /**
+     * Tells whether the stream starts with an HTML document, that is {@code <!doctype html} or {@code <html} after an
+     * optional byte order mark and white space, ignoring case. Reads from and resets a stream that supports marks.
+     */
+    static boolean startsWithHtml(BufferedInputStream in) throws IOException {
+        in.mark(HTML_SNIFF_LENGTH);
+        final byte[] head = new byte[HTML_SNIFF_LENGTH];
+        int len = 0;
+        int n;
+        while (len < head.length && (n = in.read(head, len, head.length - len)) >= 0) {
+            len += n;
+        }
+        in.reset();
+        return startsWithHtml(head, len);
+    }
+
+    static boolean startsWithHtml(byte[] head, int len) {
+        int i = 0;
+        if (len >= 3 && (head[0] & 0xFF) == 0xEF && (head[1] & 0xFF) == 0xBB && (head[2] & 0xFF) == 0xBF) {
+            i = 3;
+        }
+        while (i < len && (head[i] == ' ' || head[i] == '\t' || head[i] == '\r' || head[i] == '\n')) {
+            i++;
+        }
+        final String start = new String(head, i, len - i, StandardCharsets.ISO_8859_1).toLowerCase(Locale.ROOT);
+        return start.startsWith("<!doctype html") || start.startsWith("<html");
     }
 }
