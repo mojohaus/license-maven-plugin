@@ -27,7 +27,11 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -130,7 +134,14 @@ public class DependenciesTool {
                 .setProcessPlugins(false)
                 .setRemoteRepositories(remoteRepositories);
 
-        for (Artifact artifact : depArtifacts) {
+        // The projects built so far by artifact id: the POM of a dependency may declare the repository of its own
+        // dependencies, so the ancestors of an artifact must be built before the artifact.
+        final Map<String, MavenProject> builtProjects = new HashMap<>();
+
+        final List<Artifact> sortedArtifacts = new ArrayList<>(depArtifacts);
+        sortedArtifacts.sort(Comparator.comparingInt(DependenciesTool::trailLength));
+
+        for (Artifact artifact : sortedArtifacts) {
 
             excludeArtifacts.put(artifact.getId(), artifact);
 
@@ -166,7 +177,7 @@ public class DependenciesTool {
 
                 try {
                     depMavenProject = mavenProjectBuilder
-                            .build(artifact, true, projectBuildingRequest)
+                            .build(artifact, true, requestFor(artifact, projectBuildingRequest, builtProjects))
                             .getProject();
                     depMavenProject.getArtifact().setScope(artifact.getScope());
 
@@ -198,6 +209,7 @@ public class DependenciesTool {
 
             // keep the project
             result.put(id, depMavenProject);
+            builtProjects.put(artifact.getId(), depMavenProject);
 
             excludeArtifacts.remove(artifact.getId());
             includeArtifacts.put(artifact.getId(), artifact);
@@ -233,4 +245,47 @@ public class DependenciesTool {
         return result;
     }
     // CHECKSTYLE_ON: MethodLength
+
+    private static int trailLength(Artifact artifact) {
+        final List<String> trail = artifact.getDependencyTrail();
+        return trail == null ? 0 : trail.size();
+    }
+
+    /**
+     * Maven resolves a dependency from the repositories that the POMs on its way declare. Reading the POM of the
+     * dependency again with the repositories of the project only would not find a POM that is hosted by such a
+     * repository, so the repositories of the artifact and of the projects that lead to it are added to the project
+     * repositories.
+     */
+    private static ProjectBuildingRequest requestFor(
+            Artifact artifact, ProjectBuildingRequest request, Map<String, MavenProject> builtProjects) {
+        final Map<String, ArtifactRepository> repositories = new LinkedHashMap<>();
+        addRepositories(repositories, request.getRemoteRepositories());
+        if (artifact.getRepository() != null) {
+            addRepositories(repositories, Collections.singletonList(artifact.getRepository()));
+        }
+        final List<String> trail = artifact.getDependencyTrail();
+        if (trail != null) {
+            // the first element of the trail is the project itself, the last one the artifact
+            for (int i = 1; i < trail.size() - 1; i++) {
+                final MavenProject ancestor = builtProjects.get(trail.get(i));
+                if (ancestor != null) {
+                    addRepositories(repositories, ancestor.getRemoteArtifactRepositories());
+                }
+            }
+        }
+        final List<ArtifactRepository> known = request.getRemoteRepositories();
+        if (known != null && repositories.size() == known.size()) {
+            return request;
+        }
+        return new DefaultProjectBuildingRequest(request).setRemoteRepositories(new ArrayList<>(repositories.values()));
+    }
+
+    private static void addRepositories(Map<String, ArtifactRepository> target, List<ArtifactRepository> repositories) {
+        if (repositories != null) {
+            for (ArtifactRepository repository : repositories) {
+                target.putIfAbsent(repository.getId(), repository);
+            }
+        }
+    }
 }
