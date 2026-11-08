@@ -19,4 +19,11 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
+def log = new File(basedir, 'build.log').text
+assert !log.contains('forbidden licenses used')
+
+thirdParty = new File(basedir, 'target/generated-sources/license/THIRD-PARTY.txt')
+assert thirdParty.isFile()
+assert thirdParty.text.contains('(COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0) (GNU General Public Library) Streaming API for XML (javax.xml.stream:stax-api:1.0-2')
+
 return true

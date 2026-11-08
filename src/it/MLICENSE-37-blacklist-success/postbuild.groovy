@@ -19,4 +19,11 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
-return true;
+def log = new File(basedir, 'build.log').text
+assert !log.contains('forbidden licenses used')
+
+thirdParty = new File(basedir, 'target/generated-sources/license/THIRD-PARTY.txt')
+assert thirdParty.isFile()
+assert thirdParty.text.contains('(The Apache Software License, Version 2.0) Commons Logging (commons-logging:commons-logging:1.1.1')
+
+return true
