@@ -24,15 +24,18 @@ package org.codehaus.mojo.license.model;
 
 import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledOnJre;
 import org.junit.jupiter.api.condition.JRE;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -150,5 +153,16 @@ class LicenseStoreTest {
 
         assertTrue(e.getMessage().contains("classpath://no/such/licenses"), e.getMessage());
         assertTrue(e.getMessage().contains("plugin dependency"), e.getMessage());
+    }
+
+    @Test
+    void euplHeaderPointsToCurrentLocation() throws Exception {
+        URL headerUrl = getClass().getResource("/META-INF/licenses/eupl_v1_1/header.txt");
+        assertNotNull(headerUrl);
+
+        String header = IOUtils.toString(headerUrl, StandardCharsets.UTF_8);
+
+        assertTrue(header.contains("https://joinup.ec.europa.eu/software/page/eupl"));
+        assertFalse(header.contains("idabc"));
     }
 }
