@@ -108,6 +108,11 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo {
 
     /**
      * Specific files to includes, separated by a comma. By default, it is "** /*".
+     * <p>
+     * The patterns are Ant-style and are matched against the path of each file relative to the
+     * <code>roots</code>, not against its absolute path or the project base directory. A <code>*</code> does not
+     * cross directory boundaries and <code>**</code> matches any number of directories, so <code>*.java</code>
+     * only matches files directly in a root and <code>** /*.java</code> matches them at any depth.
      *
      * @since 1.11
      */
@@ -116,6 +121,12 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo {
 
     /**
      * Specific files to excludes, separated by a comma.
+     * <p>
+     * The patterns are Ant-style and are matched against the path of each file relative to the
+     * <code>roots</code>, in the same way as <code>includes</code>: <code>*</code> does not cross directory
+     * boundaries, so <code>** /generated/**</code> excludes a directory at any depth where
+     * <code>generated/**</code> only matches one directly in a root.
+     * <p>
      * By default, those file types are excluded:
      * <ul>
      * <li>modelisation</li>
