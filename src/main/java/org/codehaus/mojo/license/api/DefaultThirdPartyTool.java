@@ -585,10 +585,28 @@ public class DefaultThirdPartyTool implements ThirdPartyTool {
     public void writeThirdPartyFile(
             LicenseMap licenseMap, File thirdPartyFile, boolean verbose, String encoding, String lineFormat)
             throws IOException {
+        writeThirdPartyFile(licenseMap, thirdPartyFile, verbose, encoding, lineFormat, null);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void writeThirdPartyFile(
+            LicenseMap licenseMap,
+            File thirdPartyFile,
+            boolean verbose,
+            String encoding,
+            String lineFormat,
+            MavenProject project)
+            throws IOException {
 
         Map<String, Object> properties = new HashMap<>();
         properties.put("licenseMap", licenseMap.entrySet());
         properties.put("dependencyMap", licenseMap.toDependencyMap().entrySet());
+        if (project != null) {
+            properties.put("project", project);
+        }
         String content = freeMarkerHelper.renderTemplate(lineFormat, properties);
 
         LOG.info("Writing third-party file to " + thirdPartyFile);

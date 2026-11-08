@@ -583,6 +583,9 @@ public abstract class AbstractAddThirdPartyMojo extends AbstractLicenseMojo {
      * the classpath. In case it points to a file and this plugin is used within
      * a sub-module as part of a multi-module build, you need to make this path
      * resolvable, e.g. by prepending {@code basedir}.
+     * <p>
+     * The template can use {@code licenseMap}, {@code dependencyMap} and, since 2.8.1, {@code project}, the Maven
+     * project the file is generated for.
      *
      * @since 1.1
      */
@@ -1048,7 +1051,8 @@ public abstract class AbstractAddThirdPartyMojo extends AbstractLicenseMojo {
             if (sortArtifactByName) {
                 licenseMap1 = licenseMap.toLicenseMapOrderByName();
             }
-            thirdPartyTool.writeThirdPartyFile(licenseMap1, thirdPartyFile, isVerbose(), getEncoding(), fileTemplate);
+            thirdPartyTool.writeThirdPartyFile(
+                    licenseMap1, thirdPartyFile, isVerbose(), getEncoding(), fileTemplate, getProject());
         }
 
         if (doGenerateBundle) {

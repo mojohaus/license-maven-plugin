@@ -214,6 +214,32 @@ public interface ThirdPartyTool {
             throws IOException;
 
     /**
+     * Write the content of the third-party file, exposing the project to the template as {@code project}.
+     * <p>
+     * The default implementation ignores the project, for tools that predate this method.
+     * </p>
+     *
+     * @param licenseMap     map of all license to use
+     * @param thirdPartyFile location of file to generate
+     * @param verbose        verbose flag
+     * @param encoding       encoding used to generate file
+     * @param template       the location of the freemarker template used to generate the file content
+     * @param project        the project the file is generated for, available to the template as {@code project}
+     * @throws IOException if any probem while writing file
+     * @since 2.8.1
+     */
+    default void writeThirdPartyFile(
+            LicenseMap licenseMap,
+            File thirdPartyFile,
+            boolean verbose,
+            String encoding,
+            String template,
+            MavenProject project)
+            throws IOException {
+        writeThirdPartyFile(licenseMap, thirdPartyFile, verbose, encoding, template);
+    }
+
+    /**
      * Writes the bundled version of the third-party file.
      *
      * @param thirdPartyFile       location of normal third-party file
