@@ -25,6 +25,7 @@ package org.codehaus.mojo.license.download;
 import java.io.File;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.Collections;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -298,6 +299,98 @@ class LicenseDownloaderTest {
         } finally {
             server.stop(0);
         }
+    }
+
+    @Test
+    void relativeFileUrlsAreResolvedAgainstTheBasedir(@TempDir File dir) throws Exception {
+        final File basedir = new File(dir, "project");
+        final File source = new File(basedir, "licenses/company.html");
+        assertTrue(source.getParentFile().mkdirs());
+        Files.write(source.toPath(), "<p>company</p>".getBytes(StandardCharsets.UTF_8));
+
+        int i = 0;
+        for (String url : new String[] {
+            "file:licenses/company.html", "file://licenses/company.html", "file://./licenses/company.html"
+        }) {
+            try (LicenseDownloader d = downloader()) {
+                d.setBasedir(basedir.toPath());
+                final File out = new File(dir, "out" + i++ + "/company");
+                assertTrue(out.getParentFile().mkdirs());
+
+                final LicenseDownloader.LicenseDownloadResult result =
+                        d.downloadLicense(url, new FileNameEntry(out, false, null));
+
+                assertTrue(result.isSuccess(), url);
+                assertEquals("company.html", result.getFile().getName(), url);
+                assertEquals(
+                        "<p>company</p>",
+                        new String(Files.readAllBytes(result.getFile().toPath()), StandardCharsets.UTF_8));
+            }
+        }
+    }
+
+    @Test
+    void absoluteFileUrlIsStillRead(@TempDir File dir) throws Exception {
+        final File source = new File(dir, "elsewhere.txt");
+        Files.write(source.toPath(), "text".getBytes(StandardCharsets.UTF_8));
+
+        try (LicenseDownloader d = downloader()) {
+            d.setBasedir(new File(dir, "project").toPath());
+            final LicenseDownloader.LicenseDownloadResult result = d.downloadLicense(
+                    source.toURI().toString().replace("file:/", "file:///"),
+                    new FileNameEntry(new File(dir, "my license"), false, null));
+
+            assertTrue(result.isSuccess());
+            assertEquals("my license.txt", result.getFile().getName());
+        }
+    }
+
+    @Test
+    void fileUrlTakesTheExtensionOfTheSourceFile(@TempDir File dir) throws Exception {
+        final File html = new File(dir, "a.html");
+        final File noExtension = new File(dir, "COPYING");
+        Files.write(html.toPath(), "x".getBytes(StandardCharsets.UTF_8));
+        Files.write(noExtension.toPath(), "x".getBytes(StandardCharsets.UTF_8));
+
+        try (LicenseDownloader d = downloader()) {
+            assertEquals(
+                    "mit - a.html",
+                    d.downloadLicense(html.toURI().toString().replace("file:/", "file:///"), entry(dir, "mit - a.html"))
+                            .getFile()
+                            .getName());
+            assertEquals(
+                    "mit - a.html",
+                    d.downloadLicense(html.toURI().toString().replace("file:/", "file:///"), entry(dir, "mit - a"))
+                            .getFile()
+                            .getName());
+            assertEquals(
+                    "mit - copying.txt",
+                    d.downloadLicense(
+                                    noExtension.toURI().toString().replace("file:/", "file:///"),
+                                    entry(dir, "mit - copying"))
+                            .getFile()
+                            .getName());
+        }
+    }
+
+    @Test
+    void preferredFileNameKeepsItsExtensionForAFileUrl(@TempDir File dir) throws Exception {
+        final File html = new File(dir, "a.html");
+        Files.write(html.toPath(), "x".getBytes(StandardCharsets.UTF_8));
+
+        try (LicenseDownloader d = downloader()) {
+            final LicenseDownloader.LicenseDownloadResult result = d.downloadLicense(
+                    html.toURI().toString().replace("file:/", "file:///"),
+                    new FileNameEntry(new File(dir, "preferred.license"), true, null));
+
+            assertEquals("preferred.license", result.getFile().getName());
+        }
+    }
+
+    private static FileNameEntry entry(File dir, String name) {
+        final File out = new File(new File(dir, "out" + System.nanoTime()), name);
+        assertTrue(out.getParentFile().mkdirs());
+        return new FileNameEntry(out, false, null);
     }
 
     private static LicenseDownloader.LicenseDownloadResult download(
