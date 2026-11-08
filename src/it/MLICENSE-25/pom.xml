@@ -65,6 +65,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>license-maven-plugin</artifactId>
+        <version>@project.version@</version>
         <configuration>
           <outputDirectory>${project.build.directory}</outputDirectory>
         </configuration>
@@ -91,16 +92,6 @@
         </executions>
       </plugin>
     </plugins>
-    <pluginManagement>
-      <plugins>
-
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>license-maven-plugin</artifactId>
-          <version>@project.version@</version>
-        </plugin>
-      </plugins>
-    </pluginManagement>
   </build>
 
 </project>

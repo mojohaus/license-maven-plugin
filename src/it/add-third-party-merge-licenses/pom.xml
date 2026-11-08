@@ -80,6 +80,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>license-maven-plugin</artifactId>
+        <version>@project.version@</version>
         <executions>
           <execution>
             <id>singleList</id>
@@ -156,15 +157,6 @@
         </executions>
       </plugin>
     </plugins>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>license-maven-plugin</artifactId>
-          <version>@project.version@</version>
-        </plugin>
-      </plugins>
-    </pluginManagement>
   </build>
 
 </project>
