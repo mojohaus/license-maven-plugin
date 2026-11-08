@@ -14,7 +14,6 @@
   </description>
 
   <properties>
-    <cache.enabled>true</cache.enabled>
   </properties>
 
   <dependencies>
@@ -37,7 +36,7 @@
         <artifactId>license-maven-plugin</artifactId>
         <version>@project.version@</version>
         <configuration>
-          <useLicenseCache>${cache.enabled}</useLicenseCache>
+          <useLicenseCache>true</useLicenseCache>
           <!-- outside target, which "clean" removes -->
           <licenseCacheDirectory>${project.basedir}/license-cache</licenseCacheDirectory>
         </configuration>
