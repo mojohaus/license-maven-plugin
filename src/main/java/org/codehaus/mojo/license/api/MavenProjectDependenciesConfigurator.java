@@ -52,6 +52,8 @@ public interface MavenProjectDependenciesConfigurator {
 
     /**
      * @return {@code true} if verbose mode is on, {@code false} otherwise.
+     * @deprecated the verbose messages are logged at debug level, this value is not used any more
      */
+    @Deprecated
     boolean isVerbose();
 }

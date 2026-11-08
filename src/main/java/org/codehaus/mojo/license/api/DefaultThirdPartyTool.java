@@ -149,6 +149,7 @@ public class DefaultThirdPartyTool implements ThirdPartyTool {
     /**
      * {@inheritDoc}
      */
+    @Deprecated
     public boolean isVerbose() {
         return verbose;
     }
@@ -156,6 +157,7 @@ public class DefaultThirdPartyTool implements ThirdPartyTool {
     /**
      * {@inheritDoc}
      */
+    @Deprecated
     public void setVerbose(boolean verbose) {
         this.verbose = verbose;
     }
@@ -376,23 +378,17 @@ public class DefaultThirdPartyTool implements ThirdPartyTool {
 
         SortedSet<MavenProject> mainSet = licenseMap.get(mainLicense);
         if (mainSet == null) {
-            if (isVerbose()) {
-                LOG.warn("No license [{}] found, will create it.", mainLicense);
-            }
+            LOG.debug("No license [{}] found, will create it.", mainLicense);
             mainSet = new TreeSet<>(projectComparator);
             licenseMap.put(mainLicense, mainSet);
         }
         for (String license : licenses) {
             SortedSet<MavenProject> set = licenseMap.get(license);
             if (set == null) {
-                if (isVerbose()) {
-                    LOG.warn("No license [{}] found, skip the merge to [{}]", license, mainLicense);
-                }
+                LOG.debug("No license [{}] found, skip the merge to [{}]", license, mainLicense);
                 continue;
             }
-            if (isVerbose()) {
-                LOG.info("Merge license [{}] to [{}] ({} dependencies).", license, mainLicense, set.size());
-            }
+            LOG.debug("Merge license [{}] to [{}] ({} dependencies).", license, mainLicense, set.size());
             mainSet.addAll(set);
             set.clear();
             licenseMap.remove(license);
@@ -635,9 +631,7 @@ public class DefaultThirdPartyTool implements ThirdPartyTool {
         String content = freeMarkerHelper.renderTemplate(lineFormat, properties);
 
         LOG.info("Writing third-party file to " + thirdPartyFile);
-        if (verbose) {
-            LOG.info(content);
-        }
+        LOG.debug(content);
 
         FileUtil.printString(thirdPartyFile, content, encoding);
     }

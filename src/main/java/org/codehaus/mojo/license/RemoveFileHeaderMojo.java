@@ -260,7 +260,7 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo {
             this.ignoreTag = "%" + "%Ignore-License";
         }
 
-        if (isVerbose()) {
+        if (LOG.isDebugEnabled()) {
 
             // print available comment styles (transformers)
             StringBuilder buffer = new StringBuilder();
@@ -271,7 +271,7 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo {
                 String str = String.format(commentFormat, aTransformer.getName(), aTransformer.getDescription());
                 buffer.append(str);
             }
-            LOG.info("{}", buffer);
+            LOG.debug("{}", buffer);
         }
 
         // set timestamp used for temporary files
@@ -281,23 +281,17 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo {
 
         if (roots == null || roots.length == 0) {
             roots = DEFAULT_ROOTS;
-            if (isVerbose()) {
-                LOG.info("Will use default roots {}", (Object) roots);
-            }
+            LOG.debug("Will use default roots {}", (Object) roots);
         }
 
         if (includes == null || includes.length == 0) {
             includes = DEFAULT_INCLUDES;
-            if (isVerbose()) {
-                LOG.info("Will use default includes {}", (Object) includes);
-            }
+            LOG.debug("Will use default includes {}", (Object) includes);
         }
 
         if (excludes == null || excludes.length == 0) {
             excludes = DEFAULT_EXCLUDES;
-            if (isVerbose()) {
-                LOG.info("Will use default excludes {}", (Object) excludes);
-            }
+            LOG.debug("Will use default excludes {}", (Object) excludes);
         }
 
         Map<String, String> extensionToCommentStyle = new TreeMap<>();
@@ -308,9 +302,7 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo {
             FileHeaderTransformer aTransformer = entry.getValue();
             String[] extensions = aTransformer.getDefaultAcceptedExtensions();
             for (String extension : extensions) {
-                if (isVerbose()) {
-                    LOG.info("Associate extension '{}' to comment style '{}'", extension, commentStyle);
-                }
+                LOG.debug("Associate extension '{}' to comment style '{}'", extension, commentStyle);
                 extensionToCommentStyle.put(extension, commentStyle);
             }
         }
@@ -333,9 +325,7 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo {
                 // check transformer exists
                 getTransformer(transformers, commentStyle);
 
-                if (isVerbose()) {
-                    LOG.info("Associate extension '{}' to comment style '{}'", extension, commentStyle);
-                }
+                LOG.debug("Associate extension '{}' to comment style '{}'", extension, commentStyle);
                 extensionToCommentStyle.put(extension, commentStyle);
             }
         }
@@ -408,9 +398,9 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo {
         // obtain license from definition
         License license = getLicense(getLicenseName(), true);
 
-        if (isVerbose()) {
-            LOG.info("Process header '{}'", commentStyle);
-            LOG.info(" - using {}", license.getDescription());
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Process header '{}'", commentStyle);
+            LOG.debug(" - using {}", license.getDescription());
         }
 
         // use header transformer according to comment style given in header
@@ -464,9 +454,7 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo {
             lastchar = content.charAt((++lastIndex));
         }
 
-        if (isVerbose()) {
-            LOG.info(" - header was removed for {}", file);
-        }
+        LOG.debug(" - header was removed for {}", file);
 
         String contentWithoutHeader = content.substring(0, firstIndex) + content.substring(lastIndex + 1);
 

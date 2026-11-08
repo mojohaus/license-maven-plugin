@@ -107,8 +107,6 @@ public class DependenciesTool {
             depArtifacts = artifacts.getDirectDependencies();
         }
 
-        boolean verbose = configuration.isVerbose();
-
         SortedMap<String, MavenProject> result = new TreeMap<>();
 
         Map<String, Artifact> excludeArtifacts = new HashMap<>();
@@ -148,9 +146,7 @@ public class DependenciesTool {
 
             String id = MojoHelper.getArtifactId(artifact);
 
-            if (verbose) {
-                LOG.info("detected artifact {}", id);
-            }
+            LOG.debug("detected artifact {}", id);
 
             MavenProject depMavenProject;
 
@@ -158,9 +154,7 @@ public class DependenciesTool {
             depMavenProject = localCache.get(id);
 
             if (depMavenProject != null) {
-                if (verbose) {
-                    LOG.info("add dependency [{}] (from cache)", id);
-                }
+                LOG.debug("add dependency [{}] (from cache)", id);
             } else {
                 // build project
 
@@ -188,9 +182,7 @@ public class DependenciesTool {
                     continue;
                 }
 
-                if (verbose) {
-                    LOG.info("add dependency [{}]", id);
-                }
+                LOG.debug("add dependency [{}]", id);
 
                 // store it also in cache
                 localCache.put(id, depMavenProject);

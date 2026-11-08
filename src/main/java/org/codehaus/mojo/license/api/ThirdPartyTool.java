@@ -55,7 +55,9 @@ public interface ThirdPartyTool {
      *
      * @return {@code true} if verbose log should be produced, {@code false} otherwise.
      * @since 1.4
+     * @deprecated the verbose messages are logged at debug level
      */
+    @Deprecated
     boolean isVerbose();
 
     /**
@@ -63,7 +65,9 @@ public interface ThirdPartyTool {
      *
      * @param verbose new verbose mode to set
      * @since 1.4
+     * @deprecated the verbose messages are logged at debug level
      */
+    @Deprecated
     void setVerbose(boolean verbose);
 
     /**
@@ -204,7 +208,7 @@ public interface ThirdPartyTool {
      *
      * @param licenseMap     map of all license to use
      * @param thirdPartyFile location of file to generate
-     * @param verbose        verbose flag
+     * @param verbose        ignored, the file content is logged at debug level
      * @param encoding       encoding used to generate file
      * @param template       the location of the freemarker template used to generate the file content
      * @throws IOException if any probem while writing file

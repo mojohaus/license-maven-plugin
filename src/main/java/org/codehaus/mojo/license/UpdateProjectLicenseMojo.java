@@ -171,14 +171,10 @@ public class UpdateProjectLicenseMojo extends AbstractLicenseNameMojo {
         if (doGenerate) {
 
             LOG.info("Will create or update license file [{}] to {}", license.getName(), licenseFile);
-            if (isVerbose()) {
-                LOG.info("detail of license :\n{}", license);
-            }
+            LOG.debug("detail of license :\n{}", license);
 
             if (licenseFile.exists() && isKeepBackup()) {
-                if (isVerbose()) {
-                    LOG.info("backup {}", licenseFile);
-                }
+                LOG.debug("backup {}", licenseFile);
                 // copy it to backup file
                 FileUtil.backupFile(licenseFile);
             }

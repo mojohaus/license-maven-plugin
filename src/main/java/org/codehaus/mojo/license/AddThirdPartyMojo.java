@@ -279,14 +279,12 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
                         unsafeDependencies,
                         projectDependencies,
                         resolveDependencyArtifacts().getAllDependencies());
-        if (isVerbose()) {
-            LOG.info("found {} unsafe mappings", unsafeMappings.size());
-        }
+        LOG.debug("found {} unsafe mappings", unsafeMappings.size());
 
         // compute if missing file should be (re)-generate
         doGenerateMissing = computeDoGenerateMissingFile(unsafeMappings, unsafeDependencies);
 
-        if (doGenerateMissing && isVerbose()) {
+        if (doGenerateMissing && LOG.isDebugEnabled()) {
             StringBuilder sb = new StringBuilder();
             sb.append("Will use ");
             sb.append(unsafeMappings.size());
@@ -296,7 +294,7 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
                 String license = (String) entry.getValue();
                 sb.append("\n - ").append(id).append(" - ").append(license);
             }
-            LOG.info("{}", sb);
+            LOG.debug("{}", sb);
         } else {
             if (useMissingFile && !unsafeMappings.isEmpty()) {
                 LOG.info("Missing file {} is up-to-date.", missingFile);

@@ -1491,6 +1491,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
     /**
      * {@inheritDoc}
      */
+    @Deprecated
     public boolean isVerbose() {
         return getLog().isDebugEnabled();
     }
