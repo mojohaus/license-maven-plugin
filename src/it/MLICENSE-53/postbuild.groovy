@@ -19,4 +19,25 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
-return true;
+// the included and excluded licenses are accepted both as one '|'-separated string and as a list
+def log = new File(basedir, 'build.log').text
+assert !log.contains('forbidden licenses used')
+
+file = new File(basedir, 'target/generated-sources/license/with-single-string-included-licenses-THIRD-PARTY.txt')
+assert file.isFile()
+assert file.text.contains('(The Apache Software License, Version 2.0) Commons Logging (commons-logging:commons-logging:1.1.1')
+assert file.text.contains('(Lesser General Public License (LGPL) v 3.0) Nuiton Processor :: Api')
+file = new File(basedir, 'target/generated-sources/license/with-single-string-excluded-licenses-THIRD-PARTY.txt')
+assert file.isFile()
+assert file.text.contains('(The Apache Software License, Version 2.0) Commons Logging (commons-logging:commons-logging:1.1.1')
+assert file.text.contains('(Lesser General Public License (LGPL) v 3.0) Nuiton Processor :: Api')
+file = new File(basedir, 'target/generated-sources/license/with-string-list-included-licenses-THIRD-PARTY.txt')
+assert file.isFile()
+assert file.text.contains('(The Apache Software License, Version 2.0) Commons Logging (commons-logging:commons-logging:1.1.1')
+assert file.text.contains('(Lesser General Public License (LGPL) v 3.0) Nuiton Processor :: Api')
+file = new File(basedir, 'target/generated-sources/license/with-string-list-excluded-licenses-THIRD-PARTY.txt')
+assert file.isFile()
+assert file.text.contains('(The Apache Software License, Version 2.0) Commons Logging (commons-logging:commons-logging:1.1.1')
+assert file.text.contains('(Lesser General Public License (LGPL) v 3.0) Nuiton Processor :: Api')
+
+return true

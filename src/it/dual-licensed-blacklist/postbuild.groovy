@@ -19,4 +19,9 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
+def log = new File(basedir, 'build.log').text
+// failed for the forbidden licenses, not for another reason
+assert log.contains('There are 1 forbidden licenses used:')
+assert log.contains("License: 'GNU General Public Library' used by 1 dependencies:")
+
 return true
