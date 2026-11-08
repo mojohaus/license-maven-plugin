@@ -30,8 +30,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 
@@ -97,6 +99,11 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
      * Add the output directory as resource directory.
      * <p>
      * If this is set to <code>false</code> the generated files are no longer added automatically to the final artifact.
+     * </p>
+     * <p>
+     * The resource includes are <code>**&#47;*.txt</code>, plus <code>thirdPartyFilename</code> and, when
+     * <code>generateBundle</code> is on, <code>bundleThirdPartyPath</code> if their names do not end in
+     * <code>.txt</code>.
      * </p>
      *
      * @since 2.5.0
@@ -207,8 +214,25 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
         }
 
         if (addOutputDirectoryAsResourceDir) {
-            addResourceDir(outputDirectory, "**/*.txt");
+            addResourceDir(outputDirectory, resourceIncludes(thirdPartyFilename, generateBundle, bundleThirdPartyPath));
         }
+    }
+
+    /**
+     * Computes the includes of the output directory when it is added as a resource directory. The files ending in
+     * {@code .txt} are always included; a third party file or bundle whose name does not end in {@code .txt} is
+     * added by name.
+     */
+    static String[] resourceIncludes(String thirdPartyFilename, boolean generateBundle, String bundleThirdPartyPath) {
+        final Set<String> includes = new LinkedHashSet<>();
+        includes.add("**/*.txt");
+        if (thirdPartyFilename != null && !thirdPartyFilename.endsWith(".txt")) {
+            includes.add(thirdPartyFilename);
+        }
+        if (generateBundle && bundleThirdPartyPath != null && !bundleThirdPartyPath.endsWith(".txt")) {
+            includes.add(bundleThirdPartyPath);
+        }
+        return includes.toArray(new String[0]);
     }
 
     // ----------------------------------------------------------------------
