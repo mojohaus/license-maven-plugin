@@ -37,6 +37,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.settings.Proxy;
 import org.codehaus.mojo.license.download.LicenseSummaryWriter;
 import org.codehaus.mojo.license.download.LicensedArtifactResolver;
 import org.codehaus.mojo.license.download.ProjectLicenseInfo;
@@ -85,6 +86,14 @@ public abstract class AbstractLicensesXmlMojo extends AbstractMojo {
      */
     @Parameter(property = "licensesOutputFileEncoding", defaultValue = "${project.build.sourceEncoding}")
     private String licensesOutputFileEncoding;
+
+    /**
+     * Get declared proxies from the {@code settings.xml} file.
+     *
+     * @since 1.4
+     */
+    @Parameter(defaultValue = "${settings.proxies}", readonly = true)
+    protected List<Proxy> proxies;
 
     /**
      * List of Remote Repositories used by the resolver

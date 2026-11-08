@@ -37,12 +37,14 @@ import java.util.List;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.settings.Proxy;
 
 /**
  * This class should be used to load the content from a URL.
@@ -52,6 +54,29 @@ import org.apache.maven.plugin.MojoExecutionException;
 public class UrlRequester {
 
     public static final String CLASSPATH_PROTOCOL = "classpath";
+
+    /** The proxy of the running build, shared by all downloads of the plugin; {@code null} means no proxy. */
+    private static volatile Proxy proxy;
+
+    /**
+     * Sets the proxy used by the {@code http} and {@code https} requests of this class. The mojos set the active proxy
+     * of {@code settings.xml} before they download anything.
+     *
+     * @param proxy the proxy, or {@code null} to connect directly
+     */
+    public static void setProxy(Proxy proxy) {
+        UrlRequester.proxy = proxy;
+    }
+
+    private static CloseableHttpClient createHttpClient() {
+        HttpClientBuilder clientBuilder = HttpClientBuilder.create();
+        RequestConfig.Builder requestConfig = RequestConfig.custom();
+        HttpClientProxy.configure(proxy, requestConfig, clientBuilder);
+        if (proxy != null) {
+            clientBuilder.setDefaultRequestConfig(requestConfig.build());
+        }
+        return clientBuilder.build();
+    }
 
     /**
      * Checks if the given input is a URL value.
@@ -163,7 +188,7 @@ public class UrlRequester {
                 throw new IOException("The resource " + resource + " was not found in the maven plugin classpath");
             }
         } else if ("http".equals(protocol) || "https".equals(protocol)) {
-            try (CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
+            try (CloseableHttpClient httpClient = createHttpClient()) {
                 HttpGet get = new HttpGet(url);
                 try (CloseableHttpResponse response = httpClient.execute(get)) {
                     int responseCode = response.getStatusLine().getStatusCode();

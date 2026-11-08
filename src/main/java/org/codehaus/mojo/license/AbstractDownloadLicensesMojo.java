@@ -84,6 +84,8 @@ import org.codehaus.mojo.license.extended.spreadsheet.ExcelFileWriter;
 import org.codehaus.mojo.license.spdx.SpdxLicenseList;
 import org.codehaus.mojo.license.spdx.SpdxLicenseList.Attachments.ContentSanitizer;
 import org.codehaus.mojo.license.utils.FileUtil;
+import org.codehaus.mojo.license.utils.HttpClientProxy;
+import org.codehaus.mojo.license.utils.UrlRequester;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -463,14 +465,6 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
      */
     @Parameter(property = "license.includeOptional", defaultValue = "true")
     boolean includeOptional;
-
-    /**
-     * Get declared proxies from the {@code settings.xml} file.
-     *
-     * @since 1.4
-     */
-    @Parameter(defaultValue = "${settings.proxies}", readonly = true)
-    private List<Proxy> proxies;
 
     /**
      * The Maven session, used to resolve {@link #serverId} credentials from {@code settings.xml}.
@@ -1048,6 +1042,8 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
             return;
         }
 
+        UrlRequester.setProxy(findActiveProxy());
+
         if (licenseNameUrlOverrides != null) {
             for (LicenseNameUrlOverride override : licenseNameUrlOverrides) {
                 override.validate();
@@ -1528,13 +1524,8 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
         };
     }
 
-    private Proxy findActiveProxy() throws MojoExecutionException {
-        for (Proxy proxy : proxies) {
-            if (proxy.isActive() && "http".equals(proxy.getProtocol())) {
-                return proxy;
-            }
-        }
-        return null;
+    private Proxy findActiveProxy() {
+        return HttpClientProxy.findActiveProxy(proxies);
     }
 
     /**

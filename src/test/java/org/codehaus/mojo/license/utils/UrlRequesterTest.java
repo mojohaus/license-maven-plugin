@@ -1,16 +1,26 @@
 package org.codehaus.mojo.license.utils;
 
 import java.io.File;
+import java.io.OutputStream;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicReference;
 
+import com.sun.net.httpserver.HttpServer;
+import org.apache.maven.settings.Proxy;
 import org.codehaus.plexus.util.FileUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -74,5 +84,51 @@ class UrlRequesterTest {
     void otherInvalidUrlIsNotAUrl() {
         assertFalse(UrlRequester.isStringUrl("http://host/a\\b"));
         assertThrows(IllegalArgumentException.class, () -> UrlRequester.toUrl("http://host/a\\b"));
+    }
+
+    @Test
+    void httpRequestGoesThroughTheProxy() throws Exception {
+        // a plain HTTP proxy receives the request line with the absolute URL of the target
+        AtomicReference<String> requestLine = new AtomicReference<>();
+        HttpServer proxyServer = HttpServer.create(new InetSocketAddress(InetAddress.getLoopbackAddress(), 0), 0);
+        proxyServer.createContext("/", exchange -> {
+            requestLine.set(exchange.getRequestURI().toString());
+            byte[] body = "via proxy".getBytes(StandardCharsets.UTF_8);
+            exchange.getResponseHeaders().add("Content-Type", "text/plain; charset=UTF-8");
+            exchange.sendResponseHeaders(200, body.length);
+            try (OutputStream out = exchange.getResponseBody()) {
+                out.write(body);
+            }
+        });
+        proxyServer.start();
+        try {
+            Proxy proxy = new Proxy();
+            proxy.setHost(proxyServer.getAddress().getHostString());
+            proxy.setPort(proxyServer.getAddress().getPort());
+            proxy.setProtocol("http");
+
+            UrlRequester.setProxy(proxy);
+            // .invalid never resolves, so the request can only succeed through the proxy
+            assertEquals("via proxy", UrlRequester.getFromUrl("http://license-host.invalid/licenses.txt"));
+            assertEquals("http://license-host.invalid/licenses.txt", requestLine.get());
+        } finally {
+            UrlRequester.setProxy(null);
+            proxyServer.stop(0);
+        }
+    }
+
+    @Test
+    void activeHttpProxyIsFoundInSettings() {
+        Proxy inactive = new Proxy();
+        inactive.setActive(false);
+        inactive.setProtocol("http");
+        Proxy https = new Proxy();
+        https.setProtocol("https");
+        Proxy active = new Proxy();
+        active.setProtocol("http");
+
+        assertSame(active, HttpClientProxy.findActiveProxy(Arrays.asList(inactive, https, active)));
+        assertNull(HttpClientProxy.findActiveProxy(Arrays.asList(inactive, https)));
+        assertNull(HttpClientProxy.findActiveProxy(null));
     }
 }

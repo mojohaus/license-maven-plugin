@@ -45,7 +45,9 @@ import org.codehaus.mojo.license.download.LicenseSummaryReader;
 import org.codehaus.mojo.license.download.LicensedArtifact;
 import org.codehaus.mojo.license.download.LicensedArtifactResolver;
 import org.codehaus.mojo.license.download.ProjectLicenseInfo;
+import org.codehaus.mojo.license.utils.HttpClientProxy;
 import org.codehaus.mojo.license.utils.MojoHelper;
+import org.codehaus.mojo.license.utils.UrlRequester;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,6 +93,8 @@ public class LicensesXmlInsertVersionsMojo extends AbstractLicensesXmlMojo {
             LOG.info("Skipping due to skipDownloadLicenses = true");
             return;
         }
+
+        UrlRequester.setProxy(HttpClientProxy.findActiveProxy(proxies));
 
         if (licensesInputFile == null) {
             licensesInputFile = licensesOutputFile;
