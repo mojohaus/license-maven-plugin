@@ -373,6 +373,18 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
     protected ErrorRemedy errorRemedy;
 
     /**
+     * If {@code true}, the build fails after all dependencies have been processed when a dependency ends without a
+     * license file, whatever the reason: a license URL that could not be fetched, a relative or missing license URL, or
+     * a download error that {@link #errorRemedy} let pass. The summary files are written first, and the failure names
+     * every such dependency. Dependencies marked as approved in {@link #licensesConfigFile} are not counted.
+     * The default {@code false} keeps the build going, as before.
+     *
+     * @since 2.8.0
+     */
+    @Parameter(property = "license.failOnMissingLicenseFile", defaultValue = "false")
+    private boolean failOnMissingLicenseFile;
+
+    /**
      * If {@code true}, all encountered dependency license URLs are downloaded, no matter what is there in
      * {@link #licensesConfigFile} and {@link #licensesOutputFile}; otherwise {@link #licensesConfigFile},
      * {@link #licensesOutputFile} (eventually persisted from a previous build) and the content of
@@ -1094,12 +1106,14 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
         }
 
         List<String> forbiddenDependencies;
+        List<String> withoutLicenseFile;
         try {
             if (!sortDependencies(depProjectLicenses) && sortByGroupIdAndArtifactId) {
                 sortByGroupIdAndArtifactId(depProjectLicenses);
             }
 
             forbiddenDependencies = failOnForbidden ? findForbidden(depProjectLicenses, licenseClassifier()) : null;
+            withoutLicenseFile = findWithoutLicenseFile(depProjectLicenses);
             List<ProjectLicenseInfo> depProjectLicensesWithErrors = filterErrors(depProjectLicenses);
             writeLicenseSummaries(
                     depProjectLicenses, licensesOutputFile, licensesExcelOutputFile, licensesCalcOutputFile);
@@ -1118,6 +1132,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
 
         reportDownloadErrors();
         failOnForbidden(forbiddenDependencies);
+        failOnMissingLicenseFile(failOnMissingLicenseFile, withoutLicenseFile);
     }
 
     /**
@@ -1140,11 +1155,41 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
         return result;
     }
 
+    /**
+     * @return the GAV of every dependency that has no license with a file and is not approved
+     */
+    static List<String> findWithoutLicenseFile(List<ProjectLicenseInfo> dependencies) {
+        final List<String> result = new ArrayList<>();
+        for (ProjectLicenseInfo dependency : dependencies) {
+            if (dependency.isApproved()) {
+                continue;
+            }
+            boolean hasFile = false;
+            for (ProjectLicense license : dependency.getLicenses()) {
+                if (StringUtils.isNotEmpty(license.getFile())) {
+                    hasFile = true;
+                    break;
+                }
+            }
+            if (!hasFile) {
+                result.add(dependency.toGavString());
+            }
+        }
+        return result;
+    }
+
     static void failOnForbidden(List<String> forbiddenDependencies) throws MojoFailureException {
         if (forbiddenDependencies != null && !forbiddenDependencies.isEmpty()) {
             throw new MojoFailureException(forbiddenDependencies.size()
                     + " dependencies have a forbidden license (failOnForbidden is true): "
                     + String.join("; ", forbiddenDependencies));
+        }
+    }
+
+    static void failOnMissingLicenseFile(boolean enabled, List<String> withoutLicenseFile) throws MojoFailureException {
+        if (enabled && !withoutLicenseFile.isEmpty()) {
+            throw new MojoFailureException(withoutLicenseFile.size() + " dependencies have no license file"
+                    + " (failOnMissingLicenseFile is true): " + String.join(", ", withoutLicenseFile));
         }
     }
 
