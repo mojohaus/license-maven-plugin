@@ -199,6 +199,84 @@ class LicenseDownloaderTest {
         });
     }
 
+    // -----------------------------------------------------------------------
+    // HTML responses are not license texts
+    // -----------------------------------------------------------------------
+
+    @Test
+    void htmlContentTypeIsNotALicenseTextWhenRejected(@TempDir File dir) throws Exception {
+        runWithBody("text/html; charset=UTF-8", "Permission is hereby granted", (server, hits) -> {
+            try (LicenseDownloader downloader = downloader()) {
+                downloader.setRejectHtml(true);
+                LicenseDownloader.LicenseDownloadResult result = download(downloader, server, "a", dir);
+
+                assertFalse(result.isSuccess());
+                assertTrue(result.getErrorMessage().contains("did not return a license text"));
+                assertEquals(0, dir.list().length);
+            }
+        });
+    }
+
+    @Test
+    void htmlBodyIsNotALicenseTextWhenRejected(@TempDir File dir) throws Exception {
+        runWithBody("text/plain", "\uFEFF \n<!DOCTYPE HTML>\n<html><title>MIT</title></html>", (server, hits) -> {
+            try (LicenseDownloader downloader = downloader()) {
+                downloader.setRejectHtml(true);
+                LicenseDownloader.LicenseDownloadResult result = download(downloader, server, "a", dir);
+
+                assertFalse(result.isSuccess());
+                assertTrue(result.getErrorMessage().contains("did not return a license text"));
+                assertEquals(0, dir.list().length);
+            }
+        });
+    }
+
+    @Test
+    void htmlIsKeptByDefault(@TempDir File dir) throws Exception {
+        runWithBody("text/html; charset=UTF-8", "<html><body>GPL page</body></html>", (server, hits) -> {
+            try (LicenseDownloader downloader = downloader()) {
+                LicenseDownloader.LicenseDownloadResult result = download(downloader, server, "a", dir);
+
+                assertTrue(result.isSuccess(), result.getErrorMessage());
+                assertEquals(1, dir.list().length);
+            }
+        });
+    }
+
+    @Test
+    void plainTextIsStillDownloaded(@TempDir File dir) throws Exception {
+        final String text = "MIT License. Use <html> tags freely.\nPermission is hereby granted";
+        runWithBody("text/plain", text, (server, hits) -> {
+            try (LicenseDownloader downloader = downloader()) {
+                LicenseDownloader.LicenseDownloadResult result = download(downloader, server, "a", dir);
+
+                assertTrue(result.isSuccess(), result.getErrorMessage());
+                assertEquals(
+                        text,
+                        new String(
+                                java.nio.file.Files.readAllBytes(new File(dir, "a.txt").toPath()),
+                                StandardCharsets.UTF_8));
+            }
+        });
+    }
+
+    private static void runWithBody(String contentType, String body, ServerTest test) throws Exception {
+        final HttpServer server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
+        server.createContext("/", exchange -> {
+            final byte[] bytes = body.getBytes(StandardCharsets.UTF_8);
+            exchange.getResponseHeaders().add("Content-Type", contentType);
+            exchange.sendResponseHeaders(200, bytes.length);
+            exchange.getResponseBody().write(bytes);
+            exchange.close();
+        });
+        server.start();
+        try {
+            test.run(server, new AtomicInteger());
+        } finally {
+            server.stop(0);
+        }
+    }
+
     private interface ServerTest {
         void run(HttpServer server, AtomicInteger hits) throws Exception;
     }

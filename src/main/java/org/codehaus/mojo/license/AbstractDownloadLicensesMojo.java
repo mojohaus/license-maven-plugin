@@ -428,6 +428,18 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
     private BundledLicenseTexts.Mode useBundledLicenseTexts;
 
     /**
+     * Whether a license URL that answers with an HTML page, by {@code Content-Type} or by a body that starts with an
+     * HTML document, is treated as a failed download, so that {@code errorRemedy} decides between a warning and a
+     * build failure and no file is written. Off by default: many licenses are published only as HTML pages, and a
+     * saved page is better than nothing. Turn it on when a landing or error page would otherwise be stored as a
+     * license text.
+     *
+     * @since 2.8.1
+     */
+    @Parameter(property = "license.rejectHtmlLicenseTexts", defaultValue = "false")
+    private boolean rejectHtmlLicenseTexts;
+
+    /**
      * Include transitive dependencies when downloading license files.
      *
      * @since 1.0
@@ -1104,6 +1116,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
                 serverUrl,
                 serverHttpHeaders)) {
             licenseDownloader.setBundledTextsMode(useBundledLicenseTexts);
+            licenseDownloader.setRejectHtml(rejectHtmlLicenseTexts);
             licenseDownloader.setLicenseCache(licenseCache);
             for (LicensedArtifact artifact : dependencies.values()) {
                 LOG.debug("Checking licenses for project {}", artifact);
