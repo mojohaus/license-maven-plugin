@@ -40,11 +40,11 @@
     </license>
   </licenses>
 
-  <!-- "hidden" lives only here, in a repository the project does not know; the cloned IT is the working directory -->
+  <!-- "hidden" lives only here, in a repository the project does not know; prebuild.groovy writes its URL -->
   <repositories>
     <repository>
       <id>repo-b</id>
-      <url>file://${user.dir}/repo-b</url>
+      <url>@repo-b.url@</url>
       <releases>
         <enabled>true</enabled>
       </releases>
