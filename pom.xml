@@ -30,7 +30,7 @@
   </parent>
 
   <artifactId>license-maven-plugin</artifactId>
-  <version>2.9.0</version>
+  <version>2.9.1-SNAPSHOT</version>
   <packaging>maven-plugin</packaging>
 
   <name>License Maven Plugin</name>
@@ -103,7 +103,7 @@
   <scm>
     <connection>scm:git:https://github.com/mojohaus/license-maven-plugin.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/mojohaus/license-maven-plugin.git</developerConnection>
-    <tag>2.9.0</tag>
+    <tag>HEAD</tag>
     <url>https://github.com/mojohaus/license-maven-plugin/tree/master</url>
   </scm>
 
@@ -142,7 +142,7 @@
     <license.failOnMissing>true</license.failOnMissing>
     <license.licenseName>lgpl_v3</license.licenseName>
 
-    <project.build.outputTimestamp>2026-11-09T22:24:41Z</project.build.outputTimestamp>
+    <project.build.outputTimestamp>2026-11-09T22:25:11Z</project.build.outputTimestamp>
   </properties>
 
   <dependencyManagement>
