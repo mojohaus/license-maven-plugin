@@ -26,7 +26,7 @@ content = file.text;
 assert !content.contains('the project has no dependencies.');
 assert !content.contains('/third-party-report.html#');
 assert content.contains('<a href="#commons-logging:commons-logging:1.1.1">commons-logging:commons-logging:1.1.1</a>');
-assert content.contains('<td>The Apache Software License, Version 2.0</td>'); // TODO Should be a link
+assert content.contains('<td><a href="http://www.apache.org/licenses/LICENSE-2.0.txt">The Apache Software License, Version 2.0</a></td>');
 assert content.contains('<a href="#Overview">Back to top</a>');
 
 file = new File(basedir, 'target/reports/third-party-report.html');
