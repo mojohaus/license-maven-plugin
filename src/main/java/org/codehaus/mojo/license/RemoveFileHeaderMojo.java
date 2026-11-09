@@ -97,6 +97,7 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo {
      * Should be on form "root1,root2,rootn".
      * <p>
      * By default, the main roots are "src, target/generated-sources, target/processed-sources".
+     * Directories declared as modules of the current project are automatically excluded when they are below a root.
      * <p>
      * <b>Note:</b> If some of these roots do not exist, they will be simply
      * ignored.
