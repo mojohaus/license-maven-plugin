@@ -68,9 +68,9 @@ class AbstractLicenseNameMojoTest {
 
         List<String> included = Arrays.asList(files.get(projectDir.toFile()));
         assertTrue(included.contains("pom.xml"));
-        assertTrue(included.contains("src/Example.java"));
-        assertFalse(included.contains("child/pom.xml"));
-        assertFalse(included.contains("target/generated.java"));
+        assertTrue(included.contains("src" + File.separator + "Example.java"));
+        assertFalse(included.contains("child" + File.separator + "pom.xml"));
+        assertFalse(included.contains("target" + File.separator + "generated.java"));
     }
 
     private static class TestMojo extends AbstractLicenseNameMojo {
