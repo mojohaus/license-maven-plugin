@@ -24,6 +24,7 @@ package org.codehaus.mojo.license;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -293,8 +294,8 @@ public abstract class AbstractLicenseNameMojo extends AbstractLicenseMojo {
     /**
      * Collects some files.
      *
-     * @param includes includes
-     * @param excludes excludes
+     * @param includes includes, may use both "/" and "\" as path separators
+     * @param excludes excludes, may use both "/" and "\" as path separators
      * @param roots    root directories to treat
      * @param files    cache of file detected indexed by their root directory
      */
@@ -302,9 +303,6 @@ public abstract class AbstractLicenseNameMojo extends AbstractLicenseMojo {
 
         DirectoryScanner ds = new DirectoryScanner();
         ds.setIncludes(includes);
-        if (excludes != null) {
-            ds.setExcludes(excludes);
-        }
         for (String src : roots) {
 
             File f = new File(src);
@@ -316,6 +314,21 @@ public abstract class AbstractLicenseNameMojo extends AbstractLicenseMojo {
             LOG.debug("discovering source files in {}", src);
 
             ds.setBasedir(f);
+            List<String> scanExcludes = new ArrayList<>();
+            if (excludes != null) {
+                Collections.addAll(scanExcludes, excludes);
+            }
+            Path rootPath = f.toPath().toAbsolutePath().normalize();
+            for (String module : getProject().getModules()) {
+                Path modulePath = new File(getProject().getBasedir(), module)
+                        .toPath()
+                        .toAbsolutePath()
+                        .normalize();
+                if (modulePath.startsWith(rootPath) && !modulePath.equals(rootPath)) {
+                    scanExcludes.add(rootPath.relativize(modulePath).toString() + "/**");
+                }
+            }
+            ds.setExcludes(scanExcludes.isEmpty() ? null : scanExcludes.toArray(new String[0]));
             // scan
             ds.scan();
 

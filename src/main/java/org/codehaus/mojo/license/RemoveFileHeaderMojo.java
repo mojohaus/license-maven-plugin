@@ -96,7 +96,8 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo {
      * <p>
      * Should be on form "root1,root2,rootn".
      * <p>
-     * By default, the main roots are "src, target/generated-sources, target/processed-sources".
+     * By default, the main roots are {@value #DEFAULT_ROOTS}.
+     * Directories declared as modules of the current project are automatically excluded when they are below a root.
      * <p>
      * <b>Note:</b> If some of these roots do not exist, they will be simply
      * ignored.
@@ -107,7 +108,7 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo {
     private String[] roots;
 
     /**
-     * Specific files to includes, separated by a comma. By default, it is "** /*".
+     * Specific patterns to include, separated by a comma. By default, it is {@value #DEFAULT_INCLUDES}.
      * <p>
      * The patterns are Ant-style and are matched against the path of each file relative to the
      * <code>roots</code>, not against its absolute path or the project base directory. A <code>*</code> does not
@@ -120,18 +121,14 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo {
     private String[] includes;
 
     /**
-     * Specific files to excludes, separated by a comma.
+     * Specific patterns to exclude, separated by a comma. By default it is {@value #DEFAULT_EXCLUDES}.
      * <p>
      * The patterns are Ant-style and are matched against the path of each file relative to the
      * <code>roots</code>, in the same way as <code>includes</code>: <code>*</code> does not cross directory
      * boundaries, so <code>** /generated/**</code> excludes a directory at any depth where
      * <code>generated/**</code> only matches one directly in a root.
      * <p>
-     * By default, those file types are excluded:
-     * <ul>
-     * <li>modelisation</li>
-     * <li>images</li>
-     * </ul>
+     * All directories matching project modules will always be automatically excluded.
      *
      * @since 1.11
      */
