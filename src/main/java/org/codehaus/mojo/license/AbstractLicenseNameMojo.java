@@ -294,8 +294,8 @@ public abstract class AbstractLicenseNameMojo extends AbstractLicenseMojo {
     /**
      * Collects some files.
      *
-     * @param includes includes
-     * @param excludes excludes
+     * @param includes includes, may use both "/" and "\" as path separators
+     * @param excludes excludes, may use both "/" and "\" as path separators
      * @param roots    root directories to treat
      * @param files    cache of file detected indexed by their root directory
      */
@@ -325,8 +325,7 @@ public abstract class AbstractLicenseNameMojo extends AbstractLicenseMojo {
                         .toAbsolutePath()
                         .normalize();
                 if (modulePath.startsWith(rootPath) && !modulePath.equals(rootPath)) {
-                    scanExcludes.add(
-                            rootPath.relativize(modulePath).toString().replace(File.separatorChar, '/') + "/**");
+                    scanExcludes.add(rootPath.relativize(modulePath).toString() + "/**");
                 }
             }
             ds.setExcludes(scanExcludes.isEmpty() ? null : scanExcludes.toArray(new String[0]));
