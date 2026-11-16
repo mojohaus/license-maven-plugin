@@ -37,7 +37,6 @@ import java.util.TreeMap;
 
 import freemarker.template.Template;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProjectHelper;
@@ -254,7 +253,7 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo {
     @Override
     public void init() throws Exception {
 
-        if (StringUtils.isEmpty(ignoreTag)) {
+        if (ignoreTag == null || ignoreTag.isEmpty()) {
 
             // use default value
             this.ignoreTag = "%" + "%Ignore-License";

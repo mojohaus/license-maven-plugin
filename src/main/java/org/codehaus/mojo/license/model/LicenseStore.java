@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,7 +74,7 @@ public class LicenseStore implements Iterable<LicenseRepository> {
             store.addJarRepository();
             if (extraResolver != null) {
                 for (String s : extraResolver) {
-                    if (StringUtils.isNotEmpty(s)) {
+                    if (s != null && !s.isEmpty()) {
                         LOG.info("adding extra resolver {}", s);
                         store.addRepository(s);
                     }

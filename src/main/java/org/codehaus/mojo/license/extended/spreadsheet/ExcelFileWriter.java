@@ -734,7 +734,7 @@ public final class ExcelFileWriter {
     private static void addHyperlinkIfExists(
             Workbook workbook, Cell cell, CellStyle hyperlinkStyle, HyperlinkType hyperlinkType) {
         final String link = cell.getStringCellValue();
-        if (!StringUtils.isEmpty(link)) {
+        if (!(link == null || link.isEmpty())) {
             Hyperlink hyperlink = workbook.getCreationHelper().createHyperlink(hyperlinkType);
             final String modifiedLink = prefixedHyperlink(hyperlinkType, link);
             try {

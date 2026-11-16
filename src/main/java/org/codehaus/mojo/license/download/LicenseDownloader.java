@@ -55,7 +55,6 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
@@ -668,7 +667,9 @@ public class LicenseDownloader implements AutoCloseable {
      * @return {@code true} if the URL matches the configured server and credentials should be sent
      */
     boolean shouldAuthenticate(String url) {
-        return StringUtils.isNotEmpty(serverUrl) && StringUtils.isNotEmpty(userName) && url.startsWith(serverUrl);
+        return (serverUrl != null && !serverUrl.isEmpty())
+                && (userName != null && !userName.isEmpty())
+                && url.startsWith(serverUrl);
     }
 
     /**
