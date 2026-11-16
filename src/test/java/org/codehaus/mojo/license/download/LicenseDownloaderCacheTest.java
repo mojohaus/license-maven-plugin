@@ -163,7 +163,7 @@ class LicenseDownloaderCacheTest {
             assertArrayEquals(expected, Files.readAllBytes(viaNetwork.getFile().toPath()));
             assertArrayEquals(expected, Files.readAllBytes(viaCache.getFile().toPath()));
             assertEquals(plain.getSha1(), viaCache.getSha1());
-            assertEquals(plain.getFile().getName().replaceAll("^plain", "x"), "x.txt");
+            assertEquals("x.txt", plain.getFile().getName().replaceAll("^plain", "x"));
         }
     }
 

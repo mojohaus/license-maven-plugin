@@ -29,6 +29,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -132,7 +133,7 @@ class BundledLicenseTextsTest {
         for (Map.Entry<String, BundledLicenseTexts.Entry> e : entries.entrySet()) {
             final String key = e.getKey();
             assertEquals(key, BundledLicenseTexts.normalize("https://" + key), "key is not normalized: " + key);
-            assertTrue(!key.startsWith("www."), key);
+            assertFalse(key.startsWith("www."), key);
             final String resource = "META-INF/licenses/" + e.getValue().getLicenseId() + "/license.txt";
             try (InputStream in = getClass().getClassLoader().getResourceAsStream(resource)) {
                 assertNotNull(in, "no bundled text for " + key + ": " + resource);

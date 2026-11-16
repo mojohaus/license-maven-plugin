@@ -186,7 +186,7 @@ class LicenseNameUrlOverridesTest {
     }
 
     @Test
-    void validationPassesOnValidOverride() throws MojoExecutionException {
+    void validationPassesOnValidOverride() throws Exception {
         LicenseNameUrlOverride o = new LicenseNameUrlOverride();
         o.setLicenseNamePattern(".*MIT.*");
         o.setUrl("https://example.com/mit.txt");
