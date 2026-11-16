@@ -22,7 +22,6 @@ package org.codehaus.mojo.license.download;
  * #L%
  */
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -133,7 +132,7 @@ class PersistentLicenseCacheTest {
     }
 
     @Test
-    void truncatedEntryIsAMiss() throws IOException {
+    void truncatedEntryIsAMiss() throws Exception {
         final PersistentLicenseCache cache = cache(true);
         cache.store(URL, "0123456789".getBytes(StandardCharsets.UTF_8), null, null, null);
         final Path file = cache.entryPath(URL);
@@ -144,7 +143,7 @@ class PersistentLicenseCacheTest {
     }
 
     @Test
-    void garbageIsAMiss() throws IOException {
+    void garbageIsAMiss() throws Exception {
         final PersistentLicenseCache cache = cache(true);
         cache.store(URL, "x".getBytes(StandardCharsets.UTF_8), null, null, null);
         Files.write(cache.entryPath(URL), "not an entry".getBytes(StandardCharsets.UTF_8));
@@ -153,7 +152,7 @@ class PersistentLicenseCacheTest {
     }
 
     @Test
-    void writeLeavesNoTemporaryFiles() throws IOException {
+    void writeLeavesNoTemporaryFiles() throws Exception {
         final PersistentLicenseCache cache = cache(true);
         cache.store(URL, "x".getBytes(StandardCharsets.UTF_8), null, null, null);
         cache.store(URL, "y".getBytes(StandardCharsets.UTF_8), null, null, null);
