@@ -285,7 +285,7 @@ public abstract class AbstractLicenseNameMojo extends AbstractLicenseMojo {
     }
 
     Copyright getCopyright(String copyrightStringFormat, String holder) {
-        return (ignoreLastDate)
+        return ignoreLastDate
                 ? Copyright.newCopyright(copyrightStringFormat, inceptionYear, null, holder)
                 : Copyright.newCopyright(copyrightStringFormat, inceptionYear, holder);
     }

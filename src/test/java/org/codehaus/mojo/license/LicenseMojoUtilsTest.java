@@ -132,7 +132,6 @@ class LicenseMojoUtilsTest {
             result = result.replace(overrideFile.toURI().toString(), "file:/.../" + overrideFile.getName());
         }
 
-        String actual = "resolved=" + result + "\n" + "valid=" + LicenseMojoUtils.isValid(result) + "\n" + dump;
-        return actual;
+        return "resolved=" + result + "\n" + "valid=" + LicenseMojoUtils.isValid(result) + "\n" + dump;
     }
 }

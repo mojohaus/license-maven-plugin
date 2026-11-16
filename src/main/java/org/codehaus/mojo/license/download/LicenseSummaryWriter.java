@@ -93,9 +93,9 @@ public class LicenseSummaryWriter {
             xformer.transform(new DOMSource(doc), new StreamResult(sw));
 
             final String platformEol = Eol.PLATFORM.getEolString();
-            final String outputString = !platformEol.equals(eol.getEolString())
-                    ? sw.toString().replace(platformEol, eol.getEolString())
-                    : sw.toString();
+            final String outputString = platformEol.equals(eol.getEolString())
+                    ? sw.toString()
+                    : sw.toString().replace(platformEol, eol.getEolString());
             Files.write(outputFile.toPath(), outputString.getBytes(charset));
         }
     }

@@ -707,7 +707,7 @@ public class LicenseDownloader implements AutoCloseable {
      *
      * @since 1.18
      */
-    public static class LicenseDownloadResult {
+    public static final class LicenseDownloadResult {
         public static LicenseDownloadResult success(File file, String sha1, boolean preferredFileName) {
             return new LicenseDownloadResult(file, sha1, preferredFileName, null);
         }

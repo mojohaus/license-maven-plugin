@@ -41,7 +41,7 @@ public class LicenseNameUrlOverride {
     public void setLicenseNamePattern(String licenseNamePattern) {
         this.licenseNamePattern = licenseNamePattern;
         this.pattern =
-                (licenseNamePattern != null) ? Pattern.compile(licenseNamePattern, Pattern.CASE_INSENSITIVE) : null;
+                licenseNamePattern != null ? Pattern.compile(licenseNamePattern, Pattern.CASE_INSENSITIVE) : null;
     }
 
     public String getUrl() {
