@@ -62,7 +62,7 @@ public class PreferredFileNames {
      */
     public static PreferredFileNames build(File licensesOutputDirectory, Map<String, String> licenseUrlFileNames) {
         final Map<String, Map.Entry<String, List<Pattern>>> fileNameToUrlPatterns = new LinkedHashMap<>();
-        final Map<String, String> sha1TofileName = new LinkedHashMap<String, String>();
+        final Map<String, String> sha1TofileName = new LinkedHashMap<>();
 
         if (licenseUrlFileNames != null) {
             if (licenseUrlFileNames.containsKey("spdx")) {
@@ -216,14 +216,14 @@ public class PreferredFileNames {
                 final String fileName = en.getKey();
                 final String sha1 = en.getValue().getKey();
                 final List<Pattern> patterns = en.getValue().getValue();
-                sb.append("  <" + fileName + ">\n");
+                sb.append("  <").append(fileName).append(">\n");
                 if (sha1 != null) {
-                    sb.append("    sha1:" + sha1 + "\n");
+                    sb.append("    sha1:").append(sha1).append("\n");
                 }
                 for (Pattern pattern : patterns) {
-                    sb.append("    " + pattern.pattern() + "\n");
+                    sb.append("    ").append(pattern.pattern()).append("\n");
                 }
-                sb.append("  </" + fileName + ">\n");
+                sb.append("  </").append(fileName).append(">\n");
             }
             sb.append("</licenseUrlFileNames>\n");
             LOG.debug("SPDX licenseUrlFileNames:");

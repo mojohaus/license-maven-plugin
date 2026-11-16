@@ -82,13 +82,11 @@ public class LicenseRepository implements Iterable<License> {
             throw new IllegalStateException("no baseURL defined in " + this);
         }
 
-        URL definitionURL = MojoHelper.getUrl(getBaseURL(), REPOSITORY_DEFINITION_FILE);
-        return definitionURL;
+        return MojoHelper.getUrl(getBaseURL(), REPOSITORY_DEFINITION_FILE);
     }
 
     protected URL getLicenseBaseURL(String licenseName) {
-        URL licenseBaseURL = MojoHelper.getUrl(baseURL, licenseName);
-        return licenseBaseURL;
+        return MojoHelper.getUrl(baseURL, licenseName);
     }
 
     public void load() throws IOException {

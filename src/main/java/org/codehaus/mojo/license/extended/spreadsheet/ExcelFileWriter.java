@@ -73,7 +73,7 @@ import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.get
 /**
  * Writes project license infos into Excel file.
  */
-public class ExcelFileWriter {
+public final class ExcelFileWriter {
     private static final BorderStyle HEADER_CELLS_BORDER_STYLE = BorderStyle.MEDIUM;
     private static final Logger LOG = LoggerFactory.getLogger(ExcelFileWriter.class);
 
@@ -375,7 +375,8 @@ public class ExcelFileWriter {
         styleGray.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
         for (ProjectLicenseInfo projectInfo : projectLicenseInfos) {
-            final CellStyle cellStyle, hyperlinkStyle;
+            final CellStyle cellStyle;
+            final CellStyle hyperlinkStyle;
             LOG.debug("Writing {}:{} into Microsoft Excel file", projectInfo.getGroupId(), projectInfo.getArtifactId());
             if (grayBackground) {
                 cellStyle = styleGray;
@@ -868,7 +869,7 @@ public class ExcelFileWriter {
     /**
      * Parameters for cells which apply to all cells in each loop iteration.
      */
-    private static class CellListParameter {
+    private static final class CellListParameter {
         private final Sheet sheet;
         private final Map<Integer, Row> rows;
         private final CellStyle cellStyle;

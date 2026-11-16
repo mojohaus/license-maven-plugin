@@ -70,8 +70,7 @@ public class Copyright {
         if (copyrightToStringFormat == null) {
             return newCopyright(DEFAULT_COPYRIGHT_TO_STRING_FORMAT, firstYear, lastYear, holder);
         }
-        Copyright result = new Copyright(copyrightToStringFormat, firstYear, lastYear, holder);
-        return result;
+        return new Copyright(copyrightToStringFormat, firstYear, lastYear, holder);
     }
 
     public static Copyright newCopyright(Integer inceptionYear, Integer lastYear, String holder) {
@@ -187,8 +186,7 @@ public class Copyright {
      * @return the String representation of the copyright
      */
     public String getText() {
-        String copyright = String.format(getCopyrightToStringFormat(), getYears(), getHolder());
-        return copyright;
+        return String.format(getCopyrightToStringFormat(), getYears(), getHolder());
     }
 
     @Override
@@ -219,8 +217,7 @@ public class Copyright {
     public int hashCode() {
         int result = holder != null ? holder.hashCode() : 0;
         result = 31 * result + firstYear;
-        result = 31 * result + (lastYear != null ? lastYear.hashCode() : 0);
-        return result;
+        return 31 * result + (lastYear != null ? lastYear.hashCode() : 0);
     }
 
     @Override

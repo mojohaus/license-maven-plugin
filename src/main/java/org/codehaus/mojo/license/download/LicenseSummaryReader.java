@@ -121,7 +121,7 @@ public class LicenseSummaryReader {
     }
 
     private static Map.Entry<Boolean, List<ProjectLicense>> parseLicenses(Node node) {
-        final List<ProjectLicense> result = new ArrayList<ProjectLicense>();
+        final List<ProjectLicense> result = new ArrayList<>();
         final NodeList licensesChildNodes = node.getChildNodes();
         final Node approvedNode = node.getAttributes().getNamedItem("approved");
         boolean approved = Boolean.parseBoolean(approvedNode != null ? approvedNode.getNodeValue() : "false");
@@ -135,7 +135,7 @@ public class LicenseSummaryReader {
                 result.add(parseLicense(licensesChildNode));
             }
         }
-        return new AbstractMap.SimpleImmutableEntry<Boolean, List<ProjectLicense>>(approved, result);
+        return new AbstractMap.SimpleImmutableEntry<>(approved, result);
     }
 
     private static ProjectLicense parseLicense(Node licenseNode) {

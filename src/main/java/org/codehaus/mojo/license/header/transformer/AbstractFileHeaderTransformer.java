@@ -383,8 +383,7 @@ public abstract class AbstractFileHeaderTransformer implements FileHeaderTransfo
         int lastIndex =
                 result.lastIndexOf(getProcessEndTag()) + getProcessEndTag().length();
 
-        result = result.substring(index, lastIndex);
-        return result;
+        return result.substring(index, lastIndex);
     }
 
     /**

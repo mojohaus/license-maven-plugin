@@ -1318,7 +1318,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
     }
 
     private Map<String, ContentSanitizer> contentSanitizers() {
-        Map<String, ContentSanitizer> result = new TreeMap<String, ContentSanitizer>();
+        Map<String, ContentSanitizer> result = new TreeMap<>();
         if (useDefaultContentSanitizers) {
             final Map<String, ContentSanitizer> defaultSanitizers =
                     SpdxLicenseList.getLatest().getAttachments().getContentSanitizers();
@@ -1404,11 +1404,10 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
     }
 
     private static ErrorRemedy getEffectiveErrorRemedy(boolean quiet, ErrorRemedy errorRemedy) {
-        switch (errorRemedy) {
-            case warn:
-                return quiet ? ErrorRemedy.ignore : ErrorRemedy.warn;
-            default:
-                return errorRemedy;
+        if (errorRemedy == AbstractDownloadLicensesMojo.ErrorRemedy.warn) {
+            return quiet ? ErrorRemedy.ignore : ErrorRemedy.warn;
+        } else {
+            return errorRemedy;
         }
     }
 

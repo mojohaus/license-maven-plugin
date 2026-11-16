@@ -52,7 +52,8 @@ class AbstractFileHeaderTransformerTest {
 
     FileHeaderTransformer transformer;
 
-    FileHeader model1, model2;
+    FileHeader model1;
+    FileHeader model2;
 
     @BeforeEach
     void setUp() throws Exception {

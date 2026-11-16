@@ -96,9 +96,7 @@ public class MojoHelper {
         }
 
         tmp *= sign;
-        String result;
-        result = MessageFormat.format("{0,number,0.###}{1}", tmp, unites[i]);
-        return result;
+        return MessageFormat.format("{0,number,0.###}{1}", tmp, unites[i]);
     }
 
     /**

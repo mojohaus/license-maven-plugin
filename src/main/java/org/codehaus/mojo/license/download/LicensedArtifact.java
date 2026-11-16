@@ -95,32 +95,53 @@ public class LicensedArtifact {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((artifactId == null) ? 0 : artifactId.hashCode());
-        result = prime * result + ((groupId == null) ? 0 : groupId.hashCode());
-        result = prime * result + ((licenses == null) ? 0 : licenses.hashCode());
-        result = prime * result + ((version == null) ? 0 : version.hashCode());
-        return result;
+        result = prime * result + (artifactId == null ? 0 : artifactId.hashCode());
+        result = prime * result + (groupId == null ? 0 : groupId.hashCode());
+        result = prime * result + (licenses == null ? 0 : licenses.hashCode());
+        return prime * result + (version == null ? 0 : version.hashCode());
     }
 
     @Override
     public boolean equals(Object obj) {
         // CHECKSTYLE_OFF: NeedBraces
-        if (this == obj) return true;
-        if (obj == null) return false;
-        if (getClass() != obj.getClass()) return false;
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
         LicensedArtifact other = (LicensedArtifact) obj;
         if (artifactId == null) {
-            if (other.artifactId != null) return false;
-        } else if (!artifactId.equals(other.artifactId)) return false;
+            if (other.artifactId != null) {
+                return false;
+            }
+        } else if (!artifactId.equals(other.artifactId)) {
+            return false;
+        }
         if (groupId == null) {
-            if (other.groupId != null) return false;
-        } else if (!groupId.equals(other.groupId)) return false;
+            if (other.groupId != null) {
+                return false;
+            }
+        } else if (!groupId.equals(other.groupId)) {
+            return false;
+        }
         if (licenses == null) {
-            if (other.licenses != null) return false;
-        } else if (!licenses.equals(other.licenses)) return false;
+            if (other.licenses != null) {
+                return false;
+            }
+        } else if (!licenses.equals(other.licenses)) {
+            return false;
+        }
         if (version == null) {
-            if (other.version != null) return false;
-        } else if (!version.equals(other.version)) return false;
+            if (other.version != null) {
+                return false;
+            }
+        } else if (!version.equals(other.version)) {
+            return false;
+        }
         return true;
         // CHECKSTYLE_ON: NeedBraces
     }

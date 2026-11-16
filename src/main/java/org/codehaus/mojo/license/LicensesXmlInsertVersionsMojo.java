@@ -142,7 +142,7 @@ public class LicensesXmlInsertVersionsMojo extends AbstractLicensesXmlMojo {
                     return artifactFilters;
                 }
             };
-            final Map<String, LicensedArtifact> resolvedDeps = new TreeMap<String, LicensedArtifact>();
+            final Map<String, LicensedArtifact> resolvedDeps = new TreeMap<>();
             licensedArtifactResolver.loadProjectDependencies(
                     new ResolvedProjectDependencies(project.getArtifacts(), MojoHelper.getDependencyArtifacts(project)),
                     config,

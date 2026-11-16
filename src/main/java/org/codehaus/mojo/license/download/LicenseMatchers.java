@@ -37,7 +37,7 @@ import org.apache.maven.plugin.MojoExecutionException;
  * @author <a href="https://github.com/ppalaga">Peter Palaga</a>
  * @since 1.18
  */
-public class LicenseMatchers {
+public final class LicenseMatchers {
 
     private static final Pattern MATCH_EMPTY_PATTERN = Pattern.compile("");
     private static final Pattern MATCH_ALL_PATTERN = Pattern.compile(".*");

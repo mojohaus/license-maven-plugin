@@ -8,7 +8,7 @@ import org.codehaus.mojo.license.download.ProjectLicenseInfo;
 /**
  * Writes LibreOffice Calc ODS file.
  */
-public class CalcFileWriter {
+public final class CalcFileWriter {
 
     private CalcFileWriter() {}
 

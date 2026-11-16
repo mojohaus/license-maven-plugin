@@ -441,7 +441,7 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo {
 
         char lastchar = ' ';
         while (lastchar != '\n' && firstIndex > 0) {
-            lastchar = content.charAt((--firstIndex));
+            lastchar = content.charAt(--firstIndex);
         }
         String commentEndTag = transformer.getCommentEndTag();
         int lastIndex = content.indexOf(commentEndTag);
@@ -451,7 +451,7 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo {
         }
         lastchar = ' ';
         while (lastchar != '\n') {
-            lastchar = content.charAt((++lastIndex));
+            lastchar = content.charAt(++lastIndex);
         }
 
         LOG.debug(" - header was removed for {}", file);
