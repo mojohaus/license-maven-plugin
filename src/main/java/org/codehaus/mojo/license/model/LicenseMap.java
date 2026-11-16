@@ -23,7 +23,6 @@ package org.codehaus.mojo.license.model;
  */
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -134,7 +133,7 @@ public class LicenseMap extends TreeMap<String, SortedSet<MavenProject>> {
         SortedMap<MavenProject, String[]> result = new TreeMap<>(projectComparator);
         for (Map.Entry<MavenProject, Set<String>> entry : tmp.entrySet()) {
             List<String> value = new ArrayList<>(entry.getValue());
-            Collections.sort(value);
+            value.sort(null);
             result.put(entry.getKey(), value.toArray(new String[value.size()]));
         }
         tmp.clear();

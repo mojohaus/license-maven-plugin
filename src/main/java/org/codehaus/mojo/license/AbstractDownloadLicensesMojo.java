@@ -1447,7 +1447,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
                         .compareTo(info2.getGroupId() + "+" + info2.getArtifactId());
             }
         };
-        Collections.sort(depProjectLicenses, comparator);
+        depProjectLicenses.sort(comparator);
     }
 
     // ----------------------------------------------------------------------

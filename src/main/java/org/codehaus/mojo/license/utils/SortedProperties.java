@@ -77,7 +77,7 @@ public class SortedProperties extends Properties {
         try {
             // Attention, si les clef ne sont pas des string, ca ne marchera pas
             List<String> list = toGenericList(objects, String.class);
-            Collections.sort(list);
+            list.sort(null);
             result = new Vector<>(list);
         } catch (IllegalArgumentException e) {
             // keys are not string !!!

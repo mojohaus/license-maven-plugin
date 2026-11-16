@@ -26,7 +26,6 @@ import javax.inject.Inject;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.maven.plugin.MojoExecutionException;
@@ -131,7 +130,7 @@ public class LicenseListMojo extends AbstractLicenseMojo {
                 maxLength = name.length();
             }
         }
-        Collections.sort(names);
+        names.sort(null);
 
         String pattern = " * %1$-" + maxLength + "s : %2$s\n";
         for (String licenseName : names) {
