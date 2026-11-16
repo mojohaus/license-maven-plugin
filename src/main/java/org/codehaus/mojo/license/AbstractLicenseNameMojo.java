@@ -350,7 +350,7 @@ public abstract class AbstractLicenseNameMojo extends AbstractLicenseMojo {
      */
     String cleanHeaderConfiguration(String value, String defaultValue) {
         String resultHeader;
-        if (StringUtils.isEmpty(value)) {
+        if (value == null || value.isEmpty()) {
 
             // use default value
             resultHeader = defaultValue;
@@ -369,7 +369,7 @@ public abstract class AbstractLicenseNameMojo extends AbstractLicenseMojo {
      * @return the transformer for the givne tramsformer name
      */
     FileHeaderTransformer getTransformer(Map<String, FileHeaderTransformer> transformers, String transformerName) {
-        if (StringUtils.isEmpty(transformerName)) {
+        if (transformerName == null || transformerName.isEmpty()) {
             throw new IllegalArgumentException("transformerName can not be null, nor empty!");
         }
         if (transformers == null) {
@@ -473,12 +473,12 @@ public abstract class AbstractLicenseNameMojo extends AbstractLicenseMojo {
             for (String path : filesPath) {
                 String extension = FileUtils.extension(path);
                 String commentStyle = extensionToCommentStyle.get(extension);
-                if (StringUtils.isEmpty(commentStyle)) {
+                if (commentStyle == null || commentStyle.isEmpty()) {
 
                     // unknown extension, try with extra files
                     File file = new File(root, path);
                     commentStyle = extraFiles.get(file.getName());
-                    if (StringUtils.isEmpty(commentStyle)) {
+                    if (commentStyle == null || commentStyle.isEmpty()) {
                         // do not treat this file
                         continue;
                     }

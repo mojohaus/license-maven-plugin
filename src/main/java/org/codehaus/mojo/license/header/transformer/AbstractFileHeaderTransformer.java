@@ -459,7 +459,9 @@ public abstract class AbstractFileHeaderTransformer implements FileHeaderTransfo
     public String unboxProcessTag(String boxedHeader) {
         StringBuilder buffer = new StringBuilder();
         for (String line : boxedHeader.split(getLineSeparator() + "")) {
-            if (StringUtils.isEmpty(line) || line.contains(getProcessStartTag()) || line.contains(getProcessEndTag())) {
+            if ((line == null || line.isEmpty())
+                    || line.contains(getProcessStartTag())
+                    || line.contains(getProcessEndTag())) {
                 // not be unboxed, but just skipped
                 continue;
             }
