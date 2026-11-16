@@ -190,6 +190,7 @@ public abstract class AbstractLicenseMojo extends AbstractMojo {
     /**
      * {@inheritDoc}
      */
+    @Override
     public final void execute() throws MojoExecutionException, MojoFailureException {
         UrlRequester.setProxy(HttpClientProxy.findActiveProxy(proxies));
         try {

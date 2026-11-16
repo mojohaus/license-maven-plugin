@@ -45,6 +45,7 @@ public class JspFileHeaderTransformer extends AbstractFileHeaderTransformer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String[] getDefaultAcceptedExtensions() {
         return new String[] {"jsp", "jspx"};
     }

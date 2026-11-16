@@ -131,6 +131,7 @@ public class DefaultThirdPartyHelper implements ThirdPartyHelper {
     /**
      * {@inheritDoc}
      */
+    @Override
     public SortedMap<String, MavenProject> getArtifactCache() {
         return artifactCache;
     }
@@ -138,6 +139,7 @@ public class DefaultThirdPartyHelper implements ThirdPartyHelper {
     /**
      * {@inheritDoc}
      */
+    @Override
     public SortedMap<String, MavenProject> loadDependencies(
             MavenProjectDependenciesConfigurator configuration, ResolvedProjectDependencies dependencyArtifacts) {
         return dependenciesTool.loadProjectDependencies(
@@ -147,6 +149,7 @@ public class DefaultThirdPartyHelper implements ThirdPartyHelper {
     /**
      * {@inheritDoc}
      */
+    @Override
     public SortedProperties loadThirdPartyDescriptorForUnsafeMapping(
             Set<Artifact> topLevelDependencies,
             SortedSet<MavenProject> unsafeDependencies,
@@ -160,6 +163,7 @@ public class DefaultThirdPartyHelper implements ThirdPartyHelper {
     /**
      * {@inheritDoc}
      */
+    @Override
     public SortedProperties loadUnsafeMapping(
             LicenseMap licenseMap,
             File missingFile,
@@ -172,6 +176,7 @@ public class DefaultThirdPartyHelper implements ThirdPartyHelper {
     /**
      * {@inheritDoc}
      */
+    @Override
     public LicenseMap createLicenseMap(SortedMap<String, MavenProject> dependencies) {
 
         LicenseMap licenseMap = new LicenseMap();
@@ -185,6 +190,7 @@ public class DefaultThirdPartyHelper implements ThirdPartyHelper {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void attachThirdPartyDescriptor(File file) {
 
         thirdPartyTool.attachThirdPartyDescriptor(project, file);
@@ -193,6 +199,7 @@ public class DefaultThirdPartyHelper implements ThirdPartyHelper {
     /**
      * {@inheritDoc}
      */
+    @Override
     public SortedSet<MavenProject> getProjectsWithNoLicense(LicenseMap licenseMap) {
         return thirdPartyTool.getProjectsWithNoLicense(licenseMap);
     }
@@ -200,6 +207,7 @@ public class DefaultThirdPartyHelper implements ThirdPartyHelper {
     /**
      * {@inheritDoc}
      */
+    @Override
     public SortedProperties createUnsafeMapping(
             LicenseMap licenseMap,
             File missingFile,
@@ -244,6 +252,7 @@ public class DefaultThirdPartyHelper implements ThirdPartyHelper {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void mergeLicenses(List<String> licenseMerges, LicenseMap licenseMap) throws MojoFailureException {
 
         Set<String> licenseFound = new HashSet<>();

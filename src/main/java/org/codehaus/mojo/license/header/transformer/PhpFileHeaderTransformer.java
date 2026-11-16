@@ -46,6 +46,7 @@ public class PhpFileHeaderTransformer extends AbstractFileHeaderTransformer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String[] getDefaultAcceptedExtensions() {
         return new String[] {"php"};
     }

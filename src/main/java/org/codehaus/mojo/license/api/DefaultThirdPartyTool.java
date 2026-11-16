@@ -150,6 +150,7 @@ public class DefaultThirdPartyTool implements ThirdPartyTool {
      * {@inheritDoc}
      */
     @Deprecated
+    @Override
     public boolean isVerbose() {
         return verbose;
     }
@@ -158,6 +159,7 @@ public class DefaultThirdPartyTool implements ThirdPartyTool {
      * {@inheritDoc}
      */
     @Deprecated
+    @Override
     public void setVerbose(boolean verbose) {
         this.verbose = verbose;
     }
@@ -165,6 +167,7 @@ public class DefaultThirdPartyTool implements ThirdPartyTool {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void attachThirdPartyDescriptor(MavenProject project, File file) {
         projectHelper.attachArtifact(project, DESCRIPTOR_TYPE, DESCRIPTOR_CLASSIFIER, file);
     }
@@ -172,6 +175,7 @@ public class DefaultThirdPartyTool implements ThirdPartyTool {
     /**
      * {@inheritDoc}
      */
+    @Override
     public SortedSet<MavenProject> getProjectsWithNoLicense(LicenseMap licenseMap) {
 
         // get unsafe dependencies (says with no license)
@@ -200,6 +204,7 @@ public class DefaultThirdPartyTool implements ThirdPartyTool {
     /**
      * {@inheritDoc}
      */
+    @Override
     public SortedProperties loadThirdPartyDescriptorsForUnsafeMapping(
             Set<Artifact> topLevelDependencies,
             String encoding,
@@ -285,6 +290,7 @@ public class DefaultThirdPartyTool implements ThirdPartyTool {
     /**
      * {@inheritDoc}
      */
+    @Override
     public File resolvThirdPartyDescriptor(MavenProject project, List<RemoteRepository> remoteRepositories)
             throws ThirdPartyToolException {
         if (project == null) {
@@ -305,6 +311,7 @@ public class DefaultThirdPartyTool implements ThirdPartyTool {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void addLicense(LicenseMap licenseMap, MavenProject project, String... licenseNames) {
         List<License> licenses = new ArrayList<>();
         for (String licenseName : licenseNames) {
@@ -319,6 +326,7 @@ public class DefaultThirdPartyTool implements ThirdPartyTool {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void addLicense(LicenseMap licenseMap, MavenProject project, License license) {
         addLicense(licenseMap, project, Collections.singletonList(license));
     }
@@ -326,6 +334,7 @@ public class DefaultThirdPartyTool implements ThirdPartyTool {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void addLicense(LicenseMap licenseMap, MavenProject project, List<?> licenses) {
 
         if (Artifact.SCOPE_SYSTEM.equals(project.getArtifact().getScope())) {
@@ -368,6 +377,7 @@ public class DefaultThirdPartyTool implements ThirdPartyTool {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void mergeLicenses(LicenseMap licenseMap, String mainLicense, Set<String> licenses) {
 
         if (licenses.isEmpty()) {
@@ -410,6 +420,7 @@ public class DefaultThirdPartyTool implements ThirdPartyTool {
     /**
      * {@inheritDoc}
      */
+    @Override
     public SortedProperties loadUnsafeMapping(
             LicenseMap licenseMap,
             SortedMap<String, MavenProject> artifactCache,
@@ -551,6 +562,7 @@ public class DefaultThirdPartyTool implements ThirdPartyTool {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void overrideLicenses(
             LicenseMap licenseMap, SortedMap<String, MavenProject> artifactCache, String encoding, String overrideUrl)
             throws IOException {
@@ -603,6 +615,7 @@ public class DefaultThirdPartyTool implements ThirdPartyTool {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void writeThirdPartyFile(
             LicenseMap licenseMap, File thirdPartyFile, boolean verbose, String encoding, String lineFormat)
             throws IOException {
@@ -639,6 +652,7 @@ public class DefaultThirdPartyTool implements ThirdPartyTool {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void writeBundleThirdPartyFile(File thirdPartyFile, File outputDirectory, String bundleThirdPartyPath)
             throws IOException {
 
@@ -759,6 +773,7 @@ public class DefaultThirdPartyTool implements ThirdPartyTool {
         return result;
     }
 
+    @Override
     public File resolveMissingLicensesDescriptor(
             String groupId, String artifactId, String version, List<RemoteRepository> remoteRepositories)
             throws IOException, ArtifactResolutionException, ArtifactNotFoundException {

@@ -45,6 +45,7 @@ public class HtmlFileHeaderTransformer extends AbstractFileHeaderTransformer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String[] getDefaultAcceptedExtensions() {
         return new String[] {"xhtml", "html", "htm"};
     }

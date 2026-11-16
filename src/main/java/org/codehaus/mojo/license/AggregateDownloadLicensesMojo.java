@@ -143,6 +143,7 @@ public class AggregateDownloadLicensesMojo extends AbstractDownloadLicensesMojo 
     /**
      * {@inheritDoc}
      */
+    @Override
     protected boolean isSkip() {
         return skipAggregateDownloadLicenses
                 || (executeOnlyOnRootModule && !getProject().isExecutionRoot());
@@ -151,6 +152,7 @@ public class AggregateDownloadLicensesMojo extends AbstractDownloadLicensesMojo 
     /**
      * {@inheritDoc}
      */
+    @Override
     protected Map<String, LicensedArtifact> getDependencies() {
         final Map<String, LicensedArtifact> result = new TreeMap<>();
 

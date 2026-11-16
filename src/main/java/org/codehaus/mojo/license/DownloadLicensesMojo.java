@@ -89,10 +89,12 @@ public class DownloadLicensesMojo extends AbstractDownloadLicensesMojo {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected boolean isSkip() {
         return skipDownloadLicenses;
     }
 
+    @Override
     protected Map<String, LicensedArtifact> getDependencies() {
         final Map<String, LicensedArtifact> result = new TreeMap<>();
         licensedArtifactResolver.loadProjectDependencies(

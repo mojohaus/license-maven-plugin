@@ -45,6 +45,7 @@ public class SqlFileHeaderTransformer extends AbstractFileHeaderTransformer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String[] getDefaultAcceptedExtensions() {
         return new String[] {"sql"};
     }

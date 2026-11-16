@@ -61,6 +61,7 @@ public class JavaFileHeaderTransformer extends AbstractFileHeaderTransformer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String[] getDefaultAcceptedExtensions() {
         return new String[] {
             "java", "groovy", "css", "jccs", "cs", "as", "aj", "c", "h", "cpp", "js", "json", "ts", "go", "kt"

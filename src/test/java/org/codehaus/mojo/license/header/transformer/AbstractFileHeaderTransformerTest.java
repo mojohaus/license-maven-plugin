@@ -85,6 +85,7 @@ class AbstractFileHeaderTransformerTest {
                         new AbstractFileHeaderTransformer(
                                 "name", "description", "commentPrefix", "commentEndtag", "commentPrefix") {
 
+                            @Override
                             public String[] getDefaultAcceptedExtensions() {
                                 return new String[] {getName()};
                             }
@@ -99,6 +100,7 @@ class AbstractFileHeaderTransformerTest {
                         new AbstractFileHeaderTransformer(
                                 "name", "description", "commentstartTag", "commentPrefix", "commentPrefix") {
 
+                            @Override
                             public String[] getDefaultAcceptedExtensions() {
                                 return new String[] {getName()};
                             }

@@ -87,6 +87,7 @@ public class LicensesXmlInsertVersionsMojo extends AbstractLicensesXmlMojo {
         super(licensedArtifactResolver);
     }
 
+    @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
 
         if (skipDownloadLicenses) {
@@ -174,6 +175,7 @@ public class LicensesXmlInsertVersionsMojo extends AbstractLicensesXmlMojo {
         }
     }
 
+    @Override
     protected Path[] getAutodetectEolFiles() {
         return new Path[] {licensesInputFile.toPath(), licensesOutputFile.toPath()};
     }

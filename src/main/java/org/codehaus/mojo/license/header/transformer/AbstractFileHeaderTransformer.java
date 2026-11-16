@@ -132,6 +132,7 @@ public abstract class AbstractFileHeaderTransformer implements FileHeaderTransfo
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getName() {
         return name;
     }
@@ -139,6 +140,7 @@ public abstract class AbstractFileHeaderTransformer implements FileHeaderTransfo
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setName(String name) {
         this.name = name;
     }
@@ -146,6 +148,7 @@ public abstract class AbstractFileHeaderTransformer implements FileHeaderTransfo
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getDescription() {
         return description;
     }
@@ -153,6 +156,7 @@ public abstract class AbstractFileHeaderTransformer implements FileHeaderTransfo
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setDescription(String description) {
         this.description = description;
     }
@@ -160,6 +164,7 @@ public abstract class AbstractFileHeaderTransformer implements FileHeaderTransfo
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getSectionDelimiter() {
         return sectionDelimiter;
     }
@@ -167,6 +172,7 @@ public abstract class AbstractFileHeaderTransformer implements FileHeaderTransfo
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setSectionDelimiter(String sectionDelimiter) {
         this.sectionDelimiter = sectionDelimiter;
     }
@@ -174,6 +180,7 @@ public abstract class AbstractFileHeaderTransformer implements FileHeaderTransfo
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getProcessStartTag() {
         return processStartTag;
     }
@@ -181,6 +188,7 @@ public abstract class AbstractFileHeaderTransformer implements FileHeaderTransfo
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setProcessStartTag(String processStartTag) {
         this.processStartTag = processStartTag;
     }
@@ -188,6 +196,7 @@ public abstract class AbstractFileHeaderTransformer implements FileHeaderTransfo
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getProcessEndTag() {
         return processEndTag;
     }
@@ -195,6 +204,7 @@ public abstract class AbstractFileHeaderTransformer implements FileHeaderTransfo
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setProcessEndTag(String processEndTag) {
         this.processEndTag = processEndTag;
     }
@@ -202,6 +212,7 @@ public abstract class AbstractFileHeaderTransformer implements FileHeaderTransfo
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getCommentStartTag() {
         return commentStartTag;
     }
@@ -209,6 +220,7 @@ public abstract class AbstractFileHeaderTransformer implements FileHeaderTransfo
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setCommentStartTag(String commentStartTag) {
         this.commentStartTag = commentStartTag;
     }
@@ -216,6 +228,7 @@ public abstract class AbstractFileHeaderTransformer implements FileHeaderTransfo
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getCommentEndTag() {
         return commentEndTag;
     }
@@ -223,6 +236,7 @@ public abstract class AbstractFileHeaderTransformer implements FileHeaderTransfo
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setCommentEndTag(String commentEndTag) {
         this.commentEndTag = commentEndTag;
     }
@@ -230,12 +244,15 @@ public abstract class AbstractFileHeaderTransformer implements FileHeaderTransfo
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getCommentLinePrefix() {
         return commentLinePrefix;
     }
+
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getLineSeparator() {
         if (lineSeparator == null) {
             lineSeparator = LINE_SEPARATOR;
@@ -244,9 +261,11 @@ public abstract class AbstractFileHeaderTransformer implements FileHeaderTransfo
             return lineSeparator;
         }
     }
+
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setLineSeparator(String lineSeparator) {
         this.lineSeparator = lineSeparator;
     }
@@ -254,6 +273,7 @@ public abstract class AbstractFileHeaderTransformer implements FileHeaderTransfo
     /**
      * {@inheritDoc}
      */
+    @Override
     public String addHeader(String header, String content) {
         if (isEmptyLineAfterHeader()) {
             String[] contentSplit = content.split("\\r?\\n", 2);
@@ -270,6 +290,7 @@ public abstract class AbstractFileHeaderTransformer implements FileHeaderTransfo
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setCommentLinePrefix(String commentLinePrefix) {
         this.commentLinePrefix = commentLinePrefix;
     }
@@ -277,6 +298,7 @@ public abstract class AbstractFileHeaderTransformer implements FileHeaderTransfo
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isEmptyLineAfterHeader() {
         return emptyLineAfterHeader;
     }
@@ -284,6 +306,7 @@ public abstract class AbstractFileHeaderTransformer implements FileHeaderTransfo
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setEmptyLineAfterHeader(boolean emptyLine) {
         this.emptyLineAfterHeader = emptyLine;
     }
@@ -291,6 +314,7 @@ public abstract class AbstractFileHeaderTransformer implements FileHeaderTransfo
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isTrimHeaderLine() {
         return trimHeaderLine;
     }
@@ -298,6 +322,7 @@ public abstract class AbstractFileHeaderTransformer implements FileHeaderTransfo
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setTrimHeaderLine(boolean trimLine) {
         this.trimHeaderLine = trimLine;
     }
@@ -305,6 +330,7 @@ public abstract class AbstractFileHeaderTransformer implements FileHeaderTransfo
     /**
      * {@inheritDoc}
      */
+    @Override
     public FileHeader toFileHeader(String header) {
         FileHeader model = new FileHeader();
 
@@ -339,6 +365,7 @@ public abstract class AbstractFileHeaderTransformer implements FileHeaderTransfo
     /**
      * {@inheritDoc}
      */
+    @Override
     public String toString(FileHeader model) {
         if (model == null) {
             throw new NullPointerException("model can not be null!");
@@ -363,6 +390,7 @@ public abstract class AbstractFileHeaderTransformer implements FileHeaderTransfo
     /**
      * {@inheritDoc}
      */
+    @Override
     public String toHeaderContent(FileHeader model) {
 
         String result;
@@ -389,6 +417,7 @@ public abstract class AbstractFileHeaderTransformer implements FileHeaderTransfo
     /**
      * {@inheritDoc}
      */
+    @Override
     public String boxComment(String header, boolean withTags) {
         StringBuilder buffer = new StringBuilder();
         if (withTags) {
@@ -415,6 +444,7 @@ public abstract class AbstractFileHeaderTransformer implements FileHeaderTransfo
     /**
      * {@inheritDoc}
      */
+    @Override
     public String unboxComent(String header) {
         StringBuilder buffer = new StringBuilder();
         int prefixLength = getCommentLinePrefix().length();
@@ -445,6 +475,7 @@ public abstract class AbstractFileHeaderTransformer implements FileHeaderTransfo
     /**
      * {@inheritDoc}
      */
+    @Override
     public String boxProcessTag(String header) {
         StringBuilder buffer = new StringBuilder();
         buffer.append(getProcessStartTag()).append(getLineSeparator());
@@ -456,6 +487,7 @@ public abstract class AbstractFileHeaderTransformer implements FileHeaderTransfo
     /**
      * {@inheritDoc}
      */
+    @Override
     public String unboxProcessTag(String boxedHeader) {
         StringBuilder buffer = new StringBuilder();
         for (String line : boxedHeader.split(getLineSeparator() + "")) {
@@ -473,6 +505,7 @@ public abstract class AbstractFileHeaderTransformer implements FileHeaderTransfo
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isDescriptionEquals(FileHeader header1, FileHeader header2) {
         return header1.getDescription().equals(header2.getDescription());
     }
@@ -480,6 +513,7 @@ public abstract class AbstractFileHeaderTransformer implements FileHeaderTransfo
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isCopyrightEquals(FileHeader header1, FileHeader header2) {
         return header1.getCopyright().equals(header2.getCopyright());
     }
@@ -487,6 +521,7 @@ public abstract class AbstractFileHeaderTransformer implements FileHeaderTransfo
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isLicenseEquals(FileHeader header1, FileHeader header2) {
         String license1 = removeSpaces(header1.getLicense());
         String license2 = removeSpaces(header2.getLicense());
