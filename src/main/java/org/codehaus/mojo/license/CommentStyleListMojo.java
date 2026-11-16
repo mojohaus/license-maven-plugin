@@ -26,7 +26,6 @@ import javax.inject.Inject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -112,7 +111,7 @@ public class CommentStyleListMojo extends AbstractLicenseMojo {
             buffer.append("-------------------------------------------------------------------------------\n\n");
         }
         List<String> names = new ArrayList<>(transformers.keySet());
-        Collections.sort(names);
+        names.sort(null);
 
         int maxLength = 0;
         int maxDLength = 0;

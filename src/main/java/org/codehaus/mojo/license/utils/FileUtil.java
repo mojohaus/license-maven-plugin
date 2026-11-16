@@ -37,7 +37,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -130,7 +129,7 @@ public class FileUtil {
 
     public static List<File> orderFiles(Collection<File> files) {
         List<File> result = new ArrayList<>(files);
-        Collections.sort(result, new Comparator<File>() {
+        result.sort(new Comparator<File>() {
             public int compare(File o1, File o2) {
                 return o1.getAbsolutePath().compareTo(o2.getAbsolutePath());
             }
