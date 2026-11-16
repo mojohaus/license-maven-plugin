@@ -195,6 +195,7 @@ public class LicenseStore implements Iterable<LicenseRepository> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Iterator<LicenseRepository> iterator() {
         return getRepositories().iterator();
     }

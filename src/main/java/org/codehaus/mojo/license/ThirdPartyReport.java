@@ -74,6 +74,7 @@ public class ThirdPartyReport extends AbstractThirdPartyReport {
      * {@inheritDoc}
      */
     @Deprecated
+    @Override
     public String getOutputName() {
         return "third-party-report";
     }

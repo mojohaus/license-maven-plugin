@@ -52,6 +52,7 @@ public class MojoHelper {
             /**
              * {@inheritDoc}
              */
+            @Override
             public int compare(MavenProject o1, MavenProject o2) {
 
                 String id1 = getArtifactId(o1.getArtifact());
@@ -67,6 +68,7 @@ public class MojoHelper {
             /**
              * {@inheritDoc}
              */
+            @Override
             public int compare(MavenProject o1, MavenProject o2) {
 
                 String id1 = getProjectName(o1);

@@ -340,6 +340,7 @@ public class ArtifactFilters {
             this.pattern = pattern;
         }
 
+        @Override
         public boolean matches(Artifact artifact) {
             return pattern.matcher(artifact.getGroupId() + ":" + artifact.getArtifactId())
                     .matches();
@@ -405,6 +406,7 @@ public class ArtifactFilters {
             this.scope = scope;
         }
 
+        @Override
         public boolean matches(Artifact artifact) {
             return this.scope.equals(artifact.getScope());
         }
@@ -418,6 +420,7 @@ public class ArtifactFilters {
             this.type = type;
         }
 
+        @Override
         public boolean matches(Artifact artifact) {
             return this.type.equals(artifact.getType());
         }

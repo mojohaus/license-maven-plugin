@@ -59,6 +59,7 @@ public class FreeMarkerFileHeaderTransformer extends AbstractFileHeaderTransform
     /**
      * {@inheritDoc}
      */
+    @Override
     public String[] getDefaultAcceptedExtensions() {
         return new String[] {"ftl"};
     }

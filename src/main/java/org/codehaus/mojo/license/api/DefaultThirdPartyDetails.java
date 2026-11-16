@@ -48,6 +48,7 @@ public class DefaultThirdPartyDetails implements ThirdPartyDetails {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getGroupId() {
         return project.getArtifact().getGroupId();
     }
@@ -55,6 +56,7 @@ public class DefaultThirdPartyDetails implements ThirdPartyDetails {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getArtifactId() {
         return project.getArtifact().getArtifactId();
     }
@@ -62,6 +64,7 @@ public class DefaultThirdPartyDetails implements ThirdPartyDetails {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getVersion() {
         return project.getArtifact().getVersion();
     }
@@ -69,6 +72,7 @@ public class DefaultThirdPartyDetails implements ThirdPartyDetails {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getType() {
         return project.getArtifact().getType();
     }
@@ -76,6 +80,7 @@ public class DefaultThirdPartyDetails implements ThirdPartyDetails {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getClassifier() {
         return project.getArtifact().getClassifier();
     }
@@ -83,6 +88,7 @@ public class DefaultThirdPartyDetails implements ThirdPartyDetails {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getScope() {
         return project.getArtifact().getScope();
     }
@@ -90,6 +96,7 @@ public class DefaultThirdPartyDetails implements ThirdPartyDetails {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean hasPomLicenses() {
         return pomLicenses != null && pomLicenses.length > 0;
     }
@@ -97,6 +104,7 @@ public class DefaultThirdPartyDetails implements ThirdPartyDetails {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String[] getLicenses() {
         String[] result = null;
         if (hasPomLicenses()) {
@@ -110,6 +118,7 @@ public class DefaultThirdPartyDetails implements ThirdPartyDetails {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean hasLicenses() {
         return hasPomLicenses() || hasThirdPartyLicenses();
     }
@@ -117,6 +126,7 @@ public class DefaultThirdPartyDetails implements ThirdPartyDetails {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String[] getPomLicenses() {
         return pomLicenses;
     }
@@ -124,6 +134,7 @@ public class DefaultThirdPartyDetails implements ThirdPartyDetails {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setPomLicenses(String[] pomLicenses) {
         this.pomLicenses = pomLicenses;
     }
@@ -131,6 +142,7 @@ public class DefaultThirdPartyDetails implements ThirdPartyDetails {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String[] getThirdPartyLicenses() {
         return thirdPartyLicenses;
     }
@@ -138,6 +150,7 @@ public class DefaultThirdPartyDetails implements ThirdPartyDetails {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean hasThirdPartyLicenses() {
         return thirdPartyLicenses != null && thirdPartyLicenses.length > 0;
     }
@@ -145,6 +158,7 @@ public class DefaultThirdPartyDetails implements ThirdPartyDetails {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setThirdPartyLicenses(String[] thirdPartyLicenses) {
         this.thirdPartyLicenses = thirdPartyLicenses;
     }

@@ -1035,6 +1035,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
      * {@inheritDoc}
      * @throws MojoFailureException
      */
+    @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
 
         if (isSkip()) {
@@ -1441,6 +1442,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
 
     private void sortByGroupIdAndArtifactId(List<ProjectLicenseInfo> depProjectLicenses) {
         Comparator<ProjectLicenseInfo> comparator = new Comparator<ProjectLicenseInfo>() {
+            @Override
             public int compare(ProjectLicenseInfo info1, ProjectLicenseInfo info2) {
                 // ProjectLicenseInfo::getId() can not be used because . is before : thus a:b.c would be after a.b:c
                 return (info1.getGroupId() + "+" + info1.getArtifactId())
@@ -1457,6 +1459,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isIncludeTransitiveDependencies() {
         return includeTransitiveDependencies;
     }
@@ -1464,11 +1467,13 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isExcludeTransitiveDependencies() {
         return excludeTransitiveDependencies;
     }
 
     /** {@inheritDoc} */
+    @Override
     public ArtifactFilters getArtifactFilters() {
         if (artifactFilters == null) {
             artifactFilters = ArtifactFilters.of(
@@ -1491,6 +1496,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
      * {@inheritDoc}
      */
     @Deprecated
+    @Override
     public boolean isVerbose() {
         return getLog().isDebugEnabled();
     }
@@ -1518,6 +1524,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
     }
 
     /** {@inheritDoc} */
+    @Override
     protected Path[] getAutodetectEolFiles() {
         return new Path[] {
             licensesConfigFile.toPath(), project.getBasedir().toPath().resolve("pom.xml")

@@ -310,6 +310,7 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isIncludeTransitiveDependencies() {
         return includeTransitiveDependencies;
     }
@@ -317,11 +318,13 @@ public class AddThirdPartyMojo extends AbstractAddThirdPartyMojo implements Mave
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isExcludeTransitiveDependencies() {
         return excludeTransitiveDependencies;
     }
 
     /** {@inheritDoc} */
+    @Override
     public ArtifactFilters getArtifactFilters() {
         if (artifactFilters == null) {
             artifactFilters = ArtifactFilters.of(

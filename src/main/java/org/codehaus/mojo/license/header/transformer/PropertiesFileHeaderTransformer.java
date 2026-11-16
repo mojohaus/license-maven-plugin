@@ -45,6 +45,7 @@ public class PropertiesFileHeaderTransformer extends AbstractFileHeaderTransform
     /**
      * {@inheritDoc}
      */
+    @Override
     public String[] getDefaultAcceptedExtensions() {
         return new String[] {"properties", "sh", "py", "rb", "pl", "pm"};
     }

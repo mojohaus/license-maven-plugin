@@ -71,6 +71,7 @@ public abstract class AbstractLicenseReportRenderer extends AbstractMavenReportR
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getTitle() {
         return getText("report.title");
     }

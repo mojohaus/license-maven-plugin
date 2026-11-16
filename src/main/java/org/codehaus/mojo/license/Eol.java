@@ -41,6 +41,7 @@ public enum Eol {
 
     /** Autodetect the end of line value based on some existing file using {@link #autodetect(Path, Charset)} */
     AUTODETECT(null) {
+        @Override
         public String getEolString() {
             throw new IllegalStateException("You need to autodetect the end of line value using " + Eol.class.getName()
                     + ".autodetect(Path, Charset)");
@@ -55,8 +56,9 @@ public enum Eol {
      */
     @Deprecated
     PLATFORM(null) {
+        @Override
         public String getEolString() {
-            return System.getProperty("line.separator");
+            return System.lineSeparator();
         }
     };
 

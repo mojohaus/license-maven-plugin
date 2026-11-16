@@ -130,6 +130,7 @@ public class FileUtil {
     public static List<File> orderFiles(Collection<File> files) {
         List<File> result = new ArrayList<>(files);
         result.sort(new Comparator<File>() {
+            @Override
             public int compare(File o1, File o2) {
                 return o1.getAbsolutePath().compareTo(o2.getAbsolutePath());
             }

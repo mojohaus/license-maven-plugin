@@ -130,6 +130,7 @@ public class AggregatorThirdPartyReport extends AbstractThirdPartyReport {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected Collection<ThirdPartyDetails> createThirdPartyDetails()
             throws IOException, ThirdPartyToolException, ProjectBuildingException, MojoFailureException,
                     DependenciesToolException, MojoExecutionException {
