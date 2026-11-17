@@ -269,7 +269,7 @@ public class DefaultThirdPartyTool implements ThirdPartyTool {
             if (unsafeMappings.containsKey(id)) {
 
                 String license = (String) unsafeMappings.get(id);
-                if (license == null || license.isEmpty()) {
+                if (StringUtils.isEmpty(license)) {
 
                     // empty license means not fill, skip it
                     continue;
@@ -361,12 +361,12 @@ public class DefaultThirdPartyTool implements ThirdPartyTool {
 
             // tchemit 2010-08-29 Ano #816 Check if the License object is well formed
 
-            if (license.getName() == null || license.getName().isEmpty()) {
+            if (StringUtils.isEmpty(license.getName())) {
                 LOG.warn("The license for {} has no name (but exist)", id);
                 licenseKey = license.getUrl();
             }
 
-            if (licenseKey == null || licenseKey.isEmpty()) {
+            if (StringUtils.isEmpty(licenseKey)) {
                 LOG.warn("No license url defined for {}", id);
                 licenseKey = LicenseMap.UNKNOWN_LICENSE_MESSAGE;
             }

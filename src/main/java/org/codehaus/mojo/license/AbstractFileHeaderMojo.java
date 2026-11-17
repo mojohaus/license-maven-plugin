@@ -420,7 +420,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo {
 
     @Override
     public void init() throws Exception {
-        if (ignoreTag == null || ignoreTag.isEmpty()) {
+        if (StringUtils.isEmpty(ignoreTag)) {
             // use default value
             this.ignoreTag = "%" + "%Ignore-License";
         }

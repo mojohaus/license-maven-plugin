@@ -1218,7 +1218,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
             }
             boolean hasFile = false;
             for (ProjectLicense license : dependency.getLicenses()) {
-                if (license.getFile() != null && !license.getFile().isEmpty()) {
+                if (StringUtils.isNotEmpty(license.getFile())) {
                     hasFile = true;
                     break;
                 }
@@ -1543,7 +1543,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
      * @return the decrypted {@link Server}, or {@code null} when not found or {@code id} is empty
      */
     private Server decryptServer(String id) {
-        if (id == null || id.isEmpty()) {
+        if (StringUtils.isEmpty(id)) {
             return null;
         }
         if (session == null || session.getSettings() == null) {
