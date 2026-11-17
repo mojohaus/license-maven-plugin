@@ -26,6 +26,7 @@ import javax.inject.Inject;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Collections;
 import java.util.EnumMap;
@@ -44,7 +45,6 @@ import org.codehaus.mojo.license.header.transformer.FileHeaderTransformer;
 import org.codehaus.mojo.license.model.License;
 import org.codehaus.mojo.license.utils.FileUtil;
 import org.codehaus.mojo.license.utils.MojoHelper;
-import org.codehaus.plexus.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -457,7 +457,7 @@ public class RemoveFileHeaderMojo extends AbstractLicenseNameMojo {
 
         String contentWithoutHeader = content.substring(0, firstIndex) + content.substring(lastIndex + 1);
 
-        FileUtils.fileWrite(processFile, contentWithoutHeader);
+        Files.write(processFile.toPath(), contentWithoutHeader.getBytes(StandardCharsets.UTF_8));
         FileState.remove.addFile(file, result);
         return true;
     }
