@@ -6,8 +6,8 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 class LicenseMojoUtilsTest {
     private String resolvedUrl;
@@ -58,13 +58,10 @@ class LicenseMojoUtilsTest {
     void prepareThirdPartyOverrideUrlBothOverrides() {
         overrideFile = new File("src/test/resources/overrides.properties");
         url = "classpath:overrides.properties";
-        try {
-            LicenseMojoUtils.prepareThirdPartyOverrideUrl(resolvedUrl, overrideFile, url, basedir, log);
-
-            fail("Missing exception");
-        } catch (IllegalArgumentException e) {
-            assertEquals("You can't use both overrideFile and overrideUrl", e.getMessage());
-        }
+        IllegalArgumentException e = assertThrows(
+                IllegalArgumentException.class,
+                () -> LicenseMojoUtils.prepareThirdPartyOverrideUrl(resolvedUrl, overrideFile, url, basedir, log));
+        assertEquals("You can't use both overrideFile and overrideUrl", e.getMessage());
     }
 
     @Test
