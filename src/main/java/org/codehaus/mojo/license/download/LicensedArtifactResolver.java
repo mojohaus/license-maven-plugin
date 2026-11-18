@@ -119,6 +119,9 @@ public class LicensedArtifactResolver {
                 .setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL)
                 .setResolveDependencies(false)
                 .setProcessPlugins(false);
+        // The session request carries the reactor project. Leaving it set makes ProjectBuilder return that shared
+        // project instead of building one for the dependency, which corrupts it under -T.
+        projectBuildingRequest.setProject(null);
 
         final Map<String, String> mergedLicenses = buildMergedLicenses(licenseMerges);
 
