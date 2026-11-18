@@ -131,6 +131,9 @@ public class DependenciesTool {
                 // We don't care about plugin licensing
                 .setProcessPlugins(false)
                 .setRemoteRepositories(remoteRepositories);
+        // The session request carries the reactor project. Leaving it set makes ProjectBuilder return that shared
+        // project instead of building one for the dependency, which corrupts it under -T.
+        projectBuildingRequest.setProject(null);
 
         // The projects built so far by artifact id: the POM of a dependency may declare the repository of its own
         // dependencies, so the ancestors of an artifact must be built before the artifact.
