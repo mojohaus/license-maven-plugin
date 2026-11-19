@@ -232,7 +232,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo {
      * <p>
      * Should be on form "root1,root2,rootn".
      * <p>
-     * By default, the main roots are {@value #DEFAULT_ROOTS}.
+     * By default, the main roots are "src, target/generated-sources, target/processed-sources".
      * Directories declared as modules of the current project are automatically excluded when they are below a root.
      * <p>
      * <b>Note:</b> If some of these roots do not exist, they will be simply
@@ -246,7 +246,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo {
     private String[] roots;
 
     /**
-     * Specific patterns to include, separated by a comma. By default, it is {@value #DEFAULT_INCLUDES}.
+     * Specific patterns to include, separated by a comma. By default, all files below a root are included.
      * <p>
      * The patterns are Ant-style and are matched against the path of each file relative to the
      * <code>roots</code>, not against its absolute path or the project base directory. A <code>*</code> does not
@@ -261,7 +261,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo {
     private String[] includes;
 
     /**
-     * Specific patterns to exclude, separated by a comma. By default it is {@value #DEFAULT_EXCLUDES}.
+     * Specific patterns to exclude, separated by a comma. By default, modelisation and image file types are excluded.
      * <p>
      * The patterns are Ant-style and are matched against the path of each file relative to the
      * <code>roots</code>, in the same way as <code>includes</code>: <code>*</code> does not cross directory
