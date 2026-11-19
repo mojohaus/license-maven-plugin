@@ -73,6 +73,62 @@ class AbstractLicenseNameMojoTest {
         assertFalse(included.contains("target" + File.separator + "generated.java"));
     }
 
+    @Test
+    void doesNotExcludeAnythingWhenNoModulesAreDeclared() throws IOException {
+        Files.createDirectories(projectDir.resolve("child"));
+        Files.write(projectDir.resolve("pom.xml"), new byte[0]);
+        Files.write(projectDir.resolve("child/pom.xml"), new byte[0]);
+
+        MavenProject project = new MavenProject();
+        project.setFile(projectDir.resolve("pom.xml").toFile());
+        TestMojo mojo = new TestMojo();
+        mojo.project = project;
+
+        Map<File, String[]> files = new HashMap<>();
+        mojo.getFilesToTreatForRoots(new String[] {"**/*"}, null, Arrays.asList(projectDir.toString()), files);
+
+        List<String> included = Arrays.asList(files.get(projectDir.toFile()));
+        assertTrue(included.contains("pom.xml"));
+        assertTrue(included.contains("child" + File.separator + "pom.xml"));
+    }
+
+    @Test
+    void moduleEqualToRootDoesNotExcludeTheRootItself() throws IOException {
+        Files.write(projectDir.resolve("pom.xml"), new byte[0]);
+
+        MavenProject project = new MavenProject();
+        project.setFile(projectDir.resolve("pom.xml").toFile());
+        project.getModel().setModules(Arrays.asList("."));
+        TestMojo mojo = new TestMojo();
+        mojo.project = project;
+
+        Map<File, String[]> files = new HashMap<>();
+        mojo.getFilesToTreatForRoots(new String[] {"**/*"}, null, Arrays.asList(projectDir.toString()), files);
+
+        assertTrue(Arrays.asList(files.get(projectDir.toFile())).contains("pom.xml"));
+    }
+
+    @Test
+    void moduleOutsideARootDoesNotAffectTheOtherRoot() throws IOException {
+        Path other = projectDir.resolve("other");
+        Files.createDirectories(other);
+        Files.write(projectDir.resolve("pom.xml"), new byte[0]);
+        Files.write(other.resolve("pom.xml"), new byte[0]);
+
+        MavenProject project = new MavenProject();
+        project.setFile(projectDir.resolve("pom.xml").toFile());
+        project.getModel().setModules(Arrays.asList("other"));
+        TestMojo mojo = new TestMojo();
+        mojo.project = project;
+
+        Map<File, String[]> files = new HashMap<>();
+        mojo.getFilesToTreatForRoots(
+                new String[] {"**/*"}, null, Arrays.asList(projectDir.toString(), other.toString()), files);
+
+        assertTrue(Arrays.asList(files.get(projectDir.toFile())).contains("pom.xml"));
+        assertTrue(Arrays.asList(files.get(other.toFile())).contains("pom.xml"));
+    }
+
     private static class TestMojo extends AbstractLicenseNameMojo {
 
         TestMojo() {

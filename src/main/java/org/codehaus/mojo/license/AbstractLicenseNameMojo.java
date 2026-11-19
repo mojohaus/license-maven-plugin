@@ -319,14 +319,20 @@ public abstract class AbstractLicenseNameMojo extends AbstractLicenseMojo {
                 Collections.addAll(scanExcludes, excludes);
             }
             Path rootPath = f.toPath().toAbsolutePath().normalize();
+            List<String> excludedModules = new ArrayList<>();
             for (String module : getProject().getModules()) {
                 Path modulePath = new File(getProject().getBasedir(), module)
                         .toPath()
                         .toAbsolutePath()
                         .normalize();
                 if (modulePath.startsWith(rootPath) && !modulePath.equals(rootPath)) {
-                    scanExcludes.add(rootPath.relativize(modulePath).toString() + "/**");
+                    String pattern = rootPath.relativize(modulePath).toString() + "/**";
+                    scanExcludes.add(pattern);
+                    excludedModules.add(module);
                 }
+            }
+            if (!excludedModules.isEmpty()) {
+                LOG.info("Excluding project modules from the license scan in {}: {}", src, excludedModules);
             }
             ds.setExcludes(scanExcludes.isEmpty() ? null : scanExcludes.toArray(new String[0]));
             // scan
