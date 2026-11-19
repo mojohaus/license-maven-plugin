@@ -59,11 +59,25 @@ public class UrlReplacements {
         for (UrlReplacement r : replacements) {
             resultUrl = r.getUrlPattern().matcher(resultUrl).replaceAll(r.getReplacement());
         }
+        // Strip after the replacements so user patterns still see the URL as the POM published it.
+        resultUrl = stripSurroundingQuotes(resultUrl);
 
         if (LOG.isDebugEnabled() && !resultUrl.equals(originalLicenseUrl)) {
             LOG.debug("Rewrote URL {} => {}", originalLicenseUrl, resultUrl);
         }
         return resultUrl;
+    }
+
+    private static String stripSurroundingQuotes(String url) {
+        if (url == null || url.length() < 2) {
+            return url;
+        }
+        char first = url.charAt(0);
+        char last = url.charAt(url.length() - 1);
+        if (first == last && (first == '\'' || first == '"')) {
+            return url.substring(1, url.length() - 1);
+        }
+        return url;
     }
 
     /**
