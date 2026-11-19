@@ -135,7 +135,7 @@
 
     <version.httpcomponents.httpclient>4.5.14</version.httpcomponents.httpclient>
     <version.httpcomponents.httpcore>4.4.16</version.httpcomponents.httpcore>
-    <version.odfdom-java>0.12.0</version.odfdom-java>
+    <version.odfdom-java>0.13.0</version.odfdom-java>
 
     <!-- license configuration -->
     <license.useMissingFile>true</license.useMissingFile>
@@ -348,12 +348,6 @@
       <version>5.5.1</version>
     </dependency>
 
-    <!-- LibreOffice Calc ODT export -->
-    <dependency>
-      <groupId>org.odftoolkit</groupId>
-      <artifactId>odfdom-java</artifactId>
-      <version>${version.odfdom-java}</version>
-    </dependency>
     <!-- XML APIs is needed for JDK 8, was a transitive dependency from old version of odfdom-java -->
     <dependency>
       <groupId>xml-apis</groupId>
@@ -446,7 +440,6 @@
           </execution>
         </executions>
       </plugin>
-
     </plugins>
   </build>
 
@@ -641,6 +634,29 @@
         <jdk>[11,)</jdk>
       </activation>
 
+      <dependencies>
+        <!-- LibreOffice Calc ODS export — requires Java 11+; excluded from Java 8 compilation -->
+        <dependency>
+          <groupId>org.odftoolkit</groupId>
+          <artifactId>odfdom-java</artifactId>
+          <version>${version.odfdom-java}</version>
+        </dependency>
+        <!-- ========== Begin of test dependencies ========== -->
+        <!-- For parameterized tests -->
+        <dependency>
+          <groupId>org.junit.jupiter</groupId>
+          <artifactId>junit-jupiter-params</artifactId>
+          <scope>test</scope>
+        </dependency>
+        <!-- Log during tests for test-driven-development. -->
+        <dependency>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-simple</artifactId>
+          <version>1.7.36</version>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+
       <build>
         <plugins>
           <plugin>
@@ -662,7 +678,37 @@
                   <outputDirectory>${project.build.outputDirectory}/META-INF/versions/11</outputDirectory>
                 </configuration>
               </execution>
+              <!-- Compile Java 11+ specific test code -->
+              <execution>
+                <id>java11-test-compile</id>
+                <goals>
+                  <goal>testCompile</goal>
+                </goals>
+                <phase>test-compile</phase>
+                <configuration>
+                  <release>11</release>
+                  <compileSourceRoots>
+                    <compileSourceRoot>${project.basedir}/src/test/java11</compileSourceRoot>
+                  </compileSourceRoots>
+                  <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
+                </configuration>
+              </execution>
             </executions>
+          </plugin>
+          <!-- Required for Spotless to detect the Java 11 source directories. -->
+          <plugin>
+            <groupId>com.diffplug.spotless</groupId>
+            <artifactId>spotless-maven-plugin</artifactId>
+            <configuration>
+              <java combine.children="append">
+                <includes>
+                  <include>src/main/java/**/*.java</include>
+                  <include>src/test/java/**/*.java</include>
+                  <include>src/main/java11/**/*.java</include>
+                  <include>src/test/java11/**/*.java</include>
+                </includes>
+              </java>
+            </configuration>
           </plugin>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>

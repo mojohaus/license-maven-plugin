@@ -1,5 +1,7 @@
 package org.codehaus.mojo.license.extended.spreadsheet;
 
+import org.codehaus.mojo.license.download.LicenseClassifier.LicenseMatch;
+
 /**
  * Utility class to build spreadsheets.
  */
@@ -36,7 +38,7 @@ class SpreadsheetUtil {
     // Columns values for JAR data, including separator gaps for data grouping.
     private static final int INFO_FILES_GAPS = 2;
     private static final int MANIFEST_GAPS = 1;
-    private static final int MANIFEST_COLUMNS = 3;
+    static final int MANIFEST_COLUMNS = 3;
     static final int MANIFEST_END_COLUMN = MANIFEST_START_COLUMN + MANIFEST_COLUMNS;
     static final int INFO_NOTICES_START_COLUMN = MANIFEST_END_COLUMN + 1;
     static final int INFO_NOTICES_COLUMNS = 3;
@@ -70,7 +72,31 @@ class SpreadsheetUtil {
      */
     static final int[] ALTERNATING_ROWS_COLOR = new int[] {220, 220, 220};
 
+    /** The colour a highlighted license is written in, one per {@link LicenseMatch}. */
+    static final int[] FORBIDDEN_LICENSE_COLOR = new int[] {200, 0, 0};
+
+    static final int[] PROBLEMATIC_LICENSE_COLOR = new int[] {255, 90, 0};
+
+    static final int[] OK_LICENSE_COLOR = new int[] {0, 128, 0};
+
+    static final int[] UNKNOWN_LICENSE_COLOR = new int[] {0, 128, 128};
+
     static final String COPYRIGHT_JOIN_SEPARATOR = "§";
+
+    static int[] licenseColor(LicenseMatch licenseMatch) {
+        switch (licenseMatch) {
+            case forbidden:
+                return FORBIDDEN_LICENSE_COLOR;
+            case problematic:
+                return PROBLEMATIC_LICENSE_COLOR;
+            case ok:
+                return OK_LICENSE_COLOR;
+            case unknown:
+                return UNKNOWN_LICENSE_COLOR;
+            default:
+                throw new IllegalArgumentException("Unexpected " + LicenseMatch.class.getName() + ": " + licenseMatch);
+        }
+    }
 
     static int getDownloadColumn(boolean hasExtendedInfo) {
         return hasExtendedInfo

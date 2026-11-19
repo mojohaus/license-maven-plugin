@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.maven.model.Developer;
 import org.apache.maven.model.Organization;
 import org.apache.maven.model.Scm;
+import org.codehaus.mojo.license.download.LicenseClassifier.LicenseMatch;
 import org.codehaus.mojo.license.download.ProjectLicense;
 import org.codehaus.mojo.license.download.ProjectLicenseInfo;
 import org.codehaus.mojo.license.extended.ExtendedInfo;
@@ -29,7 +31,6 @@ import org.codehaus.mojo.license.extended.InfoFile;
 import org.odftoolkit.odfdom.doc.OdfSpreadsheetDocument;
 import org.odftoolkit.odfdom.doc.table.OdfTable;
 import org.odftoolkit.odfdom.doc.table.OdfTableCell;
-import org.odftoolkit.odfdom.doc.table.OdfTableCellRange;
 import org.odftoolkit.odfdom.doc.table.OdfTableColumn;
 import org.odftoolkit.odfdom.doc.table.OdfTableRow;
 import org.odftoolkit.odfdom.dom.OdfContentDom;
@@ -74,6 +75,7 @@ import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.INF
 import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.LICENSES_COLUMNS;
 import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.LICENSES_END_COLUMN;
 import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.LICENSES_START_COLUMN;
+import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.MANIFEST_COLUMNS;
 import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.MANIFEST_END_COLUMN;
 import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.MANIFEST_START_COLUMN;
 import static org.codehaus.mojo.license.extended.spreadsheet.SpreadsheetUtil.MAVEN_END_COLUMN;
@@ -98,13 +100,40 @@ public class CalcFileWriter {
     private static final String HYPERLINK_GRAY_STYLE = "hyperlinkGrayStyle";
     private static final String GRAY_CELL_STYLE = "grayCellStyle";
     private static final String NORMAL_CELL_STYLE = "normalCellStyle";
+    private static final String LICENSE_CELL_STYLE_PREFIX = "licenseCellStyle-";
+    private static final String GRAY_CELL_STYLE_SUFFIX = "-gray";
+    private static final String MATCHED_LICENSE_BORDER_WIDTH = "1.5pt";
+    /** Odf column width property in hundreds of millimeters (mm).
+     * 6_000 / 100 = 60 mm. */
     private static final int DOWNLOAD_COLUMN_WIDTH = 6_000;
+    /** Min column width when autosizing. */
+    private static final int MIN_COLUMN_WIDTH = 25;
+    /** Max column width when autosizing. */
+    private static final int MAX_COLUMN_WIDTH = 160;
+
     private static final String VALUE_TYPE_STRING = "string";
     private static final String CONFIG_TYPE_SHORT = "short";
+
+    private static final String ATTRIBUTE_CONFIG_NAME = "config:name";
 
     private CalcFileWriter() {}
 
     public static void write(List<ProjectLicenseInfo> projectLicenseInfos, final File licensesCalcOutputFile) {
+        write(projectLicenseInfos, licensesCalcOutputFile, SpreadsheetFormatting.NONE);
+    }
+
+    /**
+     * Writes a list of projects into a LibreOffice Calc file.
+     *
+     * @param projectLicenseInfos    Project license infos to write.
+     * @param licensesCalcOutputFile LibreOffice Calc output file.
+     * @param formatting             How to mark up the licenses.
+     * @since 2.8.0
+     */
+    public static void write(
+            List<ProjectLicenseInfo> projectLicenseInfos,
+            final File licensesCalcOutputFile,
+            SpreadsheetFormatting formatting) {
         if (CollectionUtils.isEmpty(projectLicenseInfos)) {
             LOG.debug("Nothing to write to excel, no project data.");
             return;
@@ -112,7 +141,7 @@ public class CalcFileWriter {
         LOG.debug("Write LibreOffice Calc file {}", licensesCalcOutputFile);
 
         try (OdfSpreadsheetDocument spreadsheet = OdfSpreadsheetDocument.newSpreadsheetDocument()) {
-            List<OdfTable> tableList = spreadsheet.getTableList();
+            List<OdfTable> tableList = spreadsheet.getTableList(false);
             final OdfTable table;
             if (!tableList.isEmpty()) {
                 table = tableList.get(0);
@@ -126,7 +155,12 @@ public class CalcFileWriter {
             createHeader(projectLicenseInfos, spreadsheet, table);
 
             writeData(
-                    projectLicenseInfos, spreadsheet, table, convertToOdfColor(SpreadsheetUtil.ALTERNATING_ROWS_COLOR));
+                    projectLicenseInfos,
+                    spreadsheet,
+                    table,
+                    convertToOdfColor(SpreadsheetUtil.ALTERNATING_ROWS_COLOR),
+                    formatting);
+            CalcColumnGroupBuilder.applyPendingColumnGroups(table);
 
             try (OutputStream fileOut = Files.newOutputStream(licensesCalcOutputFile.toPath())) {
                 spreadsheet.save(fileOut);
@@ -169,12 +203,12 @@ public class CalcFileWriter {
         OdfTableRow thirdHeaderRow = table.appendRow();
 
         // Create Maven header cell
-        createMergedCellsInRow(
+        CalcColumnGroupBuilder.createMergedCellsInRow(
                 table, MAVEN_START_COLUMN, MAVEN_END_COLUMN, mavenJarRow, "Maven information", 0, HEADER_CELL_STYLE);
 
         if (hasExtendedInfo) {
             // Create JAR header cell
-            createMergedCellsInRow(
+            CalcColumnGroupBuilder.createMergedCellsInRow(
                     table,
                     EXTENDED_INFO_START_COLUMN,
                     EXTENDED_INFO_END_COLUMN,
@@ -185,11 +219,11 @@ public class CalcFileWriter {
         }
 
         // Create Maven "General" header
-        createMergedCellsInRow(
+        CalcColumnGroupBuilder.createMergedCellsInRow(
                 table, GENERAL_START_COLUMN, GENERAL_END_COLUMN, secondHeaderRow, "General", 1, HEADER_CELL_STYLE);
 
         // Create Maven "Plugin ID" header
-        createMergedCellsInRow(
+        CalcColumnGroupBuilder.createMergedCellsInRow(
                 table,
                 PLUGIN_ID_START_COLUMN,
                 PLUGIN_ID_END_COLUMN,
@@ -202,14 +236,14 @@ public class CalcFileWriter {
         setColumnWidth(table, GENERAL_END_COLUMN, GAP_WIDTH);
 
         // Create Maven "Licenses" header
-        createMergedCellsInRow(
+        CalcColumnGroupBuilder.createMergedCellsInRow(
                 table, LICENSES_START_COLUMN, LICENSES_END_COLUMN, secondHeaderRow, "Licenses", 1, HEADER_CELL_STYLE);
 
         // Gap "Plugin ID" <-> "Licenses".
         setColumnWidth(table, PLUGIN_ID_END_COLUMN, GAP_WIDTH);
 
         // Create Maven "Developers" header
-        createMergedCellsInRow(
+        CalcColumnGroupBuilder.createMergedCellsInRow(
                 table,
                 DEVELOPERS_START_COLUMN,
                 DEVELOPERS_END_COLUMN,
@@ -222,14 +256,14 @@ public class CalcFileWriter {
         setColumnWidth(table, LICENSES_END_COLUMN, GAP_WIDTH);
 
         // Create Maven "Miscellaneous" header
-        createMergedCellsInRow(
+        CalcColumnGroupBuilder.createMergedCellsInRow(
                 table, MISC_START_COLUMN, MISC_END_COLUMN, secondHeaderRow, "Miscellaneous", 1, HEADER_CELL_STYLE);
 
         // Gap "Developers" <-> "Miscellaneous".
         setColumnWidth(table, DEVELOPERS_END_COLUMN, GAP_WIDTH);
 
         if (hasExtendedInfo) {
-            createMergedCellsInRow(
+            CalcColumnGroupBuilder.createMergedCellsInRow(
                     table,
                     MANIFEST_START_COLUMN,
                     MANIFEST_END_COLUMN,
@@ -241,7 +275,7 @@ public class CalcFileWriter {
             // Gap "Miscellaneous" <-> "MANIFEST.MF".
             setColumnWidth(table, DEVELOPERS_END_COLUMN, GAP_WIDTH);
 
-            createMergedCellsInRow(
+            CalcColumnGroupBuilder.createMergedCellsInRow(
                     table,
                     INFO_NOTICES_START_COLUMN,
                     INFO_NOTICES_END_COLUMN,
@@ -253,7 +287,7 @@ public class CalcFileWriter {
             // Gap "MANIFEST.MF" <-> "Notice text files".
             setColumnWidth(table, MANIFEST_END_COLUMN, GAP_WIDTH);
 
-            createMergedCellsInRow(
+            CalcColumnGroupBuilder.createMergedCellsInRow(
                     table,
                     INFO_LICENSES_START_COLUMN,
                     INFO_LICENSES_END_COLUMN,
@@ -265,7 +299,7 @@ public class CalcFileWriter {
             // Gap "Notice text files" <-> "License text files".
             setColumnWidth(table, INFO_NOTICES_END_COLUMN, GAP_WIDTH);
 
-            createMergedCellsInRow(
+            CalcColumnGroupBuilder.createMergedCellsInRow(
                     table,
                     INFO_SPDX_START_COLUMN,
                     INFO_SPDX_END_COLUMN,
@@ -348,8 +382,7 @@ public class CalcFileWriter {
 
     private static void createFreezePane(
             OdfSpreadsheetDocument spreadsheet, OdfTable table, int column, int lineCount) {
-        // TODO: Find out why this perfect XML is ignored. Use FreezePane function from ODFToolkit after they add it.
-
+        // Note: Use FreezePane function from ODFToolkit once they add it.
         final OdfSettingsDom settingsDom;
         try {
             settingsDom = spreadsheet.getSettingsDom();
@@ -361,14 +394,13 @@ public class CalcFileWriter {
         for (int i = 0; i < childNodes.getLength(); i++) {
             Node child = childNodes.item(i);
             if ("config:config-item-set".equals(child.getNodeName())
-                    && "ooo:view-settings".equals(((Element) child).getAttribute("config:name"))) {
+                    && "ooo:view-settings".equals(((Element) child).getAttribute(ATTRIBUTE_CONFIG_NAME))) {
 
                 NodeList subChilds = child.getChildNodes();
                 for (int j = 0; j < subChilds.getLength(); j++) {
                     Node subChild = subChilds.item(j);
                     if ("config:config-item-map-indexed".equals(subChild.getNodeName())
-                            && "Views".equals(((Element) subChild).getAttribute("config:name"))) {
-
+                            && "Views".equals(((Element) subChild).getAttribute(ATTRIBUTE_CONFIG_NAME))) {
                         break;
                     }
                 }
@@ -377,50 +409,66 @@ public class CalcFileWriter {
         }
 
         XPath xpath = settingsDom.getXPath();
-        NodeList list;
         try {
-            list = (NodeList) xpath.evaluate(
-                    "/office:document-settings/" + "office:settings/"
-                            + "config:config-item-set/"
-                            + "config:config-item-map-indexed/"
-                            + "config:config-item-map-entry/"
-                            + "config:config-item-map-named/"
-                            + "config:config-item-map-entry",
-                    //                    "/config:config-item-set[@config:name=\"ooo:view-settings\"]" +
+            String tableName = table.getTableName();
+            // Find the config:config-item-map-named[@config:name="Tables"] for the active view
+            Node tablesNode = (Node) xpath.evaluate(
+                    "/office:document-settings/office:settings"
+                            + "/config:config-item-set[@config:name='ooo:view-settings']"
+                            + "/config:config-item-map-indexed[@config:name='Views']"
+                            + "/config:config-item-map-entry"
+                            + "/config:config-item-map-named[@config:name='Tables']",
                     settingsDom,
                     XPathConstants.NODE);
 
-            /*
-            <config:config-item config:name="HorizontalSplitMode" config:type="short">2</config:config-item>
-            <config:config-item config:name="VerticalSplitMode" config:type="short">2</config:config-item>
-            <config:config-item config:name="HorizontalSplitPosition" config:type="int">1</config:config-item>
-            <config:config-item config:name="VerticalSplitPosition" config:type="int">4</config:config-item>
-            <config:config-item config:name="ActiveSplitRange" config:type="short">3</config:config-item>
-
-            <config:config-item config:name="PositionLeft" config:type="int">0</config:config-item>
-            <config:config-item config:name="PositionRight" config:type="int">1</config:config-item>
-            <config:config-item config:name="PositionTop" config:type="int">0</config:config-item>
-            <config:config-item config:name="PositionBottom" config:type="int">3</config:config-item>
-             */
-            if (list instanceof ConfigConfigItemMapEntryElement) {
-                ConfigConfigItemMapEntryElement entryElement = (ConfigConfigItemMapEntryElement) list;
-
-                appendConfigItemElement(entryElement, "HorizontalSplitMode", CONFIG_TYPE_SHORT, "2");
-                appendConfigItemElement(entryElement, "VerticalSplitMode", CONFIG_TYPE_SHORT, "2");
-
-                appendConfigItemElement(entryElement, "HorizontalSplitPosition", "int", "1");
-                appendConfigItemElement(entryElement, "VerticalSplitPosition", "int", "3");
-
-                appendConfigItemElement(entryElement, "ActiveSplitRange", CONFIG_TYPE_SHORT, "3");
-
-                appendConfigItemElement(entryElement, "PositionLeft", "int", "0");
-                appendConfigItemElement(entryElement, "PositionRight", "int", "1");
-                appendConfigItemElement(entryElement, "PositionTop", "int", "0");
-                appendConfigItemElement(entryElement, "PositionBottom", "int", "3");
-
-                appendConfigItemElement(entryElement, "ShowGrid", "boolean", "true");
-                appendConfigItemElement(entryElement, "AnchoredTextOverflowLegacy", "boolean", "false");
+            if (tablesNode == null) {
+                return;
             }
+
+            // Find the sheet's config entry — rename it to the actual table name if the
+            // template still carries the default "Sheet1" placeholder.
+            ConfigConfigItemMapEntryElement entryElement = null;
+            NodeList tableEntries = tablesNode.getChildNodes();
+            for (int i = 0; i < tableEntries.getLength(); i++) {
+                Node n = tableEntries.item(i);
+                if (n instanceof ConfigConfigItemMapEntryElement) {
+                    entryElement = (ConfigConfigItemMapEntryElement) n;
+                    if (!tableName.equals(((Element) n).getAttribute(ATTRIBUTE_CONFIG_NAME))) {
+                        entryElement.setAttribute(ATTRIBUTE_CONFIG_NAME, tableName);
+                    }
+                    break;
+                }
+            }
+            if (entryElement == null) {
+                return;
+            }
+
+            // Fix the ActiveTable item in the parent view entry so the correct sheet is shown
+            Node viewEntry = tablesNode.getParentNode();
+            NodeList viewChildren = viewEntry.getChildNodes();
+            for (int i = 0; i < viewChildren.getLength(); i++) {
+                Node n = viewChildren.item(i);
+                if (n instanceof ConfigConfigItemElement
+                        && "ActiveTable".equals(((ConfigConfigItemElement) n).getConfigNameAttribute())) {
+                    n.setTextContent(tableName);
+                    break;
+                }
+            }
+            appendConfigItemElement(entryElement, "HorizontalSplitMode", CONFIG_TYPE_SHORT, "2");
+            appendConfigItemElement(entryElement, "VerticalSplitMode", CONFIG_TYPE_SHORT, "2");
+
+            appendConfigItemElement(entryElement, "HorizontalSplitPosition", "int", String.valueOf(column));
+            appendConfigItemElement(entryElement, "VerticalSplitPosition", "int", String.valueOf(lineCount));
+
+            appendConfigItemElement(entryElement, "ActiveSplitRange", CONFIG_TYPE_SHORT, "3");
+
+            appendConfigItemElement(entryElement, "PositionLeft", "int", "0");
+            appendConfigItemElement(entryElement, "PositionRight", "int", String.valueOf(column));
+            appendConfigItemElement(entryElement, "PositionTop", "int", "0");
+            appendConfigItemElement(entryElement, "PositionBottom", "int", String.valueOf(lineCount));
+
+            appendConfigItemElement(entryElement, "ShowGrid", "boolean", "true");
+            appendConfigItemElement(entryElement, "AnchoredTextOverflowLegacy", "boolean", "false");
         } catch (XPathExpressionException e) {
             throw new RuntimeException(e);
         }
@@ -480,7 +528,8 @@ public class CalcFileWriter {
             List<ProjectLicenseInfo> projectLicenseInfos,
             OdfSpreadsheetDocument wb,
             OdfTable table,
-            Color alternatingRowsColor) {
+            Color alternatingRowsColor,
+            SpreadsheetFormatting formatting) {
         final int firstRowIndex = 3;
         int currentRowIndex = firstRowIndex;
         final Map<Integer, OdfTableRow> rowMap = new HashMap<>();
@@ -500,10 +549,13 @@ public class CalcFileWriter {
         OdfStyle styleNormal = officeStyles.newStyle(NORMAL_CELL_STYLE, OdfStyleFamily.TableCell);
         styleNormal.setProperty(OdfTableColumnProperties.UseOptimalColumnWidth, String.valueOf(true));
 
+        final Map<LicenseMatch, String> licenseStyles =
+                createLicenseStyles(officeStyles, alternatingRowsColor, formatting);
+
         for (ProjectLicenseInfo projectInfo : projectLicenseInfos) {
             final OdfStyle cellStyle, hyperlinkStyle;
             LOG.debug(
-                    "Writing {}:{} into LibreOffice calc file", projectInfo.getGroupId(), projectInfo.getArtifactId());
+                    "Writing {}:{} into LibreOffice Calc file", projectInfo.getGroupId(), projectInfo.getArtifactId());
             if (grayBackground) {
                 cellStyle = styleGray;
                 hyperlinkStyle = hyperlinkStyleGray;
@@ -511,10 +563,12 @@ public class CalcFileWriter {
                 cellStyle = styleNormal;
                 hyperlinkStyle = hyperlinkStyleNormal;
             }
+            final boolean grayRow = grayBackground;
             grayBackground = !grayBackground;
 
             int extraRows = 0;
             OdfTableRow currentRow = table.appendRow();
+            fixRowHeight(currentRow);
             rowMap.put(currentRowIndex, currentRow);
             // Plugin ID
             createDataCellsInRow(
@@ -543,38 +597,48 @@ public class CalcFileWriter {
                                 license.getDistribution(),
                                 license.getComments(),
                                 license.getFile());
+                        applyLicenseStyle(licenses[0], licenseStyles, formatting.highlight(license), grayRow);
                         addHyperlinkIfExists(table, licenses[1], hyperlinkStyle);
                     });
 
+            // Add empty cells, so it doesn't copy the previous row cell, even if it doesn't have any data.
+            setStyleOnEmptyCells(cellListParameter, currentRowData, GENERAL_START_COLUMN, 1);
+            setStyleOnEmptyCells(cellListParameter, currentRowData, DEVELOPERS_START_COLUMN, DEVELOPERS_COLUMNS);
+            setStyleOnEmptyCells(cellListParameter, currentRowData, MISC_START_COLUMN, MISC_COLUMNS);
+
             final ExtendedInfo extendedInfo = projectInfo.getExtendedInfo();
             if (extendedInfo != null) {
+                setStyleOnEmptyCells(cellListParameter, currentRowData, MANIFEST_START_COLUMN, MANIFEST_COLUMNS);
+
                 hasExtendedInfo = true;
                 // General
                 createDataCellsInRow(currentRow, GENERAL_START_COLUMN, cellStyle, extendedInfo.getName());
                 // Developers
                 currentRowData = new CurrentRowData(currentRowIndex, extraRows, hasExtendedInfo);
-                extraRows = addList(
-                        cellListParameter,
-                        currentRowData,
-                        DEVELOPERS_START_COLUMN,
-                        DEVELOPERS_COLUMNS,
-                        extendedInfo.getDevelopers(),
-                        (OdfTableRow developerRow, Developer developer) -> {
-                            OdfTableCell[] licenses = createDataCellsInRow(
-                                    developerRow,
-                                    DEVELOPERS_START_COLUMN,
-                                    cellStyle,
-                                    developer.getId(),
-                                    developer.getEmail(),
-                                    developer.getName(),
-                                    developer.getOrganization(),
-                                    developer.getOrganizationUrl(),
-                                    developer.getUrl(),
-                                    developer.getTimezone());
-                            addHyperlinkIfExists(table, licenses[1], hyperlinkStyle, true);
-                            addHyperlinkIfExists(table, licenses[4], hyperlinkStyle);
-                            addHyperlinkIfExists(table, licenses[5], hyperlinkStyle);
-                        });
+                if (!formatting.skipsDevelopers()) {
+                    extraRows = addList(
+                            cellListParameter,
+                            currentRowData,
+                            DEVELOPERS_START_COLUMN,
+                            DEVELOPERS_COLUMNS,
+                            extendedInfo.getDevelopers(),
+                            (OdfTableRow developerRow, Developer developer) -> {
+                                OdfTableCell[] developers = createDataCellsInRow(
+                                        developerRow,
+                                        DEVELOPERS_START_COLUMN,
+                                        cellStyle,
+                                        developer.getId(),
+                                        developer.getEmail(),
+                                        developer.getName(),
+                                        developer.getOrganization(),
+                                        developer.getOrganizationUrl(),
+                                        developer.getUrl(),
+                                        developer.getTimezone());
+                                addHyperlinkIfExists(table, developers[1], hyperlinkStyle, true);
+                                addHyperlinkIfExists(table, developers[4], hyperlinkStyle);
+                                addHyperlinkIfExists(table, developers[5], hyperlinkStyle);
+                            });
+                }
                 // Miscellaneous
                 OdfTableCell[] miscCells = createDataCellsInRow(
                         currentRow,
@@ -648,10 +712,6 @@ public class CalcFileWriter {
                             cellListParameter, currentRowData, INFO_LICENSES_START_COLUMN, INFO_LICENSES_COLUMNS);
                     setStyleOnEmptyCells(cellListParameter, currentRowData, INFO_SPDX_START_COLUMN, INFO_SPDX_COLUMNS);
                 }
-            } else {
-                createDataCellsInRow(currentRow, GENERAL_START_COLUMN, cellStyle, 1);
-                createDataCellsInRow(currentRow, DEVELOPERS_START_COLUMN, cellStyle, DEVELOPERS_COLUMNS);
-                createDataCellsInRow(currentRow, MISC_START_COLUMN, cellStyle, MISC_COLUMNS);
             }
 
             final int downloadColumn = getDownloadColumn(hasExtendedInfo);
@@ -680,6 +740,69 @@ public class CalcFileWriter {
         }
 
         autosizeColumns(table, hasExtendedInfo, currentRowIndex);
+    }
+
+    /**
+     * Lock row height, so extra large content doesn't inflate it.
+     *
+     * @param row Row to fix height for.
+     */
+    private static void fixRowHeight(OdfTableRow row) {
+        row.setUseOptimalHeight(false);
+        row.setHeight(6, true);
+    }
+
+    /**
+     * Creates one cell style per license category and row background, and returns the style names keyed by category.
+     * The key of a style on a row with the alternating background is suffixed with {@code -gray}.
+     */
+    private static Map<LicenseMatch, String> createLicenseStyles(
+            OdfOfficeStyles officeStyles, Color alternatingRowsColor, SpreadsheetFormatting formatting) {
+        final Map<LicenseMatch, String> styleNames = new EnumMap<>(LicenseMatch.class);
+        if (!formatting.highlights()) {
+            return styleNames;
+        }
+        for (LicenseMatch licenseMatch : LicenseMatch.values()) {
+            final Color color = convertToOdfColor(SpreadsheetUtil.licenseColor(licenseMatch));
+            final String name = LICENSE_CELL_STYLE_PREFIX + licenseMatch;
+            createLicenseStyle(officeStyles, name, color, null, formatting.hasBorder());
+            createLicenseStyle(
+                    officeStyles, name + GRAY_CELL_STYLE_SUFFIX, color, alternatingRowsColor, formatting.hasBorder());
+            styleNames.put(licenseMatch, name);
+        }
+        return styleNames;
+    }
+
+    private static void createLicenseStyle(
+            OdfOfficeStyles officeStyles, String name, Color color, Color backgroundColor, boolean border) {
+        final OdfStyle style = officeStyles.newStyle(name, OdfStyleFamily.TableCell);
+        style.setProperty(StyleTextPropertiesElement.Color, color.toString());
+        style.setProperty(OdfTableColumnProperties.UseOptimalColumnWidth, String.valueOf(true));
+        if (backgroundColor != null) {
+            style.setProperty(StyleTableCellPropertiesElement.BackgroundColor, backgroundColor.toString());
+        }
+        if (border) {
+            style.setProperty(StyleTableCellPropertiesElement.Border, MATCHED_LICENSE_BORDER_WIDTH + " solid " + color);
+        }
+    }
+
+    /**
+     * Writes a cell in the colour of its license category.
+     *
+     * @param cell         the cell holding the license name
+     * @param styleNames   the styles created for this document
+     * @param licenseMatch the category, or {@code null} to leave the cell as it is
+     * @param gray         whether the cell is on a row with the alternating background
+     */
+    private static void applyLicenseStyle(
+            OdfTableCell cell, Map<LicenseMatch, String> styleNames, LicenseMatch licenseMatch, boolean gray) {
+        if (licenseMatch == null) {
+            return;
+        }
+        final String name = styleNames.get(licenseMatch);
+        if (name != null) {
+            cell.getOdfElement().setStyleName(gray ? name + GRAY_CELL_STYLE_SUFFIX : name);
+        }
     }
 
     private static OdfStyle createHyperlinkStyle(OdfSpreadsheetDocument wb, String name, Color backgroundColor) {
@@ -720,18 +843,28 @@ public class CalcFileWriter {
         }
     }
 
+    /**
+     * Autosizes the columns in the given ranges, based on the maximum string length of the cells in each column.
+     *
+     * <p>The width is calculated by the cell content because <code>OdfTableColumn.setUseOptimalWidth(true)</code>
+     * is ignored by LibreOffice Calc.
+     *
+     * @param sheet Sheet.
+     * @param rows Rows to autosize.
+     * @param ranges Ranges of columns to autosize.
+     */
     @SafeVarargs
     private static void autosizeColumns(OdfTable sheet, int rows, Pair<Integer, Integer>... ranges) {
         for (Pair<Integer, Integer> range : ranges) {
             for (int i = range.getLeft(); i < range.getRight(); i++) {
                 final float sizeFactor = 2.0f;
-                float size = 25;
+                float size = MIN_COLUMN_WIDTH;
                 // Get max width by taking the max string length multiplied by sizeFactor.
                 for (int row = 0; row < rows; row++) {
                     OdfTableCell cell = sheet.getCellByPosition(i, row);
                     if (VALUE_TYPE_STRING.equals(cell.getValueType())) {
                         String stringValue = cell.getStringValue();
-                        size = Math.max(stringValue.length() * sizeFactor, size);
+                        size = Math.min(Math.max(stringValue.length() * sizeFactor, size), MAX_COLUMN_WIDTH);
                     }
                 }
                 final OdfTableColumn column = sheet.getColumnByIndex(i);
@@ -784,6 +917,7 @@ public class CalcFileWriter {
                 OdfTableRow row = cellListParameter.getRows().get(index);
                 if (row == null) {
                     row = cellListParameter.getSheet().appendRow();
+                    fixRowHeight(row);
                     cellListParameter.getRows().put(index, row);
                     if (cellListParameter.getCellStyle() != null) {
                         // Style all empty left cells, in the columns left from this
@@ -818,7 +952,9 @@ public class CalcFileWriter {
 
     /**
      * If no cells are set, color at least the background,
-     * to color concatenated blocks with the same background color.
+     * to color concatenated blocks with the same background color.<br>
+     * Also, it stops the exporter from copying the style of the previous row,
+     * if the current row has no cells set.
      *
      * @param cellListParameter Passes data about sheet, row, cell style.
      * @param currentRowData    Passes data about the current indices for rows and columns.
@@ -827,11 +963,24 @@ public class CalcFileWriter {
      */
     private static void setStyleOnEmptyCells(
             CellListParameter cellListParameter, CurrentRowData currentRowData, int startColumn, int columnsToFill) {
-        OdfTableRow row = cellListParameter.getRows().get(currentRowData.getCurrentRowIndex());
-        for (int i = 0; i < columnsToFill; i++) {
-            OdfTableCell cell = row.getCellByIndex(startColumn + i);
-            cell.setValueType(VALUE_TYPE_STRING);
-            cell.getOdfElement().setStyleName(getCellStyleName(cellListParameter.getCellStyle()));
+        if (currentRowData.getExtraRows() > 0) {
+            LOG.debug("Create extra {} empty rows for empty cells.", currentRowData.getExtraRows());
+        }
+        for (int rowIndex = currentRowData.getCurrentRowIndex();
+                rowIndex <= currentRowData.getCurrentRowIndex() + currentRowData.getExtraRows();
+                rowIndex++) {
+            OdfTableRow row = cellListParameter.getRows().get(rowIndex);
+            if (row == null) {
+                LOG.warn("Create row {} for empty cells, because it doesn't exist yet.", rowIndex);
+                row = cellListParameter.getSheet().appendRow();
+                fixRowHeight(row);
+                cellListParameter.getRows().put(rowIndex, row);
+            }
+            for (int i = 0; i < columnsToFill; i++) {
+                OdfTableCell cell = row.getCellByIndex(startColumn + i);
+                cell.setValueType(VALUE_TYPE_STRING);
+                cell.getOdfElement().setStyleName(getCellStyleName(cellListParameter.getCellStyle()));
+            }
         }
     }
 
@@ -904,7 +1053,7 @@ public class CalcFileWriter {
             if (cellStyle != null) {
                 cell.getOdfElement().setStyleName(getCellStyleName(cellStyle));
             }
-            if (!StringUtils.isEmpty(names[i])) {
+            if (StringUtils.isNotEmpty(names[i])) {
                 final String value;
                 final int maxCellStringLength = Short.MAX_VALUE;
                 if (names[i].length() > maxCellStringLength) {
@@ -917,26 +1066,6 @@ public class CalcFileWriter {
             result[i] = cell;
         }
         return result;
-    }
-
-    /**
-     * Fills cells with empty strings, so they get created and don't copy the previous rows content and <b>style</b>,
-     * like the header's background color and bold border.
-     *
-     * @param row         Row.
-     * @param startColumn Starting column (inclusive).
-     * @param cellStyle   Cell style.
-     * @param count       Number of columns to set.
-     */
-    private static void createDataCellsInRow(OdfTableRow row, int startColumn, OdfStyle cellStyle, int count) {
-        for (int i = 0; i < count; i++) {
-            OdfTableCell cell = row.getCellByIndex(startColumn + i);
-            cell.setValueType(VALUE_TYPE_STRING);
-            if (cellStyle != null) {
-                cell.getOdfElement().setStyleName(getCellStyleName(cellStyle));
-            }
-            cell.setStringValue("");
-        }
     }
 
     private static String getCellStyleName(OdfStyle cellStyle) {
@@ -963,43 +1092,6 @@ public class CalcFileWriter {
             cell.getOdfElement().setStyleName(styleName);
             cell.setStringValue(names[i]);
         }
-    }
-
-    private static void createMergedCellsInRow(
-            OdfTable table,
-            int startColumn,
-            int endColumn,
-            OdfTableRow row,
-            String cellValue,
-            int rowIndex,
-            String styleName) {
-        OdfTableCell cell = createCellsInRow(startColumn, endColumn, row);
-        if (cell == null) {
-            return;
-        }
-        final boolean merge = endColumn - 1 > startColumn;
-
-        if (merge) {
-            OdfTableCellRange cellRange = table.getCellRangeByPosition(startColumn, rowIndex, endColumn - 1, rowIndex);
-            cellRange.merge();
-        }
-
-        // Set value and style only after merge
-        cell.setStringValue(cellValue);
-        cell.getOdfElement().setStyleName(styleName);
-
-        // TODO: Add grouping, with a hierarchy, after ODFToolkit offers it.
-    }
-
-    private static OdfTableCell createCellsInRow(int startColumn, int exclusiveEndColumn, OdfTableRow inRow) {
-        OdfTableCell firstCell = null;
-        for (int i = startColumn; i < exclusiveEndColumn; i++) {
-            OdfTableCell cell = inRow.getCellByIndex(i);
-            if (i == startColumn) {
-                firstCell = cell;
-            }
-        }
-        return firstCell;
     }
 
     /**
