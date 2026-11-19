@@ -69,7 +69,17 @@ public class Cache {
      * @return If the cache has a license file with the same normalized content.
      */
     public boolean hasNormalizedContentChecksum(String normalizedContentChecksum) {
-        return normalizedContentToFile.get(normalizedContentChecksum) != null;
+        return getByNormalizedContentChecksum(normalizedContentChecksum) != null;
+    }
+
+    /**
+     * Returns the first cached result whose license text has the given normalized content.
+     *
+     * @param normalizedContentChecksum normalized file content checksum
+     * @return the cached result, or {@code null} if no license with that content has been seen
+     */
+    public LicenseDownloadResult getByNormalizedContentChecksum(String normalizedContentChecksum) {
+        return normalizedContentChecksum == null ? null : normalizedContentToFile.get(normalizedContentChecksum);
     }
 
     /**
