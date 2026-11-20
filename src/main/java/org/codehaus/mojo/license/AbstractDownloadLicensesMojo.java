@@ -68,6 +68,7 @@ import org.codehaus.mojo.license.download.FileNameEntry;
 import org.codehaus.mojo.license.download.LicenseClassifier;
 import org.codehaus.mojo.license.download.LicenseDownloader;
 import org.codehaus.mojo.license.download.LicenseDownloader.LicenseDownloadResult;
+import org.codehaus.mojo.license.download.LicenseFileDeduplicator;
 import org.codehaus.mojo.license.download.LicenseMatchers;
 import org.codehaus.mojo.license.download.LicenseNameUrlOverrides;
 import org.codehaus.mojo.license.download.LicenseSummaryReader;
@@ -1802,7 +1803,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
                             if (!licenseOutputFile.exists() || forceDownload) {
                                 LicenseDownloadResult result =
                                         licenseDownloader.downloadLicense(licenseUrl, fileNameEntry);
-                                if (!organizeLicensesByDependencies && result.isSuccess()) {
+                                if (!organizeLicensesByDependencies && !result.isBundled() && result.isSuccess()) {
                                     /* check if we can re-use an existing file that has the same content */
                                     final String name = preferredFileNames.getFileNameBySha1(result.getSha1());
                                     if (name != null) {
@@ -1824,6 +1825,8 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
                                         }
                                     }
                                 }
+                                result = new LicenseFileDeduplicator(cache, LOG)
+                                        .reuseFileWithSameContent(result, licenseUrl, license.getName());
                                 handleResult(licenseUrl, result, depProject, license);
                                 cache.put(licenseUrl, result);
                             } else if (licenseOutputFile.exists()) {
