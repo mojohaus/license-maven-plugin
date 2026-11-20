@@ -1803,7 +1803,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
                             if (!licenseOutputFile.exists() || forceDownload) {
                                 LicenseDownloadResult result =
                                         licenseDownloader.downloadLicense(licenseUrl, fileNameEntry);
-                                if (!organizeLicensesByDependencies && result.isSuccess()) {
+                                if (!organizeLicensesByDependencies && !result.isBundled() && result.isSuccess()) {
                                     /* check if we can re-use an existing file that has the same content */
                                     final String name = preferredFileNames.getFileNameBySha1(result.getSha1());
                                     if (name != null) {

@@ -64,6 +64,23 @@ class LicenseFileDeduplicatorTest {
     }
 
     @Test
+    void bundledTextsKeepTheirConfiguredNames() throws Exception {
+        File first = Files.write(tempDir.resolve("text.txt"), "GPL text".getBytes(StandardCharsets.UTF_8))
+                .toFile();
+        File second = Files.write(tempDir.resolve("page.txt"), "gpl text".getBytes(StandardCharsets.UTF_8))
+                .toFile();
+
+        Cache cache = new Cache(false);
+        cache.put("https://first.example/license", LicenseDownloadResult.bundled(first, "sha1-a", false));
+        LicenseDownloadResult bundled = LicenseDownloadResult.bundled(second, "sha1-b", false);
+
+        LicenseDownloadResult result = new LicenseFileDeduplicator(cache, mock(Logger.class))
+                .reuseFileWithSameContent(bundled, "https://second.example/page", "GPL page");
+
+        assertEquals(second, result.getFile());
+    }
+
+    @Test
     void distinctContentIsKept() throws Exception {
         File first = Files.write(tempDir.resolve("a.txt"), "license A".getBytes(StandardCharsets.UTF_8))
                 .toFile();

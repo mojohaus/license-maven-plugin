@@ -581,11 +581,11 @@ public class LicenseDownloader implements AutoCloseable {
         bundledTextsServed.incrementAndGet();
         if (sanitizers.isEmpty()) {
             Files.write(updatedFile.toPath(), text);
-            return LicenseDownloadResult.success(updatedFile, DigestUtils.sha1Hex(text), fileNameEntry.isPreferred());
+            return LicenseDownloadResult.bundled(updatedFile, DigestUtils.sha1Hex(text), fileNameEntry.isPreferred());
         }
         try (BufferedReader r =
                 new BufferedReader(new InputStreamReader(new ByteArrayInputStream(text), StandardCharsets.UTF_8))) {
-            return sanitize(r, updatedFile, charset, sanitizers, fileNameEntry.isPreferred());
+            return sanitize(r, updatedFile, charset, sanitizers, fileNameEntry.isPreferred(), true);
         }
     }
 
@@ -596,6 +596,17 @@ public class LicenseDownloader implements AutoCloseable {
 
     static LicenseDownloadResult sanitize(
             BufferedReader r, File out, Charset charset, List<ContentSanitizer> sanitizers, boolean preferredFileName)
+            throws IOException {
+        return sanitize(r, out, charset, sanitizers, preferredFileName, false);
+    }
+
+    static LicenseDownloadResult sanitize(
+            BufferedReader r,
+            File out,
+            Charset charset,
+            List<ContentSanitizer> sanitizers,
+            boolean preferredFileName,
+            boolean bundled)
             throws IOException {
         final StringBuilder contentBuilder = new StringBuilder();
         // CHECKSTYLE_OFF: MagicNumber
@@ -613,7 +624,9 @@ public class LicenseDownloader implements AutoCloseable {
         byte[] bytes = content.getBytes(charset);
         Files.write(out.toPath(), bytes);
         final String sha1 = DigestUtils.sha1Hex(bytes);
-        return LicenseDownloadResult.success(out, sha1, preferredFileName);
+        return bundled
+                ? LicenseDownloadResult.bundled(out, sha1, preferredFileName)
+                : LicenseDownloadResult.success(out, sha1, preferredFileName);
     }
 
     List<ContentSanitizer> filterSanitizers(String licenseUrlString) {
@@ -710,19 +723,26 @@ public class LicenseDownloader implements AutoCloseable {
      */
     public static final class LicenseDownloadResult {
         public static LicenseDownloadResult success(File file, String sha1, boolean preferredFileName) {
-            return new LicenseDownloadResult(file, sha1, preferredFileName, null);
+            return new LicenseDownloadResult(file, sha1, preferredFileName, null, false);
+        }
+
+        /** A result written from a text bundled with the plugin rather than fetched from the URL. */
+        public static LicenseDownloadResult bundled(File file, String sha1, boolean preferredFileName) {
+            return new LicenseDownloadResult(file, sha1, preferredFileName, null, true);
         }
 
         public static LicenseDownloadResult failure(String errorMessage) {
-            return new LicenseDownloadResult(null, null, false, errorMessage);
+            return new LicenseDownloadResult(null, null, false, errorMessage, false);
         }
 
-        private LicenseDownloadResult(File file, String sha1, boolean preferredFileName, String errorMessage) {
+        private LicenseDownloadResult(
+                File file, String sha1, boolean preferredFileName, String errorMessage, boolean bundled) {
             super();
             this.file = file;
             this.errorMessage = errorMessage;
             this.sha1 = sha1;
             this.preferredFileName = preferredFileName;
+            this.bundled = bundled;
             this.normalizedContentChecksum = LicenseDownloader.calculateFileChecksum(file);
         }
 
@@ -743,6 +763,8 @@ public class LicenseDownloader implements AutoCloseable {
         private final String normalizedContentChecksum;
 
         private final boolean preferredFileName;
+
+        private final boolean bundled;
 
         public File getFile() {
             return file;
@@ -773,8 +795,12 @@ public class LicenseDownloader implements AutoCloseable {
             return normalizedContentChecksum;
         }
 
+        public boolean isBundled() {
+            return bundled;
+        }
+
         public LicenseDownloadResult withFile(File otherFile) {
-            return new LicenseDownloadResult(otherFile, sha1, preferredFileName, errorMessage);
+            return new LicenseDownloadResult(otherFile, sha1, preferredFileName, errorMessage, bundled);
         }
 
         @Override
