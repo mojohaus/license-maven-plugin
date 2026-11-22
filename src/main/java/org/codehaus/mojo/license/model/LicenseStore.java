@@ -25,7 +25,9 @@ package org.codehaus.mojo.license.model;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
+import java.security.CodeSource;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 
@@ -179,11 +181,33 @@ public class LicenseStore implements Iterable<LicenseRepository> {
 
     public void addJarRepository() throws IOException {
         checkNotInit("addJarRepository");
-        URL baseURL = getClass().getResource(JAR_LICENSE_REPOSITORY);
+        URL baseURL = findJarLicenseRepository();
         LicenseRepository repository = new LicenseRepository();
         repository.setBaseURL(baseURL);
         LOG.debug("Adding a jar license repository {}", repository);
         addRepository(repository);
+    }
+
+    /**
+     * Finds the {@link #JAR_LICENSE_REPOSITORY} that ships with this class. Another entry of the class path may
+     * have a {@code META-INF/licenses} directory too and come first, as byte-buddy does in the tests.
+     */
+    private URL findJarLicenseRepository() throws IOException {
+        URL first = getClass().getResource(JAR_LICENSE_REPOSITORY);
+        CodeSource codeSource = getClass().getProtectionDomain().getCodeSource();
+        if (codeSource == null || getClass().getClassLoader() == null) {
+            return first;
+        }
+        String own = codeSource.getLocation().toExternalForm();
+        Enumeration<URL> candidates = getClass().getClassLoader().getResources(JAR_LICENSE_REPOSITORY.substring(1));
+        while (candidates.hasMoreElements()) {
+            URL candidate = candidates.nextElement();
+            String text = candidate.toExternalForm();
+            if (text.startsWith(own) || text.startsWith("jar:" + own)) {
+                return candidate;
+            }
+        }
+        return first;
     }
 
     public void addRootPackageClassPathRepository() throws IOException {

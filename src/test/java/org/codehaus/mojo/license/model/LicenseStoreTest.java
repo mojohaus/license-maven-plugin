@@ -31,8 +31,6 @@ import java.util.List;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.EnabledOnJre;
-import org.junit.jupiter.api.condition.JRE;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -77,9 +75,6 @@ class LicenseStoreTest {
     }
 
     @Test
-    @EnabledOnJre(
-            value = JRE.JAVA_8,
-            disabledReason = "changed class order for Java 9+, dut to add varsion/11 for surefire")
     void jarRepository() throws Exception {
 
         store = new LicenseStore();
