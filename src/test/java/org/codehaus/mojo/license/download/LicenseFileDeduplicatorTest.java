@@ -22,7 +22,9 @@ package org.codehaus.mojo.license.download;
  * #L%
  */
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -35,6 +37,7 @@ import org.slf4j.Logger;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 class LicenseFileDeduplicatorTest {
@@ -95,5 +98,34 @@ class LicenseFileDeduplicatorTest {
                 .reuseFileWithSameContent(secondResult, "https://second.example/license", "B");
 
         assertEquals(second, result.getFile());
+    }
+
+    @Test
+    void writesNothingToTheConsole() throws Exception {
+        File first = Files.write(tempDir.resolve("a.txt"), "Apache License".getBytes(StandardCharsets.UTF_8))
+                .toFile();
+        File second = Files.write(tempDir.resolve("b.txt"), "apache license".getBytes(StandardCharsets.UTF_8))
+                .toFile();
+        Cache cache = new Cache(false);
+        cache.put("https://first.example/license", LicenseDownloadResult.success(first, "sha1-a", false));
+        LicenseFileDeduplicator deduplicator = new LicenseFileDeduplicator(cache, mock(Logger.class));
+
+        PrintStream originalOut = System.out;
+        PrintStream originalErr = System.err;
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ByteArrayOutputStream err = new ByteArrayOutputStream();
+        try {
+            System.setOut(new PrintStream(out, true));
+            System.setErr(new PrintStream(err, true));
+            deduplicator.reuseFileWithSameContent(
+                    LicenseDownloadResult.success(second, "sha1-b", false), "https://second.example/license", "B");
+            deduplicator.reuseFileWithSameContent(
+                    LicenseDownloadResult.bundled(first, "sha1-c", false), "https://third.example/license", "C");
+        } finally {
+            System.setOut(originalOut);
+            System.setErr(originalErr);
+        }
+
+        assertTrue(out.size() == 0 && err.size() == 0, "unexpected console output: " + out + err);
     }
 }

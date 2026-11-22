@@ -54,8 +54,6 @@ public final class LicenseFileDeduplicator {
      */
     public LicenseDownloadResult reuseFileWithSameContent(
             LicenseDownloadResult result, String licenseUrl, String licenseName) {
-        System.err.println("DEDUP DEBUG name=" + licenseName + " bundled=" + result.isBundled() + " success="
-                + result.isSuccess() + " file=" + result.getFile());
         // Bundled texts are written under their configured names on purpose, even when two names share text.
         if (result.isBundled() || !result.isSuccess() || result.getNormalizedContentChecksum() == null) {
             return result;
