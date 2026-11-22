@@ -1,34 +1,34 @@
----
 title: Introduction
 date: 2010-10-16
----
 
 <!--
-  #%L
-  License Maven Plugin
-  %%
-  Copyright (C) 2008 - 2011 CodeLutin, Codehaus, Tony Chemit
-  %%
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU Lesser General Public License as
-  published by the Free Software Foundation, either version 3 of the
-  License, or (at your option) any later version.
+#%L
+License Maven Plugin
+%%
+Copyright (C) 2008 - 2011 CodeLutin, Codehaus, Tony Chemit
+%%
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
 
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Lesser Public License for more details.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Lesser Public License for more details.
 
-  You should have received a copy of the GNU General Lesser Public
-  License along with this program.  If not, see
-  <http://www.gnu.org/licenses/lgpl-3.0.html>.
-  #L%
+You should have received a copy of the GNU General Lesser Public
+License along with this program.  If not, see
+<http://www.gnu.org/licenses/lgpl-3.0.html>.
+#L%
 -->
 
-${project.name}
-===============
+License Maven Plugin
+====================
 
-This plugin manages the license of a maven project and its dependencies (update file headers, download dependencies licenses, check thirdparty licenses, ...)
+This plugin manages the license of a Maven project and its dependencies: it updates and checks file headers, downloads the licenses of dependencies, and lists and checks the third-party licenses.
+
+It requires Maven 3.9.0 or later and Java 8 or later.
 
 <a id="Goals"></a>
 
@@ -47,6 +47,8 @@ The following goals are meant to participate in the default build lifecycle:
   Downloads the license files associated with each dependency.
 - [`license:aggregate-download-licenses`](./aggregate-download-licenses-mojo.html)  
   Downloads the license files associated with each dependency for a multi-modules build.
+- [`license:licenses-xml-insert-versions`](./licenses-xml-insert-versions-mojo.html)  
+  Inserts the versions into a `licenses.xml` file written by a download goal with `writeVersions` set to `false`.
 - [`license:license-list`](./license-list-mojo.html)  
   Display all available licenses.
 - [`license:update-file-header`](./update-file-header-mojo.html)  
@@ -92,3 +94,4 @@ To provide you with better understanding of some usages of the License Plugin, y
 - [List available Comment styles](./examples/example-comment-style-list.html)
 - [Check thirdparty licenses](./examples/example-thirdparty.html)
 - [Update file header of source files](./examples/update-file-header-config.html)
+

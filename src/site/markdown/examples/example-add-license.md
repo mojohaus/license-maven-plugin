@@ -1,23 +1,23 @@
 <!--
-  #%L
-  License Maven Plugin
-  %%
-  Copyright (C) 2008 - 2011 CodeLutin, Jean Couteau
-  %%
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU Lesser General Public License as
-  published by the Free Software Foundation, either version 3 of the
-  License, or (at your option) any later version.
+#%L
+License Maven Plugin
+%%
+Copyright (C) 2008 - 2011 CodeLutin, Jean Couteau
+%%
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
 
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Lesser Public License for more details.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Lesser Public License for more details.
 
-  You should have received a copy of the GNU General Lesser Public
-  License along with this program.  If not, see
-  <http://www.gnu.org/licenses/lgpl-3.0.html>.
-  #L%
+You should have received a copy of the GNU General Lesser Public
+License along with this program.  If not, see
+<http://www.gnu.org/licenses/lgpl-3.0.html>.
+#L%
 -->
 
 Add a license not present in license-maven-plugin
@@ -32,7 +32,6 @@ To use a new license, you need to define two content files :
 
 - the header file (this content will be added in header of all source files)
 - the license file (this file is the real license file placed at the root of the maven project in (by convention) LICENSE.txt file.
-
 - `src/license/my_license/header.txt`
 
   Example for GPLv3 :
@@ -108,7 +107,6 @@ You need to specify the name of your license and where to find it.
 <plugin>
     <groupId>org.codehaus.mojo</groupId>
     <artifactId>license-maven-plugin</artifactId>
-    <version>${project.version}</version>
     <configuration>
         <licenseName>my_license</licenseName>
         <licenseResolver>${project.baseUri}/src/license</licenseResolver>
@@ -136,7 +134,6 @@ or
 <plugin>
     <groupId>org.codehaus.mojo</groupId>
     <artifactId>license-maven-plugin</artifactId>
-    <version>${project.version}</version>
     <executions>
         <execution>
             <id>first</id>
@@ -164,7 +161,6 @@ Next example show how to use this license resolver from classpath:
 <plugin>
   <groupId>org.codehaus.mojo</groupId>
   <artifactId>license-maven-plugin</artifactId>
-  <version>${project.version}</version>
   <configuration>
       <licenseName>my_license</licenseName>
       <licenseResolver>classpath://foo/bar</licenseResolver>

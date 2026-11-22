@@ -11,7 +11,7 @@ import org.apache.maven.plugin.MojoExecutionException;
  * names to canonical download URLs, regardless of which dependency declares the license and regardless
  * of whether the dependency's POM already contains a URL.
  *
- * @since 2.7.2
+ * @since 2.9.0
  */
 public class LicenseNameUrlOverride {
     /**

@@ -385,7 +385,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
      * every such dependency. Dependencies marked as approved in {@link #licensesConfigFile} are not counted.
      * The default {@code false} keeps the build going, as before.
      *
-     * @since 2.8.0
+     * @since 2.9.0
      */
     @Parameter(property = "license.failOnMissingLicenseFile", defaultValue = "false")
     private boolean failOnMissingLicenseFile;
@@ -438,7 +438,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
      * saved page is better than nothing. Turn it on when a landing or error page would otherwise be stored as a
      * license text.
      *
-     * @since 2.8.1
+     * @since 2.9.0
      */
     @Parameter(property = "license.rejectHtmlLicenseTexts", defaultValue = "false")
     private boolean rejectHtmlLicenseTexts;
@@ -553,7 +553,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
      * and no license text are consulted. The default {@code false} keeps the build going, as before.
      *
      * @see #forbiddenLicenses
-     * @since 2.8.0
+     * @since 2.9.0
      */
     @Parameter(property = "license.failOnForbidden", defaultValue = "false")
     private boolean failOnForbidden;
@@ -581,7 +581,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
      * {@link #okLicenses} are highlighted in the Excel and Calc files as well. Turn this on once the three lists
      * are complete, to see what has slipped through them.
      *
-     * @since 2.8.0
+     * @since 2.9.1
      */
     @Parameter(property = "license.highlightUnknownLicenses", defaultValue = "false")
     private boolean highlightUnknownLicenses;
@@ -592,7 +592,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
      * <p>A border tells the categories apart at a glance. The cost is that when scrolling through a long report, the
      * boxed license of a dependency with several licenses looks like the only one it has.
      *
-     * @since 2.8.0
+     * @since 2.9.1
      */
     @Parameter(property = "license.matchedLicensesHaveBorder", defaultValue = "false")
     private boolean matchedLicensesHaveBorder;
@@ -603,7 +603,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
      * <p>They are rarely what a license report is read for, and they are the main reason one dependency takes a
      * dozen rows instead of one. The developer columns stay in place, they are simply empty.
      *
-     * @since 2.8.0
+     * @since 2.9.1
      */
     @Parameter(property = "license.skipDevelopers", defaultValue = "false")
     private boolean skipDevelopers;
@@ -745,7 +745,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
      *   <li>{@link #licenseUrlReplacements} are applied before {@link #licenseUrlFileNames}</li>
      * </ul>
      *
-     * @since 2.7.2
+     * @since 2.9.0
      */
     @Parameter
     protected List<LicenseNameUrlOverride> licenseNameUrlOverrides;
@@ -855,7 +855,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
      * Texts downloaded with the credentials of {@link #serverId} are never cached. {@code file:} URLs are not cached.
      * {@link #forceDownload} ignores the cached texts but refreshes them.
      *
-     * @since 2.8.0
+     * @since 2.9.0
      */
     @Parameter(property = "license.useLicenseCache", defaultValue = "true")
     private boolean useLicenseCache;
@@ -864,7 +864,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
      * The directory of the cache described at {@link #useLicenseCache}. The default is inside the local repository,
      * so that a CI job that saves and restores the local repository carries the cache along.
      *
-     * @since 2.8.0
+     * @since 2.9.0
      */
     @Parameter(
             property = "license.licenseCacheDirectory",
@@ -875,7 +875,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
      * The number of days a cached license text is used without asking the server. {@code 0} checks the server on
      * every build.
      *
-     * @since 2.8.0
+     * @since 2.9.0
      */
     @Parameter(property = "license.licenseCacheTtlDays", defaultValue = "30")
     private int licenseCacheTtlDays;

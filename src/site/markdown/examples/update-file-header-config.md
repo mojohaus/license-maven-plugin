@@ -1,23 +1,23 @@
 <!--
-  #%L
-  License Maven Plugin
-  %%
-  Copyright (C) 2008 - 2011 CodeLutin, Codehaus, Tony Chemit
-  %%
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU Lesser General Public License as
-  published by the Free Software Foundation, either version 3 of the
-  License, or (at your option) any later version.
+#%L
+License Maven Plugin
+%%
+Copyright (C) 2008 - 2011 CodeLutin, Codehaus, Tony Chemit
+%%
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
 
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Lesser Public License for more details.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Lesser Public License for more details.
 
-  You should have received a copy of the GNU General Lesser Public
-  License along with this program.  If not, see
-  <http://www.gnu.org/licenses/lgpl-3.0.html>.
-  #L%
+You should have received a copy of the GNU General Lesser Public
+License along with this program.  If not, see
+<http://www.gnu.org/licenses/lgpl-3.0.html>.
+#L%
 -->
 
 Update File Header Examples
@@ -36,7 +36,7 @@ The *update-file-header* goal can be configured this way:
 To see all extensions accepted run the **comment-style-list** goal.
 
 ```text
-[INFO] --- license-maven-plugin:${project.version}:comment-style-list (default-cli) @ license-maven-plugin ---
+[INFO] --- license-maven-plugin:2.9.0:comment-style-list (default-cli) @ license-maven-plugin ---
 [INFO] List of available comment styles:
 
   - apt        : header transformer with apt comment style            , extensions : [apt]
@@ -62,33 +62,31 @@ Example
 Given a pom with this plugin configuration:
 
 ```xml
-    <plugins>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>license-maven-plugin</artifactId>
-        <version>${project.version}</version>
+<plugins>
+  <plugin>
+    <groupId>org.codehaus.mojo</groupId>
+    <artifactId>license-maven-plugin</artifactId>
+    <configuration>
+      <addSvnKeyWords>true</addSvnKeyWords>
+    </configuration>
+    <executions>
+      <execution>
+        <id>first</id>
+        <goals>
+          <goal>update-file-header</goal>
+        </goals>
+        <phase>process-sources</phase>
         <configuration>
-          <verbose>false</verbose>
-          <addSvnKeyWords>true</addSvnKeyWords>
+          <licenseName>gpl_v3</licenseName>
+          <roots>
+            <root>src/main/java</root>
+            <root>src/test</root>
+          </roots>
         </configuration>
-        <executions>
-          <execution>
-            <id>first</id>
-            <goals>
-              <goal>update-file-header</goal>
-            </goals>
-            <phase>process-sources</phase>
-            <configuration>
-              <licenseName>gpl_v3</licenseName>
-              <roots>
-                <root>src/main/java</root>
-                <root>src/test</root>
-              </roots>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
+      </execution>
+    </executions>
+  </plugin>
+</plugins>
 ```
 
 ```text
@@ -112,34 +110,32 @@ Example
 Given a pom with this plugin configuration:
 
 ```xml
-    <plugins>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>license-maven-plugin</artifactId>
-        <version>${project.version}</version>
+<plugins>
+  <plugin>
+    <groupId>org.codehaus.mojo</groupId>
+    <artifactId>license-maven-plugin</artifactId>
+    <configuration>
+      <addSvnKeyWords>true</addSvnKeyWords>
+    </configuration>
+    <executions>
+      <execution>
+        <id>first</id>
+        <goals>
+          <goal>update-file-header</goal>
+        </goals>
+        <phase>process-sources</phase>
         <configuration>
-          <verbose>false</verbose>
-          <addSvnKeyWords>true</addSvnKeyWords>
+          <licenseName>gpl_v3</licenseName>
+          <includes>
+            <include>*Dao.java</include>
+            <include>*Bean.java</include>
+            <include>.*entities.*.xml</include>
+          </includes>
         </configuration>
-        <executions>
-          <execution>
-            <id>first</id>
-            <goals>
-              <goal>update-file-header</goal>
-            </goals>
-            <phase>process-sources</phase>
-            <configuration>
-              <licenseName>gpl_v3</licenseName>
-              <includes>
-                <include>*Dao.java</include>
-                <include>*Bean.java</include>
-                <include>.*entities.*.xml</include>
-              </includes>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
+      </execution>
+    </executions>
+  </plugin>
+</plugins>
 ```
 
 The update-file-header will be done only on java files (from "src") ending with *"Dao"* and *"Bean"* and on xml files containing *"entities"* in their file name.
@@ -155,34 +151,32 @@ Example
 Given a pom with this plugin configuration:
 
 ```xml
-    <plugins>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>license-maven-plugin</artifactId>
-        <version>${project.version}</version>
+<plugins>
+  <plugin>
+    <groupId>org.codehaus.mojo</groupId>
+    <artifactId>license-maven-plugin</artifactId>
+    <configuration>
+      <addSvnKeyWords>true</addSvnKeyWords>
+    </configuration>
+    <executions>
+      <execution>
+        <id>first</id>
+        <goals>
+          <goal>update-file-header</goal>
+        </goals>
+        <phase>process-sources</phase>
         <configuration>
-          <verbose>false</verbose>
-          <addSvnKeyWords>true</addSvnKeyWords>
+          <licenseName>gpl_v3</licenseName>
+          <excludes>
+            <exclude>*.png</exclude>
+            <exclude>*.txt</exclude>
+            <exclude>*Test.java</exclude>
+          </excludes>
         </configuration>
-        <executions>
-          <execution>
-            <id>first</id>
-            <goals>
-              <goal>update-file-header</goal>
-            </goals>
-            <phase>process-sources</phase>
-            <configuration>
-              <licenseName>gpl_v3</licenseName>
-              <excludes>
-                <exclude>*.png</exclude>
-                <exclude>*.txt</exclude>
-                <exclude>*Test.java</exclude>
-              </excludes>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
+      </execution>
+    </executions>
+  </plugin>
+</plugins>
 ```
 
 The java files ending with "Test", the png files and the txt files will be ignored by the update-file-header goal.
@@ -198,18 +192,17 @@ Example
 Given a pom with this plugin configuration:
 
 ```xml
-    <plugins>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>license-maven-plugin</artifactId>
-        <version>${project.version}</version>
-        <configuration>
-          <extraExtensions>
-            <myProprietaryExtension>java</myProprietaryExtension>
-          </extraExtensions>
-        </configuration>
-      </plugin>
-    </plugins>
+<plugins>
+  <plugin>
+    <groupId>org.codehaus.mojo</groupId>
+    <artifactId>license-maven-plugin</artifactId>
+    <configuration>
+      <extraExtensions>
+        <myProprietaryExtension>java</myProprietaryExtension>
+      </extraExtensions>
+    </configuration>
+  </plugin>
+</plugins>
 ```
 
 Files with extension **myProprietaryExtension** will be treated as java files (says using the comment style named java).
@@ -225,18 +218,17 @@ Example
 Given a pom with this plugin configuration:
 
 ```xml
-    <plugins>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>license-maven-plugin</artifactId>
-        <version>${project.version}</version>
-        <configuration>
-          <extraFiles>
-            <DockerFile>properties</DockerFile>
-          </extraFiles>
-        </configuration>
-      </plugin>
-    </plugins>
+<plugins>
+  <plugin>
+    <groupId>org.codehaus.mojo</groupId>
+    <artifactId>license-maven-plugin</artifactId>
+    <configuration>
+      <extraFiles>
+        <DockerFile>properties</DockerFile>
+      </extraFiles>
+    </configuration>
+  </plugin>
+</plugins>
 ```
 
 Files named **DockerFile** will be treated as properties files (says using the comment style named properties).
@@ -261,19 +253,18 @@ Example
 -------
 
 ```xml
-    <plugins>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>license-maven-plugin</artifactId>
-        <version>${project.version}</version>
-        <configuration>
-          <descriptionTemplate>#[[${basedir}]]#/src/license/myDescriptionTemplate.ftl</descriptionTemplate>
-        </configuration>
-      </plugin>
-    </plugins>
+<plugins>
+  <plugin>
+    <groupId>org.codehaus.mojo</groupId>
+    <artifactId>license-maven-plugin</artifactId>
+    <configuration>
+      <descriptionTemplate>${basedir}/src/license/myDescriptionTemplate.ftl</descriptionTemplate>
+    </configuration>
+  </plugin>
+</plugins>
 ```
 
-With this freemarker template located in `#[[${basedir}/src/license/myDescriptionTemplate.ftl]]#`:
+With this freemarker template located in `${basedir}/src/license/myDescriptionTemplate.ftl`:
 
 ```ftl
 <#-- To render the description of a license file header.
@@ -285,8 +276,9 @@ With this freemarker template located in `#[[${basedir}/src/license/myDescriptio
  - inceptionYear
  - file current file to treat
 -->
-#[[${file.name} - ${projectName} - ${organizationName} - ${inceptionYear}
+${file.name} - ${projectName} - ${organizationName} - ${inceptionYear}
 ${project.groupId}-${project.artifactId}-${project.version}
 $Id$
-$HeadURL$]]#
+$HeadURL$
 ```
+
