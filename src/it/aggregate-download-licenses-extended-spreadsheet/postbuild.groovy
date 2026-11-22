@@ -62,6 +62,9 @@ try (InputStream input = new FileInputStream(excelFile)) {
     assert cells.contains("Maven information")
     assert cells.contains("The Apache Software License, Version 2.0")
     assert cells.contains("The Apache Software Foundation")
+    // the licenseMerges entry folds the two other spellings of the license into the first one
+    assert !cells.contains("Apache License, Version 2.0")
+    assert !cells.contains("Apache Public License 2.0")
 }
 
 // -------------- Calc -----------------

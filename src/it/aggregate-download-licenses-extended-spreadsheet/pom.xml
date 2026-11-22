@@ -66,12 +66,4 @@
       </plugins>
     </pluginManagement>
   </build>
-
-  <dependencies>
-    <dependency>
-      <groupId>org.sonarsource.sonarlint.core</groupId>
-      <artifactId>sonarlint-core</artifactId>
-      <version>9.2.0.74516</version>
-    </dependency>
-  </dependencies>
 </project>
