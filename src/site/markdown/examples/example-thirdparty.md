@@ -1,28 +1,26 @@
----
 title: Thirdparty Licenses Examples
 date: 2013-01-01
----
 
 <!--
-  #%L
-  License Maven Plugin
-  %%
-  Copyright (C) 2008 - 2011 CodeLutin, Codehaus, Tony Chemit
-  %%
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU Lesser General Public License as
-  published by the Free Software Foundation, either version 3 of the
-  License, or (at your option) any later version.
+#%L
+License Maven Plugin
+%%
+Copyright (C) 2008 - 2011 CodeLutin, Codehaus, Tony Chemit
+%%
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
 
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Lesser Public License for more details.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Lesser Public License for more details.
 
-  You should have received a copy of the GNU General Lesser Public
-  License along with this program.  If not, see
-  <http://www.gnu.org/licenses/lgpl-3.0.html>.
-  #L%
+You should have received a copy of the GNU General Lesser Public
+License along with this program.  If not, see
+<http://www.gnu.org/licenses/lgpl-3.0.html>.
+#L%
 -->
 
 Third-party
@@ -92,7 +90,7 @@ It is possible to improve the THIRD-PARTY file :
 - Fill back missing license for dependencies.
 - Merge licenses (same license but named differently in dependencies poms).
 
-#[[### Add missing licenses]]#
+### Add missing licenses
 
 While using configuration's property **useMissingfile** on third-party goals, it will create (or read for aggregate) a file located from property **missingFile** (by default **src/license/THIRD-PARTY.properties**).
 
@@ -100,7 +98,7 @@ In this file, we find dependencies with no license, you just have to fill correc
 
 Once the file filled, just relaunch the goal to integrate your modifications in the generated **THIRD-PARTY** file.
 
-#[[#### Example]]#
+#### Example
 
 Given a pom with these dependencies :
 
@@ -172,13 +170,13 @@ List of 2 third-party dependencies.
  (The Apache Software License, Version 2.0) Unnamed - commons-primitives:commons-primitives:jar:1.0 (commons-primitives:commons-primitives:1.0 - no url defined)
 ```
 
-#[[### Merge licenses.]]#
+### Merge licenses.
 
 To merge licenses added in **THIRD-PARTY** file, you have to add a **licenseMerges** to the plugin this configuration :
 
 Each entry of **licenseMerges** describe a merge, the first license is the one to keep.
 
-#[[#### Example]]#
+#### Example
 
 Given a pom with these dependencies :
 
@@ -222,26 +220,25 @@ List of 2 third-party dependencies.
 Now, adds this configuration in your pom
 
 ```xml
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>license-maven-plugin</artifactId>
-          <version>${project.version}</version>
-          <executions>
-            <execution>
-              <id>default-cli</id>
-              <configuration>
-                <licenseMerges>
-                  <licenseMerge>The Apache Software License, Version 2.0|Apache License, Version 2.0|Apache Public License 2.0</licenseMerge>
-                </licenseMerges>
-              </configuration>
-            </execution>
-          </executions>
-        </plugin>
-        ...
-      </plugins>
-    </pluginManagement>
+<pluginManagement>
+  <plugins>
+    <plugin>
+      <groupId>org.codehaus.mojo</groupId>
+      <artifactId>license-maven-plugin</artifactId>
+      <executions>
+        <execution>
+          <id>default-cli</id>
+          <configuration>
+            <licenseMerges>
+              <licenseMerge>The Apache Software License, Version 2.0|Apache License, Version 2.0|Apache Public License 2.0</licenseMerge>
+            </licenseMerges>
+          </configuration>
+        </execution>
+      </executions>
+    </plugin>
+    ...
+  </plugins>
+</pluginManagement>
 ```
 
 and relaunch the goal, we now obtain the following **THIRD-PARTY** file :
@@ -257,27 +254,26 @@ List of 2 third-party dependencies.
 Note: From version *1.4*, you can have split a license merge into some entries (before a destination license should be unique), you can now write:
 
 ```xml
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>license-maven-plugin</artifactId>
-          <version>${project.version}</version>
-          <executions>
-            <execution>
-              <id>default-cli</id>
-              <configuration>
-                <licenseMerges>
-                  <licenseMerge>The Apache Software License, Version 2.0|Apache License, Version 2.0</licenseMerge>
-                  <licenseMerge>The Apache Software License, Version 2.0|Apache Public License 2.0</licenseMerge>
-                </licenseMerges>
-              </configuration>
-            </execution>
-          </executions>
-        </plugin>
-        ...
-      </plugins>
-    </pluginManagement>
+<pluginManagement>
+  <plugins>
+    <plugin>
+      <groupId>org.codehaus.mojo</groupId>
+      <artifactId>license-maven-plugin</artifactId>
+      <executions>
+        <execution>
+          <id>default-cli</id>
+          <configuration>
+            <licenseMerges>
+              <licenseMerge>The Apache Software License, Version 2.0|Apache License, Version 2.0</licenseMerge>
+              <licenseMerge>The Apache Software License, Version 2.0|Apache Public License 2.0</licenseMerge>
+            </licenseMerges>
+          </configuration>
+        </execution>
+      </executions>
+    </plugin>
+    ...
+  </plugins>
+</pluginManagement>
 ```
 
 Note': From version *1.4* extra space before and after a license are ignored so you can have also this configuration:
@@ -288,7 +284,6 @@ Note': From version *1.4* extra space before and after a license are ignored so 
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>license-maven-plugin</artifactId>
-          <version>${project.version}</version>
           <executions>
             <execution>
               <id>default-cli</id>
@@ -314,7 +309,7 @@ Note': From version *1.4* extra space before and after a license are ignored so 
     </pluginManagement>
 ```
 
-#[[### Override identified licenses (Since 1.12)]]#
+### Override identified licenses (Since 1.12)
 
 Sometimes, identified licenses are wrong, using the **overrideUrl** permits to fix them.
 
@@ -326,7 +321,7 @@ org.jboss.xnio--xnio-api--3.3.6.Final=The Apache Software License, Version 2.0
 
 The default location of the override file is **src/main/license/override-THIRD-PARTY.properties**.
 
-#[[### Attach missing files to build]]#
+### Attach missing files to build
 
 When your licenses **missing file** is filled for a project, then this file will be attached to the build with a classifier **third-parties** and type **properties**.
 
@@ -342,29 +337,29 @@ Use the **includedLicenses** (whitelist of licenses) or/and **excludedLicenses**
 These parameters contains licenses separated by **`|`**:
 
 ```xml
-  <configuration>
-    ...
-    <includedLicenses>The Apache Software License, Version 2.0|BSD License</includedLicenses>
-    <excludedLicenses>Bad license 1|Bad license 2</excludedLicenses>
-    ...
-    </configuration>
+<configuration>
+  ...
+  <includedLicenses>The Apache Software License, Version 2.0|BSD License</includedLicenses>
+  <excludedLicenses>Bad license 1|Bad license 2</excludedLicenses>
+  ...
+  </configuration>
 ```
 
 Since version *1.4*, you can also use a list format:
 
 ```xml
-  <configuration>
-    ...
-    <includedLicenses>
-      <includedLicense>The Apache Software License, Version 2.0</includedLicense>
-      <includedLicense>BSD License</includedLicense>
-    </includedLicenses>
-    <excludedLicenses>
-      <excludedLicense>Bad license 1</excludedLicense>
-      <excludedLicense>Bad license 2</excludedLicense>
-    </excludedLicenses>
-    ...
-    </configuration>
+<configuration>
+  ...
+  <includedLicenses>
+    <includedLicense>The Apache Software License, Version 2.0</includedLicense>
+    <includedLicense>BSD License</includedLicense>
+  </includedLicenses>
+  <excludedLicenses>
+    <excludedLicense>Bad license 1</excludedLicense>
+    <excludedLicense>Bad license 2</excludedLicense>
+  </excludedLicenses>
+  ...
+  </configuration>
 ```
 
 Note that any extra space at the start or end of a license will be removed.
@@ -390,11 +385,11 @@ Filter the dependencies
 
   Note that the exclude filter prevails on include filter. So, if we include an artifact but exclude its groupId, it will not be referred in THIRD-PARTY file.
 
-#[[### exclude scopes]]#
+### exclude scopes
 
 Using configuration's property **excludedScopes**, will remove from the THIRD-PARTY file all the dependencies coming from the given scopes.
 
-#[[#### Example]]#
+#### Example
 
 Given a pom with these dependencies :
 
@@ -432,11 +427,11 @@ List of 2 third-party dependencies.
  (The Apache Software License, Version 2.0) JHlabs Java Projection Library (com.jhlabs:javaproj:1.0 - http://www.jhlabs.com/java/maps/proj/index.html)
 ```
 
-#[[### include scopes]]#
+### include scopes
 
 Using configuration's property **includedScopes**, will only put in the THIRD-PARTY file all the dependencies coming from the given scopes.
 
-#[[#### Example]]#
+#### Example
 
 Given a pom with these dependencies :
 
@@ -473,11 +468,11 @@ List of 1 third-party dependency.
  (The Apache Software License, Version 2.0) Commons Logging (commons-logging:commons-logging:1.1.1 - http://commons.apache.org/logging)
 ```
 
-#[[### exclude groupIds]]#
+### exclude groupIds
 
 Using configuration's property **excludedGroups**, will remove from the THIRD-PARTY file all the dependencies coming from the given groupIds.
 
-#[[#### Example]]#
+#### Example
 
 Given a pom with these dependencies :
 
@@ -513,11 +508,11 @@ List of 1 third-party dependency.
  (The Apache Software License, Version 2.0) Commons Logging (commons-logging:commons-logging:1.1.1 - http://commons.apache.org/logging)
 ```
 
-#[[### exclude artifactIds]]#
+### exclude artifactIds
 
 Using configuration's property **excludedArtifacts**, will remove from the THIRD-PARTY file all the dependencies coming from the given artifactIds.
 
-#[[#### Example]]#
+#### Example
 
 Given a pom with these dependencies :
 
@@ -554,11 +549,11 @@ List of 2 third-party dependencies.
   (The Apache Software License, Version 2.0) Commons Logging (commons-logging:commons-logging:1.1.1 - http://commons.apache.org/logging)
 ```
 
-#[[### include groupIds]]#
+### include groupIds
 
 Using configuration's property **includedGroups**, will only put in the THIRD-PARTY file all the dependencies coming from the given groupIds.
 
-#[[#### Example]]#
+#### Example
 
 Given a pom with these dependencies :
 
@@ -595,11 +590,11 @@ List of 2 third-party dependencies.
   (The Apache Software License, Version 2.0) JHlabs Java Projection Library (com.jhlabs:javaproj:1.0 - http://www.jhlabs.com/java/maps/proj/index.html)
 ```
 
-#[[### include artifactIds]]#
+### include artifactIds
 
 Using configuration's property **includedArtifacts**, will only put in the THIRD-PARTY file all the dependencies coming from the given artifactIds.
 
-#[[#### Example]]#
+#### Example
 
 Given a pom with these dependencies :
 
@@ -634,3 +629,4 @@ List of 1 third-party dependency.
 
   (Apache License, Version 2.0) JHLabs Image Processing Filters (com.jhlabs:filters:2.0.235 - http://www.jhlabs.com/ip/index.html)
 ```
+

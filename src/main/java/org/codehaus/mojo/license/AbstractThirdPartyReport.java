@@ -83,7 +83,7 @@ public abstract class AbstractThirdPartyReport extends AbstractMavenReport
     /**
      * Get declared proxies from the {@code settings.xml} file.
      *
-     * @since 2.8.1
+     * @since 2.9.0
      */
     @Parameter(defaultValue = "${settings.proxies}", readonly = true)
     private List<Proxy> proxies;

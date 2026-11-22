@@ -1,8 +1,5 @@
----
-
 title: License List Examples
 date: 2011-02-04
-----------------
 
 <!--
 #%L

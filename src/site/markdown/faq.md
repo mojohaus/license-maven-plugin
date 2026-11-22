@@ -1,7 +1,4 @@
----
-
 title: Frequently Asked Questions
----------------------------------
 
 <!--
 #%L
@@ -60,7 +57,7 @@ Mysql does not accept **`---`** as comment (which is used to mark license header
 </extraExtensions>
 ```
 
-[Bug detail.](http://jira.codehaus.org/browse/MLICENSE-56)
+This is issue MLICENSE-56.
 
 <a id="properties_files"></a>
 

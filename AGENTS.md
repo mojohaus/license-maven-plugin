@@ -30,7 +30,7 @@ The repository is a single Maven module, the plugin itself.
   signature, and CI builds on JDK 8 as well as newer JDKs. Code that needs a Java 11 API goes
   into `src/main/java11`; the `java11-mrjar` profile compiles it on JDK 11 and later, and
   surefire then tests the Java 11 classes.
-- The plugin compiles against Maven 3.9.16 (`mavenVersion`) and declares a literal
+- The plugin compiles against `mavenVersion` and declares a literal
   `<prerequisites><maven>3.9.0</maven>`; `minimalMavenBuildVersion` holds the build to the same
   floor. Keep the two apart, so raising `mavenVersion` does not raise the prerequisite.
 - Java sources start with the `package` line followed by the LGPL `#%L` header, as in the
@@ -77,6 +77,26 @@ The repository is a single Maven module, the plugin itself.
   Mockito below 5 because the build and the integration tests run on JDK 8, Maven Resolver below 2
   because 2.x targets Maven 4, and SLF4J below 2 because the Maven 3 runtime does not support SLF4J
   2 providers.
+
+## Documentation updates
+
+A change that users or contributors can notice ships with the documentation it affects, in the same pull
+request. A refactor with no visible effect needs none.
+
+- A new goal, parameter or default: the Javadoc of the mojo field, which becomes the goal page, with `@since`
+  set to the version in which the next release ships, and the goal list in `src/site/markdown/index.md`.
+- New or changed behaviour of a goal: a section on its page under `src/site/markdown/examples`, or in
+  `usage.md` and `faq.md`. The pages are plain Markdown; only the first plugin declaration of `usage.md`
+  carries a version, written as `<version><!-- latest release --></version>`, so no example goes stale.
+- The metadata block of a page (`title:`, `date:`) has no `---` fences: Spotless would turn the closing fence
+  into an underline and the page would render empty.
+- A page added, removed or renamed: the menu in `src/site/site.xml`. Never rename a published page; its URL is
+  linked from elsewhere.
+- The Maven or Java requirement, or how to build and release: `README.md`, and the opening of
+  `src/site/markdown/index.md`.
+- A new convention, build gate or test fixture: this file.
+
+Check the result with `mvn site` and open `target/site/index.html`.
 
 ## Pull requests
 

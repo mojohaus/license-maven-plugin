@@ -1,28 +1,26 @@
----
 title: Download Licenses Examples
 date: 2010-10-16
----
 
 <!--
-  #%L
-  License Maven Plugin
-  %%
-  Copyright (C) 2008 - 2011 CodeLutin, Codehaus, Tony Chemit
-  %%
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU Lesser General Public License as
-  published by the Free Software Foundation, either version 3 of the
-  License, or (at your option) any later version.
+#%L
+License Maven Plugin
+%%
+Copyright (C) 2008 - 2011 CodeLutin, Codehaus, Tony Chemit
+%%
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
 
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Lesser Public License for more details.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Lesser Public License for more details.
 
-  You should have received a copy of the GNU General Lesser Public
-  License along with this program.  If not, see
-  <http://www.gnu.org/licenses/lgpl-3.0.html>.
-  #L%
+You should have received a copy of the GNU General Lesser Public
+License along with this program.  If not, see
+<http://www.gnu.org/licenses/lgpl-3.0.html>.
+#L%
 -->
 
 Download Licenses Examples
@@ -45,7 +43,6 @@ This example shows how to configure the `download-licenses` goal for basic usage
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>license-maven-plugin</artifactId>
-        <version>${project.version}</version>
         <executions>
           <execution>
             <id>download-licenses</id>
@@ -130,6 +127,77 @@ The parameters can also be set on the command line, as `-Dlicense.licenseCacheDi
 
 To share the cache in CI, restore and save `~/.m2/repository/.cache/mojohaus-license-maven-plugin` together with the local repository, or point `licenseCacheDirectory` at a directory your CI caches. The cache may also be filled once and shipped as part of a build image.
 
+Downloading From a Protected Server
+-----------------------------------
+
+A license text that lives on a server that asks for credentials, such as a repository manager, is downloaded with the credentials of a `<server>` entry in `settings.xml`. Name the entry in `serverId` and give the URL prefix that the credentials are meant for in `serverUrl`:
+
+```xml
+<configuration>
+  <serverId>internal-licenses</serverId>
+  <serverUrl>https://artifactory.example.com/artifactory</serverUrl>
+</configuration>
+```
+
+The user name, the password and any custom HTTP headers of the server entry are sent only with requests for URLs that start with `serverUrl`; all other licenses are downloaded without them. The parameters can also be set as `-Dlicense.serverId=...` and `-Dlicense.serverUrl=...`.
+
+Failing the Build
+-----------------
+
+By default the build goes on when a license cannot be downloaded or a dependency has a forbidden license, and the problem shows only in the log and in the summary file. Two parameters turn this into a build failure. Both fail after all dependencies have been processed and the summary files have been written, and the failure names every dependency concerned:
+
+- `failOnMissingLicenseFile` fails when a dependency ends without a license file, for example because the license URL could not be fetched, is relative, or is missing. Dependencies marked as approved in `licensesConfigFile` are not counted.
+- `failOnForbidden` fails when a dependency has a license listed in `forbiddenLicenses`, see [Classifying the Licenses](#Classifying_the_Licenses). A dependency that offers several licenses counts when any one of them is forbidden.
+
+```xml
+<configuration>
+  <forbiddenLicenses>
+    <forbiddenLicense>GNU General Public License v3.0</forbiddenLicense>
+  </forbiddenLicenses>
+  <failOnForbidden>true</failOnForbidden>
+  <failOnMissingLicenseFile>true</failOnMissingLicenseFile>
+</configuration>
+```
+
+Both can be set on the command line, as `-Dlicense.failOnForbidden=true` and `-Dlicense.failOnMissingLicenseFile=true`. What a failed download itself does is decided by `errorRemedy`: `warn` (the default) logs it, `ignore` does not, `failFast` stops at the first one, and `xmlOutput` collects the messages in `licensesErrorsFile` and fails at the end.
+
+Rejecting HTML Pages
+--------------------
+
+Some servers answer a request for a license text with an HTML page, such as a landing page or an error page. These are saved like any other text by default, because many licenses are published only as HTML. Set `rejectHtmlLicenseTexts` to `true` to treat a response that is an HTML page, by its `Content-Type` or by the start of its body, as a failed download. No file is written, and `errorRemedy` decides between a warning and a failure. The command-line property is `-Dlicense.rejectHtmlLicenseTexts=true`.
+
+Choosing the License URL by Name
+--------------------------------
+
+`licenseNameUrlOverrides` replaces the URL that a dependency declares for its license by a URL of your choice, chosen by the name of the license. Each entry holds a regular expression, which is matched case-insensitively against the whole license name in the POM, and the URL to download instead. The first entry that matches wins. This brings all spellings of one license to a single clean text, redirects downloads to an internal mirror, and supplies a URL for a license that has a name but no URL:
+
+```xml
+<configuration>
+  <licenseNameUrlOverrides>
+    <licenseNameUrlOverride>
+      <licenseNamePattern>.*Apache.*2\.0.*</licenseNamePattern>
+      <url>https://nexus.example.com/licenses/apache-2.0.txt</url>
+    </licenseNameUrlOverride>
+    <licenseNameUrlOverride>
+      <licenseNamePattern>\QMIT License\E</licenseNamePattern>
+      <url>https://nexus.example.com/licenses/mit.txt</url>
+    </licenseNameUrlOverride>
+  </licenseNameUrlOverrides>
+</configuration>
+```
+
+The overrides are applied after `licensesConfigFile` and before `licenseUrlReplacements` and `licenseUrlFileNames`.
+
+Hosts That Refuse Requests
+--------------------------
+
+Each request carries a `User-Agent` header that names the plugin, because some license hosts turn away the default one of the Java HTTP client. When a host answers with `429 Too Many Requests` or `503 Service Unavailable`, the plugin sends it no further request during the same execution; later downloads from that host fail at once and the log says why. It does not wait or retry.
+
+Identical License Texts
+-----------------------
+
+Two license names can lead to the same text, for example when two URLs serve the same license with different formatting. The plugin then writes the text once and the second license points at the same file; the report keeps the name each dependency declares. The log says when this happens. This does not apply to the bundled texts, which keep their own file names.
+
 Sorting the Report
 ------------------
 
@@ -143,13 +211,13 @@ The dependencies appear in the order they were resolved in, which changes as the
 
 The parameter takes one of the following values, and can also be set on the command line as `-Dlicense.orderBy=dependencyName`:
 
-| Value | Description |
-| --- | --- |
-| `none` | The order the dependencies were resolved in. The default. |
+|      Value       |                                                                             Description                                                                              |
+|------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `none`           | The order the dependencies were resolved in. The default.                                                                                                            |
 | `dependencyName` | The name the dependency gives itself in its POM. Falls back to the artifact id for dependencies without a name, and for every dependency when `extendedInfo` is off. |
-| `dependencyGav` | The group id, artifact id and version. |
-| `licenseName` | The license. Dependencies with more than one license are ordered by the alphabetically first of them, dependencies without a license come last. |
-| `licenseMatch` | How the license compares against the lists described in [Classifying the Licenses](#Classifying_the_Licenses), worst first. |
+| `dependencyGav`  | The group id, artifact id and version.                                                                                                                               |
+| `licenseName`    | The license. Dependencies with more than one license are ordered by the alphabetically first of them, dependencies without a license come last.                      |
+| `licenseMatch`   | How the license compares against the lists described in [Classifying the Licenses](#Classifying_the_Licenses), worst first.                                          |
 
 Dependencies that compare equal are ordered by group id, artifact id and version, so the report is the same on every run.
 

@@ -1,39 +1,37 @@
----
 title: Usage
 date: 2010-10-16
----
 
 <!--
-  #%L
-  License Maven Plugin
-  %%
-  Copyright (C) 2008 - 2011 CodeLutin, Codehaus, Tony Chemit
-  %%
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU Lesser General Public License as
-  published by the Free Software Foundation, either version 3 of the
-  License, or (at your option) any later version.
+#%L
+License Maven Plugin
+%%
+Copyright (C) 2008 - 2011 CodeLutin, Codehaus, Tony Chemit
+%%
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
 
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Lesser Public License for more details.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Lesser Public License for more details.
 
-  You should have received a copy of the GNU General Lesser Public
-  License along with this program.  If not, see
-  <http://www.gnu.org/licenses/lgpl-3.0.html>.
-  #L%
+You should have received a copy of the GNU General Lesser Public
+License along with this program.  If not, see
+<http://www.gnu.org/licenses/lgpl-3.0.html>.
+#L%
 -->
 
 Usage
 =====
 
-The License Maven Plugin provides several goals related to licenses in a project. This includes validating/updating license header information in source files, updating the LICENSE.txt file, and retrieving license information from dependencies. The information below should help you to get started. If you have problems using the plugin, please feel free to post your questions to the [user mailing list](./mail-lists.html).
+The License Maven Plugin provides several goals related to licenses in a project. This includes validating/updating license header information in source files, updating the LICENSE.txt file, and retrieving license information from dependencies. The information below should help you to get started. If you have problems using the plugin, please feel free to post your questions to the [user mailing list](./mailing-lists.html).
 
 Getting Plugin Configuration Information
 ----------------------------------------
 
-#[[### license-list goal]]#
+### license-list goal
 
 This goal displays a list of available licenses.
 
@@ -51,7 +49,7 @@ mvn license:license-list -Ddetail
 
 For more information, see the [examples](./examples/example-license-list.html) and for full detail see [detail page](./license-list-mojo.html).
 
-#[[### comment-style-list goal]]#
+### comment-style-list goal
 
 This goal displays the available comment styles to box file header.
 
@@ -69,7 +67,7 @@ mvn license:comment-style-list -Ddetail
 
 For more information, see the [examples](./examples/example-comment-style-list.html) and for full detail see [detail page](./comment-style-list-mojo.html).
 
-#[[### help goal]]#
+### help goal
 
 This goal display the help of the plugin (available goals).
 
@@ -90,7 +88,7 @@ for full detail see [detail page](./help-mojo.html).
 Updating and checking License Information
 -----------------------------------------
 
-#[[### update-project-license goal]]#
+### update-project-license goal
 
 This goal creates or updates the LICENSE.txt file and adds it in the build.
 
@@ -98,19 +96,19 @@ It can also generate a bundle License file to avoid name collision in a final ap
 
 For full detail see [detail page](./update-project-license-mojo.html).
 
-#[[### check-project-license goal]]#
+### check-project-license goal
 
 This checks existing of the LICENSE.txt.
 
 For full detail see [detail page](./check-project-license-mojo.html).
 
-#[[### update-file-header goal]]#
+### update-file-header goal
 
 This goal adds or updates the license header based on the configuration.
 
 For more information, see the [examples](./examples/update-file-header-config.html) and for full detail on the configuration see [detail page](./update-file-header-mojo.html).
 
-#[[### check-file-header goal]]#
+### check-file-header goal
 
 This goal checks the license header based on the configuration on project sources files.
 
@@ -121,7 +119,7 @@ This goal has same behaviour as the update-file-header with *dryRun* option.
 Getting Dependency License Information
 --------------------------------------
 
-#[[### add-third-party goal]]#
+### add-third-party goal
 
 This goal builds the THIRD-PARTY.txt file and adds it in the build.
 
@@ -131,7 +129,7 @@ We are also able to consolidate the generated file by filling another file (the 
 
 For more information, see the [examples](./examples/example-thirdparty.html) and for full details see [the add third party mojo page](./add-third-party-mojo.html).
 
-#[[### aggregate-add-third-party goal]]#
+### aggregate-add-third-party goal
 
 This goal builds the THIRD-PARTY.txt file on a multi-module project from the dependencies of all its modules.
 
@@ -139,7 +137,7 @@ This goal builds the THIRD-PARTY.txt file on a multi-module project from the dep
 
 For more information, see the [examples](./examples/example-thirdparty.html) and for full detail see [the aggregate add third party mojo page](./aggregate-add-third-party-mojo.html).
 
-#[[### download-licenses goal]]#
+### download-licenses goal
 
 The License Maven Plugin can download dependency license files and generate an XML report of the licenses. Example configuration is listed below, and more information is available in the [examples page](./examples/example-download-licenses.html).
 
@@ -153,7 +151,7 @@ By default the plugin attaches to the `generate-resources` phase of the build li
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>license-maven-plugin</artifactId>
-        <version>${project.version}</version>
+        <version><!-- latest release --></version>
         <executions>
           <execution>
             <id>download-licenses</id>
@@ -176,9 +174,9 @@ Next run your build:
 mvn package
 ```
 
-For the `download-licenses` goal, licenses will by default be downloaded into the directory `target/licenses`. This can be configured using the `licensesOutputDirectory` parameter.
+For the `download-licenses` goal, licenses will by default be downloaded into the directory `target/generated-resources/licenses`. This can be configured using the `licensesOutputDirectory` parameter.
 
-#[[### aggregate-download-licenses goal]]#
+### aggregate-download-licenses goal
 
 The aggregate version of the download-licenses goal.
 
@@ -192,7 +190,6 @@ By default the plugin attaches to the `generate-resources` phase of the build li
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>license-maven-plugin</artifactId>
-        <version>${project.version}</version>
         <executions>
           <execution>
             <id>aggregate-download-licenses</id>
@@ -215,4 +212,4 @@ Next run your build:
 mvn package
 ```
 
-For the `download-licenses` goal, licenses will by default be downloaded into the directory `target/licenses`. This can be configured using the `licensesOutputDirectory` parameter.
+For the `download-licenses` goal, licenses will by default be downloaded into the directory `target/generated-resources/licenses`. This can be configured using the `licensesOutputDirectory` parameter.
