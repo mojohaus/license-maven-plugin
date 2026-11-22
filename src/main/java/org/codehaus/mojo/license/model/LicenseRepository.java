@@ -189,7 +189,14 @@ public class LicenseRepository implements Iterable<License> {
 
     protected boolean checkExists(URL url) throws IOException {
         URLConnection openConnection = url.openConnection();
-        return openConnection.getContentLength() > 0;
+        int contentLength = openConnection.getContentLength();
+        // a file: connection keeps the file open once it is connected, and Windows then cannot delete it
+        try {
+            openConnection.getInputStream().close();
+        } catch (IOException e) {
+            // the resource does not exist, and the content length says so
+        }
+        return contentLength > 0;
     }
 
     protected void checkInit(String operation) {
