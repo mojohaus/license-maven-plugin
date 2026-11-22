@@ -40,6 +40,11 @@ The repository is a single Maven module, the plugin itself.
 
 - JUnit 5 with Mockito 4. There is no plugin testing harness: tests construct the mojos and
   helpers directly and mock their collaborators.
+- `MojoTestSupport` sets a mojo's parameters the way Maven does, from the generated plugin
+  descriptor (plugin configuration, then the property expression, then the default), so a mojo test
+  sees the `@Parameter` defaults. It reads `target/classes/META-INF/maven/plugin.xml`, which
+  `process-classes` generates. `UpdateFileHeaderMojoTest` uses it, with its fixtures in
+  `src/test/resources/update-file-header`.
 - Prefer a unit test. Add an integration test only for what needs a real Maven build: dependency
   resolution, reactor and aggregate goals, the site report, or files written into a project.
 

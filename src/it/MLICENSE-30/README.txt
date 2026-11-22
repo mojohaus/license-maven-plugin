@@ -1,1 +1,0 @@
-To test the MLICENSE-30 improvement (customize description) (see http://jira.codehaus.org/browse/MLICENSE-30)

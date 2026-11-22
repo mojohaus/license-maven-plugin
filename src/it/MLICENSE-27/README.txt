@@ -1,1 +1,0 @@
-To test the MLICENSE-27 improvement (configure header model) (see http://jira.codehaus.org/browse/MLICENSE-27)
