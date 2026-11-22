@@ -1,1 +1,0 @@
-To fix MLICENSE-44 bug (see http://jira.codehaus.org/browse/MLICENSE-44)
