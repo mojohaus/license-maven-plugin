@@ -326,9 +326,20 @@ public abstract class AbstractLicenseNameMojo extends AbstractLicenseMojo {
                         .toAbsolutePath()
                         .normalize();
                 if (modulePath.startsWith(rootPath) && !modulePath.equals(rootPath)) {
-                    String pattern = rootPath.relativize(modulePath).toString() + "/**";
+                    String pattern =
+                            rootPath.relativize(modulePath).toString().replace(File.separatorChar, '/') + "/**";
                     scanExcludes.add(pattern);
                     excludedModules.add(module);
+                }
+            }
+            String buildDirectory = getProject().getBuild().getDirectory();
+            if (buildDirectory != null) {
+                Path buildPath =
+                        new File(buildDirectory).toPath().toAbsolutePath().normalize();
+                if (buildPath.startsWith(rootPath) && !buildPath.equals(rootPath)) {
+                    scanExcludes.add(
+                            rootPath.relativize(buildPath).toString().replace(File.separatorChar, '/') + "/**");
+                    LOG.info("Excluding the project build directory from the license scan in {}", src);
                 }
             }
             if (!excludedModules.isEmpty()) {
