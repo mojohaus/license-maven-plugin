@@ -21,13 +21,13 @@ configureFor(wireMockServer.port())
 
 stubFor(get('/auth-licenses/apache-2.0.txt')
         .willReturn(aResponse()
-                .withStatus(200)
-                .withBody('Apache License 2.0 text served by Authenticated WireMock')))
+        .withStatus(200)
+        .withBody('Apache License 2.0 text served by Authenticated WireMock')))
 
 stubFor(get('/public-licenses/mit.txt')
         .willReturn(aResponse()
-                .withStatus(200)
-                .withBody('MIT License text served by Public WireMock')))
+        .withStatus(200)
+        .withBody('MIT License text served by Public WireMock')))
 
 context.put('wireMockServer', wireMockServer)
 true

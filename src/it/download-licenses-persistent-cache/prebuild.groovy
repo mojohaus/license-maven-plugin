@@ -19,16 +19,16 @@ configureFor(wireMockServer.port())
 
 stubFor(get('/licenses/apache-2.0.txt')
         .willReturn(aResponse()
-                .withStatus(200)
-                .withHeader('Content-Type', 'text/plain; charset=UTF-8')
-                .withHeader('ETag', '"apache-v1"')
-                .withBody('Apache License 2.0 text from the server')))
+        .withStatus(200)
+        .withHeader('Content-Type', 'text/plain; charset=UTF-8')
+        .withHeader('ETag', '"apache-v1"')
+        .withBody('Apache License 2.0 text from the server')))
 
 stubFor(get('/licenses/mit.txt')
         .willReturn(aResponse()
-                .withStatus(200)
-                .withHeader('Content-Type', 'text/plain; charset=UTF-8')
-                .withBody('MIT License text from the server')))
+        .withStatus(200)
+        .withHeader('Content-Type', 'text/plain; charset=UTF-8')
+        .withBody('MIT License text from the server')))
 
 context.put('wireMockServer', wireMockServer)
 true

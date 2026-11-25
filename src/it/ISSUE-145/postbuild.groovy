@@ -21,7 +21,7 @@
  */
 import java.util.jar.JarFile
 
-file = new JarFile(new File(basedir, 'submodule1/target/test-ISSUE-145-submodule1-' + projectVersion + '.jar'));
-expectedLibPath = 'org/codehaus/mojo/license/AnImportantDependency.class';
-assert file.getJarEntry(expectedLibPath) != null;
-return true;
+file = new JarFile(new File(basedir, 'submodule1/target/test-ISSUE-145-submodule1-' + projectVersion + '.jar'))
+expectedLibPath = 'org/codehaus/mojo/license/AnImportantDependency.class'
+assert file.getJarEntry(expectedLibPath) != null
+return true

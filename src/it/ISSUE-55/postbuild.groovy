@@ -19,20 +19,18 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
-def assertExistsFile(file)
-{
-    if ( !file.exists() || file.isDirectory() )
-    {
+def assertExistsFile(file) {
+    if (!file.exists() || file.isDirectory()) {
         println(file.getAbsolutePath() + " file is missing or a directory.")
         assert false
     }
     assert true
 }
 
-file = new File(basedir, 'target/generated-resources/licenses/bsd 3-clause license w_nuclear disclaimer - license.txt');
-assertExistsFile(file);
+file = new File(basedir, 'target/generated-resources/licenses/bsd 3-clause license w_nuclear disclaimer - license.txt')
+assertExistsFile(file)
 
-file = new File(basedir, 'target/generated-resources/licenses.xml');
-assertExistsFile(file);
+file = new File(basedir, 'target/generated-resources/licenses.xml')
+assertExistsFile(file)
 
-return true;
+return true

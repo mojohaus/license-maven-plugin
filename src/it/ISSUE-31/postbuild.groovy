@@ -20,14 +20,14 @@
  * #L%
  */
 
-file = new File(basedir, 'child2/src/main/java/org/codehaus/mojo/license/test/File1.java');
-assert file.isFile();
+file = new File(basedir, 'child2/src/main/java/org/codehaus/mojo/license/test/File1.java')
+assert file.isFile()
 
-content = file.text;
-assert content.contains('License from classpath header.');
+content = file.text
+assert content.contains('License from classpath header.')
 
-file = new File(basedir, 'child2/LICENSE.txt');
-assert file.isFile();
+file = new File(basedir, 'child2/LICENSE.txt')
+assert file.isFile()
 
-content = file.text;
-assert content.contains('Full License from classpath.');
+content = file.text
+assert content.contains('Full License from classpath.')

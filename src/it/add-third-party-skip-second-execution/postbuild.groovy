@@ -20,10 +20,10 @@
  * #L%
  */
 
-file = new File(basedir, 'build.log');
-assert file.exists();
-content = file.text;
-assert 1 == content.count('[INFO] Writing third-party file to');
-assert 1 == content.count('[INFO] Writing bundled third-party file to');
-assert 1 == content.count('[INFO] All files are up to date, skip goal execution.');
-assert 2 == content.count('[INFO] BUILD SUCCESS');
+file = new File(basedir, 'build.log')
+assert file.exists()
+content = file.text
+assert 1 == content.count('[INFO] Writing third-party file to')
+assert 1 == content.count('[INFO] Writing bundled third-party file to')
+assert 1 == content.count('[INFO] All files are up to date, skip goal execution.')
+assert 2 == content.count('[INFO] BUILD SUCCESS')

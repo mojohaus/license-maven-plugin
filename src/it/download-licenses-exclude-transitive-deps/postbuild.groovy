@@ -19,33 +19,29 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
-def assertExistsFile(file)
-{
-    if ( !file.exists() || file.isDirectory() )
-    {
+def assertExistsFile(file) {
+    if (!file.exists() || file.isDirectory()) {
         println(file.getAbsolutePath() + " file is missing or a directory.")
         assert false
     }
     assert true
 }
 
-def assertNotExistsFile(file)
-{
-  if ( file.exists() )
-  {
-    println(file.getAbsolutePath() + " file should not exists.")
-    assert false
-  }
-  assert true
+def assertNotExistsFile(file) {
+    if (file.exists()) {
+        println(file.getAbsolutePath() + " file should not exists.")
+        assert false
+    }
+    assert true
 }
 
-file = new File(basedir, 'target/generated-resources/licenses/eclipse public license 1.0 - epl-v10.html');
-assertExistsFile(file);
+file = new File(basedir, 'target/generated-resources/licenses/eclipse public license 1.0 - epl-v10.html')
+assertExistsFile(file)
 
-file = new File(basedir, 'target/generated-resources/licenses/lgpl - lgpl-2.1.txt');
-assertNotExistsFile(file);
+file = new File(basedir, 'target/generated-resources/licenses/lgpl - lgpl-2.1.txt')
+assertNotExistsFile(file)
 
-file = new File(basedir, 'target/generated-resources/licenses.xml');
-assertExistsFile(file);
+file = new File(basedir, 'target/generated-resources/licenses.xml')
+assertExistsFile(file)
 
-return true;
+return true

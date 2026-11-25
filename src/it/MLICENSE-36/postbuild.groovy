@@ -20,9 +20,9 @@
  * #L%
  */
 
-file = new File(basedir, 'target/generated-sources/license/THIRD-PARTY.txt');
-assert file.exists();
-content = file.text;
-assert content.contains('The project has no dependencies in my project.');
+file = new File(basedir, 'target/generated-sources/license/THIRD-PARTY.txt')
+assert file.exists()
+content = file.text
+assert content.contains('The project has no dependencies in my project.')
 
-return true;
+return true

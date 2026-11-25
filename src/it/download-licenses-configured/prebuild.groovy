@@ -20,13 +20,13 @@
  * #L%
  */
 
-import java.nio.file.Path;
-import java.nio.file.Files;
+import java.nio.file.Path
+import java.nio.file.Files
 
 final Path basePath = basedir.toPath()
 
 final String baseUri = basePath.toUri().toString()
-final Path sanitizesConfigPath = basePath.resolve('src/license/licenses-config-content-sanitizers.xml');
+final Path sanitizesConfigPath = basePath.resolve('src/license/licenses-config-content-sanitizers.xml')
 String sanitizersConfigContent = new String(Files.readAllBytes(sanitizesConfigPath), 'utf-8')
 sanitizersConfigContent = sanitizersConfigContent.replace('%project.baseUri%', baseUri)
 Files.write(sanitizesConfigPath, sanitizersConfigContent.getBytes('utf-8'))

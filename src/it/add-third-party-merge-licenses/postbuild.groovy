@@ -21,20 +21,20 @@
  */
 
 def checkThirdPartyFile(filePath) {
-  file = new File(basedir, filePath);
-  assert file.isFile();
+    file = new File(basedir, filePath)
+    assert file.isFile()
 
-  content = file.text;
-  assert !content.contains('the project has no dependencies.');
-  assert !content.contains('(Apache License, Version 2.0)');
-  assert !content.contains('(Apache Public License 2.0)');
-  assert content.contains('(The Apache Software License, Version 2.0)');
-  assert content.contains('(The Apache Software License, Version 2.0) Commons Logging (commons-logging:commons-logging:1.1.1 - http://commons.apache.org/logging)');
-  assert content.contains('(The Apache Software License, Version 2.0) JHLabs Image Processing Filters (com.jhlabs:filters:2.0.235 - http://www.jhlabs.com/ip/index.html)');
-  assert content.contains('(The Apache Software License, Version 2.0) Plexus Cipher: encryption/decryption Component (org.sonatype.plexus:plexus-cipher:1.4 - http://spice.sonatype.org/plexus-cipher)');
+    content = file.text
+    assert !content.contains('the project has no dependencies.')
+    assert !content.contains('(Apache License, Version 2.0)')
+    assert !content.contains('(Apache Public License 2.0)')
+    assert content.contains('(The Apache Software License, Version 2.0)')
+    assert content.contains('(The Apache Software License, Version 2.0) Commons Logging (commons-logging:commons-logging:1.1.1 - http://commons.apache.org/logging)')
+    assert content.contains('(The Apache Software License, Version 2.0) JHLabs Image Processing Filters (com.jhlabs:filters:2.0.235 - http://www.jhlabs.com/ip/index.html)')
+    assert content.contains('(The Apache Software License, Version 2.0) Plexus Cipher: encryption/decryption Component (org.sonatype.plexus:plexus-cipher:1.4 - http://spice.sonatype.org/plexus-cipher)')
 }
 
-checkThirdPartyFile('target/generated-sources/license/THIRD-PARTY-singleList.txt');
-checkThirdPartyFile('target/generated-sources/license/THIRD-PARTY-singleListSplit.txt');
-checkThirdPartyFile('target/generated-sources/license/THIRD-PARTY-twoList.txt');
-checkThirdPartyFile('target/generated-sources/license/THIRD-PARTY-twoListSplit.txt');
+checkThirdPartyFile('target/generated-sources/license/THIRD-PARTY-singleList.txt')
+checkThirdPartyFile('target/generated-sources/license/THIRD-PARTY-singleListSplit.txt')
+checkThirdPartyFile('target/generated-sources/license/THIRD-PARTY-twoList.txt')
+checkThirdPartyFile('target/generated-sources/license/THIRD-PARTY-twoListSplit.txt')

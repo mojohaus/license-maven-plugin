@@ -20,10 +20,10 @@
  * #L%
  */
 
-file = new File(basedir, 'target/generated-sources/org/example/test/SampleFile.java');
-assert file.exists();
-content = file.text;
+file = new File(basedir, 'target/generated-sources/org/example/test/SampleFile.java')
+assert file.exists()
+content = file.text
 
-assert content.contains('Copyright (C) 2023 org.example');
+assert content.contains('Copyright (C) 2023 org.example')
 
-return true;
+return true

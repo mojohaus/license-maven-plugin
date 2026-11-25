@@ -20,9 +20,9 @@
  * #L%
  */
 
-file = new File(basedir, 'target/generated-sources/license/THIRD-PARTY.txt');
-assert file.isFile();
+file = new File(basedir, 'target/generated-sources/license/THIRD-PARTY.txt')
+assert file.isFile()
 
-content = file.text;
-assert content.contains('groovy:groovy-all:1.0-jsr-04');
-assert content.contains('nanocontainer:nanocontainer-remoting:1.0-RC-1');
+content = file.text
+assert content.contains('groovy:groovy-all:1.0-jsr-04')
+assert content.contains('nanocontainer:nanocontainer-remoting:1.0-RC-1')

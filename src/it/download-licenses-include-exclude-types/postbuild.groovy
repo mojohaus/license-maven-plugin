@@ -21,46 +21,42 @@
  */
 import com.github.tomakehurst.wiremock.WireMockServer
 
-def assertExistsFile(file)
-{
-    if ( !file.exists() || file.isDirectory() )
-    {
+def assertExistsFile(file) {
+    if (!file.exists() || file.isDirectory()) {
         println(file.getAbsolutePath() + " file is missing or a directory.")
         assert false
     }
     assert true
 }
 
-def assertNotExistsFile(file)
-{
-  if ( file.exists() )
-  {
-    println(file.getAbsolutePath() + " file should not exists.")
-    assert false
-  }
-  assert true
+def assertNotExistsFile(file) {
+    if (file.exists()) {
+        println(file.getAbsolutePath() + " file should not exists.")
+        assert false
+    }
+    assert true
 }
 
 WireMockServer wireMockServer = context.get("wireMockServer")
 try {
-    file = new File(basedir, 'target/generated-resources/licenses1/eclipse public license 1.0 - epl-v10.html');
-    assertExistsFile(file);
+    file = new File(basedir, 'target/generated-resources/licenses1/eclipse public license 1.0 - epl-v10.html')
+    assertExistsFile(file)
 
-    file = new File(basedir, 'target/generated-resources/licenses2/eclipse public license 1.0 - epl-v10.html');
-    assertNotExistsFile(file);
+    file = new File(basedir, 'target/generated-resources/licenses2/eclipse public license 1.0 - epl-v10.html')
+    assertNotExistsFile(file)
 
-    file = new File(basedir, 'target/generated-resources/licenses1/lgpl - lgpl-2.1.txt');
-    assertNotExistsFile(file);
-    file = new File(basedir, 'target/generated-resources/licenses2/lgpl - lgpl-2.1.txt');
-    assertExistsFile(file);
-    assert file.text.equals('stub license text for ITs');
+    file = new File(basedir, 'target/generated-resources/licenses1/lgpl - lgpl-2.1.txt')
+    assertNotExistsFile(file)
+    file = new File(basedir, 'target/generated-resources/licenses2/lgpl - lgpl-2.1.txt')
+    assertExistsFile(file)
+    assert file.text.equals('stub license text for ITs')
 
-    file = new File(basedir, 'target/generated-resources/licenses1.xml');
-    assertExistsFile(file);
-    file = new File(basedir, 'target/generated-resources/licenses2.xml');
-    assertExistsFile(file);
+    file = new File(basedir, 'target/generated-resources/licenses1.xml')
+    assertExistsFile(file)
+    file = new File(basedir, 'target/generated-resources/licenses2.xml')
+    assertExistsFile(file)
 } finally {
     wireMockServer.stop()
 }
 
-return true;
+return true

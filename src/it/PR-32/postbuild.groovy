@@ -22,9 +22,9 @@
 
 def asl2 = new File(basedir, 'child2/target/generated-resources/licenses/apache license 2.0 - license-2.0.txt')
 assert asl2.exists()
-assert asl2.text.contains('Version 2.0, January 2004');
+assert asl2.text.contains('Version 2.0, January 2004')
 
-def licensesXml = new File(basedir, 'child2/target/generated-resources/licenses.xml');
+def licensesXml = new File(basedir, 'child2/target/generated-resources/licenses.xml')
 assert licensesXml.exists()
 assert licensesXml.text.contains('<file>apache license 2.0 - license-2.0.txt</file>')
 assert licensesXml.text.contains('<url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>')

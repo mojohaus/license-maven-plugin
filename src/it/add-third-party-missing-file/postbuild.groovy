@@ -20,14 +20,14 @@
  * #L%
  */
 
-file = new File(basedir, 'target/generated-sources/license/THIRD-PARTY-by-classpath.txt');
-assert file.exists();
-content = file.text;
-assert content.contains('The JSON License by classpath url');
-assert content.contains('CDDL + GPLv2 with classpath exception by classpath url');
+file = new File(basedir, 'target/generated-sources/license/THIRD-PARTY-by-classpath.txt')
+assert file.exists()
+content = file.text
+assert content.contains('The JSON License by classpath url')
+assert content.contains('CDDL + GPLv2 with classpath exception by classpath url')
 
-file = new File(basedir, 'target/generated-sources/license/THIRD-PARTY-by-file.txt');
-assert file.exists();
-content = file.text;
-assert content.contains('The JSON License by file url');
-assert content.contains('CDDL + GPLv2 with classpath exception by file url');
+file = new File(basedir, 'target/generated-sources/license/THIRD-PARTY-by-file.txt')
+assert file.exists()
+content = file.text
+assert content.contains('The JSON License by file url')
+assert content.contains('CDDL + GPLv2 with classpath exception by file url')

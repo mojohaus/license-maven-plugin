@@ -20,9 +20,9 @@
  * #L%
  */
 
-file = new File(basedir, 'target/generated-sources/license/THIRD-PARTY.txt');
-assert file.isFile();
+file = new File(basedir, 'target/generated-sources/license/THIRD-PARTY.txt')
+assert file.isFile()
 
-content = file.text;
-assert content.contains('Eclipse Public License 1.0');
-assert content.contains('Custom ISSUE-145 license');
+content = file.text
+assert content.contains('Eclipse Public License 1.0')
+assert content.contains('Custom ISSUE-145 license')

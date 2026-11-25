@@ -20,13 +20,15 @@ try {
     wireMockServer.verify(exactly(1), getRequestedFor(urlEqualTo('/licenses/mit.txt')))
 
     // The entries are in the cache directory
-    def entries = new File(basedir, 'license-cache').listFiles({ f -> f.name.endsWith('.entry') } as FileFilter)
+    def entries = new File(basedir, 'license-cache').listFiles({ f ->
+        f.name.endsWith('.entry')
+    } as FileFilter)
     assert entries != null && entries.length == 2 : "cache entries: ${entries}"
 
     def log = new File(basedir, 'build.log').text
     assert log.contains('2 license text(s) from the cache') : 'second run did not report cache use'
     assert log.contains('0 license text(s) from the cache') && log.contains('2 downloaded') :
-            'first run did not report downloads'
+    'first run did not report downloads'
 } finally {
     wireMockServer.stop()
 }

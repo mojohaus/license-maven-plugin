@@ -20,8 +20,8 @@
  * #L%
  */
 
-import java.nio.file.Path;
-import java.nio.file.Files;
+import java.nio.file.Path
+import java.nio.file.Files
 
 final Path basePath = basedir.toPath()
 

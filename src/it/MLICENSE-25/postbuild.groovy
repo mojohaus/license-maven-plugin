@@ -20,18 +20,18 @@
  * #L%
  */
 
-File target = new File(basedir, "target");
-File defaultThirdPartyFile = new File(target, "THIRD-PARTY.txt");
-File otherThirdPartyFile = new File(target, "THIRD-PARTY-for-pom.txt");
+File target = new File(basedir, "target")
+File defaultThirdPartyFile = new File(target, "THIRD-PARTY.txt")
+File otherThirdPartyFile = new File(target, "THIRD-PARTY-for-pom.txt")
 
-assert target.isDirectory();
-assert !defaultThirdPartyFile.exists();
-assert otherThirdPartyFile.isFile();
+assert target.isDirectory()
+assert !defaultThirdPartyFile.exists()
+assert otherThirdPartyFile.isFile()
 
 String content = otherThirdPartyFile.text
 
 String[] expectedContents = ["commons-logging:commons-logging:1.1.1"]
 
 for (expected in expectedContents) {
-  assert content.contains(expected)
+    assert content.contains(expected)
 }

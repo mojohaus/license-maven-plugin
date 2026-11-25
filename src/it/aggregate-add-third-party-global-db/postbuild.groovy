@@ -20,11 +20,11 @@
  * #L%
  */
 
-file = new File(basedir, 'target/generated-sources/license/THIRD-PARTY.txt');
-assert file.exists();
-content = file.text;
-assert !content.contains('the project has no dependencies.');
-assert content.contains('(The Apache Software License, Version 2.0) Spring O/X Mapping (org.springframework.ws:spring-oxm:1.5.8 - no url defined)');
+file = new File(basedir, 'target/generated-sources/license/THIRD-PARTY.txt')
+assert file.exists()
+content = file.text
+assert !content.contains('the project has no dependencies.')
+assert content.contains('(The Apache Software License, Version 2.0) Spring O/X Mapping (org.springframework.ws:spring-oxm:1.5.8 - no url defined)')
 
 
-return true;
+return true

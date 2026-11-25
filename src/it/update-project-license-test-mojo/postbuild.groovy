@@ -20,28 +20,28 @@
  * #L%
  */
 
-file = new File(basedir, 'LICENSE.txt');
-assert file.exists();
+file = new File(basedir, 'LICENSE.txt')
+assert file.exists()
 
-content = file.text;
-assert !content.contains(';; This line will be removed!');
-assert !content.contains('GNU LESSER GENERAL PUBLIC LICENSE');
-assert content.contains('GNU GENERAL PUBLIC LICENSE');
+content = file.text
+assert !content.contains(';; This line will be removed!')
+assert !content.contains('GNU LESSER GENERAL PUBLIC LICENSE')
+assert content.contains('GNU GENERAL PUBLIC LICENSE')
 
-file = new File(basedir, 'target/generated-sources/license/LICENSE.txt');
-assert file.exists();
+file = new File(basedir, 'target/generated-sources/license/LICENSE.txt')
+assert file.exists()
 
-content = file.text;
-assert !content.contains(';; This line will be removed!');
-assert !content.contains('GNU LESSER GENERAL PUBLIC LICENSE');
-assert content.contains('GNU GENERAL PUBLIC LICENSE');
+content = file.text
+assert !content.contains(';; This line will be removed!')
+assert !content.contains('GNU LESSER GENERAL PUBLIC LICENSE')
+assert content.contains('GNU GENERAL PUBLIC LICENSE')
 
-file = new File(basedir, 'target/generated-sources/license/META-INF/bundleLicense.txt');
-assert file.exists();
+file = new File(basedir, 'target/generated-sources/license/META-INF/bundleLicense.txt')
+assert file.exists()
 
-content = file.text;
-assert !content.contains(';; This line will be removed!');
-assert !content.contains('GNU LESSER GENERAL PUBLIC LICENSE');
-assert content.contains('GNU GENERAL PUBLIC LICENSE');
+content = file.text
+assert !content.contains(';; This line will be removed!')
+assert !content.contains('GNU LESSER GENERAL PUBLIC LICENSE')
+assert content.contains('GNU GENERAL PUBLIC LICENSE')
 
-return true;
+return true
