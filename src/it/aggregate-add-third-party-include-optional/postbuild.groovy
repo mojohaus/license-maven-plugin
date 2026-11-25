@@ -20,10 +20,10 @@
  * #L%
  */
 
-file = new File(basedir, 'target/generated-sources/license/THIRD-PARTY.txt');
-assert file.exists();
-content = file.text;
+file = new File(basedir, 'target/generated-sources/license/THIRD-PARTY.txt')
+assert file.exists()
+content = file.text
 
-assert !content.contains('the project has no dependencies.');
-assert content.contains('com.jhlabs:filters:2.0.235');
-assert content.contains('commons-logging:commons-logging:1.1.1');
+assert !content.contains('the project has no dependencies.')
+assert content.contains('com.jhlabs:filters:2.0.235')
+assert content.contains('commons-logging:commons-logging:1.1.1')

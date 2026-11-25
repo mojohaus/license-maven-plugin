@@ -19,35 +19,31 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
-def assertExistsFile(file)
-{
-    if ( !file.exists() || file.isDirectory() )
-    {
+def assertExistsFile(file) {
+    if (!file.exists() || file.isDirectory()) {
         println(file.getAbsolutePath() + " file is missing or a directory.")
         assert false
     }
     assert true
 }
 
-def assertContains(file, content, expected)
-{
-    if ( !content.contains(expected) )
-    {
+def assertContains(file, content, expected) {
+    if (!content.contains(expected)) {
         println(expected + " was not found in file [" + file + "]\n :" + content)
         assert false
     }
     assert true
 }
 
-file = new File(basedir, 'target/generated-resources/licenses/eclipse public license 1.0 - epl-v10.html');
-assertExistsFile(file);
+file = new File(basedir, 'target/generated-resources/licenses/eclipse public license 1.0 - epl-v10.html')
+assertExistsFile(file)
 
-def licenseFile = new File(basedir, 'target/generated-resources/licenses.xml');
-assertExistsFile(licenseFile);
+def licenseFile = new File(basedir, 'target/generated-resources/licenses.xml')
+assertExistsFile(licenseFile)
 // -Dlicense.orderBy=dependencyName puts hamcrest-core before junit, the reverse of the order the two are
 // resolved in, so this also fails if the property is not picked up at all.
-String expectedContent = new File(basedir, 'expected_licenses.xml').getText('UTF-8');
-String actualContent = licenseFile.getText('UTF-8');
+String expectedContent = new File(basedir, 'expected_licenses.xml').getText('UTF-8')
+String actualContent = licenseFile.getText('UTF-8')
 assert expectedContent == actualContent : "${licenseFile} has unexpected content"
 
-return true;
+return true

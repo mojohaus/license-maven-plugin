@@ -20,16 +20,16 @@
  * #L%
  */
 
-file = new File(basedir, 'child1/target/generated-sources/license/THIRD-PARTY.txt');
-assert !file.exists();
+file = new File(basedir, 'child1/target/generated-sources/license/THIRD-PARTY.txt')
+assert !file.exists()
 
-file = new File(basedir, 'child2/target/generated-sources/license/THIRD-PARTY.txt');
-assert !file.exists();
+file = new File(basedir, 'child2/target/generated-sources/license/THIRD-PARTY.txt')
+assert !file.exists()
 
-file = new File(basedir, 'target/generated-sources/license/THIRD-PARTY.txt');
-assert file.isFile();
-content = file.text;
+file = new File(basedir, 'target/generated-sources/license/THIRD-PARTY.txt')
+assert file.isFile()
+content = file.text
 
-assert !content.contains('the project has no dependencies.');
-assert content.contains('(The Apache Software License, Version 2.0) Commons Logging (commons-logging:commons-logging:1.1.1 - http://commons.apache.org/logging)');
-assert content.contains('(The Apache Software License, Version 2.0) commons-primitives (commons-primitives:commons-primitives:1.0 - no url defined)');
+assert !content.contains('the project has no dependencies.')
+assert content.contains('(The Apache Software License, Version 2.0) Commons Logging (commons-logging:commons-logging:1.1.1 - http://commons.apache.org/logging)')
+assert content.contains('(The Apache Software License, Version 2.0) commons-primitives (commons-primitives:commons-primitives:1.0 - no url defined)')

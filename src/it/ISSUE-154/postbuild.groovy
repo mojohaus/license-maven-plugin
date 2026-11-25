@@ -20,10 +20,10 @@
  * #L%
  */
 
-file = new File(basedir, 'target/licenses.xml');
-expectedFile = new File(basedir, 'expected_licenses.xml');
-assert expectedFile.text.equals(file.text);
+file = new File(basedir, 'target/licenses.xml')
+expectedFile = new File(basedir, 'expected_licenses.xml')
+assert expectedFile.text.equals(file.text)
 
-licenseFile = new File(basedir, 'target/generated-resources/licenses/public domain - alternative.txt');
-expectedLicenseTxt = new File(basedir, 'src/alternative.txt');
-assert expectedLicenseTxt.text.equals(licenseFile.text);
+licenseFile = new File(basedir, 'target/generated-resources/licenses/public domain - alternative.txt')
+expectedLicenseTxt = new File(basedir, 'src/alternative.txt')
+assert expectedLicenseTxt.text.equals(licenseFile.text)

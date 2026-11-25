@@ -20,11 +20,11 @@
  * #L%
  */
 
-file = new File(basedir, 'consume-db/target/generated-sources/license/THIRD-PARTY.txt');
-assert file.exists();
-content = file.text;
-assert !content.contains('the project has no dependencies.');
-assert content.contains('(The Apache Software License, Version 2.0)');
+file = new File(basedir, 'consume-db/target/generated-sources/license/THIRD-PARTY.txt')
+assert file.exists()
+content = file.text
+assert !content.contains('the project has no dependencies.')
+assert content.contains('(The Apache Software License, Version 2.0)')
 
 
-return true;
+return true

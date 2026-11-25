@@ -20,27 +20,28 @@
  * #L%
  */
 
-file = new File( basedir, 'LICENSE.txt' );
+file = new File(basedir, 'LICENSE.txt')
 assert file.isFile()
 
-String[] notExpectedContents = ["MYLicense!",
-        ";; This line will be removed!1"];
+String[] notExpectedContents = ["MYLicense!", ";; This line will be removed!1"]
 
-String[] expectedContents = ["The License!",
-        "ArtifactId: test-update-project-license-MLICENSE-92",
-        "Property versionId: 1.0.a",
-        "ProjectName: License Test :: update-project-license-MLICENSE-92",
-        "OrganisationName: License Test",
-        "CopyrightYear: 2013",
-        "CopyrightOwners: copyrightOwners",
-        "ExtraParam: myValue"];
+String[] expectedContents = [
+    "The License!",
+    "ArtifactId: test-update-project-license-MLICENSE-92",
+    "Property versionId: 1.0.a",
+    "ProjectName: License Test :: update-project-license-MLICENSE-92",
+    "OrganisationName: License Test",
+    "CopyrightYear: 2013",
+    "CopyrightOwners: copyrightOwners",
+    "ExtraParam: myValue"
+]
 
-content = file.text;
+content = file.text
 
 for (expected in notExpectedContents) {
-  assert !content.contains(expected)
+    assert !content.contains(expected)
 }
 
 for (expected in expectedContents) {
-  assert content.contains(expected)
+    assert content.contains(expected)
 }

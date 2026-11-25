@@ -20,8 +20,8 @@
  * #L%
  */
 
-file = new File(basedir, 'src/main/java/org/codehaus/mojo/HelloWorld.java');
-assert file.isFile();
+file = new File(basedir, 'src/main/java/org/codehaus/mojo/HelloWorld.java')
+assert file.isFile()
 
-content = file.text;
-assert !content.contains('#%L');
+content = file.text
+assert !content.contains('#%L')

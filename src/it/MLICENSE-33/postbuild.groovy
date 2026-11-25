@@ -20,20 +20,22 @@
  * #L%
  */
 
-File target = new File(basedir, "target");
-File defaultThirdPartyFile = new File(target, "generated-sources/license/THIRD-PARTY.txt");
-File reportThirdPartyFile = new File(target, "site/third-party-report.html");
+File target = new File(basedir, "target")
+File defaultThirdPartyFile = new File(target, "generated-sources/license/THIRD-PARTY.txt")
+File reportThirdPartyFile = new File(target, "site/third-party-report.html")
 
-assert target.isDirectory();
-assert defaultThirdPartyFile.isFile();
-assert reportThirdPartyFile.isFile();
+assert target.isDirectory()
+assert defaultThirdPartyFile.isFile()
+assert reportThirdPartyFile.isFile()
 
 String content = reportThirdPartyFile.text
 
-String[] expectedContents = ["commons-logging:commons-logging:1.1.1",
-        "commons-primitives:commons-primitives:1.0",
-        "woodstox:wstx-asl:3.2.7"]
+String[] expectedContents = [
+    "commons-logging:commons-logging:1.1.1",
+    "commons-primitives:commons-primitives:1.0",
+    "woodstox:wstx-asl:3.2.7"
+]
 
 for (expected in expectedContents) {
-  assert content.contains(expected)
+    assert content.contains(expected)
 }

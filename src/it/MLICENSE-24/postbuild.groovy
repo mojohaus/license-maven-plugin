@@ -23,32 +23,32 @@
  * #L%
  */
 
-file = new File(basedir, 'target/generated-resources/licenses-excludedScope.xml');
-assert file.exists();
-content = file.text;
-assert !content.contains('the project has no dependencies.');
-assert content.contains('commons-logging');
-assert content.contains('nuiton-utils');
-assert content.contains('nuiton-i18n');
-assert content.contains('maven-helper-plugin');
-assert !content.contains('junit');
+file = new File(basedir, 'target/generated-resources/licenses-excludedScope.xml')
+assert file.exists()
+content = file.text
+assert !content.contains('the project has no dependencies.')
+assert content.contains('commons-logging')
+assert content.contains('nuiton-utils')
+assert content.contains('nuiton-i18n')
+assert content.contains('maven-helper-plugin')
+assert !content.contains('junit')
 
-file = new File(basedir, 'target/generated-resources/licenses-includedScope.xml');
-assert file.exists();
-content = file.text;
-assert !content.contains('commons-logging');
-assert !content.contains('nuiton-utils');
-assert !content.contains('nuiton-i18n');
-assert !content.contains('maven-helper-plugin');
-assert content.contains('junit');
+file = new File(basedir, 'target/generated-resources/licenses-includedScope.xml')
+assert file.exists()
+content = file.text
+assert !content.contains('commons-logging')
+assert !content.contains('nuiton-utils')
+assert !content.contains('nuiton-i18n')
+assert !content.contains('maven-helper-plugin')
+assert content.contains('junit')
 
-file = new File(basedir, 'target/generated-resources/licenses-includedScope2.xml');
-assert file.exists();
-content = file.text;
-assert content.contains('commons-logging');
-assert !content.contains('nuiton-utils');
-assert !content.contains('nuiton-i18n');
-assert !content.contains('maven-helper-plugin');
-assert content.contains('junit');
+file = new File(basedir, 'target/generated-resources/licenses-includedScope2.xml')
+assert file.exists()
+content = file.text
+assert content.contains('commons-logging')
+assert !content.contains('nuiton-utils')
+assert !content.contains('nuiton-i18n')
+assert !content.contains('maven-helper-plugin')
+assert content.contains('junit')
 
-return true;
+return true

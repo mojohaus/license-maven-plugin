@@ -20,52 +20,52 @@
  * #L%
  */
 
-file = new File(basedir, 'LICENSE.html');
-assert file.exists();
+file = new File(basedir, 'LICENSE.html')
+assert file.exists()
 
-content = file.text;
-assert !content.contains(';; This line will be removed!1');
-assert content.contains('<html>');
-assert content.contains('My license!');
-assert content.contains('</html>');
+content = file.text
+assert !content.contains(';; This line will be removed!1')
+assert content.contains('<html>')
+assert content.contains('My license!')
+assert content.contains('</html>')
 
-file = new File(basedir, 'target/generated-sources/license/LICENSE.html');
-assert file.exists();
+file = new File(basedir, 'target/generated-sources/license/LICENSE.html')
+assert file.exists()
 
-content = file.text;
-assert !content.contains(';; This line will be removed!2');
-assert content.contains('<html>');
-assert content.contains('My license!');
-assert content.contains('</html>');
+content = file.text
+assert !content.contains(';; This line will be removed!2')
+assert content.contains('<html>')
+assert content.contains('My license!')
+assert content.contains('</html>')
 
-file = new File(basedir, 'target/generated-sources/license/META-INF/bundleLicense.html');
-assert file.exists();
+file = new File(basedir, 'target/generated-sources/license/META-INF/bundleLicense.html')
+assert file.exists()
 
-content = file.text;
-assert !content.contains(';; This line will be removed!3');
-assert content.contains('<html>');
-assert content.contains('My license!');
-assert content.contains('</html>');
+content = file.text
+assert !content.contains(';; This line will be removed!3')
+assert content.contains('<html>')
+assert content.contains('My license!')
+assert content.contains('</html>')
 
-file = new File(basedir, 'target/classes/LICENSE.html');
-assert file.exists();
+file = new File(basedir, 'target/classes/LICENSE.html')
+assert file.exists()
 
-content = file.text;
-assert !content.contains(';; This line will be removed!4');
-assert content.contains('<html>');
-assert content.contains('My license!');
-assert content.contains('</html>');
-
-
-file = new File(basedir, 'target/classes/META-INF/bundleLicense.html');
-assert file.exists();
-
-content = file.text;
-assert !content.contains(';; This line will be removed!5');
-assert content.contains('<html>');
-assert content.contains('My license!');
-assert content.contains('</html>');
+content = file.text
+assert !content.contains(';; This line will be removed!4')
+assert content.contains('<html>')
+assert content.contains('My license!')
+assert content.contains('</html>')
 
 
+file = new File(basedir, 'target/classes/META-INF/bundleLicense.html')
+assert file.exists()
 
-return true;
+content = file.text
+assert !content.contains(';; This line will be removed!5')
+assert content.contains('<html>')
+assert content.contains('My license!')
+assert content.contains('</html>')
+
+
+
+return true

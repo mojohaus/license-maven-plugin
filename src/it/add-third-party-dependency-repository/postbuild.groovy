@@ -21,11 +21,11 @@
  */
 
 // "hidden" is hosted only by the repository that the POM of "direct" declares
-file = new File(basedir, 'target/generated-sources/license/THIRD-PARTY.txt');
-assert file.exists();
-content = file.text;
-assert content.contains('(Direct License) Direct');
-assert content.contains('(Hidden License) Hidden');
-assert !content.contains('Unknown license');
+file = new File(basedir, 'target/generated-sources/license/THIRD-PARTY.txt')
+assert file.exists()
+content = file.text
+assert content.contains('(Direct License) Direct')
+assert content.contains('(Hidden License) Hidden')
+assert !content.contains('Unknown license')
 
-return true;
+return true

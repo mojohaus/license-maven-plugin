@@ -20,18 +20,18 @@
  * #L%
  */
 
-file = new File(basedir, 'target/generated-sources/license/THIRD-PARTY.txt');
-assert file.exists();
-content = file.text;
+file = new File(basedir, 'target/generated-sources/license/THIRD-PARTY.txt')
+assert file.exists()
+content = file.text
 
-assert !content.contains('the project has no dependencies.');
-assert !content.contains('commons-logging:commons-logging:1.1.1');
-assert !content.contains('commons-primitives:commons-primitives:jar:1.0');
-assert !content.contains('org.nuiton:nuiton-utils:1.4');
-assert !content.contains('org.nuiton.i18n:nuiton-i18n:1.2.2');
-assert !content.contains('junit:junit:3.8.1');
+assert !content.contains('the project has no dependencies.')
+assert !content.contains('commons-logging:commons-logging:1.1.1')
+assert !content.contains('commons-primitives:commons-primitives:jar:1.0')
+assert !content.contains('org.nuiton:nuiton-utils:1.4')
+assert !content.contains('org.nuiton.i18n:nuiton-i18n:1.2.2')
+assert !content.contains('junit:junit:3.8.1')
 
-assert content.contains('org.nuiton:maven-helper-plugin:1.2.3');
-assert content.contains('junit:junit:4.13.1');
+assert content.contains('org.nuiton:maven-helper-plugin:1.2.3')
+assert content.contains('junit:junit:4.13.1')
 
 return true

@@ -19,30 +19,26 @@
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  * #L%
  */
-def assertExistsFile(file)
-{
-    if ( !file.exists() || file.isDirectory() )
-    {
+def assertExistsFile(file) {
+    if (!file.exists() || file.isDirectory()) {
         println(file.getAbsolutePath() + " file is missing or a directory.")
         assert false
     }
     assert true
 }
 
-def assertContains(file, content, expected)
-{
-    if ( !content.contains(expected) )
-    {
+def assertContains(file, content, expected) {
+    if (!content.contains(expected)) {
         println(expected + " was not found in file [" + file + "]\n :" + content)
         assert false
     }
     assert true
 }
 
-file = new File(basedir, 'licenseout/the apache software license, version 2.0 - license-2.0.txt');
-assertExistsFile(file);
+file = new File(basedir, 'licenseout/the apache software license, version 2.0 - license-2.0.txt')
+assertExistsFile(file)
 
-file = new File(basedir, 'licensesout.xml');
-assertExistsFile(file);
+file = new File(basedir, 'licensesout.xml')
+assertExistsFile(file)
 
-return true;
+return true

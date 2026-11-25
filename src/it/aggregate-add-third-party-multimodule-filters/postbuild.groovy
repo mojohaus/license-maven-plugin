@@ -20,13 +20,13 @@
  * #L%
  */
 
-file = new File(basedir, 'target/generated-sources/license/THIRD-PARTY.txt');
-assert file.exists();
-content = file.text;
-assert !content.contains('the project has no dependencies.');
-assert !content.contains('commons-logging:commons-logging:1.1.1');
-assert !content.contains('org.nuiton:nuiton-utils:1.4');
-assert content.contains('org.nuiton.i18n:nuiton-i18n:1.2.2');
-assert content.contains('junit:junit');
+file = new File(basedir, 'target/generated-sources/license/THIRD-PARTY.txt')
+assert file.exists()
+content = file.text
+assert !content.contains('the project has no dependencies.')
+assert !content.contains('commons-logging:commons-logging:1.1.1')
+assert !content.contains('org.nuiton:nuiton-utils:1.4')
+assert content.contains('org.nuiton.i18n:nuiton-i18n:1.2.2')
+assert content.contains('junit:junit')
 
 return true
