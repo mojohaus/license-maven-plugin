@@ -581,7 +581,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
      * {@link #okLicenses} are highlighted in the Excel and Calc files as well. Turn this on once the three lists
      * are complete, to see what has slipped through them.
      *
-     * @since 2.9.1
+     * @since 2.10.0
      */
     @Parameter(property = "license.highlightUnknownLicenses", defaultValue = "false")
     private boolean highlightUnknownLicenses;
@@ -592,7 +592,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
      * <p>A border tells the categories apart at a glance. The cost is that when scrolling through a long report, the
      * boxed license of a dependency with several licenses looks like the only one it has.
      *
-     * @since 2.9.1
+     * @since 2.10.0
      */
     @Parameter(property = "license.matchedLicensesHaveBorder", defaultValue = "false")
     private boolean matchedLicensesHaveBorder;
@@ -603,7 +603,7 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
      * <p>They are rarely what a license report is read for, and they are the main reason one dependency takes a
      * dozen rows instead of one. The developer columns stay in place, they are simply empty.
      *
-     * @since 2.9.1
+     * @since 2.10.0
      */
     @Parameter(property = "license.skipDevelopers", defaultValue = "false")
     private boolean skipDevelopers;

@@ -31,7 +31,7 @@ import org.slf4j.Logger;
  * Reuses a previously downloaded license file when a different license name yields byte-identical text apart from
  * formatting. The report keeps the license name; only one file is written to the output directory.
  *
- * @since 2.9.1
+ * @since 2.10.0
  */
 public final class LicenseFileDeduplicator {
 
