@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<licenseSummary>
+  <dependencies>
+    <dependency>
+      <groupId>localhost</groupId>
+      <artifactId>jettison</artifactId>
+      <version>1.1</version>
+      <licenses>
+        <license>
+          <name>Company License</name>
+          <url>file:licenses/first.txt</url>
+        </license>
+      </licenses>
+    </dependency>
+    <dependency>
+      <groupId>localhost</groupId>
+      <artifactId>json</artifactId>
+      <version>20230227</version>
+      <licenses>
+        <license>
+          <name>Company License</name>
+          <url>file:licenses/second.txt</url>
+        </license>
+      </licenses>
+    </dependency>
+  </dependencies>
+</licenseSummary>

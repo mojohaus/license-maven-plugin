@@ -1825,8 +1825,10 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
                                         }
                                     }
                                 }
-                                result = new LicenseFileDeduplicator(cache, LOG)
-                                        .reuseFileWithSameContent(result, licenseUrl, license.getName());
+                                if (!organizeLicensesByDependencies) {
+                                    result = new LicenseFileDeduplicator(cache, LOG)
+                                            .reuseFileWithSameContent(result, licenseUrl, license.getName());
+                                }
                                 handleResult(licenseUrl, result, depProject, license);
                                 cache.put(licenseUrl, result);
                             } else if (licenseOutputFile.exists()) {

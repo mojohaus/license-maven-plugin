@@ -196,7 +196,7 @@ Each request carries a `User-Agent` header that names the plugin, because some l
 Identical License Texts
 -----------------------
 
-Two license names can lead to the same text, for example when two URLs serve the same license with different formatting. The plugin then writes the text once and the second license points at the same file; the report keeps the name each dependency declares. The log says when this happens. This does not apply to the bundled texts, which keep their own file names.
+Two license names can lead to the same text, for example when two URLs serve the same license with different formatting. The plugin then writes the text once and the second license points at the same file; the report keeps the name each dependency declares. The log says when this happens. This does not apply to the bundled texts, which keep their own file names, or when `organizeLicensesByDependencies` is `true`, where every dependency keeps its own file.
 
 Sorting the Report
 ------------------
