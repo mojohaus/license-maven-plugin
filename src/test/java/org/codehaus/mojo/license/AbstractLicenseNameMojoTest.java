@@ -74,6 +74,28 @@ class AbstractLicenseNameMojoTest {
     }
 
     @Test
+    void excludesBuildDirectoryWhenScanningProjectRoot() throws IOException {
+        Files.createDirectories(projectDir.resolve("src"));
+        Files.createDirectories(projectDir.resolve("build-output"));
+        Files.write(projectDir.resolve("src/Example.java"), new byte[0]);
+        Files.write(projectDir.resolve("build-output/generated.java"), new byte[0]);
+
+        MavenProject project = new MavenProject();
+        project.setFile(projectDir.resolve("pom.xml").toFile());
+        project.getBuild().setDirectory(projectDir.resolve("build-output").toString());
+
+        TestMojo mojo = new TestMojo();
+        mojo.project = project;
+
+        Map<File, String[]> files = new HashMap<>();
+        mojo.getFilesToTreatForRoots(new String[] {"**/*"}, null, Arrays.asList(projectDir.toString()), files);
+
+        List<String> included = Arrays.asList(files.get(projectDir.toFile()));
+        assertTrue(included.contains("src" + File.separator + "Example.java"));
+        assertFalse(included.contains("build-output" + File.separator + "generated.java"));
+    }
+
+    @Test
     void doesNotExcludeAnythingWhenNoModulesAreDeclared() throws IOException {
         Files.createDirectories(projectDir.resolve("child"));
         Files.write(projectDir.resolve("pom.xml"), new byte[0]);

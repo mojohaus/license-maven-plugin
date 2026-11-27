@@ -268,7 +268,7 @@ public abstract class AbstractFileHeaderMojo extends AbstractLicenseNameMojo {
      * boundaries, so <code>** /generated/**</code> excludes a directory at any depth where
      * <code>generated/**</code> only matches one directly in a root.
      * <p>
-     * All directories matching project modules will always be automatically excluded.
+     * The project build directory and all directories matching project modules will always be automatically excluded.
      *
      * @since 1.0
      */
