@@ -31,6 +31,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.collections.comparators.ComparatorChain;
 import org.apache.maven.artifact.Artifact;
@@ -173,23 +174,26 @@ public class MojoHelper {
     }
 
     /**
-     * {@link MavenProject#getDependencyArtifacts()} is deprecated.
-     *
-     * <p>
-     * This method checks if the dependency artifacts is {@code null} and returns an empty {@code HashSet} to avoid the
-     * {@code NullPointerException}s caused by the {@link MavenProject#getDependencyArtifacts()} returning {@code null}.
-     * </p>
+     * Returns the direct dependency artifacts without calling {@link MavenProject#getDependencyArtifacts()}, which is
+     * deprecated. Direct dependencies have a trail of the project GAV followed by the dependency GAV; transitive
+     * dependencies have a longer trail.
      *
      * @param project the MavenProject to retrieve artifacts from
-     * @return a HashSet of dependencies or an empty set
+     * @return the direct dependency artifacts, or an empty set if there are none
      */
     public static Set<Artifact> getDependencyArtifacts(MavenProject project) {
-        if (project == null || project.getDependencyArtifacts() == null) {
+        if (project == null) {
+            return Collections.emptySet();
+        }
+        Set<Artifact> dependencies = project.getArtifacts().stream()
+                .filter(artifact -> artifact.getDependencyTrail() != null
+                        && artifact.getDependencyTrail().size() == 2)
+                .collect(Collectors.toSet());
+        if (dependencies.isEmpty()) {
             LOG.warn("");
             LOG.warn("Non-transitive dependencies cannot be found. ");
             LOG.warn("");
-            return Collections.emptySet();
         }
-        return project.getDependencyArtifacts();
+        return dependencies;
     }
 }
