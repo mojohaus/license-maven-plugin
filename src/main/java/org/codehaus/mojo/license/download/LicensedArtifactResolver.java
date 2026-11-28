@@ -24,7 +24,6 @@ package org.codehaus.mojo.license.download;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import java.util.HashMap;
@@ -33,21 +32,16 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.execution.MavenSession;
-import org.apache.maven.model.building.ModelBuildingRequest;
-import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.ProjectBuilder;
-import org.apache.maven.project.ProjectBuildingException;
-import org.apache.maven.project.ProjectBuildingRequest;
 import org.codehaus.mojo.license.api.ArtifactFilters;
 import org.codehaus.mojo.license.api.DefaultThirdPartyTool;
 import org.codehaus.mojo.license.api.MavenProjectDependenciesConfigurator;
 import org.codehaus.mojo.license.api.ResolvedProjectDependencies;
+import org.codehaus.mojo.license.api.ResolverProjectBuilder;
 import org.codehaus.mojo.license.download.LicensedArtifact.Builder;
 import org.codehaus.mojo.license.utils.MojoHelper;
 import org.codehaus.mojo.license.utils.StringToList;
+import org.eclipse.aether.repository.RemoteRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,13 +63,10 @@ public class LicensedArtifactResolver {
             "The pattern specified by expression <%s> seems to be invalid.";
 
     /**
-     * Project builder.
+     * Resolver-based builder for dependency POMs.
      */
     @Inject
-    private ProjectBuilder mavenProjectBuilder;
-
-    @Inject
-    private Provider<MavenSession> mavenSessionProvider;
+    private ResolverProjectBuilder projectBuilder;
 
     // CHECKSTYLE_OFF: MethodLength
     /**
@@ -92,7 +83,7 @@ public class LicensedArtifactResolver {
     public void loadProjectDependencies(
             ResolvedProjectDependencies artifacts,
             MavenProjectDependenciesConfigurator configuration,
-            List<ArtifactRepository> remoteRepositories,
+            List<RemoteRepository> remoteRepositories,
             Map<String, LicensedArtifact> result,
             boolean extendedInfo,
             List<String> licenseMerges) {
@@ -112,16 +103,6 @@ public class LicensedArtifactResolver {
 
         final Map<String, Artifact> excludeArtifacts = new HashMap<>();
         final Map<String, Artifact> includeArtifacts = new HashMap<>();
-
-        ProjectBuildingRequest projectBuildingRequest = new DefaultProjectBuildingRequest(
-                        mavenSessionProvider.get().getProjectBuildingRequest())
-                .setRemoteRepositories(remoteRepositories)
-                .setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL)
-                .setResolveDependencies(false)
-                .setProcessPlugins(false);
-        // The session request carries the reactor project. Leaving it set makes ProjectBuilder return that shared
-        // project instead of building one for the dependency, which corrupts it under -T.
-        projectBuildingRequest.setProject(null);
 
         final Map<String, String> mergedLicenses = buildMergedLicenses(licenseMerges);
 
@@ -155,29 +136,22 @@ public class LicensedArtifactResolver {
             } else {
                 // build project
                 final Builder laBuilder = LicensedArtifact.builder(artifact, extendedInfo);
-                try {
-                    final MavenProject project = mavenProjectBuilder
-                            .build(artifact, true, projectBuildingRequest)
-                            .getProject();
-                    if (extendedInfo) {
-                        laBuilder.setName(project.getName());
-                        laBuilder.setInceptionYear(project.getInceptionYear());
-                        laBuilder.setOrganization(project.getOrganization());
-                        laBuilder.setDevelopers(project.getDevelopers());
-                        laBuilder.setUrl(project.getUrl());
-                        laBuilder.setScm(project.getScm());
+                final MavenProject project = projectBuilder.build(artifact, remoteRepositories);
+                if (extendedInfo) {
+                    laBuilder.setName(project.getName());
+                    laBuilder.setInceptionYear(project.getInceptionYear());
+                    laBuilder.setOrganization(project.getOrganization());
+                    laBuilder.setDevelopers(project.getDevelopers());
+                    laBuilder.setUrl(project.getUrl());
+                    laBuilder.setScm(project.getScm());
+                }
+                List<org.apache.maven.model.License> lics = project.getLicenses();
+                if (lics != null) {
+                    for (org.apache.maven.model.License lic : lics) {
+                        final String mergedLicense = mergedLicenses.getOrDefault(lic.getName(), lic.getName());
+                        laBuilder.license(
+                                new License(mergedLicense, lic.getUrl(), lic.getDistribution(), lic.getComments()));
                     }
-                    List<org.apache.maven.model.License> lics = project.getLicenses();
-                    if (lics != null) {
-                        for (org.apache.maven.model.License lic : lics) {
-                            final String mergedLicense = mergedLicenses.getOrDefault(lic.getName(), lic.getName());
-                            laBuilder.license(
-                                    new License(mergedLicense, lic.getUrl(), lic.getDistribution(), lic.getComments()));
-                        }
-                    }
-                } catch (ProjectBuildingException e) {
-                    laBuilder.errorMessage("Could not create effective POM for '" + id + "': "
-                            + e.getClass().getSimpleName() + ": " + e.getMessage());
                 }
 
                 depMavenProject = laBuilder.build();

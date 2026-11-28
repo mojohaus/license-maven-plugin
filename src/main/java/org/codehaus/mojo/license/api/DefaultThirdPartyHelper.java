@@ -37,7 +37,6 @@ import java.util.concurrent.ConcurrentSkipListMap;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
@@ -73,11 +72,6 @@ public class DefaultThirdPartyHelper implements ThirdPartyHelper {
     private final ThirdPartyTool thirdPartyTool;
 
     /**
-     * List of remote repositories. Same as remoteRepositories, just a different API.
-     */
-    private final List<ArtifactRepository> remoteRepositoriesCoreApi;
-
-    /**
      * List of remote repositories.
      */
     private final List<RemoteRepository> remoteRepositories;
@@ -106,7 +100,6 @@ public class DefaultThirdPartyHelper implements ThirdPartyHelper {
      * @param verbose            Verbose flag
      * @param dependenciesTool   tool to load dependencies
      * @param thirdPartyTool     tool to load third-parties descriptors
-     * @param remoteRepositoriesCoreApi maven remote repositories, in the core api format
      * @param remoteRepositories maven remote repositories
      */
     // CHECKSTYLE_OFF: ParameterNumber
@@ -116,14 +109,12 @@ public class DefaultThirdPartyHelper implements ThirdPartyHelper {
             boolean verbose,
             DependenciesTool dependenciesTool,
             ThirdPartyTool thirdPartyTool,
-            List<ArtifactRepository> remoteRepositoriesCoreApi,
             List<RemoteRepository> remoteRepositories) {
         // CHECKSTYLE_ON: ParameterNumber
         this.project = project;
         this.encoding = encoding;
         this.dependenciesTool = dependenciesTool;
         this.thirdPartyTool = thirdPartyTool;
-        this.remoteRepositoriesCoreApi = remoteRepositoriesCoreApi;
         this.remoteRepositories = remoteRepositories;
         this.thirdPartyTool.setVerbose(verbose);
     }
@@ -143,7 +134,7 @@ public class DefaultThirdPartyHelper implements ThirdPartyHelper {
     public SortedMap<String, MavenProject> loadDependencies(
             MavenProjectDependenciesConfigurator configuration, ResolvedProjectDependencies dependencyArtifacts) {
         return dependenciesTool.loadProjectDependencies(
-                dependencyArtifacts, configuration, remoteRepositoriesCoreApi, getArtifactCache());
+                dependencyArtifacts, configuration, remoteRepositories, getArtifactCache());
     }
 
     /**

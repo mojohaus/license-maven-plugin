@@ -854,7 +854,6 @@ public abstract class AbstractAddThirdPartyMojo extends AbstractLicenseMojo {
                     LOG.isDebugEnabled(),
                     dependenciesTool,
                     thirdPartyTool,
-                    getProject().getRemoteArtifactRepositories(),
                     getProject().getRemoteProjectRepositories());
         }
         return helper;

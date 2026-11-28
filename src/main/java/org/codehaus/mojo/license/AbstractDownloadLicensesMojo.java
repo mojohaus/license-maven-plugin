@@ -49,7 +49,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -89,6 +88,7 @@ import org.codehaus.mojo.license.utils.FileUtil;
 import org.codehaus.mojo.license.utils.HttpClientProxy;
 import org.codehaus.mojo.license.utils.UrlRequester;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.eclipse.aether.repository.RemoteRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -110,8 +110,8 @@ public abstract class AbstractDownloadLicensesMojo extends AbstractLicensesXmlMo
      *
      * @since 1.0
      */
-    @Parameter(defaultValue = "${project.remoteArtifactRepositories}", readonly = true)
-    protected List<ArtifactRepository> remoteRepositories;
+    @Parameter(defaultValue = "${project.remoteProjectRepositories}", readonly = true)
+    protected List<RemoteRepository> remoteRepositories;
 
     // CHECKSTYLE_OFF: LineLength
     /**

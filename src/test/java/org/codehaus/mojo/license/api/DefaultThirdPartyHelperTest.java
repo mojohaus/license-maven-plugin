@@ -62,7 +62,6 @@ class DefaultThirdPartyHelperTest {
                 false,
                 mock(DependenciesTool.class),
                 mock(ThirdPartyTool.class),
-                Collections.emptyList(),
                 Collections.emptyList());
     }
 }
