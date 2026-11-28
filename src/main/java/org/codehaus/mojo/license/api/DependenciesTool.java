@@ -24,11 +24,9 @@ package org.codehaus.mojo.license.api;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -39,15 +37,10 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.execution.MavenSession;
-import org.apache.maven.model.building.ModelBuildingRequest;
-import org.apache.maven.project.DefaultProjectBuildingRequest;
+import org.apache.maven.model.Repository;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.ProjectBuilder;
-import org.apache.maven.project.ProjectBuildingException;
-import org.apache.maven.project.ProjectBuildingRequest;
 import org.codehaus.mojo.license.utils.MojoHelper;
+import org.eclipse.aether.repository.RemoteRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,13 +62,10 @@ public class DependenciesTool {
             "The pattern specified by expression <%s> seems to be invalid.";
 
     /**
-     * Project builder.
+     * Resolver-based builder for dependency POMs.
      */
     @Inject
-    private ProjectBuilder mavenProjectBuilder;
-
-    @Inject
-    private Provider<MavenSession> mavenSessionProvider;
+    private ResolverProjectBuilder projectBuilder;
 
     // CHECKSTYLE_OFF: MethodLength
     /**
@@ -94,7 +84,7 @@ public class DependenciesTool {
     public SortedMap<String, MavenProject> loadProjectDependencies(
             ResolvedProjectDependencies artifacts,
             MavenProjectDependenciesConfigurator configuration,
-            List<ArtifactRepository> remoteRepositories,
+            List<RemoteRepository> remoteRepositories,
             SortedMap<String, MavenProject> cache) {
 
         final ArtifactFilters artifactFilters = configuration.getArtifactFilters();
@@ -122,19 +112,6 @@ public class DependenciesTool {
                 localCache.putAll(cache);
             }
         }
-        ProjectBuildingRequest projectBuildingRequest = new DefaultProjectBuildingRequest(
-                        mavenSessionProvider.get().getProjectBuildingRequest())
-                .setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL)
-                // We already have the relevant part of the dependency tree
-                // Re-resolving risks including e.g. excluded artifacts
-                .setResolveDependencies(false)
-                // We don't care about plugin licensing
-                .setProcessPlugins(false)
-                .setRemoteRepositories(remoteRepositories);
-        // The session request carries the reactor project. Leaving it set makes ProjectBuilder return that shared
-        // project instead of building one for the dependency, which corrupts it under -T.
-        projectBuildingRequest.setProject(null);
-
         // The projects built so far by artifact id: the POM of a dependency may declare the repository of its own
         // dependencies, so the ancestors of an artifact must be built before the artifact.
         final Map<String, MavenProject> builtProjects = new HashMap<>();
@@ -170,30 +147,23 @@ public class DependenciesTool {
             if (depMavenProject != null) {
                 LOG.debug("add dependency [{}] (from cache)", id);
             } else {
-                // build project
+                // build project from its POM, with the repositories declared by the POMs on its dependency trail
+                depMavenProject =
+                        projectBuilder.build(artifact, repositoriesFor(artifact, remoteRepositories, builtProjects));
+                depMavenProject.getArtifact().setScope(artifact.getScope());
 
-                try {
-                    depMavenProject = mavenProjectBuilder
-                            .build(artifact, true, requestFor(artifact, projectBuildingRequest, builtProjects))
-                            .getProject();
-                    depMavenProject.getArtifact().setScope(artifact.getScope());
-
-                    // In case maven-metadata.xml has different artifactId, groupId or version.
-                    if (!depMavenProject.getGroupId().equals(artifact.getGroupId())) {
-                        depMavenProject.setGroupId(artifact.getGroupId());
-                        depMavenProject.getArtifact().setGroupId(artifact.getGroupId());
-                    }
-                    if (!depMavenProject.getArtifactId().equals(artifact.getArtifactId())) {
-                        depMavenProject.setArtifactId(artifact.getArtifactId());
-                        depMavenProject.getArtifact().setArtifactId(artifact.getArtifactId());
-                    }
-                    if (!depMavenProject.getVersion().equals(artifact.getVersion())) {
-                        depMavenProject.setVersion(artifact.getVersion());
-                        depMavenProject.getArtifact().setVersion(artifact.getVersion());
-                    }
-                } catch (ProjectBuildingException e) {
-                    LOG.warn("Unable to obtain POM for artifact: {}", artifact, e);
-                    continue;
+                // In case maven-metadata.xml has different artifactId, groupId or version.
+                if (!depMavenProject.getGroupId().equals(artifact.getGroupId())) {
+                    depMavenProject.setGroupId(artifact.getGroupId());
+                    depMavenProject.getArtifact().setGroupId(artifact.getGroupId());
+                }
+                if (!depMavenProject.getArtifactId().equals(artifact.getArtifactId())) {
+                    depMavenProject.setArtifactId(artifact.getArtifactId());
+                    depMavenProject.getArtifact().setArtifactId(artifact.getArtifactId());
+                }
+                if (!depMavenProject.getVersion().equals(artifact.getVersion())) {
+                    depMavenProject.setVersion(artifact.getVersion());
+                    depMavenProject.getArtifact().setVersion(artifact.getVersion());
                 }
 
                 LOG.debug("add dependency [{}]", id);
@@ -248,37 +218,32 @@ public class DependenciesTool {
 
     /**
      * Maven resolves a dependency from the repositories that the POMs on its way declare. Reading the POM of the
-     * dependency again with the repositories of the project only would not find a POM that is hosted by such a
-     * repository, so the repositories of the artifact and of the projects that lead to it are added to the project
-     * repositories.
+     * dependency with the repositories of the project only would not find a POM that is hosted by such a repository,
+     * so the repositories declared by the POMs that lead to it are added to the project repositories.
      */
-    private static ProjectBuildingRequest requestFor(
-            Artifact artifact, ProjectBuildingRequest request, Map<String, MavenProject> builtProjects) {
-        final Map<String, ArtifactRepository> repositories = new LinkedHashMap<>();
-        addRepositories(repositories, request.getRemoteRepositories());
-        if (artifact.getRepository() != null) {
-            addRepositories(repositories, Collections.singletonList(artifact.getRepository()));
-        }
-        final List<String> trail = artifact.getDependencyTrail();
+    private static List<RemoteRepository> repositoriesFor(
+            Artifact artifact, List<RemoteRepository> remoteRepositories, Map<String, MavenProject> builtProjects) {
+        Map<String, RemoteRepository> repositories = new LinkedHashMap<>();
+        addRepositories(repositories, remoteRepositories);
+        List<String> trail = artifact.getDependencyTrail();
         if (trail != null) {
             // the first element of the trail is the project itself, the last one the artifact
             for (int i = 1; i < trail.size() - 1; i++) {
-                final MavenProject ancestor = builtProjects.get(trail.get(i));
-                if (ancestor != null) {
-                    addRepositories(repositories, ancestor.getRemoteArtifactRepositories());
+                MavenProject ancestor = builtProjects.get(trail.get(i));
+                if (ancestor != null && ancestor.getModel() != null) {
+                    for (Repository repository : ancestor.getModel().getRepositories()) {
+                        repositories.putIfAbsent(
+                                repository.getId(), ResolverProjectBuilder.toRemoteRepository(repository));
+                    }
                 }
             }
         }
-        final List<ArtifactRepository> known = request.getRemoteRepositories();
-        if (known != null && repositories.size() == known.size()) {
-            return request;
-        }
-        return new DefaultProjectBuildingRequest(request).setRemoteRepositories(new ArrayList<>(repositories.values()));
+        return new ArrayList<>(repositories.values());
     }
 
-    private static void addRepositories(Map<String, ArtifactRepository> target, List<ArtifactRepository> repositories) {
+    private static void addRepositories(Map<String, RemoteRepository> target, List<RemoteRepository> repositories) {
         if (repositories != null) {
-            for (ArtifactRepository repository : repositories) {
+            for (RemoteRepository repository : repositories) {
                 target.putIfAbsent(repository.getId(), repository);
             }
         }

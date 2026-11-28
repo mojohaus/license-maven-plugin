@@ -33,7 +33,6 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
@@ -41,6 +40,7 @@ import org.apache.maven.settings.Proxy;
 import org.codehaus.mojo.license.download.LicenseSummaryWriter;
 import org.codehaus.mojo.license.download.LicensedArtifactResolver;
 import org.codehaus.mojo.license.download.ProjectLicenseInfo;
+import org.eclipse.aether.repository.RemoteRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -100,8 +100,8 @@ public abstract class AbstractLicensesXmlMojo extends AbstractMojo {
      *
      * @since 1.0
      */
-    @Parameter(defaultValue = "${project.remoteArtifactRepositories}", readonly = true)
-    protected List<ArtifactRepository> remoteRepositories;
+    @Parameter(defaultValue = "${project.remoteProjectRepositories}", readonly = true)
+    protected List<RemoteRepository> remoteRepositories;
 
     /**
      * The Maven Project Object

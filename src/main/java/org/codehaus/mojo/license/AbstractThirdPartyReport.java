@@ -509,7 +509,6 @@ public abstract class AbstractThirdPartyReport extends AbstractMavenReport
                 LOG.isDebugEnabled(),
                 dependenciesTool,
                 thirdPartyTool,
-                project.getRemoteArtifactRepositories(),
                 project.getRemoteProjectRepositories());
         // load dependencies of the project
         SortedMap<String, MavenProject> projectDependencies =
